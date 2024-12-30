@@ -1,19 +1,26 @@
 Classic = require("Classic")
 
 
-Character = Classic:extend()
-Friendly  = Character:extend()
-Neutral   = Character:extend()
-Ennemy    = Character:extend()
-
-Nitcha    = Character:extend()
-
-function Nitcha:new(x, y)
-  self.x = x or 0
-  self.y = y or 0
+ClassicCharacter = Classic:extend()
+function ClassicCharacter:new()
+  self.sprite = 400
+  self.x = 200
+  self.y = 100
 end
 
-local _nitcha = Nitcha(10, 20)
+ClassicPlayer = ClassicCharacter:extend()
+-- function ClassicPlayer:new()
+--   ClassicCharacter.super:new()
+-- end
+
+
+ClassicNitcha = ClassicPlayer:extend()
+function ClassicNitcha:new()
+  ClassicPlayer.super:new()
+  self.sprite = 1000
+end
+
+Nitcha = ClassicNitcha()
 
 print("Hello World")
-print(_nitcha.x, _nitcha.y)
+print(Nitcha.sprite, Nitcha.x, Nitcha.y)
