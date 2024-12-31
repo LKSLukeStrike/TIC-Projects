@@ -10,5 +10,6 @@ require("includes/Tic")
 
 -- Main
 function TIC()
+    Tic:tick()
     Tic:draw()
 end

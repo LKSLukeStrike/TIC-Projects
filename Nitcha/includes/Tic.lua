@@ -29,21 +29,22 @@ Tic = {
     FRAME00 = 0, -- characters animations
     FRAME01 = 1,
 
-    HIDEN = 0, -- hidden or not
-    HIDEY = 1,
+    HIDENOT = 0, -- hidden or not
+    HIDEYES = 1,
 
     STRESSMIN = 0, -- stress handling
     STRESSMAX = 100,
 
     WEAPONBANK = 448, -- weapons types
-    WEAPONEMPTY = 0,
-    WEAPONMELEE = 1,
-    WEAPONRANGE = 2,
-    WEAPONMAGIC = 3,
-    WEAPONLIGHT = 4,
-    WEAPONALCHE = 5,
+    WEAPONEMPTY = -1,
+    WEAPONMELEE = 0,
+    WEAPONRANGE = 1,
+    WEAPONMAGIC = 2,
+    WEAPONLIGHT = 3,
+    WEAPONALCHE = 4,
 
     STATUSBANK = 480, -- status types
+    STATUSEMPTY = -1,
     STATUSSLEEP = 0,
     STATUSWOUND = 1,
     STATUSALCHE = 2,
@@ -51,10 +52,21 @@ Tic = {
     STATUSDEATH = 4,
 
 
-    -- Log System
+    -- Log System -- store logs to display each frame
     Log = {},
 
+
+    -- Tick System -- loop on the tick from 0-59
+    Tick = 0,
+
 }
+
+
+
+-- Utils
+function Tic:b2i(_boolean) -- convert a boolean to integer 0-1
+    return _boolean and 1 or 0
+end
 
 
 -- Log System
@@ -75,19 +87,18 @@ function Tic:logPrint() -- print the log and clear it
 end
 
 
--- Ticks
-function Tic:getTick() -- at what tick we are from 0 to 59
-    return (time() // 60) % 60
+-- Tick System
+function Tic:tick() -- loop on tick from 0-59 -- to be called in TIC()
+    self.Tick = self.Tick == 59 and 0 or self.Tick + 1
 end
 
 
 function Tic:draw()
-    cls()
-    Tic:logStack("Hello")
-    Tic:logStack("World")
+    local _tick = Tic.Tick
+    local _frame = Tic:b2i(_tick < 50)
+
     Tic:logStack("W: "..Tic.SCREENW)
     Tic:logStack("H: "..Tic.SCREENH)
-    local _tick = Tic.getTick()
     Tic:logStack("T: ".._tick)
     if _tick == 0 then
         Tic:logStack("00: True")
@@ -101,6 +112,12 @@ function Tic:draw()
     end
     if _tick > 59 then
         Tic:logStack("Error !")
+    else
+        Tic:logStack("Ok !")
     end
+    Tic:logStack("Frame ".._frame)
+
+    cls()
     Tic:logPrint()
+    spr(273 + (_frame * 16), 100, 100)
 end
