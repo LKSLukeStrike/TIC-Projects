@@ -1,14 +1,15 @@
 -- title:   Nitcha
 -- author:  LKS
 -- desc:    Nitcha the Drow Adventures
--- script:  lua
 --
--- version: 0.01
+-- version: 0.1
+-- script:  lua
 -- sprites & animations
 
 
 -- Libraries
-Classic = require("libraries/Classic")
+package.path = package.path..";G:/TIC80 1.1/TICProjects/Nitcha/?.lua"
+Classic = require("libs/Classic")
 
 
 -- Constants
