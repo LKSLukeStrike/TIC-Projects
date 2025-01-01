@@ -1,4 +1,7 @@
-Classic = require("Classic")
+-- Packages
+package.path = package.path..";G:/TIC80 1.1/TICProjects/Nitcha/?.lua"
+
+Classic = require("libraries/ext/Classic")
 
 
 ClassicCharacter = Classic:extend()

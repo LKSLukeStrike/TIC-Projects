@@ -1,6 +1,11 @@
 -- Tic object
 -- Instance only once
 -- Contains constants, globals and general functions
+-- 
+
+
+-- Packages
+Nums = require("libraries/lks/Nums")
 
 
 Tic = {
@@ -62,13 +67,6 @@ Tic = {
 }
 
 
-
--- Utils
-function Tic:b2i(_boolean) -- convert a boolean to integer 0-1
-    return _boolean and 1 or 0
-end
-
-
 -- Log System
 function Tic:logClear() -- clear the log
     self.Log = {}
@@ -79,9 +77,9 @@ function Tic:logStack(_item) -- add item to the log
 end
 
 function Tic:logPrint() -- print the log and clear it
-    for _index, _item in ipairs(self.Log) do
-        _index = _index - 1 -- start from 0
-        print(_item, 0, _index * 8) -- one item per "line"
+    for _line, _item in ipairs(self.Log) do
+        _line = _line - 1 -- line start from 0
+        print(_item, 0, _line * 8) -- one item per "line"
       end    
     Tic:logClear()
 end
@@ -93,9 +91,10 @@ function Tic:tick() -- loop on tick from 0-59 -- to be called in TIC()
 end
 
 
+-- Drawing
 function Tic:draw()
     local _tick = Tic.Tick
-    local _frame = Tic:b2i(_tick < 50)
+    local _frame = Nums:yes2int(_tick < 50)
 
     Tic:logStack("W: "..Tic.SCREENW)
     Tic:logStack("H: "..Tic.SCREENH)
@@ -121,3 +120,7 @@ function Tic:draw()
     Tic:logPrint()
     spr(273 + (_frame * 16), 100, 100)
 end
+
+
+-- END
+return Tic

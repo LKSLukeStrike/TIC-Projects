@@ -5,7 +5,7 @@
 
 
 -- Includes
-require("includes/Tic")
+Tic = require("libraries/tic/Tic")
 
 
 -- Main
