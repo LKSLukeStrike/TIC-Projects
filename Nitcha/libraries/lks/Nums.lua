@@ -24,7 +24,16 @@ function Nums:_isFctAny(_num, _fct, ...) -- if _fct true on any ... -- false by 
     return false
 end
 
+function Nums:_isFctAll(_num, _fct, ...) -- if _fct true on all ... -- false by default
+    local _args = {...}
+    if (not _num) or (not _fct) or (#_args == 0) then return false end
+    for _, _val in ipairs(_args) do
+        if not _fct(self, _num, _val) then return false end
+    end
+    return true
+end
 
+-- Simgle
 function Nums:isGT(_num, _val) -- greater than _val
     if (not _num) or (not _val) then return false end
     return _num > _val
@@ -55,7 +64,7 @@ function Nums:isLT(_num, _val) -- lower than _val
     return _num < _val
 end
 
-
+-- Any
 function Nums:isGTAny(_num, ...) -- greater than any ... -- false by default
     local _args = {...}
     if (not _num) or (#_args == 0) then return false end
@@ -90,6 +99,43 @@ function Nums:isLTAny(_num, ...) -- lower than any ... -- false by default
     local _args = {...}
     if (not _num) or (#_args == 0) then return false end
     return self:_isFctAny(_num, self.isLT, table.unpack(_args))
+end
+
+-- All
+function Nums:isGTAll(_num, ...) -- greater than all ... -- false by default
+    local _args = {...}
+    if (not _num) or (#_args == 0) then return false end
+    return self:_isFctAll(_num, self.isGT, table.unpack(_args))
+end
+
+function Nums:isGEAll(_num, ...) -- greater or equals all ... -- false by default
+    local _args = {...}
+    if (not _num) or (#_args == 0) then return false end
+    return self:_isFctAll(_num, self.isGE, table.unpack(_args))
+end
+
+function Nums:isEQAll(_num, ...) -- equals all ... -- false by default
+    local _args = {...}
+    if (not _num) or (#_args == 0) then return false end
+    return self:_isFctAll(_num, self.isEQ, table.unpack(_args))
+end
+
+function Nums:isNEAll(_num, ...) -- not equals all ... -- false by default
+    local _args = {...}
+    if (not _num) or (#_args == 0) then return false end
+    return self:_isFctAll(_num, self.isNE, table.unpack(_args))
+end
+
+function Nums:isLEAll(_num, ...) -- lower or equals all ... -- false by default
+    local _args = {...}
+    if (not _num) or (#_args == 0) then return false end
+    return self:_isFctAll(_num, self.isLE, table.unpack(_args))
+end
+
+function Nums:isLTAll(_num, ...) -- lower than all ... -- false by default
+    local _args = {...}
+    if (not _num) or (#_args == 0) then return false end
+    return self:_isFctAll(_num, self.isLT, table.unpack(_args))
 end
 
 
