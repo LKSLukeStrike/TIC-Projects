@@ -18,25 +18,45 @@ end
 
 
 function Classic:extend()
-  local cls = {}
-  for k, v in pairs(self) do
-    if k:find("__") == 1 then
-      cls[k] = v
+  local _classic = {}
+  for _key, _val in pairs(self) do
+    if _key:find("__") == 1 then
+      _classic[_key] = _val
     end
   end
-  cls.__index = cls
-  cls.super = self
-  setmetatable(cls, self)
-  return cls
+  _classic.__index = _classic
+  _classic.super = self
+  setmetatable(_classic, self)
+  return _classic
 end
 
 
-function Classic:implement(...)
-  for _, cls in pairs({...}) do
-    for k, v in pairs(cls) do
-      if self[k] == nil and type(v) == "function" then
-        self[k] = v
-      end
+-- function Classic:implement(...) -- implement only new functions -- original version
+--   for _, _classic in pairs({...}) do
+--     for _key, _val in pairs(_classic) do
+--       if self[_key] == nil and type(_val) == "function" then
+--         self[_key] = _val
+--       end
+--     end
+--   end
+-- end
+
+
+function Classic:defaultArg(_arg, _default, ...) -- return _arg if _arg exists in allowed ... else return _default
+  for _, _allowed in ipairs({...}) do
+    if _arg == _allowed then return _arg end
+  end
+  return _default
+end
+
+function Classic:implement(_new, _type, ...) -- implement vars or fcts or both (depending of _type) if they exist or not (depending of _new)
+  _new = Classic:defaultArg(_new, "all", "new", "all") -- new = only if not existing, all = even existing
+  _type = Classic:defaultArg(_type, "all", "var", "fct", "all") -- only vars, fcts or all
+  for _, _classic in ipairs({...}) do
+    for _key, _val in pairs(_classic) do
+      if self[_key] ~= nil and _new == "new" then break end
+      if type(_val) == "function" and _type == "vars" then break end
+      self[_key] = _val
     end
   end
 end
@@ -66,4 +86,5 @@ function Classic:__call(...)
 end
 
 
+-- END
 return Classic

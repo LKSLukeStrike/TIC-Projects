@@ -5,7 +5,7 @@
 
 
 -- Includes
-Tic = require("libraries/tic/Tic")
+local Tic = require("libraries/tic/Tic")
 
 
 -- Main

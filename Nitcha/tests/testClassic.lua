@@ -1,7 +1,7 @@
 -- Packages
 package.path = package.path..";G:/TIC80 1.1/TICProjects/Nitcha/?.lua"
 
-Classic = require("libraries/ext/Classic")
+local Classic = require("libraries/ext/Classic")
 
 
 ClassicCharacter = Classic:extend()
@@ -20,7 +20,7 @@ ClassicPlayer = ClassicCharacter:extend()
 ClassicNitcha = ClassicPlayer:extend()
 function ClassicNitcha:new()
   ClassicPlayer.super:new()
-  self.sprite = 1000
+  self.sprite = self.sprite + 1000
 end
 
 Nitcha = ClassicNitcha()
