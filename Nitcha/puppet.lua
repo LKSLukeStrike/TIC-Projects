@@ -34,7 +34,6 @@ local Tic = require("libraries/tic/Tic")
 -- Main
 function TIC()
     Tic:draw()
-    Tic:tick() -- MUST end TIC()
 end
 
 
