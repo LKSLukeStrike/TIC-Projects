@@ -13,7 +13,7 @@ local Classic = {}
 Classic.__index = Classic
 
 
-function Classic:new()
+function Classic:new(...)
 end
 
 
@@ -100,19 +100,21 @@ function Classic:_size() -- size (number of keys) of a classic table
 end
 
 
-function Classic:_keys() -- keys of a classic table
+function Classic:_keys() -- keys of a classic table -- SORTED
   local _result = {}
   for _key, _val in pairs(self) do
     table.insert(_result, _key)
   end
+  table.sort(_result)
   return _result
 end
 
 
-function Classic:_vals() -- vals of a classic table
+function Classic:_vals() -- vals of a classic table -- SORTED
   local _result = {}
-  for _key, _val in pairs(self) do
-    table.insert(_result, _val)
+  local _selfkeys = self:_keys() -- sorted keys
+  for _key, _val in pairs(_selfkeys) do -- _val is the key for self
+    table.insert(_result, self[_val])
   end
   return _result
 end
@@ -125,6 +127,13 @@ function Classic:_copy() -- copy of a classic table
     _result[_key] = _val
   end
   return _result
+end
+
+
+function Classic:argt(_argt) -- set a classic tables key/val from a _argt table
+  for _key, _val in pairs(_argt or {}) do
+    self[_key] = _val
+  end
 end
 
 
