@@ -414,8 +414,8 @@ function CPlayerDwarf:new(_argt)
     CPlayerDwarf.super.new(self, _argt)
     self.colorhairsfg = Tic.COLORRED -- Dwarf colors
     self.colorhairsbg = Tic.COLORORANGE
-    self.colorextra   = Tic.COLOREXTRA
     self.colorskin    = Tic.COLORWHITE
+    self.colorextra   = self.colorskin
     self.coloreyesfg  = Tic.COLORLGREY
     self.coloreyesbg  = Tic.COLORMGREY
     self.colorarmor   = Tic.COLORDGREY
@@ -433,8 +433,8 @@ function CPlayerGnome:new(_argt)
     CPlayerGnome.super.new(self, _argt)
     self.colorhairsfg = Tic.COLORORANGE -- Gnome colors
     self.colorhairsbg = Tic.COLORYELLOW
-    self.colorextra   = Tic.COLOREXTRA
     self.colorskin    = Tic.COLORWHITE
+    self.colorextra   = self.colorskin
     self.coloreyesfg  = Tic.COLORLGREEN
     self.coloreyesbg  = Tic.COLORMGREEN
     self.colorarmor   = Tic.COLORDGREY
@@ -452,8 +452,8 @@ function CPlayerDrowe:new(_argt)
     CPlayerDrowe.super.new(self, _argt)
     self.colorhairsfg = Tic.COLORDGREY -- Drowe colors
     self.colorhairsbg = Tic.COLORMGREY
-    self.colorextra   = Tic.COLOREXTRA
     self.colorskin    = Tic.COLORWHITE
+    self.colorextra   = self.colorskin
     self.coloreyesfg  = Tic.COLORRED
     self.coloreyesbg  = Tic.COLORPURPLE
     self.colorarmor   = Tic.COLORDGREY
@@ -471,8 +471,8 @@ function CPlayerAngel:new(_argt)
     CPlayerAngel.super.new(self, _argt)
     self.colorhairsfg = Tic.COLORMGREY -- Angel colors
     self.colorhairsbg = Tic.COLORWHITE
-    self.colorextra   = Tic.COLORYELLOW
     self.colorskin    = Tic.COLORWHITE
+    self.colorextra   = Tic.COLORYELLOW
     self.coloreyesfg  = Tic.COLORLGREY
     self.coloreyesbg  = Tic.COLORMGREY
     self.colorarmor   = Tic.COLORDGREY
@@ -490,8 +490,8 @@ function CPlayerGogol:new(_argt)
     CPlayerGogol.super.new(self, _argt)
     self.colorhairsfg = Tic.COLORWHITE -- Gogol colors
     self.colorhairsbg = Tic.COLORWHITE
-    self.colorextra   = Tic.COLORMGREY
     self.colorskin    = Tic.COLORWHITE
+    self.colorextra   = Tic.COLORMGREY
     self.coloreyesfg  = Tic.COLORLBLUE
     self.coloreyesbg  = Tic.COLORMBLUE
     self.colorarmor   = Tic.COLORDGREY
@@ -509,8 +509,8 @@ function CPlayerHorne:new(_argt)
     CPlayerHorne.super.new(self, _argt)
     self.colorhairsfg = Tic.COLORPURPLE -- Horne colors
     self.colorhairsbg = Tic.COLORRED
-    self.colorextra   = Tic.COLORDGREY
     self.colorskin    = Tic.COLORWHITE
+    self.colorextra   = Tic.COLORDGREY
     self.coloreyesfg  = Tic.COLORLGREY
     self.coloreyesbg  = Tic.COLORMGREY
     self.colorarmor   = Tic.COLORDGREY
@@ -564,34 +564,31 @@ local CEnnemy = CCharacter:extend() -- ennemy characters
 
 
 -- Characters
--- local Truduk = CPlayerDwarf()
--- local Prinnn = CPlayerGnome()
--- local Kaptan = CPlayerMeduz()
--- local Kaptin = CPlayerMeduz()
--- Kaptin.colorhairsbg = Tic.COLORLBLUE
--- Kaptin.colorhairsfg = Tic.COLORMBLUE
--- local Nitcha = CPlayerDrowe()
--- local Zariel = CPlayerAngel()
--- local Zikkow = CPlayerTifel()
--- Zikkow.colorhairsbg = Tic.COLORMGREEN
--- Zikkow.colorhairsfg = Tic.COLORDGREEN
--- Zikkow.colorextra   = Tic.COLORMGREY
--- Zikkow.coloreyesbg  = Tic.COLORMGREEN
--- Zikkow.coloreyesfg  = Tic.COLORLGREEN
--- local Zikkow = CPlayerTifel({
---     colorhairsbg = Tic.COLORMGREEN,
---     colorhairsfg = Tic.COLORDGREEN,
---     colorextra   = Tic.COLORMGREY,
---     coloreyesbg  = Tic.COLORMGREEN,
---     coloreyesfg  = Tic.COLORLGREEN,
--- })
--- local Daemok = CPlayerDemon()
+local Truduk = CPlayerDwarf()
+local Prinnn = CPlayerGnome()
+local Kaptan = CPlayerMeduz()
+local Kaptin = CPlayerMeduz()
+Kaptin:argt({
+    colorhairsbg = Tic.COLORLBLUE,
+    colorhairsfg = Tic.COLORMBLUE,
+})
+local Nitcha = CPlayerDrowe()
+local Zariel = CPlayerAngel()
+local Zikkow = CPlayerTifel()
+Zikkow:argt({
+    colorhairsbg = Tic.COLORMGREEN,
+    colorhairsfg = Tic.COLORDGREEN,
+    colorextra   = Tic.COLORMGREY,
+    coloreyesbg  = Tic.COLORORANGE,
+    coloreyesfg  = Tic.COLORYELLOW,
+})
+local Daemok = CPlayerDemon()
 local Golith = CPlayerGogol()
-Golith.test = 1
+-- Tic:trace(Golith:_size())
+-- Tic:trace(table.unpack(Golith:_keys()))
+-- Tic:trace(table.unpack(Golith:_vals()))
 
-Tic:trace("Golith", Golith, #Golith)
--- Tic:traceTable(Golith)
-exit()
+-- exit()
 
 -- Drawing
 function Tic:draw()
@@ -603,9 +600,9 @@ function Tic:draw()
 
     cls()
 
-    local _scale = Tic.SPRITESCALE01
-    -- local _scale = Tic.SPRITESCALE02
-    local _screenx = 100
+    -- local _scale = Tic.SPRITESCALE01
+    local _scale = Tic.SPRITESCALE02
+    local _screenx = 50
     local _screeny = 0
     for _, _character in ipairs(Tic.Players) do
         _character.scale = _scale
