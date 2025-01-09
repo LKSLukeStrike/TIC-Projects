@@ -141,24 +141,39 @@ function Tic:tickCycle() -- cycle on tick from 0-59 -- to be called in Tic.draw(
 end
 
 
+-- Players System -- add new players to a players stack
+Tic.Players = {}
+Tic.CurrentPlayer = 0
+function Tic:playerStack(_player) -- set the current player to the last added
+    table.insert(Tic.Players, _player)
+    Tic.CurrentPlayer = #Tic.Players
+end
+
+
 -- Trace
 function Tic:trace(...) -- trace with multiple args
     local _args = {...}
-    local _item = ""
-    for _, _val in ipairs(_args) do
-        _val = _val or "NIL"
-        if type(_val) == "table" then
-            Tic:traceTable(_val)
-        else
-            _item = _item.._val.." "
-        end
+    local _output = ""
+    for _, _val in pairs(_args) do
+        _val = (type(_val) == "table" or type(_val) == "function") and type(_val) or _val -- for concat
+        _output = _output.._val.." "
     end
-    trace(_item)
+    trace(_output)
 end
 
-function Tic:traceTable(_table) -- trace a table keys, vals and vals types
-    for _key, _val in pairs(_table) do
-        Tic:trace(_key, _val, type(_val))
+function Tic:traceTable(_table, _sort, _recurse) -- trace a table keys, vals and vals types -- sorted if any
+    if type(_table) ~= "table" then return end
+    Tic:trace(type(_table))
+    Tic:trace(#_table)
+    local _worktable = {table.unpack(_table)} -- work on a copy
+    Tic:trace(#_worktable)
+    if _sort then table.sort(_worktable) end -- sort if any
+    for _key, _val in pairs(_worktable) do
+        if type(_val) == "table" and _recurse then
+            Tic:traceTable(_val, _sort, _recurse)
+        else
+            Tic:trace(_key, _val, type(_val))
+        end
     end
 end
 
@@ -170,8 +185,8 @@ end
 local CSprite = Classic:extend() -- general sprites
 CSprite.SPRITEBANK = 0
 
-function CSprite:new()
-    CSprite.super.new(self)
+function CSprite:new(_argt)
+    CSprite.super.new(self, _argt)
     self.spritebank = CSprite.SPRITEBANK
     self.sprite = self.spritebank -- initial sprite number
     self.screenx = 0 -- screen positions
@@ -187,8 +202,6 @@ end
 
 function CSprite:draw(_offset) -- draw a sprite -- use offset for frames
     _offset = _offset or 0
-    Tic:logStack("XY:", self.screenx, self.screeny)
-    Tic:logStack("SO:", self.sprite, _offset)
     for _key, _val in pairs(self.palettemap or {}) do -- swap palette colors if any
         poke4(Tic.PALETTEMAP + _key, _val)
     end
@@ -211,9 +224,8 @@ end
 
 local CSpriteBG = CSprite:extend() --bg sprites aka tic tiles
 
-function CSpriteBG:new()
-    CSpriteBG.super.new(self)
-    Tic:trace("CSpriteBG", self.sprite, type(self))
+function CSpriteBG:new(_argt)
+    CSpriteBG.super.new(self, _argt)
 end
 
 
@@ -229,18 +241,17 @@ CSpriteFG.HEADANGEL   = CSpriteFG.HEADBANK + 4
 CSpriteFG.HEADHORNE   = CSpriteFG.HEADBANK + 5
 CSpriteFG.HEADMEDUZ   = CSpriteFG.HEADBANK + 6
 
-function CSpriteFG:new()
-    CSpriteFG.super.new(self)
+function CSpriteFG:new(_argt)
+    CSpriteFG.super.new(self, _argt)
     self.spritebank = CSpriteFG.SPRITEBANK
     self.sprite = self.spritebank
-    Tic:trace("CSpriteFG", self.sprite, type(self))
 end
 
 
 local CSpriteFGPaletteMap = CSpriteFG:extend() --fg sprites with a palette map
 
-function CSpriteFGPaletteMap:new()
-    CSpriteFGPaletteMap.super.new(self)
+function CSpriteFGPaletteMap:new(_argt)
+    CSpriteFGPaletteMap.super.new(self, _argt)
     self.palettemap = {} -- empty by default, can be filled later
 end
 
@@ -249,11 +260,10 @@ local CEntity = Classic:extend() -- general entities like places, objects, chara
 CEntity.WORLDX = 0
 CEntity.WORLDY = 0
 
-function CEntity:new()
-    CEntity.super.new(self)
+function CEntity:new(_argt)
+    CEntity.super.new(self, _argt)
     self.worldx = CEntity.WORLDX -- world positions
     self.worldy = CEntity.WORLDY
-    Tic:trace("CSpriteFG", self.sprite, type(self))
 end
 
 
@@ -267,8 +277,8 @@ CCharacter.SIZES = 2
 CCharacter.BODYHUMANOID = 394 -- sprite for humanoid bodies
 CCharacter.HEADSPRITE = 377 -- initial head sprite (middle)
 
-function CCharacter:new()
-    CCharacter.super.new(self)
+function CCharacter:new(_argt)
+    CCharacter.super.new(self, _argt)
     self.size = CCharacter.SIZEM
     self.screenx = 100
     self.screeny = 100
@@ -294,28 +304,30 @@ function CCharacter:new()
     self.eyesfgsprite.sprite = CSpriteFG.SPRITEPIXEL
     self.eyesbgsprite = CSpriteFGPaletteMap() -- character eyes fg
     self.eyesbgsprite.sprite = CSpriteFG.SPRITEPIXEL
+    for _argk, _argv in pairs(_argt or {}) do -- override if any
+        -- Tic:trace(type(self))
+        -- Tic:trace(_argk, _argv)
+        -- self[_argk] = _argv
+    end
+    Tic:traceTable(_argt, true)
 end
 
 function CCharacter:draw()
-    Tic:logStack("DRAW:", self.bodysprite.sprite, self.screenx, self.screeny)
-    -- CCharacter:drawWeapon()
-    -- CCharacter:drawShield()
+    self:_drawWeapon()
+    self:_drawShield()
     self:_drawBody()
     self:_drawHead()
     self:_drawEyes()
-    -- CCharacter:drawStatus()
+    self:_drawStatus()
 end
 
-function CCharacter:drawWeapon()
-    -- Tic:logStack("WEAPON:")
+function CCharacter:_drawWeapon()
 end
 
-function CCharacter:drawShield()
-    -- Tic:logStack("SHIELD:")
+function CCharacter:_drawShield()
 end
 
 function CCharacter:_drawBody()
-    Tic:logStack("BODY:", self.bodysprite.sprite)
     local _offset = (Tic.Tick // 30) * 16 -- body offset -- TODO
 
     self.bodysprite.screenx = self.screenx -- apply screen positions and scale to the bodysprite
@@ -330,8 +342,6 @@ function CCharacter:_drawBody()
 end
 
 function CCharacter:_drawHead()
-    Tic:logStack("HEAD:", self.headsprite.sprite)
-
     self.headsprite.screenx = self.screenx -- apply screen positions and scale to the headsprite
     self.headsprite.screeny = self.screeny + (self.size * self.scale) -- adjust the head y position
     self.headsprite.scale = self.scale
@@ -344,13 +354,11 @@ function CCharacter:_drawHead()
 end
 
 function CCharacter:_drawEyes()
-    Tic:logStack("EYES:", self.eyesbgsprite.sprite)
     self:_drawEyesFG()
     self:_drawEyesBG()
 end
 
-function CCharacter:drawStatus()
-    -- Tic:logStack("STATUS:")
+function CCharacter:_drawStatus()
 end
 
 
@@ -384,25 +392,26 @@ function CCharacterHumanoid:_drawEyesBG() -- draw bg eyes depending on dir h v
 end
 
 
-local CPlayer = CCharacter:extend() -- player characters
+local IPlayer = CCharacter:extend() -- players characters interface
 
-function CPlayer:new()
-    CPlayer.super.new(self)
-    -- Tic:trace("CPlayer", self.bodysprite, type(self))
+function IPlayer:playerStack()
+    Tic:playerStack(self) -- record the new player on tic
 end
 
 
 local CPlayerHumanoid = CCharacterHumanoid:extend() -- humanoid player characters
+CPlayerHumanoid:implement(IPlayer)
 
-function CPlayerHumanoid:new()
-    CPlayerHumanoid.super.new(self)
+function CPlayerHumanoid:new(_argt)
+    CPlayerHumanoid.super.new(self, _argt)
+    self:playerStack()
 end
 
 
 local CPlayerDwarf = CPlayerHumanoid:extend() -- Dwarf player characters
 
-function CPlayerDwarf:new()
-    CPlayerDwarf.super.new(self)
+function CPlayerDwarf:new(_argt)
+    CPlayerDwarf.super.new(self, _argt)
     self.colorhairsfg = Tic.COLORRED -- Dwarf colors
     self.colorhairsbg = Tic.COLORORANGE
     self.colorextra   = Tic.COLOREXTRA
@@ -420,8 +429,8 @@ end
 
 local CPlayerGnome = CPlayerHumanoid:extend() -- Gnome player characters
 
-function CPlayerGnome:new()
-    CPlayerGnome.super.new(self)
+function CPlayerGnome:new(_argt)
+    CPlayerGnome.super.new(self, _argt)
     self.colorhairsfg = Tic.COLORORANGE -- Gnome colors
     self.colorhairsbg = Tic.COLORYELLOW
     self.colorextra   = Tic.COLOREXTRA
@@ -439,8 +448,8 @@ end
 
 local CPlayerDrowe = CPlayerHumanoid:extend() -- Drowe player characters
 
-function CPlayerDrowe:new()
-    CPlayerDrowe.super.new(self)
+function CPlayerDrowe:new(_argt)
+    CPlayerDrowe.super.new(self, _argt)
     self.colorhairsfg = Tic.COLORDGREY -- Drowe colors
     self.colorhairsbg = Tic.COLORMGREY
     self.colorextra   = Tic.COLOREXTRA
@@ -458,8 +467,8 @@ end
 
 local CPlayerAngel = CPlayerHumanoid:extend() -- Angel player characters
 
-function CPlayerAngel:new()
-    CPlayerAngel.super.new(self)
+function CPlayerAngel:new(_argt)
+    CPlayerAngel.super.new(self, _argt)
     self.colorhairsfg = Tic.COLORMGREY -- Angel colors
     self.colorhairsbg = Tic.COLORWHITE
     self.colorextra   = Tic.COLORYELLOW
@@ -477,8 +486,8 @@ end
 
 local CPlayerGogol = CPlayerHumanoid:extend() -- Gogol player characters
 
-function CPlayerGogol:new()
-    CPlayerGogol.super.new(self)
+function CPlayerGogol:new(_argt)
+    CPlayerGogol.super.new(self, _argt)
     self.colorhairsfg = Tic.COLORWHITE -- Gogol colors
     self.colorhairsbg = Tic.COLORWHITE
     self.colorextra   = Tic.COLORMGREY
@@ -496,8 +505,8 @@ end
 
 local CPlayerHorne = CPlayerHumanoid:extend() -- Horne player characters
 
-function CPlayerHorne:new()
-    CPlayerHorne.super.new(self)
+function CPlayerHorne:new(_argt)
+    CPlayerHorne.super.new(self, _argt)
     self.colorhairsfg = Tic.COLORPURPLE -- Horne colors
     self.colorhairsbg = Tic.COLORRED
     self.colorextra   = Tic.COLORDGREY
@@ -515,16 +524,35 @@ end
 
 local CPlayerDemon = CPlayerHorne:extend() -- Demon player characters
 
-function CPlayerDemon:new()
-    CPlayerDemon.super.new(self)
+function CPlayerDemon:new(_argt)
+    CPlayerDemon.super.new(self, _argt)
     self.size = CCharacter.SIZEL -- Demon size
 end
 
 
 local CPlayerTifel = CPlayerHorne:extend() -- Tifel player characters
 
-function CPlayerTifel:new()
-    CPlayerTifel.super.new(self)
+function CPlayerTifel:new(_argt)
+    CPlayerTifel.super.new(self, _argt)
+end
+
+
+local CPlayerMeduz = CPlayerHumanoid:extend() -- Meduz player characters
+
+function CPlayerMeduz:new(_argt)
+    CPlayerMeduz.super.new(self, _argt)
+    self.colorhairsfg = Tic.COLORDGREEN -- Meduz colors
+    self.colorhairsbg = Tic.COLORMGREEN
+    self.colorskin    = Tic.COLORWHITE
+    self.colorextra   = self.colorskin
+    self.coloreyesfg  = Tic.COLORMGREY
+    self.coloreyesbg  = Tic.COLORDGREY
+    self.colorarmor   = Tic.COLORDGREY
+    self.colorshirt   = Tic.COLORMGREY
+    self.colorpants   = Tic.COLORLGREY
+    self.colorhands   = self.colorskin
+    self.size = CCharacter.SIZES -- Meduz size
+    self.headsprite.sprite = CSpriteFG.HEADMEDUZ -- Meduz head
 end
 
 
@@ -536,31 +564,42 @@ local CEnnemy = CCharacter:extend() -- ennemy characters
 
 
 -- Characters
-local Truduk = CPlayerDwarf()
-local Prinnn = CPlayerGnome()
-local Nitcha = CPlayerDrowe()
-local Zariel = CPlayerAngel()
+-- local Truduk = CPlayerDwarf()
+-- local Prinnn = CPlayerGnome()
+-- local Kaptan = CPlayerMeduz()
+-- local Kaptin = CPlayerMeduz()
+-- Kaptin.colorhairsbg = Tic.COLORLBLUE
+-- Kaptin.colorhairsfg = Tic.COLORMBLUE
+-- local Nitcha = CPlayerDrowe()
+-- local Zariel = CPlayerAngel()
+-- local Zikkow = CPlayerTifel()
+-- Zikkow.colorhairsbg = Tic.COLORMGREEN
+-- Zikkow.colorhairsfg = Tic.COLORDGREEN
+-- Zikkow.colorextra   = Tic.COLORMGREY
+-- Zikkow.coloreyesbg  = Tic.COLORMGREEN
+-- Zikkow.coloreyesfg  = Tic.COLORLGREEN
+-- local Zikkow = CPlayerTifel({
+--     colorhairsbg = Tic.COLORMGREEN,
+--     colorhairsfg = Tic.COLORDGREEN,
+--     colorextra   = Tic.COLORMGREY,
+--     coloreyesbg  = Tic.COLORMGREEN,
+--     coloreyesfg  = Tic.COLORLGREEN,
+-- })
+-- local Daemok = CPlayerDemon()
 local Golith = CPlayerGogol()
-local Daemok = CPlayerDemon()
+Golith.test = 1
 
-
+Tic:trace("Golith", Golith, #Golith)
+-- Tic:traceTable(Golith)
+exit()
 
 -- Drawing
 function Tic:draw()
     local _tick = Tic.Tick
     local _frame = _tick // 30
-    local _characters = {
-        Truduk,
-        Prinnn,
-        Nitcha,
-        Zariel,
-        Daemok,
-        Golith,
-    }
 
     Tic:logStack("T:", _tick)
     Tic:logStack("F:", _frame)
-    -- Tic:logStack("NZ:", Nitcha.size)
 
     cls()
 
@@ -568,7 +607,7 @@ function Tic:draw()
     -- local _scale = Tic.SPRITESCALE02
     local _screenx = 100
     local _screeny = 0
-    for _index, _character in pairs(_characters) do
+    for _, _character in ipairs(Tic.Players) do
         _character.scale = _scale
         _character.screenx = _screenx
 

@@ -18,7 +18,7 @@ end
 function Nums:_isFctAny(_num, _fct, ...) -- if _fct true on any ... -- false by default
     local _args = {...}
     if (not _num) or (not _fct) or (#_args == 0) then return false end
-    for _, _val in ipairs(_args) do
+    for _, _val in pairs(_args) do
         if _fct(self, _num, _val) then return true end
     end
     return false
@@ -27,7 +27,7 @@ end
 function Nums:_isFctAll(_num, _fct, ...) -- if _fct true on all ... -- false by default
     local _args = {...}
     if (not _num) or (not _fct) or (#_args == 0) then return false end
-    for _, _val in ipairs(_args) do
+    for _, _val in pairs(_args) do
         if not _fct(self, _num, _val) then return false end
     end
     return true

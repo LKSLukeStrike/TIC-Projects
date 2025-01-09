@@ -31,32 +31,12 @@ function Classic:extend()
 end
 
 
--- function Classic:implement(...) -- implement only new functions -- original version
---   for _, _classic in pairs({...}) do
---     for _key, _val in pairs(_classic) do
---       if self[_key] == nil and type(_val) == "function" then
---         self[_key] = _val
---       end
---     end
---   end
--- end
-
-
-function Classic:defaultArg(_arg, _default, ...) -- return _arg if _arg exists in allowed ... else return _default
-  for _, _allowed in ipairs({...}) do
-    if _arg == _allowed then return _arg end
-  end
-  return _default
-end
-
-function Classic:implement(_new, _type, ...) -- implement vars or fcts or both (depending of _type) if they exist or not (depending of _new)
-  _new = Classic:defaultArg(_new, "all", "new", "all") -- new = only if not existing, all = even existing
-  _type = Classic:defaultArg(_type, "all", "var", "fct", "all") -- only vars, fcts or all
-  for _, _classic in ipairs({...}) do
+function Classic:implement(...) -- implement only new functions -- original version
+  for _, _classic in pairs({...}) do
     for _key, _val in pairs(_classic) do
-      if self[_key] ~= nil and _new == "new" then break end
-      if type(_val) == "function" and _type == "vars" then break end
-      self[_key] = _val
+      if self[_key] == nil and type(_val) == "function" then
+        self[_key] = _val
+      end
     end
   end
 end
@@ -83,6 +63,68 @@ function Classic:__call(...)
   local obj = setmetatable({}, self)
   obj:new(...)
   return obj
+end
+
+
+--
+-- LKS additions
+--
+function Classic:defaultArg(_arg, _default, ...) -- return _arg if _arg in allowed ... else _default
+  for _, _allowed in pairs({...}) do
+    if _arg == _allowed then return _arg end
+  end
+  return _default
+end
+
+
+-- TODO rewrite this ?
+function Classic:implementIfType(_new, _type, ...) -- implement vars or fcts or both (depending of _type) if they exist or not (depending of _new)
+  _new = Classic:defaultArg(_new, "all", "new", "all") -- new = only if not existing, all = even existing
+  _type = Classic:defaultArg(_type, "all", "var", "fct", "all") -- only vars, fcts or all
+  for _, _classic in pairs({...}) do
+    for _key, _val in pairs(_classic) do
+      if self[_key] ~= nil and _new == "new" then break end
+      if type(_val) == "function" and _type == "vars" then break end
+      self[_key] = _val
+    end
+  end
+end
+
+
+function Classic:_size() -- size (number of keys) of a classic table
+  local _result = 0
+  for _key, _val in pairs(self) do
+    _result = _result + 1
+  end
+  return _result
+end
+
+
+function Classic:_keys() -- keys of a classic table
+  local _result = {}
+  for _key, _val in pairs(self) do
+    table.insert(_result, _key)
+  end
+  return _result
+end
+
+
+function Classic:_vals() -- vals of a classic table
+  local _result = {}
+  for _key, _val in pairs(self) do
+    table.insert(_result, _val)
+  end
+  return _result
+end
+
+
+function Classic:_copy() -- copy of a classic table
+  local _result = {}
+  for _key, _val in pairs(self) do
+    table.insert(_result, _key)
+    _result[_key] = _val
+  end
+  return _result
 end
 
 

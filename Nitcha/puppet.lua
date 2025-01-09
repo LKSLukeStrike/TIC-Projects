@@ -6,23 +6,22 @@
 
 --
 -- Wrappers for calls external to tic80
-if not trace then
+TIC80 = (exit and true or false)
+if not TIC80 then
     function trace(...)
         print("trace:", table.unpack({...}))
     end
-end
-    
-if not spr then
     function spr(...)
         print("spr:", table.unpack({...}))
     end
-end
-    
-if not cls then
     function cls(...)
         print("cls:", table.unpack({...}))
     end
-end
+    function exit(...)
+        print("exit:", table.unpack({...}))
+        os.exit()
+    end
+ end
 
 
 --
@@ -37,6 +36,6 @@ function TIC()
 end
 
 
-if not exit then -- run it from outside tic80
-    TIC()
+if not TIC80 then -- run it from outside tic80
+   TIC()
 end
