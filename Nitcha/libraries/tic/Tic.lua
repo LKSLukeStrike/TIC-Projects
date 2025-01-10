@@ -184,7 +184,6 @@ end
 --
 local CSprite = Classic:extend() -- general sprites
 CSprite.SPRITEBANK = 0
-
 function CSprite:new(_argt)
     CSprite.super.new(self, _argt)
     self.spritebank = CSprite.SPRITEBANK
@@ -198,6 +197,7 @@ function CSprite:new(_argt)
     self.width = 1 -- sprite 1x1 by default
     self.height = 1
     -- self.palettemap -- optional palette map for swapping
+    self:argt(_argt) -- override if any
 end
 
 function CSprite:draw(_offset) -- draw a sprite -- use offset for frames
@@ -223,9 +223,9 @@ end
 
 
 local CSpriteBG = CSprite:extend() --bg sprites aka tic tiles
-
 function CSpriteBG:new(_argt)
     CSpriteBG.super.new(self, _argt)
+    self:argt(_argt) -- override if any
 end
 
 
@@ -240,30 +240,30 @@ CSpriteFG.HEADGOGOL   = CSpriteFG.HEADBANK + 3
 CSpriteFG.HEADANGEL   = CSpriteFG.HEADBANK + 4
 CSpriteFG.HEADHORNE   = CSpriteFG.HEADBANK + 5
 CSpriteFG.HEADMEDUZ   = CSpriteFG.HEADBANK + 6
-
 function CSpriteFG:new(_argt)
     CSpriteFG.super.new(self, _argt)
     self.spritebank = CSpriteFG.SPRITEBANK
     self.sprite = self.spritebank
+    self:argt(_argt) -- override if any
 end
 
 
 local CSpriteFGPaletteMap = CSpriteFG:extend() --fg sprites with a palette map
-
 function CSpriteFGPaletteMap:new(_argt)
     CSpriteFGPaletteMap.super.new(self, _argt)
     self.palettemap = {} -- empty by default, can be filled later
+    self:argt(_argt) -- override if any
 end
 
 
 local CEntity = Classic:extend() -- general entities like places, objects, characters ...
 CEntity.WORLDX = 0
 CEntity.WORLDY = 0
-
 function CEntity:new(_argt)
     CEntity.super.new(self, _argt)
     self.worldx = CEntity.WORLDX -- world positions
     self.worldy = CEntity.WORLDY
+    self:argt(_argt) -- override if any
 end
 
 
@@ -276,7 +276,6 @@ CCharacter.SIZEM = 1
 CCharacter.SIZES = 2
 CCharacter.BODYHUMANOID = 394 -- sprite for humanoid bodies
 CCharacter.HEADSPRITE = 377 -- initial head sprite (middle)
-
 function CCharacter:new(_argt)
     CCharacter.super.new(self, _argt)
     self.size = CCharacter.SIZEM
@@ -304,12 +303,7 @@ function CCharacter:new(_argt)
     self.eyesfgsprite.sprite = CSpriteFG.SPRITEPIXEL
     self.eyesbgsprite = CSpriteFGPaletteMap() -- character eyes fg
     self.eyesbgsprite.sprite = CSpriteFG.SPRITEPIXEL
-    for _argk, _argv in pairs(_argt or {}) do -- override if any
-        -- Tic:trace(type(self))
-        -- Tic:trace(_argk, _argv)
-        -- self[_argk] = _argv
-    end
-    Tic:traceTable(_argt, true)
+    self:argt(_argt) -- override if any
 end
 
 function CCharacter:draw()
@@ -368,6 +362,10 @@ CCharacterHumanoid.HEYEBGLF = 2 -- h eyes offsets
 CCharacterHumanoid.HEYEFGLF = 3
 CCharacterHumanoid.HEYEFGRG = 4
 CCharacterHumanoid.HEYEBGRG = 5
+function CCharacterHumanoid:new(_argt)
+    CCharacterHumanoid.super.new(self, _argt)
+    self:argt(_argt) -- override if any
+end
 
 function CCharacterHumanoid:_drawEyesFG() -- draw fg eyes depending on dir h v
     local _offset = 0 -- offset for x and y
@@ -393,7 +391,6 @@ end
 
 
 local IPlayer = CCharacter:extend() -- players characters interface
-
 function IPlayer:playerStack()
     Tic:playerStack(self) -- record the new player on tic
 end
@@ -401,15 +398,14 @@ end
 
 local CPlayerHumanoid = CCharacterHumanoid:extend() -- humanoid player characters
 CPlayerHumanoid:implement(IPlayer)
-
 function CPlayerHumanoid:new(_argt)
     CPlayerHumanoid.super.new(self, _argt)
     self:playerStack()
+    self:argt(_argt) -- override if any
 end
 
 
 local CPlayerDwarf = CPlayerHumanoid:extend() -- Dwarf player characters
-
 function CPlayerDwarf:new(_argt)
     CPlayerDwarf.super.new(self, _argt)
     self.colorhairsfg = Tic.COLORRED -- Dwarf colors
@@ -424,11 +420,11 @@ function CPlayerDwarf:new(_argt)
     self.colorhands   = self.colorskin
     self.size = CCharacter.SIZES -- Dwarf size
     self.headsprite.sprite = CSpriteFG.HEADDWARF -- Dwarf head
+    self:argt(_argt) -- override if any
 end
 
 
 local CPlayerGnome = CPlayerHumanoid:extend() -- Gnome player characters
-
 function CPlayerGnome:new(_argt)
     CPlayerGnome.super.new(self, _argt)
     self.colorhairsfg = Tic.COLORORANGE -- Gnome colors
@@ -443,11 +439,11 @@ function CPlayerGnome:new(_argt)
     self.colorhands   = self.colorskin
     self.size = CCharacter.SIZES -- Gnome size
     self.headsprite.sprite = CSpriteFG.HEADGNOME -- Gnome head
+    self:argt(_argt) -- override if any
 end
 
 
 local CPlayerDrowe = CPlayerHumanoid:extend() -- Drowe player characters
-
 function CPlayerDrowe:new(_argt)
     CPlayerDrowe.super.new(self, _argt)
     self.colorhairsfg = Tic.COLORDGREY -- Drowe colors
@@ -462,11 +458,11 @@ function CPlayerDrowe:new(_argt)
     self.colorhands   = self.colorskin
     self.size = CCharacter.SIZEM -- Drowe size
     self.headsprite.sprite = CSpriteFG.HEADDROWE -- Drowe head
+    self:argt(_argt) -- override if any
 end
 
 
 local CPlayerAngel = CPlayerHumanoid:extend() -- Angel player characters
-
 function CPlayerAngel:new(_argt)
     CPlayerAngel.super.new(self, _argt)
     self.colorhairsfg = Tic.COLORMGREY -- Angel colors
@@ -481,11 +477,11 @@ function CPlayerAngel:new(_argt)
     self.colorhands   = self.colorskin
     self.size = CCharacter.SIZEM -- Angel size
     self.headsprite.sprite = CSpriteFG.HEADANGEL -- Angel head
+    self:argt(_argt) -- override if any
 end
 
 
 local CPlayerGogol = CPlayerHumanoid:extend() -- Gogol player characters
-
 function CPlayerGogol:new(_argt)
     CPlayerGogol.super.new(self, _argt)
     self.colorhairsfg = Tic.COLORWHITE -- Gogol colors
@@ -500,11 +496,11 @@ function CPlayerGogol:new(_argt)
     self.colorhands   = self.colorskin
     self.size = CCharacter.SIZEL -- Gogol size
     self.headsprite.sprite = CSpriteFG.HEADGOGOL -- Gogol head
+    self:argt(_argt) -- override if any
 end
 
 
 local CPlayerHorne = CPlayerHumanoid:extend() -- Horne player characters
-
 function CPlayerHorne:new(_argt)
     CPlayerHorne.super.new(self, _argt)
     self.colorhairsfg = Tic.COLORPURPLE -- Horne colors
@@ -519,26 +515,26 @@ function CPlayerHorne:new(_argt)
     self.colorhands   = self.colorskin
     self.size = CCharacter.SIZEM -- Horne size
     self.headsprite.sprite = CSpriteFG.HEADHORNE -- Horne head
+    self:argt(_argt) -- override if any
 end
 
 
 local CPlayerDemon = CPlayerHorne:extend() -- Demon player characters
-
 function CPlayerDemon:new(_argt)
     CPlayerDemon.super.new(self, _argt)
     self.size = CCharacter.SIZEL -- Demon size
+    self:argt(_argt) -- override if any
 end
 
 
 local CPlayerTifel = CPlayerHorne:extend() -- Tifel player characters
-
 function CPlayerTifel:new(_argt)
     CPlayerTifel.super.new(self, _argt)
+    self:argt(_argt) -- override if any
 end
 
 
 local CPlayerMeduz = CPlayerHumanoid:extend() -- Meduz player characters
-
 function CPlayerMeduz:new(_argt)
     CPlayerMeduz.super.new(self, _argt)
     self.colorhairsfg = Tic.COLORDGREEN -- Meduz colors
@@ -553,6 +549,7 @@ function CPlayerMeduz:new(_argt)
     self.colorhands   = self.colorskin
     self.size = CCharacter.SIZES -- Meduz size
     self.headsprite.sprite = CSpriteFG.HEADMEDUZ -- Meduz head
+    self:argt(_argt) -- override if any
 end
 
 
@@ -567,15 +564,13 @@ local CEnnemy = CCharacter:extend() -- ennemy characters
 local Truduk = CPlayerDwarf()
 local Prinnn = CPlayerGnome()
 local Kaptan = CPlayerMeduz()
-local Kaptin = CPlayerMeduz()
-Kaptin:argt({
+local Kaptin = CPlayerMeduz({
     colorhairsbg = Tic.COLORLBLUE,
     colorhairsfg = Tic.COLORMBLUE,
 })
 local Nitcha = CPlayerDrowe()
 local Zariel = CPlayerAngel()
-local Zikkow = CPlayerTifel()
-Zikkow:argt({
+local Zikkow = CPlayerTifel({
     colorhairsbg = Tic.COLORMGREEN,
     colorhairsfg = Tic.COLORDGREEN,
     colorextra   = Tic.COLORMGREY,

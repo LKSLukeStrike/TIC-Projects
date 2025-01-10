@@ -5,15 +5,16 @@ local Classic = require("libraries/ext/Classic")
 
 
 CCharacter = Classic:extend()
-function CCharacter:new()
+function CCharacter:new(_argt)
   self.sprite = 1
   self.x = 2
   self.y = 3
+  self:argt(_argt)
 end
 
 CPlayer = CCharacter:extend()
-function CPlayer:new()
-  self.super.new(self)
+function CPlayer:new(_argt)
+  self.super.new(self, _argt)
 end
 
 
@@ -47,3 +48,25 @@ Golith:argt({
 print(Golith:_size())
 print(table.unpack(Golith:_keys()))
 print(table.unpack(Golith:_vals()))
+
+print(":Jeandu 1:")
+Jeandu = CPlayer({
+  age = 42,
+  prenom = "jean",
+  nom = "du",
+})
+print(Jeandu:_size())
+print(table.unpack(Jeandu:_keys()))
+print(table.unpack(Jeandu:_vals()))
+
+print(":Jeandu 2:")
+Jeandu:argt({
+  y = 300,
+  x = 200,
+  sprite = 100,
+  age = 24,
+  race = "Human",
+})
+print(Jeandu:_size())
+print(table.unpack(Jeandu:_keys()))
+print(table.unpack(Jeandu:_vals()))
