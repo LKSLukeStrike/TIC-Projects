@@ -142,10 +142,6 @@ end
 Tic.Tick = CCyclerInt({
     maxindex = 59
 })
--- Tic.Tick = 0
--- function Tic:tickCycle() -- cycle on tick from 0-59 -- to be called in Tic.draw()
---     Tic.Tick = Tic.Tick == 59 and 0 or Tic.Tick + 1
--- end
 
 
 -- Players System -- add new players to a players stack
