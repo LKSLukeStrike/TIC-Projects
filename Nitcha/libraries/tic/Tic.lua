@@ -259,8 +259,10 @@ end
 local CEntity = Classic:extend() -- general entities like places, objects, characters ...
 CEntity.WORLDX = 0
 CEntity.WORLDY = 0
+CEntity.KINDENTITY = "Entity" -- default kind
 function CEntity:new(_argt)
     CEntity.super.new(self, _argt)
+    self.kind = CEntity.KINDENTITY
     self.worldx = CEntity.WORLDX -- world positions
     self.worldy = CEntity.WORLDY
     self:argt(_argt) -- override if any
@@ -276,8 +278,10 @@ CCharacter.SIZEM = 1
 CCharacter.SIZES = 2
 CCharacter.BODYHUMANOID = 394 -- sprite for humanoid bodies
 CCharacter.HEADSPRITE = 377 -- initial head sprite (middle)
+CEntity.KINDCHARACTER = "Character" -- default kind
 function CCharacter:new(_argt)
     CCharacter.super.new(self, _argt)
+    self.kind = CEntity.KINDCHARACTER
     self.size = CCharacter.SIZEM
     self.screenx = 100
     self.screeny = 100
@@ -362,8 +366,10 @@ CCharacterHumanoid.HEYEBGLF = 2 -- h eyes offsets
 CCharacterHumanoid.HEYEFGLF = 3
 CCharacterHumanoid.HEYEFGRG = 4
 CCharacterHumanoid.HEYEBGRG = 5
+CEntity.KINDHUMANOID = "Humanoid" -- default kind
 function CCharacterHumanoid:new(_argt)
     CCharacterHumanoid.super.new(self, _argt)
+    self.kind = CEntity.KINDHUMANOID
     self:argt(_argt) -- override if any
 end
 
@@ -406,8 +412,10 @@ end
 
 
 local CPlayerDwarf = CPlayerHumanoid:extend() -- Dwarf player characters
+CEntity.KINDDWARF = "Dwarf" -- default kind
 function CPlayerDwarf:new(_argt)
     CPlayerDwarf.super.new(self, _argt)
+    self.kind = CEntity.KINDDWARF
     self.colorhairsfg = Tic.COLORRED -- Dwarf colors
     self.colorhairsbg = Tic.COLORORANGE
     self.colorskin    = Tic.COLORWHITE
@@ -425,8 +433,10 @@ end
 
 
 local CPlayerGnome = CPlayerHumanoid:extend() -- Gnome player characters
+CEntity.KINDGNOME = "Gnome" -- default kind
 function CPlayerGnome:new(_argt)
     CPlayerGnome.super.new(self, _argt)
+    self.kind = CEntity.KINDGNOME
     self.colorhairsfg = Tic.COLORORANGE -- Gnome colors
     self.colorhairsbg = Tic.COLORYELLOW
     self.colorskin    = Tic.COLORWHITE
@@ -444,8 +454,10 @@ end
 
 
 local CPlayerDrowe = CPlayerHumanoid:extend() -- Drowe player characters
+CEntity.KINDDROWE = "Drowe" -- default kind
 function CPlayerDrowe:new(_argt)
     CPlayerDrowe.super.new(self, _argt)
+    self.kind = CEntity.KINDDROWE
     self.colorhairsfg = Tic.COLORDGREY -- Drowe colors
     self.colorhairsbg = Tic.COLORMGREY
     self.colorskin    = Tic.COLORWHITE
@@ -463,8 +475,10 @@ end
 
 
 local CPlayerAngel = CPlayerHumanoid:extend() -- Angel player characters
+CEntity.KINDANGEL = "Angel" -- default kind
 function CPlayerAngel:new(_argt)
     CPlayerAngel.super.new(self, _argt)
+    self.kind = CEntity.KINDANGEL
     self.colorhairsfg = Tic.COLORMGREY -- Angel colors
     self.colorhairsbg = Tic.COLORWHITE
     self.colorskin    = Tic.COLORWHITE
@@ -482,8 +496,10 @@ end
 
 
 local CPlayerGogol = CPlayerHumanoid:extend() -- Gogol player characters
+CEntity.KINDGOGOL = "Gogol" -- default kind
 function CPlayerGogol:new(_argt)
     CPlayerGogol.super.new(self, _argt)
+    self.kind = CEntity.KINDGOGOL
     self.colorhairsfg = Tic.COLORWHITE -- Gogol colors
     self.colorhairsbg = Tic.COLORWHITE
     self.colorskin    = Tic.COLORWHITE
@@ -501,8 +517,10 @@ end
 
 
 local CPlayerHorne = CPlayerHumanoid:extend() -- Horne player characters
+CEntity.KINDHORNE = "Horne" -- default kind
 function CPlayerHorne:new(_argt)
     CPlayerHorne.super.new(self, _argt)
+    self.kind = CEntity.KINDHORNE
     self.colorhairsfg = Tic.COLORPURPLE -- Horne colors
     self.colorhairsbg = Tic.COLORRED
     self.colorskin    = Tic.COLORWHITE
@@ -520,23 +538,29 @@ end
 
 
 local CPlayerDemon = CPlayerHorne:extend() -- Demon player characters
+CEntity.KINDDEMON = "Demon" -- default kind
 function CPlayerDemon:new(_argt)
     CPlayerDemon.super.new(self, _argt)
+    self.kind = CEntity.KINDDEMON
     self.size = CCharacter.SIZEL -- Demon size
     self:argt(_argt) -- override if any
 end
 
 
 local CPlayerTifel = CPlayerHorne:extend() -- Tifel player characters
+CEntity.KINDTIFEL = "Tifel" -- default kind
 function CPlayerTifel:new(_argt)
     CPlayerTifel.super.new(self, _argt)
+    self.kind = CEntity.KINDTIFEL
     self:argt(_argt) -- override if any
 end
 
 
 local CPlayerMeduz = CPlayerHumanoid:extend() -- Meduz player characters
+CEntity.KINDMEDUZ = "Meduz" -- default kind
 function CPlayerMeduz:new(_argt)
     CPlayerMeduz.super.new(self, _argt)
+    self.kind = CEntity.KINDMEDUZ
     self.colorhairsfg = Tic.COLORDGREEN -- Meduz colors
     self.colorhairsbg = Tic.COLORMGREEN
     self.colorskin    = Tic.COLORWHITE
@@ -634,6 +658,8 @@ function Tic:draw()
         _character:draw()
         
         _screenx = _screenx + (8 * _scale) + 1
+
+        Tic:logStack("K:", _character.kind)
     end
 
     Tic:logPrint()
