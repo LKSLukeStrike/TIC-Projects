@@ -2,17 +2,21 @@
 -- Instance only once
 -- Contains constants, globals and general functions
 -- 
+local Tic = {}
+
 
 --
 -- Packages
-local Nums = require("libraries/lks/Nums")
 local Classic = require("libraries/ext/Classic")                
+local Nums = require("libraries/lks/Nums")
+--
+-- Includes
+require("includes/tic/CCycler")                
             
 
 --
 -- Tic
 --
-local Tic = {}
 -- Screen sizes
 Tic.SCREENW = 240 -- screen width
 Tic.SCREENH = 136 -- screen height
@@ -135,10 +139,13 @@ end
 
 
 -- Tick System -- loop on the tick from 0-59
-Tic.Tick = 0
-function Tic:tickCycle() -- cycle on tick from 0-59 -- to be called in Tic.draw()
-    Tic.Tick = Tic.Tick == 59 and 0 or Tic.Tick + 1
-end
+Tic.Tick = CCyclerInt({
+    maxindex = 59
+})
+-- Tic.Tick = 0
+-- function Tic:tickCycle() -- cycle on tick from 0-59 -- to be called in Tic.draw()
+--     Tic.Tick = Tic.Tick == 59 and 0 or Tic.Tick + 1
+-- end
 
 
 -- Players System -- add new players to a players stack
@@ -326,7 +333,7 @@ function CCharacter:_drawShield()
 end
 
 function CCharacter:_drawBody()
-    local _offset = (Tic.Tick // 30) * 16 -- body offset -- TODO
+    local _offset = (Tic.Tick.actvalue // 30) * 16 -- body offset -- TODO
 
     self.bodysprite.screenx = self.screenx -- apply screen positions and scale to the bodysprite
     self.bodysprite.screeny = self.screeny
@@ -611,7 +618,7 @@ local Golith = CPlayerGogol()
 
 -- Drawing
 function Tic:draw()
-    local _tick = Tic.Tick
+    local _tick = Tic.Tick.actvalue
     local _frame = _tick // 30
 
     Tic:logStack("T:", _tick)
@@ -664,7 +671,7 @@ function Tic:draw()
 
     Tic:logPrint()
 
-    Tic.tickCycle() -- /!\ required in the draw function
+    Tic.Tick:next() -- /!\ required in the draw function
 end
 
 
