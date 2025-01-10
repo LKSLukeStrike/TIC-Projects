@@ -36,13 +36,9 @@ function CCycler:new(_argt)
 end
 
 function CCycler:next() -- next cycler value
+    local _newindex = self.actindex + self.stepnext
     if self.mode == CCycler.MODELOOP then
-        _newindex = self.actindex + self.stepnext
-        if _newindex > self.maxindex then
-            self.actindex = self.minindex
-        elseif _newindex < self.minindex then
-            self.actindex = self.maxindex
-        end
+        self.actindex = Nums:isBW(_newindex, self.minindex, self.maxindex) and _newindex or self.minindex
         self.actvalue = self.actindex -- value = index by default
         return self.actvalue
     end
@@ -50,13 +46,9 @@ function CCycler:next() -- next cycler value
 end
 
 function CCycler:prev() -- prev cycler value
+    local _newindex = self.actindex + self.stepprev
     if self.mode == CCycler.MODELOOP then
-        _newindex = self.actindex + self.stepprev
-        if _newindex > self.maxindex then
-            self.actindex = self.minindex
-        elseif _newindex < self.minindex then
-            self.actindex = self.maxindex
-        end
+        self.actindex = Nums:isBW(_newindex, self.minindex, self.maxindex) and _newindex or self.maxindex
         self.actvalue = self.actindex -- value = index by default
         return self.actvalue
     end

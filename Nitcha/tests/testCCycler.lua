@@ -8,7 +8,7 @@ require("includes/tic/CCycler")
 
 
 local CyclerINT = CCyclerInt({
-    maxindex = 1
+    maxindex = 2
 })
 
 print(CyclerINT.minindex, CyclerINT.maxindex, CyclerINT.actindex, CyclerINT.actvalue)
@@ -17,4 +17,14 @@ print(CyclerINT.minindex, CyclerINT.maxindex, CyclerINT.actindex, CyclerINT.actv
 CyclerINT:next()
 print(CyclerINT.minindex, CyclerINT.maxindex, CyclerINT.actindex, CyclerINT.actvalue)
 CyclerINT:next()
+print(CyclerINT.minindex, CyclerINT.maxindex, CyclerINT.actindex, CyclerINT.actvalue)
+CyclerINT:next()
+print(CyclerINT.minindex, CyclerINT.maxindex, CyclerINT.actindex, CyclerINT.actvalue)
+CyclerINT:prev()
+print(CyclerINT.minindex, CyclerINT.maxindex, CyclerINT.actindex, CyclerINT.actvalue)
+CyclerINT:prev()
+print(CyclerINT.minindex, CyclerINT.maxindex, CyclerINT.actindex, CyclerINT.actvalue)
+CyclerINT:prev()
+print(CyclerINT.minindex, CyclerINT.maxindex, CyclerINT.actindex, CyclerINT.actvalue)
+CyclerINT:prev()
 print(CyclerINT.minindex, CyclerINT.maxindex, CyclerINT.actindex, CyclerINT.actvalue)
