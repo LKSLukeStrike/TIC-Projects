@@ -321,23 +321,32 @@ function CCharacter:new(_argt)
     self:argt(_argt) -- override if any
 end
 
-function CCharacter:portrait() -- draw the portrait
+function CCharacter:portrait(_still) -- draw the portrait -- animated or _still
+    _still = (_still == true) and true or false
     local _screenx = self.screenx -- save character attributes
     local _screeny = self.screeny
     local _scale = self.scale
     local _dirx = self.dirx
     local _diry = self.diry
+    local _posture = self.posture
+    local _frame = self.frame
     self.screenx = self.portraitx -- force character attributes
     self.screeny = self.portraity
     self.scale = CSprite.SCALE02
-    self.dirx = Tic.DIRXLF
-    self.diry = Tic.DIRYMD
+    if _still then
+        self.dirx = Tic.DIRXLF
+        self.diry = Tic.DIRYMD
+        self.posture = CCharacter.POSTUREIDLE
+        self.frame = CSprite.FRAME00
+    end
     self:draw()
     self.screenx = _screenx -- restore character attributes
     self.screeny = _screeny
     self.scale = _scale
     self.dirx = _dirx
     self.diry = _diry
+    self.posture = _posture
+    self.frame = _frame
 end
 
 function CCharacter:draw()
@@ -712,7 +721,7 @@ function Tic:draw()
         -- Tic:logStack("N:", _character.name)
         -- Tic:logStack("K:", _character.kind)
     end
-    Tic.Players[Tic.CurrentPlayer]:portrait()
+    Tic.Players[Tic.CurrentPlayer]:portrait(true)
 
     Tic:logPrint()
 
