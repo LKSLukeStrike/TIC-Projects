@@ -652,7 +652,7 @@ local Kaainn = CPlayerDemon{name = "Kaainn",
 }
 local Daemok = CPlayerDemon{name = "Daemok",}
 local Golith = CPlayerGogol{name = "Golith",}
-local Wolfie = CPlayerWolfe{name = "Wolfie",}
+local Wolfie = CPlayerWolfe{name = "Wolfie", colorextra = Tic.COLORPURPLE}
 
 
 
