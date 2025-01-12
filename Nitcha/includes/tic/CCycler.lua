@@ -40,7 +40,7 @@ function CCycler:next() -- next cycler value
     if self.mode == CCycler.MODELOOP then
         self.actindex = Nums:isBW(_newindex, self.minindex, self.maxindex) and _newindex or self.minindex
         self.actvalue = self.actindex -- value = index by default
-        return self.actvalue
+        return self.actindex
     end
     -- TODO add more modes
 end
@@ -50,7 +50,7 @@ function CCycler:prev() -- prev cycler value
     if self.mode == CCycler.MODELOOP then
         self.actindex = Nums:isBW(_newindex, self.minindex, self.maxindex) and _newindex or self.maxindex
         self.actvalue = self.actindex -- value = index by default
-        return self.actvalue
+        return self.actindex
     end
     -- TODO add more modes
 end
@@ -67,4 +67,46 @@ CCyclerInt = CCyclerNum:extend() -- integer cyclers
 function CCyclerInt:new(_argt)
     CCyclerInt.super.new(self, _argt)
     self:argt(_argt) -- override if any
+end
+
+
+CCyclerTab = CCycler:extend() -- table cyclers
+function CCyclerTab:new(_argt)
+    CCyclerTab.super.new(self, _argt)
+    self.acttable = {} -- internal table
+    self.actvalue = nil
+    self:argt(_argt) -- override if any
+end
+
+function CCyclerTab:insert(_item, _at) -- insert an _item into table _at (end by default)
+    if _item == nil then return self.actindex end
+    if _at == nil then
+        table.insert(self.acttable, _item)
+        self.actindex = #self.acttable -- adjust actual index
+    else
+        _at = (Nums:isLT(_at, 1)) and 1 or _at -- beg
+        _at = (Nums:isGT(_at, #self.acttable)) and #self.acttable + 1 or _at -- end
+        table.insert(self.acttable, _at, _item)
+        self.actindex = _at -- adjust actual index
+    end
+    self.minindex = 1 -- at least one item
+    self.maxindex = #self.acttable
+    self.actvalue = _item
+    return self.actindex
+end
+
+function CCyclerTab:remove(_at) -- remove an item from table _at (end by default)
+    -- TODO
+end
+
+function CCyclerTab:next() -- next cycler value
+    CCyclerTab.super.next(self)
+    self.actvalue = self.acttable[self.actindex]
+    return self.actindex
+end
+
+function CCyclerTab:prev() -- ^rev cycler value
+    CCyclerTab.super.prev(self)
+    self.actvalue = self.acttable[self.actindex]
+    return self.actindex
 end
