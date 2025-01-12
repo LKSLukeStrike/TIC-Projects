@@ -45,17 +45,17 @@ Tic.COLORPURPLE = Tic.COLOR01 -- purple
 Tic.COLORRED    = Tic.COLOR02 -- red
 Tic.COLORORANGE = Tic.COLOR03 -- orange
 Tic.COLORYELLOW = Tic.COLOR04 -- yellow
-Tic.COLORLGREEN = Tic.COLOR05 -- l green
-Tic.COLORMGREEN = Tic.COLOR06 -- m green
-Tic.COLORDGREEN = Tic.COLOR07 -- d green
-Tic.COLORDBLUE  = Tic.COLOR08 -- d blue
-Tic.COLORMBLUE  = Tic.COLOR09 -- m blue
-Tic.COLORLBLUE  = Tic.COLOR10 -- l blue
+Tic.COLORGREENL = Tic.COLOR05 -- l green
+Tic.COLORGREENM = Tic.COLOR06 -- m green
+Tic.COLORGREEND = Tic.COLOR07 -- d green
+Tic.COLORBLUEL  = Tic.COLOR10 -- l blue
+Tic.COLORBLUEM  = Tic.COLOR09 -- m blue
+Tic.COLORBLUED  = Tic.COLOR08 -- d blue
 Tic.COLORCYAN   = Tic.COLOR11 -- cyan
 Tic.COLORWHITE  = Tic.COLOR12 -- white
-Tic.COLORLGREY  = Tic.COLOR13 -- l grey
-Tic.COLORMGREY  = Tic.COLOR14 -- m grey
-Tic.COLORDGREY  = Tic.COLOR15 -- d grey
+Tic.COLORGREYL  = Tic.COLOR13 -- l grey
+Tic.COLORGREYM  = Tic.COLOR14 -- m grey
+Tic.COLORGREYD  = Tic.COLOR15 -- d grey
 -- Special palette colors that can be replaced
 Tic.COLORKEY   = Tic.COLOR00 -- transparent color
 Tic.COLORARMOR = Tic.COLOR15 -- 4 colors for the bodies
@@ -67,9 +67,6 @@ Tic.COLORHAIRSBG = Tic.COLOR14
 Tic.COLOREXTRA   = Tic.COLOR13
 Tic.COLORSKIN    = Tic.COLOR12
 -- TODO weapons fg/bg + status
--- Sprite scales
-Tic.SPRITESCALE01 = 01
-Tic.SPRITESCALE02 = 02
 -- Key values
 Tic.KEYUP = 26 -- move up (z)
 Tic.KEYDW = 19 -- move down (s)
@@ -80,19 +77,16 @@ Tic.KEYCR = 03 -- hide on/off (c)
 Tic.OFFSETHIDE = 4 -- sprites offsets
 Tic.OFFSETMOVE = 16
 
-Tic.DIRHLF = 0 -- h directions -- also the sprite flip
-Tic.DIRHRG = 1
-Tic.DIRVMD = 0 -- v directions -- also the sprite offset
-Tic.DIRVUP = Tic.DIRVMD - 1
-Tic.DIRVDW = Tic.DIRVMD + 1
+Tic.DIRXLF = 0 -- h directions -- also the sprite flip
+Tic.DIRXRG = 1
+Tic.DIRYMD = 0 -- v directions -- also the sprite offset
+Tic.DIRYUP = Tic.DIRYMD - 1
+Tic.DIRYDW = Tic.DIRYMD + 1
 
 Tic.ROTATE000 =  0 -- sprite rotations
 Tic.ROTATE090 =  90
 Tic.ROTATE180 =  180
 Tic.ROTATE270 =  270
-
-Tic.POSTUREUP = 0 -- standing or hidding -- used for the sprite positions and body
-Tic.POSTUREDW = 1
 
 Tic.STRESSMIN = 0 -- stress handling
 Tic.STRESSMAX = 100
@@ -187,15 +181,21 @@ end
 --
 local CSprite = Classic:extend() -- general sprites
 CSprite.SPRITEBANK = 0
+CSprite.SCALE01 = 01 -- sprites scales
+CSprite.SCALE02 = 02
+CSprite.FRAMEOF = 16 -- sprites frames offset multiplier
+CSprite.FRAME00 = 00 -- sprites frames -- /!\ start at 0, used to compute the offset
+CSprite.FRAME01 = 01
 function CSprite:new(_argt)
     CSprite.super.new(self, _argt)
     self.spritebank = CSprite.SPRITEBANK
     self.sprite = self.spritebank -- initial sprite number
     self.screenx = 0 -- screen positions
     self.screeny = 0
+    self.frame = CSprite.FRAME00
     self.colorkey = Tic.COLORKEY -- default colorkey
-    self.scale = Tic.SPRITESCALE01 -- default scale
-    self.flip = Tic.DIRHLF -- all sprites are dir h left by default
+    self.scale = CSprite.SCALE01 -- default scale
+    self.flip = Tic.DIRXLF -- all sprites are dir h left by default
     self.rotate = Tic.ROTATE000 -- no rotation by default
     self.width = 1 -- sprite 1x1 by default
     self.height = 1
@@ -203,13 +203,12 @@ function CSprite:new(_argt)
     self:argt(_argt) -- override if any
 end
 
-function CSprite:draw(_offset) -- draw a sprite -- use offset for frames
-    _offset = _offset or 0
+function CSprite:draw() -- draw a sprite
     for _key, _val in pairs(self.palettemap or {}) do -- swap palette colors if any
         poke4(Tic.PALETTEMAP + _key, _val)
     end
     spr(
-        self.sprite + _offset,
+        self.sprite + (self.frame *  CSprite.FRAMEOF),
         self.screenx,
         self.screeny,
         self.colorkey,
@@ -243,6 +242,8 @@ CSpriteFG.HEADGOGOL   = CSpriteFG.HEADBANK + 3
 CSpriteFG.HEADANGEL   = CSpriteFG.HEADBANK + 4
 CSpriteFG.HEADHORNE   = CSpriteFG.HEADBANK + 5
 CSpriteFG.HEADMEDUZ   = CSpriteFG.HEADBANK + 6
+CSpriteFG.HEADGNOLL   = CSpriteFG.HEADBANK + 7
+CSpriteFG.BODYHUMAN   = 396 -- sprite for humanoid bodies
 function CSpriteFG:new(_argt)
     CSpriteFG.super.new(self, _argt)
     self.spritebank = CSpriteFG.SPRITEBANK
@@ -260,11 +261,13 @@ end
 
 
 local CEntity = Classic:extend() -- general entities like places, objects, characters ...
+CEntity.NAMENOBODY = "Nobody" -- default name
+CEntity.KINDENTITY = "Entity" -- default kind
 CEntity.WORLDX = 0
 CEntity.WORLDY = 0
-CEntity.KINDENTITY = "Entity" -- default kind
 function CEntity:new(_argt)
     CEntity.super.new(self, _argt)
+    self.name = CEntity.NAMENOBODY
     self.kind = CEntity.KINDENTITY
     self.worldx = CEntity.WORLDX -- world positions
     self.worldy = CEntity.WORLDY
@@ -276,11 +279,13 @@ local CObject = CEntity:extend() -- objects
 
 
 local CCharacter = CEntity:extend() -- characters
-CCharacter.SIZEL = 0 -- character size aka the head sprite y offset
+CCharacter.SIZEL = 0 -- character size for the head sprite y offset
 CCharacter.SIZEM = 1
 CCharacter.SIZES = 2
-CCharacter.BODYHUMANOID = 394 -- sprite for humanoid bodies
-CCharacter.HEADSPRITE = 377 -- initial head sprite (middle)
+CCharacter.POSTUREIDLE = 0 -- character posture for the head sprite y offset and the body selection
+CCharacter.POSTUREMOVE = 1
+CCharacter.POSTUREHIDE = 2
+CCharacter.POSTUREDOWN = 3 -- special case -- dont have a sprite -- to compute
 CEntity.KINDCHARACTER = "Character" -- default kind
 function CCharacter:new(_argt)
     CCharacter.super.new(self, _argt)
@@ -288,29 +293,51 @@ function CCharacter:new(_argt)
     self.size = CCharacter.SIZEM
     self.screenx = 100
     self.screeny = 100
-    self.scale = Tic.SPRITESCALE01
-    self.dirh = Tic.DIRHLF
-    self.dirv = Tic.DIRVMD
-    self.posture = Tic.POSTUREUP
+    self.portraitx = 120
+    self.portraity = 120
+    self.scale = CSprite.SCALE01
+    self.frame = CSprite.FRAME00
+    self.dirx = Tic.DIRXLF
+    self.diry = Tic.DIRYMD
+    self.posture = CCharacter.POSTUREIDLE
     self.colorhairsfg = Tic.COLORHAIRSFG -- character colors
     self.colorhairsbg = Tic.COLORHAIRSBG
     self.colorextra   = Tic.COLOREXTRA
     self.colorskin    = Tic.COLORSKIN
-    self.coloreyesfg  = Tic.COLORLGREY
-    self.coloreyesbg  = Tic.COLORMGREY
+    self.coloreyesfg  = Tic.COLORGREYL
+    self.coloreyesbg  = Tic.COLORGREYM
     self.colorarmor   = Tic.COLORARMOR
     self.colorshirt   = Tic.COLORSHIRT
     self.colorpants   = Tic.COLORPANTS
     self.colorhands   = Tic.COLORHANDS
     self.headsprite   = CSpriteFGPaletteMap() -- character head
-    self.headsprite.sprite = CCharacter.HEADSPRITE
+    self.headsprite.sprite = CSpriteFG.HEADDROWE
     self.bodysprite   = CSpriteFGPaletteMap() -- character body
-    self.bodysprite.sprite = CCharacter.BODYHUMANOID
+    self.bodysprite.sprite = CSpriteFG.BODYHUMAN
     self.eyesfgsprite = CSpriteFGPaletteMap() -- character eyes fg
     self.eyesfgsprite.sprite = CSpriteFG.SPRITEPIXEL
     self.eyesbgsprite = CSpriteFGPaletteMap() -- character eyes fg
     self.eyesbgsprite.sprite = CSpriteFG.SPRITEPIXEL
     self:argt(_argt) -- override if any
+end
+
+function CCharacter:portrait() -- draw the portrait
+    local _screenx = self.screenx -- save character attributes
+    local _screeny = self.screeny
+    local _scale = self.scale
+    local _dirx = self.dirx
+    local _diry = self.diry
+    self.screenx = self.portraitx -- force character attributes
+    self.screeny = self.portraity
+    self.scale = CSprite.SCALE02
+    self.dirx = Tic.DIRXLF
+    self.diry = Tic.DIRYMD
+    self:draw()
+    self.screenx = _screenx -- restore character attributes
+    self.screeny = _screeny
+    self.scale = _scale
+    self.dirx = _dirx
+    self.diry = _diry
 end
 
 function CCharacter:draw()
@@ -328,26 +355,20 @@ end
 function CCharacter:_drawShield()
 end
 
-function CCharacter:_drawBody()
-    local _offset = (Tic.Tick.actvalue // 30) * 16 -- body offset -- TODO
-
-    self.bodysprite.screenx = self.screenx -- apply screen positions and scale to the bodysprite
-    self.bodysprite.screeny = self.screeny
-    self.bodysprite.scale = self.scale
-    self.bodysprite.flip = self.dirh -- flip h if any
-    self.bodysprite.palettemap[Tic.COLORARMOR] = self.colorarmor -- adjust the body palette
-    self.bodysprite.palettemap[Tic.COLORSHIRT] = self.colorshirt
-    self.bodysprite.palettemap[Tic.COLORPANTS] = self.colorpants
-    self.bodysprite.palettemap[Tic.COLORHANDS] = self.colorhands
-    self.bodysprite:draw(_offset)
-end
-
 function CCharacter:_drawHead()
-    self.headsprite.screenx = self.screenx -- apply screen positions and scale to the headsprite
-    self.headsprite.screeny = self.screeny + (self.size * self.scale) -- adjust the head y position
+    local _heady = self.size
+    if self.posture == CCharacter.POSTUREHIDE then
+        _heady = _heady + 1
+    end
+    if self.posture == CCharacter.POSTUREDOWN then
+        -- TODO rotate the head
+    end
+
+    self.headsprite.screenx = self.screenx -- apply screen positions and scale
+    self.headsprite.screeny = self.screeny + (_heady * self.scale) -- adjust the head y position
     self.headsprite.scale = self.scale
-    self.headsprite.flip = self.dirh -- flip h if any
-    self.headsprite.palettemap[Tic.COLORHAIRSFG] = self.colorhairsfg -- adjust the head palette
+    self.headsprite.flip = self.dirx -- flip h if any
+    self.headsprite.palettemap[Tic.COLORHAIRSFG] = self.colorhairsfg -- apply head palette
     self.headsprite.palettemap[Tic.COLORHAIRSBG] = self.colorhairsbg
     self.headsprite.palettemap[Tic.COLOREXTRA]   = self.colorextra
     self.headsprite.palettemap[Tic.COLORSKIN]    = self.colorskin
@@ -364,35 +385,79 @@ end
 
 
 local CCharacterHumanoid = CCharacter:extend() -- humanoid characters
-CCharacterHumanoid.VEYE     = 2 -- v eyes offsets
-CCharacterHumanoid.HEYEBGLF = 2 -- h eyes offsets
-CCharacterHumanoid.HEYEFGLF = 3
-CCharacterHumanoid.HEYEFGRG = 4
-CCharacterHumanoid.HEYEBGRG = 5
+CCharacterHumanoid.YEYE     = 2 -- y eyes offsets
+CCharacterHumanoid.XEYEBGLF = 2 -- x eyes offsets
+CCharacterHumanoid.XEYEFGLF = 3
+CCharacterHumanoid.XEYEFGRG = 4
+CCharacterHumanoid.XEYEBGRG = 5
 CEntity.KINDHUMANOID = "Humanoid" -- default kind
 function CCharacterHumanoid:new(_argt)
     CCharacterHumanoid.super.new(self, _argt)
     self.kind = CEntity.KINDHUMANOID
+    self.colorhairsfg = Tic.COLORGREYD -- default head colors
+    self.colorhairsbg = Tic.COLORGREYM
+    self.colorskin    = Tic.COLORWHITE
+    self.colorextra   = self.colorskin
+    self.coloreyesfg  = Tic.COLORGREYL -- default eyes colors
+    self.coloreyesbg  = Tic.COLORGREYM
+    self.colorarmor   = Tic.COLORGREYD -- default body colors
+    self.colorshirt   = Tic.COLORGREYM
+    self.colorpants   = Tic.COLORGREYL
+    self.colorhands   = self.colorskin
     self:argt(_argt) -- override if any
 end
 
+function CCharacterHumanoid:_drawBody()
+    local _sprite = CSpriteFG.BODYHUMAN + self.posture
+    if self.posture == CCharacter.POSTUREDOWN then
+        _sprite = CSpriteFG.BODYHUMAN + CCharacter.POSTUREIDLE
+        -- TODO rotate the body
+    end
+
+    self.bodysprite.sprite = _sprite -- apply the corresponding sprite
+    self.bodysprite.screenx = self.screenx -- apply screen positions and scale
+    self.bodysprite.screeny = self.screeny
+    self.bodysprite.scale = self.scale
+    self.bodysprite.frame = self.frame
+    self.bodysprite.flip = self.dirx -- flip h if any
+    self.bodysprite.palettemap[Tic.COLORARMOR] = self.colorarmor -- apply body palette
+    self.bodysprite.palettemap[Tic.COLORSHIRT] = self.colorshirt
+    self.bodysprite.palettemap[Tic.COLORPANTS] = self.colorpants
+    self.bodysprite.palettemap[Tic.COLORHANDS] = self.colorhands
+    self.bodysprite:draw()
+end
+
 function CCharacterHumanoid:_drawEyesFG() -- draw fg eyes depending on dir h v
-    local _offset = 0 -- offset for x and y
-    _offset = (self.dirh == Tic.DIRHLF and CCharacterHumanoid.HEYEFGLF or CCharacterHumanoid.HEYEFGRG)
-    self.eyesfgsprite.screenx = self.screenx + (_offset * self.scale)
-    _offset = CCharacterHumanoid.VEYE + self.size + self.posture
-    self.eyesfgsprite.screeny = self.screeny + (_offset * self.scale)
+    local _eyesx = (self.dirx == Tic.DIRXLF) and CCharacterHumanoid.XEYEFGLF
+        or CCharacterHumanoid.XEYEFGRG
+    local _eyesy = CCharacterHumanoid.YEYE + self.size
+    if self.posture == CCharacter.POSTUREHIDE then
+        _eyesy = _eyesy + 1
+    end
+    if self.posture == CCharacter.POSTUREDOWN then
+        -- TODO rotate the eyes
+    end
+
+    self.eyesfgsprite.screenx = self.screenx + (_eyesx * self.scale)
+    self.eyesfgsprite.screeny = self.screeny + (_eyesy * self.scale)
     self.eyesfgsprite.scale = self.scale
     self.eyesfgsprite.palettemap[Tic.COLORWHITE] = self.coloreyesfg -- adjust the eyes palette
     self.eyesfgsprite:draw()
 end
 
 function CCharacterHumanoid:_drawEyesBG() -- draw bg eyes depending on dir h v
-    local _offset = 0 -- offset for x and y
-    _offset = (self.dirh == Tic.DIRHLF and CCharacterHumanoid.HEYEBGLF or CCharacterHumanoid.HEYEBGRG)
-    self.eyesbgsprite.screenx = self.screenx + (_offset * self.scale)
-    _offset = CCharacterHumanoid.VEYE + self.size + self.posture + self.dirv
-    self.eyesbgsprite.screeny = self.screeny + (_offset * self.scale)
+    local _eyesx = (self.dirx == Tic.DIRXLF) and CCharacterHumanoid.XEYEBGLF
+        or CCharacterHumanoid.XEYEBGRG
+    local _eyesy = CCharacterHumanoid.YEYE + self.size + self.diry
+    if self.posture == CCharacter.POSTUREHIDE then
+        _eyesy = _eyesy + 1
+    end
+    if self.posture == CCharacter.POSTUREDOWN then
+        -- TODO rotate the eyes
+    end
+
+    self.eyesbgsprite.screenx = self.screenx + (_eyesx * self.scale)
+    self.eyesbgsprite.screeny = self.screeny + (_eyesy * self.scale)
     self.eyesbgsprite.scale = self.scale
     self.eyesbgsprite.palettemap[Tic.COLORWHITE] = self.coloreyesbg -- adjust the eyes palette
     self.eyesbgsprite:draw()
@@ -421,14 +486,6 @@ function CPlayerDwarf:new(_argt)
     self.kind = CEntity.KINDDWARF
     self.colorhairsfg = Tic.COLORRED -- Dwarf colors
     self.colorhairsbg = Tic.COLORORANGE
-    self.colorskin    = Tic.COLORWHITE
-    self.colorextra   = self.colorskin
-    self.coloreyesfg  = Tic.COLORLGREY
-    self.coloreyesbg  = Tic.COLORMGREY
-    self.colorarmor   = Tic.COLORDGREY
-    self.colorshirt   = Tic.COLORMGREY
-    self.colorpants   = Tic.COLORLGREY
-    self.colorhands   = self.colorskin
     self.size = CCharacter.SIZES -- Dwarf size
     self.headsprite.sprite = CSpriteFG.HEADDWARF -- Dwarf head
     self:argt(_argt) -- override if any
@@ -442,14 +499,7 @@ function CPlayerGnome:new(_argt)
     self.kind = CEntity.KINDGNOME
     self.colorhairsfg = Tic.COLORORANGE -- Gnome colors
     self.colorhairsbg = Tic.COLORYELLOW
-    self.colorskin    = Tic.COLORWHITE
-    self.colorextra   = self.colorskin
-    self.coloreyesfg  = Tic.COLORLGREEN
-    self.coloreyesbg  = Tic.COLORMGREEN
-    self.colorarmor   = Tic.COLORDGREY
-    self.colorshirt   = Tic.COLORMGREY
     self.colorpants   = self.colorskin
-    self.colorhands   = self.colorskin
     self.size = CCharacter.SIZES -- Gnome size
     self.headsprite.sprite = CSpriteFG.HEADGNOME -- Gnome head
     self:argt(_argt) -- override if any
@@ -461,16 +511,8 @@ CEntity.KINDDROWE = "Drowe" -- default kind
 function CPlayerDrowe:new(_argt)
     CPlayerDrowe.super.new(self, _argt)
     self.kind = CEntity.KINDDROWE
-    self.colorhairsfg = Tic.COLORDGREY -- Drowe colors
-    self.colorhairsbg = Tic.COLORMGREY
-    self.colorskin    = Tic.COLORWHITE
-    self.colorextra   = self.colorskin
-    self.coloreyesfg  = Tic.COLORRED
+    self.coloreyesfg  = Tic.COLORRED -- Drowe colors
     self.coloreyesbg  = Tic.COLORPURPLE
-    self.colorarmor   = Tic.COLORDGREY
-    self.colorshirt   = Tic.COLORMGREY
-    self.colorpants   = Tic.COLORLGREY
-    self.colorhands   = self.colorskin
     self.size = CCharacter.SIZEM -- Drowe size
     self.headsprite.sprite = CSpriteFG.HEADDROWE -- Drowe head
     self:argt(_argt) -- override if any
@@ -482,16 +524,9 @@ CEntity.KINDANGEL = "Angel" -- default kind
 function CPlayerAngel:new(_argt)
     CPlayerAngel.super.new(self, _argt)
     self.kind = CEntity.KINDANGEL
-    self.colorhairsfg = Tic.COLORMGREY -- Angel colors
+    self.colorhairsfg = Tic.COLORGREYM -- Angel colors
     self.colorhairsbg = Tic.COLORWHITE
-    self.colorskin    = Tic.COLORWHITE
     self.colorextra   = Tic.COLORYELLOW
-    self.coloreyesfg  = Tic.COLORLGREY
-    self.coloreyesbg  = Tic.COLORMGREY
-    self.colorarmor   = Tic.COLORDGREY
-    self.colorshirt   = Tic.COLORMGREY
-    self.colorpants   = Tic.COLORLGREY
-    self.colorhands   = self.colorskin
     self.size = CCharacter.SIZEM -- Angel size
     self.headsprite.sprite = CSpriteFG.HEADANGEL -- Angel head
     self:argt(_argt) -- override if any
@@ -505,14 +540,9 @@ function CPlayerGogol:new(_argt)
     self.kind = CEntity.KINDGOGOL
     self.colorhairsfg = Tic.COLORWHITE -- Gogol colors
     self.colorhairsbg = Tic.COLORWHITE
-    self.colorskin    = Tic.COLORWHITE
-    self.colorextra   = Tic.COLORMGREY
-    self.coloreyesfg  = Tic.COLORLBLUE
-    self.coloreyesbg  = Tic.COLORMBLUE
-    self.colorarmor   = Tic.COLORDGREY
-    self.colorshirt   = self.colorextra
-    self.colorpants   = Tic.COLORLGREY
-    self.colorhands   = self.colorskin
+    self.colorextra   = self.colorshirt
+    self.coloreyesfg  = Tic.COLORBLUEL
+    self.coloreyesbg  = Tic.COLORBLUEM
     self.size = CCharacter.SIZEL -- Gogol size
     self.headsprite.sprite = CSpriteFG.HEADGOGOL -- Gogol head
     self:argt(_argt) -- override if any
@@ -526,14 +556,7 @@ function CPlayerHorne:new(_argt)
     self.kind = CEntity.KINDHORNE
     self.colorhairsfg = Tic.COLORPURPLE -- Horne colors
     self.colorhairsbg = Tic.COLORRED
-    self.colorskin    = Tic.COLORWHITE
-    self.colorextra   = Tic.COLORDGREY
-    self.coloreyesfg  = Tic.COLORLGREY
-    self.coloreyesbg  = Tic.COLORMGREY
-    self.colorarmor   = Tic.COLORDGREY
-    self.colorshirt   = Tic.COLORMGREY
-    self.colorpants   = Tic.COLORLGREY
-    self.colorhands   = self.colorskin
+    self.colorextra   = Tic.COLORGREYD
     self.size = CCharacter.SIZEM -- Horne size
     self.headsprite.sprite = CSpriteFG.HEADHORNE -- Horne head
     self:argt(_argt) -- override if any
@@ -564,18 +587,32 @@ CEntity.KINDMEDUZ = "Meduz" -- default kind
 function CPlayerMeduz:new(_argt)
     CPlayerMeduz.super.new(self, _argt)
     self.kind = CEntity.KINDMEDUZ
-    self.colorhairsfg = Tic.COLORDGREEN -- Meduz colors
-    self.colorhairsbg = Tic.COLORMGREEN
-    self.colorskin    = Tic.COLORWHITE
-    self.colorextra   = self.colorskin
-    self.coloreyesfg  = Tic.COLORMGREY
-    self.coloreyesbg  = Tic.COLORDGREY
-    self.colorarmor   = Tic.COLORDGREY
-    self.colorshirt   = Tic.COLORMGREY
-    self.colorpants   = Tic.COLORLGREY
-    self.colorhands   = self.colorskin
+    self.colorhairsfg = Tic.COLORGREEND -- Meduz colors
+    self.colorhairsbg = Tic.COLORGREENM
     self.size = CCharacter.SIZES -- Meduz size
     self.headsprite.sprite = CSpriteFG.HEADMEDUZ -- Meduz head
+    self:argt(_argt) -- override if any
+end
+
+
+local CPlayerGnoll = CPlayerHumanoid:extend() -- Gnoll player characters
+CEntity.KINDGNOLL = "Gnoll" -- default kind
+function CPlayerGnoll:new(_argt)
+    CPlayerGnoll.super.new(self, _argt)
+    self.kind = CEntity.KINDGNOLL
+    self.coloreyesfg  = Tic.COLORRED -- Gnoll colors
+    self.coloreyesbg  = Tic.COLORPURPLE
+    self.size = CCharacter.SIZEL -- Gnoll size
+    self.headsprite.sprite = CSpriteFG.HEADGNOLL -- Gnoll head
+    self:argt(_argt) -- override if any
+end
+
+
+local CPlayerWolfe = CPlayerGnoll:extend() -- Wolfe player characters
+CEntity.KINDWOLFE = "Wolfe" -- default kind
+function CPlayerWolfe:new(_argt)
+    CPlayerWolfe.super.new(self, _argt)
+    self.kind = CEntity.KINDTIFEL
     self:argt(_argt) -- override if any
 end
 
@@ -588,29 +625,36 @@ local CEnnemy = CCharacter:extend() -- ennemy characters
 
 
 -- Characters
-local Truduk = CPlayerDwarf()
-local Prinnn = CPlayerGnome()
-local Kaptan = CPlayerMeduz()
-local Kaptin = CPlayerMeduz({
-    colorhairsbg = Tic.COLORLBLUE,
-    colorhairsfg = Tic.COLORMBLUE,
-})
-local Nitcha = CPlayerDrowe()
-local Zariel = CPlayerAngel()
-local Zikkow = CPlayerTifel({
-    colorhairsbg = Tic.COLORMGREEN,
-    colorhairsfg = Tic.COLORDGREEN,
-    colorextra   = Tic.COLORMGREY,
+local Truduk = CPlayerDwarf{name = "Truduk",}
+local Prinnn = CPlayerGnome{name = "Prinnn",}
+local Kaptan = CPlayerMeduz{name = "Kaptan",}
+local Kaptin = CPlayerMeduz{name = "Kaptin",
+    colorhairsbg = Tic.COLORBLUEL,
+    colorhairsfg = Tic.COLORBLUEM,
+}
+local Nitcha = CPlayerDrowe{name = "Nitcha",}
+local Zariel = CPlayerAngel{name = "Zariel",}
+local Zikkow = CPlayerTifel{name = "Zikkow",
+    colorhairsbg = Tic.COLORGREENM,
+    colorhairsfg = Tic.COLORGREEND,
+    colorextra   = Tic.COLORGREYM,
     coloreyesbg  = Tic.COLORORANGE,
     coloreyesfg  = Tic.COLORYELLOW,
-})
-local Daemok = CPlayerDemon()
-local Golith = CPlayerGogol()
--- Tic:trace(Golith:_size())
--- Tic:trace(table.unpack(Golith:_keys()))
--- Tic:trace(table.unpack(Golith:_vals()))
+}
+local Kaainn = CPlayerDemon{name = "Kaainn",
+    colorhairsbg = Tic.COLORGREYL,
+    colorhairsfg = Tic.COLORWHITE,
+    coloreyesbg  = Tic.COLORBLUEM,
+    coloreyesfg  = Tic.COLORBLUEL,
+    size         = CCharacter.SIZEM,
+    colorshirt   = Tic.COLORPURPLE,
+    colorpants   = Tic.COLORRED,
+}
+local Daemok = CPlayerDemon{name = "Daemok",}
+local Golith = CPlayerGogol{name = "Golith",}
+local Wolfie = CPlayerWolfe{name = "Wolfie",}
 
--- exit()
+
 
 -- Drawing
 function Tic:draw()
@@ -622,48 +666,53 @@ function Tic:draw()
 
     cls()
 
-    -- local _scale = Tic.SPRITESCALE01
-    local _scale = Tic.SPRITESCALE02
+    -- local _scale = CSprite.SCALE01
+    local _scale = CSprite.SCALE02
     local _screenx = 50
     local _screeny = 0
+    local _posture = CCharacter.POSTUREMOVE
     for _, _character in ipairs(Tic.Players) do
         _character.scale = _scale
         _character.screenx = _screenx
+        _character.frame = _frame
+        _character.posture = _posture
 
         _character.screeny = _screeny
-        _character.dirh = Tic.DIRHLF
-        _character.dirv = Tic.DIRVUP
+        _character.dirx = Tic.DIRXLF
+        _character.diry = Tic.DIRYUP
         _character:draw()
 
-        _character.screeny = _character.screeny + (8 * _scale) + 1
-        _character.dirh = Tic.DIRHLF
-        _character.dirv = Tic.DIRVMD
+        _character.screeny = _character.screeny + (8 * _scale) + 2
+        _character.dirx = Tic.DIRXLF
+        _character.diry = Tic.DIRYMD
         _character:draw()
 
-        _character.screeny = _character.screeny + (8 * _scale) + 1
-        _character.dirh = Tic.DIRHLF
-        _character.dirv = Tic.DIRVDW
+        _character.screeny = _character.screeny + (8 * _scale) + 2
+        _character.dirx = Tic.DIRXLF
+        _character.diry = Tic.DIRYDW
         _character:draw()
 
-        _character.screeny = _character.screeny + (8 * _scale) + 1
-        _character.dirh = Tic.DIRHRG
-        _character.dirv = Tic.DIRVUP
+        _character.screeny = _character.screeny + (8 * _scale) + 2
+        _character.dirx = Tic.DIRXRG
+        _character.diry = Tic.DIRYUP
         _character:draw()
 
-        _character.screeny = _character.screeny + (8 * _scale) + 1
-        _character.dirh = Tic.DIRHRG
-        _character.dirv = Tic.DIRVMD
+        _character.screeny = _character.screeny + (8 * _scale) + 2
+        _character.dirx = Tic.DIRXRG
+        _character.diry = Tic.DIRYMD
         _character:draw()
 
-        _character.screeny = _character.screeny + (8 * _scale) + 1
-        _character.dirh = Tic.DIRHRG
-        _character.dirv = Tic.DIRVDW
+        _character.screeny = _character.screeny + (8 * _scale) + 2
+        _character.dirx = Tic.DIRXRG
+        _character.diry = Tic.DIRYDW
         _character:draw()
         
         _screenx = _screenx + (8 * _scale) + 1
 
-        Tic:logStack("K:", _character.kind)
+        -- Tic:logStack("N:", _character.name)
+        -- Tic:logStack("K:", _character.kind)
     end
+    Tic.Players[Tic.CurrentPlayer]:portrait()
 
     Tic:logPrint()
 

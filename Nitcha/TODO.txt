@@ -1,2 +1,6 @@
-- cycle numerics
+x cycle numerics
 - cycle tables
+
+- add posture down
+- add gnolls
+- EYES

@@ -15,11 +15,17 @@ end
 CPlayer = CCharacter:extend()
 function CPlayer:new(_argt)
   self.super.new(self, _argt)
+  self:argt(_argt)
 end
 
 
 
-Golith = CPlayer()
+-- CGolith = CPlayer:extend()
+-- function CGolith:new(_argt)
+--   self.super.new(self, _argt)
+-- end
+-- Golith = CGolith()
+Golith = CPlayer{name = "Golith"}
 
 print(":Golith 1:")
 print(Golith:_size())
@@ -70,3 +76,6 @@ Jeandu:argt({
 print(Jeandu:_size())
 print(table.unpack(Jeandu:_keys()))
 print(table.unpack(Jeandu:_vals()))
+
+print(Golith:is(Golith))
+print(Golith.name)
