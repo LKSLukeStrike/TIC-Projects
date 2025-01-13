@@ -139,12 +139,11 @@ Tic.Tick = CCyclerInt({
 
 
 -- Players System -- add new players to a players stack
-Tic.Players = {}
-Tic.CurrentPlayer = 0
-function Tic:playerStack(_player) -- set the current player to the last added
-    table.insert(Tic.Players, _player)
-    Tic.CurrentPlayer = #Tic.Players
-end
+Tic.Players = CCyclerTab()
+-- function Tic:stackPlayer(_player) -- set the current player to the last added
+--     table.insert(Tic.Players, _player)
+--     Tic.CurrentPlayer = #Tic.Players
+-- end
 
 
 -- Trace
@@ -158,16 +157,13 @@ function Tic:trace(...) -- trace with multiple args
     trace(_output)
 end
 
-function Tic:traceTable(_table, _sort, _recurse) -- trace a table keys, vals and vals types -- sorted if any
+-- TODO
+function Tic:traceTable(_table, _recurse) -- trace a table keys, vals and vals types -- recurse by default
     if type(_table) ~= "table" then return end
-    Tic:trace(type(_table))
-    Tic:trace(#_table)
-    local _worktable = {table.unpack(_table)} -- work on a copy
-    Tic:trace(#_worktable)
-    if _sort then table.sort(_worktable) end -- sort if any
-    for _key, _val in pairs(_worktable) do
-        if type(_val) == "table" and _recurse then
-            Tic:traceTable(_val, _sort, _recurse)
+    _recurse = (_recurse == false) and false or true
+    for _key, _val in pairs(_table) do
+        if (type(_val) == "table") and _recurse then
+            Tic:traceTable(_val, _recurse)
         else
             Tic:trace(_key, _val, type(_val))
         end
@@ -234,7 +230,7 @@ end
 local CSpriteFG = CSprite:extend() --fg sprites aka tic sprites
 CSpriteFG.SPRITEBANK  = 256
 CSpriteFG.SPRITEPIXEL = CSpriteFG.SPRITEBANK -- single pixel
-CSpriteFG.HEADBANK    = 416 -- characters heads
+CSpriteFG.HEADBANK    = 272 -- characters heads
 CSpriteFG.HEADDWARF   = CSpriteFG.HEADBANK + 0
 CSpriteFG.HEADGNOME   = CSpriteFG.HEADBANK + 1
 CSpriteFG.HEADDROWE   = CSpriteFG.HEADBANK + 2
@@ -243,7 +239,7 @@ CSpriteFG.HEADANGEL   = CSpriteFG.HEADBANK + 4
 CSpriteFG.HEADHORNE   = CSpriteFG.HEADBANK + 5
 CSpriteFG.HEADMEDUZ   = CSpriteFG.HEADBANK + 6
 CSpriteFG.HEADGNOLL   = CSpriteFG.HEADBANK + 7
-CSpriteFG.BODYHUMAN   = 396 -- sprite for humanoid bodies
+CSpriteFG.BODYHUMAN   = 288 -- sprite for humanoid bodies
 function CSpriteFG:new(_argt)
     CSpriteFG.super.new(self, _argt)
     self.spritebank = CSpriteFG.SPRITEBANK
@@ -474,8 +470,8 @@ end
 
 
 local IPlayer = CCharacter:extend() -- players characters interface
-function IPlayer:playerStack()
-    Tic:playerStack(self) -- record the new player on tic
+function IPlayer:stackPlayer()
+    Tic.Players:insert(self) -- record the new player on tic
 end
 
 
@@ -483,7 +479,7 @@ local CPlayerHumanoid = CCharacterHumanoid:extend() -- humanoid player character
 CPlayerHumanoid:implement(IPlayer)
 function CPlayerHumanoid:new(_argt)
     CPlayerHumanoid.super.new(self, _argt)
-    self:playerStack()
+    self:stackPlayer()
     self:argt(_argt) -- override if any
 end
 
@@ -621,7 +617,7 @@ local CPlayerWolfe = CPlayerGnoll:extend() -- Wolfe player characters
 CEntity.KINDWOLFE = "Wolfe" -- default kind
 function CPlayerWolfe:new(_argt)
     CPlayerWolfe.super.new(self, _argt)
-    self.kind = CEntity.KINDTIFEL
+    self.kind = CEntity.KINDWOLFE
     self:argt(_argt) -- override if any
 end
 
@@ -662,16 +658,28 @@ local Kaainn = CPlayerDemon{name = "Kaainn",
 local Daemok = CPlayerDemon{name = "Daemok",}
 local Golith = CPlayerGogol{name = "Golith",}
 local Wolfie = CPlayerWolfe{name = "Wolfie", colorextra = Tic.COLORPURPLE}
+-- Tic:trace("ok")
+-- Tic:traceTable(Tic.Players.acttable)
+-- exit()
 
 
-
+local _postures = CCyclerTab()
+_postures:insert(CCharacter.POSTUREIDLE)
+_postures:insert(CCharacter.POSTUREMOVE)
+_postures:insert(CCharacter.POSTUREHIDE)
 -- Drawing
 function Tic:draw()
     local _tick = Tic.Tick.actvalue
+    if _tick == 0 then
+        _postures:next()
+        Tic.Players:next()
+    end
+    local _posture = _postures.actvalue
     local _frame = _tick // 30
 
     Tic:logStack("T:", _tick)
     Tic:logStack("F:", _frame)
+    Tic:logStack("P:", _posture)
 
     cls()
 
@@ -679,8 +687,7 @@ function Tic:draw()
     local _scale = CSprite.SCALE02
     local _screenx = 50
     local _screeny = 0
-    local _posture = CCharacter.POSTUREMOVE
-    for _, _character in ipairs(Tic.Players) do
+    for _, _character in ipairs(Tic.Players.acttable) do
         _character.scale = _scale
         _character.screenx = _screenx
         _character.frame = _frame
@@ -721,7 +728,7 @@ function Tic:draw()
         -- Tic:logStack("N:", _character.name)
         -- Tic:logStack("K:", _character.kind)
     end
-    Tic.Players[Tic.CurrentPlayer]:portrait(true)
+    Tic.Players.actvalue:portrait(true)
 
     Tic:logPrint()
 
