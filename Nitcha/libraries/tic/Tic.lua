@@ -172,7 +172,7 @@ end
 
 
 --
--- Classic
+-- Sprite
 --
 local CSprite = Classic:extend() -- general sprites
 CSprite.SPRITEBANK = 0
@@ -198,12 +198,12 @@ function CSprite:new(_argt)
     self.rotate = CSprite.ROTATE000 -- no rotation by default
     self.width = 1 -- sprite 1x1 by default
     self.height = 1
-    -- self.palettemap -- optional palette map for swapping
+    -- self.palette -- optional palette map for swapping
     self:argt(_argt) -- override if any
 end
 
 function CSprite:draw() -- draw a sprite
-    for _key, _val in pairs(self.palettemap or {}) do -- swap palette colors if any
+    for _key, _val in pairs(self.palette or {}) do -- swap palette colors if any
         poke4(Tic.PALETTEMAP + _key, _val)
     end
     spr(
@@ -217,7 +217,7 @@ function CSprite:draw() -- draw a sprite
         self.width,
         self.height
     )
-    for _key, _val in pairs(self.palettemap or {}) do -- restore palette colors if any
+    for _key, _val in pairs(self.palette or {}) do -- restore palette colors if any
         poke4(Tic.PALETTEMAP + _key, _key)
     end
 end
@@ -251,14 +251,18 @@ function CSpriteFG:new(_argt)
 end
 
 
-local CSpriteFGPaletteMap = CSpriteFG:extend() --fg sprites with a palette map
-function CSpriteFGPaletteMap:new(_argt)
-    CSpriteFGPaletteMap.super.new(self, _argt)
-    self.palettemap = {} -- empty by default, can be filled later
+local CSpriteFGPalette = CSpriteFG:extend() --fg sprites with a palette map
+function CSpriteFGPalette:new(_argt)
+    CSpriteFGPalette.super.new(self, _argt)
+    self.palette = {} -- empty by default, can be filled later
     self:argt(_argt) -- override if any
 end
+local MUSpriteFGPalette = CSpriteFGPalette() -- multi usage unique sprite
 
 
+--
+-- Entity
+--
 local CEntity = Classic:extend() -- general entities like places, objects, characters ...
 CEntity.NAMENOBODY = "Nobody" -- default name
 CEntity.KINDENTITY = "Entity" -- default kind
@@ -309,13 +313,14 @@ function CCharacter:new(_argt)
     self.colorshirt   = Tic.COLORSHIRT
     self.colorpants   = Tic.COLORPANTS
     self.colorhands   = Tic.COLORHANDS
-    self.headsprite   = CSpriteFGPaletteMap() -- character head
+    self.spritehead   = CSpriteFG.HEADDROWE -- HERE
+    self.headsprite   = CSpriteFGPalette() -- character head
     self.headsprite.sprite = CSpriteFG.HEADDROWE
-    self.bodysprite   = CSpriteFGPaletteMap() -- character body
+    self.bodysprite   = CSpriteFGPalette() -- character body
     self.bodysprite.sprite = CSpriteFG.BODYHUMAN
-    self.eyesfgsprite = CSpriteFGPaletteMap() -- character eyes fg
+    self.eyesfgsprite = CSpriteFGPalette() -- character eyes fg
     self.eyesfgsprite.sprite = CSpriteFG.SPRITEPIXEL
-    self.eyesbgsprite = CSpriteFGPaletteMap() -- character eyes fg
+    self.eyesbgsprite = CSpriteFGPalette() -- character eyes fg
     self.eyesbgsprite.sprite = CSpriteFG.SPRITEPIXEL
     self:argt(_argt) -- override if any
 end
@@ -418,15 +423,16 @@ function CCharacterHumanoid:_drawBody()
     self.bodysprite.frame = _frame
     self.bodysprite.scale = self.scale
     self.bodysprite.flip = self.dirx -- flip h if any
-    self.bodysprite.palettemap[Tic.COLORARMOR] = self.colorarmor -- apply body palette
-    self.bodysprite.palettemap[Tic.COLORSHIRT] = self.colorshirt
-    self.bodysprite.palettemap[Tic.COLORPANTS] = self.colorpants
-    self.bodysprite.palettemap[Tic.COLORHANDS] = self.colorhands
+    self.bodysprite.palette[Tic.COLORARMOR] = self.colorarmor -- apply body palette
+    self.bodysprite.palette[Tic.COLORSHIRT] = self.colorshirt
+    self.bodysprite.palette[Tic.COLORPANTS] = self.colorpants
+    self.bodysprite.palette[Tic.COLORHANDS] = self.colorhands
     self.bodysprite:draw()
 end
 
 function CCharacterHumanoid:_drawHead()
-    local _sprite = self.headsprite.sprite -- redundant
+    local _sprite = self.spritehead -- HERE
+    -- local _sprite = self.headsprite.sprite -- redundant
     local _offsetx = 0
     local _offsety = (self.posture == CCharacter.POSTUREHIDE)
     and self.size + 1
@@ -437,17 +443,17 @@ function CCharacterHumanoid:_drawHead()
         _rotate = CSprite.ROTATE090
     end
 
-    self.headsprite.sprite = _sprite -- apply the corresponding attributes
-    self.headsprite.screenx = self.screenx + (_offsetx * self.scale)
-    self.headsprite.screeny = self.screeny + (_offsety * self.scale)
-    self.headsprite.rotate = _rotate
-    self.headsprite.scale = self.scale
-    self.headsprite.flip = self.dirx -- flip h if any
-    self.headsprite.palettemap[Tic.COLORHAIRSFG] = self.colorhairsfg -- apply head palette
-    self.headsprite.palettemap[Tic.COLORHAIRSBG] = self.colorhairsbg
-    self.headsprite.palettemap[Tic.COLOREXTRA]   = self.colorextra
-    self.headsprite.palettemap[Tic.COLORSKIN]    = self.colorskin
-    self.headsprite:draw()
+    MUSpriteFGPalette.sprite = _sprite -- apply the corresponding attributes
+    MUSpriteFGPalette.screenx = self.screenx + (_offsetx * self.scale)
+    MUSpriteFGPalette.screeny = self.screeny + (_offsety * self.scale)
+    MUSpriteFGPalette.rotate = _rotate
+    MUSpriteFGPalette.scale = self.scale
+    MUSpriteFGPalette.flip = self.dirx -- flip h if any
+    MUSpriteFGPalette.palette[Tic.COLORHAIRSFG] = self.colorhairsfg -- apply head palette
+    MUSpriteFGPalette.palette[Tic.COLORHAIRSBG] = self.colorhairsbg
+    MUSpriteFGPalette.palette[Tic.COLOREXTRA]   = self.colorextra
+    MUSpriteFGPalette.palette[Tic.COLORSKIN]    = self.colorskin
+    MUSpriteFGPalette:draw()
     self:_drawEyes()
 end
 
@@ -477,7 +483,7 @@ function CCharacterHumanoid:_drawEyesFG() -- draw fg eyes depending on dir h v
     self.eyesfgsprite.screenx = self.screenx + (_offsetx * self.scale)
     self.eyesfgsprite.screeny = self.screeny + (_offsety * self.scale)
     self.eyesfgsprite.scale = self.scale
-    self.eyesfgsprite.palettemap[Tic.COLORWHITE] = _color -- adjust the eyes palette
+    self.eyesfgsprite.palette[Tic.COLORWHITE] = _color -- adjust the eyes palette
     self.eyesfgsprite:draw()
 end
 
@@ -502,7 +508,7 @@ function CCharacterHumanoid:_drawEyesBG() -- draw bg eyes depending on dir h v
     self.eyesbgsprite.screenx = self.screenx + (_offsetx * self.scale)
     self.eyesbgsprite.screeny = self.screeny + (_offsety * self.scale)
     self.eyesbgsprite.scale = self.scale
-    self.eyesbgsprite.palettemap[Tic.COLORWHITE] = _color -- adjust the eyes palette
+    self.eyesbgsprite.palette[Tic.COLORWHITE] = _color -- adjust the eyes palette
     self.eyesbgsprite:draw()
 end
 
@@ -523,139 +529,139 @@ end
 
 
 local CPlayerDwarf = CPlayerHumanoid:extend() -- Dwarf player characters
-CEntity.KINDDWARF = "Dwarf" -- default kind
+CEntity.KINDDWARF = "Dwarf" -- Dwarf kind
 function CPlayerDwarf:new(_argt)
     CPlayerDwarf.super.new(self, _argt)
-    self.kind = CEntity.KINDDWARF
-    self.colorhairsfg = Tic.COLORRED -- Dwarf colors
+    self.kind = CEntity.KINDDWARF -- kind
+    self.colorhairsfg = Tic.COLORRED -- colors
     self.colorhairsbg = Tic.COLORORANGE
-    self.size = CCharacter.SIZES -- Dwarf size
-    self.headsprite.sprite = CSpriteFG.HEADDWARF -- Dwarf head
+    self.size         = CCharacter.SIZES -- size
+    self.spritehead   = CSpriteFG.HEADDWARF -- head
     self:argt(_argt) -- override if any
 end
 
 
 local CPlayerGnome = CPlayerHumanoid:extend() -- Gnome player characters
-CEntity.KINDGNOME = "Gnome" -- default kind
+CEntity.KINDGNOME = "Gnome" -- Gnome kind
 function CPlayerGnome:new(_argt)
     CPlayerGnome.super.new(self, _argt)
-    self.kind = CEntity.KINDGNOME
-    self.colorhairsfg = Tic.COLORORANGE -- Gnome colors
+    self.kind         = CEntity.KINDGNOME -- kind
+    self.colorhairsfg = Tic.COLORORANGE -- colors
     self.colorhairsbg = Tic.COLORYELLOW
     self.colorpants   = self.colorskin
-    self.size = CCharacter.SIZES -- Gnome size
-    self.headsprite.sprite = CSpriteFG.HEADGNOME -- Gnome head
+    self.size         = CCharacter.SIZES -- size
+    self.spritehead   = CSpriteFG.HEADGNOME -- head
     self:argt(_argt) -- override if any
 end
 
 
 local CPlayerDrowe = CPlayerHumanoid:extend() -- Drowe player characters
-CEntity.KINDDROWE = "Drowe" -- default kind
+CEntity.KINDDROWE = "Drowe" -- Drowe kind
 function CPlayerDrowe:new(_argt)
     CPlayerDrowe.super.new(self, _argt)
-    self.kind = CEntity.KINDDROWE
-    self.coloreyesfg  = Tic.COLORRED -- Drowe colors
+    self.kind         = CEntity.KINDDROWE -- kind
+    self.coloreyesfg  = Tic.COLORRED -- colors
     self.coloreyesbg  = Tic.COLORPURPLE
-    self.size = CCharacter.SIZEM -- Drowe size
-    self.headsprite.sprite = CSpriteFG.HEADDROWE -- Drowe head
+    self.size         = CCharacter.SIZEM -- size
+    self.spritehead   = CSpriteFG.HEADDROWE -- head
     self:argt(_argt) -- override if any
 end
 
 
 local CPlayerAngel = CPlayerHumanoid:extend() -- Angel player characters
-CEntity.KINDANGEL = "Angel" -- default kind
+CEntity.KINDANGEL = "Angel" -- Angel kind
 function CPlayerAngel:new(_argt)
     CPlayerAngel.super.new(self, _argt)
-    self.kind = CEntity.KINDANGEL
-    self.colorhairsfg = Tic.COLORGREYM -- Angel colors
+    self.kind         = CEntity.KINDANGEL -- kind
+    self.colorhairsfg = Tic.COLORGREYM -- colors
     self.colorhairsbg = Tic.COLORWHITE
     self.colorextra   = Tic.COLORYELLOW
-    self.size = CCharacter.SIZEM -- Angel size
-    self.headsprite.sprite = CSpriteFG.HEADANGEL -- Angel head
+    self.size         = CCharacter.SIZEM -- size
+    self.spritehead   = CSpriteFG.HEADANGEL -- head
     self:argt(_argt) -- override if any
 end
 
 
 local CPlayerGogol = CPlayerHumanoid:extend() -- Gogol player characters
-CEntity.KINDGOGOL = "Gogol" -- default kind
+CEntity.KINDGOGOL = "Gogol" -- Gogol kind
 function CPlayerGogol:new(_argt)
     CPlayerGogol.super.new(self, _argt)
-    self.kind = CEntity.KINDGOGOL
-    self.colorhairsfg = Tic.COLORWHITE -- Gogol colors
+    self.kind         = CEntity.KINDGOGOL -- kind
+    self.colorhairsfg = Tic.COLORWHITE -- colors
     self.colorhairsbg = Tic.COLORWHITE
     self.colorextra   = self.colorshirt
     self.coloreyesfg  = Tic.COLORBLUEL
     self.coloreyesbg  = Tic.COLORBLUEM
-    self.size = CCharacter.SIZEL -- Gogol size
-    self.headsprite.sprite = CSpriteFG.HEADGOGOL -- Gogol head
+    self.size         = CCharacter.SIZEL -- size
+    self.spritehead   = CSpriteFG.HEADGOGOL -- head
     self:argt(_argt) -- override if any
 end
 
 
 local CPlayerHorne = CPlayerHumanoid:extend() -- Horne player characters
-CEntity.KINDHORNE = "Horne" -- default kind
+CEntity.KINDHORNE = "Horne" -- Horne kind
 function CPlayerHorne:new(_argt)
     CPlayerHorne.super.new(self, _argt)
-    self.kind = CEntity.KINDHORNE
-    self.colorhairsfg = Tic.COLORPURPLE -- Horne colors
+    self.kind         = CEntity.KINDHORNE -- kind
+    self.colorhairsfg = Tic.COLORPURPLE -- colors
     self.colorhairsbg = Tic.COLORRED
     self.colorextra   = Tic.COLORGREYD
-    self.size = CCharacter.SIZEM -- Horne size
-    self.headsprite.sprite = CSpriteFG.HEADHORNE -- Horne head
+    self.size         = CCharacter.SIZEM -- size
+    self.spritehead   = CSpriteFG.HEADHORNE -- head
     self:argt(_argt) -- override if any
 end
 
 
 local CPlayerDemon = CPlayerHorne:extend() -- Demon player characters
-CEntity.KINDDEMON = "Demon" -- default kind
+CEntity.KINDDEMON = "Demon" -- Demon kind
 function CPlayerDemon:new(_argt)
     CPlayerDemon.super.new(self, _argt)
-    self.kind = CEntity.KINDDEMON
-    self.size = CCharacter.SIZEL -- Demon size
+    self.kind         = CEntity.KINDDEMON -- kind
+    self.size         = CCharacter.SIZEL -- size
     self:argt(_argt) -- override if any
 end
 
 
 local CPlayerTifel = CPlayerHorne:extend() -- Tifel player characters
-CEntity.KINDTIFEL = "Tifel" -- default kind
+CEntity.KINDTIFEL = "Tifel" -- Tifel kind
 function CPlayerTifel:new(_argt)
     CPlayerTifel.super.new(self, _argt)
-    self.kind = CEntity.KINDTIFEL
+    self.kind         = CEntity.KINDTIFEL -- kind
     self:argt(_argt) -- override if any
 end
 
 
 local CPlayerMeduz = CPlayerHumanoid:extend() -- Meduz player characters
-CEntity.KINDMEDUZ = "Meduz" -- default kind
+CEntity.KINDMEDUZ = "Meduz" -- Meduz kind
 function CPlayerMeduz:new(_argt)
     CPlayerMeduz.super.new(self, _argt)
-    self.kind = CEntity.KINDMEDUZ
-    self.colorhairsfg = Tic.COLORGREEND -- Meduz colors
+    self.kind         = CEntity.KINDMEDUZ -- kind
+    self.colorhairsfg = Tic.COLORGREEND -- colors
     self.colorhairsbg = Tic.COLORGREENM
-    self.size = CCharacter.SIZES -- Meduz size
-    self.headsprite.sprite = CSpriteFG.HEADMEDUZ -- Meduz head
+    self.size         = CCharacter.SIZES -- size
+    self.spritehead   = CSpriteFG.HEADMEDUZ -- head
     self:argt(_argt) -- override if any
 end
 
 
 local CPlayerGnoll = CPlayerHumanoid:extend() -- Gnoll player characters
-CEntity.KINDGNOLL = "Gnoll" -- default kind
+CEntity.KINDGNOLL = "Gnoll" -- Gnoll kind
 function CPlayerGnoll:new(_argt)
     CPlayerGnoll.super.new(self, _argt)
-    self.kind = CEntity.KINDGNOLL
-    self.coloreyesfg  = Tic.COLORRED -- Gnoll colors
+    self.kind         = CEntity.KINDGNOLL -- kind
+    self.coloreyesfg  = Tic.COLORRED -- colors
     self.coloreyesbg  = Tic.COLORPURPLE
-    self.size = CCharacter.SIZEL -- Gnoll size
-    self.headsprite.sprite = CSpriteFG.HEADGNOLL -- Gnoll head
+    self.size         = CCharacter.SIZEL -- size
+    self.spritehead   = CSpriteFG.HEADGNOLL -- head
     self:argt(_argt) -- override if any
 end
 
 
 local CPlayerWolfe = CPlayerGnoll:extend() -- Wolfe player characters
-CEntity.KINDWOLFE = "Wolfe" -- default kind
+CEntity.KINDWOLFE = "Wolfe" -- Wolfe kind
 function CPlayerWolfe:new(_argt)
     CPlayerWolfe.super.new(self, _argt)
-    self.kind = CEntity.KINDWOLFE
+    self.kind         = CEntity.KINDWOLFE -- kind
     self:argt(_argt) -- override if any
 end
 
