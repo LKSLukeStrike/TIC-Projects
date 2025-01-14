@@ -462,7 +462,7 @@ function CCharacterHumanoid:_drawEyes()
     self:_drawEyesBG()
 end
 
-function CCharacterHumanoid:_drawEyesFG() -- draw fg eyes depending on dir h v
+function CCharacterHumanoid:_drawEyesFG() -- draw fg eyes depending on dir x y
     local _musprite = CSpriteFGPalette() -- multi usage unique sprite
     local _sprite = CSpriteFG.SPRITEPIXEL
     local _offsetx = (self.dirx == Tic.DIRXLF)
@@ -488,7 +488,7 @@ function CCharacterHumanoid:_drawEyesFG() -- draw fg eyes depending on dir h v
     _musprite:draw()
 end
 
-function CCharacterHumanoid:_drawEyesBG() -- draw bg eyes depending on dir h v
+function CCharacterHumanoid:_drawEyesBG() -- draw bg eyes depending on dir x y
     local _musprite = CSpriteFGPalette() -- multi usage unique sprite
     local _sprite = CSpriteFG.SPRITEPIXEL
     local _offsetx = (self.dirx == Tic.DIRXLF)
