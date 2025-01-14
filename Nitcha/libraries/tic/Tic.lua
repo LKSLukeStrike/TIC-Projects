@@ -83,11 +83,6 @@ Tic.DIRYMD = 0 -- v directions -- also the sprite offset
 Tic.DIRYUP = Tic.DIRYMD - 1
 Tic.DIRYDW = Tic.DIRYMD + 1
 
-Tic.ROTATE000 =  0 -- sprite rotations
-Tic.ROTATE090 =  90
-Tic.ROTATE180 =  180
-Tic.ROTATE270 =  270
-
 Tic.STRESSMIN = 0 -- stress handling
 Tic.STRESSMAX = 100
 
@@ -151,16 +146,20 @@ function Tic:trace(...) -- trace with multiple args
     local _args = {...}
     local _output = ""
     for _, _val in pairs(_args) do
-        _val = (type(_val) == "table" or type(_val) == "function") and type(_val) or _val -- for concat
+        _val = (type(_val) == "table" or type(_val) == "function")
+            and type(_val)
+            or  _val -- for concat
         _output = _output.._val.." "
     end
     trace(_output)
 end
 
--- TODO
+-- TODO sort ?
 function Tic:traceTable(_table, _recurse) -- trace a table keys, vals and vals types -- recurse by default
     if type(_table) ~= "table" then return end
-    _recurse = (_recurse == false) and false or true
+    _recurse = (_recurse == false)
+        and false
+        or  true
     for _key, _val in pairs(_table) do
         if (type(_val) == "table") and _recurse then
             Tic:traceTable(_val, _recurse)
@@ -182,6 +181,10 @@ CSprite.SCALE02 = 02
 CSprite.FRAMEOF = 16 -- sprites frames offset multiplier
 CSprite.FRAME00 = 00 -- sprites frames -- /!\ start at 0, used to compute the offset
 CSprite.FRAME01 = 01
+CSprite.ROTATE000 =  0 -- sprite rotations
+CSprite.ROTATE090 =  1
+CSprite.ROTATE180 =  2
+CSprite.ROTATE270 =  3
 function CSprite:new(_argt)
     CSprite.super.new(self, _argt)
     self.spritebank = CSprite.SPRITEBANK
@@ -192,7 +195,7 @@ function CSprite:new(_argt)
     self.colorkey = Tic.COLORKEY -- default colorkey
     self.scale = CSprite.SCALE01 -- default scale
     self.flip = Tic.DIRXLF -- all sprites are dir h left by default
-    self.rotate = Tic.ROTATE000 -- no rotation by default
+    self.rotate = CSprite.ROTATE000 -- no rotation by default
     self.width = 1 -- sprite 1x1 by default
     self.height = 1
     -- self.palettemap -- optional palette map for swapping
@@ -318,7 +321,9 @@ function CCharacter:new(_argt)
 end
 
 function CCharacter:portrait(_still) -- draw the portrait -- animated or _still
-    _still = (_still == true) and true or false
+    _still = (_still == true)
+        and true
+        or  false
     local _screenx = self.screenx -- save character attributes
     local _screeny = self.screeny
     local _scale = self.scale
@@ -350,7 +355,6 @@ function CCharacter:draw()
     self:_drawShield()
     self:_drawBody()
     self:_drawHead()
-    self:_drawEyes()
     self:_drawStatus()
 end
 
@@ -360,41 +364,20 @@ end
 function CCharacter:_drawShield()
 end
 
-function CCharacter:_drawHead()
-    local _heady = self.size
-    if self.posture == CCharacter.POSTUREHIDE then
-        _heady = _heady + 1
-    end
-    if self.posture == CCharacter.POSTUREDOWN then
-        -- TODO rotate the head
-    end
-
-    self.headsprite.screenx = self.screenx -- apply screen positions and scale
-    self.headsprite.screeny = self.screeny + (_heady * self.scale) -- adjust the head y position
-    self.headsprite.scale = self.scale
-    self.headsprite.flip = self.dirx -- flip h if any
-    self.headsprite.palettemap[Tic.COLORHAIRSFG] = self.colorhairsfg -- apply head palette
-    self.headsprite.palettemap[Tic.COLORHAIRSBG] = self.colorhairsbg
-    self.headsprite.palettemap[Tic.COLOREXTRA]   = self.colorextra
-    self.headsprite.palettemap[Tic.COLORSKIN]    = self.colorskin
-    self.headsprite:draw()
-end
-
-function CCharacter:_drawEyes()
-    self:_drawEyesFG()
-    self:_drawEyesBG()
-end
-
 function CCharacter:_drawStatus()
 end
 
 
 local CCharacterHumanoid = CCharacter:extend() -- humanoid characters
-CCharacterHumanoid.YEYE     = 2 -- y eyes offsets
-CCharacterHumanoid.XEYEBGLF = 2 -- x eyes offsets
-CCharacterHumanoid.XEYEFGLF = 3
-CCharacterHumanoid.XEYEFGRG = 4
-CCharacterHumanoid.XEYEBGRG = 5
+CCharacterHumanoid.EYEXBGLF = 2 -- x eyes offsets
+CCharacterHumanoid.EYEXFGLF = 3
+CCharacterHumanoid.EYEXFGRG = 4
+CCharacterHumanoid.EYEXBGRG = 5
+CCharacterHumanoid.EYEXDWLF = 5 -- down left
+CCharacterHumanoid.EYEXDWRG = 2 -- down right
+CCharacterHumanoid.EYEYIDLE = 2 -- y eyes offsets
+CCharacterHumanoid.EYEYDWBG = 4
+CCharacterHumanoid.EYEYDWFG = 5
 CEntity.KINDHUMANOID = "Humanoid" -- default kind
 function CCharacterHumanoid:new(_argt)
     CCharacterHumanoid.super.new(self, _argt)
@@ -414,16 +397,26 @@ end
 
 function CCharacterHumanoid:_drawBody()
     local _sprite = CSpriteFG.BODYHUMAN + self.posture
+    local _offsetx = 0
+    local _offsety = 0
+    local _rotate  = CSprite.ROTATE000
+    local _frame = self.frame
     if self.posture == CCharacter.POSTUREDOWN then
         _sprite = CSpriteFG.BODYHUMAN + CCharacter.POSTUREIDLE
-        -- TODO rotate the body
+        _offsetx = (self.dirx == Tic.DIRXLF)
+        and 0 + self.size
+        or  0 - self.size
+        _offsety = 2
+        _rotate = CSprite.ROTATE090
+        _frame = CSprite.FRAME01
     end
 
-    self.bodysprite.sprite = _sprite -- apply the corresponding sprite
-    self.bodysprite.screenx = self.screenx -- apply screen positions and scale
-    self.bodysprite.screeny = self.screeny
+    self.bodysprite.sprite = _sprite -- apply the corresponding attributes
+    self.bodysprite.screenx = self.screenx + (_offsetx * self.scale)
+    self.bodysprite.screeny = self.screeny + (_offsety * self.scale)
+    self.bodysprite.rotate = _rotate
+    self.bodysprite.frame = _frame
     self.bodysprite.scale = self.scale
-    self.bodysprite.frame = self.frame
     self.bodysprite.flip = self.dirx -- flip h if any
     self.bodysprite.palettemap[Tic.COLORARMOR] = self.colorarmor -- apply body palette
     self.bodysprite.palettemap[Tic.COLORSHIRT] = self.colorshirt
@@ -432,39 +425,84 @@ function CCharacterHumanoid:_drawBody()
     self.bodysprite:draw()
 end
 
-function CCharacterHumanoid:_drawEyesFG() -- draw fg eyes depending on dir h v
-    local _eyesx = (self.dirx == Tic.DIRXLF) and CCharacterHumanoid.XEYEFGLF
-        or CCharacterHumanoid.XEYEFGRG
-    local _eyesy = CCharacterHumanoid.YEYE + self.size
-    if self.posture == CCharacter.POSTUREHIDE then
-        _eyesy = _eyesy + 1
-    end
+function CCharacterHumanoid:_drawHead()
+    local _sprite = self.headsprite.sprite -- redundant
+    local _offsetx = 0
+    local _offsety = (self.posture == CCharacter.POSTUREHIDE)
+    and self.size + 1
+    or  self.size
+    local _rotate  = CSprite.ROTATE000
     if self.posture == CCharacter.POSTUREDOWN then
-        -- TODO rotate the eyes
+        _offsety = 2
+        _rotate = CSprite.ROTATE090
     end
 
-    self.eyesfgsprite.screenx = self.screenx + (_eyesx * self.scale)
-    self.eyesfgsprite.screeny = self.screeny + (_eyesy * self.scale)
+    self.headsprite.sprite = _sprite -- apply the corresponding attributes
+    self.headsprite.screenx = self.screenx + (_offsetx * self.scale)
+    self.headsprite.screeny = self.screeny + (_offsety * self.scale)
+    self.headsprite.rotate = _rotate
+    self.headsprite.scale = self.scale
+    self.headsprite.flip = self.dirx -- flip h if any
+    self.headsprite.palettemap[Tic.COLORHAIRSFG] = self.colorhairsfg -- apply head palette
+    self.headsprite.palettemap[Tic.COLORHAIRSBG] = self.colorhairsbg
+    self.headsprite.palettemap[Tic.COLOREXTRA]   = self.colorextra
+    self.headsprite.palettemap[Tic.COLORSKIN]    = self.colorskin
+    self.headsprite:draw()
+    self:_drawEyes()
+end
+
+function CCharacterHumanoid:_drawEyes()
+    self:_drawEyesFG()
+    self:_drawEyesBG()
+end
+
+function CCharacterHumanoid:_drawEyesFG() -- draw fg eyes depending on dir h v
+    local _sprite = self.eyesfgsprite.sprite -- redundant
+    local _offsetx = (self.dirx == Tic.DIRXLF)
+    and CCharacterHumanoid.EYEXFGLF
+    or  CCharacterHumanoid.EYEXFGRG
+    local _offsety = (self.posture == CCharacter.POSTUREHIDE)
+    and CCharacterHumanoid.EYEYIDLE + self.size + 1
+    or  CCharacterHumanoid.EYEYIDLE + self.size
+    local _color = self.coloreyesfg
+    if self.posture == CCharacter.POSTUREDOWN then
+        _offsetx = (self.dirx == Tic.DIRXLF)
+        and CCharacterHumanoid.EYEXDWLF
+        or  CCharacterHumanoid.EYEXDWRG
+        _offsety = CCharacterHumanoid.EYEYDWFG
+        _color = self.colorskin
+    end
+
+    self.eyesfgsprite.sprite = _sprite -- apply the corresponding attributes
+    self.eyesfgsprite.screenx = self.screenx + (_offsetx * self.scale)
+    self.eyesfgsprite.screeny = self.screeny + (_offsety * self.scale)
     self.eyesfgsprite.scale = self.scale
-    self.eyesfgsprite.palettemap[Tic.COLORWHITE] = self.coloreyesfg -- adjust the eyes palette
+    self.eyesfgsprite.palettemap[Tic.COLORWHITE] = _color -- adjust the eyes palette
     self.eyesfgsprite:draw()
 end
 
 function CCharacterHumanoid:_drawEyesBG() -- draw bg eyes depending on dir h v
-    local _eyesx = (self.dirx == Tic.DIRXLF) and CCharacterHumanoid.XEYEBGLF
-        or CCharacterHumanoid.XEYEBGRG
-    local _eyesy = CCharacterHumanoid.YEYE + self.size + self.diry
-    if self.posture == CCharacter.POSTUREHIDE then
-        _eyesy = _eyesy + 1
-    end
+    local _sprite = self.eyesbgsprite.sprite -- redundant
+    local _offsetx = (self.dirx == Tic.DIRXLF)
+    and CCharacterHumanoid.EYEXBGLF
+    or  CCharacterHumanoid.EYEXBGRG
+    local _offsety = (self.posture == CCharacter.POSTUREHIDE) 
+    and CCharacterHumanoid.EYEYIDLE + self.size + self.diry + 1
+    or  CCharacterHumanoid.EYEYIDLE + self.size + self.diry
+    local _color = self.coloreyesbg
     if self.posture == CCharacter.POSTUREDOWN then
-        -- TODO rotate the eyes
+        _offsetx = (self.dirx == Tic.DIRXLF)
+        and CCharacterHumanoid.EYEXDWLF
+        or  CCharacterHumanoid.EYEXDWRG
+        _offsety = CCharacterHumanoid.EYEYDWBG
+        _color = self.coloreyesbg -- Tic.COLORGREYM
     end
 
-    self.eyesbgsprite.screenx = self.screenx + (_eyesx * self.scale)
-    self.eyesbgsprite.screeny = self.screeny + (_eyesy * self.scale)
+    self.eyesbgsprite.sprite = _sprite -- apply the corresponding attributes
+    self.eyesbgsprite.screenx = self.screenx + (_offsetx * self.scale)
+    self.eyesbgsprite.screeny = self.screeny + (_offsety * self.scale)
     self.eyesbgsprite.scale = self.scale
-    self.eyesbgsprite.palettemap[Tic.COLORWHITE] = self.coloreyesbg -- adjust the eyes palette
+    self.eyesbgsprite.palettemap[Tic.COLORWHITE] = _color -- adjust the eyes palette
     self.eyesbgsprite:draw()
 end
 
@@ -643,8 +681,8 @@ local Zikkow = CPlayerTifel{name = "Zikkow",
     colorhairsbg = Tic.COLORGREENM,
     colorhairsfg = Tic.COLORGREEND,
     colorextra   = Tic.COLORGREYM,
-    coloreyesbg  = Tic.COLORORANGE,
-    coloreyesfg  = Tic.COLORYELLOW,
+    coloreyesbg  = Tic.COLORGREENM,
+    coloreyesfg  = Tic.COLORGREENL,
 }
 local Kaainn = CPlayerDemon{name = "Kaainn",
     colorhairsbg = Tic.COLORGREYL,
@@ -657,7 +695,14 @@ local Kaainn = CPlayerDemon{name = "Kaainn",
 }
 local Daemok = CPlayerDemon{name = "Daemok",}
 local Golith = CPlayerGogol{name = "Golith",}
-local Wolfie = CPlayerWolfe{name = "Wolfie", colorextra = Tic.COLORPURPLE}
+local Wolfie = CPlayerWolfe{name = "Wolfie", colorextra = Tic.COLORPURPLE,}
+local Sprite = CSprite{
+    screenx = 150,
+    screeny = 120,
+    sprite = 288,
+    scale = CSprite.SCALE02,
+    rotate = CSprite.ROTATE090,
+}
 -- Tic:trace("ok")
 -- Tic:traceTable(Tic.Players.acttable)
 -- exit()
@@ -667,6 +712,7 @@ local _postures = CCyclerTab()
 _postures:insert(CCharacter.POSTUREIDLE)
 _postures:insert(CCharacter.POSTUREMOVE)
 _postures:insert(CCharacter.POSTUREHIDE)
+_postures:insert(CCharacter.POSTUREDOWN)
 -- Drawing
 function Tic:draw()
     local _tick = Tic.Tick.actvalue
@@ -685,7 +731,7 @@ function Tic:draw()
 
     -- local _scale = CSprite.SCALE01
     local _scale = CSprite.SCALE02
-    local _screenx = 50
+    local _screenx = 30
     local _screeny = 0
     for _, _character in ipairs(Tic.Players.acttable) do
         _character.scale = _scale
@@ -723,12 +769,13 @@ function Tic:draw()
         _character.diry = Tic.DIRYDW
         _character:draw()
         
-        _screenx = _screenx + (8 * _scale) + 1
+        _screenx = _screenx + (8 * _scale) + 2
 
         -- Tic:logStack("N:", _character.name)
         -- Tic:logStack("K:", _character.kind)
     end
     Tic.Players.actvalue:portrait(true)
+    -- Sprite:draw()
 
     Tic:logPrint()
 
