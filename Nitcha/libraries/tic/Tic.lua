@@ -74,9 +74,6 @@ Tic.KEYLF = 17 -- move left (q)
 Tic.KEYRG = 04 -- move right (d)
 Tic.KEYCR = 03 -- hide on/off (c)
 
-Tic.OFFSETHIDE = 4 -- sprites offsets
-Tic.OFFSETMOVE = 16
-
 Tic.DIRXLF = 0 -- h directions -- also the sprite flip
 Tic.DIRXRG = 1
 Tic.DIRYMD = 0 -- v directions -- also the sprite offset
@@ -93,14 +90,6 @@ Tic.WEAPONRANGE = 1
 Tic.WEAPONMAGIC = 2
 Tic.WEAPONLIGHT = 3
 Tic.WEAPONALCHE = 4
-
-Tic.STATUSBANK = 480 -- status types
-Tic.STATUSEMPTY = -1
-Tic.STATUSSLEEP = 0
-Tic.STATUSWOUND = 1
-Tic.STATUSALCHE = 2
-Tic.STATUSKNOCK = 3
-Tic.STATUSDEATH = 4
 
 
 -- Log System -- store logs to display each frame
@@ -147,8 +136,8 @@ function Tic:trace(...) -- trace with multiple args
     local _output = ""
     for _, _val in pairs(_args) do
         _val = (type(_val) == "table" or type(_val) == "function")
-            and type(_val)
-            or  _val -- for concat
+        and type(_val)
+        or  _val -- for concat
         _output = _output.._val.." "
     end
     trace(_output)
@@ -158,8 +147,8 @@ end
 function Tic:traceTable(_table, _recurse) -- trace a table keys, vals and vals types -- recurse by default
     if type(_table) ~= "table" then return end
     _recurse = (_recurse == false)
-        and false
-        or  true
+    and false
+    or  true
     for _key, _val in pairs(_table) do
         if (type(_val) == "table") and _recurse then
             Tic:traceTable(_val, _recurse)
@@ -242,7 +231,11 @@ CSpriteFG.HEADANGEL   = CSpriteFG.HEADBANK + 4
 CSpriteFG.HEADHORNE   = CSpriteFG.HEADBANK + 5
 CSpriteFG.HEADMEDUZ   = CSpriteFG.HEADBANK + 6
 CSpriteFG.HEADGNOLL   = CSpriteFG.HEADBANK + 7
-CSpriteFG.BODYHUMAN   = 288 -- sprite for humanoid bodies
+CSpriteFG.BODYHUMAN   = 288 -- humanoid bodies
+CSpriteFG.STATUSBANK  = 352 -- status types
+CSpriteFG.STATUSSLEEP = CSpriteFG.STATUSBANK + 0
+CSpriteFG.STATUSOTHER = CSpriteFG.STATUSBANK + 1
+CSpriteFG.STATUSDEATH = CSpriteFG.STATUSBANK + 2
 function CSpriteFG:new(_argt)
     CSpriteFG.super.new(self, _argt)
     self.spritebank = CSpriteFG.SPRITEBANK
@@ -281,13 +274,19 @@ local CObject = CEntity:extend() -- objects
 
 
 local CCharacter = CEntity:extend() -- characters
-CCharacter.SIZEL = 0 -- character size for the head sprite y offset
+CCharacter.SIZEL = 0 -- character sizes -- for the head sprite y offset
 CCharacter.SIZEM = 1
 CCharacter.SIZES = 2
-CCharacter.POSTUREIDLE = 0 -- character posture for the head sprite y offset and the body selection
+CCharacter.POSTUREIDLE = 0 -- character postures -- for the head sprite y offset and the body selection
 CCharacter.POSTUREMOVE = 1
 CCharacter.POSTUREHIDE = 2
-CCharacter.POSTUREDOWN = 3 -- special case -- dont have a sprite -- to compute
+CCharacter.POSTUREDOWN = 3 -- special case -- same than idle with computations
+CCharacter.STATUSREADY = 0 -- character status -- will force the posture if any
+CCharacter.STATUSSLEEP = 1
+CCharacter.STATUSWOUND = 2
+CCharacter.STATUSALCHE = 3
+CCharacter.STATUSKNOCK = 4
+CCharacter.STATUSDEATH = 5
 CEntity.KINDCHARACTER = "Character" -- Character kind
 function CCharacter:new(_argt)
     CCharacter.super.new(self, _argt)
@@ -302,6 +301,7 @@ function CCharacter:new(_argt)
     self.dirx         = Tic.DIRXLF -- directions
     self.diry         = Tic.DIRYMD
     self.posture      = CCharacter.POSTUREIDLE -- posture
+    self.status       = CCharacter.STATUSREADY -- status
     self.colorhairsfg = Tic.COLORHAIRSFG -- colors
     self.colorhairsbg = Tic.COLORHAIRSBG
     self.colorextra   = Tic.COLOREXTRA
@@ -355,20 +355,39 @@ function CCharacter:portrait(_still, _info) -- draw the portrait -- animated or 
 end
 
 function CCharacter:draw()
+    self:_drawStatus()
     -- self:_drawWeapon()
     -- self:_drawShield()
     self:_drawBody()
     self:_drawHead()
-    -- self:_drawStatus()
+end
+
+function CCharacter:_drawStatus()
+    if self.status == CCharacter.STATUSREADY then return self:_drawStatusReady() end
+    if self.status == CCharacter.STATUSSLEEP then return self:_drawStatusSleep() end
+end
+
+function CCharacter:_drawStatusReady()
+    -- nothing to do
+end
+
+function CCharacter:_drawStatusSleep()
+    self.posture = CCharacter.POSTUREDOWN -- force the posture
+    local _musprite = CSpriteFGPalette() -- multi usage unique sprite
+    _musprite.sprite = CSpriteFG.STATUSSLEEP
+    _musprite.screenx = self.screenx
+    _musprite.screeny = self.screeny
+    _musprite.flip = self.frame
+    _musprite.scale = self.scale
+    _musprite.palette[Tic.COLORWHITE] = self.coloreyesbg -- apply eyes palette
+    _musprite.palette[Tic.COLORGREYL] = self.coloreyesfg
+    _musprite:draw()
 end
 
 function CCharacter:_drawWeapon()
 end
 
 function CCharacter:_drawShield()
-end
-
-function CCharacter:_drawStatus()
 end
 
 
@@ -676,23 +695,23 @@ local CEnnemy = CCharacter:extend() -- ennemy characters
 
 
 -- Characters
-local Truduk = CPlayerDwarf{name = "Truduk",}
-local Prinnn = CPlayerGnome{name = "Prinnn",}
-local Kaptan = CPlayerMeduz{name = "Kaptan",}
-local Kaptin = CPlayerMeduz{name = "Kaptin",
+local Truduk = CPlayerDwarf{name = "Truduk", status = CCharacter.STATUSSLEEP,}
+local Prinnn = CPlayerGnome{name = "Prinnn", status = CCharacter.STATUSSLEEP,}
+local Kaptan = CPlayerMeduz{name = "Kaptan", status = CCharacter.STATUSSLEEP,}
+local Kaptin = CPlayerMeduz{name = "Kaptin", status = CCharacter.STATUSSLEEP,
     colorhairsbg = Tic.COLORBLUEL,
     colorhairsfg = Tic.COLORBLUEM,
 }
-local Nitcha = CPlayerDrowe{name = "Nitcha",}
-local Zariel = CPlayerAngel{name = "Zariel",}
-local Zikkow = CPlayerTifel{name = "Zikkow",
+local Nitcha = CPlayerDrowe{name = "Nitcha", status = CCharacter.STATUSSLEEP,}
+local Zariel = CPlayerAngel{name = "Zariel", status = CCharacter.STATUSSLEEP,}
+local Zikkow = CPlayerTifel{name = "Zikkow", status = CCharacter.STATUSSLEEP,
     colorhairsbg = Tic.COLORGREENM,
     colorhairsfg = Tic.COLORGREEND,
     colorextra   = Tic.COLORGREYM,
     coloreyesbg  = Tic.COLORGREENM,
     coloreyesfg  = Tic.COLORGREENL,
 }
-local Kaainn = CPlayerDemon{name = "Kaainn",
+local Kaainn = CPlayerDemon{name = "Kaainn", status = CCharacter.STATUSSLEEP,
     colorhairsbg = Tic.COLORGREYL,
     colorhairsfg = Tic.COLORWHITE,
     coloreyesbg  = Tic.COLORBLUEM,
@@ -701,9 +720,11 @@ local Kaainn = CPlayerDemon{name = "Kaainn",
     colorshirt   = Tic.COLORPURPLE,
     colorpants   = Tic.COLORRED,
 }
-local Daemok = CPlayerDemon{name = "Daemok",}
-local Golith = CPlayerGogol{name = "Golith",}
-local Wulfie = CPlayerWolfe{name = "Wulfie", colorextra = Tic.COLORRED,}
+local Daemok = CPlayerDemon{name = "Daemok", status = CCharacter.STATUSSLEEP,}
+local Golith = CPlayerGogol{name = "Golith", status = CCharacter.STATUSSLEEP,}
+local Wulfie = CPlayerWolfe{name = "Wulfie", status = CCharacter.STATUSSLEEP,
+    colorextra = Tic.COLORRED,
+}
 local Sprite = CSprite{
     screenx = 150,
     screeny = 120,
