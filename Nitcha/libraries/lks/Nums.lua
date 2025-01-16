@@ -11,7 +11,13 @@ function Nums:yes2int(_yes) -- convert a boolean to integer 0|1
 end
 
 
--- Numeric comparisons
+-- Frequences
+function Nums:frequence01(_num, _frequence) -- 0 in frequence, 1 out of frequence -- toggle
+    return math.tointeger((_num // _frequence) % 2)
+end
+
+
+-- Comparisons
 function Nums:_isFctAny(_num, _fct, ...) -- if _fct true on any ... -- false by default
     local _args = {...}
     if (not _num) or (not _fct) or (#_args == 0) then return false end
@@ -29,6 +35,7 @@ function Nums:_isFctAll(_num, _fct, ...) -- if _fct true on all ... -- false by 
     end
     return true
 end
+
 
 -- Single
 function Nums:isGT(_num, _val) -- greater than _val
@@ -74,6 +81,7 @@ function Nums:isBW(_num, _valx, _valy, _inmin, _inmax) -- between _valx and _val
     return true
 end
 
+
 -- Any
 function Nums:isGTAny(_num, ...) -- greater than any ... -- false by default
     local _args = {...}
@@ -110,6 +118,7 @@ function Nums:isLTAny(_num, ...) -- lower than any ... -- false by default
     if (not _num) or (#_args == 0) then return false end
     return Nums:_isFctAny(_num, self.isLT, table.unpack(_args))
 end
+
 
 -- All
 function Nums:isGTAll(_num, ...) -- greater than all ... -- false by default

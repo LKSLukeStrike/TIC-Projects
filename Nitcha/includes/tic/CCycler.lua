@@ -70,15 +70,15 @@ function CCyclerInt:new(_argt)
 end
 
 
-CCyclerTab = CCycler:extend() -- table cyclers
-function CCyclerTab:new(_argt)
-    CCyclerTab.super.new(self, _argt)
+CCyclerTable = CCycler:extend() -- table cyclers
+function CCyclerTable:new(_argt)
+    CCyclerTable.super.new(self, _argt)
     self.acttable = {} -- internal table
     self.actvalue = nil
     self:argt(_argt) -- override if any
 end
 
-function CCyclerTab:insert(_item, _at) -- insert an _item into table _at (end by default)
+function CCyclerTable:insert(_item, _at) -- insert an _item into table _at (end by default)
     if _item == nil then return self.actindex end
     if _at == nil then
         table.insert(self.acttable, _item)
@@ -95,18 +95,18 @@ function CCyclerTab:insert(_item, _at) -- insert an _item into table _at (end by
     return self.actindex
 end
 
-function CCyclerTab:remove(_at) -- remove an item from table _at (end by default)
+function CCyclerTable:remove(_at) -- remove an item from table _at (end by default)
     -- TODO
 end
 
-function CCyclerTab:next() -- next cycler value
-    CCyclerTab.super.next(self)
+function CCyclerTable:next() -- next cycler value
+    CCyclerTable.super.next(self)
     self.actvalue = self.acttable[self.actindex]
     return self.actindex
 end
 
-function CCyclerTab:prev() -- ^rev cycler value
-    CCyclerTab.super.prev(self)
+function CCyclerTable:prev() -- ^rev cycler value
+    CCyclerTable.super.prev(self)
     self.actvalue = self.acttable[self.actindex]
     return self.actindex
 end
