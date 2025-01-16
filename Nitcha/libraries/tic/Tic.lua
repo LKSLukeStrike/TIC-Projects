@@ -398,8 +398,10 @@ function CCharacter:_drawStatusSleep()
     _musprite.screeny = self.screeny
     _musprite.flip = self.dirx
     _musprite.scale = self.scale
-    _musprite.palette[Tic.COLORWHITE] = _colorwhite -- apply palette
-    _musprite.palette[Tic.COLORGREYL] = _colorgreyl
+    _musprite:palettize{ -- apply palette
+        [Tic.COLORWHITE] = _colorwhite,
+        [Tic.COLORGREYL] = _colorgreyl,
+    }
     _musprite:draw()
 end
 
@@ -484,10 +486,12 @@ function CCharacterHumanoid:_drawBody()
     _musprite.frame = _frame
     _musprite.scale = self.scale
     _musprite.flip = self.dirx -- flip h if any
-    _musprite.palette[Tic.COLORARMOR] = self.colorarmor -- apply body palette
-    _musprite.palette[Tic.COLORSHIRT] = self.colorshirt
-    _musprite.palette[Tic.COLORPANTS] = self.colorpants
-    _musprite.palette[Tic.COLORHANDS] = self.colorhands
+    _musprite:palettize{ -- apply body palette
+        [Tic.COLORARMOR] = self.colorarmor,
+        [Tic.COLORSHIRT] = self.colorshirt,
+        [Tic.COLORPANTS] = self.colorpants,
+        [Tic.COLORHANDS] = self.colorhands,
+    }
     _musprite:draw()
 end
 
@@ -510,10 +514,12 @@ function CCharacterHumanoid:_drawHead()
     _musprite.rotate = _rotate
     _musprite.scale = self.scale
     _musprite.flip = self.dirx -- flip h if any
-    _musprite.palette[Tic.COLORHAIRSFG] = self.colorhairsfg -- apply head palette
-    _musprite.palette[Tic.COLORHAIRSBG] = self.colorhairsbg
-    _musprite.palette[Tic.COLOREXTRA]   = self.colorextra
-    _musprite.palette[Tic.COLORSKIN]    = self.colorskin
+    _musprite:palettize{ -- apply head palette
+        [Tic.COLORHAIRSFG] = self.colorhairsfg,
+        [Tic.COLORHAIRSBG] = self.colorhairsbg,
+        [Tic.COLOREXTRA]   = self.colorextra,
+        [Tic.COLORSKIN]    = self.colorskin,
+    }
     _musprite:draw()
     self:_drawEyes()
 end
@@ -545,7 +551,9 @@ function CCharacterHumanoid:_drawEyesFG() -- draw fg eyes depending on dir x y
     _musprite.screenx = self.screenx + (_offsetx * self.scale)
     _musprite.screeny = self.screeny + (_offsety * self.scale)
     _musprite.scale = self.scale
-    _musprite.palette[Tic.COLORWHITE] = _color -- apply eyes palette
+    _musprite:palettize{ -- apply eyes palette
+        [Tic.COLORWHITE] = _color,
+    }
     _musprite:draw()
 end
 
@@ -571,7 +579,9 @@ function CCharacterHumanoid:_drawEyesBG() -- draw bg eyes depending on dir x y
     _musprite.screenx = self.screenx + (_offsetx * self.scale)
     _musprite.screeny = self.screeny + (_offsety * self.scale)
     _musprite.scale = self.scale
-    _musprite.palette[Tic.COLORWHITE] = _color -- apply eyes palette
+    _musprite:palettize{ -- apply eyes palette
+        [Tic.COLORWHITE] = _color,
+    }
     _musprite:draw()
 end
 
@@ -738,11 +748,16 @@ local CEnnemy = CCharacter:extend() -- ennemy characters
 
 -- Characters
 local Truduk = CPlayerDwarf{name = "Truduk",}
-local Prinnn = CPlayerGnome{name = "Prinnn",}
+local Prinnn = CPlayerGnome{name = "Prinnn",
+    coloreyesbg  = Tic.COLORRED,
+    coloreyesfg  = Tic.COLORORANGE,
+}
 local Kaptan = CPlayerMeduz{name = "Kaptan",}
 local Kaptin = CPlayerMeduz{name = "Kaptin",
     colorhairsbg = Tic.COLORBLUEL,
     colorhairsfg = Tic.COLORBLUEM,
+    coloreyesbg  = Tic.COLORBLUEM,
+    coloreyesfg  = Tic.COLORBLUEL,
 }
 local Nitcha = CPlayerDrowe{name = "Nitcha",}
 local Zariel = CPlayerAngel{name = "Zariel",}
@@ -779,11 +794,22 @@ local Sprite = CSprite{
 -- exit()
 
 
-local _postures = CCyclerTable()
-_postures:insert(CCharacter.POSTUREIDLE)
-_postures:insert(CCharacter.POSTUREMOVE)
-_postures:insert(CCharacter.POSTUREHIDE)
-_postures:insert(CCharacter.POSTUREDOWN)
+-- local _postures = CCyclerTable()
+-- _postures:insert(CCharacter.POSTUREIDLE)
+-- _postures:insert(CCharacter.POSTUREMOVE)
+-- _postures:insert(CCharacter.POSTUREHIDE)
+-- _postures:insert(CCharacter.POSTUREDOWN)
+local _postures = CCyclerTable{acttable = {
+    CCharacter.POSTUREIDLE,
+    CCharacter.POSTUREMOVE,
+    CCharacter.POSTUREHIDE,
+    CCharacter.POSTUREDOWN,
+}}
+local _statuses = {
+    CCharacter.STATUSREADY,
+    CCharacter.STATUSSLEEP,
+    CCharacter.STATUSWOUND,
+}
 -- Drawing
 function Tic:draw()
     local _tick = Tic.Tick.actvalue
@@ -819,7 +845,8 @@ function Tic:draw()
     local _screenx = 30
     local _screeny = 0
     for _, _character in ipairs(Tic.Players.acttable) do
-        _character.status = CCharacter.STATUSREADY
+        -- for _, _status in ipairs(_statuses) do
+        _character.status = _status
         _character.scale = _scale
         _character.screenx = _screenx
         _character.frame = _frame
@@ -859,6 +886,7 @@ function Tic:draw()
 
         -- Tic:logStack("N:", _character.name)
         -- Tic:logStack("K:", _character.kind)
+        -- end
     end
     Tic.Players.actvalue:portrait(true, true)
     -- Sprite:draw()

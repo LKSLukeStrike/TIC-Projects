@@ -72,10 +72,30 @@ end
 
 CCyclerTable = CCycler:extend() -- table cyclers
 function CCyclerTable:new(_argt)
-    CCyclerTable.super.new(self, _argt)
     self.acttable = {} -- internal table
     self.actvalue = nil
+    CCyclerTable.super.new(self, _argt)
     self:argt(_argt) -- override if any
+    return self.actindex
+end
+
+function CCyclerTable:argt(_argt) -- setup cycler
+    CCyclerTable.super.argt(self, _argt)
+    local _size = #self.acttable -- adjust the related fields
+    if _size == 0 then -- empty acttable
+        self.minindex = 0
+        self.maxindex = self.minindex
+        self.actindex = self.minindex
+        self.actvalue = nil
+        return self.actindex
+    end
+    self.minindex = 1
+    self.maxindex = _size
+    self.actindex = (Nums:isBW(self.actindex, self.minindex, self.maxindex))
+    and self.actindex
+    or  self.minindex
+    self.actvalue = self.acttable[self.actindex]
+    return self.actindex
 end
 
 function CCyclerTable:insert(_item, _at) -- insert an _item into table _at (end by default)
