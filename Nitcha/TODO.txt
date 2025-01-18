@@ -2,5 +2,8 @@ x cycle numerics
 - cycle tables
 
 - add posture down
-- add gnolls
+x add gnolls
 - EYES
+
+- require Tables in Classic (for size, keys, vals ...)
+- probably require Nums also ?

@@ -9,6 +9,7 @@ local Tic = {}
 -- Packages
 local Classic = require("libraries/ext/Classic")                
 local Nums = require("libraries/lks/Nums")
+local Tables = require("libraries/lks/Tables")
 --
 -- Includes
 require("includes/tic/CCycler")                
@@ -116,10 +117,15 @@ function Tic:logPrint() -- print the log then clear it
 end
 
 
--- Tick System -- loop on the tick from 0-59
-Tic.Tick = CCyclerInt{
+-- Tick System
+Tic.Tick00 = 0 -- tick counter from 0
+Tic.Tick60 = CCyclerInt{ -- tick cycler from 0-59
     maxindex = 59,
 }
+function Tic:tick() -- increment the timers
+    Tic.Tick00 = Tic.Tick00 + 1
+    Tic.Tick60:next()
+end
 
 
 -- Players System -- add new players to a players stack
@@ -151,11 +157,12 @@ function Tic:traceTable(_table, _recurse) -- trace a table keys, vals and vals t
     _recurse = (_recurse == false)
     and false
     or  true
-    for _key, _val in pairs(_table) do
-        if (type(_val) == "table") and _recurse then
+    local _tablecopy = Tables:copy(_table) -- sorted copy
+    for _key, _val in pairs(_tablecopy) do
+        Tic:trace(_key, _val, type(_val))
+        -- if (type(_val) == "table") and _recurse then
+        if _recurse then
             Tic:traceTable(_val, _recurse)
-        else
-            Tic:trace(_key, _val, type(_val))
         end
     end
 end
@@ -287,16 +294,36 @@ local CCharacter = CEntity:extend() -- characters
 CCharacter.SIZEL = 0 -- character sizes -- for the head sprite y offset
 CCharacter.SIZEM = 1
 CCharacter.SIZES = 2
-CCharacter.POSTUREIDLE = 0 -- character postures -- for the head sprite y offset and the body selection
-CCharacter.POSTUREMOVE = 1
-CCharacter.POSTUREHIDE = 2
-CCharacter.POSTUREDOWN = 3 -- special case -- same than idle with computations
-CCharacter.STATUSREADY = 0 -- character status -- will force the posture if any
-CCharacter.STATUSSLEEP = 1
-CCharacter.STATUSWOUND = 2
-CCharacter.STATUSALCHE = 3
-CCharacter.STATUSKNOCK = 4
-CCharacter.STATUSDEATH = 5
+CCharacter.STATUSSTAND = "stand" -- character status -- will force the posture if any
+CCharacter.STATUSSHIFT = "shift"
+CCharacter.STATUSKNEEL = "kneel"
+CCharacter.STATUSSLEEP = "sleep"
+CCharacter.STATUSWOUND = "wound"
+CCharacter.STATUSALCHE = "alche"
+CCharacter.STATUSKNOCK = "knock"
+CCharacter.STATUSFLAME = "flame"
+CCharacter.STATUSWATER = "water"
+CCharacter.STATUSEARTH = "earth"
+CCharacter.STATUSBREEZ = "breez"
+CCharacter.STATUSDEATH = "death"
+CCharacter.POSTURESTAND = 0 -- character postures -- for the head sprite y offset and the body selection
+CCharacter.POSTURESHIFT = 1
+CCharacter.POSTUREKNEEL = 2
+CCharacter.POSTURESLEEP = 3
+CCharacter.STATUS2POSTURE = { -- relation status to posture
+    [CCharacter.STATUSSTAND] = CCharacter.POSTURESTAND,
+    [CCharacter.STATUSSHIFT] = CCharacter.POSTURESHIFT,
+    [CCharacter.STATUSKNEEL] = CCharacter.POSTUREKNEEL,
+    [CCharacter.STATUSSLEEP] = CCharacter.POSTURESLEEP,
+    [CCharacter.STATUSWOUND] = CCharacter.POSTURESLEEP,
+    [CCharacter.STATUSALCHE] = CCharacter.POSTURESLEEP,
+    [CCharacter.STATUSKNOCK] = CCharacter.POSTURESLEEP,
+    [CCharacter.STATUSFLAME] = CCharacter.POSTURESLEEP,
+    [CCharacter.STATUSWATER] = CCharacter.POSTURESLEEP,
+    [CCharacter.STATUSEARTH] = CCharacter.POSTURESLEEP,
+    [CCharacter.STATUSBREEZ] = CCharacter.POSTURESLEEP,
+    [CCharacter.STATUSDEATH] = CCharacter.POSTURESLEEP,
+}
 CEntity.KINDCHARACTER = "Character" -- Character kind
 function CCharacter:new(_argt)
     CCharacter.super.new(self, _argt)
@@ -310,8 +337,8 @@ function CCharacter:new(_argt)
     self.frame        = CSprite.FRAME00 -- frame
     self.dirx         = Tic.DIRXLF -- directions
     self.diry         = Tic.DIRYMD
-    self.posture      = CCharacter.POSTUREIDLE -- posture
-    self.status       = CCharacter.STATUSREADY -- status
+    self.posture      = CCharacter.POSTURESTAND -- posture
+    self.status       = CCharacter.STATUSSTAND -- status
     self.colorhairsfg = Tic.COLORHAIRSFG -- colors
     self.colorhairsbg = Tic.COLORHAIRSBG
     self.colorextra   = Tic.COLOREXTRA
@@ -347,7 +374,7 @@ function CCharacter:portrait(_still, _info) -- draw the portrait -- animated or 
     if _still then
         self.dirx = Tic.DIRXLF
         self.diry = Tic.DIRYMD
-        self.posture = CCharacter.POSTUREIDLE
+        self.posture = CCharacter.POSTURESTAND
         self.frame = CSprite.FRAME00
     end
     self:draw()
@@ -365,20 +392,20 @@ function CCharacter:portrait(_still, _info) -- draw the portrait -- animated or 
 end
 
 function CCharacter:draw()
-    self:_drawStatus()
+    -- self:_drawStatus()
     -- self:_drawWeapon()
     -- self:_drawShield()
-    self:_drawBody()
-    self:_drawHead()
+    -- self:_drawBody()
+    -- self:_drawHead()
 end
 
 function CCharacter:_drawStatus()
-    if self.status == CCharacter.STATUSREADY then return self:_drawStatusReady() end
+    if self.status == CCharacter.STATUSSTAND then return self:_drawStatusStand() end
     if self.status == CCharacter.STATUSSLEEP then return self:_drawStatusSleep() end
     if self.status == CCharacter.STATUSWOUND then return self:_drawStatusWound() end
 end
 
-function CCharacter:_drawStatusReady()
+function CCharacter:_drawStatusStand()
     -- nothing to do
 end
 
@@ -391,7 +418,7 @@ function CCharacter:_drawStatusSleep()
     local _colorgreyl = (Nums:frequence01(_seconds, _frequence) == 0)
     and self.coloreyesfg
     or  self.coloreyesbg
-    self.posture = CCharacter.POSTUREDOWN -- force the posture
+    self.posture = CCharacter.POSTURESLEEP -- force the posture
     local _musprite = CSpriteFG() -- multi usage unique sprite
     _musprite.sprite = CSpriteFG.STATUSSLEEP
     _musprite.screenx = self.screenx
@@ -414,7 +441,7 @@ function CCharacter:_drawStatusWound()
     local _colorgreyl = (Nums:frequence01(_seconds, _frequence) == 0)
     and Tic.COLORPURPLE
     or  Tic.COLORRED
-    self.posture = CCharacter.POSTUREDOWN -- force the posture
+    self.posture = CCharacter.POSTURESLEEP -- force the posture
     local _musprite = CSpriteFG() -- multi usage unique sprite
     _musprite.sprite = CSpriteFG.STATUSOTHER
     _musprite.screenx = self.screenx
@@ -469,8 +496,8 @@ function CCharacterHumanoid:_drawBody()
     local _offsety = 0
     local _rotate  = CSprite.ROTATE000
     local _frame = self.frame
-    if self.posture == CCharacter.POSTUREDOWN then
-        _sprite = self.spritebody + CCharacter.POSTUREIDLE
+    if self.posture == CCharacter.POSTURESLEEP then
+        _sprite = self.spritebody + CCharacter.POSTURESTAND
         _offsetx = (self.dirx == Tic.DIRXLF)
         and 0 + self.size
         or  0 - self.size
@@ -499,11 +526,11 @@ function CCharacterHumanoid:_drawHead()
     local _musprite = CSpriteFG() -- multi usage unique sprite
     local _sprite = self.spritehead
     local _offsetx = 0
-    local _offsety = (self.posture == CCharacter.POSTUREHIDE)
+    local _offsety = (self.posture == CCharacter.POSTUREKNEEL)
     and self.size + 1
     or  self.size
     local _rotate  = CSprite.ROTATE000
-    if self.posture == CCharacter.POSTUREDOWN then
+    if self.posture == CCharacter.POSTURESLEEP then
         _offsety = 2
         _rotate = CSprite.ROTATE090
     end
@@ -535,11 +562,11 @@ function CCharacterHumanoid:_drawEyesFG() -- draw fg eyes depending on dir x y
     local _offsetx = (self.dirx == Tic.DIRXLF)
     and CCharacterHumanoid.EYEXFGLF
     or  CCharacterHumanoid.EYEXFGRG
-    local _offsety = (self.posture == CCharacter.POSTUREHIDE)
+    local _offsety = (self.posture == CCharacter.POSTUREKNEEL)
     and CCharacterHumanoid.EYEYIDLE + self.size + 1
     or  CCharacterHumanoid.EYEYIDLE + self.size
     local _color = self.coloreyesfg
-    if self.posture == CCharacter.POSTUREDOWN then
+    if self.posture == CCharacter.POSTURESLEEP then
         _offsetx = (self.dirx == Tic.DIRXLF)
         and CCharacterHumanoid.EYEXDWLF
         or  CCharacterHumanoid.EYEXDWRG
@@ -563,11 +590,11 @@ function CCharacterHumanoid:_drawEyesBG() -- draw bg eyes depending on dir x y
     local _offsetx = (self.dirx == Tic.DIRXLF)
     and CCharacterHumanoid.EYEXBGLF
     or  CCharacterHumanoid.EYEXBGRG
-    local _offsety = (self.posture == CCharacter.POSTUREHIDE) 
+    local _offsety = (self.posture == CCharacter.POSTUREKNEEL) 
     and CCharacterHumanoid.EYEYIDLE + self.size + self.diry + 1
     or  CCharacterHumanoid.EYEYIDLE + self.size + self.diry
     local _color = self.coloreyesbg
-    if self.posture == CCharacter.POSTUREDOWN then
+    if self.posture == CCharacter.POSTURESLEEP then
         _offsetx = (self.dirx == Tic.DIRXLF)
         and CCharacterHumanoid.EYEXDWLF
         or  CCharacterHumanoid.EYEXDWRG
@@ -794,35 +821,38 @@ local Sprite = CSprite{
 -- exit()
 
 
--- local _postures = CCyclerTable()
--- _postures:insert(CCharacter.POSTUREIDLE)
--- _postures:insert(CCharacter.POSTUREMOVE)
--- _postures:insert(CCharacter.POSTUREHIDE)
--- _postures:insert(CCharacter.POSTUREDOWN)
-local _postures = CCyclerTable{acttable = {
-    CCharacter.POSTUREIDLE,
-    CCharacter.POSTUREMOVE,
-    CCharacter.POSTUREHIDE,
-    CCharacter.POSTUREDOWN,
-}}
-local _statuses = {
-    CCharacter.STATUSREADY,
+-- local _postures = CCyclerTable{acttable = {
+--     CCharacter.POSTURESTAND,
+--     CCharacter.POSTURESHIFT,
+--     CCharacter.POSTUREKNEEL,
+--     CCharacter.POSTURESLEEP,
+-- }}
+local Statuses = CCyclerTable{acttable = {
+    CCharacter.STATUSSTAND,
     CCharacter.STATUSSLEEP,
     CCharacter.STATUSWOUND,
-}
+    CCharacter.STATUSFLAME,
+}}
+Tic:traceTable(Statuses)
+
+
 -- Drawing
 function Tic:draw()
-    local _tick = Tic.Tick.actvalue
-    if _tick == 0 then
-        _postures:next()
-        Tic.Players:next()
-    end
-    local _posture = _postures.actvalue
-    local _frame = _tick // 30
+    local _tick00 = Tic.Tick00
+    local _tick60 = Tic.Tick60.actvalue
 
-    Tic:logStack("T:", _tick)
-    Tic:logStack("F:", _frame)
-    Tic:logStack("P:", _posture)
+    local _frame = _tick60 // 30
+
+    local _status  = Statuses.actindex
+    if Nums:frequence01(_tick00, 120) == 1 then
+        Statuses:next()
+        -- Tic:trace("---")
+        -- Tic:traceTable(Statuses)
+    end
+
+    -- local _posture = CCharacter.STATUS2POSTURE[_status]
+    local _posture = 0
+
     Tic:logStack("")
     Tic:logStack("")
     Tic:logStack("")
@@ -832,11 +862,14 @@ function Tic:draw()
     Tic:logStack("")
     Tic:logStack("")
     Tic:logStack("")
-    -- Tic:logStack("S:", Tic:time2seconds())
-    -- Tic:logStack("1:", Tic:time2seconds(), 1, Nums:frequence01(Tic:time2seconds(), 1))
-    -- Tic:logStack("2:", Tic:time2seconds(), 2, Nums:frequence01(Tic:time2seconds(), 2))
-    -- Tic:logStack("3:", Tic:time2seconds(), 3, Nums:frequence01(Tic:time2seconds(), 3))
-    -- Tic:logStack("4:", Tic:time2seconds(), 4, Nums:frequence01(Tic:time2seconds(), 4))
+    Tic:logStack("")
+    Tic:logStack("")
+    Tic:logStack("")
+    Tic:logStack("T60:", _tick60)
+    Tic:logStack("FRM:", _frame)
+    Tic:logStack("POS:", _posture)
+    Tic:logStack("STA:", _status)
+    Tic:logStack("T00:", _tick00)
 
     cls()
 
@@ -845,7 +878,6 @@ function Tic:draw()
     local _screenx = 30
     local _screeny = 0
     for _, _character in ipairs(Tic.Players.acttable) do
-        -- for _, _status in ipairs(_statuses) do
         _character.status = _status
         _character.scale = _scale
         _character.screenx = _screenx
@@ -888,12 +920,12 @@ function Tic:draw()
         -- Tic:logStack("K:", _character.kind)
         -- end
     end
-    Tic.Players.actvalue:portrait(true, true)
+    -- Tic.Players.actvalue:portrait(true, true)
     -- Sprite:draw()
 
     Tic:logPrint()
 
-    Tic.Tick:next() -- /!\ required in the draw function
+    Tic:tick() -- /!\ required in the draw function 
 end
 
 
