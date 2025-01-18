@@ -92,6 +92,12 @@ Tic.WEAPONMAGIC = 2
 Tic.WEAPONLIGHT = 3
 Tic.WEAPONALCHE = 4
 
+Tic.FREQUENCE240 = 240 -- frequences -- each 4 second
+Tic.FREQUENCE120 = 120 -- each 2 second
+Tic.FREQUENCE090 = 090 -- each 1.5 second
+Tic.FREQUENCE060 = 060 -- each 1 second
+Tic.FREQUENCE030 = 030 -- each 0.5 second
+
 
 -- Log System -- store logs to display each frame
 Tic.Log = {}
@@ -143,7 +149,7 @@ function Tic:trace(...) -- trace with multiple args
     local _args = {...}
     local _output = ""
     for _, _val in pairs(_args) do
-        _val = (type(_val) == "table" or type(_val) == "function")
+        _val = (type(_val) == "table" or type(_val) == "function") -- TODO add more ?
         and type(_val)
         or  _val -- for concat
         _output = _output.._val.." "
@@ -151,20 +157,8 @@ function Tic:trace(...) -- trace with multiple args
     trace(_output)
 end
 
--- TODO sort ?
-function Tic:traceTable(_table, _recurse) -- trace a table keys, vals and vals types -- recurse by default
-    if type(_table) ~= "table" then return end
-    _recurse = (_recurse == false)
-    and false
-    or  true
-    local _tablecopy = Tables:copy(_table) -- sorted copy
-    for _key, _val in pairs(_tablecopy) do
-        Tic:trace(_key, _val, type(_val))
-        -- if (type(_val) == "table") and _recurse then
-        if _recurse then
-            Tic:traceTable(_val, _recurse)
-        end
-    end
+function Tic:traceTable(_table, _indent) -- trace a table  -- SORTED -- RECURSIVE -- INDENT
+    Tic:trace(Tables:dump(_table, _indent))
 end
 
 
@@ -193,10 +187,10 @@ CSprite.SCALE02 = 02
 CSprite.FRAMEOF = 16 -- sprites frames offset multiplier
 CSprite.FRAME00 = 00 -- sprites frames -- /!\ start at 0, used to compute the offset
 CSprite.FRAME01 = 01
-CSprite.ROTATE000 =  0 -- sprite rotations
-CSprite.ROTATE090 =  1
-CSprite.ROTATE180 =  2
-CSprite.ROTATE270 =  3
+CSprite.ROTATE000 = 0 -- sprite rotations
+CSprite.ROTATE090 = 1
+CSprite.ROTATE180 = 2
+CSprite.ROTATE270 = 3
 function CSprite:new(_argt)
     CSprite.super.new(self, _argt)
     self.spritebank = CSprite.SPRITEBANK
@@ -299,11 +293,12 @@ CCharacter.STATUSSHIFT = "shift"
 CCharacter.STATUSKNEEL = "kneel"
 CCharacter.STATUSSLEEP = "sleep"
 CCharacter.STATUSWOUND = "wound"
+CCharacter.STATUSMAGIC = "magic"
 CCharacter.STATUSALCHE = "alche"
 CCharacter.STATUSKNOCK = "knock"
 CCharacter.STATUSFLAME = "flame"
 CCharacter.STATUSWATER = "water"
-CCharacter.STATUSEARTH = "earth"
+CCharacter.STATUSSTONE = "stone"
 CCharacter.STATUSBREEZ = "breez"
 CCharacter.STATUSDEATH = "death"
 CCharacter.POSTURESTAND = 0 -- character postures -- for the head sprite y offset and the body selection
@@ -316,11 +311,12 @@ CCharacter.STATUS2POSTURE = { -- relation status to posture
     [CCharacter.STATUSKNEEL] = CCharacter.POSTUREKNEEL,
     [CCharacter.STATUSSLEEP] = CCharacter.POSTURESLEEP,
     [CCharacter.STATUSWOUND] = CCharacter.POSTURESLEEP,
+    [CCharacter.STATUSMAGIC] = CCharacter.POSTURESLEEP,
     [CCharacter.STATUSALCHE] = CCharacter.POSTURESLEEP,
     [CCharacter.STATUSKNOCK] = CCharacter.POSTURESLEEP,
     [CCharacter.STATUSFLAME] = CCharacter.POSTURESLEEP,
     [CCharacter.STATUSWATER] = CCharacter.POSTURESLEEP,
-    [CCharacter.STATUSEARTH] = CCharacter.POSTURESLEEP,
+    [CCharacter.STATUSSTONE] = CCharacter.POSTURESLEEP,
     [CCharacter.STATUSBREEZ] = CCharacter.POSTURESLEEP,
     [CCharacter.STATUSDEATH] = CCharacter.POSTURESLEEP,
 }
@@ -392,66 +388,97 @@ function CCharacter:portrait(_still, _info) -- draw the portrait -- animated or 
 end
 
 function CCharacter:draw()
-    -- self:_drawStatus()
-    -- self:_drawWeapon()
-    -- self:_drawShield()
-    -- self:_drawBody()
-    -- self:_drawHead()
+    self:_drawStatus()
+    self:_drawWeapon()
+    self:_drawShield()
+    self:_drawBody()
+    self:_drawHead()
 end
 
 function CCharacter:_drawStatus()
+    self.posture = CCharacter.STATUS2POSTURE[self.status] -- force the posture
     if self.status == CCharacter.STATUSSTAND then return self:_drawStatusStand() end
+    if self.status == CCharacter.STATUSSHIFT then return self:_drawStatusShift() end
+    if self.status == CCharacter.STATUSKNEEL then return self:_drawStatusKneel() end
     if self.status == CCharacter.STATUSSLEEP then return self:_drawStatusSleep() end
     if self.status == CCharacter.STATUSWOUND then return self:_drawStatusWound() end
+    if self.status == CCharacter.STATUSMAGIC then return self:_drawStatusMagic() end
+    if self.status == CCharacter.STATUSALCHE then return self:_drawStatusAlche() end
+    if self.status == CCharacter.STATUSKNOCK then return self:_drawStatusKnock() end
+    if self.status == CCharacter.STATUSFLAME then return self:_drawStatusFlame() end
+    if self.status == CCharacter.STATUSWATER then return self:_drawStatusWater() end
+    if self.status == CCharacter.STATUSSTONE then return self:_drawStatusStone() end
+    if self.status == CCharacter.STATUSBREEZ then return self:_drawStatusBreez() end
+    if self.status == CCharacter.STATUSDEATH then return self:_drawStatusDeath() end
 end
 
 function CCharacter:_drawStatusStand()
     -- nothing to do
 end
 
+function CCharacter:_drawStatusShift()
+    -- nothing to do
+end
+
+function CCharacter:_drawStatusKneel()
+    -- nothing to do
+end
+
 function CCharacter:_drawStatusSleep()
-    local _seconds = Tic:time2seconds()
-    local _frequence = 4 -- frequence in seconds
-    local _colorwhite = (Nums:frequence01(_seconds, _frequence) == 0)
-    and self.coloreyesbg
-    or  self.coloreyesfg
-    local _colorgreyl = (Nums:frequence01(_seconds, _frequence) == 0)
-    and self.coloreyesfg
-    or  self.coloreyesbg
-    self.posture = CCharacter.POSTURESLEEP -- force the posture
-    local _musprite = CSpriteFG() -- multi usage unique sprite
-    _musprite.sprite = CSpriteFG.STATUSSLEEP
-    _musprite.screenx = self.screenx
-    _musprite.screeny = self.screeny
-    _musprite.flip = self.dirx
-    _musprite.scale = self.scale
-    _musprite:palettize{ -- apply palette
-        [Tic.COLORWHITE] = _colorwhite,
-        [Tic.COLORGREYL] = _colorgreyl,
-    }
-    _musprite:draw()
+    CCharacter._drawStatusSprite(self, CSpriteFG.STATUSSLEEP, Tic.FREQUENCE090, self.coloreyesfg, self.coloreyesbg)
 end
 
 function CCharacter:_drawStatusWound()
-    local _seconds = Tic:time2seconds()
-    local _frequence = 2 -- frequence in seconds
-    local _colorwhite = (Nums:frequence01(_seconds, _frequence) == 0)
-    and Tic.COLORRED
-    or  Tic.COLORPURPLE
-    local _colorgreyl = (Nums:frequence01(_seconds, _frequence) == 0)
-    and Tic.COLORPURPLE
-    or  Tic.COLORRED
-    self.posture = CCharacter.POSTURESLEEP -- force the posture
+    CCharacter._drawStatusSprite(self, CSpriteFG.STATUSOTHER, Tic.FREQUENCE030, Tic.COLORRED, Tic.COLORPURPLE)
+end
+
+function CCharacter:_drawStatusMagic()
+    CCharacter._drawStatusSprite(self, CSpriteFG.STATUSOTHER, Tic.FREQUENCE030, Tic.COLORCYAN, Tic.COLORBLUEM)
+end
+
+function CCharacter:_drawStatusAlche()
+    CCharacter._drawStatusSprite(self, CSpriteFG.STATUSOTHER, Tic.FREQUENCE030, Tic.COLORGREENL, Tic.COLORGREENM)
+end
+
+function CCharacter:_drawStatusKnock()
+    CCharacter._drawStatusSprite(self, CSpriteFG.STATUSOTHER, Tic.FREQUENCE030, self.colorskin, self.coloreyesbg)
+end
+
+function CCharacter:_drawStatusFlame()
+    CCharacter._drawStatusSprite(self, CSpriteFG.STATUSOTHER, Tic.FREQUENCE030, Tic.COLORORANGE, Tic.COLORRED)
+end
+
+function CCharacter:_drawStatusWater()
+    CCharacter._drawStatusSprite(self, CSpriteFG.STATUSOTHER, Tic.FREQUENCE030, Tic.COLORWHITE, Tic.COLORCYAN)
+end
+
+function CCharacter:_drawStatusStone()
+    CCharacter._drawStatusSprite(self, CSpriteFG.STATUSOTHER, Tic.FREQUENCE030, Tic.COLORGREYM, Tic.COLORGREYD)
+end
+
+function CCharacter:_drawStatusBreez()
+    CCharacter._drawStatusSprite(self, CSpriteFG.STATUSOTHER, Tic.FREQUENCE030, Tic.COLORWHITE, Tic.COLORGREYL)
+end
+
+function CCharacter:_drawStatusDeath()
+    CCharacter._drawStatusSprite(self, CSpriteFG.STATUSDEATH, Tic.FREQUENCE120, self.coloreyesfg, self.coloreyesbg)
+end
+
+function CCharacter:_drawStatusSprite(_sprite, _frequence, _colorwhite, _colorgreyl)
+    local _tick = Tic.Tick00
+    if Nums:frequence01(_tick, _frequence) == 1 then -- toggle colors
+        local _colorclone = _colorwhite
+        _colorwhite = _colorgreyl
+        _colorgreyl = _colorclone
+    end
     local _musprite = CSpriteFG() -- multi usage unique sprite
-    _musprite.sprite = CSpriteFG.STATUSOTHER
+    _musprite.sprite = _sprite
     _musprite.screenx = self.screenx
     _musprite.screeny = self.screeny
     _musprite.flip = self.dirx
     _musprite.scale = self.scale
     _musprite.palette[Tic.COLORWHITE] = _colorwhite -- apply palette
     _musprite.palette[Tic.COLORGREYL] = _colorgreyl
-    _musprite.palette[Tic.COLORGREYM] = _colorgreym
-    _musprite.palette[Tic.COLORGREYD] = _colorgreyd
     _musprite:draw()
 end
 
@@ -816,26 +843,24 @@ local Sprite = CSprite{
     scale = CSprite.SCALE02,
     rotate = CSprite.ROTATE090,
 }
--- Tic:trace("ok")
--- Tic:traceTable(Tic.Players.acttable)
--- exit()
 
 
--- local _postures = CCyclerTable{acttable = {
---     CCharacter.POSTURESTAND,
---     CCharacter.POSTURESHIFT,
---     CCharacter.POSTUREKNEEL,
---     CCharacter.POSTURESLEEP,
--- }}
 local Statuses = CCyclerTable{acttable = {
     CCharacter.STATUSSTAND,
+    CCharacter.STATUSKNEEL,
     CCharacter.STATUSSLEEP,
     CCharacter.STATUSWOUND,
+    CCharacter.STATUSMAGIC,
+    CCharacter.STATUSALCHE,
+    CCharacter.STATUSKNOCK,
     CCharacter.STATUSFLAME,
+    CCharacter.STATUSWATER,
+    CCharacter.STATUSSTONE,
+    CCharacter.STATUSBREEZ,
+    CCharacter.STATUSDEATH,
 }}
-Tic:traceTable(Statuses)
 
-
+local _statustick01 = 0
 -- Drawing
 function Tic:draw()
     local _tick00 = Tic.Tick00
@@ -843,15 +868,12 @@ function Tic:draw()
 
     local _frame = _tick60 // 30
 
-    local _status  = Statuses.actindex
-    if Nums:frequence01(_tick00, 120) == 1 then
+    if Nums:frequence01(_tick00, Tic.FREQUENCE240) ~= _statustick01 then
+        _statustick01 = Nums:frequence01(_tick00, Tic.FREQUENCE240)
         Statuses:next()
-        -- Tic:trace("---")
-        -- Tic:traceTable(Statuses)
     end
-
-    -- local _posture = CCharacter.STATUS2POSTURE[_status]
-    local _posture = 0
+    local _status  = Statuses.actvalue
+    local _posture = CCharacter.STATUS2POSTURE[_status]
 
     Tic:logStack("")
     Tic:logStack("")
@@ -875,10 +897,11 @@ function Tic:draw()
 
     -- local _scale = CSprite.SCALE01
     local _scale = CSprite.SCALE02
-    local _screenx = 30
+    local _screenx = 40
     local _screeny = 0
-    for _, _character in ipairs(Tic.Players.acttable) do
-        _character.status = _status
+    for _, _character in ipairs({Nitcha}) do
+        -- for _, _character in ipairs(Tic.Players.acttable) do
+            _character.status = _status
         _character.scale = _scale
         _character.screenx = _screenx
         _character.frame = _frame

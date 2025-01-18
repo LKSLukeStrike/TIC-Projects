@@ -9,7 +9,8 @@
 TIC80 = (exit) and true or false
 if not TIC80 then
     function trace(...)
-        print("trace:", table.unpack({...}))
+        print("trace:")
+        print(table.unpack({...}))
     end
     function spr(...)
         print("spr:", table.unpack({...}))
