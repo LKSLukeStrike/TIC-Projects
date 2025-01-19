@@ -477,39 +477,66 @@ function CCharacter:_drawStatusSleep()
 end
 
 function CCharacter:_drawStatusWound()
-    CCharacter._drawStatusSprite(self, Tic.COLORRED, Tic.COLORPURPLE)
+    CCharacter._drawStatusSprite(self,
+        {[Tic.COLORWHITE] = Tic.COLORRED, [Tic.COLORGREYL] = Tic.COLORPURPLE,},
+        {[Tic.COLORWHITE] = Tic.COLORPURPLE, [Tic.COLORGREYL] = Tic.COLORRED,}
+    )
 end
 
 function CCharacter:_drawStatusMagic()
-    CCharacter._drawStatusSprite(self, Tic.COLORCYAN, Tic.COLORBLUEM)
+    CCharacter._drawStatusSprite(self,
+        {[Tic.COLORWHITE] = Tic.COLORCYAN, [Tic.COLORGREYL] = Tic.COLORBLUEM,},
+        {[Tic.COLORWHITE] = Tic.COLORBLUEM, [Tic.COLORGREYL] = Tic.COLORCYAN,}
+    )
 end
 
 function CCharacter:_drawStatusAlche()
-    CCharacter._drawStatusSprite(self, Tic.COLORGREENL, Tic.COLORGREENM)
+    CCharacter._drawStatusSprite(self,
+        {[Tic.COLORWHITE] = Tic.COLORGREENL, [Tic.COLORGREYL] = Tic.COLORGREENM,},
+        {[Tic.COLORWHITE] = Tic.COLORGREENM, [Tic.COLORGREYL] = Tic.COLORGREENL,}
+    )
 end
 
 function CCharacter:_drawStatusKnock()
-    CCharacter._drawStatusSprite(self, self.colorskin, self.coloreyesbg)
+    CCharacter._drawStatusSprite(self,
+        {[Tic.COLORWHITE] = self.colorskin, [Tic.COLORGREYL] = self.coloreyesbg,},
+        {[Tic.COLORWHITE] = self.coloreyesbg, [Tic.COLORGREYL] = self.colorskin,}
+    )
 end
 
 function CCharacter:_drawStatusFlame()
-    CCharacter._drawStatusSprite(self, Tic.COLORORANGE, Tic.COLORRED)
+    CCharacter._drawStatusSprite(self,
+        {[Tic.COLORWHITE] = Tic.COLORORANGE, [Tic.COLORGREYL] = Tic.COLORRED, [Tic.COLORGREYM] = Tic.COLORPURPLE,},
+        {[Tic.COLORWHITE] = Tic.COLORRED, [Tic.COLORGREYL] = Tic.COLORORANGE, [Tic.COLORGREYM] = Tic.COLORPURPLE,}
+    )
 end
 
 function CCharacter:_drawStatusWater()
-    CCharacter._drawStatusSprite(self, Tic.COLORWHITE, Tic.COLORCYAN)
+    CCharacter._drawStatusSprite(self,
+        {[Tic.COLORWHITE] = Tic.COLORWHITE, [Tic.COLORGREYL] = Tic.COLORCYAN,},
+        {[Tic.COLORWHITE] = Tic.COLORCYAN, [Tic.COLORGREYL] = Tic.COLORWHITE,}
+    )
 end
 
 function CCharacter:_drawStatusStone()
-    CCharacter._drawStatusSprite(self, Tic.COLORGREYM, Tic.COLORGREYD)
+    CCharacter._drawStatusSprite(self,
+        {[Tic.COLORWHITE] = Tic.COLORGREYM, [Tic.COLORGREYL] = Tic.COLORGREYD,},
+        {[Tic.COLORWHITE] = Tic.COLORGREYD, [Tic.COLORGREYL] = Tic.COLORGREYM,}
+    )
 end
 
 function CCharacter:_drawStatusBreez()
-    CCharacter._drawStatusSprite(self, Tic.COLORWHITE, Tic.COLORGREYL)
+    CCharacter._drawStatusSprite(self,
+        {[Tic.COLORWHITE] = Tic.COLORWHITE, [Tic.COLORGREYL] = Tic.COLORGREYL,},
+        {[Tic.COLORWHITE] = Tic.COLORGREYL, [Tic.COLORGREYL] = Tic.COLORWHITE,}
+    )
 end
 
 function CCharacter:_drawStatusDeath()
-    CCharacter._drawStatusSprite(self, self.coloreyesfg, self.coloreyesbg)
+    CCharacter._drawStatusSprite(self,
+        {[Tic.COLORRED] = Tic.COLORRED, [Tic.COLORPURPLE] = Tic.COLORPURPLE,},
+        {[Tic.COLORRED] = Tic.COLORPURPLE, [Tic.COLORPURPLE] = Tic.COLORRED,}
+    )
 end
 
 function CCharacter:_drawStatusSprite(_palette0, _palette1)
@@ -898,13 +925,13 @@ local Statuses = CCyclerTable{acttable = {
     -- CCharacter.STATUSSTAND,
     -- CCharacter.STATUSSHIFT,
     -- CCharacter.STATUSKNEEL,
-    CCharacter.STATUSSLEEP,
+    -- CCharacter.STATUSSLEEP,
     -- CCharacter.STATUSWOUND,
     -- CCharacter.STATUSMAGIC,
     -- CCharacter.STATUSALCHE,
     -- CCharacter.STATUSKNOCK,
     -- CCharacter.STATUSFLAME,
-    -- CCharacter.STATUSWATER,
+    CCharacter.STATUSWATER,
     -- CCharacter.STATUSSTONE,
     -- CCharacter.STATUSBREEZ,
     -- CCharacter.STATUSDEATH,
