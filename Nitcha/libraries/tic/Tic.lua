@@ -384,18 +384,48 @@ CCharacter.STATUSSETTINGS = { -- statuses settings
 CCharacter.POSTURESETTINGS = { -- postures settings
     [CCharacter.POSTURESTAND] = {
         bodyspriteoffset = 0,
+        bodyoffsetx = 0,
+        bodyoffsety = 0,
+        headoffsetx = 0,
+        headoffsety = 0,
+        rotate = CSprite.ROTATE000,
+        frame = nil, -- nil use self.frame
     },
     [CCharacter.POSTUREBLOCK] = {
         bodyspriteoffset = 1,
+        bodyoffsetx = 0,
+        bodyoffsety = 0,
+        headoffsetx = 0,
+        headoffsety = 0,
+        rotate = CSprite.ROTATE000,
+        frame = nil, -- nil use self.frame
     },
     [CCharacter.POSTURESHIFT] = {
         bodyspriteoffset = 2,
+        bodyoffsetx = 0,
+        bodyoffsety = 0,
+        headoffsetx = 0,
+        headoffsety = 0,
+        rotate = CSprite.ROTATE000,
+        frame = nil, -- nil use self.frame
     },
     [CCharacter.POSTUREKNEEL] = {
         bodyspriteoffset = 3,
+        bodyoffsetx = 0,
+        bodyoffsety = 0,
+        headoffsetx = 0,
+        headoffsety = 0,
+        rotate = CSprite.ROTATE000,
+        frame = nil, -- nil use self.frame
     },
     [CCharacter.POSTURESLEEP] = {
         bodyspriteoffset = 0,
+        bodyoffsetx = nil, -- nil use size
+        bodyoffsety = 2,
+        headoffsetx = 0,
+        headoffsety = 0,
+        rotate = CSprite.ROTATE090,
+        frame = CSprite.FRAME01, -- fix frame
     },
 }
 CEntity.KINDCHARACTER = "Character" -- Character kind
@@ -630,24 +660,24 @@ end
 
 function CCharacterHumanoid:_drawBody()
     local _musprite = CSpriteFG() -- multi usage unique sprite
-    local _sprite = self.spritebody + CCharacter.POSTURESETTINGS[self.posture].bodyspriteoffset
-    local _offsetx = 0
-    local _offsety = 0
-    local _rotate  = CSprite.ROTATE000
-    local _frame = self.frame
-    if self.posture == CCharacter.POSTURESLEEP then
-        _sprite = self.spritebody + CCharacter.POSTURESETTINGS[CCharacter.POSTURESTAND].bodyspriteoffset
-        _offsetx = (self.dirx == Tic.DIRXLF)
-        and 0 + self.size
-        or  0 - self.size
-        _offsety = 2
-        _rotate = CSprite.ROTATE090
-        _frame = CSprite.FRAME01
-    end
+    local _bodyspriteoffset  = CCharacter.POSTURESETTINGS[self.posture].bodyspriteoffset
+    local _bodyoffsetx = CCharacter.POSTURESETTINGS[self.posture].bodyoffsetx
+    _bodyoffsetx = (_bodyoffsetx == nil and self.dirx == Tic.DIRXLF)
+    and 0 + self.size
+    or  _bodyoffsetx
+    _bodyoffsetx = (_bodyoffsetx == nil and self.dirx == Tic.DIRXRG)
+    and 0 - self.size
+    or  _bodyoffsetx
+    local _bodyoffsety = CCharacter.POSTURESETTINGS[self.posture].bodyoffsety
+    local _rotate  = CCharacter.POSTURESETTINGS[self.posture].rotate
+    local _frame = CCharacter.POSTURESETTINGS[self.posture].frame
+    _frame = (_frame)
+    and _frame -- fix frame
+    or  self.frame
 
-    _musprite.sprite = _sprite -- apply the corresponding attributes
-    _musprite.screenx = self.screenx + (_offsetx * self.scale)
-    _musprite.screeny = self.screeny + (_offsety * self.scale)
+    _musprite.sprite = self.spritebody + _bodyspriteoffset -- apply the corresponding attributes
+    _musprite.screenx = self.screenx + (_bodyoffsetx * self.scale)
+    _musprite.screeny = self.screeny + (_bodyoffsety * self.scale)
     _musprite.rotate = _rotate
     _musprite.frame = _frame
     _musprite.scale = self.scale
