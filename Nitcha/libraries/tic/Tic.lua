@@ -384,46 +384,51 @@ CCharacter.STATUSSETTINGS = { -- statuses settings
 CCharacter.POSTURESETTINGS = { -- postures settings
     [CCharacter.POSTURESTAND] = {
         bodyspriteoffset = 0,
-        bodyoffsetx = 0,
-        bodyoffsety = 0,
-        headoffsetx = 0,
-        headoffsety = 0,
+        bodyxoffset = 0,
+        bodyyoffset = 0,
+        headxoffset = 0,
+        headyoffset = 0,
+        headusesize = true,
         rotate = CSprite.ROTATE000,
         frame = nil, -- nil use self.frame
     },
     [CCharacter.POSTUREBLOCK] = {
         bodyspriteoffset = 1,
-        bodyoffsetx = 0,
-        bodyoffsety = 0,
-        headoffsetx = 0,
-        headoffsety = 0,
+        bodyxoffset = 0,
+        bodyyoffset = 0,
+        headxoffset = 0,
+        headyoffset = 0,
+        headusesize = true,
         rotate = CSprite.ROTATE000,
         frame = nil, -- nil use self.frame
     },
     [CCharacter.POSTURESHIFT] = {
         bodyspriteoffset = 2,
-        bodyoffsetx = 0,
-        bodyoffsety = 0,
-        headoffsetx = 0,
-        headoffsety = 0,
+        bodyxoffset = 0,
+        bodyyoffset = 0,
+        headxoffset = 0,
+        headyoffset = 0,
+        headusesize = true,
         rotate = CSprite.ROTATE000,
         frame = nil, -- nil use self.frame
     },
     [CCharacter.POSTUREKNEEL] = {
         bodyspriteoffset = 3,
-        bodyoffsetx = 0,
-        bodyoffsety = 0,
-        headoffsetx = 0,
-        headoffsety = 0,
+        bodyxoffset = 0,
+        bodyyoffset = 0,
+        headxoffset = 0,
+        headyoffset = 1,
+        headusesize = true,
         rotate = CSprite.ROTATE000,
         frame = nil, -- nil use self.frame
     },
     [CCharacter.POSTURESLEEP] = {
         bodyspriteoffset = 0,
-        bodyoffsetx = nil, -- nil use size
-        bodyoffsety = 2,
-        headoffsetx = 0,
-        headoffsety = 0,
+        bodyxoffset = nil, -- nil use size
+        bodyyoffset = 2,
+        headxoffset = 0,
+        headyoffset = 2,
+        headusesize = false,
         rotate = CSprite.ROTATE090,
         frame = CSprite.FRAME01, -- fix frame
     },
@@ -453,8 +458,8 @@ function CCharacter:new(_argt)
     self.colorshirt   = Tic.COLORSHIRT
     self.colorpants   = Tic.COLORPANTS
     self.colorhands   = Tic.COLORHANDS
-    self.spritebody   = CSpriteFG.BODYHUMAN -- body
-    self.spritehead   = CSpriteFG.HEADDROWE -- head
+    self.bodysprite   = CSpriteFG.BODYHUMAN -- body
+    self.headsprite   = CSpriteFG.HEADDROWE -- head
     self:argt(_argt) -- override if any
 end
 
@@ -614,6 +619,7 @@ function CCharacter:_drawStatusSprite(_palette0, _palette1)
     local _palette = (Nums:frequence01(_tick00, _frequence) == 0)
     and _palette0
     or  _palette1
+
     local _musprite = CSpriteFG() -- multi usage unique sprite
     _musprite.sprite = _statussprite
     _musprite.screenx = self.screenx
@@ -659,25 +665,25 @@ function CCharacterHumanoid:new(_argt)
 end
 
 function CCharacterHumanoid:_drawBody()
-    local _musprite = CSpriteFG() -- multi usage unique sprite
     local _bodyspriteoffset  = CCharacter.POSTURESETTINGS[self.posture].bodyspriteoffset
-    local _bodyoffsetx = CCharacter.POSTURESETTINGS[self.posture].bodyoffsetx
-    _bodyoffsetx = (_bodyoffsetx == nil and self.dirx == Tic.DIRXLF)
-    and 0 + self.size
-    or  _bodyoffsetx
-    _bodyoffsetx = (_bodyoffsetx == nil and self.dirx == Tic.DIRXRG)
-    and 0 - self.size
-    or  _bodyoffsetx
-    local _bodyoffsety = CCharacter.POSTURESETTINGS[self.posture].bodyoffsety
+    local _bodyxoffset = CCharacter.POSTURESETTINGS[self.posture].bodyxoffset
+    _bodyxoffset = (_bodyxoffset == nil and self.dirx == Tic.DIRXLF)
+    and 0 + self.size -- nil use size
+    or  _bodyxoffset
+    _bodyxoffset = (_bodyxoffset == nil and self.dirx == Tic.DIRXRG)
+    and 0 - self.size -- nil use size
+    or  _bodyxoffset
+    local _bodyyoffset = CCharacter.POSTURESETTINGS[self.posture].bodyyoffset
     local _rotate  = CCharacter.POSTURESETTINGS[self.posture].rotate
     local _frame = CCharacter.POSTURESETTINGS[self.posture].frame
     _frame = (_frame)
     and _frame -- fix frame
     or  self.frame
 
-    _musprite.sprite = self.spritebody + _bodyspriteoffset -- apply the corresponding attributes
-    _musprite.screenx = self.screenx + (_bodyoffsetx * self.scale)
-    _musprite.screeny = self.screeny + (_bodyoffsety * self.scale)
+    local _musprite = CSpriteFG() -- multi usage unique sprite
+    _musprite.sprite = self.bodysprite + _bodyspriteoffset -- apply the corresponding attributes
+    _musprite.screenx = self.screenx + (_bodyxoffset * self.scale)
+    _musprite.screeny = self.screeny + (_bodyyoffset * self.scale)
     _musprite.rotate = _rotate
     _musprite.frame = _frame
     _musprite.scale = self.scale
@@ -692,21 +698,17 @@ function CCharacterHumanoid:_drawBody()
 end
 
 function CCharacterHumanoid:_drawHead()
-    local _musprite = CSpriteFG() -- multi usage unique sprite
-    local _sprite = self.spritehead
-    local _offsetx = 0
-    local _offsety = (self.posture == CCharacter.POSTUREKNEEL)
-    and self.size + 1
-    or  self.size
-    local _rotate  = CSprite.ROTATE000
-    if self.posture == CCharacter.POSTURESLEEP then
-        _offsety = 2
-        _rotate = CSprite.ROTATE090
-    end
+    local _headxoffset = CCharacter.POSTURESETTINGS[self.posture].headxoffset
+    local _headyoffset = CCharacter.POSTURESETTINGS[self.posture].headyoffset
+    _headyoffset = (CCharacter.POSTURESETTINGS[self.posture].headusesize)
+    and _headyoffset + self.size
+    or  _headyoffset
+    local _rotate  = CCharacter.POSTURESETTINGS[self.posture].rotate
 
-    _musprite.sprite = _sprite -- apply the corresponding attributes
-    _musprite.screenx = self.screenx + (_offsetx * self.scale)
-    _musprite.screeny = self.screeny + (_offsety * self.scale)
+    local _musprite = CSpriteFG() -- multi usage unique sprite
+    _musprite.sprite = self.headsprite -- apply the corresponding attributes
+    _musprite.screenx = self.screenx + (_headxoffset * self.scale)
+    _musprite.screeny = self.screeny + (_headyoffset * self.scale)
     _musprite.rotate = _rotate
     _musprite.scale = self.scale
     _musprite.flip = self.dirx -- flip h if any
@@ -726,26 +728,26 @@ function CCharacterHumanoid:_drawEyes()
 end
 
 function CCharacterHumanoid:_drawEyesFG() -- draw fg eyes depending on dir x y
-    local _musprite = CSpriteFG() -- multi usage unique sprite
     local _sprite = CSpriteFG.SPRITEPIXEL
-    local _offsetx = (self.dirx == Tic.DIRXLF)
+    local _xoffset = (self.dirx == Tic.DIRXLF)
     and CCharacterHumanoid.EYEXFGLF
     or  CCharacterHumanoid.EYEXFGRG
-    local _offsety = (self.posture == CCharacter.POSTUREKNEEL)
+    local _yoffset = (self.posture == CCharacter.POSTUREKNEEL)
     and CCharacterHumanoid.EYEYIDLE + self.size + 1
     or  CCharacterHumanoid.EYEYIDLE + self.size
     local _color = self.coloreyesfg
     if self.posture == CCharacter.POSTURESLEEP then
-        _offsetx = (self.dirx == Tic.DIRXLF)
+        _xoffset = (self.dirx == Tic.DIRXLF)
         and CCharacterHumanoid.EYEXDWLF
         or  CCharacterHumanoid.EYEXDWRG
-        _offsety = CCharacterHumanoid.EYEYDWFG
+        _yoffset = CCharacterHumanoid.EYEYDWFG
         _color = self.colorskin
     end
 
+    local _musprite = CSpriteFG() -- multi usage unique sprite
     _musprite.sprite = _sprite -- apply the corresponding attributes
-    _musprite.screenx = self.screenx + (_offsetx * self.scale)
-    _musprite.screeny = self.screeny + (_offsety * self.scale)
+    _musprite.screenx = self.screenx + (_xoffset * self.scale)
+    _musprite.screeny = self.screeny + (_yoffset * self.scale)
     _musprite.scale = self.scale
     _musprite:palettize{ -- apply eyes palette
         [Tic.COLORWHITE] = _color,
@@ -754,26 +756,26 @@ function CCharacterHumanoid:_drawEyesFG() -- draw fg eyes depending on dir x y
 end
 
 function CCharacterHumanoid:_drawEyesBG() -- draw bg eyes depending on dir x y
-    local _musprite = CSpriteFG() -- multi usage unique sprite
     local _sprite = CSpriteFG.SPRITEPIXEL
-    local _offsetx = (self.dirx == Tic.DIRXLF)
+    local _xoffset = (self.dirx == Tic.DIRXLF)
     and CCharacterHumanoid.EYEXBGLF
     or  CCharacterHumanoid.EYEXBGRG
-    local _offsety = (self.posture == CCharacter.POSTUREKNEEL) 
+    local _yoffset = (self.posture == CCharacter.POSTUREKNEEL) 
     and CCharacterHumanoid.EYEYIDLE + self.size + self.diry + 1
     or  CCharacterHumanoid.EYEYIDLE + self.size + self.diry
     local _color = self.coloreyesbg
     if self.posture == CCharacter.POSTURESLEEP then
-        _offsetx = (self.dirx == Tic.DIRXLF)
+        _xoffset = (self.dirx == Tic.DIRXLF)
         and CCharacterHumanoid.EYEXDWLF
         or  CCharacterHumanoid.EYEXDWRG
-        _offsety = CCharacterHumanoid.EYEYDWBG
+        _yoffset = CCharacterHumanoid.EYEYDWBG
         _color = self.coloreyesbg
     end
 
+    local _musprite = CSpriteFG() -- multi usage unique sprite
     _musprite.sprite = _sprite -- apply the corresponding attributes
-    _musprite.screenx = self.screenx + (_offsetx * self.scale)
-    _musprite.screeny = self.screeny + (_offsety * self.scale)
+    _musprite.screenx = self.screenx + (_xoffset * self.scale)
+    _musprite.screeny = self.screeny + (_yoffset * self.scale)
     _musprite.scale = self.scale
     _musprite:palettize{ -- apply eyes palette
         [Tic.COLORWHITE] = _color,
@@ -805,7 +807,7 @@ function CPlayerDwarf:new(_argt)
     self.colorhairsfg = Tic.COLORRED -- colors
     self.colorhairsbg = Tic.COLORORANGE
     self.size         = CCharacter.SIZES -- size
-    self.spritehead   = CSpriteFG.HEADDWARF -- head
+    self.headsprite   = CSpriteFG.HEADDWARF -- head
     self:argt(_argt) -- override if any
 end
 
@@ -819,7 +821,7 @@ function CPlayerGnome:new(_argt)
     self.colorhairsbg = Tic.COLORYELLOW
     self.colorpants   = self.colorskin
     self.size         = CCharacter.SIZES -- size
-    self.spritehead   = CSpriteFG.HEADGNOME -- head
+    self.headsprite   = CSpriteFG.HEADGNOME -- head
     self:argt(_argt) -- override if any
 end
 
@@ -832,7 +834,7 @@ function CPlayerDrowe:new(_argt)
     self.coloreyesfg  = Tic.COLORRED -- colors
     self.coloreyesbg  = Tic.COLORPURPLE
     self.size         = CCharacter.SIZEM -- size
-    self.spritehead   = CSpriteFG.HEADDROWE -- head
+    self.headsprite   = CSpriteFG.HEADDROWE -- head
     self:argt(_argt) -- override if any
 end
 
@@ -846,7 +848,7 @@ function CPlayerAngel:new(_argt)
     self.colorhairsbg = Tic.COLORWHITE
     self.colorextra   = Tic.COLORYELLOW
     self.size         = CCharacter.SIZEM -- size
-    self.spritehead   = CSpriteFG.HEADANGEL -- head
+    self.headsprite   = CSpriteFG.HEADANGEL -- head
     self:argt(_argt) -- override if any
 end
 
@@ -862,7 +864,7 @@ function CPlayerGogol:new(_argt)
     self.coloreyesfg  = Tic.COLORBLUEL
     self.coloreyesbg  = Tic.COLORBLUEM
     self.size         = CCharacter.SIZEL -- size
-    self.spritehead   = CSpriteFG.HEADGOGOL -- head
+    self.headsprite   = CSpriteFG.HEADGOGOL -- head
     self:argt(_argt) -- override if any
 end
 
@@ -876,7 +878,7 @@ function CPlayerHorne:new(_argt)
     self.colorhairsbg = Tic.COLORRED
     self.colorextra   = Tic.COLORGREYD
     self.size         = CCharacter.SIZEM -- size
-    self.spritehead   = CSpriteFG.HEADHORNE -- head
+    self.headsprite   = CSpriteFG.HEADHORNE -- head
     self:argt(_argt) -- override if any
 end
 
@@ -908,7 +910,7 @@ function CPlayerMeduz:new(_argt)
     self.colorhairsfg = Tic.COLORGREEND -- colors
     self.colorhairsbg = Tic.COLORGREENM
     self.size         = CCharacter.SIZES -- size
-    self.spritehead   = CSpriteFG.HEADMEDUZ -- head
+    self.headsprite   = CSpriteFG.HEADMEDUZ -- head
     self:argt(_argt) -- override if any
 end
 
@@ -921,7 +923,7 @@ function CPlayerGnoll:new(_argt)
     self.coloreyesfg  = Tic.COLORRED -- colors
     self.coloreyesbg  = Tic.COLORPURPLE
     self.size         = CCharacter.SIZEL -- size
-    self.spritehead   = CSpriteFG.HEADGNOLL -- head
+    self.headsprite   = CSpriteFG.HEADGNOLL -- head
     self:argt(_argt) -- override if any
 end
 
