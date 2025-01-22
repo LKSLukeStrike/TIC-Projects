@@ -23,6 +23,8 @@ Tic.SCREENW = 240 -- screen width
 Tic.SCREENH = 136 -- screen height
 -- Palette map
 Tic.PALETTEMAP = 0x3FF0 * 2 -- vram bank 1
+-- Sprites bank
+Tic.SPRITEBANK = 0x4000 -- start at tiles sprites
 -- Palette colors
 Tic.COLOR00 = 00 -- black
 Tic.COLOR01 = 01 -- purple
@@ -176,6 +178,35 @@ end
 function Tic:paletteReset() -- reset palette colors
     for _key = 0, 15 do
         poke4(Tic.PALETTEMAP + _key, _key)
+    end
+end
+
+
+-- Board
+function Tic:boardPixel(_sprite, _x, _y, _color) -- paint a pixel to a board sprite
+    if not _sprite then return end
+    _x = _x or 0
+    _y = _y or 0
+    _color = _color or Tic.COLORKEY -- transparent by default
+    poke4(((Tic.SPRITEBANK + (32 * _sprite)) * 2) + ((_y * 8) + _x), _color)
+end
+
+function Tic:boardClean(_sprite) -- clean a board sprite
+    if not _sprite then return end
+    for _y = 0, 7 do
+        for _x = 0, 7 do
+            Tic:boardPixel(_sprite, _x, _y, nil) -- all transparent
+        end
+    end
+end
+
+function Tic:boardPaint(_sprite, _directives, _clean) -- paint a board sprite
+    if not _sprite then return end
+    if not _directives then return end
+    _clean = (_clean == nil or _clean == true) and true or false
+    if _clean then Tic:boardClean(_sprite) end -- clean by default
+    for _, _directive in pairs(_directives) do
+        Tic:boardPixel(_sprite, _directive.x, _directive.y, _directive.color) -- paint each pixel
     end
 end
 
@@ -1041,6 +1072,12 @@ local Sprite = CSpriteFGBoard{
     screeny = 50,
     scale = CSprite.SCALE02,
 }
+-- Tic:boardClean(Sprite.sprite)
+Tic:boardPaint(Sprite.sprite, {
+    {x = 0, y = 0, color = Tic.COLORWHITE,},
+    {x = 7, y = 7, color = Tic.COLORRED,},
+})
+
 
 
 local Statuses = CCyclerTable{acttable = {
