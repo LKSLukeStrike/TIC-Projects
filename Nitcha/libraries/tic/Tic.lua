@@ -67,6 +67,10 @@ Tic.COLORHAIRSFG = Tic.COLOR15 -- 4 colors for the heads
 Tic.COLORHAIRSBG = Tic.COLOR14
 Tic.COLOREXTRA   = Tic.COLOR13
 Tic.COLORSKIN    = Tic.COLOR12
+Tic.COLOREYESFG   = Tic.COLOR15 -- 4 colors for the eyes
+Tic.COLOREYESBGUP = Tic.COLOR14
+Tic.COLOREYESBGMD = Tic.COLOR13
+Tic.COLOREYESBGDW = Tic.COLOR12
 -- TODO weapons fg/bg + status
 -- Key values
 Tic.KEYUP = 26 -- move up (z)
@@ -242,6 +246,7 @@ local CSpriteFG = CSprite:extend() -- fg sprites aka tic sprites
 CSpriteFG.SPRITEBANK  = 256
 CSpriteFG.SPRITEEMPTY = CSpriteFG.SPRITEBANK + 0 -- empty sprite
 CSpriteFG.SPRITEPIXEL = CSpriteFG.SPRITEBANK + 1 -- pixel sprite
+CSpriteFG.SPRITEBOARD = CSpriteFG.SPRITEBANK + 2 -- board sprite -- for creating a sprite by code
 CSpriteFG.HEADBANK    = 272 -- characters heads
 CSpriteFG.HEADDWARF   = CSpriteFG.HEADBANK + 0
 CSpriteFG.HEADGNOME   = CSpriteFG.HEADBANK + 1
@@ -266,6 +271,28 @@ function CSpriteFG:new(_argt)
     self.sprite = self.spritebank
     self:argt(_argt) -- override if any
 end
+
+local CSpriteFGEmpty = CSpriteFG:extend() -- empty sprites
+function CSpriteFGEmpty:new(_argt)
+    CSpriteFGEmpty.super.new(self, _argt)
+    self.sprite = CSpriteFG.SPRITEEMPTY
+    self:argt(_argt) -- override if any
+end
+
+local CSpriteFGPixel = CSpriteFG:extend() -- pixel sprites
+function CSpriteFGPixel:new(_argt)
+    CSpriteFGPixel.super.new(self, _argt)
+    self.sprite = CSpriteFG.SPRITEPIXEL
+    self:argt(_argt) -- override if any
+end
+
+local CSpriteFGBoard = CSpriteFG:extend() -- board sprites
+function CSpriteFGBoard:new(_argt)
+    CSpriteFGBoard.super.new(self, _argt)
+    self.sprite = CSpriteFG.SPRITEBOARD
+    self:argt(_argt) -- override if any
+end
+
 
 
 --
@@ -729,19 +756,27 @@ function CCharacterHumanoid:_drawHead()
         [Tic.COLORSKIN]    = self.colorskin,
     }
     _musprite:draw()
+
     -- draw eyes
-    local _eyescolorfg   = (self.posture == CCharacter.POSTURESLEEP)
-    and self.colorskin
-    or  self.coloreyesfg
-    local _eyescolorbgup = self.coloreyesbg
-    local _eyescolorbgmd = self.coloreyesbg
-    local _eyescolorbgdw = self.coloreyesbg
+    local _eyescolorfg   = (self.posture ~= CCharacter.POSTURESLEEP)
+    and self.coloreyesfg
+    or  Tic.COLORGREENL --Tic.COLORKEY
+    local _eyescolorbgup = (self.posture ~= CCharacter.POSTURESLEEP and self.diry == Tic.DIRYUP)
+    and self.coloreyesbg
+    or  Tic.COLORGREENL --Tic.COLORKEY
+    local _eyescolorbgmd = (self.posture == CCharacter.POSTURESLEEP or  self.diry == Tic.DIRYMD)
+    and self.coloreyesbg
+    or  Tic.COLORGREENL --Tic.COLORKEY
+    local _eyescolorbgdw = (self.posture ~= CCharacter.POSTURESLEEP and self.diry == Tic.DIRYDW)
+    and self.coloreyesbg
+    or  Tic.COLORGREENL --Tic.COLORKEY
     _musprite.sprite  = self.eyessprite -- apply the corresponding attributes
+    _musprite.palette = {} -- fresh palette
     _musprite:palettize{ -- apply eyes palette
-        [Tic.COLORWHITE] = _eyescolorfg,
-        [Tic.COLORGREYL] = _eyescolorbgup,
-        [Tic.COLORGREYM] = _eyescolorbgmd,
-        [Tic.COLORGREYD] = _eyescolorbgdw,
+        [Tic.COLOREYESFG]   = _eyescolorfg,
+        [Tic.COLOREYESBGUP] = _eyescolorbgup,
+        [Tic.COLOREYESBGMD] = _eyescolorbgmd,
+        [Tic.COLOREYESBGDW] = _eyescolorbgdw,
     }
     _musprite:draw()
     -- self:_drawEyes()
@@ -1001,12 +1036,10 @@ local Golith = CPlayerGogol{name = "Golith",}
 local Wulfie = CPlayerWolfe{name = "Wulfie",
     colorextra = Tic.COLORRED,
 }
-local Sprite = CSprite{
-    screenx = 150,
-    screeny = 120,
-    sprite = 288,
+local Sprite = CSpriteFGBoard{
+    screenx = 100,
+    screeny = 50,
     scale = CSprite.SCALE02,
-    rotate = CSprite.ROTATE090,
 }
 
 
@@ -1015,7 +1048,7 @@ local Statuses = CCyclerTable{acttable = {
     -- CCharacter.STATUSBLOCK,
     -- CCharacter.STATUSSHIFT,
     -- CCharacter.STATUSKNEEL,
-    CCharacter.STATUSSLEEP,
+    -- CCharacter.STATUSSLEEP,
     -- CCharacter.STATUSWOUND,
     -- CCharacter.STATUSMAGIC,
     -- CCharacter.STATUSALCHE,
@@ -1039,7 +1072,7 @@ function Tic:draw()
         _statustick01 = Nums:frequence01(_tick00, Tic.FREQUENCE240)
         Statuses:next()
     end
-    local _status  = Statuses.actvalue
+    local _status  = Statuses.actvalue or CCharacter.STATUSSTAND
     local _posture = CCharacter.STATUSSETTINGS[_status].posture
 
     Tic:logStack("")
@@ -1066,8 +1099,9 @@ function Tic:draw()
     local _scale = CSprite.SCALE02
     local _screenx = 40
     local _screeny = 0
-    for _, _character in ipairs({Truduk, Nitcha, Golith,}) do
-        -- for _, _character in ipairs(Tic.Players.acttable) do
+    for _, _character in ipairs({}) do
+        -- for _, _character in ipairs({Truduk, Nitcha, Golith,}) do
+            -- for _, _character in ipairs(Tic.Players.acttable) do
         _character.status = _status
         _character.scale = _scale
         _character.screenx = _screenx
@@ -1111,7 +1145,7 @@ function Tic:draw()
         -- end
     end
     -- Tic.Players.actvalue:portrait(true, true)
-    -- Sprite:draw()
+    Sprite:draw()
 
     Tic:logPrint()
 
