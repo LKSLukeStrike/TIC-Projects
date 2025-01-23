@@ -321,7 +321,13 @@ local CSpriteFGBoard = CSpriteFG:extend() -- board sprites
 function CSpriteFGBoard:new(_argt)
     CSpriteFGBoard.super.new(self, _argt)
     self.sprite = CSpriteFG.SPRITEBOARD
+    self.directives = {} -- table of painting directives {{x = 0-7, y = 0-7, color = 0-15,}, ...}
     self:argt(_argt) -- override if any
+end
+
+function CSpriteFGBoard:draw()
+    Tic:boardPaint(self.sprite, self.directives)
+    CSpriteFGBoard.super.draw(self)
 end
 
 
@@ -700,16 +706,6 @@ end
 
 
 local CCharacterHumanoid = CCharacter:extend() -- humanoid characters
--- CCharacterHumanoid.EYESFGXOFFSET = 3
--- CCharacterHumanoid.EYESFGYOFFSET = 2
--- CCharacterHumanoid.EYEXBGLF = 2 -- x eyes offsets
--- CCharacterHumanoid.EYEXFGRG = 4
--- CCharacterHumanoid.EYEXBGRG = 5
--- CCharacterHumanoid.EYEXDWLF = 5 -- down left
--- CCharacterHumanoid.EYEXDWRG = 2 -- down right
--- CCharacterHumanoid.EYEYIDLE = 2 -- y eyes offsets
--- CCharacterHumanoid.EYEYDWBG = 4
--- CCharacterHumanoid.EYEYDWFG = 5
 CEntity.KINDHUMANOID = "Humanoid" -- Humanoid kind
 function CCharacterHumanoid:new(_argt)
     CCharacterHumanoid.super.new(self, _argt)
@@ -789,83 +785,31 @@ function CCharacterHumanoid:_drawHead()
     _musprite:draw()
 
     -- draw eyes
-    local _eyescolorfg   = (self.posture ~= CCharacter.POSTURESLEEP)
-    and self.coloreyesfg
-    or  Tic.COLORGREENL --Tic.COLORKEY
-    local _eyescolorbgup = (self.posture ~= CCharacter.POSTURESLEEP and self.diry == Tic.DIRYUP)
-    and self.coloreyesbg
-    or  Tic.COLORGREENL --Tic.COLORKEY
-    local _eyescolorbgmd = (self.posture == CCharacter.POSTURESLEEP or  self.diry == Tic.DIRYMD)
-    and self.coloreyesbg
-    or  Tic.COLORGREENL --Tic.COLORKEY
-    local _eyescolorbgdw = (self.posture ~= CCharacter.POSTURESLEEP and self.diry == Tic.DIRYDW)
-    and self.coloreyesbg
-    or  Tic.COLORGREENL --Tic.COLORKEY
+    local _coloreyesfg   = self.coloreyesfg
+    local _coloreyesbgup = self.coloreyesbg
+    local _coloreyesbgmd = self.coloreyesbg
+    local _coloreyesbgdw = self.coloreyesbg
+
+    if self.posture == CCharacter.POSTURESLEEP then
+        _musprite.colorkey = {Tic.COLORKEY, Tic.COLOREYESFG, Tic.COLOREYESBGUP, Tic.COLOREYESBGDW,}
+    end
+    if self.posture ~= CCharacter.POSTURESLEEP and self.diry == Tic.DIRYUP then
+        _musprite.colorkey = {Tic.COLORKEY, Tic.COLOREYESBGMD, Tic.COLOREYESBGDW,}
+    end
+    if self.posture ~= CCharacter.POSTURESLEEP and self.diry == Tic.DIRYMD then
+        _musprite.colorkey = {Tic.COLORKEY, Tic.COLOREYESBGUP, Tic.COLOREYESBGDW,}
+    end
+    if self.posture ~= CCharacter.POSTURESLEEP and self.diry == Tic.DIRYDW then
+        _musprite.colorkey = {Tic.COLORKEY, Tic.COLOREYESBGUP, Tic.COLOREYESBGMD,}
+    end
+
     _musprite.sprite  = self.eyessprite -- apply the corresponding attributes
     _musprite.palette = {} -- fresh palette
     _musprite:palettize{ -- apply eyes palette
-        [Tic.COLOREYESFG]   = _eyescolorfg,
-        [Tic.COLOREYESBGUP] = _eyescolorbgup,
-        [Tic.COLOREYESBGMD] = _eyescolorbgmd,
-        [Tic.COLOREYESBGDW] = _eyescolorbgdw,
-    }
-    _musprite:draw()
-    -- self:_drawEyes()
-end
-
-function CCharacterHumanoid:_drawEyes()
-    -- self:_drawEyesFG()
-    -- self:_drawEyesBG()
-end
-
-function CCharacterHumanoid:_drawEyesFG() -- draw fg eyes depending on dir x y
-    local _posture     = CCharacter.POSTURESETTINGS[self.posture]
-    local _eyesxoffset = (self.dirx == Tic.DIRXLF)
-    and _posture.headxoffset + CCharacterHumanoid.EYESFGXOFFSET
-    or  _posture.headxoffset - CCharacterHumanoid.EYESFGXOFFSET
-    local _eyesyoffset = _posture.headyoffset + CCharacterHumanoid.EYESFGYOFFSET + self.size
-
-    local _eyesrotate  = _posture.rotate
-    local _eyesframe   = CSprite.FRAME00 -- eyes have only one frame
-    local _eyescolor = self.coloreyesfg -- TODO
-
-    local _musprite = CSpriteFG() -- multi usage unique sprite
-    _musprite.sprite  = CSpriteFG.SPRITEPIXEL -- apply the corresponding attributes
-    _musprite.screenx = self.screenx + (_eyesxoffset * self.scale)
-    _musprite.screeny = self.screeny + (_eyesyoffset * self.scale)
-    _musprite.rotate  = _eyesrotate
-    _musprite.frame   = _eyesframe
-    _musprite.scale   = self.scale
-    _musprite.flip    = self.dirx -- flip x if any
-    _musprite:palettize{ -- apply eyes palette
-        [Tic.COLORWHITE] = _eyescolor,
-    }
-    _musprite:draw()
-end
-
-function CCharacterHumanoid:_drawEyesBG() -- draw bg eyes depending on dir x y
-    local _eyesxoffset = (self.dirx == Tic.DIRXLF)
-    and CCharacterHumanoid.EYEXBGLF
-    or  CCharacterHumanoid.EYEXBGRG
-    local _eyesyoffset = (self.posture == CCharacter.POSTUREKNEEL) 
-    and CCharacterHumanoid.EYEYIDLE + self.size + self.diry + 1
-    or  CCharacterHumanoid.EYEYIDLE + self.size + self.diry
-    local _color = self.coloreyesbg
-    if self.posture == CCharacter.POSTURESLEEP then
-        _eyesxoffset = (self.dirx == Tic.DIRXLF)
-        and CCharacterHumanoid.EYEXDWLF
-        or  CCharacterHumanoid.EYEXDWRG
-        _eyesyoffset = CCharacterHumanoid.EYEYDWBG
-        _color = self.coloreyesbg
-    end
-
-    local _musprite = CSpriteFG() -- multi usage unique sprite
-    _musprite.sprite = CSpriteFG.SPRITEPIXEL -- apply the corresponding attributes
-    _musprite.screenx = self.screenx + (_eyesxoffset * self.scale)
-    _musprite.screeny = self.screeny + (_eyesyoffset * self.scale)
-    _musprite.scale = self.scale
-    _musprite:palettize{ -- apply eyes palette
-        [Tic.COLORWHITE] = _color,
+        [Tic.COLOREYESFG]   = _coloreyesfg,
+        [Tic.COLOREYESBGUP] = _coloreyesbgup,
+        [Tic.COLOREYESBGMD] = _coloreyesbgmd,
+        [Tic.COLOREYESBGDW] = _coloreyesbgdw,
     }
     _musprite:draw()
 end
@@ -1070,31 +1014,30 @@ local Wulfie = CPlayerWolfe{name = "Wulfie",
 local Sprite = CSpriteFGBoard{
     screenx = 100,
     screeny = 50,
+    directives = {
+        {x = 0, y = 0, color = Tic.COLORWHITE,},
+        {x = 7, y = 7, color = Tic.COLORRED,},
+    },
     scale = CSprite.SCALE02,
 }
--- Tic:boardClean(Sprite.sprite)
-Tic:boardPaint(Sprite.sprite, {
-    {x = 0, y = 0, color = Tic.COLORWHITE,},
-    {x = 7, y = 7, color = Tic.COLORRED,},
-})
 
 
 
 local Statuses = CCyclerTable{acttable = {
-    -- CCharacter.STATUSSTAND,
-    -- CCharacter.STATUSBLOCK,
-    -- CCharacter.STATUSSHIFT,
-    -- CCharacter.STATUSKNEEL,
-    -- CCharacter.STATUSSLEEP,
-    -- CCharacter.STATUSWOUND,
-    -- CCharacter.STATUSMAGIC,
-    -- CCharacter.STATUSALCHE,
-    -- CCharacter.STATUSKNOCK,
-    -- CCharacter.STATUSFLAME,
-    -- CCharacter.STATUSWATER,
-    -- CCharacter.STATUSSTONE,
-    -- CCharacter.STATUSBREEZ,
-    -- CCharacter.STATUSDEATH,
+    CCharacter.STATUSSTAND,
+    CCharacter.STATUSBLOCK,
+    CCharacter.STATUSSHIFT,
+    CCharacter.STATUSKNEEL,
+    CCharacter.STATUSSLEEP,
+    CCharacter.STATUSWOUND,
+    CCharacter.STATUSMAGIC,
+    CCharacter.STATUSALCHE,
+    CCharacter.STATUSKNOCK,
+    CCharacter.STATUSFLAME,
+    CCharacter.STATUSWATER,
+    CCharacter.STATUSSTONE,
+    CCharacter.STATUSBREEZ,
+    CCharacter.STATUSDEATH,
 }}
 -- local Statuses = CCyclerTable{acttable = Tables:keys(CCharacter.STATUSSETTINGS)}
 local _statustick01 = 0
@@ -1136,9 +1079,9 @@ function Tic:draw()
     local _scale = CSprite.SCALE02
     local _screenx = 40
     local _screeny = 0
-    for _, _character in ipairs({}) do
+    -- for _, _character in ipairs({}) do
         -- for _, _character in ipairs({Truduk, Nitcha, Golith,}) do
-            -- for _, _character in ipairs(Tic.Players.acttable) do
+            for _, _character in ipairs(Tic.Players.acttable) do
         _character.status = _status
         _character.scale = _scale
         _character.screenx = _screenx
@@ -1182,7 +1125,7 @@ function Tic:draw()
         -- end
     end
     -- Tic.Players.actvalue:portrait(true, true)
-    Sprite:draw()
+    -- Sprite:draw()
 
     Tic:logPrint()
 
