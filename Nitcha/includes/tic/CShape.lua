@@ -25,7 +25,7 @@ function CShape:new(_argt)
     self.color  = CShape.COLORWHITE
     self.scalex = CShape.SCALE01
     self.scaley = CShape.SCALE01
-    self:argt(_argt) -- override if any
+    self:_argt(_argt) -- override if any
 end
 
 function CShape:draw()

@@ -14,6 +14,7 @@ Classic.__index = Classic
 
 
 function Classic:new(...)
+  self._savestack = {} -- for saving/loading fields -- {{k = v, ...}, ...}
 end
 
 
@@ -130,10 +131,25 @@ function Classic:_copy() -- copy of a classic table
 end
 
 
-function Classic:argt(_argt) -- set a classic tables key/val from a _argt table
+function Classic:_argt(_argt) -- set a classic tables key/val from a _argt table {k = v, ...}
   for _key, _val in pairs(_argt or {}) do
     self[_key] = _val
   end
+end
+
+
+function Classic:_save(_keyt) -- save (into stack) a table of keys {"k", ...}
+  local _argt = {}
+  for _, _key in pairs(_keyt or {}) do
+    _argt[_key] = self[_key]
+  end
+  table.insert(self._savestack, _argt)
+end
+
+
+function Classic:_load() -- load (from stack) a table of argt {k = v, ...}
+  local _argt = table.remove(self._savestack)
+  self:_argt(_argt)
 end
 
 

@@ -32,7 +32,7 @@ function CCycler:new(_argt)
     self.stepnext = CCycler.STEPNEXT
     self.stepprev = CCycler.STEPPREV
     self.mode     = CCycler.MODELOOP
-    self:argt(_argt) -- override if any
+    self:_argt(_argt) -- override if any
 end
 
 function CCycler:next() -- next cycler value
@@ -59,14 +59,14 @@ end
 CCyclerNum = CCycler:extend() -- numeric cyclers
 function CCyclerNum:new(_argt)
     CCyclerNum.super.new(self, _argt)
-    self:argt(_argt) -- override if any
+    self:_argt(_argt) -- override if any
 end
 
 
 CCyclerInt = CCyclerNum:extend() -- integer cyclers
 function CCyclerInt:new(_argt)
     CCyclerInt.super.new(self, _argt)
-    self:argt(_argt) -- override if any
+    self:_argt(_argt) -- override if any
 end
 
 
@@ -75,12 +75,12 @@ function CCyclerTable:new(_argt)
     self.acttable = {} -- internal table
     self.actvalue = nil
     CCyclerTable.super.new(self, _argt)
-    self:argt(_argt) -- override if any
+    self:_argt(_argt) -- override if any
     return self.actindex
 end
 
-function CCyclerTable:argt(_argt) -- setup cycler
-    CCyclerTable.super.argt(self, _argt)
+function CCyclerTable:_argt(_argt) -- setup cycler
+    CCyclerTable.super._argt(self, _argt)
     local _size = #self.acttable -- adjust the related fields
     if _size == 0 then -- empty acttable
         self.minindex = 0

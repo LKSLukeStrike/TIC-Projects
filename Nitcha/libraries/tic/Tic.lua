@@ -271,7 +271,7 @@ function CSprite:new(_argt)
     self.width = 1 -- sprite 1x1 by default
     self.height = 1
     self.palette = {} -- empty by default, can be filled later
-    self:argt(_argt) -- override if any
+    self:_argt(_argt) -- override if any
 end
 
 function CSprite:draw() -- draw a sprite
@@ -310,7 +310,7 @@ end
 local CSpriteBG = CSprite:extend() -- bg sprites aka tic tiles
 function CSpriteBG:new(_argt)
     CSpriteBG.super.new(self, _argt)
-    self:argt(_argt) -- override if any
+    self:_argt(_argt) -- override if any
 end
 
 
@@ -341,21 +341,21 @@ function CSpriteFG:new(_argt)
     CSpriteFG.super.new(self, _argt)
     self.spritebank = CSpriteFG.SPRITEBANK
     self.sprite = self.spritebank
-    self:argt(_argt) -- override if any
+    self:_argt(_argt) -- override if any
 end
 
 local CSpriteFGEmpty = CSpriteFG:extend() -- empty sprites
 function CSpriteFGEmpty:new(_argt)
     CSpriteFGEmpty.super.new(self, _argt)
     self.sprite = CSpriteFG.SPRITEEMPTY
-    self:argt(_argt) -- override if any
+    self:_argt(_argt) -- override if any
 end
 
 local CSpriteFGPixel = CSpriteFG:extend() -- pixel sprites
 function CSpriteFGPixel:new(_argt)
     CSpriteFGPixel.super.new(self, _argt)
     self.sprite = CSpriteFG.SPRITEPIXEL
-    self:argt(_argt) -- override if any
+    self:_argt(_argt) -- override if any
 end
 
 local CSpriteFGBoard = CSpriteFG:extend() -- board sprites
@@ -363,7 +363,7 @@ function CSpriteFGBoard:new(_argt)
     CSpriteFGBoard.super.new(self, _argt)
     self.sprite = CSpriteFG.SPRITEBOARD
     self.directives = {} -- table of painting directives {{x = 0-7, y = 0-7, color = 0-15,}, ...}
-    self:argt(_argt) -- override if any
+    self:_argt(_argt) -- override if any
 end
 
 function CSpriteFGBoard:draw()
@@ -388,7 +388,7 @@ function CEntity:new(_argt)
     self.kind = CEntity.KINDENTITY
     self.worldx = CEntity.WORLDX -- world positions
     self.worldy = CEntity.WORLDY
-    self:argt(_argt) -- override if any
+    self:_argt(_argt) -- override if any
 end
 
 
@@ -570,7 +570,7 @@ function CCharacter:new(_argt)
     self.bodysprite   = CSpriteFG.BODYHUMAN -- body
     self.headsprite   = CSpriteFG.HEADDROWE -- head
     self.eyessprite   = CSpriteFG.EYESHUMAN -- eyes
-    self:argt(_argt) -- override if any
+    self:_argt(_argt) -- override if any
 end
 
 function CCharacter:portrait(_still, _info) -- draw the portrait -- animated or _still
@@ -592,8 +592,7 @@ function CCharacter:portrait(_still, _info) -- draw the portrait -- animated or 
         self.posture = CCharacter.POSTURESTAND
         self.frame = CSprite.FRAME00
     end
-    -- self:draw()
-    self:drawc()
+    self:draw()
     if _info then
         print(self.name, self.portraitx + (10 * self.scale), self.portraity)
         print(self.kind, self.portraitx + (10 * self.scale), self.portraity + (5 * self.scale))
@@ -759,7 +758,7 @@ function CCharacterHumanoid:new(_argt)
     self.colorshirt   = Tic.COLORGREYM
     self.colorpants   = Tic.COLORGREYL
     self.colorhands   = self.colorskin
-    self:argt(_argt) -- override if any
+    self:_argt(_argt) -- override if any
 end
 
 function CCharacterHumanoid:_drawBody()
@@ -865,7 +864,7 @@ CPlayerHumanoid:implement(IPlayer)
 function CPlayerHumanoid:new(_argt)
     CPlayerHumanoid.super.new(self, _argt)
     self:stack()
-    self:argt(_argt) -- override if any
+    self:_argt(_argt) -- override if any
 end
 
 
@@ -878,7 +877,7 @@ function CPlayerDwarf:new(_argt)
     self.colorhairsbg = Tic.COLORORANGE
     self.size         = CCharacter.SIZES -- size
     self.headsprite   = CSpriteFG.HEADDWARF -- head
-    self:argt(_argt) -- override if any
+    self:_argt(_argt) -- override if any
 end
 
 
@@ -892,7 +891,7 @@ function CPlayerGnome:new(_argt)
     self.colorpants   = self.colorskin
     self.size         = CCharacter.SIZES -- size
     self.headsprite   = CSpriteFG.HEADGNOME -- head
-    self:argt(_argt) -- override if any
+    self:_argt(_argt) -- override if any
 end
 
 
@@ -905,7 +904,7 @@ function CPlayerDrowe:new(_argt)
     self.coloreyesbg  = Tic.COLORPURPLE
     self.size         = CCharacter.SIZEM -- size
     self.headsprite   = CSpriteFG.HEADDROWE -- head
-    self:argt(_argt) -- override if any
+    self:_argt(_argt) -- override if any
 end
 
 
@@ -919,7 +918,7 @@ function CPlayerAngel:new(_argt)
     self.colorextra   = Tic.COLORYELLOW
     self.size         = CCharacter.SIZEM -- size
     self.headsprite   = CSpriteFG.HEADANGEL -- head
-    self:argt(_argt) -- override if any
+    self:_argt(_argt) -- override if any
 end
 
 
@@ -935,7 +934,7 @@ function CPlayerGogol:new(_argt)
     self.coloreyesbg  = Tic.COLORBLUEM
     self.size         = CCharacter.SIZEL -- size
     self.headsprite   = CSpriteFG.HEADGOGOL -- head
-    self:argt(_argt) -- override if any
+    self:_argt(_argt) -- override if any
 end
 
 
@@ -949,7 +948,7 @@ function CPlayerHorne:new(_argt)
     self.colorextra   = Tic.COLORGREYD
     self.size         = CCharacter.SIZEM -- size
     self.headsprite   = CSpriteFG.HEADHORNE -- head
-    self:argt(_argt) -- override if any
+    self:_argt(_argt) -- override if any
 end
 
 
@@ -959,7 +958,7 @@ function CPlayerDemon:new(_argt)
     CPlayerDemon.super.new(self, _argt)
     self.kind         = CEntity.KINDDEMON -- kind
     self.size         = CCharacter.SIZEL -- size
-    self:argt(_argt) -- override if any
+    self:_argt(_argt) -- override if any
 end
 
 
@@ -968,7 +967,7 @@ CEntity.KINDTIFEL = "Tifel" -- Tifel kind
 function CPlayerTifel:new(_argt)
     CPlayerTifel.super.new(self, _argt)
     self.kind         = CEntity.KINDTIFEL -- kind
-    self:argt(_argt) -- override if any
+    self:_argt(_argt) -- override if any
 end
 
 
@@ -981,7 +980,7 @@ function CPlayerMeduz:new(_argt)
     self.colorhairsbg = Tic.COLORGREENM
     self.size         = CCharacter.SIZES -- size
     self.headsprite   = CSpriteFG.HEADMEDUZ -- head
-    self:argt(_argt) -- override if any
+    self:_argt(_argt) -- override if any
 end
 
 
@@ -994,7 +993,7 @@ function CPlayerGnoll:new(_argt)
     self.coloreyesbg  = Tic.COLORPURPLE
     self.size         = CCharacter.SIZEL -- size
     self.headsprite   = CSpriteFG.HEADGNOLL -- head
-    self:argt(_argt) -- override if any
+    self:_argt(_argt) -- override if any
 end
 
 
@@ -1003,7 +1002,7 @@ CEntity.KINDWOLFE = "Wolfe" -- Wolfe kind
 function CPlayerWolfe:new(_argt)
     CPlayerWolfe.super.new(self, _argt)
     self.kind         = CEntity.KINDWOLFE -- kind
-    self:argt(_argt) -- override if any
+    self:_argt(_argt) -- override if any
 end
 
 
