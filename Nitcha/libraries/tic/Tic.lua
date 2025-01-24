@@ -74,16 +74,10 @@ Tic.COLOREYESBGUP = Tic.COLOR14
 Tic.COLOREYESBGMD = Tic.COLOR13
 Tic.COLOREYESBGDW = Tic.COLOR12
 -- TODO weapons fg/bg + status
--- Key values
-Tic.KEYUP = 26 -- move up (z)
-Tic.KEYDW = 19 -- move down (s)
-Tic.KEYLF = 17 -- move left (q)
-Tic.KEYRG = 04 -- move right (d)
-Tic.KEYCR = 03 -- hide on/off (c)
 
-Tic.DIRXLF = 0 -- h directions -- also the sprite flip
+Tic.DIRXLF = 0 -- x directions -- also the sprite flip
 Tic.DIRXRG = 1
-Tic.DIRYMD = 0 -- v directions -- also the sprite offset
+Tic.DIRYMD = 0 -- y directions -- also the sprite offset
 Tic.DIRYUP = Tic.DIRYMD - 1
 Tic.DIRYDW = Tic.DIRYMD + 1
 
@@ -103,6 +97,28 @@ Tic.FREQUENCE120 = 120 -- each 2 second
 Tic.FREQUENCE090 = 090 -- each 1.5 second
 Tic.FREQUENCE060 = 060 -- each 1 second
 Tic.FREQUENCE030 = 030 -- each 0.5 second
+
+-- Keys values
+Tic.KEYUP    = 58
+Tic.KEYDOWN  = 59
+Tic.KEYLEFT  = 60
+Tic.KEYRIGHT = 61
+Tic.KEYS     = 19
+
+-- Actions values
+Tic.ACTIONNEXTPLAYER = "nextplayer"
+Tic.ACTIONPREVPLAYER = "prevplayer"
+Tic.ACTIONNEXTSTATUS = "nextstatus"
+Tic.ACTIONPREVSTATUS = "prevstatus"
+
+-- Keys to Actions
+Tic.ACTIONS = {
+    [Tic.KEYLEFT]  = Tic.ACTIONPREVPLAYER,
+    [Tic.KEYRIGHT] = Tic.ACTIONNEXTPLAYER,
+    [Tic.KEYUP]    = Tic.ACTIONPREVSTATUS,
+    [Tic.KEYDOWN]  = Tic.ACTIONNEXTSTATUS,
+}
+
 
 
 -- Log System -- store logs to display each frame
@@ -129,7 +145,7 @@ function Tic:logPrint() -- print the log then clear it
 end
 
 
--- Tick System
+-- Tick System -- handle timers
 Tic.Tick00 = 0 -- tick counter from 0
 Tic.Tick60 = CCyclerInt{ -- tick cycler from 0-59
     maxindex = 59,
@@ -140,17 +156,32 @@ function Tic:tick() -- increment the timers
 end
 
 
--- Players System -- add new players to a players stack
+-- Players System -- handle a players stack
 Tic.Players = CCyclerTable()
+function Tic:playerStack(_player) -- stack a new player
+    return Tic.Players:insert(_player)
+end
+
+function Tic:playerNext() -- next player in the stack
+    return Tic.Players:next()
+end
+
+function Tic:playerPrev() -- prev player in the stack
+    return Tic.Players:prev()
+end
+
+function Tic:playerActual() -- actual player in the stack
+    return Tic.Players.actvalue
+end
 
 
--- Time
+-- Time System -- extend functions based on time
 function Tic:time2seconds() -- time in seconds
     return math.tointeger(time() // 1000)
 end
 
 
--- Trace
+-- Trace System -- extend the simple trace function
 function Tic:trace(...) -- trace with multiple args
     local _args = {...}
     local _output = ""
@@ -168,7 +199,7 @@ function Tic:traceTable(_table, _indent) -- trace a table  -- SORTED -- RECURSIV
 end
 
 
--- Palette
+-- Palette System -- handle the palette switching
 function Tic:paletteChange(_palette) -- change palette colors if any
     for _key, _val in pairs(_palette or {}) do
         poke4(Tic.PALETTEMAP + _key, _val)
@@ -182,7 +213,7 @@ function Tic:paletteReset() -- reset palette colors
 end
 
 
--- Board
+-- Board System -- handle the board sprite
 function Tic:boardPixel(_sprite, _x, _y, _color) -- paint a pixel to a board sprite
     if not _sprite then return end
     _x = _x or 0
@@ -257,6 +288,16 @@ function CSprite:draw() -- draw a sprite
         self.height
     )
     Tic:paletteReset() -- restore palette colors
+end
+
+function CSprite:drawc() -- draw a sprite -- CENTERED
+    local _screenx = self.screenx -- save attributes
+    local _screeny = self.screeny
+    self.screenx = self.screenx - (4 * self.scale) -- center the sprite
+    self.screeny = self.screeny - (4 * self.scale)
+    self:draw()
+    self.screenx = _screenx -- restore attributes
+    self.screeny = _screeny
 end
 
 function CSprite:palettize(_palette) -- change palette colors if any
@@ -336,6 +377,7 @@ end
 -- Entity
 --
 local CEntity = Classic:extend() -- general entities like places, objects, characters ...
+CEntity:implement(CSprite)
 CEntity.NAMENOBODY = "Nobody" -- default name
 CEntity.KINDENTITY = "Entity" -- default kind
 CEntity.WORLDX = 0
@@ -505,9 +547,9 @@ function CCharacter:new(_argt)
     CCharacter.super.new(self, _argt)
     self.kind         = CEntity.KINDCHARACTER -- kind
     self.size         = CCharacter.SIZEM -- size
-    self.screenx      = 100 -- screen positions
+    self.screenx      = Tic.SCREENW / 2 -- screen positions
     self.screeny      = 100
-    self.portraitx    = 120 -- portrait positions
+    self.portraitx    = Tic.SCREENW / 2 -- portrait positions
     self.portraity    = 120
     self.scale        = CSprite.SCALE01 -- scale
     self.frame        = CSprite.FRAME00 -- frame
@@ -532,12 +574,8 @@ function CCharacter:new(_argt)
 end
 
 function CCharacter:portrait(_still, _info) -- draw the portrait -- animated or _still
-    _still = (_still == true)
-    and true
-    or  false
-    _info = (_info == true)
-    and true
-    or  false
+    _still = (_still == true) and true or false
+    _info  = (_info == true)  and true or false
     local _screenx = self.screenx -- save character attributes
     local _screeny = self.screeny
     local _scale = self.scale
@@ -554,7 +592,8 @@ function CCharacter:portrait(_still, _info) -- draw the portrait -- animated or 
         self.posture = CCharacter.POSTURESTAND
         self.frame = CSprite.FRAME00
     end
-    self:draw()
+    -- self:draw()
+    self:drawc()
     if _info then
         print(self.name, self.portraitx + (10 * self.scale), self.portraity)
         print(self.kind, self.portraitx + (10 * self.scale), self.portraity + (5 * self.scale))
@@ -816,8 +855,8 @@ end
 
 
 local IPlayer = CCharacter:extend() -- players characters interface
-function IPlayer:stackPlayer()
-    Tic.Players:insert(self) -- record the new player on tic
+function IPlayer:stack()
+    Tic:playerStack(self) -- record the new player on tic
 end
 
 
@@ -825,7 +864,7 @@ local CPlayerHumanoid = CCharacterHumanoid:extend() -- humanoid player character
 CPlayerHumanoid:implement(IPlayer)
 function CPlayerHumanoid:new(_argt)
     CPlayerHumanoid.super.new(self, _argt)
-    self:stackPlayer()
+    self:stack()
     self:argt(_argt) -- override if any
 end
 
@@ -1015,10 +1054,29 @@ local Sprite = CSpriteFGBoard{
     screenx = 100,
     screeny = 50,
     directives = {
-        {x = 0, y = 0, color = Tic.COLORWHITE,},
-        {x = 7, y = 7, color = Tic.COLORRED,},
+        {x = 2, y = 1, color = Tic.COLORORANGE,},
+        {x = 1, y = 2, color = Tic.COLORORANGE,},
+        {x = 2, y = 3, color = Tic.COLORORANGE,},
+        {x = 2, y = 5, color = Tic.COLORORANGE,},
+        {x = 3, y = 1, color = Tic.COLORYELLOW,},
+        {x = 1, y = 5, color = Tic.COLORYELLOW,},
+        {x = 5, y = 1, color = Tic.COLORRED,},
+        {x = 6, y = 1, color = Tic.COLORRED,},
+        {x = 4, y = 2, color = Tic.COLORRED,},
+        {x = 4, y = 3, color = Tic.COLORRED,},
+        {x = 5, y = 3, color = Tic.COLORRED,},
+        {x = 3, y = 4, color = Tic.COLORRED,},
+        {x = 7, y = 1, color = Tic.COLORPURPLE,},
+        {x = 6, y = 3, color = Tic.COLORPURPLE,},
+        {x = 4, y = 4, color = Tic.COLORPURPLE,},
+        {x = 3, y = 5, color = Tic.COLORPURPLE,},
     },
-    scale = CSprite.SCALE02,
+    scale = CSprite.SCALE01,
+}
+local SpriteSF = CSpriteFG{
+    sprite = 389,
+    screenx = 120,
+    screeny = 50,
 }
 
 
@@ -1051,6 +1109,7 @@ function Tic:draw()
     if Nums:frequence01(_tick00, Tic.FREQUENCE240) ~= _statustick01 then
         _statustick01 = Nums:frequence01(_tick00, Tic.FREQUENCE240)
         Statuses:next()
+        Tic:playerNext()
     end
     local _status  = Statuses.actvalue or CCharacter.STATUSSTAND
     local _posture = CCharacter.STATUSSETTINGS[_status].posture
@@ -1067,11 +1126,11 @@ function Tic:draw()
     Tic:logStack("")
     Tic:logStack("")
     Tic:logStack("")
-    Tic:logStack("T60:", _tick60)
-    Tic:logStack("FRM:", _frame)
-    Tic:logStack("STA:", _status)
-    Tic:logStack("POS:", _posture)
-    Tic:logStack("T00:", _tick00)
+    -- Tic:logStack("T60:", _tick60)
+    -- Tic:logStack("FRM:", _frame)
+    -- Tic:logStack("STA:", _status)
+    -- Tic:logStack("POS:", _posture)
+    -- Tic:logStack("T00:", _tick00)
 
     cls()
 
@@ -1079,9 +1138,9 @@ function Tic:draw()
     local _scale = CSprite.SCALE02
     local _screenx = 40
     local _screeny = 0
-    -- for _, _character in ipairs({}) do
+    for _, _character in ipairs({}) do
         -- for _, _character in ipairs({Truduk, Nitcha, Golith,}) do
-            for _, _character in ipairs(Tic.Players.acttable) do
+            -- for _, _character in ipairs(Tic.Players.acttable) do
         _character.status = _status
         _character.scale = _scale
         _character.screenx = _screenx
@@ -1124,8 +1183,9 @@ function Tic:draw()
         -- Tic:logStack("K:", _character.kind)
         -- end
     end
-    -- Tic.Players.actvalue:portrait(true, true)
+    Tic:playerActual():portrait(true, true)
     -- Sprite:draw()
+    -- SpriteSF:draw()
 
     Tic:logPrint()
 
