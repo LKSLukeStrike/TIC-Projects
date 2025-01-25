@@ -546,9 +546,9 @@ function CCharacter:new(_argt)
     self.kind         = CEntity.KINDCHARACTER -- kind
     self.size         = CCharacter.SIZEM -- size
     self.screenx      = Tic.SCREENW // 2 -- screen positions
-    self.screeny      = 100
+    self.screeny      = Tic.SCREENH // 2
     self.portraitx    = Tic.SCREENW // 2 -- portrait positions
-    self.portraity    = 120
+    self.portraity    = Tic.SCREENH - (8 * CSprite.SCALE02) - 2
     self.scale        = CSprite.SCALE01 -- scale
     self.frame        = CSprite.FRAME00 -- frame
     self.dirx         = Tic.DIRXLF -- directions
@@ -594,8 +594,8 @@ end
 
 function CCharacter:portraitc(_still, _info) -- draw the portrait CENTERED -- animated or _still -- with _info ?
     self:_save{"portraitx", "portraity",}
-    self.portraitx = self.portraitx - (4 * self.scale) -- center the sprite
-    self.portraity = self.portraity - (4 * self.scale)
+    self.portraitx = self.portraitx - (4 * CSprite.SCALE02) -- center the sprite
+    self.portraity = self.portraity - (4 * CSprite.SCALE02)
     self:portrait(_still, _info)
     self:_load()
 end
@@ -1065,8 +1065,8 @@ local SpriteSFB = CSpriteFGBoard{
         {x = 3, y = 5, color = Tic.COLORPURPLE,},
     },
 }
-local Sprite = CSpriteFG{
-    sprite = 390,
+local SpriteFG = CSpriteFG{
+    sprite = 442,
     screenx = Tic.SCREENW // 2,
     screeny = Tic.SCREENH // 2,
 }
@@ -1181,12 +1181,12 @@ function Tic:draw()
         -- Tic:logStack("K:", _character.kind)
         -- end
     end
-    Tic:playerActual():portrait(true, true)
+    -- Tic:playerActual():portrait(true, true)
     Tic:playerActual():portraitc(true, true)
     -- SpriteSFB:draw()
     -- SpriteSFB:drawc()
-    Sprite:draw()
-    Sprite:drawc()
+    -- SpriteFG:draw()
+    -- SpriteFG:drawc()
 
     Tic:logPrint()
 
