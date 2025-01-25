@@ -291,13 +291,11 @@ function CSprite:draw() -- draw a sprite
 end
 
 function CSprite:drawc() -- draw a sprite -- CENTERED
-    local _screenx = self.screenx -- save attributes
-    local _screeny = self.screeny
+    self:_save{"screenx", "screeny",}
     self.screenx = self.screenx - (4 * self.scale) -- center the sprite
     self.screeny = self.screeny - (4 * self.scale)
     self:draw()
-    self.screenx = _screenx -- restore attributes
-    self.screeny = _screeny
+    self:_load()
 end
 
 function CSprite:palettize(_palette) -- change palette colors if any
@@ -547,9 +545,9 @@ function CCharacter:new(_argt)
     CCharacter.super.new(self, _argt)
     self.kind         = CEntity.KINDCHARACTER -- kind
     self.size         = CCharacter.SIZEM -- size
-    self.screenx      = Tic.SCREENW / 2 -- screen positions
+    self.screenx      = Tic.SCREENW // 2 -- screen positions
     self.screeny      = 100
-    self.portraitx    = Tic.SCREENW / 2 -- portrait positions
+    self.portraitx    = Tic.SCREENW // 2 -- portrait positions
     self.portraity    = 120
     self.scale        = CSprite.SCALE01 -- scale
     self.frame        = CSprite.FRAME00 -- frame
@@ -573,16 +571,10 @@ function CCharacter:new(_argt)
     self:_argt(_argt) -- override if any
 end
 
-function CCharacter:portrait(_still, _info) -- draw the portrait -- animated or _still
+function CCharacter:portrait(_still, _info) -- draw the portrait -- animated or _still -- with _info ?
     _still = (_still == true) and true or false
     _info  = (_info == true)  and true or false
-    local _screenx = self.screenx -- save character attributes
-    local _screeny = self.screeny
-    local _scale = self.scale
-    local _dirx = self.dirx
-    local _diry = self.diry
-    local _posture = self.posture
-    local _frame = self.frame
+    self:_save{"screenx", "screeny", "scale", "dirx", "diry", "posture", "frame",}
     self.screenx = self.portraitx -- force character attributes
     self.screeny = self.portraity
     self.scale = CSprite.SCALE02
@@ -597,13 +589,15 @@ function CCharacter:portrait(_still, _info) -- draw the portrait -- animated or 
         print(self.name, self.portraitx + (10 * self.scale), self.portraity)
         print(self.kind, self.portraitx + (10 * self.scale), self.portraity + (5 * self.scale))
     end
-    self.screenx = _screenx -- restore character attributes
-    self.screeny = _screeny
-    self.scale = _scale
-    self.dirx = _dirx
-    self.diry = _diry
-    self.posture = _posture
-    self.frame = _frame
+    self:_load()
+end
+
+function CCharacter:portraitc(_still, _info) -- draw the portrait CENTERED -- animated or _still -- with _info ?
+    self:_save{"portraitx", "portraity",}
+    self.portraitx = self.portraitx - (4 * self.scale) -- center the sprite
+    self.portraity = self.portraity - (4 * self.scale)
+    self:portrait(_still, _info)
+    self:_load()
 end
 
 function CCharacter:draw()
@@ -1049,9 +1043,9 @@ local Golith = CPlayerGogol{name = "Golith",}
 local Wulfie = CPlayerWolfe{name = "Wulfie",
     colorextra = Tic.COLORRED,
 }
-local Sprite = CSpriteFGBoard{
-    screenx = 100,
-    screeny = 50,
+local SpriteSFB = CSpriteFGBoard{
+    screenx = Tic.SCREENW // 2,
+    screeny = Tic.SCREENH // 2,
     directives = {
         {x = 2, y = 1, color = Tic.COLORORANGE,},
         {x = 1, y = 2, color = Tic.COLORORANGE,},
@@ -1070,12 +1064,11 @@ local Sprite = CSpriteFGBoard{
         {x = 4, y = 4, color = Tic.COLORPURPLE,},
         {x = 3, y = 5, color = Tic.COLORPURPLE,},
     },
-    scale = CSprite.SCALE01,
 }
-local SpriteSF = CSpriteFG{
-    sprite = 389,
-    screenx = 120,
-    screeny = 50,
+local Sprite = CSpriteFG{
+    sprite = 390,
+    screenx = Tic.SCREENW // 2,
+    screeny = Tic.SCREENH // 2,
 }
 
 
@@ -1132,6 +1125,12 @@ function Tic:draw()
     -- Tic:logStack("T00:", _tick00)
 
     cls()
+    local _drawcolor = Tic.COLORGREYD
+    rectb(0, 0, Tic.SCREENW, Tic.SCREENH, _drawcolor)
+    line(0, 0, Tic.SCREENW, Tic.SCREENH, _drawcolor)
+    line(0, Tic.SCREENH, Tic.SCREENW, 0, _drawcolor)
+    line(0, Tic.SCREENH // 2, Tic.SCREENW, Tic.SCREENH // 2, _drawcolor)
+    line(Tic.SCREENW // 2, 0, Tic.SCREENW // 2, Tic.SCREENH, _drawcolor)
 
     -- local _scale = CSprite.SCALE01
     local _scale = CSprite.SCALE02
@@ -1183,8 +1182,11 @@ function Tic:draw()
         -- end
     end
     Tic:playerActual():portrait(true, true)
-    -- Sprite:draw()
-    -- SpriteSF:draw()
+    Tic:playerActual():portraitc(true, true)
+    -- SpriteSFB:draw()
+    -- SpriteSFB:drawc()
+    Sprite:draw()
+    Sprite:drawc()
 
     Tic:logPrint()
 
