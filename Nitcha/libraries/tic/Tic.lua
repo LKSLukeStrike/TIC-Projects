@@ -73,6 +73,8 @@ Tic.COLOREYESFG   = Tic.COLOR15 -- 4 colors for the eyes
 Tic.COLOREYESBGUP = Tic.COLOR14
 Tic.COLOREYESBGMD = Tic.COLOR13
 Tic.COLOREYESBGDW = Tic.COLOR12
+Tic.COLORPORTRAITFG = Tic.COLORWHITE -- 2 colors for portrait frame
+Tic.COLORPORTRAITBG = Tic.COLORGREYL
 -- TODO weapons fg/bg + status
 
 Tic.DIRXLF = 0 -- x directions -- also the sprite flip
@@ -571,32 +573,37 @@ function CCharacter:new(_argt)
     self:_argt(_argt) -- override if any
 end
 
-function CCharacter:portrait(_still, _info) -- draw the portrait -- animated or _still -- with _info ?
+function CCharacter:portrait(_still, _frame, _infos) -- draw the portrait -- _still ? -- _frame ? -- _infos ?
     _still = (_still == true) and true or false
-    _info  = (_info == true)  and true or false
-    self:_save{"screenx", "screeny", "scale", "dirx", "diry", "posture", "frame",}
+    _frame = (_frame == true) and true or false
+    _infos = (_infos == true)  and true or false
+    self:_save{"screenx", "screeny", "scale", "dirx", "diry", "status", "frame",}
     self.screenx = self.portraitx -- force character attributes
     self.screeny = self.portraity
     self.scale = CSprite.SCALE02
+    if _frame then
+        rectb(self.screenx - self.scale, self.screeny - self.scale, (11 * self.scale), (11 * self.scale), Tic.COLORPORTRAITBG)
+        rectb(self.screenx - self.scale - 1, self.screeny - self.scale - 1, (11 * self.scale), (11 * self.scale), Tic.COLORPORTRAITFG)
+    end
     if _still then
         self.dirx = Tic.DIRXLF
         self.diry = Tic.DIRYMD
-        self.posture = CCharacter.POSTURESTAND
+        self.status = CCharacter.STATUSSTAND
         self.frame = CSprite.FRAME00
     end
     self:draw()
-    if _info then
-        print(self.name, self.portraitx + (10 * self.scale), self.portraity)
-        print(self.kind, self.portraitx + (10 * self.scale), self.portraity + (5 * self.scale))
+    if _infos then
+        print(self.name, self.portraitx + (11 * self.scale), self.portraity)
+        print(self.kind, self.portraitx + (11 * self.scale), self.portraity + (5 * self.scale))
     end
     self:_load()
 end
 
-function CCharacter:portraitc(_still, _info) -- draw the portrait CENTERED -- animated or _still -- with _info ?
+function CCharacter:portraitc(_still, _frame, _infos) -- draw the portrait CENTERED
     self:_save{"portraitx", "portraity",}
     self.portraitx = self.portraitx - (4 * CSprite.SCALE02) -- center the sprite
     self.portraity = self.portraity - (4 * CSprite.SCALE02)
-    self:portrait(_still, _info)
+    self:portrait(_still, _frame, _infos)
     self:_load()
 end
 
@@ -1126,17 +1133,17 @@ function Tic:draw()
 
     cls()
     local _drawcolor = Tic.COLORGREYD
-    rectb(0, 0, Tic.SCREENW, Tic.SCREENH, _drawcolor)
-    line(0, 0, Tic.SCREENW, Tic.SCREENH, _drawcolor)
-    line(0, Tic.SCREENH, Tic.SCREENW, 0, _drawcolor)
-    line(0, Tic.SCREENH // 2, Tic.SCREENW, Tic.SCREENH // 2, _drawcolor)
-    line(Tic.SCREENW // 2, 0, Tic.SCREENW // 2, Tic.SCREENH, _drawcolor)
+    -- rectb(0, 0, Tic.SCREENW, Tic.SCREENH, _drawcolor)
+    -- line(0, 0, Tic.SCREENW, Tic.SCREENH, _drawcolor)
+    -- line(0, Tic.SCREENH, Tic.SCREENW, 0, _drawcolor)
+    -- line(0, Tic.SCREENH // 2, Tic.SCREENW, Tic.SCREENH // 2, _drawcolor)
+    -- line(Tic.SCREENW // 2, 0, Tic.SCREENW // 2, Tic.SCREENH, _drawcolor)
 
     -- local _scale = CSprite.SCALE01
     local _scale = CSprite.SCALE02
     local _screenx = 40
     local _screeny = 0
-    for _, _character in ipairs({}) do
+    for _, _character in ipairs({Tic:playerActual()}) do
         -- for _, _character in ipairs({Truduk, Nitcha, Golith,}) do
             -- for _, _character in ipairs(Tic.Players.acttable) do
         _character.status = _status
@@ -1181,8 +1188,8 @@ function Tic:draw()
         -- Tic:logStack("K:", _character.kind)
         -- end
     end
-    -- Tic:playerActual():portrait(true, true)
-    Tic:playerActual():portraitc(true, true)
+    -- Tic:playerActual():portrait(true, true, true)
+    Tic:playerActual():portraitc(true, true, true)
     -- SpriteSFB:draw()
     -- SpriteSFB:drawc()
     -- SpriteFG:draw()
