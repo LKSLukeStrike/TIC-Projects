@@ -100,6 +100,7 @@ Tic.FREQUENCE090 = 090 -- each 1.5 second
 Tic.FREQUENCE060 = 060 -- each 1 second
 Tic.FREQUENCE030 = 030 -- each 0.5 second
 
+Tic.KEYBOARDKEYS = 0xFF88 -- keyboard state -- up to 4 pressed keys
 -- Keys values
 Tic.KEYUP    = 58
 Tic.KEYDOWN  = 59
@@ -114,13 +115,38 @@ Tic.ACTIONNEXTSTATUS = "nextstatus"
 Tic.ACTIONPREVSTATUS = "prevstatus"
 
 -- Keys to Actions
-Tic.ACTIONS = {
+Tic.KEYS2ACTIONS = {
     [Tic.KEYLEFT]  = Tic.ACTIONPREVPLAYER,
     [Tic.KEYRIGHT] = Tic.ACTIONNEXTPLAYER,
     [Tic.KEYUP]    = Tic.ACTIONPREVSTATUS,
     [Tic.KEYDOWN]  = Tic.ACTIONNEXTSTATUS,
 }
 
+-- Actions to Functions
+Tic.ACTIONS2FUNCTIONS = {
+    [Tic.ACTIONPREVPLAYER] = function() Tic:playerPrev() end,
+    [Tic.ACTIONNEXTPLAYER] = function() Tic:playerNext() end,
+}
+
+
+-- Keyboard System -- handle keys pressed to actions to functions
+function Tic:keysPressed(_hold, _period) -- returns the pressed keys in a table
+    local _result = {}
+    for _i = 0, 3 do
+        local _key = peek(Tic.KEYBOARDKEYS + _i)
+        if _key > 0 and keyp(_key, _hold, _period) then table.insert(_result, _key) end
+    end
+    return _result
+end
+
+function Tic:keysDo(_hold, _period) -- execute functions depending on the pressed keys if any
+    local _keyspressed = Tic:keysPressed(_hold, _period)
+    for _, _key in ipairs(_keyspressed) do
+        if not Tic.KEYS2ACTIONS[_key] then break end -- key not linked to an action -- do nothing
+        if not Tic.ACTIONS2FUNCTIONS[Tic.KEYS2ACTIONS[_key]] then break end -- action not linked to a function -- do nothing
+        Tic.ACTIONS2FUNCTIONS[Tic.KEYS2ACTIONS[_key]]() -- execute the associated function
+    end
+end
 
 
 -- Log System -- store logs to display each frame
@@ -148,32 +174,34 @@ end
 
 
 -- Tick System -- handle timers
-Tic.Tick00 = 0 -- tick counter from 0
-Tic.Tick60 = CCyclerInt{ -- tick cycler from 0-59
+Tic.TICK00 = CCyclerInt{ -- tick cycler from 0-maxinteger
+    maxindex = math.maxinteger,
+}
+Tic.TICK60 = CCyclerInt{ -- tick cycler from 0-59
     maxindex = 59,
 }
 function Tic:tick() -- increment the timers
-    Tic.Tick00 = Tic.Tick00 + 1
-    Tic.Tick60:next()
+    Tic.TICK00:next()
+    Tic.TICK60:next()
 end
 
 
 -- Players System -- handle a players stack
-Tic.Players = CCyclerTable()
+Tic.PLAYERS = CCyclerTable()
 function Tic:playerStack(_player) -- stack a new player
-    return Tic.Players:insert(_player)
+    return Tic.PLAYERS:insert(_player)
 end
 
 function Tic:playerNext() -- next player in the stack
-    return Tic.Players:next()
+    return Tic.PLAYERS:next()
 end
 
 function Tic:playerPrev() -- prev player in the stack
-    return Tic.Players:prev()
+    return Tic.PLAYERS:prev()
 end
 
 function Tic:playerActual() -- actual player in the stack
-    return Tic.Players.actvalue
+    return Tic.PLAYERS.actvalue
 end
 
 
@@ -413,6 +441,22 @@ CCharacter.STATUSWATER = "water"
 CCharacter.STATUSSTONE = "stone"
 CCharacter.STATUSBREEZ = "breez"
 CCharacter.STATUSDEATH = "death"
+CCharacter.STATUSES    = CCyclerTable{acttable = { -- all availiable statuses
+    CCharacter.STATUSSTAND,
+    CCharacter.STATUSBLOCK,
+    CCharacter.STATUSSHIFT,
+    CCharacter.STATUSKNEEL,
+    CCharacter.STATUSSLEEP,
+    CCharacter.STATUSWOUND,
+    CCharacter.STATUSMAGIC,
+    CCharacter.STATUSALCHE,
+    CCharacter.STATUSKNOCK,
+    CCharacter.STATUSFLAME,
+    CCharacter.STATUSWATER,
+    CCharacter.STATUSSTONE,
+    CCharacter.STATUSBREEZ,
+    CCharacter.STATUSDEATH,
+}}
 CCharacter.POSTURESTAND = "stand" -- character postures -- for the sprites selections and offsets
 CCharacter.POSTUREBLOCK = "block"
 CCharacter.POSTURESHIFT = "shift"
@@ -720,7 +764,7 @@ function CCharacter:_drawStatusDeath()
 end
 
 function CCharacter:_drawStatusSprite(_palette0, _palette1)
-    local _tick00 = Tic.Tick00
+    local _tick00 = Tic.TICK00.actvalue
     local _statussprite = CCharacter.STATUSSETTINGS[self.status].statussprite -- status sprite
     local _frequence    = CCharacter.STATUSSETTINGS[self.status].frequence -- status frequence
     local _palette = (Nums:frequence01(_tick00, _frequence) == 0)
@@ -741,6 +785,17 @@ function CCharacter:_drawWeapon()
 end
 
 function CCharacter:_drawShield()
+end
+
+Tic.ACTIONS2FUNCTIONS[Tic.ACTIONPREVSTATUS] = function() CCharacter:statusPrev() end -- add actions -- has to be here
+Tic.ACTIONS2FUNCTIONS[Tic.ACTIONNEXTSTATUS] = function() CCharacter:statusNext() end
+
+function CCharacter:statusNext() -- next status in the stack
+    return CCharacter.STATUSES:next()
+end
+
+function CCharacter:statusPrev() -- prev status in the stack
+    return CCharacter.STATUSES:prev()
 end
 
 
@@ -1080,29 +1135,13 @@ local SpriteFG = CSpriteFG{
 
 
 
-local Statuses = CCyclerTable{acttable = {
-    CCharacter.STATUSSTAND,
-    CCharacter.STATUSBLOCK,
-    CCharacter.STATUSSHIFT,
-    CCharacter.STATUSKNEEL,
-    CCharacter.STATUSSLEEP,
-    CCharacter.STATUSWOUND,
-    CCharacter.STATUSMAGIC,
-    CCharacter.STATUSALCHE,
-    CCharacter.STATUSKNOCK,
-    CCharacter.STATUSFLAME,
-    CCharacter.STATUSWATER,
-    CCharacter.STATUSSTONE,
-    CCharacter.STATUSBREEZ,
-    CCharacter.STATUSDEATH,
-}}
--- local Statuses = CCyclerTable{acttable = Tables:keys(CCharacter.STATUSSETTINGS)}
-local _statustick01 = 0
 -- Drawing
-function Tic:draw()
-    local _tick00 = Tic.Tick00
-    local _tick60 = Tic.Tick60.actvalue
+local _statustick01 = 0
+function Tic:drawCharacters()
+    cls()
 
+    local _tick00 = Tic.TICK00.actvalue
+    local _tick60 = Tic.TICK60.actvalue
     local _frame = _tick60 // 30
 
     if Nums:frequence01(_tick00, Tic.FREQUENCE240) ~= _statustick01 then
@@ -1113,31 +1152,8 @@ function Tic:draw()
     local _status  = Statuses.actvalue or CCharacter.STATUSSTAND
     local _posture = CCharacter.STATUSSETTINGS[_status].posture
 
-    Tic:logStack("")
-    Tic:logStack("")
-    Tic:logStack("")
-    Tic:logStack("")
-    Tic:logStack("")
-    Tic:logStack("")
-    Tic:logStack("")
-    Tic:logStack("")
-    Tic:logStack("")
-    Tic:logStack("")
-    Tic:logStack("")
-    Tic:logStack("")
-    -- Tic:logStack("T60:", _tick60)
-    -- Tic:logStack("FRM:", _frame)
-    -- Tic:logStack("STA:", _status)
-    -- Tic:logStack("POS:", _posture)
-    -- Tic:logStack("T00:", _tick00)
 
-    cls()
-    local _drawcolor = Tic.COLORGREYD
-    -- rectb(0, 0, Tic.SCREENW, Tic.SCREENH, _drawcolor)
-    -- line(0, 0, Tic.SCREENW, Tic.SCREENH, _drawcolor)
-    -- line(0, Tic.SCREENH, Tic.SCREENW, 0, _drawcolor)
-    -- line(0, Tic.SCREENH // 2, Tic.SCREENW, Tic.SCREENH // 2, _drawcolor)
-    -- line(Tic.SCREENW // 2, 0, Tic.SCREENW // 2, Tic.SCREENH, _drawcolor)
+    Tic:drawFrames()
 
     -- local _scale = CSprite.SCALE01
     local _scale = CSprite.SCALE02
@@ -1145,7 +1161,7 @@ function Tic:draw()
     local _screeny = 0
     for _, _character in ipairs({Tic:playerActual()}) do
         -- for _, _character in ipairs({Truduk, Nitcha, Golith,}) do
-            -- for _, _character in ipairs(Tic.Players.acttable) do
+            -- for _, _character in ipairs(Tic.PLAYERS.acttable) do
         _character.status = _status
         _character.scale = _scale
         _character.screenx = _screenx
@@ -1198,6 +1214,60 @@ function Tic:draw()
     Tic:logPrint()
 
     Tic:tick() -- /!\ required in the draw function 
+end
+
+function Tic:draw()
+    cls()
+
+    Tic:keysDo(20, 5)
+    Tic:drawLog()
+    -- Tic:drawFrames()
+    Tic:playerActual().status = CCharacter.STATUSES.actvalue
+    Tic:playerActual():drawc()
+    Tic:playerActual():portraitc(true, true, true)
+
+    Tic:tick() -- /!\ required in the draw function 
+end
+
+function Tic:drawFrames()
+    local _drawcolor = Tic.COLORGREYD
+    rectb(0, 0, Tic.SCREENW, Tic.SCREENH, _drawcolor)
+    line(0, 0, Tic.SCREENW, Tic.SCREENH, _drawcolor)
+    line(0, Tic.SCREENH, Tic.SCREENW, 0, _drawcolor)
+    line(0, Tic.SCREENH // 2, Tic.SCREENW, Tic.SCREENH // 2, _drawcolor)
+    line(Tic.SCREENW // 2, 0, Tic.SCREENW // 2, Tic.SCREENH, _drawcolor)
+end
+
+function Tic:drawLog()
+    local _tick00 = Tic.TICK00.actvalue
+    local _tick60 = Tic.TICK60.actvalue
+    local _frame = _tick60 // 30
+
+    if Nums:frequence01(_tick00, Tic.FREQUENCE240) ~= _statustick01 then
+        _statustick01 = Nums:frequence01(_tick00, Tic.FREQUENCE240)
+    end
+    local _status  = CCharacter.STATUSES.actvalue or CCharacter.STATUSSTAND
+    local _posture = CCharacter.STATUSSETTINGS[_status].posture
+
+    Tic:logStack("K01:", peek(Tic.KEYBOARDKEYS + 0))
+    Tic:logStack("K02:", peek(Tic.KEYBOARDKEYS + 1))
+    Tic:logStack("K03:", peek(Tic.KEYBOARDKEYS + 2))
+    Tic:logStack("K04:", peek(Tic.KEYBOARDKEYS + 3))
+    Tic:logStack("")
+    Tic:logStack("")
+    Tic:logStack("")
+    Tic:logStack("")
+    Tic:logStack("")
+    Tic:logStack("")
+    Tic:logStack("")
+    Tic:logStack("")
+    Tic:logStack("T60:", _tick60)
+    Tic:logStack("FRM:", _frame)
+    Tic:logStack("STA:", _status)
+    Tic:logStack("POS:", _posture)
+    Tic:logStack("T00:", _tick00)
+
+    Tic:logPrint()
 end
 
 
