@@ -594,7 +594,7 @@ function CCharacter:new(_argt)
     self.screenx      = Tic.SCREENW // 2 -- screen positions
     self.screeny      = Tic.SCREENH // 2
     self.portraitx    = Tic.SCREENW // 2 -- portrait positions
-    self.portraity    = Tic.SCREENH - (8 * CSprite.SCALE02) - 2
+    self.portraity    = Tic.SCREENH - (8 * CSprite.SCALE02) + 4
     self.statsx       = self.portraitx - 21 -- stats positions
     self.statsy       = self.portraity
     self.scale        = CSprite.SCALE01 -- scale
