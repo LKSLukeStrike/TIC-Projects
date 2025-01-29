@@ -320,7 +320,7 @@ function CSprite:draw() -- draw a sprite
     Tic:paletteReset() -- restore palette colors
 end
 
-function CSprite:drawc() -- draw a sprite -- CENTERED
+function CSprite:drawC() -- draw a sprite -- CENTERED
     self:_save{"screenx", "screeny",}
     self.screenx = self.screenx - (4 * self.scale) -- center the sprite
     self.screeny = self.screeny - (4 * self.scale)
@@ -595,6 +595,8 @@ function CCharacter:new(_argt)
     self.screeny      = Tic.SCREENH // 2
     self.portraitx    = Tic.SCREENW // 2 -- portrait positions
     self.portraity    = Tic.SCREENH - (8 * CSprite.SCALE02) - 2
+    self.statsx       = self.portraitx - 21 -- stats positions
+    self.statsy       = self.portraity
     self.scale        = CSprite.SCALE01 -- scale
     self.frame        = CSprite.FRAME00 -- frame
     self.dirx         = Tic.DIRXLF -- directions
@@ -614,18 +616,24 @@ function CCharacter:new(_argt)
     self.bodysprite   = CSpriteFG.BODYHUMAN -- body
     self.headsprite   = CSpriteFG.HEADDROWE -- head
     self.eyessprite   = CSpriteFG.EYESHUMAN -- eyes
+    self.statphymax   = 5 -- max stats -- 0-10
+    self.statmenmax   = 5
+    self.statpsymax   = 5
+    self.statphyact   = self.statphymax -- act stats -- 0-max
+    self.statmenact   = self.statmenmax
+    self.statpsyact   = self.statpsymax
     self:_argt(_argt) -- override if any
 end
 
-function CCharacter:portrait(_still, _frame, _infos) -- draw the portrait -- _still ? -- _frame ? -- _infos ?
-    _still = (_still == true) and true or false
-    _frame = (_frame == true) and true or false
-    _infos = (_infos == true)  and true or false
+function CCharacter:drawPortrait(_still, _border, _infos) -- draw the portrait -- _still ? -- _border ? -- _infos ?
+    _still  = (_still == true)  and true or false
+    _border = (_border == true) and true or false
+    _infos  = (_infos == true)  and true or false
     self:_save{"screenx", "screeny", "scale", "dirx", "diry", "status", "frame",}
     self.screenx = self.portraitx -- force character attributes
     self.screeny = self.portraity
     self.scale = CSprite.SCALE02
-    if _frame then
+    if _border then
         rectb(self.screenx - self.scale, self.screeny - self.scale, (11 * self.scale), (11 * self.scale), Tic.COLORPORTRAITBG)
         rectb(self.screenx - self.scale - 1, self.screeny - self.scale - 1, (11 * self.scale), (11 * self.scale), Tic.COLORPORTRAITFG)
     end
@@ -643,11 +651,38 @@ function CCharacter:portrait(_still, _frame, _infos) -- draw the portrait -- _st
     self:_load()
 end
 
-function CCharacter:portraitc(_still, _frame, _infos) -- draw the portrait CENTERED
+function CCharacter:drawPortraitC(_still, _border, _infos) -- draw the portrait CENTERED
     self:_save{"portraitx", "portraity",}
     self.portraitx = self.portraitx - (4 * CSprite.SCALE02) -- center the sprite
     self.portraity = self.portraity - (4 * CSprite.SCALE02)
-    self:portrait(_still, _frame, _infos)
+    self:drawPortrait(_still, _border, _infos)
+    self:_load()
+end
+
+function CCharacter:drawStats(_border) -- draw the stats -- _border ?
+    self:_save{"scale",} -- TODO change to use constant
+    self.scale = CSprite.SCALE02
+    if _border then
+        rectb(self.statsx - self.scale, self.statsy - self.scale, (11 * self.scale), (11 * self.scale), Tic.COLORPORTRAITBG)
+        rectb(self.statsx - self.scale - 1, self.statsy - self.scale - 1, (11 * self.scale), (11 * self.scale), Tic.COLORPORTRAITFG)
+    end
+    rectb(self.statsx + 01, self.statsy + 2, 4, 12, Tic.COLORWHITE) -- phy bar
+    rect (self.statsx + 02, self.statsy + 2 + 10 - self.statphyact + 1, 2, self.statphyact, Tic.COLORRED)
+    rectb(self.statsx + 01, self.statsy + 2 + 10 - self.statphymax, 4, 1, Tic.COLORWHITE)
+    rectb(self.statsx + 06, self.statsy + 2, 4, 12, Tic.COLORWHITE) -- men bar
+    rect (self.statsx + 07, self.statsy + 2 + 10 - self.statmenact + 1, 2, self.statmenact, Tic.COLORBLUEM)
+    rectb(self.statsx + 06, self.statsy + 2 + 10 - self.statmenmax, 4, 1, Tic.COLORWHITE)
+    rectb(self.statsx + 11, self.statsy + 2, 4, 12, Tic.COLORWHITE) -- psy bar
+    rect (self.statsx + 12, self.statsy + 2 + 10 - self.statpsyact + 1, 2, self.statpsymax, Tic.COLORGREENM)
+    rectb(self.statsx + 11, self.statsy + 2 + 10 - self.statpsymax, 4, 1, Tic.COLORWHITE)
+    self:_load()
+end
+
+function CCharacter:drawStatsC(_border) -- draw the stats CENTERED
+    self:_save{"statsx", "statsy",}
+    self.statsx = self.statsx - (4 * CSprite.SCALE02) -- center the sprite
+    self.statsy = self.statsy - (4 * CSprite.SCALE02)
+    self:drawStats(_border)
     self:_load()
 end
 
@@ -928,11 +963,17 @@ local CPlayerDwarf = CPlayerHumanoid:extend() -- Dwarf player characters
 CEntity.KINDDWARF = "Dwarf" -- Dwarf kind
 function CPlayerDwarf:new(_argt)
     CPlayerDwarf.super.new(self, _argt)
-    self.kind = CEntity.KINDDWARF -- kind
+    self.kind         = CEntity.KINDDWARF -- kind
+    self.size         = CCharacter.SIZES -- size
     self.colorhairsfg = Tic.COLORRED -- colors
     self.colorhairsbg = Tic.COLORORANGE
-    self.size         = CCharacter.SIZES -- size
     self.headsprite   = CSpriteFG.HEADDWARF -- head
+    self.statphymax   = 7
+    self.statphyact   = self.statphymax
+    self.statmenmax   = 6
+    self.statmenact   = self.statmenmax
+    self.statpsymax   = 2
+    self.statpsyact   = self.statpsymax
     self:_argt(_argt) -- override if any
 end
 
@@ -942,11 +983,17 @@ CEntity.KINDGNOME = "Gnome" -- Gnome kind
 function CPlayerGnome:new(_argt)
     CPlayerGnome.super.new(self, _argt)
     self.kind         = CEntity.KINDGNOME -- kind
+    self.size         = CCharacter.SIZES -- size
     self.colorhairsfg = Tic.COLORORANGE -- colors
     self.colorhairsbg = Tic.COLORYELLOW
     self.colorpants   = self.colorskin
-    self.size         = CCharacter.SIZES -- size
     self.headsprite   = CSpriteFG.HEADGNOME -- head
+    self.statphymax   = 3
+    self.statphyact   = self.statphymax
+    self.statmenmax   = 6
+    self.statmenact   = self.statmenmax
+    self.statpsymax   = 6
+    self.statpsyact   = self.statpsymax
     self:_argt(_argt) -- override if any
 end
 
@@ -956,10 +1003,16 @@ CEntity.KINDDROWE = "Drowe" -- Drowe kind
 function CPlayerDrowe:new(_argt)
     CPlayerDrowe.super.new(self, _argt)
     self.kind         = CEntity.KINDDROWE -- kind
+    self.size         = CCharacter.SIZEM -- size
     self.coloreyesfg  = Tic.COLORRED -- colors
     self.coloreyesbg  = Tic.COLORPURPLE
-    self.size         = CCharacter.SIZEM -- size
     self.headsprite   = CSpriteFG.HEADDROWE -- head
+    self.statphymax   = 5
+    self.statphyact   = self.statphymax
+    self.statmenmax   = 6
+    self.statmenact   = self.statmenmax
+    self.statpsymax   = 4
+    self.statpsyact   = self.statpsymax
     self:_argt(_argt) -- override if any
 end
 
@@ -969,11 +1022,17 @@ CEntity.KINDANGEL = "Angel" -- Angel kind
 function CPlayerAngel:new(_argt)
     CPlayerAngel.super.new(self, _argt)
     self.kind         = CEntity.KINDANGEL -- kind
+    self.size         = CCharacter.SIZEM -- size
     self.colorhairsfg = Tic.COLORGREYM -- colors
     self.colorhairsbg = Tic.COLORWHITE
     self.colorextra   = Tic.COLORYELLOW
-    self.size         = CCharacter.SIZEM -- size
     self.headsprite   = CSpriteFG.HEADANGEL -- head
+    self.statphymax   = 4
+    self.statphyact   = self.statphymax
+    self.statmenmax   = 6
+    self.statmenact   = self.statmenmax
+    self.statpsymax   = 5
+    self.statpsyact   = self.statpsymax
     self:_argt(_argt) -- override if any
 end
 
@@ -983,13 +1042,19 @@ CEntity.KINDGOGOL = "Gogol" -- Gogol kind
 function CPlayerGogol:new(_argt)
     CPlayerGogol.super.new(self, _argt)
     self.kind         = CEntity.KINDGOGOL -- kind
+    self.size         = CCharacter.SIZEL -- size
     self.colorhairsfg = Tic.COLORWHITE -- colors
     self.colorhairsbg = Tic.COLORWHITE
     self.colorextra   = self.colorshirt
     self.coloreyesfg  = Tic.COLORBLUEL
     self.coloreyesbg  = Tic.COLORBLUEM
-    self.size         = CCharacter.SIZEL -- size
     self.headsprite   = CSpriteFG.HEADGOGOL -- head
+    self.statphymax   = 8
+    self.statphyact   = self.statphymax
+    self.statmenmax   = 6
+    self.statmenact   = self.statmenmax
+    self.statpsymax   = 1
+    self.statpsyact   = self.statpsymax
     self:_argt(_argt) -- override if any
 end
 
@@ -999,11 +1064,18 @@ CEntity.KINDHORNE = "Horne" -- Horne kind
 function CPlayerHorne:new(_argt)
     CPlayerHorne.super.new(self, _argt)
     self.kind         = CEntity.KINDHORNE -- kind
+    self.size         = CCharacter.SIZEL -- size
     self.colorhairsfg = Tic.COLORPURPLE -- colors
     self.colorhairsbg = Tic.COLORRED
     self.colorextra   = Tic.COLORGREYD
     self.size         = CCharacter.SIZEM -- size
     self.headsprite   = CSpriteFG.HEADHORNE -- head
+    self.statphymax   = 3
+    self.statphyact   = self.statphymax
+    self.statmenmax   = 5
+    self.statmenact   = self.statmenmax
+    self.statpsymax   = 7
+    self.statpsyact   = self.statpsymax
     self:_argt(_argt) -- override if any
 end
 
@@ -1013,7 +1085,12 @@ CEntity.KINDDEMON = "Demon" -- Demon kind
 function CPlayerDemon:new(_argt)
     CPlayerDemon.super.new(self, _argt)
     self.kind         = CEntity.KINDDEMON -- kind
-    self.size         = CCharacter.SIZEL -- size
+    self.statphymax   = 3
+    self.statphyact   = self.statphymax
+    self.statmenmax   = 5
+    self.statmenact   = self.statmenmax
+    self.statpsymax   = 7
+    self.statpsyact   = self.statpsymax
     self:_argt(_argt) -- override if any
 end
 
@@ -1023,6 +1100,13 @@ CEntity.KINDTIFEL = "Tifel" -- Tifel kind
 function CPlayerTifel:new(_argt)
     CPlayerTifel.super.new(self, _argt)
     self.kind         = CEntity.KINDTIFEL -- kind
+    self.size         = CCharacter.SIZEM -- size
+    self.statphymax   = 4
+    self.statphyact   = self.statphymax
+    self.statmenmax   = 6
+    self.statmenact   = self.statmenmax
+    self.statpsymax   = 5
+    self.statpsyact   = self.statpsymax
     self:_argt(_argt) -- override if any
 end
 
@@ -1032,10 +1116,16 @@ CEntity.KINDMEDUZ = "Meduz" -- Meduz kind
 function CPlayerMeduz:new(_argt)
     CPlayerMeduz.super.new(self, _argt)
     self.kind         = CEntity.KINDMEDUZ -- kind
+    self.size         = CCharacter.SIZES -- size
     self.colorhairsfg = Tic.COLORGREEND -- colors
     self.colorhairsbg = Tic.COLORGREENM
-    self.size         = CCharacter.SIZES -- size
     self.headsprite   = CSpriteFG.HEADMEDUZ -- head
+    self.statphymax   = 4
+    self.statphyact   = self.statphymax
+    self.statmenmax   = 6
+    self.statmenact   = self.statmenmax
+    self.statpsymax   = 5
+    self.statpsyact   = self.statpsymax
     self:_argt(_argt) -- override if any
 end
 
@@ -1045,10 +1135,16 @@ CEntity.KINDGNOLL = "Gnoll" -- Gnoll kind
 function CPlayerGnoll:new(_argt)
     CPlayerGnoll.super.new(self, _argt)
     self.kind         = CEntity.KINDGNOLL -- kind
+    self.size         = CCharacter.SIZEL -- size
     self.coloreyesfg  = Tic.COLORRED -- colors
     self.coloreyesbg  = Tic.COLORPURPLE
-    self.size         = CCharacter.SIZEL -- size
     self.headsprite   = CSpriteFG.HEADGNOLL -- head
+    self.statphymax   = 7
+    self.statphyact   = self.statphymax
+    self.statmenmax   = 6
+    self.statmenact   = self.statmenmax
+    self.statpsymax   = 2
+    self.statpsyact   = self.statpsymax
     self:_argt(_argt) -- override if any
 end
 
@@ -1070,7 +1166,8 @@ local CEnnemy = CCharacter:extend() -- ennemy characters
 
 
 -- Characters
-local Truduk = CPlayerDwarf{name = "Truduk",}
+local Truduk = CPlayerDwarf{name = "Truduk",
+}
 local Prinnn = CPlayerGnome{name = "Prinnn",
     coloreyesbg  = Tic.COLORRED,
     coloreyesfg  = Tic.COLORORANGE,
@@ -1104,6 +1201,8 @@ local Daemok = CPlayerDemon{name = "Daemok",}
 local Golith = CPlayerGogol{name = "Golith",}
 local Wulfie = CPlayerWolfe{name = "Wulfie",
     colorextra = Tic.COLORRED,
+    statphyact = 10,
+    statmenact = 00,
 }
 local SpriteSFB = CSpriteFGBoard{
     screenx = Tic.SCREENW // 2,
@@ -1137,85 +1236,6 @@ local SpriteFG = CSpriteFG{
 
 -- Drawing
 local _statustick01 = 0
-function Tic:drawCharacters()
-    cls()
-
-    local _tick00 = Tic.TICK00.actvalue
-    local _tick60 = Tic.TICK60.actvalue
-    local _frame = _tick60 // 30
-
-    if Nums:frequence01(_tick00, Tic.FREQUENCE240) ~= _statustick01 then
-        _statustick01 = Nums:frequence01(_tick00, Tic.FREQUENCE240)
-        Statuses:next()
-        Tic:playerNext()
-    end
-    local _status  = Statuses.actvalue or CCharacter.STATUSSTAND
-    local _posture = CCharacter.STATUSSETTINGS[_status].posture
-
-
-    Tic:drawFrames()
-
-    -- local _scale = CSprite.SCALE01
-    local _scale = CSprite.SCALE02
-    local _screenx = 40
-    local _screeny = 0
-    for _, _character in ipairs({Tic:playerActual()}) do
-        -- for _, _character in ipairs({Truduk, Nitcha, Golith,}) do
-            -- for _, _character in ipairs(Tic.PLAYERS.acttable) do
-        _character.status = _status
-        _character.scale = _scale
-        _character.screenx = _screenx
-        _character.frame = _frame
-        _character.posture = _posture
-
-        _character.screeny = _screeny
-        _character.dirx = Tic.DIRXLF
-        _character.diry = Tic.DIRYUP
-        _character:draw()
-
-        _character.screeny = _character.screeny + (8 * _scale) + 2
-        _character.dirx = Tic.DIRXLF
-        _character.diry = Tic.DIRYMD
-        _character:draw()
-
-        _character.screeny = _character.screeny + (8 * _scale) + 2
-        _character.dirx = Tic.DIRXLF
-        _character.diry = Tic.DIRYDW
-        _character:draw()
-
-        _character.screeny = _character.screeny + (8 * _scale) + 2
-        _character.dirx = Tic.DIRXRG
-        _character.diry = Tic.DIRYUP
-        _character:draw()
-
-        _character.screeny = _character.screeny + (8 * _scale) + 2
-        _character.dirx = Tic.DIRXRG
-        _character.diry = Tic.DIRYMD
-        _character:draw()
-
-        _character.screeny = _character.screeny + (8 * _scale) + 2
-        _character.dirx = Tic.DIRXRG
-        _character.diry = Tic.DIRYDW
-        _character:draw()
-        
-        _screenx = _screenx + (8 * _scale) + 2
-
-        -- Tic:logStack("N:", _character.name)
-        -- Tic:logStack("K:", _character.kind)
-        -- end
-    end
-    -- Tic:playerActual():portrait(true, true, true)
-    Tic:playerActual():portraitc(true, true, true)
-    -- SpriteSFB:draw()
-    -- SpriteSFB:drawc()
-    -- SpriteFG:draw()
-    -- SpriteFG:drawc()
-
-    Tic:logPrint()
-
-    Tic:tick() -- /!\ required in the draw function 
-end
-
 function Tic:draw()
     cls()
 
@@ -1223,19 +1243,11 @@ function Tic:draw()
     Tic:drawLog()
     -- Tic:drawFrames()
     Tic:playerActual().status = CCharacter.STATUSES.actvalue
-    Tic:playerActual():drawc()
-    Tic:playerActual():portraitc(true, true, true)
+    Tic:playerActual():drawC()
+    Tic:playerActual():drawStatsC(true)
+    Tic:playerActual():drawPortraitC(true, true, true)
 
     Tic:tick() -- /!\ required in the draw function 
-end
-
-function Tic:drawFrames()
-    local _drawcolor = Tic.COLORGREYD
-    rectb(0, 0, Tic.SCREENW, Tic.SCREENH, _drawcolor)
-    line(0, 0, Tic.SCREENW, Tic.SCREENH, _drawcolor)
-    line(0, Tic.SCREENH, Tic.SCREENW, 0, _drawcolor)
-    line(0, Tic.SCREENH // 2, Tic.SCREENW, Tic.SCREENH // 2, _drawcolor)
-    line(Tic.SCREENW // 2, 0, Tic.SCREENW // 2, Tic.SCREENH, _drawcolor)
 end
 
 function Tic:drawLog()
@@ -1254,10 +1266,10 @@ function Tic:drawLog()
     Tic:logStack("K03:", peek(Tic.KEYBOARDKEYS + 2))
     Tic:logStack("K04:", peek(Tic.KEYBOARDKEYS + 3))
     Tic:logStack("")
-    Tic:logStack("")
-    Tic:logStack("")
-    Tic:logStack("")
-    Tic:logStack("")
+    Tic:logStack("PHY:", Tic:playerActual().statphyact, "/", Tic:playerActual().statphymax)
+    Tic:logStack("MEN:", Tic:playerActual().statmenact, "/", Tic:playerActual().statmenmax)
+    Tic:logStack("PSY:", Tic:playerActual().statpsyact, "/", Tic:playerActual().statpsymax)
+    Tic:logStack("TOT:", Tic:playerActual().statphyact + Tic:playerActual().statmenact + Tic:playerActual().statpsyact)
     Tic:logStack("")
     Tic:logStack("")
     Tic:logStack("")
@@ -1268,6 +1280,15 @@ function Tic:drawLog()
     Tic:logStack("T00:", _tick00)
 
     Tic:logPrint()
+end
+
+function Tic:drawFrames()
+    local _drawcolor = Tic.COLORGREYD
+    rectb(0, 0, Tic.SCREENW, Tic.SCREENH, _drawcolor)
+    line(0, 0, Tic.SCREENW, Tic.SCREENH, _drawcolor)
+    line(0, Tic.SCREENH, Tic.SCREENW, 0, _drawcolor)
+    line(0, Tic.SCREENH // 2, Tic.SCREENW, Tic.SCREENH // 2, _drawcolor)
+    line(Tic.SCREENW // 2, 0, Tic.SCREENW // 2, Tic.SCREENH, _drawcolor)
 end
 
 

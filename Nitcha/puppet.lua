@@ -18,8 +18,18 @@ if not TIC80 then
     function cls(...)
         print("cls:", table.unpack({...}))
     end
+    function rect(...)
+        print("rect:", table.unpack({...}))
+    end
+    function rectb(...)
+        print("rectb:", table.unpack({...}))
+    end
     function poke4(...)
         print("poke4:", table.unpack({...}))
+    end
+    function peek(...)
+        print("peek:", table.unpack({...}))
+        return 0
     end
     function exit(...)
         print("exit:", table.unpack({...}))
