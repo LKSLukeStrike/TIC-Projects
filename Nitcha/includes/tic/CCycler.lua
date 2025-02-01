@@ -40,7 +40,7 @@ function CCycler:next() -- next cycler value
     if self.mode == CCycler.MODELOOP then
         self.actindex = Nums:isBW(_newindex, self.minindex, self.maxindex) and _newindex or self.minindex
         self.actvalue = self.actindex -- value = index by default
-        return self.actindex
+        return self.actvalue
     end
     -- TODO add more modes
 end
@@ -50,7 +50,7 @@ function CCycler:prev() -- prev cycler value
     if self.mode == CCycler.MODELOOP then
         self.actindex = Nums:isBW(_newindex, self.minindex, self.maxindex) and _newindex or self.maxindex
         self.actvalue = self.actindex -- value = index by default
-        return self.actindex
+        return self.actvalue
     end
     -- TODO add more modes
 end
@@ -76,7 +76,7 @@ function CCyclerTable:new(_argt)
     self.actvalue = nil
     CCyclerTable.super.new(self, _argt)
     self:_argt(_argt) -- override if any
-    return self.actindex
+    return self.actvalue
 end
 
 function CCyclerTable:_argt(_argt) -- setup cycler
@@ -87,7 +87,7 @@ function CCyclerTable:_argt(_argt) -- setup cycler
         self.maxindex = self.minindex
         self.actindex = self.minindex
         self.actvalue = nil
-        return self.actindex
+        return self.actvalue
     end
     self.minindex = 1
     self.maxindex = _size
@@ -95,11 +95,11 @@ function CCyclerTable:_argt(_argt) -- setup cycler
     and self.actindex
     or  self.minindex
     self.actvalue = self.acttable[self.actindex]
-    return self.actindex
+    return self.actvalue
 end
 
 function CCyclerTable:insert(_item, _at) -- insert an _item into table _at (end by default)
-    if _item == nil then return self.actindex end
+    if _item == nil then return self.actvalue end
     if _at == nil then
         table.insert(self.acttable, _item)
         self.actindex = #self.acttable -- adjust actual index
@@ -112,7 +112,7 @@ function CCyclerTable:insert(_item, _at) -- insert an _item into table _at (end 
     self.minindex = 1 -- at least one item
     self.maxindex = #self.acttable
     self.actvalue = _item
-    return self.actindex
+    return self.actvalue
 end
 
 function CCyclerTable:remove(_at) -- remove an item from table _at (end by default)
@@ -122,11 +122,11 @@ end
 function CCyclerTable:next() -- next cycler value
     CCyclerTable.super.next(self)
     self.actvalue = self.acttable[self.actindex]
-    return self.actindex
+    return self.actvalue
 end
 
 function CCyclerTable:prev() -- ^rev cycler value
     CCyclerTable.super.prev(self)
     self.actvalue = self.acttable[self.actindex]
-    return self.actindex
+    return self.actvalue
 end

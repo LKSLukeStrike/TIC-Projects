@@ -102,30 +102,47 @@ Tic.FREQUENCE030 = 030 -- each 0.5 second
 
 Tic.KEYBOARDKEYS = 0xFF88 -- keyboard state -- up to 4 pressed keys
 -- Keys values
-Tic.KEYUP    = 58
-Tic.KEYDOWN  = 59
-Tic.KEYLEFT  = 60
-Tic.KEYRIGHT = 61
-Tic.KEYS     = 19
+Tic.KEY_UP       = 58
+Tic.KEY_DOWN     = 59
+Tic.KEY_LEFT     = 60
+Tic.KEY_RIGHT    = 61
+Tic.KEY_NUMPAD0  = 79
+Tic.KEY_NUMPAD1  = 80
+Tic.KEY_NUMPAD2  = 81
+Tic.KEY_NUMPAD3  = 82
+Tic.KEY_NUMPAD4  = 83
+Tic.KEY_NUMPAD5  = 84
+Tic.KEY_NUMPAD6  = 85
+Tic.KEY_NUMPAD7  = 86
+Tic.KEY_NUMPAD8  = 87
+Tic.KEY_NUMPAD9  = 88
 
 -- Actions values
-Tic.ACTIONNEXTPLAYER = "nextplayer"
-Tic.ACTIONPREVPLAYER = "prevplayer"
-Tic.ACTIONNEXTSTATUS = "nextstatus"
-Tic.ACTIONPREVSTATUS = "prevstatus"
+Tic.ACTIONPLAYERNEXT  = "playernext"
+Tic.ACTIONPLAYERPREV  = "playerprev"
+Tic.ACTIONSTATUSNEXT  = "statusnext"
+Tic.ACTIONSTATUSPREV  = "statusprev"
+Tic.ACTIONSTATUSKNEEL = "statuskneel"
+Tic.ACTIONSTATUSSLEEP = "statussleep"
 
 -- Keys to Actions
 Tic.KEYS2ACTIONS = {
-    [Tic.KEYLEFT]  = Tic.ACTIONPREVPLAYER,
-    [Tic.KEYRIGHT] = Tic.ACTIONNEXTPLAYER,
-    [Tic.KEYUP]    = Tic.ACTIONPREVSTATUS,
-    [Tic.KEYDOWN]  = Tic.ACTIONNEXTSTATUS,
+    [Tic.KEY_LEFT]     = Tic.ACTIONPLAYERPREV,
+    [Tic.KEY_RIGHT]    = Tic.ACTIONPLAYERNEXT,
+    [Tic.KEY_UP]       = Tic.ACTIONSTATUSPREV,
+    [Tic.KEY_DOWN]     = Tic.ACTIONSTATUSNEXT,
+    [Tic.KEY_NUMPAD5]  = Tic.ACTIONSTATUSKNEEL,
+    [Tic.KEY_NUMPAD0]  = Tic.ACTIONSTATUSSLEEP,
 }
 
 -- Actions to Functions
 Tic.ACTIONS2FUNCTIONS = {
-    [Tic.ACTIONPREVPLAYER] = function() Tic:playerPrev() end,
-    [Tic.ACTIONNEXTPLAYER] = function() Tic:playerNext() end,
+    [Tic.ACTIONPLAYERPREV]  = function() Tic:playerPrev()  end,
+    [Tic.ACTIONPLAYERNEXT]  = function() Tic:playerNext()  end,
+    [Tic.ACTIONSTATUSPREV]  = function() Tic:statusPrev()  end,
+    [Tic.ACTIONSTATUSNEXT]  = function() Tic:statusNext()  end,
+    [Tic.ACTIONSTATUSKNEEL] = function() Tic:statusKneel() end,
+    [Tic.ACTIONSTATUSSLEEP] = function() Tic:statusSleep() end,
 }
 
 
@@ -202,6 +219,59 @@ end
 
 function Tic:playerActual() -- actual player in the stack
     return Tic.PLAYERS.actvalue
+end
+
+
+-- Statuses System -- switch between statuses
+Tic.STATUSSTAND = "stand" -- character statuses -- will force the posture if any
+Tic.STATUSBLOCK = "block"
+Tic.STATUSSHIFT = "shift"
+Tic.STATUSKNEEL = "kneel"
+Tic.STATUSSLEEP = "sleep"
+Tic.STATUSWOUND = "wound"
+Tic.STATUSMAGIC = "magic"
+Tic.STATUSALCHE = "alche"
+Tic.STATUSKNOCK = "knock"
+Tic.STATUSFLAME = "flame"
+Tic.STATUSWATER = "water"
+Tic.STATUSSTONE = "stone"
+Tic.STATUSBREEZ = "breez"
+Tic.STATUSDEATH = "death"
+Tic.STATUSES    = CCyclerTable{acttable = { -- all availiable statuses
+    Tic.STATUSSTAND,
+    Tic.STATUSBLOCK,
+    Tic.STATUSSHIFT,
+    Tic.STATUSKNEEL,
+    Tic.STATUSSLEEP,
+    Tic.STATUSWOUND,
+    Tic.STATUSMAGIC,
+    Tic.STATUSALCHE,
+    Tic.STATUSKNOCK,
+    Tic.STATUSFLAME,
+    Tic.STATUSWATER,
+    Tic.STATUSSTONE,
+    Tic.STATUSBREEZ,
+    Tic.STATUSDEATH,
+}}
+function Tic:statusPrev() -- prev status in the stack
+    Tic:playerActual().status = Tic.STATUSES:prev()
+end
+
+function Tic:statusNext() -- next status in the stack
+    Tic:playerActual().status = Tic.STATUSES:next()
+end
+
+function Tic:statusKneel() -- toggle kneel vs stand
+    Tic:playerActual().status = (Tic:playerActual().status == Tic.STATUSKNEEL)
+    and Tic.STATUSSTAND
+    or  Tic.STATUSKNEEL
+end
+
+function Tic:statusSleep() -- toggle sleep vs stand
+    Tic:trace(Tic:playerActual().name, Tic:playerActual().status)
+    Tic:playerActual().status = (Tic:playerActual().status == Tic.STATUSSLEEP)
+    and Tic.STATUSSTAND
+    or  Tic.STATUSSLEEP
 end
 
 
@@ -427,108 +497,78 @@ local CCharacter = CEntity:extend() -- characters
 CCharacter.SIZEL = 0 -- character sizes -- for the head sprite y offset
 CCharacter.SIZEM = 1
 CCharacter.SIZES = 2
-CCharacter.STATUSSTAND = "stand" -- character status -- will force the posture if any
-CCharacter.STATUSBLOCK = "block"
-CCharacter.STATUSSHIFT = "shift"
-CCharacter.STATUSKNEEL = "kneel"
-CCharacter.STATUSSLEEP = "sleep"
-CCharacter.STATUSWOUND = "wound"
-CCharacter.STATUSMAGIC = "magic"
-CCharacter.STATUSALCHE = "alche"
-CCharacter.STATUSKNOCK = "knock"
-CCharacter.STATUSFLAME = "flame"
-CCharacter.STATUSWATER = "water"
-CCharacter.STATUSSTONE = "stone"
-CCharacter.STATUSBREEZ = "breez"
-CCharacter.STATUSDEATH = "death"
-CCharacter.STATUSES    = CCyclerTable{acttable = { -- all availiable statuses
-    CCharacter.STATUSSTAND,
-    CCharacter.STATUSBLOCK,
-    CCharacter.STATUSSHIFT,
-    CCharacter.STATUSKNEEL,
-    CCharacter.STATUSSLEEP,
-    CCharacter.STATUSWOUND,
-    CCharacter.STATUSMAGIC,
-    CCharacter.STATUSALCHE,
-    CCharacter.STATUSKNOCK,
-    CCharacter.STATUSFLAME,
-    CCharacter.STATUSWATER,
-    CCharacter.STATUSSTONE,
-    CCharacter.STATUSBREEZ,
-    CCharacter.STATUSDEATH,
-}}
 CCharacter.POSTURESTAND = "stand" -- character postures -- for the sprites selections and offsets
 CCharacter.POSTUREBLOCK = "block"
 CCharacter.POSTURESHIFT = "shift"
 CCharacter.POSTUREKNEEL = "kneel"
 CCharacter.POSTURESLEEP = "sleep"
-CCharacter.STATUSSETTINGS = { -- statuses settings
-    [CCharacter.STATUSSTAND] = {
+Tic.STATUSSETTINGS = { -- statuses settings
+    [Tic.STATUSSTAND] = {
         posture = CCharacter.POSTURESTAND,
         statussprite = CSpriteFG.STATUSEMPTY,
         frequence = Tic.FREQUENCE060,
     },
-    [CCharacter.STATUSBLOCK] = {
+    [Tic.STATUSBLOCK] = {
         posture = CCharacter.POSTUREBLOCK,
         statussprite = CSpriteFG.STATUSEMPTY,
         frequence = Tic.FREQUENCE060,
     },
-    [CCharacter.STATUSSHIFT] = {
+    [Tic.STATUSSHIFT] = {
         posture = CCharacter.POSTURESHIFT,
         statussprite = CSpriteFG.STATUSEMPTY,
         frequence = Tic.FREQUENCE060,
     },
-    [CCharacter.STATUSKNEEL] = {
+    [Tic.STATUSKNEEL] = {
         posture = CCharacter.POSTUREKNEEL,
         statussprite = CSpriteFG.STATUSEMPTY,
         frequence = Tic.FREQUENCE060,
     },
-    [CCharacter.STATUSSLEEP] = {
+    [Tic.STATUSSLEEP] = {
         posture = CCharacter.POSTURESLEEP,
         statussprite = CSpriteFG.STATUSSLEEP,
         frequence = Tic.FREQUENCE090,
     },
-    [CCharacter.STATUSWOUND] = {
+    [Tic.STATUSWOUND] = {
         posture = CCharacter.POSTURESLEEP,
         statussprite = CSpriteFG.STATUSOTHER,
         frequence = Tic.FREQUENCE030,
     },
-    [CCharacter.STATUSMAGIC] = {
+    [Tic.STATUSMAGIC] = {
         posture = CCharacter.POSTURESLEEP,
         statussprite = CSpriteFG.STATUSOTHER,
         frequence = Tic.FREQUENCE030,
     },
-    [CCharacter.STATUSALCHE] = {
+    [Tic.STATUSALCHE] = {
         posture = CCharacter.POSTURESLEEP,
         statussprite = CSpriteFG.STATUSOTHER,
         frequence = Tic.FREQUENCE030,
     },
-    [CCharacter.STATUSKNOCK] = {
+    [Tic.STATUSKNOCK] = {
         posture = CCharacter.POSTURESLEEP,
         statussprite = CSpriteFG.STATUSOTHER,
         frequence = Tic.FREQUENCE030,
     },
-    [CCharacter.STATUSFLAME] = {
+    [Tic.STATUSFLAME] = {
         posture = CCharacter.POSTURESLEEP,
         statussprite = CSpriteFG.STATUSOTHER,
         frequence = Tic.FREQUENCE030,
     },
-    [CCharacter.STATUSWATER] = {
+    [Tic.STATUSWATER] = {
         posture = CCharacter.POSTURESLEEP,
         statussprite = CSpriteFG.STATUSOTHER,
         frequence = Tic.FREQUENCE030,
     },
-    [CCharacter.STATUSSTONE] = {
+    [Tic.STATUSSTONE] = {
         posture = CCharacter.POSTURESLEEP,
         statussprite = CSpriteFG.STATUSOTHER,
         frequence = Tic.FREQUENCE030,
     },
-    [CCharacter.STATUSBREEZ] = {
+    [Tic.STATUSBREEZ] = {
         posture = CCharacter.POSTURESLEEP,
         statussprite = CSpriteFG.STATUSOTHER,
         frequence = Tic.FREQUENCE030,
     },
-    [CCharacter.STATUSDEATH] = {
+    [Tic.STATUSDEATH] = {
         posture = CCharacter.POSTURESLEEP,
         statussprite = CSpriteFG.STATUSDEATH,
         frequence = Tic.FREQUENCE120,
@@ -601,7 +641,7 @@ function CCharacter:new(_argt)
     self.frame        = CSprite.FRAME00 -- frame
     self.dirx         = Tic.DIRXLF -- directions
     self.diry         = Tic.DIRYMD
-    self.status       = CCharacter.STATUSSTAND -- status
+    self.status       = Tic.STATUSSTAND -- status
     self.posture      = CCharacter.POSTURESTAND -- posture -- depends of the status
     self.colorhairsfg = Tic.COLORHAIRSFG -- colors
     self.colorhairsbg = Tic.COLORHAIRSBG
@@ -640,7 +680,7 @@ function CCharacter:drawPortrait(_still, _border, _infos) -- draw the portrait -
     if _still then
         self.dirx = Tic.DIRXLF
         self.diry = Tic.DIRYMD
-        self.status = CCharacter.STATUSSTAND
+        self.status = Tic.STATUSSTAND
         self.frame = CSprite.FRAME00
     end
     self:draw()
@@ -687,7 +727,8 @@ function CCharacter:drawStatsC(_border) -- draw the stats CENTERED
 end
 
 function CCharacter:draw()
-    self.posture = CCharacter.STATUSSETTINGS[self.status].posture -- force the posture
+    Tic:trace(self.name, self.status)
+    self.posture = Tic.STATUSSETTINGS[self.status].posture -- force the posture
     self:_drawStatus()
     -- self:_drawWeapon()
     -- self:_drawShield()
@@ -696,20 +737,20 @@ function CCharacter:draw()
 end
 
 function CCharacter:_drawStatus()
-    if self.status == CCharacter.STATUSSTAND then return self:_drawStatusStand() end
-    if self.status == CCharacter.STATUSBLOCK then return self:_drawStatusBlock() end
-    if self.status == CCharacter.STATUSSHIFT then return self:_drawStatusShift() end
-    if self.status == CCharacter.STATUSKNEEL then return self:_drawStatusKneel() end
-    if self.status == CCharacter.STATUSSLEEP then return self:_drawStatusSleep() end
-    if self.status == CCharacter.STATUSWOUND then return self:_drawStatusWound() end
-    if self.status == CCharacter.STATUSMAGIC then return self:_drawStatusMagic() end
-    if self.status == CCharacter.STATUSALCHE then return self:_drawStatusAlche() end
-    if self.status == CCharacter.STATUSKNOCK then return self:_drawStatusKnock() end
-    if self.status == CCharacter.STATUSFLAME then return self:_drawStatusFlame() end
-    if self.status == CCharacter.STATUSWATER then return self:_drawStatusWater() end
-    if self.status == CCharacter.STATUSSTONE then return self:_drawStatusStone() end
-    if self.status == CCharacter.STATUSBREEZ then return self:_drawStatusBreez() end
-    if self.status == CCharacter.STATUSDEATH then return self:_drawStatusDeath() end
+    if self.status == Tic.STATUSSTAND then return self:_drawStatusStand() end
+    if self.status == Tic.STATUSBLOCK then return self:_drawStatusBlock() end
+    if self.status == Tic.STATUSSHIFT then return self:_drawStatusShift() end
+    if self.status == Tic.STATUSKNEEL then return self:_drawStatusKneel() end
+    if self.status == Tic.STATUSSLEEP then return self:_drawStatusSleep() end
+    if self.status == Tic.STATUSWOUND then return self:_drawStatusWound() end
+    if self.status == Tic.STATUSMAGIC then return self:_drawStatusMagic() end
+    if self.status == Tic.STATUSALCHE then return self:_drawStatusAlche() end
+    if self.status == Tic.STATUSKNOCK then return self:_drawStatusKnock() end
+    if self.status == Tic.STATUSFLAME then return self:_drawStatusFlame() end
+    if self.status == Tic.STATUSWATER then return self:_drawStatusWater() end
+    if self.status == Tic.STATUSSTONE then return self:_drawStatusStone() end
+    if self.status == Tic.STATUSBREEZ then return self:_drawStatusBreez() end
+    if self.status == Tic.STATUSDEATH then return self:_drawStatusDeath() end
 end
 
 function CCharacter:_drawStatusStand()
@@ -800,8 +841,8 @@ end
 
 function CCharacter:_drawStatusSprite(_palette0, _palette1)
     local _tick00 = Tic.TICK00.actvalue
-    local _statussprite = CCharacter.STATUSSETTINGS[self.status].statussprite -- status sprite
-    local _frequence    = CCharacter.STATUSSETTINGS[self.status].frequence -- status frequence
+    local _statussprite = Tic.STATUSSETTINGS[self.status].statussprite -- status sprite
+    local _frequence    = Tic.STATUSSETTINGS[self.status].frequence -- status frequence
     local _palette = (Nums:frequence01(_tick00, _frequence) == 0)
     and _palette0
     or  _palette1
@@ -820,17 +861,6 @@ function CCharacter:_drawWeapon()
 end
 
 function CCharacter:_drawShield()
-end
-
-Tic.ACTIONS2FUNCTIONS[Tic.ACTIONPREVSTATUS] = function() CCharacter:statusPrev() end -- add actions -- has to be here
-Tic.ACTIONS2FUNCTIONS[Tic.ACTIONNEXTSTATUS] = function() CCharacter:statusNext() end
-
-function CCharacter:statusNext() -- next status in the stack
-    return CCharacter.STATUSES:next()
-end
-
-function CCharacter:statusPrev() -- prev status in the stack
-    return CCharacter.STATUSES:prev()
 end
 
 
@@ -1242,7 +1272,6 @@ function Tic:draw()
     Tic:keysDo(20, 5)
     Tic:drawLog()
     -- Tic:drawFrames()
-    Tic:playerActual().status = CCharacter.STATUSES.actvalue
     Tic:playerActual():drawC()
     Tic:playerActual():drawStatsC(true)
     Tic:playerActual():drawPortraitC(true, true, true)
@@ -1258,8 +1287,8 @@ function Tic:drawLog()
     if Nums:frequence01(_tick00, Tic.FREQUENCE240) ~= _statustick01 then
         _statustick01 = Nums:frequence01(_tick00, Tic.FREQUENCE240)
     end
-    local _status  = CCharacter.STATUSES.actvalue or CCharacter.STATUSSTAND
-    local _posture = CCharacter.STATUSSETTINGS[_status].posture
+    local _status  = Tic.STATUSES.actvalue or Tic.STATUSSTAND
+    local _posture = Tic.STATUSSETTINGS[_status].posture
 
     Tic:logStack("K01:", peek(Tic.KEYBOARDKEYS + 0))
     Tic:logStack("K02:", peek(Tic.KEYBOARDKEYS + 1))
