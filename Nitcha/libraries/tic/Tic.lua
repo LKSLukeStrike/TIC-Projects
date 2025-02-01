@@ -118,12 +118,13 @@ Tic.KEY_NUMPAD8  = 87
 Tic.KEY_NUMPAD9  = 88
 
 -- Actions values
-Tic.ACTIONPLAYERNEXT  = "playernext"
-Tic.ACTIONPLAYERPREV  = "playerprev"
-Tic.ACTIONSTATUSNEXT  = "statusnext"
-Tic.ACTIONSTATUSPREV  = "statusprev"
-Tic.ACTIONSTATUSKNEEL = "statuskneel"
-Tic.ACTIONSTATUSSLEEP = "statussleep"
+Tic.ACTIONPLAYERPREV  = "playerPrev"
+Tic.ACTIONPLAYERNEXT  = "playerNext"
+Tic.ACTIONSTATUSPREV  = "statusPrev"
+Tic.ACTIONSTATUSNEXT  = "statusNext"
+Tic.ACTIONSTATUSKNEEL = "statusKneel"
+Tic.ACTIONSTATUSSLEEP = "statusSleep"
+Tic.ACTIONSDIRYUP     = "diryUp"
 
 -- Keys to Actions
 Tic.KEYS2ACTIONS = {
@@ -133,6 +134,7 @@ Tic.KEYS2ACTIONS = {
     [Tic.KEY_DOWN]     = Tic.ACTIONSTATUSNEXT,
     [Tic.KEY_NUMPAD5]  = Tic.ACTIONSTATUSKNEEL,
     [Tic.KEY_NUMPAD0]  = Tic.ACTIONSTATUSSLEEP,
+    [Tic.KEY_NUMPAD1]  = Tic.ACTIONSDIRYUP,
 }
 
 -- Actions to Functions
@@ -143,6 +145,7 @@ Tic.ACTIONS2FUNCTIONS = {
     [Tic.ACTIONSTATUSNEXT]  = function() Tic:statusNext()  end,
     [Tic.ACTIONSTATUSKNEEL] = function() Tic:statusKneel() end,
     [Tic.ACTIONSTATUSSLEEP] = function() Tic:statusSleep() end,
+    [Tic.ACTIONSDIRYUP]     = function() Tic:diryUp()      end,
 }
 
 
@@ -1285,7 +1288,7 @@ function Tic:drawLog()
     if Nums:frequence01(_tick00, Tic.FREQUENCE240) ~= _statustick01 then
         _statustick01 = Nums:frequence01(_tick00, Tic.FREQUENCE240)
     end
-    local _status  = Tic.STATUSES.actvalue or Tic.STATUSSTAND
+    local _status  = Tic:playerActual().status
     local _posture = Tic.STATUSSETTINGS[_status].posture
 
     Tic:logStack("K01:", peek(Tic.KEYBOARDKEYS + 0))
