@@ -268,7 +268,6 @@ function Tic:statusKneel() -- toggle kneel vs stand
 end
 
 function Tic:statusSleep() -- toggle sleep vs stand
-    Tic:trace(Tic:playerActual().name, Tic:playerActual().status)
     Tic:playerActual().status = (Tic:playerActual().status == Tic.STATUSSLEEP)
     and Tic.STATUSSTAND
     or  Tic.STATUSSLEEP
@@ -727,7 +726,6 @@ function CCharacter:drawStatsC(_border) -- draw the stats CENTERED
 end
 
 function CCharacter:draw()
-    Tic:trace(self.name, self.status)
     self.posture = Tic.STATUSSETTINGS[self.status].posture -- force the posture
     self:_drawStatus()
     -- self:_drawWeapon()
