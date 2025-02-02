@@ -124,7 +124,9 @@ Tic.ACTIONSTATUSPREV  = "statusPrev"
 Tic.ACTIONSTATUSNEXT  = "statusNext"
 Tic.ACTIONSTATUSKNEEL = "statusKneel"
 Tic.ACTIONSTATUSSLEEP = "statusSleep"
-Tic.ACTIONSDIRYUP     = "diryUp"
+Tic.ACTIONSDIRYUP     = "diryUP"
+Tic.ACTIONSDIRYMD     = "diryMD"
+Tic.ACTIONSDIRYDW     = "diryDW"
 
 -- Keys to Actions
 Tic.KEYS2ACTIONS = {
@@ -134,7 +136,9 @@ Tic.KEYS2ACTIONS = {
     [Tic.KEY_DOWN]     = Tic.ACTIONSTATUSNEXT,
     [Tic.KEY_NUMPAD5]  = Tic.ACTIONSTATUSKNEEL,
     [Tic.KEY_NUMPAD0]  = Tic.ACTIONSTATUSSLEEP,
-    [Tic.KEY_NUMPAD1]  = Tic.ACTIONSDIRYUP,
+    [Tic.KEY_NUMPAD7]  = Tic.ACTIONSDIRYUP,
+    [Tic.KEY_NUMPAD4]  = Tic.ACTIONSDIRYMD,
+    [Tic.KEY_NUMPAD1]  = Tic.ACTIONSDIRYDW,
 }
 
 -- Actions to Functions
@@ -145,7 +149,9 @@ Tic.ACTIONS2FUNCTIONS = {
     [Tic.ACTIONSTATUSNEXT]  = function() Tic:statusNext()  end,
     [Tic.ACTIONSTATUSKNEEL] = function() Tic:statusKneel() end,
     [Tic.ACTIONSTATUSSLEEP] = function() Tic:statusSleep() end,
-    [Tic.ACTIONSDIRYUP]     = function() Tic:diryUp()      end,
+    [Tic.ACTIONSDIRYUP]     = function() Tic:diryUP()      end,
+    [Tic.ACTIONSDIRYMD]     = function() Tic:diryMD()      end,
+    [Tic.ACTIONSDIRYDW]     = function() Tic:diryDW()      end,
 }
 
 
@@ -166,43 +172,6 @@ function Tic:keysDo(_hold, _period) -- execute functions depending on the presse
         if not Tic.ACTIONS2FUNCTIONS[Tic.KEYS2ACTIONS[_key]] then break end -- action not linked to a function -- do nothing
         Tic.ACTIONS2FUNCTIONS[Tic.KEYS2ACTIONS[_key]]() -- execute the associated function
     end
-end
-
-
--- Log System -- store logs to display each frame
-Tic.Log = {}
-function Tic:logClear() -- clear the log
-    Tic.Log = {}
-end
-
-function Tic:logStack(...) -- add item to the log
-    local _args = {...}
-    local _item = ""
-    for _, _val in ipairs(_args) do
-        _item = _item.._val.." "
-    end
-    table.insert(Tic.Log, _item)
-end
-
-function Tic:logPrint() -- print the log then clear it
-    for _line, _item in ipairs(Tic.Log) do
-        _line = _line - 1 -- line start from 0
-        print(_item, 0, _line * 8) -- one item per "line"
-      end    
-    Tic:logClear()
-end
-
-
--- Tick System -- handle timers
-Tic.TICK00 = CCyclerInt{ -- tick cycler from 0-maxinteger
-    maxindex = math.maxinteger,
-}
-Tic.TICK60 = CCyclerInt{ -- tick cycler from 0-59
-    maxindex = 59,
-}
-function Tic:tick() -- increment the timers
-    Tic.TICK00:next()
-    Tic.TICK60:next()
 end
 
 
@@ -274,6 +243,57 @@ function Tic:statusSleep() -- toggle sleep vs stand
     Tic:playerActual().status = (Tic:playerActual().status == Tic.STATUSSLEEP)
     and Tic.STATUSSTAND
     or  Tic.STATUSSLEEP
+end
+
+
+-- Directions System -- control the directions up, md, dw and so the eyes
+function Tic:diryUP()
+    Tic:playerActual().diry = Tic.DIRYUP
+end
+
+function Tic:diryMD()
+    Tic:playerActual().diry = Tic.DIRYMD
+end
+
+function Tic:diryDW()
+    Tic:playerActual().diry = Tic.DIRYDW
+end
+
+
+-- Tick System -- handle timers
+Tic.TICK00 = CCyclerInt{ -- tick cycler from 0-maxinteger
+    maxindex = math.maxinteger,
+}
+Tic.TICK60 = CCyclerInt{ -- tick cycler from 0-59
+    maxindex = 59,
+}
+function Tic:tick() -- increment the timers
+    Tic.TICK00:next()
+    Tic.TICK60:next()
+end
+
+
+-- Log System -- store logs to display each frame
+Tic.Log = {}
+function Tic:logClear() -- clear the log
+    Tic.Log = {}
+end
+
+function Tic:logStack(...) -- add item to the log
+    local _args = {...}
+    local _item = ""
+    for _, _val in ipairs(_args) do
+        _item = _item.._val.." "
+    end
+    table.insert(Tic.Log, _item)
+end
+
+function Tic:logPrint() -- print the log then clear it
+    for _line, _item in ipairs(Tic.Log) do
+        _line = _line - 1 -- line start from 0
+        print(_item, 0, _line * 8) -- one item per "line"
+      end    
+    Tic:logClear()
 end
 
 
@@ -1275,7 +1295,8 @@ function Tic:draw()
     -- Tic:drawFrames()
     Tic:playerActual():drawC()
     Tic:playerActual():drawStatsC(true)
-    Tic:playerActual():drawPortraitC(true, true, true)
+    -- Tic:playerActual():drawPortraitC(true, true, true)
+    Tic:playerActual():drawPortraitC(nil, true, true)
 
     Tic:tick() -- /!\ required in the draw function 
 end
