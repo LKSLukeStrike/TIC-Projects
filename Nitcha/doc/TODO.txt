@@ -1,0 +1,13 @@
+x cycle numerics
+x cycle tables
+
+x add posture down
+x add gnolls
+x eyes depending on diry
+
+? require Tables in Classic (for size, keys, vals ...)
+? probably require Nums also ?
+
+? convert include ccycler into lib
+
+

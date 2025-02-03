@@ -248,24 +248,26 @@ end
 
 -- Directions System -- control the directions up, md, dw and so the eyes
 function Tic:diryUP()
-    Tic:playerActual().diry = Tic.DIRYUP
-    Tic:playerActual().status = (Tic:playerActual().status ~= Tic.STATUSSLEEP)
-    and Tic:playerActual().status
+    local _diry   = Tic:playerActual().diry
+    local _status = Tic:playerActual().status
+    Tic:playerActual().status = (_status ~= Tic.STATUSSLEEP) -- change status ?
+    and _status
     or  Tic.STATUSSTAND
+    Tic:playerActual().diry = Tic.DIRYUP
 end
 
 function Tic:diryMD()
-    Tic:playerActual().diry = Tic.DIRYMD
     Tic:playerActual().status = (Tic:playerActual().status ~= Tic.STATUSSLEEP)
     and Tic:playerActual().status
     or  Tic.STATUSSTAND
+    Tic:playerActual().diry = Tic.DIRYMD
 end
 
 function Tic:diryDW()
-    Tic:playerActual().diry = Tic.DIRYDW
     Tic:playerActual().status = (Tic:playerActual().status ~= Tic.STATUSSLEEP)
     and Tic:playerActual().status
     or  Tic.STATUSSTAND
+    Tic:playerActual().diry = Tic.DIRYDW
 end
 
 
