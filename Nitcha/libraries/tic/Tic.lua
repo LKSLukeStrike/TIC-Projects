@@ -1304,6 +1304,7 @@ function Tic:draw()
     Tic:keysDo(20, 5)
     Tic:drawLog()
     -- Tic:drawFrames()
+    Tic:drawDirections()
     Tic:playerActual():drawC()
     Tic:playerActual():drawStatsC(true)
     -- Tic:playerActual():drawPortraitC(true, true, true)
@@ -1351,6 +1352,21 @@ function Tic:drawFrames()
     line(0, Tic.SCREENH, Tic.SCREENW, 0, _drawcolor)
     line(0, Tic.SCREENH // 2, Tic.SCREENW, Tic.SCREENH // 2, _drawcolor)
     line(Tic.SCREENW // 2, 0, Tic.SCREENW // 2, Tic.SCREENH, _drawcolor)
+end
+
+function Tic:drawDirections()
+    local _drawcolor = Tic.COLORGREYD
+    local _screenx = Tic:playerActual().screenx
+    local _screeny = Tic:playerActual().screeny
+    circb(_screenx, _screeny, 10, _drawcolor)
+    line(_screenx, _screeny, _screenx + 00, _screeny - 10, _drawcolor) -- 000°
+    line(_screenx, _screeny, _screenx + 07, _screeny - 07, _drawcolor) -- 045°
+    line(_screenx, _screeny, _screenx + 10, _screeny + 00, _drawcolor) -- 090°
+    line(_screenx, _screeny, _screenx + 07, _screeny + 07, _drawcolor) -- 135°
+    line(_screenx, _screeny, _screenx + 00, _screeny + 10, _drawcolor) -- 180°
+    line(_screenx, _screeny, _screenx - 07, _screeny + 07, _drawcolor) -- 225°
+    line(_screenx, _screeny, _screenx - 10, _screeny + 00, _drawcolor) -- 270°
+    line(_screenx, _screeny, _screenx - 07, _screeny - 07, _drawcolor) -- 315°
 end
 
 
