@@ -92,8 +92,8 @@ function CCyclerTable:_argt(_argt) -- setup cycler
     self.minindex = 1
     self.maxindex = _size
     self.actindex = (Nums:isBW(self.actindex, self.minindex, self.maxindex))
-    and self.actindex
-    or  self.minindex
+        and self.actindex
+        or  self.minindex
     self.actvalue = self.acttable[self.actindex]
     return self.actvalue
 end

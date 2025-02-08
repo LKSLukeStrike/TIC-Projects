@@ -86,6 +86,7 @@ flowchart TB
     KM0-.->KMI
     KM1-.->KMI
     KMI-.->KI0
+    KMI-.->KI1
 
     %% idle to work
     KI0-.->KIW
@@ -96,6 +97,7 @@ flowchart TB
     KW0-.->KWI
     KW1-.->KWI
     KWI-.->KI0
+    KWI-.->KI1
 
     %% move to work
     KM0-.->KMW
@@ -106,5 +108,6 @@ flowchart TB
     KW0-.->KWM
     KW1-.->KWM
     KWM-.->KM0
+    KWM-.->KM1
 
 ````

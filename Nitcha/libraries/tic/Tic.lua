@@ -21,10 +21,13 @@ require("includes/tic/CCycler")
 -- Screen sizes
 Tic.SCREENW = 240 -- screen width
 Tic.SCREENH = 136 -- screen height
+
 -- Palette map
 Tic.PALETTEMAP = 0x3FF0 * 2 -- vram bank 1
+
 -- Sprites bank
 Tic.SPRITEBANK = 0x4000 -- start at tiles sprites
+
 -- Palette colors
 Tic.COLOR00 = 00 -- black
 Tic.COLOR01 = 01 -- purple
@@ -42,6 +45,7 @@ Tic.COLOR12 = 12 -- white
 Tic.COLOR13 = 13 -- l grey
 Tic.COLOR14 = 14 -- m grey
 Tic.COLOR15 = 15 -- d grey
+
 -- Palette colors aliases (with the standard palette)
 Tic.COLORBLACK  = Tic.COLOR00 -- black
 Tic.COLORPURPLE = Tic.COLOR01 -- purple
@@ -59,6 +63,7 @@ Tic.COLORWHITE  = Tic.COLOR12 -- white
 Tic.COLORGREYL  = Tic.COLOR13 -- l grey
 Tic.COLORGREYM  = Tic.COLOR14 -- m grey
 Tic.COLORGREYD  = Tic.COLOR15 -- d grey
+
 -- Special palette colors that can be replaced
 Tic.COLORKEY   = Tic.COLOR00 -- transparent color
 Tic.COLORARMOR = Tic.COLOR15 -- 4 colors for the bodies
@@ -77,6 +82,28 @@ Tic.COLORPORTRAITFG = Tic.COLORWHITE -- 2 colors for portrait frame
 Tic.COLORPORTRAITBG = Tic.COLORGREYL
 -- TODO weapons fg/bg + status
 
+-- Directions
+Tic.DIR000 = 000 -- directions in angles (8)
+Tic.DIR045 = 045
+Tic.DIR090 = 090
+Tic.DIR135 = 135
+Tic.DIR180 = 180
+Tic.DIR225 = 225
+Tic.DIR270 = 270
+Tic.DIR315 = 315
+Tic.OFFSETZERO = 00 -- offsets for moving in line or diagonal
+Tic.OFFSETDIAG = 07
+Tic.OFFSETLINE = 10
+Tic.DIRS2OFFSETS = { -- directions to x y offsets
+    [Tic.DIR000] = {offsetx = 0 + Tic.OFFSETZERO, offsety = 0 - Tic.OFFSETLINE,},
+    [Tic.DIR045] = {offsetx = 0 + Tic.OFFSETDIAG, offsety = 0 - Tic.OFFSETDIAG,},
+    [Tic.DIR090] = {offsetx = 0 + Tic.OFFSETLINE, offsety = 0 + Tic.OFFSETZERO,},
+    [Tic.DIR135] = {offsetx = 0 + Tic.OFFSETDIAG, offsety = 0 + Tic.OFFSETDIAG,},
+    [Tic.DIR180] = {offsetx = 0 + Tic.OFFSETZERO, offsety = 0 + Tic.OFFSETLINE,},
+    [Tic.DIR225] = {offsetx = 0 - Tic.OFFSETDIAG, offsety = 0 + Tic.OFFSETDIAG,},
+    [Tic.DIR270] = {offsetx = 0 - Tic.OFFSETLINE, offsety = 0 + Tic.OFFSETZERO,},
+    [Tic.DIR315] = {offsetx = 0 - Tic.OFFSETDIAG, offsety = 0 - Tic.OFFSETDIAG,},
+}
 Tic.DIRXLF = 0 -- x directions -- also the sprite flip
 Tic.DIRXRG = 1
 Tic.DIRYMD = 0 -- y directions -- also the sprite offset
@@ -235,14 +262,14 @@ end
 
 function Tic:statusKneel() -- toggle kneel vs stand
     Tic:playerActual().status = (Tic:playerActual().status == Tic.STATUSKNEEL)
-    and Tic.STATUSSTAND
-    or  Tic.STATUSKNEEL
+        and Tic.STATUSSTAND
+        or  Tic.STATUSKNEEL
 end
 
 function Tic:statusSleep() -- toggle sleep vs stand
     Tic:playerActual().status = (Tic:playerActual().status == Tic.STATUSSLEEP)
-    and Tic.STATUSSTAND
-    or  Tic.STATUSSLEEP
+        and Tic.STATUSSTAND
+        or  Tic.STATUSSLEEP
 end
 
 
@@ -251,22 +278,22 @@ function Tic:diryUP()
     local _diry   = Tic:playerActual().diry
     local _status = Tic:playerActual().status
     Tic:playerActual().status = (_status ~= Tic.STATUSSLEEP) -- change status ?
-    and _status
-    or  Tic.STATUSSTAND
+        and _status
+        or  Tic.STATUSSTAND
     Tic:playerActual().diry = Tic.DIRYUP
 end
 
 function Tic:diryMD()
     Tic:playerActual().status = (Tic:playerActual().status ~= Tic.STATUSSLEEP)
-    and Tic:playerActual().status
-    or  Tic.STATUSSTAND
+        and Tic:playerActual().status
+        or  Tic.STATUSSTAND
     Tic:playerActual().diry = Tic.DIRYMD
 end
 
 function Tic:diryDW()
     Tic:playerActual().status = (Tic:playerActual().status ~= Tic.STATUSSLEEP)
-    and Tic:playerActual().status
-    or  Tic.STATUSSTAND
+        and Tic:playerActual().status
+        or  Tic.STATUSSTAND
     Tic:playerActual().diry = Tic.DIRYDW
 end
 
@@ -302,7 +329,7 @@ end
 function Tic:logPrint() -- print the log then clear it
     for _line, _item in ipairs(Tic.Log) do
         _line = _line - 1 -- line start from 0
-        print(_item, 0, _line * 8) -- one item per "line"
+        Tic:print(0, _line * 8, _item) -- one item per "line"
       end    
     Tic:logClear()
 end
@@ -314,14 +341,33 @@ function Tic:time2seconds() -- time in seconds
 end
 
 
+-- Print System -- extend the simple print function
+function Tic:val2string(_val) -- return val or it's type if any for concat
+    _val = (type(_val) == "table" or type(_val) == "function" or type(_val) == "nil") -- TODO add more ?
+        and type(_val)
+        or  _val
+    return _val
+end
+
+function Tic:print(_screenx, _screeny, ...) -- print with multiple args
+    _screenx = _screenx or 0
+    _screeny = _screeny or 0
+    local _args = {...}
+    local _output = ""
+    for _, _val in ipairs(_args) do
+        _val = Tic:val2string(_val)
+        _output = _output.._val.." "
+    end
+    print( _output, _screenx, _screeny)
+end
+
+
 -- Trace System -- extend the simple trace function
 function Tic:trace(...) -- trace with multiple args
     local _args = {...}
     local _output = ""
-    for _, _val in pairs(_args) do
-        _val = (type(_val) == "table" or type(_val) == "function") -- TODO add more ?
-        and type(_val)
-        or  _val -- for concat
+    for _, _val in ipairs(_args) do
+        _val = Tic:val2string(_val)
         _output = _output.._val.." "
     end
     trace(_output)
@@ -718,8 +764,10 @@ function CCharacter:drawPortrait(_still, _border, _infos) -- draw the portrait -
     end
     self:draw()
     if _infos then
-        print(self.name, self.portraitx + (11 * self.scale), self.portraity)
-        print(self.kind, self.portraitx + (11 * self.scale), self.portraity + (5 * self.scale))
+        Tic:print(self.portraitx + (12 * self.scale), self.portraity, self.name)
+        Tic:print(self.portraitx + (12 * self.scale), self.portraity + (6 * self.scale), self.kind)
+        Tic:print(self.portraitx + (36 * self.scale), self.portraity, "WOX:", self.worldx)
+        Tic:print(self.portraitx + (36 * self.scale), self.portraity + (6 * self.scale), "WOY:", self.worldy)
     end
     self:_load()
 end
@@ -876,8 +924,8 @@ function CCharacter:_drawStatusSprite(_palette0, _palette1)
     local _statussprite = Tic.STATUSSETTINGS[self.status].statussprite -- status sprite
     local _frequence    = Tic.STATUSSETTINGS[self.status].frequence -- status frequence
     local _palette = (Nums:frequence01(_tick00, _frequence) == 0)
-    and _palette0
-    or  _palette1
+        and _palette0
+        or  _palette1
 
     local _musprite = CSpriteFG() -- multi usage unique sprite
     _musprite.sprite = _statussprite
@@ -919,17 +967,17 @@ function CCharacterHumanoid:_drawBody()
     local _bodyspriteoffset = _posture.bodyspriteoffset
     local _bodyxoffset      = _posture.bodyxoffset
     _bodyxoffset = (_bodyxoffset == nil and self.dirx == Tic.DIRXLF)
-    and 0 + self.size -- nil use size
-    or  _bodyxoffset
+        and 0 + self.size -- nil use size
+        or  _bodyxoffset
     _bodyxoffset = (_bodyxoffset == nil and self.dirx == Tic.DIRXRG)
-    and 0 - self.size -- nil use size
-    or  _bodyxoffset
+        and 0 - self.size -- nil use size
+        or  _bodyxoffset
     local _bodyyoffset      = _posture.bodyyoffset
     local _bodyrotate       = _posture.rotate
     local _bodyframe        = _posture.frame
     _bodyframe = (_bodyframe)
-    and _bodyframe -- fix frame
-    or  self.frame
+        and _bodyframe -- fix frame
+        or  self.frame
 
     local _musprite = CSpriteFG() -- multi usage unique sprite
     _musprite.sprite  = self.bodysprite + _bodyspriteoffset -- apply the corresponding attributes
@@ -953,8 +1001,8 @@ function CCharacterHumanoid:_drawHead()
     local _headxoffset = _posture.headxoffset
     local _headyoffset = _posture.headyoffset
     _headyoffset = (_posture.headusesize)
-    and _headyoffset + self.size
-    or  _headyoffset
+        and _headyoffset + self.size
+        or  _headyoffset
     local _headrotate  = _posture.rotate
     local _headframe   = CSprite.FRAME00 -- heads have only one frame
 
@@ -1359,14 +1407,9 @@ function Tic:drawDirections()
     local _screenx = Tic:playerActual().screenx
     local _screeny = Tic:playerActual().screeny
     circb(_screenx, _screeny, 10, _drawcolor)
-    line(_screenx, _screeny, _screenx + 00, _screeny - 10, _drawcolor) -- 000°
-    line(_screenx, _screeny, _screenx + 07, _screeny - 07, _drawcolor) -- 045°
-    line(_screenx, _screeny, _screenx + 10, _screeny + 00, _drawcolor) -- 090°
-    line(_screenx, _screeny, _screenx + 07, _screeny + 07, _drawcolor) -- 135°
-    line(_screenx, _screeny, _screenx + 00, _screeny + 10, _drawcolor) -- 180°
-    line(_screenx, _screeny, _screenx - 07, _screeny + 07, _drawcolor) -- 225°
-    line(_screenx, _screeny, _screenx - 10, _screeny + 00, _drawcolor) -- 270°
-    line(_screenx, _screeny, _screenx - 07, _screeny - 07, _drawcolor) -- 315°
+    for _, _offsets in pairs(Tic.DIRS2OFFSETS) do
+        line(_screenx, _screeny, _screenx + _offsets.offsetx, _screeny + _offsets.offsety, _drawcolor)
+    end
 end
 
 
