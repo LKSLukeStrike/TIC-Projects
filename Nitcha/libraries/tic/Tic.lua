@@ -151,21 +151,31 @@ Tic.ACTIONSTATUSPREV  = "statusPrev"
 Tic.ACTIONSTATUSNEXT  = "statusNext"
 Tic.ACTIONSTATUSKNEEL = "statusKneel"
 Tic.ACTIONSTATUSSLEEP = "statusSleep"
-Tic.ACTIONSDIRYUP     = "diryUP"
-Tic.ACTIONSDIRYMD     = "diryMD"
-Tic.ACTIONSDIRYDW     = "diryDW"
+Tic.ACTIONSDIR000     = "dir000"
+Tic.ACTIONSDIR045     = "dir045"
+Tic.ACTIONSDIR090     = "dir090"
+Tic.ACTIONSDIR135     = "dir135"
+Tic.ACTIONSDIR180     = "dir180"
+Tic.ACTIONSDIR225     = "dir225"
+Tic.ACTIONSDIR270     = "dir270"
+Tic.ACTIONSDIR315     = "dir315"
 
 -- Keys to Actions
 Tic.KEYS2ACTIONS = {
-    [Tic.KEY_LEFT]     = Tic.ACTIONPLAYERPREV,
+    [Tic.KEY_LEFT]     = Tic.ACTIONPLAYERPREV, -- change actual player
     [Tic.KEY_RIGHT]    = Tic.ACTIONPLAYERNEXT,
-    [Tic.KEY_UP]       = Tic.ACTIONSTATUSPREV,
+    [Tic.KEY_UP]       = Tic.ACTIONSTATUSPREV, -- change actual player status
     [Tic.KEY_DOWN]     = Tic.ACTIONSTATUSNEXT,
-    [Tic.KEY_NUMPAD5]  = Tic.ACTIONSTATUSKNEEL,
+    [Tic.KEY_NUMPAD5]  = Tic.ACTIONSTATUSKNEEL, -- change actual player posture
     [Tic.KEY_NUMPAD0]  = Tic.ACTIONSTATUSSLEEP,
-    [Tic.KEY_NUMPAD7]  = Tic.ACTIONSDIRYUP,
-    [Tic.KEY_NUMPAD4]  = Tic.ACTIONSDIRYMD,
-    [Tic.KEY_NUMPAD1]  = Tic.ACTIONSDIRYDW,
+    [Tic.KEY_NUMPAD8]  = Tic.ACTIONSDIR000, -- move actual player
+    [Tic.KEY_NUMPAD9]  = Tic.ACTIONSDIR045,
+    [Tic.KEY_NUMPAD6]  = Tic.ACTIONSDIR090,
+    [Tic.KEY_NUMPAD3]  = Tic.ACTIONSDIR135,
+    [Tic.KEY_NUMPAD2]  = Tic.ACTIONSDIR180,
+    [Tic.KEY_NUMPAD1]  = Tic.ACTIONSDIR225,
+    [Tic.KEY_NUMPAD4]  = Tic.ACTIONSDIR270,
+    [Tic.KEY_NUMPAD7]  = Tic.ACTIONSDIR315,
 }
 
 -- Actions to Functions
@@ -176,9 +186,14 @@ Tic.ACTIONS2FUNCTIONS = {
     [Tic.ACTIONSTATUSNEXT]  = function() Tic:statusNext()  end,
     [Tic.ACTIONSTATUSKNEEL] = function() Tic:statusKneel() end,
     [Tic.ACTIONSTATUSSLEEP] = function() Tic:statusSleep() end,
-    [Tic.ACTIONSDIRYUP]     = function() Tic:diryUP()      end,
-    [Tic.ACTIONSDIRYMD]     = function() Tic:diryMD()      end,
-    [Tic.ACTIONSDIRYDW]     = function() Tic:diryDW()      end,
+    [Tic.ACTIONSDIR000]     = function() Tic:dir000()      end,
+    [Tic.ACTIONSDIR045]     = function() Tic:dir045()      end,
+    [Tic.ACTIONSDIR090]     = function() Tic:dir090()      end,
+    [Tic.ACTIONSDIR135]     = function() Tic:dir135()      end,
+    [Tic.ACTIONSDIR180]     = function() Tic:dir180()      end,
+    [Tic.ACTIONSDIR225]     = function() Tic:dir225()      end,
+    [Tic.ACTIONSDIR270]     = function() Tic:dir270()      end,
+    [Tic.ACTIONSDIR315]     = function() Tic:dir315()      end,
 }
 
 
@@ -274,27 +289,44 @@ end
 
 
 -- Directions System -- control the directions up, md, dw and so the eyes
-function Tic:diryUP()
-    local _diry   = Tic:playerActual().diry
-    local _status = Tic:playerActual().status
-    Tic:playerActual().status = (_status ~= Tic.STATUSSLEEP) -- change status ?
-        and _status
+function Tic:dir225()
+    Tic:playerActual().status = (Tic:playerActual().status ~= Tic.STATUSSLEEP)
+        and Tic:playerActual().status
         or  Tic.STATUSSTAND
-    Tic:playerActual().diry = Tic.DIRYUP
+    Tic:playerActual().diry = Tic.DIRYDW
 end
 
-function Tic:diryMD()
+function Tic:dir270()
     Tic:playerActual().status = (Tic:playerActual().status ~= Tic.STATUSSLEEP)
         and Tic:playerActual().status
         or  Tic.STATUSSTAND
     Tic:playerActual().diry = Tic.DIRYMD
 end
 
-function Tic:diryDW()
-    Tic:playerActual().status = (Tic:playerActual().status ~= Tic.STATUSSLEEP)
-        and Tic:playerActual().status
-        or  Tic.STATUSSTAND
-    Tic:playerActual().diry = Tic.DIRYDW
+function Tic:dir315(_character)
+    _character = _character or Tic:playerActual()
+    _character.dirx = Tic.DIRXLF
+    _character.diry = Tic.DIRYUP
+    local _status = _character.status
+    if _status == Tic.STATUSSLEEP then -- sleep to stand
+        _character.status = Tic.STATUSSTAND
+        return
+    end
+    if _status == Tic.STATUSSTAND then -- stand to shift
+        _character.status = Tic.STATUSSHIFT
+        return
+    end
+    -- TODO work
+    local _offsets = Tic.DIRS2OFFSETS[Tic.DIR315] -- move
+    local _offsetx = _offsets.offsetx
+    local _offsety = _offsets.offsety
+    _character.frame = Nums:toggle01(_character.frame)
+    _character.worldx = (_status == Tic.STATUSSHIFT)
+        and _character.worldx + _offsetx -- TODO depends of phy
+        or  _character.worldx + (_offsetx // 2) -- half speed if kneel
+    _character.worldy = (_status == Tic.STATUSSHIFT)
+        and _character.worldy + _offsety -- TODO depends of phy
+        or  _character.worldy + (_offsety // 2) -- half speed if kneel
 end
 
 

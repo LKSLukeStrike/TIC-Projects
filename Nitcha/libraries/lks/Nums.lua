@@ -17,6 +17,12 @@ function Nums:frequence01(_num, _frequence) -- 0 in frequence, 1 out of frequenc
 end
 
 
+-- Toggle
+function Nums:toggle01(_num) -- toggle btw 0 1
+    return (_num == 0) and 1 or 0
+end
+
+
 -- Comparisons
 function Nums:_isFctAny(_num, _fct, ...) -- if _fct true on any ... -- false by default
     local _args = {...}
