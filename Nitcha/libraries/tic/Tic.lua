@@ -83,6 +83,11 @@ Tic.COLORPORTRAITBG = Tic.COLORGREYL
 -- TODO weapons fg/bg + status
 
 -- Directions
+Tic.DIRXLF = 0 -- x directions -- also the sprite flip
+Tic.DIRXRG = 1
+Tic.DIRYMD = 0 -- y directions -- also the sprite offset
+Tic.DIRYUP = Tic.DIRYMD - 1
+Tic.DIRYDW = Tic.DIRYMD + 1
 Tic.DIR000 = 000 -- directions in angles (8)
 Tic.DIR045 = 045
 Tic.DIR090 = 090
@@ -94,21 +99,56 @@ Tic.DIR315 = 315
 Tic.OFFSETZERO = 00 -- offsets for moving in line or diagonal
 Tic.OFFSETDIAG = 07
 Tic.OFFSETLINE = 10
-Tic.DIRS2OFFSETS = { -- directions to x y offsets
-    [Tic.DIR000] = {offsetx = 0 + Tic.OFFSETZERO, offsety = 0 - Tic.OFFSETLINE,},
-    [Tic.DIR045] = {offsetx = 0 + Tic.OFFSETDIAG, offsety = 0 - Tic.OFFSETDIAG,},
-    [Tic.DIR090] = {offsetx = 0 + Tic.OFFSETLINE, offsety = 0 + Tic.OFFSETZERO,},
-    [Tic.DIR135] = {offsetx = 0 + Tic.OFFSETDIAG, offsety = 0 + Tic.OFFSETDIAG,},
-    [Tic.DIR180] = {offsetx = 0 + Tic.OFFSETZERO, offsety = 0 + Tic.OFFSETLINE,},
-    [Tic.DIR225] = {offsetx = 0 - Tic.OFFSETDIAG, offsety = 0 + Tic.OFFSETDIAG,},
-    [Tic.DIR270] = {offsetx = 0 - Tic.OFFSETLINE, offsety = 0 + Tic.OFFSETZERO,},
-    [Tic.DIR315] = {offsetx = 0 - Tic.OFFSETDIAG, offsety = 0 - Tic.OFFSETDIAG,},
+Tic.DIRS2OFFSETS = { -- directions to x y offsets and dirs
+    [Tic.DIR000] = {
+        offsetx = 0 + Tic.OFFSETZERO,
+        offsety = 0 - Tic.OFFSETLINE,
+        dirx = nil,
+        diry = Tic.DIRYUP,
+    },
+    [Tic.DIR045] = {
+        offsetx = 0 + Tic.OFFSETDIAG,
+        offsety = 0 - Tic.OFFSETDIAG,
+        dirx = Tic.DIRXRG,
+        diry = Tic.DIRYUP,
+    },
+    [Tic.DIR090] = {
+        offsetx = 0 + Tic.OFFSETLINE,
+        offsety = 0 + Tic.OFFSETZERO,
+        dirx = Tic.DIRXRG,
+        diry = Tic.DIRYMD,
+    },
+    [Tic.DIR135] = {
+        offsetx = 0 + Tic.OFFSETDIAG,
+        offsety = 0 + Tic.OFFSETDIAG,
+        dirx = Tic.DIRXRG,
+        diry = Tic.DIRYDW,
+    },
+    [Tic.DIR180] = {
+        offsetx = 0 + Tic.OFFSETZERO,
+        offsety = 0 + Tic.OFFSETLINE,
+        dirx = nil,
+        diry = Tic.DIRYDW,
+    },
+    [Tic.DIR225] = {
+        offsetx = 0 - Tic.OFFSETDIAG,
+        offsety = 0 + Tic.OFFSETDIAG,
+        dirx = Tic.DIRXLF,
+        diry = Tic.DIRYDW,
+    },
+    [Tic.DIR270] = {
+        offsetx = 0 - Tic.OFFSETLINE,
+        offsety = 0 + Tic.OFFSETZERO,
+        dirx = Tic.DIRXLF,
+        diry = Tic.DIRYMD,
+    },
+    [Tic.DIR315] = {
+        offsetx = 0 - Tic.OFFSETDIAG,
+        offsety = 0 - Tic.OFFSETDIAG,
+        dirx = Tic.DIRXLF,
+        diry = Tic.DIRYUP,
+    },
 }
-Tic.DIRXLF = 0 -- x directions -- also the sprite flip
-Tic.DIRXRG = 1
-Tic.DIRYMD = 0 -- y directions -- also the sprite offset
-Tic.DIRYUP = Tic.DIRYMD - 1
-Tic.DIRYDW = Tic.DIRYMD + 1
 
 Tic.STRESSMIN = 0 -- stress handling
 Tic.STRESSMAX = 100
@@ -180,20 +220,20 @@ Tic.KEYS2ACTIONS = {
 
 -- Actions to Functions
 Tic.ACTIONS2FUNCTIONS = {
-    [Tic.ACTIONPLAYERPREV]  = function() Tic:playerPrev()  end,
-    [Tic.ACTIONPLAYERNEXT]  = function() Tic:playerNext()  end,
-    [Tic.ACTIONSTATUSPREV]  = function() Tic:statusPrev()  end,
-    [Tic.ACTIONSTATUSNEXT]  = function() Tic:statusNext()  end,
+    [Tic.ACTIONPLAYERPREV]  = function() Tic:playerPrev() end,
+    [Tic.ACTIONPLAYERNEXT]  = function() Tic:playerNext() end,
+    [Tic.ACTIONSTATUSPREV]  = function() Tic:statusPrev() end,
+    [Tic.ACTIONSTATUSNEXT]  = function() Tic:statusNext() end,
     [Tic.ACTIONSTATUSKNEEL] = function() Tic:statusKneel() end,
     [Tic.ACTIONSTATUSSLEEP] = function() Tic:statusSleep() end,
-    [Tic.ACTIONSDIR000]     = function() Tic:dir000()      end,
-    [Tic.ACTIONSDIR045]     = function() Tic:dir045()      end,
-    [Tic.ACTIONSDIR090]     = function() Tic:dir090()      end,
-    [Tic.ACTIONSDIR135]     = function() Tic:dir135()      end,
-    [Tic.ACTIONSDIR180]     = function() Tic:dir180()      end,
-    [Tic.ACTIONSDIR225]     = function() Tic:dir225()      end,
-    [Tic.ACTIONSDIR270]     = function() Tic:dir270()      end,
-    [Tic.ACTIONSDIR315]     = function() Tic:dir315()      end,
+    [Tic.ACTIONSDIR000]     = function() Tic:direction(Tic.DIR000) end,
+    [Tic.ACTIONSDIR045]     = function() Tic:direction(Tic.DIR045) end,
+    [Tic.ACTIONSDIR090]     = function() Tic:direction(Tic.DIR090) end,
+    [Tic.ACTIONSDIR135]     = function() Tic:direction(Tic.DIR135) end,
+    [Tic.ACTIONSDIR180]     = function() Tic:direction(Tic.DIR180) end,
+    [Tic.ACTIONSDIR225]     = function() Tic:direction(Tic.DIR225) end,
+    [Tic.ACTIONSDIR270]     = function() Tic:direction(Tic.DIR270) end,
+    [Tic.ACTIONSDIR315]     = function() Tic:direction(Tic.DIR315) end,
 }
 
 
@@ -288,26 +328,19 @@ function Tic:statusSleep() -- toggle sleep vs stand
 end
 
 
--- Directions System -- control the directions up, md, dw and so the eyes
-function Tic:dir225()
-    Tic:playerActual().status = (Tic:playerActual().status ~= Tic.STATUSSLEEP)
-        and Tic:playerActual().status
-        or  Tic.STATUSSTAND
-    Tic:playerActual().diry = Tic.DIRYDW
-end
-
-function Tic:dir270()
-    Tic:playerActual().status = (Tic:playerActual().status ~= Tic.STATUSSLEEP)
-        and Tic:playerActual().status
-        or  Tic.STATUSSTAND
-    Tic:playerActual().diry = Tic.DIRYMD
-end
-
-function Tic:dir315(_character)
+-- Directions System -- control the 8 directions depending on status
+function Tic:direction(_direction, _character)
+    if not _direction then return end
     _character = _character or Tic:playerActual()
-    _character.dirx = Tic.DIRXLF
-    _character.diry = Tic.DIRYUP
-    local _status = _character.status
+
+    local _status  = _character.status
+    local _offsets = Tic.DIRS2OFFSETS[_direction]
+    local _offsetx = _offsets.offsetx
+    local _offsety = _offsets.offsety
+    local _dirx    = _offsets.dirx
+    local _diry    = _offsets.diry
+    _character.dirx = (_dirx) and _dirx or _character.dirx
+    _character.diry = (_diry) and _diry or _character.diry
     if _status == Tic.STATUSSLEEP then -- sleep to stand
         _character.status = Tic.STATUSSTAND
         return
@@ -316,17 +349,12 @@ function Tic:dir315(_character)
         _character.status = Tic.STATUSSHIFT
         return
     end
-    -- TODO work
-    local _offsets = Tic.DIRS2OFFSETS[Tic.DIR315] -- move
-    local _offsetx = _offsets.offsetx
-    local _offsety = _offsets.offsety
-    _character.frame = Nums:toggle01(_character.frame)
-    _character.worldx = (_status == Tic.STATUSSHIFT)
-        and _character.worldx + _offsetx -- TODO depends of phy
-        or  _character.worldx + (_offsetx // 2) -- half speed if kneel
-    _character.worldy = (_status == Tic.STATUSSHIFT)
-        and _character.worldy + _offsety -- TODO depends of phy
-        or  _character.worldy + (_offsety // 2) -- half speed if kneel
+    -- TODO block
+    _character.frame = Nums:toggle01(_character.frame) -- move
+    _offsetx = (_status == Tic.STATUSSHIFT) and _offsetx or _offsetx // 2 -- half if kneel
+    _offsety = (_status == Tic.STATUSSHIFT) and _offsety or _offsety // 2 -- half if kneel
+    _character.worldx = _character.worldx + _offsetx -- TODO depends of phy
+    _character.worldy = _character.worldy + _offsety -- TODO depends of phy
 end
 
 
