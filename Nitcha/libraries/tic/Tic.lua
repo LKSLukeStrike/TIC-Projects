@@ -339,13 +339,14 @@ function Tic:direction(_direction, _character)
     local _offsety = _offsets.offsety
     local _dirx    = _offsets.dirx
     local _diry    = _offsets.diry
+    local _oldx    = _character.dirx -- save actual character dirx
     _character.dirx = (_dirx) and _dirx or _character.dirx
     _character.diry = (_diry) and _diry or _character.diry
     if _status == Tic.STATUSSLEEP then -- sleep to stand
         _character.status = Tic.STATUSSTAND
         return
     end
-    if _status == Tic.STATUSSTAND then -- stand to shift
+    if _status == Tic.STATUSSTAND and _character.dirx == _oldx then -- stand to shift -- if same dirx
         _character.status = Tic.STATUSSHIFT
         return
     end
@@ -1409,10 +1410,10 @@ local _statustick01 = 0
 function Tic:draw()
     cls()
 
-    Tic:keysDo(20, 5)
+    Tic:keysDo(20, 10)
     Tic:drawLog()
     -- Tic:drawFrames()
-    Tic:drawDirections()
+    -- Tic:drawDirections()
     Tic:playerActual():drawC()
     Tic:playerActual():drawStatsC(true)
     -- Tic:playerActual():drawPortraitC(true, true, true)
