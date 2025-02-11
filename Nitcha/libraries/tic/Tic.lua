@@ -419,7 +419,7 @@ function Tic:print(_screenx, _screeny, ...) -- print with multiple args
         _val = Tic:val2string(_val)
         _output = _output.._val.." "
     end
-    print( _output, _screenx, _screeny)
+    print( _output, _screenx, _screeny, Tic.COLORGREYM, true)
 end
 
 
@@ -746,7 +746,7 @@ CCharacter.POSTURESETTINGS = { -- postures settings
         frame = nil, -- nil use self.frame
     },
     [CCharacter.POSTUREKNEEL] = {
-        bodyspriteoffset = 3,
+        bodyspriteoffset = 6,
         bodyxoffset = 0,
         bodyyoffset = 0,
         headxoffset = 0,
@@ -1432,6 +1432,8 @@ function Tic:drawLog()
     end
     local _status  = Tic:playerActual().status
     local _posture = Tic.STATUSSETTINGS[_status].posture
+    local _dirx  = Tic:playerActual().dirx
+    local _diry  = Tic:playerActual().diry
 
     Tic:logStack("K01:", peek(Tic.KEYBOARDKEYS + 0))
     Tic:logStack("K02:", peek(Tic.KEYBOARDKEYS + 1))
@@ -1443,12 +1445,12 @@ function Tic:drawLog()
     Tic:logStack("PSY:", Tic:playerActual().statpsyact, "/", Tic:playerActual().statpsymax)
     Tic:logStack("TOT:", Tic:playerActual().statphyact + Tic:playerActual().statmenact + Tic:playerActual().statpsyact)
     Tic:logStack("")
-    Tic:logStack("")
-    Tic:logStack("")
-    Tic:logStack("T60:", _tick60)
-    Tic:logStack("FRM:", _frame)
     Tic:logStack("STA:", _status)
     Tic:logStack("POS:", _posture)
+    Tic:logStack("DIX:", _dirx)
+    Tic:logStack("DIY:", _diry)
+    Tic:logStack("T60:", _tick60)
+    Tic:logStack("FRM:", _frame)
     Tic:logStack("T00:", _tick00)
 
     Tic:logPrint()

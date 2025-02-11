@@ -6,6 +6,23 @@
 - ?R? recover ?
 ---
 ````mermaid
+flowchart LR
+    ssl<--(M)-->ssr
+    ssl--(M)-->sml
+    sml--(I)-->ssl
+    ssr--(M)-->smr
+    smr--(I)-->ssr
+    ksl<--(M)-->ksr
+    
+    ksl--(M)-->kml
+    kml--(I)-->ksl
+    ksr--(M)-->kmr
+    kmr--(I)-->ksr
+    ssl<--(K)-->ksl
+    ssr<--(K)-->ksr
+````
+---
+````mermaid
 %% flowchart TB
 %%     WOUND(Wound)
 %%     SLEEP(Sleep)
