@@ -6,14 +6,27 @@
 - ?R? recover ?
 ---
 ````mermaid
-flowchart LR
+flowchart TB
+    ssi(STANDIDLE)
+    ssw(STANDWORK)
+    ssm(STANDMOVE)
+    ski(KNEELIDLE)
+    skw(KNEELWORK)
+    skm(KNEELMOVE)
+    sds(DOWNSLEEP)
+
+    ssi--(K)-->ski
+    ski--(K)-->ssi
+    ssi--(S)-->sds
+    ski--(S)-->sds
+
     ssl<--(M)-->ssr
     ssl--(M)-->sml
     sml--(I)-->ssl
     ssr--(M)-->smr
     smr--(I)-->ssr
     ksl<--(M)-->ksr
-    
+
     ksl--(M)-->kml
     kml--(I)-->ksl
     ksr--(M)-->kmr
