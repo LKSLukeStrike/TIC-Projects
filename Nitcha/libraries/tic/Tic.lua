@@ -190,7 +190,7 @@ Tic.ACTIONPLAYERPREV  = "playerPrev"
 Tic.ACTIONPLAYERNEXT  = "playerNext"
 Tic.ACTIONSTATEPREV   = "statePrev"
 Tic.ACTIONSTATENEXT   = "stateNext"
-Tic.ACTIONSTATEKNEEL  = "stateKneel"
+Tic.ACTIONSTATEWORK   = "stateWork"
 Tic.ACTIONSTATEKNEEL  = "stateKneel"
 Tic.ACTIONSTATESLEEP  = "stateSleep"
 Tic.ACTIONSDIR000     = "dir000"
@@ -226,16 +226,17 @@ Tic.ACTIONS2FUNCTIONS = {
     [Tic.ACTIONPLAYERNEXT]  = function() Tic:playerNext() end,
     [Tic.ACTIONSTATEPREV]   = function() Tic:statePrev() end,
     [Tic.ACTIONSTATENEXT]   = function() Tic:stateNext() end,
+    [Tic.ACTIONSTATEWORK]   = function() Tic:stateWork() end,
     [Tic.ACTIONSTATEKNEEL]  = function() Tic:stateKneel() end,
     [Tic.ACTIONSTATESLEEP]  = function() Tic:stateSleep() end,
-    [Tic.ACTIONSDIR000]     = function() Tic:direction(Tic.DIR000) end,
-    [Tic.ACTIONSDIR045]     = function() Tic:direction(Tic.DIR045) end,
-    [Tic.ACTIONSDIR090]     = function() Tic:direction(Tic.DIR090) end,
-    [Tic.ACTIONSDIR135]     = function() Tic:direction(Tic.DIR135) end,
-    [Tic.ACTIONSDIR180]     = function() Tic:direction(Tic.DIR180) end,
-    [Tic.ACTIONSDIR225]     = function() Tic:direction(Tic.DIR225) end,
-    [Tic.ACTIONSDIR270]     = function() Tic:direction(Tic.DIR270) end,
-    [Tic.ACTIONSDIR315]     = function() Tic:direction(Tic.DIR315) end,
+    [Tic.ACTIONSDIR000]     = function() Tic:move(Tic.DIR000) end,
+    [Tic.ACTIONSDIR045]     = function() Tic:move(Tic.DIR045) end,
+    [Tic.ACTIONSDIR090]     = function() Tic:move(Tic.DIR090) end,
+    [Tic.ACTIONSDIR135]     = function() Tic:move(Tic.DIR135) end,
+    [Tic.ACTIONSDIR180]     = function() Tic:move(Tic.DIR180) end,
+    [Tic.ACTIONSDIR225]     = function() Tic:move(Tic.DIR225) end,
+    [Tic.ACTIONSDIR270]     = function() Tic:move(Tic.DIR270) end,
+    [Tic.ACTIONSDIR315]     = function() Tic:move(Tic.DIR315) end,
 }
 
 
@@ -342,12 +343,22 @@ end
 
 function Tic:stateKneel(_character) -- toggle stand vs kneel
     _character = _character or Tic:playerActual()
-    _character.state = (_character.state == Tic.STATESTANDIDLE)
-        and Tic.STATEKNEELIDLE
-        or  Tic.STATESTANDIDLE
+    local _state = _character.state
+    local _statesettings = Tic.STATESETTINGS[_state]
+    local _posture = _statesettings.posture
+    local _status  = _statesettings.status
+    if _posture == Tic.POSTURESTAND then
+        _posture = Tic.POSTUREKNEEL
+    elseif _posture == Tic.POSTUREKNEEL then
+        _posture = Tic.POSTURESTAND
+    elseif _posture == Tic.POSTUREFLOOR and _status == Tic.STATUSSLEEP then
+        _posture = Tic.POSTUREKNEEL
+        _status = Tic.STATUSIDLE
+    end
+    _character.state = _posture.._status
 end
 
-function Tic:stateSleep(_character) -- toggle sleep vs stand
+function Tic:stateSleep(_character) -- toggle stand vs sleep
     _character = _character or Tic:playerActual()
     Tic:playerActual().state = (Tic:playerActual().state == Tic.STATEFLOORSLEEP)
         and Tic.STATESTANDIDLE
@@ -355,8 +366,8 @@ function Tic:stateSleep(_character) -- toggle sleep vs stand
 end
 
 
--- Directions System -- control the 8 directions depending on status
-function Tic:direction(_direction, _character)
+-- Directions System -- move to 8 directions depending on status
+function Tic:move(_direction, _character)
     if not _direction then return end
     _character = _character or Tic:playerActual()
 
@@ -373,11 +384,11 @@ function Tic:direction(_direction, _character)
         _character.state = Tic.STATESTANDIDLE
         return
     end
-    if _state == Tic.STATESTANDIDLE and _character.dirx == _oldx then -- stand to shift -- if same dirx
+    if _state == Tic.STATESTANDIDLE and _character.dirx == _oldx then -- idle to move -- if same dirx
         _character.state = Tic.STATESTANDMOVE
         return
     end
-    -- TODO block
+    -- TODO work
     _character.frame = Nums:toggle01(_character.frame) -- move
     _offsetx = (_state == Tic.STATESTANDMOVE) and _offsetx or _offsetx // 2 -- half if kneel
     _offsety = (_state == Tic.STATESTANDMOVE) and _offsety or _offsety // 2 -- half if kneel
