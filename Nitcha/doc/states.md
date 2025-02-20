@@ -19,6 +19,10 @@ flowchart TB
     ski--(K)-->ssi
     ssi--(S)-->sds
     ski--(S)-->sds
+````
+---
+````mermaid
+flowchart TB
 
     ssl<--(M)-->ssr
     ssl--(M)-->sml
