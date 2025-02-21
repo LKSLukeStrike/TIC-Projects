@@ -443,6 +443,7 @@ function Tic:move(_direction, _character)
     _character.worldx = _character.worldx + _offsetx
     _character.worldy = _character.worldy + _offsety
     _character.state = _posture..Tic.STATUSMOVE
+    _character.idlecycler:min() -- reset the idle cycler
 end
 
 function Tic:stat(_action, _stat, _value, _character) -- modify a stat -- set/dec/inc
@@ -957,6 +958,7 @@ function CCharacter:new(_argt)
     self.dirx         = Tic.DIRXLF -- directions
     self.diry         = Tic.DIRYMD
     self.state        = Tic.STATESTANDIDLE -- state
+    self.idlecycler   = CCyclerInt{maxindex = 59, mode = CCycler.MODEBLOCK,} -- cycler to get back to idle
     self.colorhairsfg = Tic.COLORHAIRSFG -- colors
     self.colorhairsbg = Tic.COLORHAIRSBG
     self.colorextra   = Tic.COLOREXTRA
@@ -1495,19 +1497,21 @@ local _statustick01 = 0
 function Tic:draw()
     cls()
 
-    -- local _state   = _playeractual.state
-    -- local _posture = Tic.STATESETTINGS[_state].posture
-    -- local _status  = Tic.STATESETTINGS[_state].status
-    -- if _status == Tic.STATUSMOVE then
-    --     _playeractual.state = _posture..Tic.STATUSIDLE
-    -- end
+    local _playeractual = Tic:playerActual()
+    local _idlecycler  = _playeractual.idlecycler
+
+    _idlecycler:next()
     Tic:keysDo(20, 10)
+    local _state   = _playeractual.state
+    local _posture = Tic.STATESETTINGS[_state].posture
+    _playeractual.state = (_posture ~= Tic.POSTUREFLOOR and _idlecycler.actvalue == _idlecycler.maxindex)
+        and _posture..Tic.STATUSIDLE
+        or  _playeractual.state
 
     -- Tic:drawFrames()
     -- Tic:drawDirections()
     Tic:drawLog()
 
-    local _playeractual = Tic:playerActual()
     _playeractual:drawC()
     _playeractual:drawStatsC(true)
     _playeractual:drawPortraitC(nil, true, true)
@@ -1534,24 +1538,24 @@ function Tic:drawLog()
     -- Tic:logStack("K02:", peek(Tic.KEYBOARDKEYS + 1))
     -- Tic:logStack("K03:", peek(Tic.KEYBOARDKEYS + 2))
     -- Tic:logStack("K04:", peek(Tic.KEYBOARDKEYS + 3))
-    -- Tic:logStack("")
+    -- Tic:logStack()
     Tic:logStack("PHY:", _playeractual.statphyact, "/", _playeractual.statphymax)
     Tic:logStack("MEN:", _playeractual.statmenact, "/", _playeractual.statmenmax)
     Tic:logStack("PSY:", _playeractual.statpsyact, "/", _playeractual.statpsymax)
     Tic:logStack("TOT:", _playeractual.statphyact + _playeractual.statmenact + _playeractual.statpsyact)
-    Tic:logStack("")
+    Tic:logStack()
     Tic:logStack("STA:", _state)
     Tic:logStack("POS:", _posture)
     Tic:logStack("STS:", _status)
     Tic:logStack("DIX:", _dirx)
     Tic:logStack("DIY:", _diry)
-    Tic:logStack("")
+    Tic:logStack()
     Tic:logStack("T60:", _tick60)
     Tic:logStack("FRM:", _frame)
     Tic:logStack("T00:", _tick00)
-    Tic:logStack("")
-    Tic:logStack("WOX:", _playeractual.worldx)
-    Tic:logStack("WOY:", _playeractual.worldy)
+    Tic:logStack()
+    Tic:logStack("IDL:", _playeractual.idlecycler.actvalue)
+    Tic:logStack()
 
     Tic:logPrint()
 end
