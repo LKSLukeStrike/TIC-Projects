@@ -1495,14 +1495,22 @@ local _statustick01 = 0
 function Tic:draw()
     cls()
 
+    -- local _state   = _playeractual.state
+    -- local _posture = Tic.STATESETTINGS[_state].posture
+    -- local _status  = Tic.STATESETTINGS[_state].status
+    -- if _status == Tic.STATUSMOVE then
+    --     _playeractual.state = _posture..Tic.STATUSIDLE
+    -- end
     Tic:keysDo(20, 10)
-    Tic:drawLog()
+
     -- Tic:drawFrames()
     -- Tic:drawDirections()
-    Tic:playerActual():drawC()
-    Tic:playerActual():drawStatsC(true)
-    -- Tic:playerActual():drawPortraitC(true, true, true)
-    Tic:playerActual():drawPortraitC(nil, true, true)
+    Tic:drawLog()
+
+    local _playeractual = Tic:playerActual()
+    _playeractual:drawC()
+    _playeractual:drawStatsC(true)
+    _playeractual:drawPortraitC(nil, true, true)
 
     Tic:tick() -- /!\ required in the draw function 
 end
@@ -1515,21 +1523,22 @@ function Tic:drawLog()
     if Nums:frequence01(_tick00, Tic.FREQUENCE240) ~= _statustick01 then
         _statustick01 = Nums:frequence01(_tick00, Tic.FREQUENCE240)
     end
-    local _state   = Tic:playerActual().state
+    local _playeractual = Tic:playerActual()
+    local _state   = _playeractual.state
     local _posture = Tic.STATESETTINGS[_state].posture
     local _status  = Tic.STATESETTINGS[_state].status
-    local _dirx  = Tic:playerActual().dirx
-    local _diry  = Tic:playerActual().diry
+    local _dirx    = _playeractual.dirx
+    local _diry    = _playeractual.diry
 
     -- Tic:logStack("K01:", peek(Tic.KEYBOARDKEYS + 0))
     -- Tic:logStack("K02:", peek(Tic.KEYBOARDKEYS + 1))
     -- Tic:logStack("K03:", peek(Tic.KEYBOARDKEYS + 2))
     -- Tic:logStack("K04:", peek(Tic.KEYBOARDKEYS + 3))
     -- Tic:logStack("")
-    Tic:logStack("PHY:", Tic:playerActual().statphyact, "/", Tic:playerActual().statphymax)
-    Tic:logStack("MEN:", Tic:playerActual().statmenact, "/", Tic:playerActual().statmenmax)
-    Tic:logStack("PSY:", Tic:playerActual().statpsyact, "/", Tic:playerActual().statpsymax)
-    Tic:logStack("TOT:", Tic:playerActual().statphyact + Tic:playerActual().statmenact + Tic:playerActual().statpsyact)
+    Tic:logStack("PHY:", _playeractual.statphyact, "/", _playeractual.statphymax)
+    Tic:logStack("MEN:", _playeractual.statmenact, "/", _playeractual.statmenmax)
+    Tic:logStack("PSY:", _playeractual.statpsyact, "/", _playeractual.statpsymax)
+    Tic:logStack("TOT:", _playeractual.statphyact + _playeractual.statmenact + _playeractual.statpsyact)
     Tic:logStack("")
     Tic:logStack("STA:", _state)
     Tic:logStack("POS:", _posture)
@@ -1541,8 +1550,8 @@ function Tic:drawLog()
     Tic:logStack("FRM:", _frame)
     Tic:logStack("T00:", _tick00)
     Tic:logStack("")
-    Tic:logStack("WOX:", Tic:playerActual().worldx)
-    Tic:logStack("WOY:", Tic:playerActual().worldy)
+    Tic:logStack("WOX:", _playeractual.worldx)
+    Tic:logStack("WOY:", _playeractual.worldy)
 
     Tic:logPrint()
 end
@@ -1558,8 +1567,9 @@ end
 
 function Tic:drawDirections()
     local _drawcolor = Tic.COLORGREYD
-    local _screenx = Tic:playerActual().screenx
-    local _screeny = Tic:playerActual().screeny
+    local _playeractual = Tic:playerActual()
+    local _screenx = _playeractual.screenx
+    local _screeny = _playeractual.screeny
     circb(_screenx, _screeny, 10, _drawcolor)
     for _, _offsets in pairs(Tic.DIRS2OFFSETS) do
         line(_screenx, _screeny, _screenx + _offsets.offsetx, _screeny + _offsets.offsety, _drawcolor)

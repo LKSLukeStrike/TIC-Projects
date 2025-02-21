@@ -20,7 +20,8 @@ CCycler.ACTINDEX = CCycler.MININDEX
 CCycler.ACTVALUE = CCycler.ACTINDEX
 CCycler.STEPNEXT =  1
 CCycler.STEPPREV = -1
-CCycler.MODELOOP = 1 -- go from max to min and from min to max
+CCycler.MODECYCLE = "cycle" -- go from max to min and from min to max
+CCycler.MODEBLOCK = "block" -- block at min and max
 -- TODO more modes
 -- TODO adjust min and max indexes if any
 function CCycler:new(_argt)
@@ -31,28 +32,44 @@ function CCycler:new(_argt)
     self.actvalue = CCycler.ACTVALUE
     self.stepnext = CCycler.STEPNEXT
     self.stepprev = CCycler.STEPPREV
-    self.mode     = CCycler.MODELOOP
+    self.mode     = CCycler.MODECYCLE
     self:_argt(_argt) -- override if any
 end
 
-function CCycler:next() -- next cycler value
-    local _newindex = self.actindex + self.stepnext
-    if self.mode == CCycler.MODELOOP then
-        self.actindex = Nums:isBW(_newindex, self.minindex, self.maxindex) and _newindex or self.minindex
-        self.actvalue = self.actindex -- value = index by default
-        return self.actvalue
-    end
-    -- TODO add more modes
+function CCycler:min() -- min cycler value
+    self.actindex = self.minindex
+    self.actvalue = self.actindex -- value = index by default
+    return self.actvalue
+end
+
+function CCycler:max() -- max cycler value
+    self.actindex = self.maxindex
+    self.actvalue = self.actindex -- value = index by default
+    return self.actvalue
 end
 
 function CCycler:prev() -- prev cycler value
     local _newindex = self.actindex + self.stepprev
-    if self.mode == CCycler.MODELOOP then
+    if self.mode == CCycler.MODECYCLE then
         self.actindex = Nums:isBW(_newindex, self.minindex, self.maxindex) and _newindex or self.maxindex
-        self.actvalue = self.actindex -- value = index by default
-        return self.actvalue
+    elseif self.mode == CCycler.MODEBLOCK then
+        self.actindex = Nums:isBW(_newindex, self.minindex, self.maxindex) and _newindex or self.minindex
     end
     -- TODO add more modes
+    self.actvalue = self.actindex -- value = index by default
+    return self.actvalue
+end
+
+function CCycler:next() -- next cycler value
+    local _newindex = self.actindex + self.stepnext
+    if self.mode == CCycler.MODECYCLE then
+        self.actindex = Nums:isBW(_newindex, self.minindex, self.maxindex) and _newindex or self.minindex
+    elseif self.mode == CCycler.MODEBLOCK then
+        self.actindex = Nums:isBW(_newindex, self.minindex, self.maxindex) and _newindex or self.maxindex
+    end
+    -- TODO add more modes
+    self.actvalue = self.actindex -- value = index by default
+    return self.actvalue
 end
 
 
@@ -60,6 +77,7 @@ CCyclerNum = CCycler:extend() -- numeric cyclers
 function CCyclerNum:new(_argt)
     CCyclerNum.super.new(self, _argt)
     self:_argt(_argt) -- override if any
+    return self.actvalue
 end
 
 
@@ -67,6 +85,7 @@ CCyclerInt = CCyclerNum:extend() -- integer cyclers
 function CCyclerInt:new(_argt)
     CCyclerInt.super.new(self, _argt)
     self:_argt(_argt) -- override if any
+    return self.actvalue
 end
 
 
@@ -119,14 +138,14 @@ function CCyclerTable:remove(_at) -- remove an item from table _at (end by defau
     -- TODO
 end
 
-function CCyclerTable:next() -- next cycler value
-    CCyclerTable.super.next(self)
+function CCyclerTable:prev() -- ^rev cycler value
+    CCyclerTable.super.prev(self)
     self.actvalue = self.acttable[self.actindex]
     return self.actvalue
 end
 
-function CCyclerTable:prev() -- ^rev cycler value
-    CCyclerTable.super.prev(self)
+function CCyclerTable:next() -- next cycler value
+    CCyclerTable.super.next(self)
     self.actvalue = self.acttable[self.actindex]
     return self.actvalue
 end
