@@ -673,7 +673,6 @@ end
 -- CEntity
 --
 local CEntity = Classic:extend() -- general entities like places, objects, characters ...
-CEntity:implement(CSprite)
 CEntity.NAMENOBODY = "Nobody" -- default name
 CEntity.KINDENTITY = "Entity" -- default kind
 CEntity.WORLDX = 0
@@ -692,18 +691,47 @@ end
 -- CCamera
 --
 local CCamera = CEntity:extend() -- camera
+CEntity.NAMECAMERA = "Camera" -- camera name
+CEntity.KINDCAMERA = "Camera" -- camera kind
+function CCamera:new(_argt)
+    CCamera.super.new(self, _argt)
+    self.name = CEntity.NAMECAMERA
+    self.kind = CEntity.KINDCAMERA
+    self:_argt(_argt) -- override if any
+end
+
+function CCamera:focusXY(_worldx, _worldy) -- focus camera on world positions -- default to center
+    _worldx = _worldx or 0
+    _worldy = _worldy or 0
+    self.worldx = _worldx
+    self.worldy = _worldy
+end
+
+function CCamera:focusCharacter(_character) -- focus camera on a character world positions
+    if not _character then return end
+    self:focusXY(_character.worldx, _character.worldy)
+end
+
+
+--
+-- CPlace
+--
+local CPlace = CEntity:extend() -- places
+CPlace:implement(CSprite)
 
 
 --
 -- CObject
 --
 local CObject = CEntity:extend() -- objects
+CObject:implement(CSprite)
 
 
 --
 -- CCharacter
 --
 local CCharacter = CEntity:extend() -- characters
+CCharacter:implement(CSprite)
 CCharacter.SIZEL = 0 -- character sizes -- for the head sprite y offset
 CCharacter.SIZEM = 1
 CCharacter.SIZES = 2
@@ -902,7 +930,7 @@ Tic.STATUSSETTINGS = { -- statuses settings
         palette1 = {[Tic.COLORRED] = Tic.COLORPURPLE, [Tic.COLORPURPLE] = Tic.COLORRED,},
      },
 }
-CEntity.KINDCHARACTER = "Character" -- Character kind
+CEntity.KINDCHARACTER = "Character" -- character kind
 function CCharacter:new(_argt)
     CCharacter.super.new(self, _argt)
     self.kind         = CEntity.KINDCHARACTER -- kind
@@ -1144,7 +1172,7 @@ end
 -- CCharacterHumanoid
 --
 local CCharacterHumanoid = CCharacter:extend() -- humanoid characters
-CEntity.KINDHUMANOID = "Humanoid" -- Humanoid kind
+CEntity.KINDHUMANOID = "Humanoid" -- humanoid kind
 function CCharacterHumanoid:new(_argt)
     CCharacterHumanoid.super.new(self, _argt)
     self.kind         = CEntity.KINDHUMANOID -- kind
@@ -1278,8 +1306,8 @@ function CPlayerHumanoid:new(_argt)
 end
 
 
-local CPlayerDwarf = CPlayerHumanoid:extend() -- Dwarf player characters
-CEntity.KINDDWARF = "Dwarf" -- Dwarf kind
+local CPlayerDwarf = CPlayerHumanoid:extend() -- dwarf player characters
+CEntity.KINDDWARF = "Dwarf" -- dwarf kind
 function CPlayerDwarf:new(_argt)
     CPlayerDwarf.super.new(self, _argt)
     self.kind         = CEntity.KINDDWARF -- kind
@@ -1297,8 +1325,8 @@ function CPlayerDwarf:new(_argt)
 end
 
 
-local CPlayerGnome = CPlayerHumanoid:extend() -- Gnome player characters
-CEntity.KINDGNOME = "Gnome" -- Gnome kind
+local CPlayerGnome = CPlayerHumanoid:extend() -- gnome player characters
+CEntity.KINDGNOME = "Gnome" -- gnome kind
 function CPlayerGnome:new(_argt)
     CPlayerGnome.super.new(self, _argt)
     self.kind         = CEntity.KINDGNOME -- kind
@@ -1317,8 +1345,8 @@ function CPlayerGnome:new(_argt)
 end
 
 
-local CPlayerDrowe = CPlayerHumanoid:extend() -- Drowe player characters
-CEntity.KINDDROWE = "Drowe" -- Drowe kind
+local CPlayerDrowe = CPlayerHumanoid:extend() -- drowe player characters
+CEntity.KINDDROWE = "Drowe" -- drowe kind
 function CPlayerDrowe:new(_argt)
     CPlayerDrowe.super.new(self, _argt)
     self.kind         = CEntity.KINDDROWE -- kind
@@ -1336,8 +1364,8 @@ function CPlayerDrowe:new(_argt)
 end
 
 
-local CPlayerAngel = CPlayerHumanoid:extend() -- Angel player characters
-CEntity.KINDANGEL = "Angel" -- Angel kind
+local CPlayerAngel = CPlayerHumanoid:extend() -- angel player characters
+CEntity.KINDANGEL = "Angel" -- angel kind
 function CPlayerAngel:new(_argt)
     CPlayerAngel.super.new(self, _argt)
     self.kind         = CEntity.KINDANGEL -- kind
@@ -1356,8 +1384,8 @@ function CPlayerAngel:new(_argt)
 end
 
 
-local CPlayerGogol = CPlayerHumanoid:extend() -- Gogol player characters
-CEntity.KINDGOGOL = "Gogol" -- Gogol kind
+local CPlayerGogol = CPlayerHumanoid:extend() -- gogol player characters
+CEntity.KINDGOGOL = "Gogol" -- gogol kind
 function CPlayerGogol:new(_argt)
     CPlayerGogol.super.new(self, _argt)
     self.kind         = CEntity.KINDGOGOL -- kind
@@ -1378,8 +1406,8 @@ function CPlayerGogol:new(_argt)
 end
 
 
-local CPlayerHorne = CPlayerHumanoid:extend() -- Horne player characters
-CEntity.KINDHORNE = "Horne" -- Horne kind
+local CPlayerHorne = CPlayerHumanoid:extend() -- horne player characters
+CEntity.KINDHORNE = "Horne" -- horne kind
 function CPlayerHorne:new(_argt)
     CPlayerHorne.super.new(self, _argt)
     self.kind         = CEntity.KINDHORNE -- kind
@@ -1399,8 +1427,8 @@ function CPlayerHorne:new(_argt)
 end
 
 
-local CPlayerDemon = CPlayerHorne:extend() -- Demon player characters
-CEntity.KINDDEMON = "Demon" -- Demon kind
+local CPlayerDemon = CPlayerHorne:extend() -- demon player characters
+CEntity.KINDDEMON = "Demon" -- demon kind
 function CPlayerDemon:new(_argt)
     CPlayerDemon.super.new(self, _argt)
     self.kind         = CEntity.KINDDEMON -- kind
@@ -1414,8 +1442,8 @@ function CPlayerDemon:new(_argt)
 end
 
 
-local CPlayerTifel = CPlayerHorne:extend() -- Tifel player characters
-CEntity.KINDTIFEL = "Tifel" -- Tifel kind
+local CPlayerTifel = CPlayerHorne:extend() -- tifel player characters
+CEntity.KINDTIFEL = "Tifel" -- tifel kind
 function CPlayerTifel:new(_argt)
     CPlayerTifel.super.new(self, _argt)
     self.kind         = CEntity.KINDTIFEL -- kind
@@ -1430,8 +1458,8 @@ function CPlayerTifel:new(_argt)
 end
 
 
-local CPlayerMeduz = CPlayerHumanoid:extend() -- Meduz player characters
-CEntity.KINDMEDUZ = "Meduz" -- Meduz kind
+local CPlayerMeduz = CPlayerHumanoid:extend() -- meduz player characters
+CEntity.KINDMEDUZ = "Meduz" -- meduz kind
 function CPlayerMeduz:new(_argt)
     CPlayerMeduz.super.new(self, _argt)
     self.kind         = CEntity.KINDMEDUZ -- kind
@@ -1449,8 +1477,8 @@ function CPlayerMeduz:new(_argt)
 end
 
 
-local CPlayerGnoll = CPlayerHumanoid:extend() -- Gnoll player characters
-CEntity.KINDGNOLL = "Gnoll" -- Gnoll kind
+local CPlayerGnoll = CPlayerHumanoid:extend() -- gnoll player characters
+CEntity.KINDGNOLL = "Gnoll" -- gnoll kind
 function CPlayerGnoll:new(_argt)
     CPlayerGnoll.super.new(self, _argt)
     self.kind         = CEntity.KINDGNOLL -- kind
@@ -1468,8 +1496,8 @@ function CPlayerGnoll:new(_argt)
 end
 
 
-local CPlayerWolfe = CPlayerGnoll:extend() -- Wolfe player characters
-CEntity.KINDWOLFE = "Wolfe" -- Wolfe kind
+local CPlayerWolfe = CPlayerGnoll:extend() -- wolfe player characters
+CEntity.KINDWOLFE = "Wolfe" -- wolfe kind
 function CPlayerWolfe:new(_argt)
     CPlayerWolfe.super.new(self, _argt)
     self.kind         = CEntity.KINDWOLFE -- kind
@@ -1484,9 +1512,10 @@ local CEnnemy = CCharacter:extend() -- ennemy characters
 
 
 
+--
 -- Characters
-local Truduk = CPlayerDwarf{name = "Truduk",
-}
+--
+local Truduk = CPlayerDwarf{name = "Truduk",}
 local Prinnn = CPlayerGnome{name = "Prinnn",
     coloreyesbg  = Tic.COLORRED,
     coloreyesfg  = Tic.COLORORANGE,
@@ -1521,6 +1550,11 @@ local Golith = CPlayerGogol{name = "Golith",}
 local Wulfie = CPlayerWolfe{name = "Wulfie",
     colorextra = Tic.COLORRED,
 }
+
+
+--
+-- Sprites -- TESTING
+--
 local SpriteSFB = CSpriteFGBoard{
     screenx = Tic.SCREENW // 2,
     screeny = Tic.SCREENH // 2,
@@ -1550,8 +1584,15 @@ local SpriteFG = CSpriteFG{
 }
 
 
+--
+-- Camera
+--
+local Camera = CCamera{}
 
+
+--
 -- Drawing
+--
 local _statustick01 = 0
 function Tic:draw()
     cls()
@@ -1573,7 +1614,9 @@ function Tic:draw()
                 and _posture..Tic.STATUSIDLE
                 or  _playeractual.state
         end
-    end  
+    end
+
+    Camera:focusCharacter(_playeractual)
 
     -- Tic:drawFrames()
     -- Tic:drawDirections()
@@ -1620,9 +1663,9 @@ function Tic:drawLog()
     Tic:logStack("T60:", _tick60)
     Tic:logStack("FRM:", _frame)
     Tic:logStack("T00:", _tick00)
-    Tic:logStack()
     Tic:logStack("IDL:", _playeractual.idlecycler.actvalue)
-    Tic:logStack()
+    Tic:logStack("CAX:", Camera.worldx)
+    Tic:logStack("CAY:", Camera.worldy)
 
     Tic:logPrint()
 end
