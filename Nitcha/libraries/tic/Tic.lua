@@ -348,102 +348,41 @@ Tic.STATES = CCyclerTable{acttable = { -- all available states
 
 function Tic:statePrev(_character) -- prev state in the stack
     _character = _character or Tic:playerActual()
-    _character.state = Tic.STATES:prev()
+    if not _character then return end
+    _character:statePrev()
 end
 
 function Tic:stateNext(_character) -- next state in the stack
     _character = _character or Tic:playerActual()
-    _character.state = Tic.STATES:next()
+    if not _character then return end
+    _character:stateNext()
 end
 
 function Tic:toggleWork(_character) -- toggle idle/move vs work
     _character = _character or Tic:playerActual()
-    local _state = _character.state
-    local _statesettings = Tic.STATESETTINGS[_state]
-    local _posture = _statesettings.posture
-    local _status  = _statesettings.status
-    if _posture == Tic.POSTUREFLOOR then return end -- cannot toggle work
-    _status = (_status == Tic.STATUSWORK)
-        and Tic.STATUSIDLE
-        or  Tic.STATUSWORK
-    _character.state = _posture.._status
+    if not _character then return end
+    _character:toggleWork()
 end
 
 function Tic:toggleKneel(_character) -- toggle stand vs kneel
     _character = _character or Tic:playerActual()
-    local _state = _character.state
-    local _statesettings = Tic.STATESETTINGS[_state]
-    local _posture = _statesettings.posture
-    local _status  = _statesettings.status
-    if _posture == Tic.POSTUREFLOOR and _status ~= Tic.STATUSSLEEP then return end -- cannot toggle sleep
-    if _posture == Tic.POSTURESTAND then
-        _posture = Tic.POSTUREKNEEL
-    elseif _posture == Tic.POSTUREKNEEL then
-        _posture = Tic.POSTURESTAND
-    elseif _posture == Tic.POSTUREFLOOR then -- sleeping
-        _posture = Tic.POSTUREKNEEL
-        _status = Tic.STATUSIDLE
-    end
-    _character.state = _posture.._status
+    if not _character then return end
+    _character:toggleKneel()
 end
 
 function Tic:toggleSleep(_character) -- toggle stand vs sleep
     _character = _character or Tic:playerActual()
-    local _state = _character.state
-    local _statesettings = Tic.STATESETTINGS[_state]
-    local _posture = _statesettings.posture
-    local _status  = _statesettings.status
-    if _posture == Tic.POSTUREFLOOR and _status ~= Tic.STATUSSLEEP then return end -- cannot toggle sleep
-    _state = (_state == Tic.STATEFLOORSLEEP)
-        and Tic.STATESTANDIDLE
-        or  Tic.STATEFLOORSLEEP
-    _character.state = _state
+    if not _character then return end
+    _character:toggleSleep()
 end
 
 
 -- Directions System -- move to 8 directions depending on status
 function Tic:move(_direction, _character)
-    if not _direction then return end -- mandatory
     _character = _character or Tic:playerActual()
-    local _state = _character.state
-    local _statesettings = Tic.STATESETTINGS[_state]
-    local _posture = _statesettings.posture
-    local _status  = _statesettings.status
-    local _offsets = Tic.DIRS2OFFSETS[_direction]
-    local _offsetx = _offsets.offsetx
-    local _offsety = _offsets.offsety
-    local _dirx    = _offsets.dirx
-    local _diry    = _offsets.diry
-    local _oldx    = _character.dirx -- save actual character dirx
-    _character.dirx = (_dirx) and _dirx or _character.dirx -- adjust dirx and diry
-    _character.diry = (_diry) and _diry or _character.diry
-    if _posture == Tic.POSTUREFLOOR and _status ~= Tic.STATUSSLEEP then return end -- cannot move
-    if _state == Tic.STATEFLOORSLEEP then -- sleep to stand
-        _character.state = Tic.STATESTANDIDLE
-        return
-    end
-    if _status == Tic.STATUSWORK then -- interrupt work and goes to idle
-        _character.state = _posture..Tic.STATUSIDLE
-        return
-    end
-    if _status == Tic.STATUSIDLE and _character.dirx ~= _oldx then -- simply change dirx
-        return
-    end
-    if _status == Tic.STATUSMOVE and _character.dirx ~= _oldx then -- change dirx and goes to idle
-        _character.state = _posture..Tic.STATUSIDLE
-        return
-    end
-    _character.frame = Nums:toggle01(_character.frame) -- animate continuous move in the same dirx
-    _offsetx = _offsetx * (_character.statphyact / Tic.STATSMAX) -- depends of phy act
-    _offsety = _offsety * (_character.statphyact / Tic.STATSMAX)
-    _offsetx = (_posture == Tic.POSTURESTAND) and _offsetx or _offsetx / 2 -- half if kneel
-    _offsety = (_posture == Tic.POSTURESTAND) and _offsety or _offsety / 2 -- half if kneel
-    _offsetx = (_offsetx < 0) and math.ceil(_offsetx) or math.floor(_offsetx)
-    _offsety = (_offsety < 0) and math.ceil(_offsety) or math.floor(_offsety)
-    _character.worldx = _character.worldx + _offsetx
-    _character.worldy = _character.worldy + _offsety
-    _character.state = _posture..Tic.STATUSMOVE
-    _character.idlecycler:min() -- reset the idle cycler
+    if not _character then return end
+    if not _direction then return end
+    _character:move(_direction)
 end
 
 function Tic:stat(_action, _stat, _value, _character) -- modify a stat -- set/dec/inc
@@ -588,7 +527,7 @@ end
 
 
 --
--- Sprite
+-- CSprite
 --
 local CSprite = Classic:extend() -- general sprites
 CSprite.SPRITEBANK = 0
@@ -649,6 +588,9 @@ function CSprite:palettize(_palette) -- change palette colors if any
 end
 
 
+--
+-- CSpriteBG
+--
 local CSpriteBG = CSprite:extend() -- bg sprites aka tic tiles
 function CSpriteBG:new(_argt)
     CSpriteBG.super.new(self, _argt)
@@ -656,6 +598,9 @@ function CSpriteBG:new(_argt)
 end
 
 
+--
+-- CSpriteFG
+--
 local CSpriteFG = CSprite:extend() -- fg sprites aka tic sprites
 CSpriteFG.SPRITEBANK  = 256
 CSpriteFG.SPRITEEMPTY = CSpriteFG.SPRITEBANK + 0 -- empty sprite
@@ -692,6 +637,10 @@ function CSpriteFG:new(_argt)
     self:_argt(_argt) -- override if any
 end
 
+
+--
+-- CSpriteFGEmpty
+--
 local CSpriteFGEmpty = CSpriteFG:extend() -- empty sprites
 function CSpriteFGEmpty:new(_argt)
     CSpriteFGEmpty.super.new(self, _argt)
@@ -720,9 +669,8 @@ function CSpriteFGBoard:draw()
 end
 
 
-
 --
--- Entity
+-- CEntity
 --
 local CEntity = Classic:extend() -- general entities like places, objects, characters ...
 CEntity:implement(CSprite)
@@ -740,9 +688,21 @@ function CEntity:new(_argt)
 end
 
 
+--
+-- CCamera
+--
+local CCamera = CEntity:extend() -- camera
+
+
+--
+-- CObject
+--
 local CObject = CEntity:extend() -- objects
 
 
+--
+-- CCharacter
+--
 local CCharacter = CEntity:extend() -- characters
 CCharacter.SIZEL = 0 -- character sizes -- for the head sprite y offset
 CCharacter.SIZEM = 1
@@ -1083,7 +1043,106 @@ end
 function CCharacter:_drawShield()
 end
 
+function CCharacter:statePrev() -- prev state in the stack
+    self.state = Tic.STATES:prev()
+end
 
+function CCharacter:stateNext() -- next state in the stack
+    self.state = Tic.STATES:next()
+end
+
+function CCharacter:toggleWork() -- toggle idle/move vs work
+    local _state = self.state
+    local _statesettings = Tic.STATESETTINGS[_state]
+    local _posture = _statesettings.posture
+    local _status  = _statesettings.status
+    if _posture == Tic.POSTUREFLOOR then return end -- cannot toggle work
+    _status = (_status == Tic.STATUSWORK)
+        and Tic.STATUSIDLE
+        or  Tic.STATUSWORK
+    self.state = _posture.._status
+end
+
+function CCharacter:toggleKneel() -- toggle stand vs kneel
+    local _state = self.state
+    local _statesettings = Tic.STATESETTINGS[_state]
+    local _posture = _statesettings.posture
+    local _status  = _statesettings.status
+    if _posture == Tic.POSTUREFLOOR and _status ~= Tic.STATUSSLEEP then return end -- cannot toggle sleep
+    if _posture == Tic.POSTURESTAND then
+        _posture = Tic.POSTUREKNEEL
+    elseif _posture == Tic.POSTUREKNEEL then
+        _posture = Tic.POSTURESTAND
+    elseif _posture == Tic.POSTUREFLOOR then -- sleeping
+        _posture = Tic.POSTUREKNEEL
+        _status = Tic.STATUSIDLE
+    end
+    self.state = _posture.._status
+end
+
+function CCharacter:toggleSleep() -- toggle stand vs sleep
+    local _state = self.state
+    local _statesettings = Tic.STATESETTINGS[_state]
+    local _posture = _statesettings.posture
+    local _status  = _statesettings.status
+    if _posture == Tic.POSTUREFLOOR and _status ~= Tic.STATUSSLEEP then return end -- cannot toggle sleep
+    _state = (_state == Tic.STATEFLOORSLEEP)
+        and Tic.STATESTANDIDLE
+        or  Tic.STATEFLOORSLEEP
+    self.state = _state
+end
+
+function CCharacter:toggleFrame() -- toggle frame 0-1
+    self.frame = Nums:toggle01(self.frame) -- animate continuous move in the same dirx
+end
+
+function CCharacter:move(_direction)
+    if not _direction then return end -- mandatory
+    local _state = self.state
+    local _statesettings = Tic.STATESETTINGS[_state]
+    local _posture = _statesettings.posture
+    local _status  = _statesettings.status
+    local _offsets = Tic.DIRS2OFFSETS[_direction]
+    local _offsetx = _offsets.offsetx
+    local _offsety = _offsets.offsety
+    local _dirx    = _offsets.dirx
+    local _diry    = _offsets.diry
+    local _oldx    = self.dirx -- save actual character dirx
+    self.dirx = (_dirx) and _dirx or self.dirx -- adjust dirx and diry
+    self.diry = (_diry) and _diry or self.diry
+    if _posture == Tic.POSTUREFLOOR and _status ~= Tic.STATUSSLEEP then return end -- cannot move
+    if _state == Tic.STATEFLOORSLEEP then -- sleep to stand
+        self.state = Tic.STATESTANDIDLE
+        return
+    end
+    if _status == Tic.STATUSWORK then -- interrupt work and goes to idle
+        self.state = _posture..Tic.STATUSIDLE
+        return
+    end
+    if _status == Tic.STATUSIDLE and self.dirx ~= _oldx then -- simply change dirx
+        return
+    end
+    if _status == Tic.STATUSMOVE and self.dirx ~= _oldx then -- change dirx and goes to idle
+        self.state = _posture..Tic.STATUSIDLE
+        return
+    end
+    self:toggleFrame() -- animate continuous move in the same dirx
+    _offsetx = _offsetx * (self.statphyact / Tic.STATSMAX) -- depends of phy act
+    _offsety = _offsety * (self.statphyact / Tic.STATSMAX)
+    _offsetx = (_posture == Tic.POSTURESTAND) and _offsetx or _offsetx / 2 -- half if kneel
+    _offsety = (_posture == Tic.POSTURESTAND) and _offsety or _offsety / 2 -- half if kneel
+    _offsetx = (_offsetx < 0) and math.ceil(_offsetx) or math.floor(_offsetx)
+    _offsety = (_offsety < 0) and math.ceil(_offsety) or math.floor(_offsety)
+    self.worldx = self.worldx + _offsetx
+    self.worldy = self.worldy + _offsety
+    self.state = _posture..Tic.STATUSMOVE
+    self.idlecycler:min() -- reset the idle cycler
+end
+
+
+--
+-- CCharacterHumanoid
+--
 local CCharacterHumanoid = CCharacter:extend() -- humanoid characters
 CEntity.KINDHUMANOID = "Humanoid" -- Humanoid kind
 function CCharacterHumanoid:new(_argt)
@@ -1504,9 +1563,17 @@ function Tic:draw()
     Tic:keysDo(20, 10)
     local _state   = _playeractual.state
     local _posture = Tic.STATESETTINGS[_state].posture
-    _playeractual.state = (_posture ~= Tic.POSTUREFLOOR and _idlecycler.actvalue == _idlecycler.maxindex)
-        and _posture..Tic.STATUSIDLE
-        or  _playeractual.state
+    local _status  = Tic.STATESETTINGS[_state].status
+    if _posture ~= Tic.POSTUREFLOOR then -- stand or kneel
+        if _status == Tic.STATUSWORK and _idlecycler.actvalue == _idlecycler.maxindex then -- animate work
+            _playeractual:toggleFrame()
+            _idlecycler:min()
+        else -- reset to idle if any
+            _playeractual.state = (_idlecycler.actvalue == _idlecycler.maxindex)
+                and _posture..Tic.STATUSIDLE
+                or  _playeractual.state
+        end
+    end  
 
     -- Tic:drawFrames()
     -- Tic:drawDirections()
