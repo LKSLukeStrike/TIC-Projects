@@ -44,21 +44,23 @@ function Tables:copy(_table) -- copy a table -- SORTED
     return _result
 end
 
-function Tables:dump(_table, _indent) -- dump a table -- SORTED -- RECURSIVE -- INDENT
+function Tables:dump(_table, _indent, _depth) -- dump a table -- SORTED -- RECURSIVE -- INDENT -- DEPTH
+    _indent = _indent or ""
+    _depth = _depth or math.maxinteger
     local _result = ""
     if type(_table) ~= "table" then return _result end
-    _indent = _indent or ""
+    if _depth <= 0 then return _result end
     local _keys = Tables:keys(_table) -- sorted keys
     for _, _key in ipairs(_keys) do
         local _val = _table[_key]
         _result = _result .. _indent..tostring(_key) .. "\t" .. tostring(_val) .. "\n"
-        _result = _result .. Tables:dump(_val, _indent.._indent)
+        _result = _result .. Tables:dump(_val, _indent.._indent, _depth - 1)
     end
     return _result
 end
 
-function Tables:print(_table, _indent) -- print a table -- SORTED -- RECURSIVE -- INDENT
-    print(Tables:dump(_table, _indent))
+function Tables:print(_table, _indent, _depth) -- print a table -- SORTED -- RECURSIVE -- INDENT -- DEPTH
+    print(Tables:dump(_table, _indent, _depth))
 end
 
 

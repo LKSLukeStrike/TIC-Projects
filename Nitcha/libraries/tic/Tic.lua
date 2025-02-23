@@ -275,7 +275,8 @@ end
 
 -- Players System -- handle a players stack
 Tic.PLAYERS = CCyclerTable()
-function Tic:playerStack(_player) -- stack a new player
+function Tic:playerAppend(_player) -- stack a new player
+    if Tic.PLAYERS[_player] then return end -- avoid doublons
     return Tic.PLAYERS:insert(_player)
 end
 
@@ -421,7 +422,7 @@ function Tic:logClear() -- clear the log
     Tic.Log = {}
 end
 
-function Tic:logStack(...) -- add item to the log
+function Tic:logAppend(...) -- add item to the log
     local _args = {...}
     local _item = ""
     for _, _val in ipairs(_args) do
@@ -477,8 +478,8 @@ function Tic:trace(...) -- trace with multiple args
     trace(_output)
 end
 
-function Tic:traceTable(_table, _indent) -- trace a table  -- SORTED -- RECURSIVE -- INDENT
-    Tic:trace(Tables:dump(_table, _indent))
+function Tic:traceTable(_table, _indent, _depth) -- trace a table  -- SORTED -- RECURSIVE -- INDENT -- DEPTH
+    Tic:trace(Tables:dump(_table, _indent, _depth))
 end
 
 
@@ -498,7 +499,7 @@ end
 
 -- Board System -- handle the board sprite
 function Tic:boardPixel(_sprite, _x, _y, _color) -- paint a pixel to a board sprite
-    if not _sprite then return end
+    if not _sprite then return end -- mandatory
     _x = _x or 0
     _y = _y or 0
     _color = _color or Tic.COLORKEY -- transparent by default
@@ -506,7 +507,7 @@ function Tic:boardPixel(_sprite, _x, _y, _color) -- paint a pixel to a board spr
 end
 
 function Tic:boardClean(_sprite) -- clean a board sprite
-    if not _sprite then return end
+    if not _sprite then return end -- mandatory
     for _y = 0, 7 do
         for _x = 0, 7 do
             Tic:boardPixel(_sprite, _x, _y, nil) -- all transparent
@@ -515,8 +516,7 @@ function Tic:boardClean(_sprite) -- clean a board sprite
 end
 
 function Tic:boardPaint(_sprite, _directives, _clean) -- paint a board sprite
-    if not _sprite then return end
-    if not _directives then return end
+    if not _sprite or not _directives then return end -- mandatory
     _clean = (_clean == nil or _clean == true) and true or false
     if _clean then Tic:boardClean(_sprite) end -- clean by default
     for _, _directive in pairs(_directives) do
@@ -670,6 +670,37 @@ end
 
 
 --
+-- CWorld
+--
+local CWorld = Classic:extend() -- general world that contains entities
+CWorld.NAMEWORLD = "World" -- default name
+CWorld.KINDWORLD = "World" -- default kind
+function CWorld:new(_argt)
+    CWorld.super.new(self, _argt)
+    self.name = CWorld.NAMEWORLD
+    self.kind = CWorld.KINDWORLD
+    self.entities  = {} -- record each entity
+    self.locations = {} -- record each entity locations -- {worldx {worldy {entity}}} for searching
+    self:_argt(_argt) -- override if any
+end
+-- World instance
+local World = CWorld{}
+
+function CWorld:entityAppend(_entity) -- add a new entity in the world
+    if not _entity then return end
+    if self.entities[_entity] then return end -- avoid doublons
+    table.insert(self.entities, _entity)
+    if not self.locations[_entity.worldx] then -- new xorldx entry
+        self.locations[_entity.worldx] = {}
+    end
+    if not self.locations[_entity.worldx][_entity.worldy] then -- new worldy entry in existing worldx
+        self.locations[_entity.worldx][_entity.worldy] = {}
+    end
+    table.insert(self.locations[_entity.worldx][_entity.worldy], _entity) -- add the new entity
+end
+
+
+--
 -- CEntity
 --
 local CEntity = Classic:extend() -- general entities like places, objects, characters ...
@@ -681,9 +712,16 @@ function CEntity:new(_argt)
     CEntity.super.new(self, _argt)
     self.name = CEntity.NAMENOBODY
     self.kind = CEntity.KINDENTITY
+    self.world = World -- world that contains the entity -- to override if any
     self.worldx = CEntity.WORLDX -- world positions
     self.worldy = CEntity.WORLDY
+    self.camera = nil -- camera that follows the entity -- to override
     self:_argt(_argt) -- override if any
+end
+
+function CEntity:focus() -- focus camera on itself
+    if not self.camera then return end
+    self.camera:focusEntity(self)
 end
 
 
@@ -699,6 +737,8 @@ function CCamera:new(_argt)
     self.kind = CEntity.KINDCAMERA
     self:_argt(_argt) -- override if any
 end
+-- Camera instance
+local Camera = CCamera{}
 
 function CCamera:focusXY(_worldx, _worldy) -- focus camera on world positions -- default to center
     _worldx = _worldx or 0
@@ -707,9 +747,9 @@ function CCamera:focusXY(_worldx, _worldy) -- focus camera on world positions --
     self.worldy = _worldy
 end
 
-function CCamera:focusCharacter(_character) -- focus camera on a character world positions
-    if not _character then return end
-    self:focusXY(_character.worldx, _character.worldy)
+function CCamera:focusEntity(_entity) -- focus camera on an entity world positions
+    if not _entity then return end -- mandatory
+    self:focusXY(_entity.worldx, _entity.worldy)
 end
 
 
@@ -966,7 +1006,9 @@ function CCharacter:new(_argt)
     self.statphyact   = self.statphymax -- act stats -- 0-max
     self.statmenact   = self.statmenmax
     self.statpsyact   = self.statpsymax
+    self.camera       = Camera -- default camera
     self:_argt(_argt) -- override if any
+    self.world:entityAppend(self) -- add itself to the world
 end
 
 function CCharacter:drawPortrait(_idle, _border, _infos) -- draw the portrait -- _idle ? -- _border ? -- _infos ?
@@ -1293,7 +1335,7 @@ end
 
 local IPlayer = CCharacter:extend() -- players characters interface
 function IPlayer:stack()
-    Tic:playerStack(self) -- record the new player on tic
+    Tic:playerAppend(self) -- record the new player on tic
 end
 
 
@@ -1550,6 +1592,8 @@ local Golith = CPlayerGogol{name = "Golith",}
 local Wulfie = CPlayerWolfe{name = "Wulfie",
     colorextra = Tic.COLORRED,
 }
+Tic:traceTable(World, " ", 4)
+exit()
 
 
 --
@@ -1585,12 +1629,6 @@ local SpriteFG = CSpriteFG{
 
 
 --
--- Camera
---
-local Camera = CCamera{}
-
-
---
 -- Drawing
 --
 local _statustick01 = 0
@@ -1616,7 +1654,8 @@ function Tic:draw()
         end
     end
 
-    Camera:focusCharacter(_playeractual)
+    -- Camera:focusEntity(_playeractual)
+    _playeractual:focus()
 
     -- Tic:drawFrames()
     -- Tic:drawDirections()
@@ -1644,28 +1683,28 @@ function Tic:drawLog()
     local _dirx    = _playeractual.dirx
     local _diry    = _playeractual.diry
 
-    -- Tic:logStack("K01:", peek(Tic.KEYBOARDKEYS + 0))
-    -- Tic:logStack("K02:", peek(Tic.KEYBOARDKEYS + 1))
-    -- Tic:logStack("K03:", peek(Tic.KEYBOARDKEYS + 2))
-    -- Tic:logStack("K04:", peek(Tic.KEYBOARDKEYS + 3))
-    -- Tic:logStack()
-    Tic:logStack("PHY:", _playeractual.statphyact, "/", _playeractual.statphymax)
-    Tic:logStack("MEN:", _playeractual.statmenact, "/", _playeractual.statmenmax)
-    Tic:logStack("PSY:", _playeractual.statpsyact, "/", _playeractual.statpsymax)
-    Tic:logStack("TOT:", _playeractual.statphyact + _playeractual.statmenact + _playeractual.statpsyact)
-    Tic:logStack()
-    Tic:logStack("STA:", _state)
-    Tic:logStack("POS:", _posture)
-    Tic:logStack("STS:", _status)
-    Tic:logStack("DIX:", _dirx)
-    Tic:logStack("DIY:", _diry)
-    Tic:logStack()
-    Tic:logStack("T60:", _tick60)
-    Tic:logStack("FRM:", _frame)
-    Tic:logStack("T00:", _tick00)
-    Tic:logStack("IDL:", _playeractual.idlecycler.actvalue)
-    Tic:logStack("CAX:", Camera.worldx)
-    Tic:logStack("CAY:", Camera.worldy)
+    -- Tic:logAppend("K01:", peek(Tic.KEYBOARDKEYS + 0))
+    -- Tic:logAppend("K02:", peek(Tic.KEYBOARDKEYS + 1))
+    -- Tic:logAppend("K03:", peek(Tic.KEYBOARDKEYS + 2))
+    -- Tic:logAppend("K04:", peek(Tic.KEYBOARDKEYS + 3))
+    -- Tic:logAppend()
+    Tic:logAppend("PHY:", _playeractual.statphyact, "/", _playeractual.statphymax)
+    Tic:logAppend("MEN:", _playeractual.statmenact, "/", _playeractual.statmenmax)
+    Tic:logAppend("PSY:", _playeractual.statpsyact, "/", _playeractual.statpsymax)
+    Tic:logAppend("TOT:", _playeractual.statphyact + _playeractual.statmenact + _playeractual.statpsyact)
+    Tic:logAppend()
+    Tic:logAppend("STA:", _state)
+    Tic:logAppend("POS:", _posture)
+    Tic:logAppend("STS:", _status)
+    Tic:logAppend("DIX:", _dirx)
+    Tic:logAppend("DIY:", _diry)
+    Tic:logAppend()
+    Tic:logAppend("T60:", _tick60)
+    Tic:logAppend("FRM:", _frame)
+    Tic:logAppend("T00:", _tick00)
+    Tic:logAppend("IDL:", _playeractual.idlecycler.actvalue)
+    Tic:logAppend("CAX:", Camera.worldx)
+    Tic:logAppend("CAY:", Camera.worldy)
 
     Tic:logPrint()
 end
