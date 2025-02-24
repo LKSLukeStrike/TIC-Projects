@@ -687,16 +687,33 @@ end
 local World = CWorld{}
 
 function CWorld:entityAppend(_entity) -- add a new entity in the world
-    if not _entity then return end
+    if not _entity then return end -- mandatory
     if self.entities[_entity] then return end -- avoid doublons
-    table.insert(self.entities, _entity)
+    self.entities[_entity] = _entity
     if not self.locations[_entity.worldx] then -- new xorldx entry
         self.locations[_entity.worldx] = {}
     end
     if not self.locations[_entity.worldx][_entity.worldy] then -- new worldy entry in existing worldx
         self.locations[_entity.worldx][_entity.worldy] = {}
     end
-    table.insert(self.locations[_entity.worldx][_entity.worldy], _entity) -- add the new entity
+    self.locations[_entity.worldx][_entity.worldy][_entity] = _entity
+end
+
+function CWorld:entityRemove(_entity) -- remove an entity from the world
+    if not _entity then return end -- mandatory
+    if not self.entities[_entity] then return end -- doesnt exist
+    self.entities[_entity] = nil
+    self.locations[_entity.worldx][_entity.worldy][_entity] = nil
+    if self.locations[_entity.worldx][_entity.worldy] == {} then self.locations[_entity.worldx][_entity.worldy] = nil end
+    if self.locations[_entity.worldx] == {} then self.locations[_entity.worldx] = nil end
+end
+
+function CWorld:entityMove(_entity, _worldx, _worldy) -- move an entity into the world
+    if not _entity or not _worldx or not _worldy then return end -- mandatory
+    self:entityRemove(_entity)
+    _entity.worldx = _worldx
+    _entity.worldy = _worldy
+    self:entityAppend(_entity)
 end
 
 
@@ -1196,6 +1213,7 @@ function CCharacter:move(_direction)
         self.state = _posture..Tic.STATUSIDLE
         return
     end
+    self.state = _posture..Tic.STATUSMOVE
     self:toggleFrame() -- animate continuous move in the same dirx
     _offsetx = _offsetx * (self.statphyact / Tic.STATSMAX) -- depends of phy act
     _offsety = _offsety * (self.statphyact / Tic.STATSMAX)
@@ -1203,9 +1221,7 @@ function CCharacter:move(_direction)
     _offsety = (_posture == Tic.POSTURESTAND) and _offsety or _offsety / 2 -- half if kneel
     _offsetx = (_offsetx < 0) and math.ceil(_offsetx) or math.floor(_offsetx)
     _offsety = (_offsety < 0) and math.ceil(_offsety) or math.floor(_offsety)
-    self.worldx = self.worldx + _offsetx
-    self.worldy = self.worldy + _offsety
-    self.state = _posture..Tic.STATUSMOVE
+    self.world:entityMove(self, self.worldx + _offsetx, self.worldy + _offsety)
     self.idlecycler:min() -- reset the idle cycler
 end
 
@@ -1592,8 +1608,6 @@ local Golith = CPlayerGogol{name = "Golith",}
 local Wulfie = CPlayerWolfe{name = "Wulfie",
     colorextra = Tic.COLORRED,
 }
-Tic:traceTable(World, " ", 4)
-exit()
 
 
 --
