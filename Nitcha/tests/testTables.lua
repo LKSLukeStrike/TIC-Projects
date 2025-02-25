@@ -47,12 +47,22 @@ local Tables = require("libraries/lks/Tables")
 -- print(table.unpack(Tables:keys(_table0)))
 -- print(table.unpack(Tables:vals(_table0)))
 
-print("--- 4")
+-- print("--- 4")
 -- local _table = {["bb"] = 20, ["aa"] = 10, {100, 50, 150}, ["cc"] = 30, ["dd"] = 40}
-local _table = {["bb"] = 20, {100, 50, 150}, ["aa"] = {10, 5, 15}, }
+-- local _table = {["bb"] = 20, {100, 50, 150}, ["aa"] = {10, 5, 15}, }
 -- local _table = {["bb"] = 20, ["aa"] = 10, ["cc"] = 30, ["dd"] = 40}
-Tables:print(_table, " ")
-print(Tables:dump(_table, " "))
+-- Tables:print(_table, " ")
+-- print(Tables:dump(_table, " "))
 -- print(Tables:size(_table))
 -- print(table.unpack(Tables:keys(_table)))
 -- print(table.unpack(Tables:vals(_table)))
+
+print("--- merge")
+local _ta = {["a"] = 10,}
+local _tb = {["b"] = 20,}
+
+Tables:print(_ta, " ")
+Tables:print(_tb, " ")
+
+Tables:print(Tables:merge(_ta, _tb), " ")
+

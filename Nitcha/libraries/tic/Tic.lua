@@ -575,8 +575,9 @@ end
 
 function CSprite:drawC() -- draw a sprite -- CENTERED
     self:_save{"screenx", "screeny",}
-    self.screenx = self.screenx - (4 * self.scale) -- center the sprite
-    self.screeny = self.screeny - (4 * self.scale)
+    local _scale = self.scale or CSprite.SCALE01
+    self.screenx = self.screenx - (4 * _scale) -- center the sprite
+    self.screeny = self.screeny - (4 * _scale)
     self:draw()
     self:_load()
 end
@@ -592,6 +593,10 @@ end
 -- CSpriteBG
 --
 local CSpriteBG = CSprite:extend() -- bg sprites aka tic tiles
+CSpriteBG.SPRITEBANK  = 0
+CSpriteBG.SPRITEEMPTY = CSpriteBG.SPRITEBANK + 0 -- empty sprite
+CSpriteBG.BUILDBANK  = 16 -- buildings
+CSpriteBG.PLACEHOUSE = CSpriteBG.BUILDBANK + 0
 function CSpriteBG:new(_argt)
     CSpriteBG.super.new(self, _argt)
     self:_argt(_argt) -- override if any
@@ -673,12 +678,12 @@ end
 -- CWorld
 --
 local CWorld = Classic:extend() -- general world that contains entities
-CWorld.NAMEWORLD = "World" -- default name
-CWorld.KINDWORLD = "World" -- default kind
+CWorld.KINDWORLD = "World" -- World kind
+CWorld.NAMEWORLD = "World" -- World name
 function CWorld:new(_argt)
     CWorld.super.new(self, _argt)
-    self.name = CWorld.NAMEWORLD
     self.kind = CWorld.KINDWORLD
+    self.name = CWorld.NAMEWORLD
     self.entities  = {} -- record each entity
     self.locations = {} -- record each entity locations -- {worldx {worldy {entity}}} for searching
     self:_argt(_argt) -- override if any
@@ -745,15 +750,15 @@ end
 --
 -- CEntity
 --
-local CEntity = Classic:extend() -- general entities like places, objects, characters ...
-CEntity.NAMENOBODY = "Nobody" -- default name
-CEntity.KINDENTITY = "Entity" -- default kind
+local CEntity = Classic:extend() -- general entities like places, objects, characters, cameras ...
+CEntity.KINDENTITY = "Entity" -- Entity kind
+CEntity.NAMEENTITY = "Entity" -- Entity name
 CEntity.WORLDX = 0
 CEntity.WORLDY = 0
 function CEntity:new(_argt)
     CEntity.super.new(self, _argt)
-    self.name = CEntity.NAMENOBODY
     self.kind = CEntity.KINDENTITY
+    self.name = CEntity.NAMEENTITY
     self.world = World -- world that contains the entity -- to override if any
     self.worldx = CEntity.WORLDX -- world positions
     self.worldy = CEntity.WORLDY
@@ -777,14 +782,14 @@ end
 -- CCamera
 --
 local CCamera = CEntity:extend() -- camera
-CEntity.NAMECAMERA = "Camera" -- camera name
-CEntity.KINDCAMERA = "Camera" -- camera kind
+CEntity.KINDCAMERA = "Camera" -- Camera kind
+CEntity.NAMECAMERA = "Camera" -- Camera name
 CCamera.RANGEX = Tic.SCREENW / 2
 CCamera.RANGEY = Tic.SCREENH / 2
 function CCamera:new(_argt)
     CCamera.super.new(self, _argt)
-    self.name = CEntity.NAMECAMERA
     self.kind = CEntity.KINDCAMERA
+    self.name = CEntity.NAMECAMERA
     self.rangex = CCamera.RANGEX
     self.rangey = CCamera.RANGEY
     self:_argt(_argt) -- override if any
@@ -808,37 +813,88 @@ end
 
 
 --
--- CPlace
+-- CEntityDrawable
 --
-local CPlace = CEntity:extend() -- places
-CPlace:implement(CSprite)
-CEntity.KINDPLACE = "Place" -- place kind
-function CPlace:new(_argt)
-    CCharacter.super.new(self, _argt)
-    self.kind         = CEntity.KINDPLACE -- kind
-    self.screenx      = Tic.SCREENW // 2 -- screen positions
-    self.screeny      = Tic.SCREENH // 2
-    self.scale        = CSprite.SCALE01 -- scale
-    self.frame        = CSprite.FRAME00 -- frame
-    self.idlecycler   = CCyclerInt{maxindex = 59, mode = CCycler.MODEBLOCK,} -- cycler to get back to idle
-    self.colorhairsfg = Tic.COLORHAIRSFG -- colors
+local CEntityDrawable = CEntity:extend() -- general entities with a sprite representation
+CEntityDrawable:implement(CSprite)
+CEntity.KINDDRAWABLE = "Drawable" -- Drawable kind
+CEntity.NAMEDRAWABLE = "Drawable" -- Drawable name
+function CEntityDrawable:new(_argt)
+    CEntityDrawable.super.new(self, _argt)
+    self.kind = CEntity.KINDDRAWABLE
+    self.name = CEntity.NAMEDRAWABLE
+    self.sprite = CSpriteBG.SPRITEEMPTY
+    self.screenx = Tic.SCREENW // 2 -- screen positions
+    self.screeny = Tic.SCREENH // 2
     self:_argt(_argt) -- override if any
     self.world:entityAppend(self) -- append itself to the world
+end
+
+function CEntityDrawable:draw()
+    local _musprite = CSpriteBG() -- multi usage unique sprite
+    _musprite.sprite  = self.sprite
+    _musprite.screenx = self.screenx
+    _musprite.screeny = self.screeny
+    _musprite.palette = self.palette
+    _musprite:draw()
+end
+
+
+
+--
+-- CPlace
+--
+local CPlace = CEntityDrawable:extend() -- places
+CEntity.KINDPLACE = "Place" -- Place kind
+CEntity.NAMEPLACE = "Place" -- Place name
+function CPlace:new(_argt)
+    CPlace.super.new(self, _argt)
+    self.kind = CEntity.KINDPLACE
+    self.name = CEntity.NAMEPLACE
+    self:_argt(_argt) -- override if any
+end
+
+
+--
+-- CPlaceHouse
+--
+local CPlaceHouse = CEntityDrawable:extend() -- places
+CEntity.KINDHOUSE = "House" -- House kind
+CEntity.NAMEHOUSE = "House" -- House name
+function CPlaceHouse:new(_argt)
+    CPlaceHouse.super.new(self, _argt)
+    self.kind = CEntity.KINDHOUSE
+    self.name = CEntity.NAMEHOUSE
+    self.sprite = CSpriteBG.PLACEHOUSE
+    self:_argt(_argt) -- override if any
+end
+
+function CPlaceHouse:draw()
+    local _tick00    = Tic.TICK00.actvalue
+    local _frequence = Tic.FREQUENCE060
+    local _palette   = self.palette
+    local _palette0  = (self.palette0) and self.palette0 or {[Tic.COLORWHITE] = Tic.COLORWHITE,}
+    local _palette1  = (self.palette1) and self.palette1 or {[Tic.COLORWHITE] = Tic.COLORYELLOW,}
+    local _palette   = (Nums:frequence01(_tick00, _frequence) == 0 and Nums:random01() == 0)
+        and Tables:merge(_palette, _palette0)
+        or  Tables:merge(_palette, _palette1)
+    self:_save{"palette",}
+    self.palette = _palette -- chimney
+    self.super.draw(self)
+    self:_load()
 end
 
 
 --
 -- CObject
 --
-local CObject = CEntity:extend() -- objects
-CObject:implement(CSprite)
+local CObject = CEntityDrawable:extend() -- objects
 
 
 --
 -- CCharacter
 --
-local CCharacter = CEntity:extend() -- characters
-CCharacter:implement(CSprite)
+local CCharacter = CEntityDrawable:extend() -- characters
 CCharacter.SIZEL = 0 -- character sizes -- for the head sprite y offset
 CCharacter.SIZEM = 1
 CCharacter.SIZES = 2
@@ -1037,13 +1093,13 @@ Tic.STATUSSETTINGS = { -- statuses settings
         palette1 = {[Tic.COLORRED] = Tic.COLORPURPLE, [Tic.COLORPURPLE] = Tic.COLORRED,},
      },
 }
-CEntity.KINDCHARACTER = "Character" -- character kind
+CEntity.KINDCHARACTER = "Character" -- Character kind
+CEntity.NAMECHARACTER = "Character" -- Character name
 function CCharacter:new(_argt)
     CCharacter.super.new(self, _argt)
-    self.kind         = CEntity.KINDCHARACTER -- kind
+    self.kind         = CEntity.KINDCHARACTER
+    self.name         = CEntity.NAMECHARACTER
     self.size         = CCharacter.SIZEM -- size
-    self.screenx      = Tic.SCREENW // 2 -- screen positions
-    self.screeny      = Tic.SCREENH // 2
     self.portraitx    = Tic.SCREENW // 2 -- portrait positions
     self.portraity    = Tic.SCREENH - (8 * CSprite.SCALE02) + 4
     self.statsx       = self.portraitx - 21 -- stats positions
@@ -1161,16 +1217,16 @@ function CCharacter:_drawStatus()
 
     local _statussprite = _statussettings.statussprite -- status sprite
     local _tick00       = Tic.TICK00.actvalue
-    local _palette = (Nums:frequence01(_tick00, _frequence) == 0)
+    local _palette      = (Nums:frequence01(_tick00, _frequence) == 0)
         and _statussettings.palette0
         or  _statussettings.palette1
 
     local _musprite = CSpriteFG() -- multi usage unique sprite
-    _musprite.sprite = _statussprite
+    _musprite.sprite  = _statussprite
     _musprite.screenx = self.screenx
     _musprite.screeny = self.screeny
-    _musprite.flip = self.dirx
-    _musprite.scale = self.scale
+    _musprite.flip    = self.dirx
+    _musprite.scale   = self.scale
     _musprite:palettize(_palette)
     _musprite:draw()
 end
@@ -1286,10 +1342,10 @@ end
 -- CCharacterHumanoid
 --
 local CCharacterHumanoid = CCharacter:extend() -- humanoid characters
-CEntity.KINDHUMANOID = "Humanoid" -- humanoid kind
+CEntity.KINDHUMANOID = "Humanoid" -- Humanoid kind
 function CCharacterHumanoid:new(_argt)
     CCharacterHumanoid.super.new(self, _argt)
-    self.kind         = CEntity.KINDHUMANOID -- kind
+    self.kind         = CEntity.KINDHUMANOID
     self.colorhairsfg = Tic.COLORGREYD -- head colors
     self.colorhairsbg = Tic.COLORGREYM
     self.colorskin    = Tic.COLORWHITE
@@ -1421,10 +1477,10 @@ end
 
 
 local CPlayerDwarf = CPlayerHumanoid:extend() -- dwarf player characters
-CEntity.KINDDWARF = "Dwarf" -- dwarf kind
+CEntity.KINDDWARF = "Dwarf" -- Dwarf kind
 function CPlayerDwarf:new(_argt)
     CPlayerDwarf.super.new(self, _argt)
-    self.kind         = CEntity.KINDDWARF -- kind
+    self.kind         = CEntity.KINDDWARF
     self.size         = CCharacter.SIZES -- size
     self.colorhairsfg = Tic.COLORRED -- colors
     self.colorhairsbg = Tic.COLORORANGE
@@ -1440,10 +1496,10 @@ end
 
 
 local CPlayerGnome = CPlayerHumanoid:extend() -- gnome player characters
-CEntity.KINDGNOME = "Gnome" -- gnome kind
+CEntity.KINDGNOME = "Gnome" -- Gnome kind
 function CPlayerGnome:new(_argt)
     CPlayerGnome.super.new(self, _argt)
-    self.kind         = CEntity.KINDGNOME -- kind
+    self.kind         = CEntity.KINDGNOME
     self.size         = CCharacter.SIZES -- size
     self.colorhairsfg = Tic.COLORORANGE -- colors
     self.colorhairsbg = Tic.COLORYELLOW
@@ -1460,10 +1516,10 @@ end
 
 
 local CPlayerDrowe = CPlayerHumanoid:extend() -- drowe player characters
-CEntity.KINDDROWE = "Drowe" -- drowe kind
+CEntity.KINDDROWE = "Drowe" -- Drowe kind
 function CPlayerDrowe:new(_argt)
     CPlayerDrowe.super.new(self, _argt)
-    self.kind         = CEntity.KINDDROWE -- kind
+    self.kind         = CEntity.KINDDROWE
     self.size         = CCharacter.SIZEM -- size
     self.coloreyesfg  = Tic.COLORRED -- colors
     self.coloreyesbg  = Tic.COLORPURPLE
@@ -1479,10 +1535,10 @@ end
 
 
 local CPlayerAngel = CPlayerHumanoid:extend() -- angel player characters
-CEntity.KINDANGEL = "Angel" -- angel kind
+CEntity.KINDANGEL = "Angel" -- Angel kind
 function CPlayerAngel:new(_argt)
     CPlayerAngel.super.new(self, _argt)
-    self.kind         = CEntity.KINDANGEL -- kind
+    self.kind         = CEntity.KINDANGEL
     self.size         = CCharacter.SIZEM -- size
     self.colorhairsfg = Tic.COLORGREYM -- colors
     self.colorhairsbg = Tic.COLORWHITE
@@ -1499,10 +1555,10 @@ end
 
 
 local CPlayerGogol = CPlayerHumanoid:extend() -- gogol player characters
-CEntity.KINDGOGOL = "Gogol" -- gogol kind
+CEntity.KINDGOGOL = "Gogol" -- Gogol kind
 function CPlayerGogol:new(_argt)
     CPlayerGogol.super.new(self, _argt)
-    self.kind         = CEntity.KINDGOGOL -- kind
+    self.kind         = CEntity.KINDGOGOL
     self.size         = CCharacter.SIZEL -- size
     self.colorhairsfg = Tic.COLORWHITE -- colors
     self.colorhairsbg = Tic.COLORWHITE
@@ -1521,10 +1577,10 @@ end
 
 
 local CPlayerHorne = CPlayerHumanoid:extend() -- horne player characters
-CEntity.KINDHORNE = "Horne" -- horne kind
+CEntity.KINDHORNE = "Horne" -- Horne kind
 function CPlayerHorne:new(_argt)
     CPlayerHorne.super.new(self, _argt)
-    self.kind         = CEntity.KINDHORNE -- kind
+    self.kind         = CEntity.KINDHORNE
     self.size         = CCharacter.SIZEL -- size
     self.colorhairsfg = Tic.COLORPURPLE -- colors
     self.colorhairsbg = Tic.COLORRED
@@ -1542,10 +1598,10 @@ end
 
 
 local CPlayerDemon = CPlayerHorne:extend() -- demon player characters
-CEntity.KINDDEMON = "Demon" -- demon kind
+CEntity.KINDDEMON = "Demon" -- Demon kind
 function CPlayerDemon:new(_argt)
     CPlayerDemon.super.new(self, _argt)
-    self.kind         = CEntity.KINDDEMON -- kind
+    self.kind         = CEntity.KINDDEMON
     self.statphymax   = 3
     self.statphyact   = self.statphymax
     self.statmenmax   = 5
@@ -1557,10 +1613,10 @@ end
 
 
 local CPlayerTifel = CPlayerHorne:extend() -- tifel player characters
-CEntity.KINDTIFEL = "Tifel" -- tifel kind
+CEntity.KINDTIFEL = "Tifel" -- Tifel kind
 function CPlayerTifel:new(_argt)
     CPlayerTifel.super.new(self, _argt)
-    self.kind         = CEntity.KINDTIFEL -- kind
+    self.kind         = CEntity.KINDTIFEL
     self.size         = CCharacter.SIZEM -- size
     self.statphymax   = 4
     self.statphyact   = self.statphymax
@@ -1573,10 +1629,10 @@ end
 
 
 local CPlayerMeduz = CPlayerHumanoid:extend() -- meduz player characters
-CEntity.KINDMEDUZ = "Meduz" -- meduz kind
+CEntity.KINDMEDUZ = "Meduz" -- Meduz kind
 function CPlayerMeduz:new(_argt)
     CPlayerMeduz.super.new(self, _argt)
-    self.kind         = CEntity.KINDMEDUZ -- kind
+    self.kind         = CEntity.KINDMEDUZ
     self.size         = CCharacter.SIZES -- size
     self.colorhairsfg = Tic.COLORGREEND -- colors
     self.colorhairsbg = Tic.COLORGREENM
@@ -1592,10 +1648,10 @@ end
 
 
 local CPlayerGnoll = CPlayerHumanoid:extend() -- gnoll player characters
-CEntity.KINDGNOLL = "Gnoll" -- gnoll kind
+CEntity.KINDGNOLL = "Gnoll" -- Gnoll kind
 function CPlayerGnoll:new(_argt)
     CPlayerGnoll.super.new(self, _argt)
-    self.kind         = CEntity.KINDGNOLL -- kind
+    self.kind         = CEntity.KINDGNOLL
     self.size         = CCharacter.SIZEL -- size
     self.coloreyesfg  = Tic.COLORRED -- colors
     self.coloreyesbg  = Tic.COLORPURPLE
@@ -1611,10 +1667,10 @@ end
 
 
 local CPlayerWolfe = CPlayerGnoll:extend() -- wolfe player characters
-CEntity.KINDWOLFE = "Wolfe" -- wolfe kind
+CEntity.KINDWOLFE = "Wolfe" -- Wolfe kind
 function CPlayerWolfe:new(_argt)
     CPlayerWolfe.super.new(self, _argt)
-    self.kind         = CEntity.KINDWOLFE -- kind
+    self.kind         = CEntity.KINDWOLFE
     self:_argt(_argt) -- override if any
 end
 
@@ -1627,19 +1683,34 @@ local CEnnemy = CCharacter:extend() -- ennemy characters
 
 
 --
--- Characters
+-- Places
 --
-local Truduk = CPlayerDwarf{name = "Truduk",
+local House01 = CPlaceHouse{
+    worldx = -15,
+    worldy = 5,
+}
+
+local House02 = CPlaceHouse{
     worldx = 20,
     worldy = 20,
+    palette = {[Tic.COLORRED] = Tic.COLORGREENM,},
 }
-local Prinnn = CPlayerGnome{name = "Prinnn",
-    coloreyesbg  = Tic.COLORRED,
-    coloreyesfg  = Tic.COLORORANGE,
-    worldx = -20,
-    worldy = -10,
-}
--- local Kaptan = CPlayerMeduz{name = "Kaptan",}
+
+
+--
+-- Players
+--
+-- local Truduk = CPlayerDwarf{name = "Truduk",
+--     worldx = 20,
+--     worldy = 20,
+-- }
+-- local Prinnn = CPlayerGnome{name = "Prinnn",
+--     coloreyesbg  = Tic.COLORRED,
+--     coloreyesfg  = Tic.COLORORANGE,
+--     worldx = -20,
+--     worldy = -10,
+-- }
+-- -- local Kaptan = CPlayerMeduz{name = "Kaptan",}
 -- local Kaptin = CPlayerMeduz{name = "Kaptin",
 --     colorhairsbg = Tic.COLORBLUEL,
 --     colorhairsfg = Tic.COLORBLUEM,
@@ -1669,6 +1740,9 @@ local Nitcha = CPlayerDrowe{name = "Nitcha",}
 -- local Wulfie = CPlayerWolfe{name = "Wulfie",
 --     colorextra = Tic.COLORRED,
 -- }
+-- Tic:traceTable(World, " ")
+-- exit()
+
 
 --
 -- Sprites -- TESTING
@@ -1709,10 +1783,20 @@ local _statustick01 = 0
 function Tic:draw()
     cls()
 
+    -- Tic:drawFrames()
+    -- Tic:drawDirections()
+    -- Tic:drawLog()
+
+    Tic:drawPlayerActual()
+
+    Tic:tick() -- /!\ required in the draw function 
+end
+
+function Tic:drawPlayerActual()
     local _playeractual = Tic:playerActual()
     local _idlecycler  = _playeractual.idlecycler
-
     _idlecycler:next()
+
     Tic:keysDo(20, 10)
     local _state   = _playeractual.state
     local _posture = Tic.STATESETTINGS[_state].posture
@@ -1728,13 +1812,6 @@ function Tic:draw()
         end
     end
 
-    -- Tic:drawFrames()
-    -- Tic:drawDirections()
-    -- Tic:drawLog()
-
-    _playeractual:drawStatsC(true)
-    _playeractual:drawPortraitC(nil, true, true)
-
     local _worldx = _playeractual.worldx
     local _worldy = _playeractual.worldy
     for _, _entity in pairs(_playeractual:entitiesAround()) do -- draw entities visible by the actual player
@@ -1745,7 +1822,8 @@ function Tic:draw()
         _entity:drawC()
     end
 
-    Tic:tick() -- /!\ required in the draw function 
+    _playeractual:drawStatsC(true)
+    _playeractual:drawPortraitC(nil, true, true)
 end
 
 function Tic:drawLog()

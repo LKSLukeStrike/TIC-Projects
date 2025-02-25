@@ -47,6 +47,14 @@ function Tables:copy(_table) -- copy a table -- SORTED
     return _result
 end
 
+function Tables:merge(_tablea, _tableb) -- merge two tables -- do not alter initial tables
+    local _result = {}
+    for _key, _val in pairs(_tablea or {}) do _result[_key] = _val end
+    for _key, _val in pairs(_tableb or {}) do _result[_key] = _val end
+    return _result
+end
+
+
 function Tables:dump(_table, _indent, _depth) -- dump a table -- SORTED -- RECURSIVE -- INDENT -- DEPTH
     _indent = _indent or ""
     _depth  = _depth  or math.maxinteger

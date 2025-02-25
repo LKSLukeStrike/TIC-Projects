@@ -11,6 +11,12 @@ function Nums:yes2int(_yes) -- convert a boolean to integer 0|1
 end
 
 
+-- Random
+function Nums:random01() -- returns random 0 or 1
+    return (math.random() > 0.5) and 1 or  0
+end
+
+
 -- Frequences
 function Nums:frequence01(_num, _frequence) -- 0 in frequence, 1 out of frequence -- toggle
     return math.tointeger((_num // _frequence) % 2)
