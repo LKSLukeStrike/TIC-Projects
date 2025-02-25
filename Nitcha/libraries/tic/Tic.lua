@@ -240,14 +240,14 @@ Tic.ACTIONS2FUNCTIONS = {
     [Tic.ACTIONTOGGLEWORK]  = function() Tic:toggleWork() end,
     [Tic.ACTIONTOGGLEKNEEL] = function() Tic:toggleKneel() end,
     [Tic.ACTIONTOGGLESLEEP] = function() Tic:toggleSleep() end,
-    [Tic.ACTIONMOVE000]     = function() Tic:move(Tic.DIR000) end,
-    [Tic.ACTIONMOVE045]     = function() Tic:move(Tic.DIR045) end,
-    [Tic.ACTIONMOVE090]     = function() Tic:move(Tic.DIR090) end,
-    [Tic.ACTIONMOVE135]     = function() Tic:move(Tic.DIR135) end,
-    [Tic.ACTIONMOVE180]     = function() Tic:move(Tic.DIR180) end,
-    [Tic.ACTIONMOVE225]     = function() Tic:move(Tic.DIR225) end,
-    [Tic.ACTIONMOVE270]     = function() Tic:move(Tic.DIR270) end,
-    [Tic.ACTIONMOVE315]     = function() Tic:move(Tic.DIR315) end,
+    [Tic.ACTIONMOVE000]     = function() Tic:moveDirection(Tic.DIR000) end,
+    [Tic.ACTIONMOVE045]     = function() Tic:moveDirection(Tic.DIR045) end,
+    [Tic.ACTIONMOVE090]     = function() Tic:moveDirection(Tic.DIR090) end,
+    [Tic.ACTIONMOVE135]     = function() Tic:moveDirection(Tic.DIR135) end,
+    [Tic.ACTIONMOVE180]     = function() Tic:moveDirection(Tic.DIR180) end,
+    [Tic.ACTIONMOVE225]     = function() Tic:moveDirection(Tic.DIR225) end,
+    [Tic.ACTIONMOVE270]     = function() Tic:moveDirection(Tic.DIR270) end,
+    [Tic.ACTIONMOVE315]     = function() Tic:moveDirection(Tic.DIR315) end,
     [Tic.ACTIONDECPHYACT]   = function() Tic:stat('dec', "statphyact", 1) end,
     [Tic.ACTIONINCPHYACT]   = function() Tic:stat('inc', "statphyact", 1) end,
 }
@@ -379,11 +379,11 @@ end
 
 
 -- Directions System -- move to 8 directions depending on status
-function Tic:move(_direction, _character)
+function Tic:moveDirection(_direction, _character)
+    if not _direction then return end -- mandatory
     _character = _character or Tic:playerActual()
     if not _character then return end
-    if not _direction then return end
-    _character:move(_direction)
+    _character:moveDirection(_direction)
 end
 
 function Tic:stat(_action, _stat, _value, _character) -- modify a stat -- set/dec/inc
@@ -708,12 +708,37 @@ function CWorld:entityRemove(_entity) -- remove an entity from the world
     if self.locations[_entity.worldx] == {} then self.locations[_entity.worldx] = nil end
 end
 
-function CWorld:entityMove(_entity, _worldx, _worldy) -- move an entity into the world
+function CWorld:entityMoveXY(_entity, _worldx, _worldy) -- move an entity into the world
     if not _entity or not _worldx or not _worldy then return end -- mandatory
+    if not self.entities[_entity] then return end -- doesnt exist
     self:entityRemove(_entity)
     _entity.worldx = _worldx
     _entity.worldy = _worldy
+    _entity:focus() -- focus its camera on itself
     self:entityAppend(_entity)
+end
+
+function CWorld:entitiesAround(_worldx, _worldy, _rangex, _rangey) -- returns entities around xy in ranges
+    if not _worldx or not _worldy or not _rangex or not _rangey then return end -- mandatory
+    local _rangexlf = _worldx - _rangex
+    local _rangexrg = _worldx + _rangex - 1
+    local _rangeyup = _worldy - _rangey
+    local _rangeydw = _worldy + _rangey - 1
+    local _result  = {}
+    -- print("around", _worldx, _worldy, _rangex, _rangey)
+    -- print("range", _rangexlf, _rangexrg, _rangeyup, _rangeydw)
+    for _keyx, _valx in pairs(self.locations) do -- search for x in range
+        if Nums:isBW(_keyx, _rangexlf, _rangexrg) then
+            for _keyy, _valy in pairs(_valx) do -- search for y in range
+                if Nums:isBW(_keyy, _rangeyup, _rangeydw) then
+                    for _key, _val in pairs(_valy) do
+                        _result[_key] = _val
+                    end
+                end
+            end
+        end
+    end
+    return _result
 end
 
 
@@ -732,13 +757,19 @@ function CEntity:new(_argt)
     self.world = World -- world that contains the entity -- to override if any
     self.worldx = CEntity.WORLDX -- world positions
     self.worldy = CEntity.WORLDY
-    self.camera = nil -- camera that follows the entity -- to override
+    self.camera = nil -- optional camera that follows the entity -- to override if any
     self:_argt(_argt) -- override if any
 end
 
 function CEntity:focus() -- focus camera on itself
     if not self.camera then return end
     self.camera:focusEntity(self)
+end
+
+function CEntity:entitiesAround() -- entities around itself -- requires a camera
+    if not self.camera then return end
+    self:focus()
+    return self.camera:entitiesAround()
 end
 
 
@@ -748,14 +779,16 @@ end
 local CCamera = CEntity:extend() -- camera
 CEntity.NAMECAMERA = "Camera" -- camera name
 CEntity.KINDCAMERA = "Camera" -- camera kind
+CCamera.RANGEX = Tic.SCREENW / 2
+CCamera.RANGEY = Tic.SCREENH / 2
 function CCamera:new(_argt)
     CCamera.super.new(self, _argt)
     self.name = CEntity.NAMECAMERA
     self.kind = CEntity.KINDCAMERA
+    self.rangex = CCamera.RANGEX
+    self.rangey = CCamera.RANGEY
     self:_argt(_argt) -- override if any
 end
--- Camera instance
-local Camera = CCamera{}
 
 function CCamera:focusXY(_worldx, _worldy) -- focus camera on world positions -- default to center
     _worldx = _worldx or 0
@@ -769,12 +802,29 @@ function CCamera:focusEntity(_entity) -- focus camera on an entity world positio
     self:focusXY(_entity.worldx, _entity.worldy)
 end
 
+function CCamera:entitiesAround() -- entities around a camera
+    return self.world:entitiesAround(self.worldx, self.worldy, self.rangex, self.rangey)
+end
+
 
 --
 -- CPlace
 --
 local CPlace = CEntity:extend() -- places
 CPlace:implement(CSprite)
+CEntity.KINDPLACE = "Place" -- place kind
+function CPlace:new(_argt)
+    CCharacter.super.new(self, _argt)
+    self.kind         = CEntity.KINDPLACE -- kind
+    self.screenx      = Tic.SCREENW // 2 -- screen positions
+    self.screeny      = Tic.SCREENH // 2
+    self.scale        = CSprite.SCALE01 -- scale
+    self.frame        = CSprite.FRAME00 -- frame
+    self.idlecycler   = CCyclerInt{maxindex = 59, mode = CCycler.MODEBLOCK,} -- cycler to get back to idle
+    self.colorhairsfg = Tic.COLORHAIRSFG -- colors
+    self:_argt(_argt) -- override if any
+    self.world:entityAppend(self) -- append itself to the world
+end
 
 
 --
@@ -1023,9 +1073,10 @@ function CCharacter:new(_argt)
     self.statphyact   = self.statphymax -- act stats -- 0-max
     self.statmenact   = self.statmenmax
     self.statpsyact   = self.statpsymax
-    self.camera       = Camera -- default camera
+    self.camera       = CCamera{name = self.name.." "..CEntity.NAMECAMERA} -- each character has it's own camera
     self:_argt(_argt) -- override if any
-    self.world:entityAppend(self) -- add itself to the world
+    self.world:entityAppend(self) -- append itself to the world
+    self:focus() -- focus its camera on itself
 end
 
 function CCharacter:drawPortrait(_idle, _border, _infos) -- draw the portrait -- _idle ? -- _border ? -- _infos ?
@@ -1183,7 +1234,12 @@ function CCharacter:toggleFrame() -- toggle frame 0-1
     self.frame = Nums:toggle01(self.frame) -- animate continuous move in the same dirx
 end
 
-function CCharacter:move(_direction)
+function CCharacter:moveXY(_worldx, _worldy)
+    if not _worldx or not _worldy then return end -- mandatory
+    self.world:entityMoveXY(self, _worldx, _worldy)
+end
+
+function CCharacter:moveDirection(_direction)
     if not _direction then return end -- mandatory
     local _state = self.state
     local _statesettings = Tic.STATESETTINGS[_state]
@@ -1221,7 +1277,7 @@ function CCharacter:move(_direction)
     _offsety = (_posture == Tic.POSTURESTAND) and _offsety or _offsety / 2 -- half if kneel
     _offsetx = (_offsetx < 0) and math.ceil(_offsetx) or math.floor(_offsetx)
     _offsety = (_offsety < 0) and math.ceil(_offsety) or math.floor(_offsety)
-    self.world:entityMove(self, self.worldx + _offsetx, self.worldy + _offsety)
+    self:moveXY(self.worldx + _offsetx, self.worldy + _offsety)
     self.idlecycler:min() -- reset the idle cycler
 end
 
@@ -1573,42 +1629,46 @@ local CEnnemy = CCharacter:extend() -- ennemy characters
 --
 -- Characters
 --
-local Truduk = CPlayerDwarf{name = "Truduk",}
+local Truduk = CPlayerDwarf{name = "Truduk",
+    worldx = 20,
+    worldy = 20,
+}
 local Prinnn = CPlayerGnome{name = "Prinnn",
     coloreyesbg  = Tic.COLORRED,
     coloreyesfg  = Tic.COLORORANGE,
+    worldx = -20,
+    worldy = -10,
 }
-local Kaptan = CPlayerMeduz{name = "Kaptan",}
-local Kaptin = CPlayerMeduz{name = "Kaptin",
-    colorhairsbg = Tic.COLORBLUEL,
-    colorhairsfg = Tic.COLORBLUEM,
-    coloreyesbg  = Tic.COLORBLUEM,
-    coloreyesfg  = Tic.COLORBLUEL,
-}
+-- local Kaptan = CPlayerMeduz{name = "Kaptan",}
+-- local Kaptin = CPlayerMeduz{name = "Kaptin",
+--     colorhairsbg = Tic.COLORBLUEL,
+--     colorhairsfg = Tic.COLORBLUEM,
+--     coloreyesbg  = Tic.COLORBLUEM,
+--     coloreyesfg  = Tic.COLORBLUEL,
+-- }
 local Nitcha = CPlayerDrowe{name = "Nitcha",}
-local Zariel = CPlayerAngel{name = "Zariel",}
-local Zikkow = CPlayerTifel{name = "Zikkow",
-    colorhairsbg = Tic.COLORGREENM,
-    colorhairsfg = Tic.COLORGREEND,
-    colorextra   = Tic.COLORGREYM,
-    coloreyesbg  = Tic.COLORGREENM,
-    coloreyesfg  = Tic.COLORGREENL,
-}
-local Kaainn = CPlayerDemon{name = "Kaainn",
-    colorhairsbg = Tic.COLORGREYL,
-    colorhairsfg = Tic.COLORWHITE,
-    coloreyesbg  = Tic.COLORBLUEM,
-    coloreyesfg  = Tic.COLORBLUEL,
-    size         = CCharacter.SIZEM,
-    colorshirt   = Tic.COLORPURPLE,
-    colorpants   = Tic.COLORRED,
-}
-local Daemok = CPlayerDemon{name = "Daemok",}
-local Golith = CPlayerGogol{name = "Golith",}
-local Wulfie = CPlayerWolfe{name = "Wulfie",
-    colorextra = Tic.COLORRED,
-}
-
+-- local Zariel = CPlayerAngel{name = "Zariel",}
+-- local Zikkow = CPlayerTifel{name = "Zikkow",
+--     colorhairsbg = Tic.COLORGREENM,
+--     colorhairsfg = Tic.COLORGREEND,
+--     colorextra   = Tic.COLORGREYM,
+--     coloreyesbg  = Tic.COLORGREENM,
+--     coloreyesfg  = Tic.COLORGREENL,
+-- }
+-- local Kaainn = CPlayerDemon{name = "Kaainn",
+--     colorhairsbg = Tic.COLORGREYL,
+--     colorhairsfg = Tic.COLORWHITE,
+--     coloreyesbg  = Tic.COLORBLUEM,
+--     coloreyesfg  = Tic.COLORBLUEL,
+--     size         = CCharacter.SIZEM,
+--     colorshirt   = Tic.COLORPURPLE,
+--     colorpants   = Tic.COLORRED,
+-- }
+-- local Daemok = CPlayerDemon{name = "Daemok",}
+-- local Golith = CPlayerGogol{name = "Golith",}
+-- local Wulfie = CPlayerWolfe{name = "Wulfie",
+--     colorextra = Tic.COLORRED,
+-- }
 
 --
 -- Sprites -- TESTING
@@ -1668,16 +1728,22 @@ function Tic:draw()
         end
     end
 
-    -- Camera:focusEntity(_playeractual)
-    _playeractual:focus()
-
     -- Tic:drawFrames()
     -- Tic:drawDirections()
-    Tic:drawLog()
+    -- Tic:drawLog()
 
-    _playeractual:drawC()
     _playeractual:drawStatsC(true)
     _playeractual:drawPortraitC(nil, true, true)
+
+    local _worldx = _playeractual.worldx
+    local _worldy = _playeractual.worldy
+    for _, _entity in pairs(_playeractual:entitiesAround()) do -- draw entities visible by the actual player
+        local _offsetx = _entity.worldx - _worldx
+        local _offsety = _entity.worldy - _worldy
+        _entity.screenx = (Tic.SCREENW // 2) + _offsetx
+        _entity.screeny = (Tic.SCREENH // 2) + _offsety
+        _entity:drawC()
+    end
 
     Tic:tick() -- /!\ required in the draw function 
 end
@@ -1713,12 +1779,15 @@ function Tic:drawLog()
     Tic:logAppend("DIX:", _dirx)
     Tic:logAppend("DIY:", _diry)
     Tic:logAppend()
-    Tic:logAppend("T60:", _tick60)
-    Tic:logAppend("FRM:", _frame)
-    Tic:logAppend("T00:", _tick00)
-    Tic:logAppend("IDL:", _playeractual.idlecycler.actvalue)
-    Tic:logAppend("CAX:", Camera.worldx)
-    Tic:logAppend("CAY:", Camera.worldy)
+    -- Tic:logAppend("T60:", _tick60)
+    -- Tic:logAppend("FRM:", _frame)
+    -- Tic:logAppend("T00:", _tick00)
+    -- Tic:logAppend("IDL:", _playeractual.idlecycler.actvalue)
+    Tic:logAppend("SCX:", _playeractual.screenx)
+    Tic:logAppend("SCY:", _playeractual.screeny)
+    Tic:logAppend()
+    Tic:logAppend("CAX:", _playeractual.camera.worldx)
+    Tic:logAppend("CAY:", _playeractual.camera.worldy)
 
     Tic:logPrint()
 end
