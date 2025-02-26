@@ -12,8 +12,9 @@ end
 
 
 -- Random
-function Nums:random01() -- returns random 0 or 1
-    return (math.random() > 0.5) and 1 or  0
+function Nums:random01(_percent0) -- returns random 0 or 1 -- use _percent0 to adjust -- default 1/2
+    _percent0 = (_percent0 and Nums:isBW(_percent0, 0, 1)) and _percent0 or 0.5
+    return (math.random() <= _percent0) and 0 or 1
 end
 
 

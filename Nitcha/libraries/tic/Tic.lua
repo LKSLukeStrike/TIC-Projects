@@ -164,11 +164,14 @@ Tic.WEAPONMAGIC = 2
 Tic.WEAPONLIGHT = 3
 Tic.WEAPONALCHE = 4
 
-Tic.FREQUENCE240 = 240 -- frequences -- each 4 second
-Tic.FREQUENCE120 = 120 -- each 2 second
-Tic.FREQUENCE090 = 090 -- each 1.5 second
-Tic.FREQUENCE060 = 060 -- each 1 second
+Tic.FREQUENCE000 = 000 -- frequences -- each 0 second
 Tic.FREQUENCE030 = 030 -- each 0.5 second
+Tic.FREQUENCE060 = 060 -- each 1 second
+Tic.FREQUENCE090 = 090 -- each 1.5 second
+Tic.FREQUENCE120 = 120 -- each 2 second
+Tic.FREQUENCE180 = 180 -- each 3 second
+Tic.FREQUENCE240 = 240 -- each 4 second
+Tic.FREQUENCE600 = 600 -- each 10 second
 
 Tic.KEYBOARDKEYS = 0xFF88 -- keyboard state -- up to 4 pressed keys
 -- Keys values
@@ -597,6 +600,7 @@ CSpriteBG.SPRITEBANK  = 0
 CSpriteBG.SPRITEEMPTY = CSpriteBG.SPRITEBANK + 0 -- empty sprite
 CSpriteBG.BUILDBANK  = 16 -- buildings
 CSpriteBG.PLACEHOUSE = CSpriteBG.BUILDBANK + 0
+CSpriteBG.PLACETOWER = CSpriteBG.BUILDBANK + 1
 function CSpriteBG:new(_argt)
     CSpriteBG.super.new(self, _argt)
     self:_argt(_argt) -- override if any
@@ -671,6 +675,20 @@ end
 function CSpriteFGBoard:draw()
     Tic:boardPaint(self.sprite, self.directives)
     CSpriteFGBoard.super.draw(self)
+end
+
+
+--
+-- CAnimation
+--
+local CAnimation = Classic:extend() -- general palette animation for entities
+function CAnimation:new(_argt)
+    CAnimation.super.new(self, _argt)
+    self.frequence = Tic.FREQUENCE060
+    self.percent0  = 0.5
+    self.palette0  = {}
+    self.palette1  = {}
+    self:_argt(_argt) -- override if any
 end
 
 
@@ -823,19 +841,44 @@ function CEntityDrawable:new(_argt)
     CEntityDrawable.super.new(self, _argt)
     self.kind = CEntity.KINDDRAWABLE
     self.name = CEntity.NAMEDRAWABLE
-    self.sprite = CSpriteBG.SPRITEEMPTY
+    self.sprite  = CSpriteBG.SPRITEEMPTY
     self.screenx = Tic.SCREENW // 2 -- screen positions
     self.screeny = Tic.SCREENH // 2
+    self.dirx    = Nums:random01()
     self:_argt(_argt) -- override if any
     self.world:entityAppend(self) -- append itself to the world
 end
 
 function CEntityDrawable:draw()
+    local _tick00      = Tic.TICK00.actvalue
+    local _palette     = self.palette
+
+    for _, _animation in pairs(self.animations or {}) do -- animate
+        local _frequence   = _animation.frequence
+        local _percent0    = _animation.percent0
+        local _palette0    = _animation.palette0
+        local _palette1    = _animation.palette1
+        local _frequence01 = Nums:frequence01(_tick00, _frequence)
+        local _random01    = Nums:random01(_percent0)
+        local _palette01   = _frequence01 * _random01
+        -- Tic:logAppend("FRQ:", _frequence)
+        -- Tic:logAppend("PER:", _percent0)
+        -- Tic:logAppend("F01:", _frequence01)
+        -- Tic:logAppend("RND:", _random01)
+        -- Tic:logAppend("P01:", _palette01)
+        -- Tic:logAppend("PA0:", Tables:dump(_palette0))
+        -- Tic:logAppend("PA1:", Tables:dump(_palette1))
+        _palette = (_palette01 == 0)
+            and Tables:merge(_palette, _palette0)
+            or  Tables:merge(_palette, _palette1)
+    end
+
     local _musprite = CSpriteBG() -- multi usage unique sprite
     _musprite.sprite  = self.sprite
     _musprite.screenx = self.screenx
     _musprite.screeny = self.screeny
-    _musprite.palette = self.palette
+    _musprite.palette = _palette
+    _musprite.flip    = self.dirx
     _musprite:draw()
 end
 
@@ -858,31 +901,79 @@ end
 --
 -- CPlaceHouse
 --
-local CPlaceHouse = CEntityDrawable:extend() -- places
+local CPlaceHouse = CPlace:extend() -- houses
+CPlaceHouse.PALETTE = {[Tic.COLORWHITE] = Tic.COLORKEY, [Tic.COLORYELLOW] = Tic.COLORGREYM,}
 CEntity.KINDHOUSE = "House" -- House kind
 CEntity.NAMEHOUSE = "House" -- House name
 function CPlaceHouse:new(_argt)
     CPlaceHouse.super.new(self, _argt)
     self.kind = CEntity.KINDHOUSE
     self.name = CEntity.NAMEHOUSE
-    self.sprite = CSpriteBG.PLACEHOUSE
+    self.sprite   = CSpriteBG.PLACEHOUSE
+    self.palette  = CPlaceHouse.PALETTE
     self:_argt(_argt) -- override if any
 end
 
-function CPlaceHouse:draw()
-    local _tick00    = Tic.TICK00.actvalue
-    local _frequence = Tic.FREQUENCE060
-    local _palette   = self.palette
-    local _palette0  = (self.palette0) and self.palette0 or {[Tic.COLORWHITE] = Tic.COLORWHITE,}
-    local _palette1  = (self.palette1) and self.palette1 or {[Tic.COLORWHITE] = Tic.COLORYELLOW,}
-    local _palette   = (Nums:frequence01(_tick00, _frequence) == 0 and Nums:random01() == 0)
-        and Tables:merge(_palette, _palette0)
-        or  Tables:merge(_palette, _palette1)
-    self:_save{"palette",}
-    self.palette = _palette -- chimney
-    self.super.draw(self)
-    self:_load()
+local CPlaceHouseAnim = CPlaceHouse:extend() -- anim houses
+function CPlaceHouseAnim:new(_argt)
+    CPlaceHouseAnim.super.new(self, _argt)
+    self.animations = {
+        CAnimation{ -- chimney
+            frequence = Tic.FREQUENCE180,
+            percent0  = 0.9,
+            palette0  = {[Tic.COLORWHITE] = Tic.COLORWHITE,},
+            palette1  = {[Tic.COLORWHITE] = Tic.COLORORANGE,},
+        },
+        CAnimation{ -- window
+            frequence = Tic.FREQUENCE600,
+            percent0  = 0.01,
+            palette0  = {[Tic.COLORYELLOW] = Tic.COLORGREYM,},
+            palette1  = {[Tic.COLORYELLOW] = Tic.COLORGREYL,},
+        },
+    }
+    self:_argt(_argt) -- override if any
 end
+
+local CPlaceHouseIdle = CPlaceHouse:extend() -- idle houses
+
+
+--
+-- CPlaceTower
+--
+local CPlaceTower = CPlace:extend() -- towers
+CPlaceTower.PALETTE = {[Tic.COLORWHITE] = Tic.COLORGREYL, [Tic.COLORYELLOW] = Tic.COLORGREYL,}
+CEntity.KINDTOWER = "Tower" -- Tower kind
+CEntity.NAMETOWER = "Tower" -- Tower name
+function CPlaceTower:new(_argt)
+    CPlaceTower.super.new(self, _argt)
+    self.kind = CEntity.KINDTOWER
+    self.name = CEntity.NAMETOWER
+    self.sprite   = CSpriteBG.PLACETOWER
+    self.palette  = CPlaceTower.PALETTE
+    self:_argt(_argt) -- override if any
+end
+
+local CPlaceTowerAnim = CPlaceTower:extend() -- anim towers
+function CPlaceTowerAnim:new(_argt)
+    CPlaceTowerAnim.super.new(self, _argt)
+    self.animations = {
+        CAnimation{ -- window 1
+            frequence = Tic.FREQUENCE600,
+            percent0  = 0.6,
+            palette0  = {[Tic.COLORWHITE] = Tic.COLORGREYL,},
+            palette1  = {[Tic.COLORWHITE] = Tic.COLORORANGE,},
+        },
+        CAnimation{ -- window 2
+            frequence = Tic.FREQUENCE600,
+            percent0  = 0.4,
+            palette0  = {[Tic.COLORYELLOW] = Tic.COLORGREYL,},
+            palette1  = {[Tic.COLORYELLOW] = Tic.COLORORANGE,},
+        },
+    }
+    self:_argt(_argt) -- override if any
+end
+
+local CPlaceTowerIdle = CPlaceTower:extend() -- idle towers
 
 
 --
@@ -1389,7 +1480,7 @@ function CCharacterHumanoid:_drawBody()
     _musprite.rotate  = _bodyrotate
     _musprite.frame   = _bodyframe
     _musprite.scale   = self.scale
-    _musprite.flip    = self.dirx -- flip x if any
+    _musprite.flip    = self.dirx
     _musprite:palettize{ -- apply body palette
         [Tic.COLORARMOR] = self.colorarmor,
         [Tic.COLORSHIRT] = self.colorshirt,
@@ -1421,7 +1512,7 @@ function CCharacterHumanoid:_drawHead()
     _musprite.rotate  = _headrotate
     _musprite.frame   = _headframe
     _musprite.scale   = self.scale
-    _musprite.flip    = self.dirx -- flip x if any
+    _musprite.flip    = self.dirx
     _musprite:palettize{ -- apply head palette
         [Tic.COLORHAIRSFG] = self.colorhairsfg,
         [Tic.COLORHAIRSBG] = self.colorhairsbg,
@@ -1685,15 +1776,27 @@ local CEnnemy = CCharacter:extend() -- ennemy characters
 --
 -- Places
 --
-local House01 = CPlaceHouse{
+local House01 = CPlaceHouseAnim{
     worldx = -15,
     worldy = 5,
 }
+-- House01:draw()
+-- exit()
 
-local House02 = CPlaceHouse{
+local House02 = CPlaceHouseIdle{
     worldx = 20,
     worldy = 20,
-    palette = {[Tic.COLORRED] = Tic.COLORGREENM,},
+    palette = Tables:merge(CPlaceHouse.PALETTE, {[Tic.COLORRED] = Tic.COLORGREENM,}),
+}
+
+local Tower01 = CPlaceTowerAnim{
+    worldx = -10,
+    worldy = 25,
+}
+
+local Tower02 = CPlaceTowerIdle{
+    worldx = 15,
+    worldy = -10,
 }
 
 
@@ -1788,6 +1891,8 @@ function Tic:draw()
     -- Tic:drawLog()
 
     Tic:drawPlayerActual()
+
+    Tic:logPrint()
 
     Tic:tick() -- /!\ required in the draw function 
 end
