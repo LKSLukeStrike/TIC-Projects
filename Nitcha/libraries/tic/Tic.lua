@@ -714,32 +714,32 @@ function CWorld:new(_argt)
     self.kind = CWorld.KINDWORLD
     self.name = CWorld.NAMEWORLD
     self.entities  = {} -- record each entity
-    self.locations = {} -- record each entity locations -- {worldx {worldy {entity}}} for searching
+    self.locations = {} -- record each entity locations -- {worldy {worldx {entity}}} for searching
     self:_argt(_argt) -- override if any
 end
 -- World instance
 local World = CWorld{}
 
-function CWorld:entityAppend(_entity) -- add a new entity in the world
+function CWorld:entityAppend(_entity) -- add a new entity in the world -- {worldy {worldx {entity}}}
     if not _entity then return end -- mandatory
     if self.entities[_entity] then return end -- avoid doublons
     self.entities[_entity] = _entity
-    if not self.locations[_entity.worldx] then -- new xorldx entry
-        self.locations[_entity.worldx] = {}
+    if not self.locations[_entity.worldy] then -- new xorldy entry
+        self.locations[_entity.worldy] = {}
     end
-    if not self.locations[_entity.worldx][_entity.worldy] then -- new worldy entry in existing worldx
-        self.locations[_entity.worldx][_entity.worldy] = {}
+    if not self.locations[_entity.worldy][_entity.worldx] then -- new worldx entry in existing worldy
+        self.locations[_entity.worldy][_entity.worldx] = {}
     end
-    self.locations[_entity.worldx][_entity.worldy][_entity] = _entity
+    self.locations[_entity.worldy][_entity.worldx][_entity] = _entity
 end
 
 function CWorld:entityRemove(_entity) -- remove an entity from the world
     if not _entity then return end -- mandatory
     if not self.entities[_entity] then return end -- doesnt exist
     self.entities[_entity] = nil
-    self.locations[_entity.worldx][_entity.worldy][_entity] = nil
-    if self.locations[_entity.worldx][_entity.worldy] == {} then self.locations[_entity.worldx][_entity.worldy] = nil end
-    if self.locations[_entity.worldx] == {} then self.locations[_entity.worldx] = nil end
+    self.locations[_entity.worldy][_entity.worldx][_entity] = nil
+    if self.locations[_entity.worldy][_entity.worldx] == {} then self.locations[_entity.worldy][_entity.worldx] = nil end
+    if self.locations[_entity.worldy] == {} then self.locations[_entity.worldy] = nil end
 end
 
 function CWorld:entityMoveXY(_entity, _worldx, _worldy) -- move an entity into the world
@@ -759,14 +759,19 @@ function CWorld:entitiesAround(_worldx, _worldy, _rangex, _rangey) -- returns en
     local _rangeyup = _worldy - _rangey
     local _rangeydw = _worldy + _rangey - 1
     local _result  = {}
-    -- print("around", _worldx, _worldy, _rangex, _rangey)
-    -- print("range", _rangexlf, _rangexrg, _rangeyup, _rangeydw)
-    for _keyx, _valx in pairs(self.locations) do -- search for x in range
-        if Nums:isBW(_keyx, _rangexlf, _rangexrg) then
-            for _keyy, _valy in pairs(_valx) do -- search for y in range
-                if Nums:isBW(_keyy, _rangeyup, _rangeydw) then
-                    for _key, _val in pairs(_valy) do
-                        _result[_key] = _val
+
+    for _keyy, _valy in pairs(self.locations) do -- search for y in range
+        if Nums:isBW(_keyy, _rangeyup, _rangeydw) then
+            for _keyx, _valx in pairs(_valy) do -- search for x in range
+                if Nums:isBW(_keyx, _rangexlf, _rangexrg) then
+                    for _key, _val in pairs(_valx) do
+                        if not _result[_keyy] then -- new xorldy entry
+                            _result[_keyy] = {}
+                        end
+                        if not _result[_keyy][_keyx] then -- new worldx entry in existing worldy
+                            _result[_keyy][_keyx] = {}
+                        end
+                        _result[_keyy][_keyx][_val] = _val
                     end
                 end
             end
@@ -1834,8 +1839,6 @@ local House01 = CPlaceHouseAnim{
     worldx = -15,
     worldy = 5,
 }
--- House01:draw()
--- exit()
 
 local House02 = CPlaceHouseIdle{
     worldx = 20,
@@ -1950,7 +1953,7 @@ local _statustick01 = 0
 function Tic:draw()
     cls()
 
-    Tic:drawScreenFrames()
+    -- Tic:drawScreenFrames()
     Tic:drawVWorldFrames()
 
     Tic:drawPlayerActual()
@@ -1973,8 +1976,8 @@ end
 function Tic:drawVWorldFrames()
     local _drawcolor = Tic.COLORGREYL
     rectb(Tic.VWORLDLF, Tic.VWORLDUP, Tic.VWORLDW, Tic.VWORLDH, _drawcolor)
-    line(Tic.VWORLDLF, Tic.VWORLDUP + (Tic.VWORLDH // 2), Tic.VWORLDRG, Tic.VWORLDUP + (Tic.VWORLDH // 2), _drawcolor)
-    line(Tic.VWORLDLF + (Tic.VWORLDW // 2), Tic.VWORLDUP, Tic.VWORLDLF + (Tic.VWORLDW // 2), Tic.VWORLDDW, _drawcolor)
+    -- line(Tic.VWORLDLF, Tic.VWORLDUP + (Tic.VWORLDH // 2), Tic.VWORLDRG, Tic.VWORLDUP + (Tic.VWORLDH // 2), _drawcolor)
+    -- line(Tic.VWORLDLF + (Tic.VWORLDW // 2), Tic.VWORLDUP, Tic.VWORLDLF + (Tic.VWORLDW // 2), Tic.VWORLDDW, _drawcolor)
 end
 
 function Tic:drawPlayerActual()
@@ -1997,14 +2000,21 @@ function Tic:drawPlayerActual()
         end
     end
 
-    local _worldx = _playeractual.worldx
-    local _worldy = _playeractual.worldy
-    for _, _entity in pairs(_playeractual:entitiesAround()) do -- draw entities visible by the actual player
-        local _offsetx = _entity.worldx - _worldx
-        local _offsety = _entity.worldy - _worldy
-        _entity.screenx = (Tic.SCREENW // 2) + _offsetx
-        _entity.screeny = (Tic.SCREENH // 2) + _offsety
-        _entity:drawC()
+    local _worldx         = _playeractual.worldx
+    local _worldy         = _playeractual.worldy
+    local _entitiesaround = _playeractual:entitiesAround()
+    local _keyys          = Tables:keys(_entitiesaround)
+    for _, _keyy in pairs(_keyys) do -- draw entities visible by the actual player sorted by y first
+        local _keyxs      = Tables:keys(_entitiesaround[_keyy])
+        for _, _keyx in pairs(_keyxs) do -- sorted by x next
+            for _entity, _ in pairs(_entitiesaround[_keyy][_keyx]) do -- draw entities at the same x y
+                local _offsetx  = _entity.worldx - _worldx
+                local _offsety  = _entity.worldy - _worldy
+                _entity.screenx = (Tic.SCREENW // 2) + _offsetx
+                _entity.screeny = (Tic.SCREENH // 2) + _offsety
+                _entity:drawC()
+            end
+        end
     end
 
     -- _playeractual:drawStatsC(true)

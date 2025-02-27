@@ -24,6 +24,15 @@ if not TIC80 then
     function rectb(...)
         print("rectb:", table.unpack({...}))
     end
+    function circ(...)
+        print("circ:", table.unpack({...}))
+    end
+    function circb(...)
+        print("circb:", table.unpack({...}))
+    end
+    function line(...)
+        print("line:", table.unpack({...}))
+    end
     function poke4(...)
         print("poke4:", table.unpack({...}))
     end
