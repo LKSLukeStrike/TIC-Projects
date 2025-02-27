@@ -22,6 +22,14 @@ require("includes/tic/CCycler")
 Tic.SCREENW = 240 -- screen width
 Tic.SCREENH = 136 -- screen height
 
+-- Vixible World sizes
+Tic.VWORLDW = Tic.SCREENH -- visible world width
+Tic.VWORLDH = Tic.SCREENH -- visible world height
+Tic.VWORLDLF = (Tic.SCREENW - Tic.VWORLDW) // 2 -- visible world screen left
+Tic.VWORLDRG = Tic.VWORLDLF + Tic.VWORLDW - 1 -- visible world screen right
+Tic.VWORLDUP = (Tic.SCREENH - Tic.VWORLDH) // 2 -- visible world screen up
+Tic.VWORLDDW = Tic.VWORLDUP + Tic.VWORLDH - 1 -- visible world screen down
+
 -- Palette map
 Tic.PALETTEMAP = 0x3FF0 * 2 -- vram bank 1
 
@@ -171,6 +179,7 @@ Tic.FREQUENCE090 = 090 -- each 1.5 second
 Tic.FREQUENCE120 = 120 -- each 2 second
 Tic.FREQUENCE180 = 180 -- each 3 second
 Tic.FREQUENCE240 = 240 -- each 4 second
+Tic.FREQUENCE300 = 300 -- each 5 second
 Tic.FREQUENCE600 = 600 -- each 10 second
 
 Tic.KEYBOARDKEYS = 0xFF88 -- keyboard state -- up to 4 pressed keys
@@ -802,8 +811,8 @@ end
 local CCamera = CEntity:extend() -- camera
 CEntity.KINDCAMERA = "Camera" -- Camera kind
 CEntity.NAMECAMERA = "Camera" -- Camera name
-CCamera.RANGEX = Tic.SCREENW / 2
-CCamera.RANGEY = Tic.SCREENH / 2
+CCamera.RANGEX = Tic.VWORLDW / 2
+CCamera.RANGEY = Tic.VWORLDH / 2
 function CCamera:new(_argt)
     CCamera.super.new(self, _argt)
     self.kind = CEntity.KINDCAMERA
@@ -861,13 +870,6 @@ function CEntityDrawable:draw()
         local _frequence01 = Nums:frequence01(_tick00, _frequence)
         local _random01    = Nums:random01(_percent0)
         local _palette01   = _frequence01 * _random01
-        -- Tic:logAppend("FRQ:", _frequence)
-        -- Tic:logAppend("PER:", _percent0)
-        -- Tic:logAppend("F01:", _frequence01)
-        -- Tic:logAppend("RND:", _random01)
-        -- Tic:logAppend("P01:", _palette01)
-        -- Tic:logAppend("PA0:", Tables:dump(_palette0))
-        -- Tic:logAppend("PA1:", Tables:dump(_palette1))
         _palette = (_palette01 == 0)
             and Tables:merge(_palette, _palette0)
             or  Tables:merge(_palette, _palette1)
@@ -926,9 +928,9 @@ function CPlaceHouseAnim:new(_argt)
         },
         CAnimation{ -- window
             frequence = Tic.FREQUENCE600,
-            percent0  = 0.01,
+            percent0  = 0.1,
             palette0  = {[Tic.COLORYELLOW] = Tic.COLORGREYM,},
-            palette1  = {[Tic.COLORYELLOW] = Tic.COLORGREYL,},
+            palette1  = {[Tic.COLORYELLOW] = Tic.COLORORANGE,},
         },
     }
     self:_argt(_argt) -- override if any
@@ -941,7 +943,7 @@ local CPlaceHouseIdle = CPlaceHouse:extend() -- idle houses
 -- CPlaceTower
 --
 local CPlaceTower = CPlace:extend() -- towers
-CPlaceTower.PALETTE = {[Tic.COLORWHITE] = Tic.COLORGREYL, [Tic.COLORYELLOW] = Tic.COLORGREYL,}
+CPlaceTower.PALETTE = {[Tic.COLORWHITE] = Tic.COLORGREYD, [Tic.COLORYELLOW] = Tic.COLORGREYD,}
 CEntity.KINDTOWER = "Tower" -- Tower kind
 CEntity.NAMETOWER = "Tower" -- Tower name
 function CPlaceTower:new(_argt)
@@ -958,15 +960,15 @@ function CPlaceTowerAnim:new(_argt)
     CPlaceTowerAnim.super.new(self, _argt)
     self.animations = {
         CAnimation{ -- window 1
-            frequence = Tic.FREQUENCE600,
+            frequence = Tic.FREQUENCE240,
             percent0  = 0.6,
-            palette0  = {[Tic.COLORWHITE] = Tic.COLORGREYL,},
+            palette0  = {[Tic.COLORWHITE] = Tic.COLORGREYD,},
             palette1  = {[Tic.COLORWHITE] = Tic.COLORORANGE,},
         },
         CAnimation{ -- window 2
-            frequence = Tic.FREQUENCE600,
-            percent0  = 0.4,
-            palette0  = {[Tic.COLORYELLOW] = Tic.COLORGREYL,},
+            frequence = Tic.FREQUENCE120,
+            percent0  = 0.1,
+            palette0  = {[Tic.COLORYELLOW] = Tic.COLORGREYD,},
             palette1  = {[Tic.COLORYELLOW] = Tic.COLORORANGE,},
         },
     }
@@ -1287,6 +1289,16 @@ function CCharacter:drawStatsC(_border) -- draw the stats CENTERED
     self.statsy = self.statsy - (4 * CSprite.SCALE02)
     self:drawStats(_border)
     self:_load()
+end
+
+function CCharacter:drawDirs() -- draw the directions and ranges
+    local _drawcolor = Tic.COLORWHITE
+    local _screenx   = self.screenx
+    local _screeny   = self.screeny
+    circb(_screenx, _screeny, 10, _drawcolor)
+    for _, _offsets in pairs(Tic.DIRS2OFFSETS) do
+        line(_screenx, _screeny, _screenx + _offsets.offsetx, _screeny + _offsets.offsety, _drawcolor)
+    end
 end
 
 function CCharacter:draw()
@@ -1803,10 +1815,10 @@ local Tower02 = CPlaceTowerIdle{
 --
 -- Players
 --
--- local Truduk = CPlayerDwarf{name = "Truduk",
---     worldx = 20,
---     worldy = 20,
--- }
+local Truduk = CPlayerDwarf{name = "Truduk",
+    worldx = 20,
+    worldy = 30,
+}
 -- local Prinnn = CPlayerGnome{name = "Prinnn",
 --     coloreyesbg  = Tic.COLORRED,
 --     coloreyesfg  = Tic.COLORORANGE,
@@ -1886,15 +1898,31 @@ local _statustick01 = 0
 function Tic:draw()
     cls()
 
-    -- Tic:drawFrames()
-    -- Tic:drawDirections()
-    -- Tic:drawLog()
+    Tic:drawScreenFrames()
+    Tic:drawVWorldFrames()
 
     Tic:drawPlayerActual()
 
+    -- Tic:drawLog()
     Tic:logPrint()
 
     Tic:tick() -- /!\ required in the draw function 
+end
+
+function Tic:drawScreenFrames()
+    local _drawcolor = Tic.COLORGREYD
+    rectb(0, 0, Tic.SCREENW, Tic.SCREENH, _drawcolor)
+    line(0, 0, Tic.SCREENW, Tic.SCREENH, _drawcolor)
+    line(0, Tic.SCREENH, Tic.SCREENW, 0, _drawcolor)
+    line(0, Tic.SCREENH // 2, Tic.SCREENW, Tic.SCREENH // 2, _drawcolor)
+    line(Tic.SCREENW // 2, 0, Tic.SCREENW // 2, Tic.SCREENH, _drawcolor)
+end
+
+function Tic:drawVWorldFrames()
+    local _drawcolor = Tic.COLORGREYL
+    rectb(Tic.VWORLDLF, Tic.VWORLDUP, Tic.VWORLDW, Tic.VWORLDH, _drawcolor)
+    line(Tic.VWORLDLF, Tic.VWORLDUP + (Tic.VWORLDH // 2), Tic.VWORLDRG, Tic.VWORLDUP + (Tic.VWORLDH // 2), _drawcolor)
+    line(Tic.VWORLDLF + (Tic.VWORLDW // 2), Tic.VWORLDUP, Tic.VWORLDLF + (Tic.VWORLDW // 2), Tic.VWORLDDW, _drawcolor)
 end
 
 function Tic:drawPlayerActual()
@@ -1927,8 +1955,9 @@ function Tic:drawPlayerActual()
         _entity:drawC()
     end
 
-    _playeractual:drawStatsC(true)
-    _playeractual:drawPortraitC(nil, true, true)
+    -- _playeractual:drawStatsC(true)
+    -- _playeractual:drawPortraitC(nil, true, true)
+    -- _playeractual:drawDirs()
 end
 
 function Tic:drawLog()
@@ -1973,26 +2002,6 @@ function Tic:drawLog()
     Tic:logAppend("CAY:", _playeractual.camera.worldy)
 
     Tic:logPrint()
-end
-
-function Tic:drawFrames()
-    local _drawcolor = Tic.COLORGREYD
-    rectb(0, 0, Tic.SCREENW, Tic.SCREENH, _drawcolor)
-    line(0, 0, Tic.SCREENW, Tic.SCREENH, _drawcolor)
-    line(0, Tic.SCREENH, Tic.SCREENW, 0, _drawcolor)
-    line(0, Tic.SCREENH // 2, Tic.SCREENW, Tic.SCREENH // 2, _drawcolor)
-    line(Tic.SCREENW // 2, 0, Tic.SCREENW // 2, Tic.SCREENH, _drawcolor)
-end
-
-function Tic:drawDirections()
-    local _drawcolor = Tic.COLORGREYD
-    local _playeractual = Tic:playerActual()
-    local _screenx = _playeractual.screenx
-    local _screeny = _playeractual.screeny
-    circb(_screenx, _screeny, 10, _drawcolor)
-    for _, _offsets in pairs(Tic.DIRS2OFFSETS) do
-        line(_screenx, _screeny, _screenx + _offsets.offsetx, _screeny + _offsets.offsety, _drawcolor)
-    end
 end
 
 
