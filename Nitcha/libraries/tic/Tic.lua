@@ -22,7 +22,7 @@ require("includes/tic/CCycler")
 Tic.SCREENW = 240 -- screen width
 Tic.SCREENH = 136 -- screen height
 
--- Vixible World sizes
+-- Visible World sizes
 Tic.VWORLDW = Tic.SCREENH -- visible world width
 Tic.VWORLDH = Tic.SCREENH -- visible world height
 Tic.VWORLDLF = (Tic.SCREENW - Tic.VWORLDW) // 2 -- visible world screen left
@@ -607,9 +607,11 @@ end
 local CSpriteBG = CSprite:extend() -- bg sprites aka tic tiles
 CSpriteBG.SPRITEBANK  = 0
 CSpriteBG.SPRITEEMPTY = CSpriteBG.SPRITEBANK + 0 -- empty sprite
-CSpriteBG.BUILDBANK  = 16 -- buildings
-CSpriteBG.PLACEHOUSE = CSpriteBG.BUILDBANK + 0
-CSpriteBG.PLACETOWER = CSpriteBG.BUILDBANK + 1
+CSpriteBG.BUILDSBANK  = 16 -- buildings
+CSpriteBG.PLACEHOUSE  = CSpriteBG.BUILDSBANK + 0
+CSpriteBG.PLACETOWER  = CSpriteBG.BUILDSBANK + 1
+CSpriteBG.FORESTBANK  = 32 -- forests
+CSpriteBG.PLACETREE0  = CSpriteBG.FORESTBANK + 0
 function CSpriteBG:new(_argt)
     CSpriteBG.super.new(self, _argt)
     self:_argt(_argt) -- override if any
@@ -853,7 +855,8 @@ function CEntityDrawable:new(_argt)
     self.sprite  = CSpriteBG.SPRITEEMPTY
     self.screenx = Tic.SCREENW // 2 -- screen positions
     self.screeny = Tic.SCREENH // 2
-    self.dirx    = Nums:random01()
+    self.dirx    = Nums:random01() -- random flip lf/rg
+    self.solid   = true -- can be traversed or not
     self:_argt(_argt) -- override if any
     self.world:entityAppend(self) -- append itself to the world
 end
@@ -976,6 +979,45 @@ function CPlaceTowerAnim:new(_argt)
 end
 
 local CPlaceTowerIdle = CPlaceTower:extend() -- idle towers
+
+
+--
+-- CPlaceTrees
+--
+local CPlaceTrees = CPlace:extend() -- trees
+CPlaceTrees.PALETTE = {[Tic.COLORWHITE] = Tic.COLORGREYM, [Tic.COLORYELLOW] = Tic.COLORGREYD,}
+CEntity.KINDTREES = "Trees" -- Trees kind
+CEntity.NAMETREES = "Trees" -- Trees name
+function CPlaceTrees:new(_argt)
+    CPlaceTrees.super.new(self, _argt)
+    self.kind = CEntity.KINDTREES
+    self.name = CEntity.NAMETREES
+    self.sprite   = CSpriteBG.PLACETREE0
+    self.palette  = CPlaceTrees.PALETTE
+    self:_argt(_argt) -- override if any
+end
+
+local CPlaceTreesAnim = CPlaceTrees:extend() -- anim trees
+function CPlaceTreesAnim:new(_argt)
+    CPlaceTreesAnim.super.new(self, _argt)
+    self.animations = {
+        CAnimation{ -- leaf 1
+            frequence = Tic.FREQUENCE240,
+            percent0  = 0.6,
+            palette0  = {[Tic.COLORWHITE] = Tic.COLORGREYD,},
+            palette1  = {[Tic.COLORWHITE] = Tic.COLORORANGE,},
+        },
+        CAnimation{ -- leaf 2
+            frequence = Tic.FREQUENCE120,
+            percent0  = 0.1,
+            palette0  = {[Tic.COLORYELLOW] = Tic.COLORGREYD,},
+            palette1  = {[Tic.COLORYELLOW] = Tic.COLORORANGE,},
+        },
+    }
+    self:_argt(_argt) -- override if any
+end
+
+local CPlaceTreesIdle = CPlaceTrees:extend() -- idle trees
 
 
 --
@@ -1809,6 +1851,16 @@ local Tower01 = CPlaceTowerAnim{
 local Tower02 = CPlaceTowerIdle{
     worldx = 15,
     worldy = -10,
+}
+
+local Trees01 = CPlaceTreesIdle{
+    worldx = 25,
+    worldy = 15,
+}
+
+local Trees02 = CPlaceTreesIdle{
+    worldx = -20,
+    worldy = -7,
 }
 
 
