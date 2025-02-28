@@ -288,7 +288,7 @@ end
 -- Players System -- handle a players stack
 Tic.PLAYERS = CCyclerTable()
 function Tic:playerAppend(_player) -- stack a new player
-    if Tic.PLAYERS[_player] then return end -- avoid doublons
+    if Tables:find(Tic.PLAYERS, _player) then return end -- avoid doublons
     return Tic.PLAYERS:insert(_player)
 end
 
@@ -460,8 +460,13 @@ end
 
 -- Print System -- extend the simple print function
 function Tic:val2string(_val) -- return val or it's type if any for concat
-    _val = (type(_val) == "table" or type(_val) == "function" or type(_val) == "nil") -- TODO add more ?
-        and type(_val)
+    _val = (
+        type(_val) == "table" or
+        type(_val) == "function" or
+        type(_val) == "boolean" or
+        type(_val) == "nil"
+    ) -- TODO add more types ?
+        and tostring(_val)
         or  _val
     return _val
 end
@@ -490,8 +495,9 @@ function Tic:trace(...) -- trace with multiple args
     trace(_output)
 end
 
-function Tic:traceTable(_table, _indent, _depth) -- trace a table  -- SORTED -- RECURSIVE -- INDENT -- DEPTH
-    Tic:trace(Tables:dump(_table, _indent, _depth))
+function Tic:traceTable(_title, _table, _indent, _depth, _verbose, _skip, _keep) -- trace a table  -- SORTED -- RECURSIVE -- INDENT -- DEPTH
+    if _title then Tic:trace(_title) end
+    Tic:trace(Tables:dump(_table, _indent, _depth, _verbose, _skip, _keep))
 end
 
 
@@ -704,68 +710,63 @@ end
 
 
 --
--- CWorld
+-- CLocations
 --
-local CWorld = Classic:extend() -- general world that contains entities
-CWorld.KINDWORLD = "World" -- World kind
-CWorld.NAMEWORLD = "World" -- World name
-function CWorld:new(_argt)
-    CWorld.super.new(self, _argt)
-    self.kind = CWorld.KINDWORLD
-    self.name = CWorld.NAMEWORLD
-    self.entities  = {} -- record each entity
-    self.locations = {} -- record each entity locations -- {worldy {worldx {entity}}} for searching
+local CLocations = Classic:extend() -- general entities locations -- {worldy {worldx {entity = entity}}}
+function CLocations:new(_argt)
+    CLocations.super.new(self, _argt)
+    self.locations = {}
     self:_argt(_argt) -- override if any
 end
--- World instance
-local World = CWorld{}
 
-function CWorld:entityAppend(_entity) -- add a new entity in the world -- {worldy {worldx {entity}}}
+function CLocations:append(_entity) -- add a new entity -- /!\ allows doublons
     if not _entity then return end -- mandatory
-    if self.entities[_entity] then return end -- avoid doublons
-    self.entities[_entity] = _entity
-    if not self.locations[_entity.worldy] then -- new xorldy entry
-        self.locations[_entity.worldy] = {}
+    local _worldx = _entity.worldx
+    local _worldy = _entity.worldy
+    if not self.locations[_worldy] then -- new worldy entry
+        self.locations[_worldy] = {}
     end
-    if not self.locations[_entity.worldy][_entity.worldx] then -- new worldx entry in existing worldy
-        self.locations[_entity.worldy][_entity.worldx] = {}
+    if not self.locations[_worldy][_worldx] then -- new worldx entry in existing worldy
+        self.locations[_worldy][_worldx] = {}
     end
-    self.locations[_entity.worldy][_entity.worldx][_entity] = _entity
+    self.locations[_worldy][_worldx][_entity] = _entity
 end
 
-function CWorld:entityRemove(_entity) -- remove an entity from the world
+function CLocations:remove(_entity) -- remove an existing entity
     if not _entity then return end -- mandatory
-    if not self.entities[_entity] then return end -- doesnt exist
-    self.entities[_entity] = nil
-    self.locations[_entity.worldy][_entity.worldx][_entity] = nil
-    if self.locations[_entity.worldy][_entity.worldx] == {} then self.locations[_entity.worldy][_entity.worldx] = nil end
-    if self.locations[_entity.worldy] == {} then self.locations[_entity.worldy] = nil end
+    local _worldx = _entity.worldx
+    local _worldy = _entity.worldy
+    if not self.locations[_worldy][_worldx][_entity] then return end -- doesnt exist
+    self.locations[_worldy][_worldx][_entity] = nil
+    if self.locations[_worldy][_worldx] == {} then self.locations[_worldy][_worldx] = nil end -- cleanup
+    if self.locations[_worldy] == {} then self.locations[_worldy] = nil end
 end
 
-function CWorld:entityMoveXY(_entity, _worldx, _worldy) -- move an entity into the world
+function CLocations:moveXY(_entity, _worldx, _worldy) -- move an existing entity
     if not _entity or not _worldx or not _worldy then return end -- mandatory
-    if not self.entities[_entity] then return end -- doesnt exist
-    self:entityRemove(_entity)
+    local _worldx = _entity.worldx
+    local _worldy = _entity.worldy
+    if not self.locations[_worldy][_worldx][_entity] then return end -- doesnt exist
+    self:remove(_entity)
     _entity.worldx = _worldx
     _entity.worldy = _worldy
-    _entity:focus() -- focus its camera on itself
-    self:entityAppend(_entity)
+    self:append(_entity)
 end
 
-function CWorld:entitiesAround(_worldx, _worldy, _rangex, _rangey) -- returns entities around xy in ranges
-    if not _worldx or not _worldy or not _rangex or not _rangey then return end -- mandatory
-    local _rangexlf = _worldx - _rangex
-    local _rangexrg = _worldx + _rangex - 1
-    local _rangeyup = _worldy - _rangey
-    local _rangeydw = _worldy + _rangey - 1
+function CLocations:entitiesWorldXYRegion(_worldx, _worldy, _lf, _rg, _up, _dw) -- entities in region
+    if not _worldx or not _worldy or not _lf or not _rg or not _up or not _dw then return end -- mandatory
+    local _rangelf = _worldx - _lf -- region around world xy
+    local _rangerg = _worldx + _rg
+    local _rangeup = _worldy - _up
+    local _rangedw = _worldy + _dw
     local _result  = {}
 
     for _keyy, _valy in pairs(self.locations) do -- search for y in range
-        if Nums:isBW(_keyy, _rangeyup, _rangeydw) then
+        if Nums:isBW(_keyy, _rangeup, _rangedw) then
             for _keyx, _valx in pairs(_valy) do -- search for x in range
-                if Nums:isBW(_keyx, _rangexlf, _rangexrg) then
+                if Nums:isBW(_keyx, _rangelf, _rangerg) then
                     for _key, _val in pairs(_valx) do
-                        if not _result[_keyy] then -- new xorldy entry
+                        if not _result[_keyy] then -- new worldy entry
                             _result[_keyy] = {}
                         end
                         if not _result[_keyy][_keyx] then -- new worldx entry in existing worldy
@@ -778,6 +779,138 @@ function CWorld:entitiesAround(_worldx, _worldy, _rangex, _rangey) -- returns en
         end
     end
     return _result
+end
+
+function CLocations:entitiesWorldXYAround(_worldx, _worldy, _rangex, _rangey) -- entities in ranges
+    if not _worldx or not _worldy or not _rangex or not _rangey then return end -- mandatory
+    local _lf = _worldx - _rangex
+    local _rg = _worldx + _rangex - 1
+    local _up = _worldy - _rangey
+    local _dw = _worldy + _rangey - 1
+
+    return self:entitiesWorldXYRegion(_worldx, _worldy, _lf, _rg, _up, _dw)
+end
+
+function CLocations:entitiesEntityRegion(_entity, _lf, _rg, _up, _dw) -- entities in region
+    if not _entity or not _lf or not _rg or not _up or not _dw then return end -- mandatory
+    local _worldx = _entity.worldx
+    local _worldy = _entity.worldy
+
+    return self:entitiesWorldXYRegion(_worldx, _worldy, _lf, _rg, _up, _dw)
+end
+
+function CLocations:entitiesEntityAround(_entity, _rangex, _rangey) -- entities in ranges
+    if not _entity or not _rangex or not _rangey then return end -- mandatory
+    local _worldx = _entity.worldx
+    local _worldy = _entity.worldy
+
+    return self:entitiesWorldXYAround(_worldx, _worldy, _rangex, _rangey)
+end
+
+--
+-- CEntitiesLocations
+--
+local CEntitiesLocations = Classic:extend() -- general locations for entities
+function CEntitiesLocations:new(_argt)
+    CEntitiesLocations.super.new(self, _argt)
+    self.entities  = {} -- record each entity -- has to have worldx and worldy attributes
+    self.locations = CLocations{} -- record each entity locations
+    self:_argt(_argt) -- override if any
+end
+
+function CEntitiesLocations:append(_entity) -- add a new entity
+    if not _entity then return end -- mandatory
+    if self.entities[_entity] then return end -- avoid doublons
+    self.entities[_entity] = _entity
+    self.locations:append(_entity)
+end
+
+function CEntitiesLocations:remove(_entity) -- remove an entity
+    if not _entity then return end -- mandatory
+    if not self.entities[_entity] then return end -- doesnt exist
+    self.entities[_entity] = nil
+    self.locations:remove(_entity)
+end
+
+function CEntitiesLocations:moveXY(_entity, _worldx, _worldy) -- move an existing entity
+    if not _entity or not _worldx or not _worldy then return end -- mandatory
+    if not self.entities[_entity] then return end -- doesnt exist
+    self.locations:moveXY(_entity, _worldx, _worldy)
+end
+
+function CEntitiesLocations:entitiesWorldXYRegion(_worldx, _worldy, _lf, _rg, _up, _dw) -- entities in region
+    if not _worldx or not _worldy or not _lf or not _rg or not _up or not _dw then return end -- mandatory
+    return self.locations:entitiesWorldXYRegion(_worldx, _worldy, _lf, _rg, _up, _dw)
+end
+
+function CEntitiesLocations:entitiesWorldXYAround(_worldx, _worldy, _rangex, _rangey) -- entities in ranges
+    if not _worldx or not _worldy or not _rangex or not _rangey then return end -- mandatory
+    return self.locations:entitiesWorldXYAround(_worldx, _worldy, _rangex, _rangey)
+end
+
+function CEntitiesLocations:entitiesEntityRegion(_entity, _lf, _rg, _up, _dw) -- entities in region
+    if not _entity or not _lf or not _rg or not _up or not _dw then return end -- mandatory
+    if not self.entities[_entity] then return end -- doesnt exist
+    return self.locations:entitiesEntityRegion(_entity, _lf, _rg, _up, _dw)
+end
+
+function CEntitiesLocations:entitiesEntityAround(_entity, _rangex, _rangey) -- entities in ranges
+    if not _entity or not _rangex or not _rangey then return end -- mandatory
+    if not self.entities[_entity] then return end -- doesnt exist
+    return self.locations:entitiesEntityAround(_entity, _rangex, _rangey)
+end
+
+
+--
+-- CWorld
+--
+local CWorld = Classic:extend() -- general world that contains entities
+CWorld.KINDWORLD = "World" -- World kind
+CWorld.NAMEWORLD = "World" -- World name
+function CWorld:new(_argt)
+    CWorld.super.new(self, _argt)
+    self.kind = CWorld.KINDWORLD
+    self.name = CWorld.NAMEWORLD
+    self.entitieslocations = CEntitiesLocations{} -- record world entities and their locations
+    self:_argt(_argt) -- override if any
+end
+-- World instance
+local World = CWorld{}
+
+function CWorld:entityAppend(_entity) -- add a new entity in the world
+    if not _entity then return end -- mandatory
+    self.entitieslocations:append(_entity)
+end
+
+function CWorld:entityRemove(_entity) -- remove an entity from the world
+    if not _entity then return end -- mandatory
+    self.entitieslocations:remove(_entity)
+end
+
+function CWorld:entityMoveXY(_entity, _worldx, _worldy) -- move an entity into the world
+    if not _entity or not _worldx or not _worldy then return end -- mandatory
+    self.entitieslocations:moveXY(_entity, _worldx, _worldy)
+    _entity:focus() -- focus its camera on itself
+end
+
+function CWorld:entitiesWorldXYRegion(_worldx, _worldy, _lf, _rg, _up, _dw) -- entities in region
+    if not _worldx or not _worldy or not _lf or not _rg or not _up or not _dw then return end -- mandatory
+    return self.entitieslocations:entitiesWorldXYRegion(_worldx, _worldy, _lf, _rg, _up, _dw)
+end
+
+function CWorld:entitiesWorldXYAround(_worldx, _worldy, _rangex, _rangey) -- entities in ranges
+    if not _worldx or not _worldy or not _rangex or not _rangey then return end -- mandatory
+    return self.entitieslocations:entitiesWorldXYAround(_worldx, _worldy, _rangex, _rangey)
+end
+
+function CWorld:entitiesEntityRegion(_entity, _lf, _rg, _up, _dw) -- entities in region
+    if not _entity or not _lf or not _rg or not _up or not _dw then return end -- mandatory
+    return self.entitieslocations:entitiesEntityRegion(_entity, _lf, _rg, _up, _dw)
+end
+
+function CWorld:entitiesEntityAround(_entity, _rangex, _rangey) -- entities in ranges
+    if not _entity or not _rangex or not _rangey then return end -- mandatory
+    return self.entitieslocations:entitiesEntityAround(_entity, _rangex, _rangey)
 end
 
 
@@ -801,12 +934,19 @@ function CEntity:new(_argt)
 end
 
 function CEntity:focus() -- focus camera on itself
-    if not self.camera then return end
+    if not self.camera then return end -- requires a camera
     self.camera:focusEntity(self)
 end
 
-function CEntity:entitiesAround() -- entities around itself -- requires a camera
-    if not self.camera then return end
+function CEntity:entitiesRegion( _lf, _rg, _up, _dw) -- entities in region from a itself
+    if not _lf or not _rg or not _up or not _dw then return end -- mandatory
+    if not self.camera then return end -- requires a camera
+    self:focus()
+    return self.camera:entitiesRegion( _lf, _rg, _up, _dw)
+end
+
+function CEntity:entitiesAround() -- entities around itself
+    if not self.camera then return end -- requires a camera
     self:focus()
     return self.camera:entitiesAround()
 end
@@ -830,10 +970,8 @@ function CCamera:new(_argt)
 end
 
 function CCamera:focusXY(_worldx, _worldy) -- focus camera on world positions -- default to center
-    _worldx = _worldx or 0
-    _worldy = _worldy or 0
-    self.worldx = _worldx
-    self.worldy = _worldy
+    self.worldx = _worldx or self.worldx
+    self.worldy = _worldy or self.worldy
 end
 
 function CCamera:focusEntity(_entity) -- focus camera on an entity world positions
@@ -841,8 +979,13 @@ function CCamera:focusEntity(_entity) -- focus camera on an entity world positio
     self:focusXY(_entity.worldx, _entity.worldy)
 end
 
-function CCamera:entitiesAround() -- entities around a camera
-    return self.world:entitiesAround(self.worldx, self.worldy, self.rangex, self.rangey)
+function CCamera:entitiesRegion( _lf, _rg, _up, _dw) -- entities in region from a camera
+    if not _lf or not _rg or not _up or not _dw then return end -- mandatory
+    return self.world:entitiesEntityRegion(self, _lf, _rg, _up, _dw)
+end
+
+function CCamera:entitiesAround() -- entities in a camera ranges
+    return self.world:entitiesEntityAround(self, self.rangex, self.rangey)
 end
 
 
@@ -1269,9 +1412,8 @@ function CCharacter:new(_argt)
     self.statphyact   = self.statphymax -- act stats -- 0-max
     self.statmenact   = self.statmenmax
     self.statpsyact   = self.statpsymax
-    self.camera       = CCamera{name = self.name.." "..CEntity.NAMECAMERA} -- each character has it's own camera
     self:_argt(_argt) -- override if any
-    self.world:entityAppend(self) -- append itself to the world
+    self.camera       = CCamera{name = self.name.." "..CEntity.NAMECAMERA} -- each character has it's own camera
     self:focus() -- focus its camera on itself
 end
 
@@ -1835,36 +1977,36 @@ local CEnnemy = CCharacter:extend() -- ennemy characters
 --
 -- Places
 --
-local House01 = CPlaceHouseAnim{
-    worldx = -15,
-    worldy = 5,
-}
+-- local House01 = CPlaceHouseAnim{
+--     worldx = -15,
+--     worldy = 5,
+-- }
 
-local House02 = CPlaceHouseIdle{
-    worldx = 20,
-    worldy = 20,
-    palette = Tables:merge(CPlaceHouse.PALETTE, {[Tic.COLORRED] = Tic.COLORGREENM,}),
-}
+-- local House02 = CPlaceHouseIdle{
+--     worldx = 20,
+--     worldy = 20,
+--     palette = Tables:merge(CPlaceHouse.PALETTE, {[Tic.COLORRED] = Tic.COLORGREENM,}),
+-- }
 
-local Tower01 = CPlaceTowerAnim{
-    worldx = -10,
-    worldy = 25,
-}
+-- local Tower01 = CPlaceTowerAnim{
+--     worldx = -10,
+--     worldy = 25,
+-- }
 
-local Tower02 = CPlaceTowerIdle{
-    worldx = 15,
-    worldy = -10,
-}
+-- local Tower02 = CPlaceTowerIdle{
+--     worldx = 15,
+--     worldy = -10,
+-- }
 
-local Trees01 = CPlaceTreesIdle{
-    worldx = 25,
-    worldy = 15,
-}
+-- local Trees01 = CPlaceTreesIdle{
+--     worldx = 25,
+--     worldy = 15,
+-- }
 
-local Trees02 = CPlaceTreesIdle{
-    worldx = -20,
-    worldy = -7,
-}
+-- local Trees02 = CPlaceTreesIdle{
+--     worldx = -20,
+--     worldy = -7,
+-- }
 
 
 --
@@ -1874,6 +2016,10 @@ local Truduk = CPlayerDwarf{name = "Truduk",
     worldx = 20,
     worldy = 30,
 }
+-- Tic:traceTable("TRUDUK", Truduk, " ", 1)
+Tic:playerAppend(Truduk)
+Tic:traceTable("PLAYERS", Tic.PLAYERS, " ", 2, nil, nil, nil, {"acttable",})
+exit()
 -- local Prinnn = CPlayerGnome{name = "Prinnn",
 --     coloreyesbg  = Tic.COLORRED,
 --     coloreyesfg  = Tic.COLORORANGE,
@@ -1888,6 +2034,8 @@ local Truduk = CPlayerDwarf{name = "Truduk",
 --     coloreyesfg  = Tic.COLORBLUEL,
 -- }
 local Nitcha = CPlayerDrowe{name = "Nitcha",}
+Tic:traceTable("PLAYERS", Tic.PLAYERS, " ", 2, nil, nil, nil, {"acttable",})
+exit()
 -- local Zariel = CPlayerAngel{name = "Zariel",}
 -- local Zikkow = CPlayerTifel{name = "Zikkow",
 --     colorhairsbg = Tic.COLORGREENM,
@@ -1910,8 +2058,6 @@ local Nitcha = CPlayerDrowe{name = "Nitcha",}
 -- local Wulfie = CPlayerWolfe{name = "Wulfie",
 --     colorextra = Tic.COLORRED,
 -- }
--- Tic:traceTable(World, " ")
--- exit()
 
 
 --

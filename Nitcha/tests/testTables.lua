@@ -59,10 +59,11 @@ local Tables = require("libraries/lks/Tables")
 
 print("--- merge")
 local _ta = {["a"] = 10,}
-local _tb = {["b"] = 20,}
+local _tb = {["b"] = 20, ["ta1"] = _ta, ["ta2"] = _ta, ["ta3"] = {_ta},}
 
-Tables:print(_ta, " ")
-Tables:print(_tb, " ")
+-- Tables:print(_ta, " ")
+Tables:print(_tb, " ", nil, true, {"b", "ta1", "ta2",})
+Tables:print(_tb, " ", nil, true, nil, {"ta3",})
 
-Tables:print(Tables:merge(_ta, _tb), " ")
+-- Tables:print(Tables:merge(_ta, _tb), " ")
 

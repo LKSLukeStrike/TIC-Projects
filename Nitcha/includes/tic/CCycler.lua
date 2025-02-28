@@ -118,8 +118,8 @@ function CCyclerTable:_argt(_argt) -- setup cycler
 end
 
 function CCyclerTable:insert(_item, _at) -- insert an _item into table _at (end by default)
-    if _item == nil then return self.actvalue end
-    if _at == nil then
+    if not _item then return self.actvalue end
+    if not _at then
         table.insert(self.acttable, _item)
         self.actindex = #self.acttable -- adjust actual index
     else
