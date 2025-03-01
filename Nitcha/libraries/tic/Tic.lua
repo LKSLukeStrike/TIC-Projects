@@ -495,9 +495,9 @@ function Tic:trace(...) -- trace with multiple args
     trace(_output)
 end
 
-function Tic:traceTable(_title, _table, _indent, _depth, _verbose, _skip, _keep) -- trace a table  -- SORTED -- RECURSIVE -- INDENT -- DEPTH
+function Tic:traceTable(_title, _table, _argt) -- trace a table  -- SORTED -- RECURSIVE -- INDENT -- DEPTH
     if _title then Tic:trace(_title) end
-    Tic:trace(Tables:dump(_table, _indent, _depth, _verbose, _skip, _keep))
+    Tic:trace(Tables:dump(_table, _argt))
 end
 
 
@@ -2016,9 +2016,10 @@ local Truduk = CPlayerDwarf{name = "Truduk",
     worldx = 20,
     worldy = 30,
 }
--- Tic:traceTable("TRUDUK", Truduk, " ", 1)
 Tic:playerAppend(Truduk)
-Tic:traceTable("PLAYERS", Tic.PLAYERS, " ", 2, nil, nil, nil, {"acttable",})
+Tic:traceTable("PLAYERS", Tic.PLAYERS.acttable, {indent=".", depth=1})
+-- Tic:traceTable("WENTLOC", World.entitieslocations, {indent="."})
+-- Tic:traceTable("ENTLOCE", World.entitieslocations.entities, {indent=".", depth=4})
 exit()
 -- local Prinnn = CPlayerGnome{name = "Prinnn",
 --     coloreyesbg  = Tic.COLORRED,
@@ -2034,7 +2035,6 @@ exit()
 --     coloreyesfg  = Tic.COLORBLUEL,
 -- }
 local Nitcha = CPlayerDrowe{name = "Nitcha",}
-Tic:traceTable("PLAYERS", Tic.PLAYERS, " ", 2, nil, nil, nil, {"acttable",})
 exit()
 -- local Zariel = CPlayerAngel{name = "Zariel",}
 -- local Zikkow = CPlayerTifel{name = "Zikkow",

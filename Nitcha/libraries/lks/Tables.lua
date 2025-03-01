@@ -39,11 +39,10 @@ function Tables:vals(_table) -- vals of a table -- SORTED
 end
 
 function Tables:find(_table, _find) -- return the key of _val else nil if not found
-    local _result = nil
     for _key, _val in pairs(_table or {}) do
         if _val == _find then return _key end
     end
-    return _result
+    return -- nil
 end
 
 function Tables:copy(_table) -- copy a table -- SORTED
@@ -63,33 +62,97 @@ function Tables:merge(_tablea, _tableb) -- merge two tables -- do not alter init
 end
 
 
-function Tables:dump(_table, _indent, _depth, _verbose, _skip, _keep) -- dump a table -- SORTED -- RECURSIVE -- INDENT -- DEPTH
-    _indent   = _indent or ""
-    _depth    = _depth  or math.maxinteger
-    _verbose  = (_verbose == nil or _verbose == false) and false or true
+function Tables:dump(_table, _argt) -- dump a table -- SORTED -- RECURSIVE -- INDENT -- DEPTH
     local _tablesdumped = {} -- already dumped tables to avoid dead loops
-    function _dump(_table, _indent, _depth, _verbose, _skip, _keep)
+    function _dump(_table, _argt)
+        local _indent   = _argt.indent or ""
+        local _depth    = _argt.depth  or math.maxinteger
+        local _verbose  = (_argt.verbose == true) or false
+        local _hide     = _argt.hide -- hide keys
+        local _show     = _argt.show -- override hidden keys if any
+        local _skip     = _argt.skip -- skip tables with those keys
+        local _keep     = _argt.keep -- override skipped tables with those keys if any
+
         local _result = ""
-        if type(_table) ~= "table" then return _result end -- not a table
-        if _depth <= 0 then return (_verbose) and _indent.."[DEPTH]\n" or _result end -- depth reached
-        if _tablesdumped[_table] then return (_verbose) and _indent.."[DUMPED]\n" or _result end -- already dumped
+        if type(_table) ~= "table" then
+            return _result end -- not a table
+        if _depth <= 0             then
+            return (_verbose) and _indent.."[DEPTH]\n" or _result end -- depth reached
+        if _tablesdumped[_table]   then
+            return (_verbose) and _indent.."[DUMPED]\n" or _result end -- already dumped
         _tablesdumped[_table] = true -- add to dumped
+
         local _keys = Tables:keys(_table) -- sorted keys
         for _, _key in ipairs(_keys) do
-            if _skip and Tables:find(_skip, _key) then goto continue end -- skip some keys
-            if _keep and not Tables:find(_keep, _key) then goto continue end -- keep some keys
+            local _doshow = true
+            local _dokeep = true
             local _val = _table[_key]
-            _result = _result.._indent..tostring(_key).."\t"..tostring(_val).."\n"
-            _result = _result.._dump(_val, _indent.._indent, _depth - 1, _verbose, _skip, _keep)
-            ::continue::
+
+            if _hide then -- TODO add more patterns ?
+                if Tables:find(_hide, _key) then
+                    _doshow = false -- hide some keys
+                elseif Tables:find(_hide, "*all*") then
+                    _doshow = false -- hide all keys -- special pattern
+                elseif Tables:find(_hide, "*num*") and type(_key) == "number" then
+                    _doshow = false -- hide num keys -- special pattern
+                elseif Tables:find(_hide, "*str*") and type(_key) == "string" then
+                    _doshow = false -- hide str keys -- special pattern
+                end
+            end
+
+            if _show and not _doshow then -- override hidden keys if any
+                if Tables:find(_show, _key) then
+                    _doshow = true -- show some keys
+                elseif Tables:find(_show, "*all*") then
+                    _doshow = true -- show all keys -- special pattern
+                elseif Tables:find(_show, "*num*") and type(_key) == "number" then
+                    _doshow = true -- show num keys -- special pattern
+                elseif Tables:find(_show, "*str*") and type(_key) == "string" then
+                    _doshow = true -- show str keys -- special pattern
+                end
+            end
+
+            if _doshow then
+                _result = _result.._indent..tostring(_key).."\t"..tostring(_val).."\n"
+            end
+
+            if _skip and type(_val) == "table" then -- skip tables with those keys
+                if Tables:find(_skip, _key) then
+                    _dokeep = false -- skip some keys
+                elseif Tables:find(_skip, "*all*") then
+                    _dokeep = false -- skip all keys -- special pattern
+                elseif Tables:find(_skip, "*num*") and type(_key) == "number" then
+                    _dokeep = false -- skip num keys -- special pattern
+                elseif Tables:find(_skip, "*str*") and type(_key) == "string" then
+                    _dokeep = false -- skip str keys -- special pattern
+                end
+            end
+
+            if _keep and type(_val) == "table" and not _dokeep then -- override skipped tables if any
+                if Tables:find(_keep, _key) then
+                    _dokeep = true -- keep some keys
+                elseif Tables:find(_keep, "*all*") then
+                    _dokeep = true -- keep all keys -- special pattern
+                elseif Tables:find(_keep, "*num*") and type(_key) == "number" then
+                    _dokeep = true -- keep num keys -- special pattern
+                elseif Tables:find(_keep, "*str*") and type(_key) == "string" then
+                    _dokeep = true -- keep str keys -- special pattern
+                end
+            end
+
+            if _dokeep then -- keep digging a table
+                _argt.indent = _indent.._indent
+                _argt.depth  = _depth - 1
+                _result = _result.._dump(_val, _argt)
+            end
         end
         return _result
     end
-    return _dump(_table, _indent, _depth, _verbose, _skip, _keep)
+    return _dump(_table, _argt)
 end
 
-function Tables:print(_table, _indent, _depth, _verbose, _skip, _keep) -- print a table -- SORTED -- RECURSIVE -- INDENT -- DEPTH
-    print(Tables:dump(_table, _indent, _depth, _verbose, _skip, _keep))
+function Tables:print(_table, _argt) -- print a table -- SORTED -- RECURSIVE -- INDENT -- DEPTH
+    print(Tables:dump(_table, _argt))
 end
 
 
