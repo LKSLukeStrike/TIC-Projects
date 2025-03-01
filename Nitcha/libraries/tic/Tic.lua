@@ -2016,18 +2016,13 @@ local Truduk = CPlayerDwarf{name = "Truduk",
     worldx = 20,
     worldy = 30,
 }
-Tic:playerAppend(Truduk)
-Tic:traceTable("PLAYERS", Tic.PLAYERS.acttable, {indent=".", depth=1})
--- Tic:traceTable("WENTLOC", World.entitieslocations, {indent="."})
--- Tic:traceTable("ENTLOCE", World.entitieslocations.entities, {indent=".", depth=4})
-exit()
 -- local Prinnn = CPlayerGnome{name = "Prinnn",
 --     coloreyesbg  = Tic.COLORRED,
 --     coloreyesfg  = Tic.COLORORANGE,
 --     worldx = -20,
 --     worldy = -10,
 -- }
--- -- local Kaptan = CPlayerMeduz{name = "Kaptan",}
+-- local Kaptan = CPlayerMeduz{name = "Kaptan",}
 -- local Kaptin = CPlayerMeduz{name = "Kaptin",
 --     colorhairsbg = Tic.COLORBLUEL,
 --     colorhairsfg = Tic.COLORBLUEM,
@@ -2035,7 +2030,6 @@ exit()
 --     coloreyesfg  = Tic.COLORBLUEL,
 -- }
 local Nitcha = CPlayerDrowe{name = "Nitcha",}
-exit()
 -- local Zariel = CPlayerAngel{name = "Zariel",}
 -- local Zikkow = CPlayerTifel{name = "Zikkow",
 --     colorhairsbg = Tic.COLORGREENM,
@@ -2058,6 +2052,10 @@ exit()
 -- local Wulfie = CPlayerWolfe{name = "Wulfie",
 --     colorextra = Tic.COLORRED,
 -- }
+Tic:traceTable("PLAYERS", Tic.PLAYERS.acttable, {indent="-", depth=1})
+Tic:traceTable("ENT", World.entitieslocations.entities, {indent="-",
+    skip={table.unpack(Tables:vals(Tic.PLAYERS.acttable))}})
+exit()
 
 
 --

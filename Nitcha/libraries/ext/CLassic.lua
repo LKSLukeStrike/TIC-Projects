@@ -56,7 +56,7 @@ end
 
 
 function Classic:__tostring()
-  return "Classic"
+  return self:_kind()..": "..string.format("%p", self)
 end
 
 
@@ -70,7 +70,7 @@ end
 --
 -- LKS additions
 --
-function Classic:defaultArg(_arg, _default, ...) -- return _arg if _arg in allowed ... else _default
+function Classic:_defaultArg(_arg, _default, ...) -- return _arg if _arg in allowed ... else _default
   for _, _allowed in pairs({...}) do
     if _arg == _allowed then return _arg end
   end
@@ -80,8 +80,8 @@ end
 
 -- TODO rewrite this ?
 function Classic:implementIfType(_new, _type, ...) -- implement vars or fcts or both (depending of _type) if they exist or not (depending of _new)
-  _new = Classic:defaultArg(_new, "all", "new", "all") -- new = only if not existing, all = even existing
-  _type = Classic:defaultArg(_type, "all", "var", "fct", "all") -- only vars, fcts or all
+  _new = Classic:_defaultArg(_new, "all", "new", "all") -- new = only if not existing, all = even existing
+  _type = Classic:_defaultArg(_type, "all", "var", "fct", "all") -- only vars, fcts or all
   for _, _classic in pairs({...}) do
     for _key, _val in pairs(_classic) do
       if self[_key] ~= nil and _new == "new" then break end
@@ -150,6 +150,11 @@ end
 function Classic:_load() -- load (from stack) a table of argt {k = v, ...}
   local _argt = table.remove(self._savestack)
   self:_argt(_argt)
+end
+
+
+function Classic:_kind() -- returns the kind of the classic if .kind exists else "Classic"
+  return self.kind or "Classic"
 end
 
 

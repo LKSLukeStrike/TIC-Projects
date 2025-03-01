@@ -78,3 +78,7 @@ Jeandu:print(":Jeandu 3:")
 
 Jeandu:_load()
 Jeandu:print(":Jeandu 4:")
+
+print("Classic", Jeandu:is(Classic))
+print("CCharacter", Jeandu:is(CCharacter))
+print("CPlayer", Jeandu:is(CPlayer))
