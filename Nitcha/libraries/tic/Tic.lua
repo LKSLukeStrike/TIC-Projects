@@ -2053,7 +2053,7 @@ local Nitcha = CPlayerDrowe{name = "Nitcha",}
 --     colorextra = Tic.COLORRED,
 -- }
 
-goto round
+goto around
 ::debug::
 Tic:traceTable("PLAYERS", Tic:playerPlayers(), {indent=" ", depth=1})
 Truduk:moveXY(15, -25)
