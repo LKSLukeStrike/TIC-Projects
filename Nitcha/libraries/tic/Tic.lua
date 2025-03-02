@@ -304,6 +304,10 @@ function Tic:playerActual() -- actual player in the stack
     return Tic.PLAYERS.actvalue
 end
 
+function Tic:playerPlayers() -- all players in the stack
+    return Tic.PLAYERS.acttable
+end
+
 
 -- State System -- affect the sprites, head offset etc
 Tic.POSTURESTAND = "stand" -- postures
@@ -2051,27 +2055,27 @@ local Nitcha = CPlayerDrowe{name = "Nitcha",}
 --     colorextra = Tic.COLORRED,
 -- }
 
--- Tic:traceTable("PLAYERS", Tic.PLAYERS.acttable, {indent=" ", depth=1})
--- Tic:traceTable("WENTLOC", World.entitieslocations, {indent=" ", hide={"_savestack"},
---     skip={table.unpack(Tables:vals(Tic.PLAYERS.acttable))}})
--- Tic:traceTable("PCAMERA", Truduk.camera, {indent=" ", hide={"_savestack"},
---     skip={"world"}})
+goto debug
+::debug::
+Tic:traceTable("PLAYERS", Tic:playerPlayers(), {indent=" ", depth=1})
 Truduk:moveXY(15, -25)
 Tic:traceTable("WENTLOC", World.entitieslocations, {indent=" ", hide={"_savestack"},
-    skip={table.unpack(Tables:vals(Tic.PLAYERS.acttable))}})
+    skip={table.unpack(Tic:playerPlayers())}})
 Truduk:moveXY(0, 0)
 Tic:traceTable("WENTLOC", World.entitieslocations, {indent=" ", hide={"_savestack"},
-    skip={table.unpack(Tables:vals(Tic.PLAYERS.acttable))}})
+    skip={table.unpack(Tic:playerPlayers())}})
 Truduk:moveXY(100, -25)
 Tic:traceTable("WENTLOC", World.entitieslocations, {indent=" ", hide={"_savestack"},
-    skip={table.unpack(Tables:vals(Tic.PLAYERS.acttable))}})
+    skip={table.unpack(Tic:playerPlayers())}})
 Nitcha:moveXY(100, -25)
 Tic:traceTable("WENTLOC", World.entitieslocations, {indent=" ", hide={"_savestack"},
-    skip={table.unpack(Tables:vals(Tic.PLAYERS.acttable))}})
--- Tic:traceTable("PCAMERA", Truduk.camera, {indent=" ", hide={"_savestack"},
---     skip={"world"}})
+    skip={table.unpack(Tic:playerPlayers())}})
+Tic:traceTable("TRUMERA", Truduk.camera, {indent=" ", hide={"_savestack"},
+    skip={"world"}})
+Tic:traceTable("NITMERA", Nitcha.camera, {indent=" ", hide={"_savestack"},
+    skip={"world"}})
 exit()
-
+::runit::
 
 --
 -- Sprites -- TESTING
