@@ -2052,9 +2052,12 @@ local Nitcha = CPlayerDrowe{name = "Nitcha",}
 -- local Wulfie = CPlayerWolfe{name = "Wulfie",
 --     colorextra = Tic.COLORRED,
 -- }
-Tic:traceTable("PLAYERS", Tic.PLAYERS.acttable, {indent=" ", depth=1})
-Tic:traceTable("ENTLOC", World.entitieslocations, {indent=" ", hide={"_savestack"},
-    skip={table.unpack(Tables:vals(Tic.PLAYERS.acttable))}})
+
+-- Tic:traceTable("PLAYERS", Tic.PLAYERS.acttable, {indent=" ", depth=1})
+-- Tic:traceTable("ENTLOCS", World.entitieslocations, {indent=" ", hide={"_savestack"},
+--     skip={table.unpack(Tables:vals(Tic.PLAYERS.acttable))}})
+Tic:traceTable("CAMERA", Truduk.camera, {indent=" ", hide={"_savestack"},
+    skip={"world"}})
 exit()
 
 

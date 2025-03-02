@@ -154,6 +154,7 @@ function Tables:dump(_table, _argt) -- dump a table -- SORTED -- RECURSIVE -- IN
     end
 
     _argt._indent = "" -- starting values
+    _argt.indent  = _indent
     _argt.depth   = _depth
     return _dump(_table, _argt)
 end
