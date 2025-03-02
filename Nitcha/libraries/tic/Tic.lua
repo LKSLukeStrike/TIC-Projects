@@ -852,13 +852,11 @@ end
 
 function CEntitiesLocations:entitiesEntityRegion(_entity, _lf, _rg, _up, _dw) -- entities in region
     if not _entity or not _lf or not _rg or not _up or not _dw then return end -- mandatory
-    if not self.entities[_entity] then return end -- doesnt exist
     return self.locations:entitiesEntityRegion(_entity, _lf, _rg, _up, _dw)
 end
 
 function CEntitiesLocations:entitiesEntityAround(_entity, _rangex, _rangey) -- entities in ranges
     if not _entity or not _rangex or not _rangey then return end -- mandatory
-    if not self.entities[_entity] then return end -- doesnt exist
     return self.locations:entitiesEntityAround(_entity, _rangex, _rangey)
 end
 
@@ -1415,7 +1413,7 @@ function CCharacter:new(_argt)
     self.statmenact   = self.statmenmax
     self.statpsyact   = self.statpsymax
     self:_argt(_argt) -- override if any
-    self.camera       = CCamera{name = self.name.." "..CEntity.NAMECAMERA} -- each character has it's own camera
+    self.camera       = CCamera{name = self.name.." "..CEntity.NAMECAMERA} -- each character has its own camera
     self:focus() -- focus its camera on itself
 end
 
@@ -2055,7 +2053,7 @@ local Nitcha = CPlayerDrowe{name = "Nitcha",}
 --     colorextra = Tic.COLORRED,
 -- }
 
-goto debug
+goto round
 ::debug::
 Tic:traceTable("PLAYERS", Tic:playerPlayers(), {indent=" ", depth=1})
 Truduk:moveXY(15, -25)
@@ -2074,6 +2072,19 @@ Tic:traceTable("TRUMERA", Truduk.camera, {indent=" ", hide={"_savestack"},
     skip={"world"}})
 Tic:traceTable("NITMERA", Nitcha.camera, {indent=" ", hide={"_savestack"},
     skip={"world"}})
+exit()
+::around::
+local _locations = {}
+_locations = World.entitieslocations.locations
+print(Tables:size(_locations))
+_locations = Nitcha.camera.world.entitieslocations.locations
+print(Tables:size(_locations))
+exit()
+local _entitiesaround = Nitcha.camera.world:entitiesWorldXYAround(0, 0, 50, 50)
+print(_entitiesaround)
+print(Tables:size(_entitiesaround))
+Tic:traceTable("NITMERA", Nitcha.camera.world, {indent=" ", hide={"_savestack"},
+    skip={table.unpack(Tic:playerPlayers())}})
 exit()
 ::runit::
 
