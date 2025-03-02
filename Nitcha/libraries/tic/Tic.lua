@@ -2052,8 +2052,8 @@ local Nitcha = CPlayerDrowe{name = "Nitcha",}
 -- local Wulfie = CPlayerWolfe{name = "Wulfie",
 --     colorextra = Tic.COLORRED,
 -- }
-Tic:traceTable("PLAYERS", Tic.PLAYERS.acttable, {indent="-", depth=1})
-Tic:traceTable("ENT", World.entitieslocations.entities, {indent="-",
+Tic:traceTable("PLAYERS", Tic.PLAYERS.acttable, {indent=" ", depth=1})
+Tic:traceTable("ENTLOC", World.entitieslocations, {indent=" ", hide={"_savestack"},
     skip={table.unpack(Tables:vals(Tic.PLAYERS.acttable))}})
 exit()
 
