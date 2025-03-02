@@ -738,15 +738,13 @@ function CLocations:remove(_entity) -- remove an existing entity
     local _worldy = _entity.worldy
     if not self.locations[_worldy][_worldx][_entity] then return end -- doesnt exist
     self.locations[_worldy][_worldx][_entity] = nil
-    if self.locations[_worldy][_worldx] == {} then self.locations[_worldy][_worldx] = nil end -- cleanup
-    if self.locations[_worldy] == {} then self.locations[_worldy] = nil end
+    if Tables:size(self.locations[_worldy][_worldx]) == 0 then self.locations[_worldy][_worldx] = nil end -- cleanup
+    if Tables:size(self.locations[_worldy]) == 0 then self.locations[_worldy] = nil end
 end
 
 function CLocations:moveXY(_entity, _worldx, _worldy) -- move an existing entity
     if not _entity or not _worldx or not _worldy then return end -- mandatory
-    local _worldx = _entity.worldx
-    local _worldy = _entity.worldy
-    if not self.locations[_worldy][_worldx][_entity] then return end -- doesnt exist
+    if not self.locations[_entity.worldy][_entity.worldx][_entity] then return end -- doesnt exist
     self:remove(_entity)
     _entity.worldx = _worldx
     _entity.worldy = _worldy
@@ -1754,7 +1752,7 @@ end
 
 
 local IPlayer = CCharacter:extend() -- players characters interface
-function IPlayer:stack()
+function IPlayer:playerAppend()
     Tic:playerAppend(self) -- record the new player on tic
 end
 
@@ -1763,7 +1761,7 @@ local CPlayerHumanoid = CCharacterHumanoid:extend() -- humanoid player character
 CPlayerHumanoid:implement(IPlayer)
 function CPlayerHumanoid:new(_argt)
     CPlayerHumanoid.super.new(self, _argt)
-    self:stack()
+    self:playerAppend()
     self:_argt(_argt) -- override if any
 end
 
@@ -2054,10 +2052,24 @@ local Nitcha = CPlayerDrowe{name = "Nitcha",}
 -- }
 
 -- Tic:traceTable("PLAYERS", Tic.PLAYERS.acttable, {indent=" ", depth=1})
--- Tic:traceTable("ENTLOCS", World.entitieslocations, {indent=" ", hide={"_savestack"},
+-- Tic:traceTable("WENTLOC", World.entitieslocations, {indent=" ", hide={"_savestack"},
 --     skip={table.unpack(Tables:vals(Tic.PLAYERS.acttable))}})
-Tic:traceTable("CAMERA", Truduk.camera, {indent=" ", hide={"_savestack"},
-    skip={"world"}})
+-- Tic:traceTable("PCAMERA", Truduk.camera, {indent=" ", hide={"_savestack"},
+--     skip={"world"}})
+Truduk:moveXY(15, -25)
+Tic:traceTable("WENTLOC", World.entitieslocations, {indent=" ", hide={"_savestack"},
+    skip={table.unpack(Tables:vals(Tic.PLAYERS.acttable))}})
+Truduk:moveXY(0, 0)
+Tic:traceTable("WENTLOC", World.entitieslocations, {indent=" ", hide={"_savestack"},
+    skip={table.unpack(Tables:vals(Tic.PLAYERS.acttable))}})
+Truduk:moveXY(100, -25)
+Tic:traceTable("WENTLOC", World.entitieslocations, {indent=" ", hide={"_savestack"},
+    skip={table.unpack(Tables:vals(Tic.PLAYERS.acttable))}})
+Nitcha:moveXY(100, -25)
+Tic:traceTable("WENTLOC", World.entitieslocations, {indent=" ", hide={"_savestack"},
+    skip={table.unpack(Tables:vals(Tic.PLAYERS.acttable))}})
+-- Tic:traceTable("PCAMERA", Truduk.camera, {indent=" ", hide={"_savestack"},
+--     skip={"world"}})
 exit()
 
 

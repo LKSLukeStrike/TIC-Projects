@@ -72,7 +72,6 @@ function Tables:dump(_table, _argt) -- dump a table -- SORTED -- RECURSIVE -- IN
     local _keep    = _argt.keep -- override skipped tables with those keys if any
 
     local _tablesdumped = {} -- already dumped tables to avoid dead loops
-
     function _dump(_table, _argt)
         local _depth  = _argt.depth
         local _indent = _argt._indent
@@ -92,7 +91,7 @@ function Tables:dump(_table, _argt) -- dump a table -- SORTED -- RECURSIVE -- IN
             local _dokeep = true
             local _val = _table[_key]
 
-            if _hide then -- TODO add more patterns ?
+            if _hide and _doshow then -- TODO add more patterns ?
                 if Tables:find(_hide, _key) then
                     _doshow = false -- hide some keys
                 elseif Tables:find(_hide, "*all*") then
@@ -120,7 +119,7 @@ function Tables:dump(_table, _argt) -- dump a table -- SORTED -- RECURSIVE -- IN
                 _result = _result.._indent..tostring(_key).."\t"..tostring(_val).."\n"
             end
 
-            if _skip and type(_val) == "table" then -- skip tables with those keys
+            if _skip and _dokeep and type(_val) == "table" then -- skip tables with those keys
                 if Tables:find(_skip, _key) then
                     _dokeep = false -- skip some keys
                 elseif Tables:find(_skip, "*all*") then
@@ -132,7 +131,7 @@ function Tables:dump(_table, _argt) -- dump a table -- SORTED -- RECURSIVE -- IN
                 end
             end
 
-            if _keep and type(_val) == "table" and not _dokeep then -- override skipped tables if any
+            if _keep and not _dokeep and type(_val) == "table" then -- override skipped tables if any
                 if Tables:find(_keep, _key) then
                     _dokeep = true -- keep some keys
                 elseif Tables:find(_keep, "*all*") then
