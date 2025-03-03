@@ -445,10 +445,13 @@ Tic.BIOMES = CCyclerTable{ -- biomes cycler
         Tic.COLORBIOROCKY,
     },
 }
-trace(Tables:size(Tic.BIOMES.acttable))
-trace(Tic.BIOMES.actvalue)
-function Tic:biomeNext()
-    Tic:trace("biome")
+
+function Tic:biomeNext() -- next biome in the stack
+    return Tic.BIOMES:next()
+end
+
+function Tic:biomeActual() -- actual biome in the stack
+    return Tic.BIOMES.actvalue
 end
 
 
@@ -2063,10 +2066,10 @@ local Truduk = CPlayerDwarf{name = "Truduk",
 --     coloreyesbg  = Tic.COLORBLUEM,
 --     coloreyesfg  = Tic.COLORBLUEL,
 -- }
--- local Nitcha = CPlayerDrowe{name = "Nitcha",
---     worldx = math.random(Tic.VWORLDLF, Tic.VWORLDRG),
---     worldy = math.random(Tic.VWORLDUP, Tic.VWORLDDW),
--- }
+local Nitcha = CPlayerDrowe{name = "Nitcha",
+    worldx = math.random(Tic.VWORLDLF, Tic.VWORLDRG),
+    worldy = math.random(Tic.VWORLDUP, Tic.VWORLDDW),
+}
 -- local Zariel = CPlayerAngel{name = "Zariel",}
 -- local Zikkow = CPlayerTifel{name = "Zikkow",
 --     colorhairsbg = Tic.COLORGREENM,
@@ -2085,10 +2088,10 @@ local Truduk = CPlayerDwarf{name = "Truduk",
 --     colorpants   = Tic.COLORRED,
 -- }
 -- local Daemok = CPlayerDemon{name = "Daemok",}
--- local Golith = CPlayerGogol{name = "Golith",
---     worldx = math.random(Tic.VWORLDLF, Tic.VWORLDRG),
---     worldy = math.random(Tic.VWORLDUP, Tic.VWORLDDW),
--- }
+local Golith = CPlayerGogol{name = "Golith",
+    worldx = math.random(Tic.VWORLDLF, Tic.VWORLDRG),
+    worldy = math.random(Tic.VWORLDUP, Tic.VWORLDDW),
+}
 -- local Wulfie = CPlayerWolfe{name = "Wulfie",
 --     colorextra = Tic.COLORRED,
 -- }
@@ -2159,18 +2162,18 @@ function Tic:drawScreenGuides()
 end
 
 function Tic:drawVWorldGround()
-    local _drawcolor = Tic.COLORBIOSNOWY -- TODO depends of actual biome
+    local _drawcolor = Tic:biomeActual()
     rect(Tic.VWORLDLF, Tic.VWORLDUP, Tic.VWORLDW, Tic.VWORLDH, _drawcolor)
 end
 
 function Tic:drawVWorldFrames()
-    local _drawcolor = Tic.COLORGREYL
     local _maskcolor = Tic.COLORHUDSCREEN -- to hide the surrounding rectangle
-    rectb(Tic.VWORLDLF, Tic.VWORLDUP, Tic.VWORLDW, Tic.VWORLDH, _drawcolor)
+    local _drawcolor = Tic.COLORGREYL
     rect(Tic.VWORLDLF - 8, Tic.VWORLDUP, 8, Tic.VWORLDH, _maskcolor)
     rect(Tic.VWORLDRG, Tic.VWORLDUP, 8, Tic.VWORLDH, _maskcolor)
     rect(Tic.VWORLDLF - 8, Tic.VWORLDUP - 8, Tic.VWORLDW + 15, 8, _maskcolor)
     rect(Tic.VWORLDLF - 8, Tic.VWORLDDW, Tic.VWORLDW + 15, 8, _maskcolor)
+    rectb(Tic.VWORLDLF, Tic.VWORLDUP, Tic.VWORLDW, Tic.VWORLDH, _drawcolor)
 end
 
 function Tic:drawVWorldGuides()
