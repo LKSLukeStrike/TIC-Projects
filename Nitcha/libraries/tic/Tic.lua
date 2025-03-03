@@ -37,22 +37,22 @@ Tic.PALETTEMAP = 0x3FF0 * 2 -- vram bank 1
 Tic.SPRITEBANK = 0x4000 -- start at tiles sprites
 
 -- Palette colors
-Tic.COLOR00 = 00 -- black
-Tic.COLOR01 = 01 -- purple
-Tic.COLOR02 = 02 -- red
-Tic.COLOR03 = 03 -- orange
-Tic.COLOR04 = 04 -- yellow
-Tic.COLOR05 = 05 -- l green
-Tic.COLOR06 = 06 -- m green
-Tic.COLOR07 = 07 -- d green
-Tic.COLOR08 = 08 -- d blue
-Tic.COLOR09 = 09 -- m blue
-Tic.COLOR10 = 10 -- l blue
-Tic.COLOR11 = 11 -- cyan
-Tic.COLOR12 = 12 -- white
-Tic.COLOR13 = 13 -- l grey
-Tic.COLOR14 = 14 -- m grey
-Tic.COLOR15 = 15 -- d grey
+Tic.COLOR00 = 00
+Tic.COLOR01 = 01
+Tic.COLOR02 = 02
+Tic.COLOR03 = 03
+Tic.COLOR04 = 04
+Tic.COLOR05 = 05
+Tic.COLOR06 = 06
+Tic.COLOR07 = 07
+Tic.COLOR08 = 08
+Tic.COLOR09 = 09
+Tic.COLOR10 = 10
+Tic.COLOR11 = 11
+Tic.COLOR12 = 12
+Tic.COLOR13 = 13
+Tic.COLOR14 = 14
+Tic.COLOR15 = 15
 
 -- Palette colors aliases (with the standard palette)
 Tic.COLORBLACK  = Tic.COLOR00 -- black
@@ -71,6 +71,16 @@ Tic.COLORWHITE  = Tic.COLOR12 -- white
 Tic.COLORGREYL  = Tic.COLOR13 -- l grey
 Tic.COLORGREYM  = Tic.COLOR14 -- m grey
 Tic.COLORGREYD  = Tic.COLOR15 -- d grey
+
+-- Palette colors for hud
+Tic.COLORHUDSCREEN = Tic.COLORBLUED
+
+-- Palette colors for biomes
+Tic.COLORBIONIGHT = Tic.COLORBLACK -- TODO rename all ?
+Tic.COLORBIOSNOWY = Tic.COLORWHITE
+Tic.COLORBIOSANDY = Tic.COLORYELLOW
+Tic.COLORBIOGREEN = Tic.COLORGREENM
+Tic.COLORBIOROCKY = Tic.COLORGREYL
 
 -- Special palette colors that can be replaced
 Tic.COLORKEY   = Tic.COLOR00 -- transparent color
@@ -202,6 +212,7 @@ Tic.KEY_NUMPADPLUS     = 89
 Tic.KEY_NUMPADMINUS    = 90
 Tic.KEY_NUMPADMULTIPLY = 91
 Tic.KEY_NUMPADDIVIDE   = 92
+Tic.KEY_B              = 02
 
 -- Actions values
 Tic.ACTIONPLAYERPREV  = "playerPrev"
@@ -221,6 +232,7 @@ Tic.ACTIONMOVE270     = "move270"
 Tic.ACTIONMOVE315     = "move315"
 Tic.ACTIONDECPHYACT   = "decPhyAct"
 Tic.ACTIONINCPHYACT   = "incPhyAct"
+Tic.ACTIONBIOMENEXT   = "biomeNext"
 
 -- Keys to Actions
 Tic.KEYS2ACTIONS = {
@@ -241,6 +253,7 @@ Tic.KEYS2ACTIONS = {
     [Tic.KEY_NUMPAD7]      = Tic.ACTIONMOVE315,
     [Tic.KEY_NUMPADMINUS]  = Tic.ACTIONDECPHYACT,
     [Tic.KEY_NUMPADPLUS]   = Tic.ACTIONINCPHYACT,
+    [Tic.KEY_B]            = Tic.ACTIONBIOMENEXT,
 }
 
 -- Actions to Functions
@@ -262,6 +275,7 @@ Tic.ACTIONS2FUNCTIONS = {
     [Tic.ACTIONMOVE315]     = function() Tic:moveDirection(Tic.DIR315) end,
     [Tic.ACTIONDECPHYACT]   = function() Tic:stat('dec', "statphyact", 1) end,
     [Tic.ACTIONINCPHYACT]   = function() Tic:stat('inc', "statphyact", 1) end,
+    [Tic.ACTIONBIOMENEXT]   = function() Tic:biomeNext() end,
 }
 
 
@@ -402,6 +416,8 @@ function Tic:moveDirection(_direction, _character)
     _character:moveDirection(_direction)
 end
 
+
+-- Stats System -- change a stat value
 function Tic:stat(_action, _stat, _value, _character) -- modify a stat -- set/dec/inc
     if not _action or not _stat or not _value then return end -- mandatory
     _character = _character or Tic:playerActual()
@@ -416,6 +432,12 @@ function Tic:stat(_action, _stat, _value, _character) -- modify a stat -- set/de
     _character[_stat] = math.max(_character[_stat], Tic.STATSMIN) -- stay in range
     _character[_stat] = math.min(_character[_stat], Tic.STATSMAX)
     _character[_stat] = math.floor(_character[_stat]) -- ensure an integer
+end
+
+
+-- Biomes System -- set the current biome
+function Tic:biomeNext()
+    Tic:trace("biome")
 end
 
 
@@ -620,7 +642,12 @@ CSpriteBG.SPRITEEMPTY = CSpriteBG.SPRITEBANK + 0 -- empty sprite
 CSpriteBG.BUILDSBANK  = 16 -- buildings
 CSpriteBG.PLACEHOUSE  = CSpriteBG.BUILDSBANK + 0
 CSpriteBG.PLACETOWER  = CSpriteBG.BUILDSBANK + 1
-CSpriteBG.FORESTBANK  = 32 -- forests
+CSpriteBG.PLACEMANOR  = CSpriteBG.BUILDSBANK + 2
+CSpriteBG.PLACEALTAR  = CSpriteBG.BUILDSBANK + 3
+CSpriteBG.STANDSBANK  = 32 -- stands
+CSpriteBG.PLACEWATER  = CSpriteBG.STANDSBANK + 0
+CSpriteBG.PLACESTALL  = CSpriteBG.STANDSBANK + 1
+CSpriteBG.FORESTBANK  = 48 -- forests
 CSpriteBG.PLACETREE0  = CSpriteBG.FORESTBANK + 0
 function CSpriteBG:new(_argt)
     CSpriteBG.super.new(self, _argt)
@@ -1386,6 +1413,7 @@ function CCharacter:new(_argt)
     self.frame        = CSprite.FRAME00 -- frame
     self.dirx         = Tic.DIRXLF -- directions
     self.diry         = Tic.DIRYMD
+    self.solid        = false -- can be traversed
     self.state        = Tic.STATESTANDIDLE -- state
     self.idlecycler   = CCyclerInt{maxindex = 59, mode = CCycler.MODEBLOCK,} -- cycler to get back to idle
     self.colorhairsfg = Tic.COLORHAIRSFG -- colors
@@ -2008,8 +2036,8 @@ local Trees02 = CPlaceTreesIdle{
 -- Players
 --
 local Truduk = CPlayerDwarf{name = "Truduk",
-    worldx = 20,
-    worldy = 30,
+    worldx = math.random(Tic.VWORLDLF, Tic.VWORLDRG),
+    worldy = math.random(Tic.VWORLDUP, Tic.VWORLDDW),
 }
 -- local Prinnn = CPlayerGnome{name = "Prinnn",
 --     coloreyesbg  = Tic.COLORRED,
@@ -2024,7 +2052,10 @@ local Truduk = CPlayerDwarf{name = "Truduk",
 --     coloreyesbg  = Tic.COLORBLUEM,
 --     coloreyesfg  = Tic.COLORBLUEL,
 -- }
-local Nitcha = CPlayerDrowe{name = "Nitcha",}
+-- local Nitcha = CPlayerDrowe{name = "Nitcha",
+--     worldx = math.random(Tic.VWORLDLF, Tic.VWORLDRG),
+--     worldy = math.random(Tic.VWORLDUP, Tic.VWORLDDW),
+-- }
 -- local Zariel = CPlayerAngel{name = "Zariel",}
 -- local Zikkow = CPlayerTifel{name = "Zikkow",
 --     colorhairsbg = Tic.COLORGREENM,
@@ -2043,7 +2074,10 @@ local Nitcha = CPlayerDrowe{name = "Nitcha",}
 --     colorpants   = Tic.COLORRED,
 -- }
 -- local Daemok = CPlayerDemon{name = "Daemok",}
-local Golith = CPlayerGogol{name = "Golith",}
+-- local Golith = CPlayerGogol{name = "Golith",
+--     worldx = math.random(Tic.VWORLDLF, Tic.VWORLDRG),
+--     worldy = math.random(Tic.VWORLDUP, Tic.VWORLDDW),
+-- }
 -- local Wulfie = CPlayerWolfe{name = "Wulfie",
 --     colorextra = Tic.COLORRED,
 -- }
@@ -2089,12 +2123,14 @@ local SpriteFG = CSpriteFG{
 --
 local _statustick01 = 0
 function Tic:draw()
-    cls()
+    cls(Tic.COLORHUDSCREEN)
 
-    -- Tic:drawScreenFrames()
-    Tic:drawVWorldFrames()
+    Tic:drawVWorldGround()
 
     Tic:drawPlayerActual()
+
+    Tic:drawVWorldFrames()
+    -- Tic:drawScreenGuides()
 
     -- Tic:drawLog()
     Tic:logPrint()
@@ -2102,7 +2138,7 @@ function Tic:draw()
     Tic:tick() -- /!\ required in the draw function 
 end
 
-function Tic:drawScreenFrames()
+function Tic:drawScreenGuides()
     local _drawcolor = Tic.COLORGREYD
     rectb(0, 0, Tic.SCREENW, Tic.SCREENH, _drawcolor)
     line(0, 0, Tic.SCREENW, Tic.SCREENH, _drawcolor)
@@ -2111,12 +2147,30 @@ function Tic:drawScreenFrames()
     line(Tic.SCREENW // 2, 0, Tic.SCREENW // 2, Tic.SCREENH, _drawcolor)
 end
 
+function Tic:drawVWorldGround()
+    local _drawcolor = Tic.COLORBIOSNOWY -- TODO depends of actual biome
+    rect(Tic.VWORLDLF, Tic.VWORLDUP, Tic.VWORLDW, Tic.VWORLDH, _drawcolor)
+end
+
 function Tic:drawVWorldFrames()
     local _drawcolor = Tic.COLORGREYL
-    rect(Tic.VWORLDLF, Tic.VWORLDUP, Tic.VWORLDW, Tic.VWORLDH, Tic.COLORBLACK)
+    local _maskcolor = Tic.COLORHUDSCREEN -- to hide the surrounding rectangle
     rectb(Tic.VWORLDLF, Tic.VWORLDUP, Tic.VWORLDW, Tic.VWORLDH, _drawcolor)
-    -- line(Tic.VWORLDLF, Tic.VWORLDUP + (Tic.VWORLDH // 2), Tic.VWORLDRG, Tic.VWORLDUP + (Tic.VWORLDH // 2), _drawcolor)
-    -- line(Tic.VWORLDLF + (Tic.VWORLDW // 2), Tic.VWORLDUP, Tic.VWORLDLF + (Tic.VWORLDW // 2), Tic.VWORLDDW, _drawcolor)
+    rect(Tic.VWORLDLF - 8, Tic.VWORLDUP, 8, Tic.VWORLDH, _maskcolor)
+    rect(Tic.VWORLDRG, Tic.VWORLDUP, 8, Tic.VWORLDH, _maskcolor)
+    rect(Tic.VWORLDLF - 8, Tic.VWORLDUP - 8, Tic.VWORLDW + 15, 8, _maskcolor)
+    rect(Tic.VWORLDLF - 8, Tic.VWORLDDW, Tic.VWORLDW + 15, 8, _maskcolor)
+end
+
+function Tic:drawVWorldGuides()
+    local _drawcolor = Tic.COLORGREYL
+    Tic:drawVWorldFrames()
+    line(Tic.VWORLDLF, Tic.VWORLDUP + (Tic.VWORLDH // 2),
+        Tic.VWORLDRG, Tic.VWORLDUP + (Tic.VWORLDH // 2),
+        _drawcolor)
+    line(Tic.VWORLDLF + (Tic.VWORLDW // 2), Tic.VWORLDUP,
+        Tic.VWORLDLF + (Tic.VWORLDW // 2), Tic.VWORLDDW,
+        _drawcolor)
 end
 
 function Tic:drawPlayerActual()

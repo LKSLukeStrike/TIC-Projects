@@ -100,7 +100,7 @@ end
 
 function CCyclerTable:_argt(_argt) -- setup cycler
     CCyclerTable.super._argt(self, _argt)
-    local _size = #self.acttable -- adjust the related fields
+    local _size = #self.acttable -- adjust the related fields -- FIXME use Tables:size instead ?
     if _size == 0 then -- empty acttable
         self.minindex = 0
         self.maxindex = self.minindex
