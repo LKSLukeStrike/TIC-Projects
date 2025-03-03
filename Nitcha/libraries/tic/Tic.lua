@@ -757,7 +757,7 @@ end
 
 function CLocations:entitiesWorldXYRegion(_worldx, _worldy, _lf, _rg, _up, _dw) -- entities in region
     if not _worldx or not _worldy or not _lf or not _rg or not _up or not _dw then return end -- mandatory
-    local _rangelf = _worldx - _lf -- region around world xy
+    local _rangelf = _worldx - _lf -- region around world xy -- /!\ all borders are supposed to be positive
     local _rangerg = _worldx + _rg
     local _rangeup = _worldy - _up
     local _rangedw = _worldy + _dw
@@ -785,12 +785,7 @@ end
 
 function CLocations:entitiesWorldXYAround(_worldx, _worldy, _rangex, _rangey) -- entities in ranges
     if not _worldx or not _worldy or not _rangex or not _rangey then return end -- mandatory
-    local _lf = _worldx - _rangex
-    local _rg = _worldx + _rangex - 1
-    local _up = _worldy - _rangey
-    local _dw = _worldy + _rangey - 1
-
-    return self:entitiesWorldXYRegion(_worldx, _worldy, _lf, _rg, _up, _dw)
+    return self:entitiesWorldXYRegion(_worldx, _worldy, _rangex, _rangex, _rangey, _rangey)
 end
 
 function CLocations:entitiesEntityRegion(_entity, _lf, _rg, _up, _dw) -- entities in region
@@ -1977,36 +1972,36 @@ local CEnnemy = CCharacter:extend() -- ennemy characters
 --
 -- Places
 --
--- local House01 = CPlaceHouseAnim{
---     worldx = -15,
---     worldy = 5,
--- }
+local House01 = CPlaceHouseAnim{
+    worldx = -15,
+    worldy = 5,
+}
 
--- local House02 = CPlaceHouseIdle{
---     worldx = 20,
---     worldy = 20,
---     palette = Tables:merge(CPlaceHouse.PALETTE, {[Tic.COLORRED] = Tic.COLORGREENM,}),
--- }
+local House02 = CPlaceHouseIdle{
+    worldx = 20,
+    worldy = 20,
+    palette = Tables:merge(CPlaceHouse.PALETTE, {[Tic.COLORRED] = Tic.COLORGREENM,}),
+}
 
--- local Tower01 = CPlaceTowerAnim{
---     worldx = -10,
---     worldy = 25,
--- }
+local Tower01 = CPlaceTowerAnim{
+    worldx = -10,
+    worldy = 25,
+}
 
--- local Tower02 = CPlaceTowerIdle{
---     worldx = 15,
---     worldy = -10,
--- }
+local Tower02 = CPlaceTowerIdle{
+    worldx = 15,
+    worldy = -10,
+}
 
--- local Trees01 = CPlaceTreesIdle{
---     worldx = 25,
---     worldy = 15,
--- }
+local Trees01 = CPlaceTreesIdle{
+    worldx = 25,
+    worldy = 15,
+}
 
--- local Trees02 = CPlaceTreesIdle{
---     worldx = -20,
---     worldy = -7,
--- }
+local Trees02 = CPlaceTreesIdle{
+    worldx = -20,
+    worldy = -7,
+}
 
 
 --
@@ -2048,44 +2043,13 @@ local Nitcha = CPlayerDrowe{name = "Nitcha",}
 --     colorpants   = Tic.COLORRED,
 -- }
 -- local Daemok = CPlayerDemon{name = "Daemok",}
--- local Golith = CPlayerGogol{name = "Golith",}
+local Golith = CPlayerGogol{name = "Golith",}
 -- local Wulfie = CPlayerWolfe{name = "Wulfie",
 --     colorextra = Tic.COLORRED,
 -- }
 
-goto around
+goto runit
 ::debug::
-Tic:traceTable("PLAYERS", Tic:playerPlayers(), {indent=" ", depth=1})
-Truduk:moveXY(15, -25)
-Tic:traceTable("WENTLOC", World.entitieslocations, {indent=" ", hide={"_savestack"},
-    skip={table.unpack(Tic:playerPlayers())}})
-Truduk:moveXY(0, 0)
-Tic:traceTable("WENTLOC", World.entitieslocations, {indent=" ", hide={"_savestack"},
-    skip={table.unpack(Tic:playerPlayers())}})
-Truduk:moveXY(100, -25)
-Tic:traceTable("WENTLOC", World.entitieslocations, {indent=" ", hide={"_savestack"},
-    skip={table.unpack(Tic:playerPlayers())}})
-Nitcha:moveXY(100, -25)
-Tic:traceTable("WENTLOC", World.entitieslocations, {indent=" ", hide={"_savestack"},
-    skip={table.unpack(Tic:playerPlayers())}})
-Tic:traceTable("TRUMERA", Truduk.camera, {indent=" ", hide={"_savestack"},
-    skip={"world"}})
-Tic:traceTable("NITMERA", Nitcha.camera, {indent=" ", hide={"_savestack"},
-    skip={"world"}})
-exit()
-::around::
-local _locations = {}
-_locations = World.entitieslocations.locations
-print(Tables:size(_locations))
-_locations = Nitcha.camera.world.entitieslocations.locations
-print(Tables:size(_locations))
-exit()
-local _entitiesaround = Nitcha.camera.world:entitiesWorldXYAround(0, 0, 50, 50)
-print(_entitiesaround)
-print(Tables:size(_entitiesaround))
-Tic:traceTable("NITMERA", Nitcha.camera.world, {indent=" ", hide={"_savestack"},
-    skip={table.unpack(Tic:playerPlayers())}})
-exit()
 ::runit::
 
 --
@@ -2149,6 +2113,7 @@ end
 
 function Tic:drawVWorldFrames()
     local _drawcolor = Tic.COLORGREYL
+    rect(Tic.VWORLDLF, Tic.VWORLDUP, Tic.VWORLDW, Tic.VWORLDH, Tic.COLORBLACK)
     rectb(Tic.VWORLDLF, Tic.VWORLDUP, Tic.VWORLDW, Tic.VWORLDH, _drawcolor)
     -- line(Tic.VWORLDLF, Tic.VWORLDUP + (Tic.VWORLDH // 2), Tic.VWORLDRG, Tic.VWORLDUP + (Tic.VWORLDH // 2), _drawcolor)
     -- line(Tic.VWORLDLF + (Tic.VWORLDW // 2), Tic.VWORLDUP, Tic.VWORLDLF + (Tic.VWORLDW // 2), Tic.VWORLDDW, _drawcolor)
