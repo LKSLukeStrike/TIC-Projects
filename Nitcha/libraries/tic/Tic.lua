@@ -8,8 +8,8 @@ local Tic = {}
 --
 -- Packages
 local Classic = require("libraries/ext/Classic")                
-local Nums = require("libraries/lks/Nums")
-local Tables = require("libraries/lks/Tables")
+local Nums    = require("libraries/lks/Nums")
+local Tables  = require("libraries/lks/Tables")
 --
 -- Includes
 require("includes/tic/CCycler")                
@@ -436,6 +436,17 @@ end
 
 
 -- Biomes System -- set the current biome
+Tic.BIOMES = CCyclerTable{ -- biomes cycler
+    acttable = {
+        Tic.COLORBIONIGHT, -- TODO add real biomes instead of just colors ?
+        Tic.COLORBIOSNOWY,
+        Tic.COLORBIOSANDY,
+        Tic.COLORBIOGREEN,
+        Tic.COLORBIOROCKY,
+    },
+}
+trace(Tables:size(Tic.BIOMES.acttable))
+trace(Tic.BIOMES.actvalue)
 function Tic:biomeNext()
     Tic:trace("biome")
 end

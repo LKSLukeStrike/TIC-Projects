@@ -7,7 +7,8 @@
 --
 -- Packages
 local Classic = require("libraries/ext/Classic")                
-local Nums = require("libraries/lks/Nums")
+local Nums    = require("libraries/lks/Nums")
+local Tables  = require("libraries/lks/Tables")
             
 
 --
@@ -100,7 +101,7 @@ end
 
 function CCyclerTable:_argt(_argt) -- setup cycler
     CCyclerTable.super._argt(self, _argt)
-    local _size = #self.acttable -- adjust the related fields -- FIXME use Tables:size instead ?
+    local _size = Tables:size(self.acttable)
     if _size == 0 then -- empty acttable
         self.minindex = 0
         self.maxindex = self.minindex
@@ -121,15 +122,15 @@ function CCyclerTable:insert(_item, _at) -- insert an _item into table _at (end 
     if not _item then return self.actvalue end
     if not _at then
         table.insert(self.acttable, _item)
-        self.actindex = #self.acttable -- adjust actual index
+        self.actindex = Tables:size(self.acttable) -- adjust actual index
     else
         _at = (Nums:isLT(_at, 1)) and 1 or _at -- beg
-        _at = (Nums:isGT(_at, #self.acttable)) and #self.acttable + 1 or _at -- end
+        _at = (Nums:isGT(_at, Tables:size(self.acttable))) and Tables:size(self.acttable) + 1 or _at -- end
         table.insert(self.acttable, _at, _item)
         self.actindex = _at -- adjust actual index
     end
     self.minindex = 1 -- at least one item
-    self.maxindex = #self.acttable
+    self.maxindex = Tables:size(self.acttable)
     self.actvalue = _item
     return self.actvalue
 end
