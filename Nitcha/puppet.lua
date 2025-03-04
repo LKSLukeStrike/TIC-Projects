@@ -60,5 +60,5 @@ end
 
 
 if not TIC80 then -- run it from outside tic80
-   TIC()
+    TIC()
 end

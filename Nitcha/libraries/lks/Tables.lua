@@ -64,7 +64,7 @@ end
 
 function Tables:dump(_table, _argt) -- dump a table -- SORTED -- RECURSIVE -- INDENT -- DEPTH
     local _indent  = _argt.indent or ""
-    local _depth   = _argt.depth or math.maxinteger
+    local _depth   = _argt.depth or Nums.MAXINTEGER
     local _verbose = (_argt.verbose == true) or false
     local _hide    = _argt.hide -- hide keys
     local _show    = _argt.show -- override hidden keys if any

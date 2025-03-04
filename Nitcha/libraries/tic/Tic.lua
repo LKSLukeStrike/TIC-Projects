@@ -457,7 +457,7 @@ end
 
 -- Tick System -- handle timers
 Tic.TICK00 = CCyclerInt{ -- tick cycler from 0-maxinteger
-    maxindex = math.maxinteger,
+    maxindex = Nums.MAXINTEGER,
 }
 Tic.TICK60 = CCyclerInt{ -- tick cycler from 0-59
     maxindex = 59,
@@ -982,7 +982,7 @@ function CEntity:focus() -- focus camera on itself
     self.camera:focusEntity(self)
 end
 
-function CEntity:entitiesRegion( _lf, _rg, _up, _dw) -- entities in region from a itself
+function CEntity:entitiesRegion(_lf, _rg, _up, _dw) -- entities in region from a itself
     if not _lf or not _rg or not _up or not _dw then return end -- mandatory
     if not self.camera then return end -- requires a camera
     self:focus()
@@ -993,6 +993,22 @@ function CEntity:entitiesAround() -- entities around itself
     if not self.camera then return end -- requires a camera
     self:focus()
     return self.camera:entitiesAround()
+end
+
+function CEntity:randomWorldRegion(_lf, _rg, _up, _dw) -- random worldx worldy in a region -- default min/max
+    _lf = _lf or Nums.MININTEGER
+    _rg = _rg or Nums.MAXINTEGER
+    _up = _up or Nums.MININTEGER
+    _dw = _dw or Nums.MAXINTEGER
+    local _minx = math.min(_lf, _rg) -- ensure correct order for random
+    local _maxx = math.max(_lf, _rg)
+    local _miny = math.min(_up, _dw)
+    local _maxy = math.max(_up, _dw)
+    self.worldx = math.random(_minx, _maxx)
+    self.worldy = math.random(_miny, _maxy)
+end
+
+function CEntity:randomWorldWindow() -- random worldx worldy into the world window region
 end
 
 
@@ -2060,9 +2076,8 @@ end
 -- Players
 --
 local Truduk = CPlayerDwarf{name = "Truduk",
-    worldx = 0, --math.random(0 - Tic.WORLDWLF, Tic.WORLDWRG),
-    worldy = 0, --math.random(0 - Tic.WORLDWUP, Tic.WORLDWDW),
 }
+Truduk:randomWorldRegion()
 -- local Prinnn = CPlayerGnome{name = "Prinnn",
 --     coloreyesbg  = Tic.COLORRED,
 --     coloreyesfg  = Tic.COLORORANGE,

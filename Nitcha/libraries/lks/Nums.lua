@@ -4,6 +4,10 @@
 -- 
 local Nums = {}
 
+-- Constants
+Nums.MAXINTEGER = 0 + 2^31 -- due to lua 5.3
+Nums.MININTEGER = 0 - 2^31
+
 
 -- Conversions
 function Nums:yes2int(_yes) -- convert a boolean to integer 0|1
