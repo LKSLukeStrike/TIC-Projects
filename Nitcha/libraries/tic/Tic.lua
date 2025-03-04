@@ -22,13 +22,17 @@ require("includes/tic/CCycler")
 Tic.SCREENW = 240 -- screen width
 Tic.SCREENH = 136 -- screen height
 
+-- Visible World positions on hud
+Tic.VWORLDX = 180 --Tic.SCREENW // 2 -- visible world hud x -- screen center
+Tic.VWORLDY = Tic.SCREENH // 2 -- visible world hud y -- screen center
+
 -- Visible World sizes
-Tic.VWORLDW = Tic.SCREENH -- visible world width
-Tic.VWORLDH = Tic.SCREENH -- visible world height
-Tic.VWORLDLF = (Tic.SCREENW - Tic.VWORLDW) // 2 -- visible world screen left
-Tic.VWORLDRG = Tic.VWORLDLF + Tic.VWORLDW - 1 -- visible world screen right
-Tic.VWORLDUP = (Tic.SCREENH - Tic.VWORLDH) // 2 -- visible world screen up
-Tic.VWORLDDW = Tic.VWORLDUP + Tic.VWORLDH - 1 -- visible world screen down
+Tic.VWORLDW  = 100 --Tic.SCREENH -- visible world width
+Tic.VWORLDH  = 100 --Tic.SCREENH -- visible world height
+Tic.VWORLDLF = (Tic.VWORLDW // 2) -- visible world screen left
+Tic.VWORLDRG = (Tic.VWORLDW // 2) - 1 -- visible world screen right
+Tic.VWORLDUP = (Tic.VWORLDH // 2) -- visible world screen up
+Tic.VWORLDDW = (Tic.VWORLDH // 2) - 1 -- visible world screen down
 
 -- Palette map
 Tic.PALETTEMAP = 0x3FF0 * 2 -- vram bank 1
@@ -1169,7 +1173,7 @@ local CPlaceTowerIdle = CPlaceTower:extend() -- idle towers
 -- CPlaceTrees
 --
 local CPlaceTrees = CPlace:extend() -- trees
-CPlaceTrees.PALETTE = {[Tic.COLORWHITE] = Tic.COLORGREYM, [Tic.COLORYELLOW] = Tic.COLORGREYD,}
+CPlaceTrees.PALETTE = {[Tic.COLORWHITE] = Tic.COLORGREYM, [Tic.COLORYELLOW] = Tic.COLORGREYM,}
 CEntity.KINDTREES = "Trees" -- Trees kind
 CEntity.NAMETREES = "Trees" -- Trees name
 function CPlaceTrees:new(_argt)
@@ -2050,8 +2054,8 @@ local Trees02 = CPlaceTreesIdle{
 -- Players
 --
 local Truduk = CPlayerDwarf{name = "Truduk",
-    worldx = math.random(Tic.VWORLDLF, Tic.VWORLDRG),
-    worldy = math.random(Tic.VWORLDUP, Tic.VWORLDDW),
+    worldx = math.random(0 - Tic.VWORLDLF, Tic.VWORLDRG),
+    worldy = math.random(0 - Tic.VWORLDUP, Tic.VWORLDDW),
 }
 -- local Prinnn = CPlayerGnome{name = "Prinnn",
 --     coloreyesbg  = Tic.COLORRED,
@@ -2067,8 +2071,8 @@ local Truduk = CPlayerDwarf{name = "Truduk",
 --     coloreyesfg  = Tic.COLORBLUEL,
 -- }
 local Nitcha = CPlayerDrowe{name = "Nitcha",
-    worldx = math.random(Tic.VWORLDLF, Tic.VWORLDRG),
-    worldy = math.random(Tic.VWORLDUP, Tic.VWORLDDW),
+    worldx = math.random(0 - Tic.VWORLDLF, Tic.VWORLDRG),
+    worldy = math.random(0 - Tic.VWORLDUP, Tic.VWORLDDW),
 }
 -- local Zariel = CPlayerAngel{name = "Zariel",}
 -- local Zikkow = CPlayerTifel{name = "Zikkow",
@@ -2089,8 +2093,8 @@ local Nitcha = CPlayerDrowe{name = "Nitcha",
 -- }
 -- local Daemok = CPlayerDemon{name = "Daemok",}
 local Golith = CPlayerGogol{name = "Golith",
-    worldx = math.random(Tic.VWORLDLF, Tic.VWORLDRG),
-    worldy = math.random(Tic.VWORLDUP, Tic.VWORLDDW),
+    worldx = math.random(0 - Tic.VWORLDLF, Tic.VWORLDRG),
+    worldy = math.random(0 - Tic.VWORLDUP, Tic.VWORLDDW),
 }
 -- local Wulfie = CPlayerWolfe{name = "Wulfie",
 --     colorextra = Tic.COLORRED,
@@ -2144,7 +2148,8 @@ function Tic:draw()
     Tic:drawPlayerActual()
 
     Tic:drawVWorldFrames()
-    -- Tic:drawScreenGuides()
+    Tic:drawScreenGuides()
+    Tic:drawVWorldGuides()
 
     -- Tic:drawLog()
     Tic:logPrint()
@@ -2153,7 +2158,7 @@ function Tic:draw()
 end
 
 function Tic:drawScreenGuides()
-    local _drawcolor = Tic.COLORGREYD
+    local _drawcolor = Tic.COLORYELLOW
     rectb(0, 0, Tic.SCREENW, Tic.SCREENH, _drawcolor)
     line(0, 0, Tic.SCREENW, Tic.SCREENH, _drawcolor)
     line(0, Tic.SCREENH, Tic.SCREENW, 0, _drawcolor)
@@ -2163,27 +2168,44 @@ end
 
 function Tic:drawVWorldGround()
     local _drawcolor = Tic:biomeActual()
-    rect(Tic.VWORLDLF, Tic.VWORLDUP, Tic.VWORLDW, Tic.VWORLDH, _drawcolor)
+    rect(Tic.VWORLDX - Tic.VWORLDLF, Tic.VWORLDY - Tic.VWORLDUP,
+        Tic.VWORLDW, Tic.VWORLDH, _drawcolor
+    )
 end
 
 function Tic:drawVWorldFrames()
     local _maskcolor = Tic.COLORHUDSCREEN -- to hide the surrounding rectangle
     local _drawcolor = Tic.COLORGREYL
-    rect(Tic.VWORLDLF - 8, Tic.VWORLDUP, 8, Tic.VWORLDH, _maskcolor)
-    rect(Tic.VWORLDRG, Tic.VWORLDUP, 8, Tic.VWORLDH, _maskcolor)
-    rect(Tic.VWORLDLF - 8, Tic.VWORLDUP - 8, Tic.VWORLDW + 15, 8, _maskcolor)
-    rect(Tic.VWORLDLF - 8, Tic.VWORLDDW, Tic.VWORLDW + 15, 8, _maskcolor)
-    rectb(Tic.VWORLDLF, Tic.VWORLDUP, Tic.VWORLDW, Tic.VWORLDH, _drawcolor)
+    rect(Tic.VWORLDX - Tic.VWORLDLF - 8, Tic.VWORLDY - Tic.VWORLDUP,
+        8, Tic.VWORLDH,
+        _maskcolor
+    )
+    rect(Tic.VWORLDX + Tic.VWORLDRG, Tic.VWORLDY - Tic.VWORLDUP,
+        8, Tic.VWORLDH,
+        _maskcolor
+    )
+    rect(Tic.VWORLDX - Tic.VWORLDLF - 8, Tic.VWORLDY - Tic.VWORLDUP - 8,
+        Tic.VWORLDW + 15, 8,
+        _maskcolor
+    )
+    rect(Tic.VWORLDX - Tic.VWORLDLF - 8, Tic.VWORLDY + Tic.VWORLDDW,
+        Tic.VWORLDW + 15, 8,
+        _maskcolor
+    )
+    rectb(Tic.VWORLDX - Tic.VWORLDLF, Tic.VWORLDY - Tic.VWORLDUP,
+        Tic.VWORLDW, Tic.VWORLDH,
+        _drawcolor
+    )
 end
 
 function Tic:drawVWorldGuides()
-    local _drawcolor = Tic.COLORGREYL
+    local _drawcolor = Tic.COLORRED
     Tic:drawVWorldFrames()
-    line(Tic.VWORLDLF, Tic.VWORLDUP + (Tic.VWORLDH // 2),
-        Tic.VWORLDRG, Tic.VWORLDUP + (Tic.VWORLDH // 2),
+    rect(Tic.VWORLDX - Tic.VWORLDLF, Tic.VWORLDY - Tic.VWORLDUP + (Tic.VWORLDH // 2),
+        Tic.VWORLDW, 1,
         _drawcolor)
-    line(Tic.VWORLDLF + (Tic.VWORLDW // 2), Tic.VWORLDUP,
-        Tic.VWORLDLF + (Tic.VWORLDW // 2), Tic.VWORLDDW,
+    rect(Tic.VWORLDX - Tic.VWORLDLF + (Tic.VWORLDW // 2), Tic.VWORLDY - Tic.VWORLDUP,
+        1, Tic.VWORLDH,
         _drawcolor)
 end
 
@@ -2223,6 +2245,16 @@ function Tic:drawPlayerActual()
             end
         end
     end
+
+    Tic:logAppend("WLF:", Tic.VWORLDLF)
+    Tic:logAppend("WRG:", Tic.VWORLDRG)
+    Tic:logAppend("WUP:", Tic.VWORLDUP)
+    Tic:logAppend("WDW:", Tic.VWORLDDW)
+
+    Tic:logAppend(_playeractual.name)
+
+    Tic:logAppend("WOX:", _playeractual.worldx)
+    Tic:logAppend("WOY:", _playeractual.worldy)
 
     -- _playeractual:drawStatsC(true)
     -- _playeractual:drawPortraitC(nil, true, true)
