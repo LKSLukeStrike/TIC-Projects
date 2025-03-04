@@ -27,7 +27,7 @@ Tic.SCREENY = 0   -- screen y position
 -- World Window sizes and positions (hud)
 Tic.WORLDWW = 100 --Tic.SCREENH -- world window width
 Tic.WORLDWH = 100 --Tic.SCREENH -- world window height
-Tic.WORLDWX = 130 --Tic.SCREENW // 2 -- world window x position -- TODO compute that
+Tic.WORLDWX = 130 --Tic.SCREENW // 2 -- world window x position -- TODO compute that ?
 Tic.WORLDWY = 18  --Tic.SCREENH // 2 -- world window y position
 
 -- Palette map
@@ -2155,7 +2155,7 @@ function Tic:draw()
 
     -- Tic:drawWorldWFrames()
     Tic:drawScreenGuides()
-    -- Tic:drawWorldWGuides()
+    Tic:drawWorldWGuides()
 
     -- Tic:drawLog()
     Tic:logPrint()
@@ -2165,24 +2165,24 @@ end
 
 function Tic:drawScreenGuides()
     local _drawcolor = Tic.COLORYELLOW
-    rectb(Tic.SCREENX, Tic.SCREENY,
+    rectb(Tic.SCREENX, Tic.SCREENY, -- border
         Tic.SCREENW, Tic.SCREENH,
         _drawcolor
     )
-    line(Tic.SCREENX, Tic.SCREENY,
-        Tic.SCREENX + Tic.SCREENW, Tic.SCREENY + Tic.SCREENH,
+    line(Tic.SCREENX, Tic.SCREENY, -- diag up lf - dw rg
+        Tic.SCREENX + Tic.SCREENW - 1, Tic.SCREENY + Tic.SCREENH - 1,
         _drawcolor
     )
-    line(Tic.SCREENX, Tic.SCREENY + Tic.SCREENH,
-        Tic.SCREENX + Tic.SCREENW, Tic.SCREENY,
+    line(Tic.SCREENX, Tic.SCREENY + Tic.SCREENH - 1, -- diag dw lf - up rg
+        Tic.SCREENX + Tic.SCREENW - 1, Tic.SCREENY,
         _drawcolor
     )
-    line(Tic.SCREENX, Tic.SCREENY + (Tic.SCREENH // 2),
-        Tic.SCREENX + Tic.SCREENW, Tic.SCREENY + (Tic.SCREENH // 2),
+    line(Tic.SCREENX, Tic.SCREENY + (Tic.SCREENH // 2) - 1, -- hline md
+        Tic.SCREENX + Tic.SCREENW - 1, Tic.SCREENY + (Tic.SCREENH // 2) - 1,
         _drawcolor
     )
-    line(Tic.SCREENX + (Tic.SCREENW // 2), Tic.SCREENY,
-        Tic.SCREENX + (Tic.SCREENW // 2), Tic.SCREENY + Tic.SCREENH,
+    line(Tic.SCREENX + (Tic.SCREENW // 2), Tic.SCREENY, -- vline md
+        Tic.SCREENX + (Tic.SCREENW // 2), Tic.SCREENY + Tic.SCREENH - 1,
         _drawcolor
     )
 end
@@ -2196,39 +2196,52 @@ function Tic:drawWorldWGround()
 end
 
 function Tic:drawWorldWFrames()
-    local _maskcolor = Tic.COLORHUDSCREEN -- to hide the surrounding rectangle
+    local _maskcolor = Tic.COLORRED --Tic.COLORHUDSCREEN -- to hide the surrounding rectangle
     local _drawcolor = Tic.COLORGREYL
-    rect(Tic.WORLDWX - Tic.WORLDWLF - 8, Tic.WORLDWY - Tic.WORLDWUP,
+    rect(Tic.WORLDWX - 8, Tic.WORLDWY, -- lf mask
         8, Tic.WORLDWH,
         _maskcolor
     )
-    rect(Tic.WORLDWX + Tic.WORLDWRG, Tic.WORLDWY - Tic.WORLDWUP,
+    rect(Tic.WORLDWX + Tic.WORLDWW, Tic.WORLDWY, -- rg mask
         8, Tic.WORLDWH,
         _maskcolor
     )
-    rect(Tic.WORLDWX - Tic.WORLDWLF - 8, Tic.WORLDWY - Tic.WORLDWUP - 8,
-        Tic.WORLDWW + 15, 8,
+    rect(Tic.WORLDWX - 8, Tic.WORLDWY - 8, -- up mask
+        Tic.WORLDWW + 16, 8,
         _maskcolor
     )
-    rect(Tic.WORLDWX - Tic.WORLDWLF - 8, Tic.WORLDWY + Tic.WORLDWDW,
-        Tic.WORLDWW + 15, 8,
+    rect(Tic.WORLDWX - 8, Tic.WORLDWY + Tic.WORLDWH, -- dw mask
+        Tic.WORLDWW + 16, 8,
         _maskcolor
     )
-    rectb(Tic.WORLDWX - Tic.WORLDWLF, Tic.WORLDWY - Tic.WORLDWUP,
+    rectb(Tic.WORLDWX, Tic.WORLDWY, -- border
         Tic.WORLDWW, Tic.WORLDWH,
         _drawcolor
     )
 end
 
 function Tic:drawWorldWGuides()
-    local _drawcolor = Tic.COLORRED
-    Tic:drawWorldWFrames()
-    rect(Tic.WORLDWX - Tic.WORLDWLF, Tic.WORLDWY - Tic.WORLDWUP + (Tic.WORLDWH // 2),
-        Tic.WORLDWW, 1,
-        _drawcolor)
-    rect(Tic.WORLDWX - Tic.WORLDWLF + (Tic.WORLDWW // 2), Tic.WORLDWY - Tic.WORLDWUP,
-        1, Tic.WORLDWH,
-        _drawcolor)
+    local _drawcolor = Tic.COLORGREENL
+    rectb(Tic.WORLDWX, Tic.WORLDWY, -- border
+        Tic.WORLDWW, Tic.WORLDWH,
+        _drawcolor
+    )
+    line(Tic.WORLDWX, Tic.WORLDWY, -- diag up lf - dw rg
+        Tic.WORLDWX + Tic.WORLDWW - 1, Tic.WORLDWY + Tic.WORLDWH - 1,
+        _drawcolor
+    )
+    line(Tic.WORLDWX, Tic.WORLDWY + Tic.WORLDWH - 1, -- diag dw lf - up rg
+        Tic.WORLDWX + Tic.WORLDWW - 1, Tic.WORLDWY,
+        _drawcolor
+    )
+    line(Tic.WORLDWX, Tic.WORLDWY + (Tic.WORLDWH // 2) - 1, -- hline md
+        Tic.WORLDWX + Tic.WORLDWW - 1, Tic.WORLDWY + (Tic.WORLDWH // 2),
+        _drawcolor
+    )
+    line(Tic.WORLDWX + (Tic.WORLDWW // 2), Tic.WORLDWY, -- vline md
+        Tic.WORLDWX + (Tic.WORLDWW // 2), Tic.WORLDWY + Tic.WORLDWH - 1,
+        _drawcolor
+    )
 end
 
 function Tic:drawPlayerActual()
