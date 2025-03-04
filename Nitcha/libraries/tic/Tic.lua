@@ -18,21 +18,17 @@ require("includes/tic/CCycler")
 --
 -- Tic
 --
--- Screen sizes
+-- Screen sizes and positions
 Tic.SCREENW = 240 -- screen width
 Tic.SCREENH = 136 -- screen height
+Tic.SCREENX = 0   -- screen x position
+Tic.SCREENY = 0   -- screen y position
 
--- Visible World positions on hud
-Tic.VWORLDX = 180 --Tic.SCREENW // 2 -- visible world hud x -- screen center
-Tic.VWORLDY = Tic.SCREENH // 2 -- visible world hud y -- screen center
-
--- Visible World sizes
-Tic.VWORLDW  = 100 --Tic.SCREENH -- visible world width
-Tic.VWORLDH  = 100 --Tic.SCREENH -- visible world height
-Tic.VWORLDLF = (Tic.VWORLDW // 2) -- visible world screen left
-Tic.VWORLDRG = (Tic.VWORLDW // 2) - 1 -- visible world screen right
-Tic.VWORLDUP = (Tic.VWORLDH // 2) -- visible world screen up
-Tic.VWORLDDW = (Tic.VWORLDH // 2) - 1 -- visible world screen down
+-- World Window sizes and positions (hud)
+Tic.WORLDWW = 100 --Tic.SCREENH -- world window width
+Tic.WORLDWH = 100 --Tic.SCREENH -- world window height
+Tic.WORLDWX = 130 --Tic.SCREENW // 2 -- world window x position -- TODO compute that
+Tic.WORLDWY = 18  --Tic.SCREENH // 2 -- world window y position
 
 -- Palette map
 Tic.PALETTEMAP = 0x3FF0 * 2 -- vram bank 1
@@ -619,7 +615,7 @@ function CSprite:new(_argt)
     self:_argt(_argt) -- override if any
 end
 
-function CSprite:draw() -- draw a sprite
+function CSprite:draw() -- draw a sprite -- DEFAULT
     Tic:paletteChange(self.palette) -- change palette colors if any
     spr(
         self.sprite + (self.frame *  CSprite.FRAMEOF),
@@ -641,6 +637,14 @@ function CSprite:drawC() -- draw a sprite -- CENTERED
     self.screenx = self.screenx - (4 * _scale) -- center the sprite
     self.screeny = self.screeny - (4 * _scale)
     self:draw()
+    self:_load()
+end
+
+function CSprite:drawW() -- draw a sprite -- CENTERED -- WORLD WINDOW
+    self:_save{"screenx", "screeny",}
+    self.screenx = Tic.WORLDWX + self.screenx -- move the sprite into the world window
+    self.screeny = Tic.WORLDWY + self.screeny
+    self:drawC() -- center the sprite
     self:_load()
 end
 
@@ -998,8 +1002,8 @@ end
 local CCamera = CEntity:extend() -- camera
 CEntity.KINDCAMERA = "Camera" -- Camera kind
 CEntity.NAMECAMERA = "Camera" -- Camera name
-CCamera.RANGEX = Tic.VWORLDW / 2
-CCamera.RANGEY = Tic.VWORLDH / 2
+CCamera.RANGEX = Tic.WORLDWW / 2
+CCamera.RANGEY = Tic.WORLDWH / 2
 function CCamera:new(_argt)
     CCamera.super.new(self, _argt)
     self.kind = CEntity.KINDCAMERA
@@ -1041,8 +1045,8 @@ function CEntityDrawable:new(_argt)
     self.kind = CEntity.KINDDRAWABLE
     self.name = CEntity.NAMEDRAWABLE
     self.sprite  = CSpriteBG.SPRITEEMPTY
-    self.screenx = Tic.SCREENW // 2 -- screen positions
-    self.screeny = Tic.SCREENH // 2
+    self.screenx = 0 -- screen positions
+    self.screeny = 0
     self.dirx    = Nums:random01() -- random flip lf/rg
     self.solid   = true -- can be traversed or not
     self:_argt(_argt) -- override if any
@@ -2018,6 +2022,7 @@ local CEnnemy = CCharacter:extend() -- ennemy characters
 --
 -- Places
 --
+if false then
 local House01 = CPlaceHouseAnim{
     worldx = -15,
     worldy = 5,
@@ -2048,14 +2053,15 @@ local Trees02 = CPlaceTreesIdle{
     worldx = -20,
     worldy = -7,
 }
+end
 
 
 --
 -- Players
 --
 local Truduk = CPlayerDwarf{name = "Truduk",
-    worldx = math.random(0 - Tic.VWORLDLF, Tic.VWORLDRG),
-    worldy = math.random(0 - Tic.VWORLDUP, Tic.VWORLDDW),
+    worldx = 0, --math.random(0 - Tic.WORLDWLF, Tic.WORLDWRG),
+    worldy = 0, --math.random(0 - Tic.WORLDWUP, Tic.WORLDWDW),
 }
 -- local Prinnn = CPlayerGnome{name = "Prinnn",
 --     coloreyesbg  = Tic.COLORRED,
@@ -2070,10 +2076,10 @@ local Truduk = CPlayerDwarf{name = "Truduk",
 --     coloreyesbg  = Tic.COLORBLUEM,
 --     coloreyesfg  = Tic.COLORBLUEL,
 -- }
-local Nitcha = CPlayerDrowe{name = "Nitcha",
-    worldx = math.random(0 - Tic.VWORLDLF, Tic.VWORLDRG),
-    worldy = math.random(0 - Tic.VWORLDUP, Tic.VWORLDDW),
-}
+-- local Nitcha = CPlayerDrowe{name = "Nitcha",
+--     worldx = math.random(0 - Tic.WORLDWLF, Tic.WORLDWRG),
+--     worldy = math.random(0 - Tic.WORLDWUP, Tic.WORLDWDW),
+-- }
 -- local Zariel = CPlayerAngel{name = "Zariel",}
 -- local Zikkow = CPlayerTifel{name = "Zikkow",
 --     colorhairsbg = Tic.COLORGREENM,
@@ -2092,10 +2098,10 @@ local Nitcha = CPlayerDrowe{name = "Nitcha",
 --     colorpants   = Tic.COLORRED,
 -- }
 -- local Daemok = CPlayerDemon{name = "Daemok",}
-local Golith = CPlayerGogol{name = "Golith",
-    worldx = math.random(0 - Tic.VWORLDLF, Tic.VWORLDRG),
-    worldy = math.random(0 - Tic.VWORLDUP, Tic.VWORLDDW),
-}
+-- local Golith = CPlayerGogol{name = "Golith",
+--     worldx = math.random(0 - Tic.WORLDWLF, Tic.WORLDWRG),
+--     worldy = math.random(0 - Tic.WORLDWUP, Tic.WORLDWDW),
+-- }
 -- local Wulfie = CPlayerWolfe{name = "Wulfie",
 --     colorextra = Tic.COLORRED,
 -- }
@@ -2143,13 +2149,13 @@ local _statustick01 = 0
 function Tic:draw()
     cls(Tic.COLORHUDSCREEN)
 
-    Tic:drawVWorldGround()
+    Tic:drawWorldWGround()
 
     Tic:drawPlayerActual()
 
-    Tic:drawVWorldFrames()
+    -- Tic:drawWorldWFrames()
     Tic:drawScreenGuides()
-    Tic:drawVWorldGuides()
+    -- Tic:drawWorldWGuides()
 
     -- Tic:drawLog()
     Tic:logPrint()
@@ -2159,53 +2165,69 @@ end
 
 function Tic:drawScreenGuides()
     local _drawcolor = Tic.COLORYELLOW
-    rectb(0, 0, Tic.SCREENW, Tic.SCREENH, _drawcolor)
-    line(0, 0, Tic.SCREENW, Tic.SCREENH, _drawcolor)
-    line(0, Tic.SCREENH, Tic.SCREENW, 0, _drawcolor)
-    line(0, Tic.SCREENH // 2, Tic.SCREENW, Tic.SCREENH // 2, _drawcolor)
-    line(Tic.SCREENW // 2, 0, Tic.SCREENW // 2, Tic.SCREENH, _drawcolor)
-end
-
-function Tic:drawVWorldGround()
-    local _drawcolor = Tic:biomeActual()
-    rect(Tic.VWORLDX - Tic.VWORLDLF, Tic.VWORLDY - Tic.VWORLDUP,
-        Tic.VWORLDW, Tic.VWORLDH, _drawcolor
+    rectb(Tic.SCREENX, Tic.SCREENY,
+        Tic.SCREENW, Tic.SCREENH,
+        _drawcolor
     )
-end
-
-function Tic:drawVWorldFrames()
-    local _maskcolor = Tic.COLORHUDSCREEN -- to hide the surrounding rectangle
-    local _drawcolor = Tic.COLORGREYL
-    rect(Tic.VWORLDX - Tic.VWORLDLF - 8, Tic.VWORLDY - Tic.VWORLDUP,
-        8, Tic.VWORLDH,
-        _maskcolor
+    line(Tic.SCREENX, Tic.SCREENY,
+        Tic.SCREENX + Tic.SCREENW, Tic.SCREENY + Tic.SCREENH,
+        _drawcolor
     )
-    rect(Tic.VWORLDX + Tic.VWORLDRG, Tic.VWORLDY - Tic.VWORLDUP,
-        8, Tic.VWORLDH,
-        _maskcolor
+    line(Tic.SCREENX, Tic.SCREENY + Tic.SCREENH,
+        Tic.SCREENX + Tic.SCREENW, Tic.SCREENY,
+        _drawcolor
     )
-    rect(Tic.VWORLDX - Tic.VWORLDLF - 8, Tic.VWORLDY - Tic.VWORLDUP - 8,
-        Tic.VWORLDW + 15, 8,
-        _maskcolor
+    line(Tic.SCREENX, Tic.SCREENY + (Tic.SCREENH // 2),
+        Tic.SCREENX + Tic.SCREENW, Tic.SCREENY + (Tic.SCREENH // 2),
+        _drawcolor
     )
-    rect(Tic.VWORLDX - Tic.VWORLDLF - 8, Tic.VWORLDY + Tic.VWORLDDW,
-        Tic.VWORLDW + 15, 8,
-        _maskcolor
-    )
-    rectb(Tic.VWORLDX - Tic.VWORLDLF, Tic.VWORLDY - Tic.VWORLDUP,
-        Tic.VWORLDW, Tic.VWORLDH,
+    line(Tic.SCREENX + (Tic.SCREENW // 2), Tic.SCREENY,
+        Tic.SCREENX + (Tic.SCREENW // 2), Tic.SCREENY + Tic.SCREENH,
         _drawcolor
     )
 end
 
-function Tic:drawVWorldGuides()
+function Tic:drawWorldWGround()
+    local _drawcolor = Tic:biomeActual()
+    rect(Tic.WORLDWX, Tic.WORLDWY,
+        Tic.WORLDWW, Tic.WORLDWH,
+        _drawcolor
+    )
+end
+
+function Tic:drawWorldWFrames()
+    local _maskcolor = Tic.COLORHUDSCREEN -- to hide the surrounding rectangle
+    local _drawcolor = Tic.COLORGREYL
+    rect(Tic.WORLDWX - Tic.WORLDWLF - 8, Tic.WORLDWY - Tic.WORLDWUP,
+        8, Tic.WORLDWH,
+        _maskcolor
+    )
+    rect(Tic.WORLDWX + Tic.WORLDWRG, Tic.WORLDWY - Tic.WORLDWUP,
+        8, Tic.WORLDWH,
+        _maskcolor
+    )
+    rect(Tic.WORLDWX - Tic.WORLDWLF - 8, Tic.WORLDWY - Tic.WORLDWUP - 8,
+        Tic.WORLDWW + 15, 8,
+        _maskcolor
+    )
+    rect(Tic.WORLDWX - Tic.WORLDWLF - 8, Tic.WORLDWY + Tic.WORLDWDW,
+        Tic.WORLDWW + 15, 8,
+        _maskcolor
+    )
+    rectb(Tic.WORLDWX - Tic.WORLDWLF, Tic.WORLDWY - Tic.WORLDWUP,
+        Tic.WORLDWW, Tic.WORLDWH,
+        _drawcolor
+    )
+end
+
+function Tic:drawWorldWGuides()
     local _drawcolor = Tic.COLORRED
-    Tic:drawVWorldFrames()
-    rect(Tic.VWORLDX - Tic.VWORLDLF, Tic.VWORLDY - Tic.VWORLDUP + (Tic.VWORLDH // 2),
-        Tic.VWORLDW, 1,
+    Tic:drawWorldWFrames()
+    rect(Tic.WORLDWX - Tic.WORLDWLF, Tic.WORLDWY - Tic.WORLDWUP + (Tic.WORLDWH // 2),
+        Tic.WORLDWW, 1,
         _drawcolor)
-    rect(Tic.VWORLDX - Tic.VWORLDLF + (Tic.VWORLDW // 2), Tic.VWORLDY - Tic.VWORLDUP,
-        1, Tic.VWORLDH,
+    rect(Tic.WORLDWX - Tic.WORLDWLF + (Tic.WORLDWW // 2), Tic.WORLDWY - Tic.WORLDWUP,
+        1, Tic.WORLDWH,
         _drawcolor)
 end
 
@@ -2241,20 +2263,22 @@ function Tic:drawPlayerActual()
                 local _offsety  = _entity.worldy - _worldy
                 _entity.screenx = (Tic.SCREENW // 2) + _offsetx
                 _entity.screeny = (Tic.SCREENH // 2) + _offsety
-                _entity:drawC()
+                _entity:drawW()
             end
         end
     end
 
-    Tic:logAppend("WLF:", Tic.VWORLDLF)
-    Tic:logAppend("WRG:", Tic.VWORLDRG)
-    Tic:logAppend("WUP:", Tic.VWORLDUP)
-    Tic:logAppend("WDW:", Tic.VWORLDDW)
+    Tic:logAppend("WLF:", Tic.WORLDWLF)
+    Tic:logAppend("WRG:", Tic.WORLDWRG)
+    Tic:logAppend("WUP:", Tic.WORLDWUP)
+    Tic:logAppend("WDW:", Tic.WORLDWDW)
 
     Tic:logAppend(_playeractual.name)
 
     Tic:logAppend("WOX:", _playeractual.worldx)
     Tic:logAppend("WOY:", _playeractual.worldy)
+    Tic:logAppend("SCX:", _playeractual.screenx)
+    Tic:logAppend("SCY:", _playeractual.screeny)
 
     -- _playeractual:drawStatsC(true)
     -- _playeractual:drawPortraitC(nil, true, true)
