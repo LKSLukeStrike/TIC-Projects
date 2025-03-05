@@ -19,16 +19,20 @@ require("includes/tic/CCycler")
 -- Tic
 --
 -- Screen sizes and positions
-Tic.SCREENW = 240 -- screen width
-Tic.SCREENH = 136 -- screen height
-Tic.SCREENX = 0   -- screen x position
-Tic.SCREENY = 0   -- screen y position
+Tic.SCREENW  = 240 -- screen width
+Tic.SCREENW2 = (Tic.SCREENW // 2) - 1 -- middle screen width
+Tic.SCREENH  = 136 -- screen height
+Tic.SCREENH2 = (Tic.SCREENH // 2) - 1 -- middle screen height
+Tic.SCREENX  = 0 -- screen x position
+Tic.SCREENY  = 0 -- screen y position
 
 -- World Window sizes and positions (hud)
-Tic.WORLDWW = 100 --Tic.SCREENH -- world window width
-Tic.WORLDWH = 100 --Tic.SCREENH -- world window height
-Tic.WORLDWX = 130 --Tic.SCREENW // 2 -- world window x position -- TODO compute that ?
-Tic.WORLDWY = 18  --Tic.SCREENH // 2 -- world window y position
+Tic.WORLDWW  = 100 --Tic.SCREENH -- world window width
+Tic.WORLDWW2 = (Tic.WORLDWW // 2) - 1 -- middle world window width
+Tic.WORLDWH  = 100 --Tic.SCREENH -- world window height
+Tic.WORLDWH2 = (Tic.WORLDWH // 2) - 1 -- middle world window height
+Tic.WORLDWX  = 130 --Tic.SCREENW // 2 -- world window x position -- TODO compute that ?
+Tic.WORLDWY  = 18  --Tic.SCREENH // 2 -- world window y position
 
 -- Palette map
 Tic.PALETTEMAP = 0x3FF0 * 2 -- vram bank 1
@@ -591,6 +595,8 @@ local CSprite = Classic:extend() -- general sprites
 CSprite.SPRITEBANK = 0
 CSprite.SCALE01 = 01 -- sprites scales
 CSprite.SCALE02 = 02
+CSprite.SCALE03 = 03
+CSprite.SCALE04 = 04
 CSprite.FRAMEOF = 16 -- sprites frames offset multiplier
 CSprite.FRAME00 = 00 -- sprites frames -- /!\ start at 0, used to compute the offset
 CSprite.FRAME01 = 01
@@ -615,7 +621,7 @@ function CSprite:new(_argt)
     self:_argt(_argt) -- override if any
 end
 
-function CSprite:draw() -- draw a sprite -- DEFAULT
+function CSprite:drawS() -- draw a sprite -- SCREEN -- DEFAULT
     Tic:paletteChange(self.palette) -- change palette colors if any
     spr(
         self.sprite + (self.frame *  CSprite.FRAMEOF),
@@ -631,20 +637,61 @@ function CSprite:draw() -- draw a sprite -- DEFAULT
     Tic:paletteReset() -- restore palette colors
 end
 
-function CSprite:drawC() -- draw a sprite -- CENTERED
+function CSprite:drawS2() -- draw a sprite -- SCREEN -- MIDDLE
     self:_save{"screenx", "screeny",}
-    local _scale = self.scale or CSprite.SCALE01
-    self.screenx = self.screenx - (4 * _scale) -- center the sprite
-    self.screeny = self.screeny - (4 * _scale)
-    self:draw()
+    self.screenx = self.screenx + Tic.SCREENW2-- middle the sprite
+    self.screeny = self.screeny + Tic.SCREENH2
+    self:drawS()
     self:_load()
 end
 
-function CSprite:drawW() -- draw a sprite -- CENTERED -- WORLD WINDOW
+function CSprite:drawSC() -- draw a sprite -- SCREEN -- CENTERED
     self:_save{"screenx", "screeny",}
-    self.screenx = Tic.WORLDWX + self.screenx -- move the sprite into the world window
-    self.screeny = Tic.WORLDWY + self.screeny
-    self:drawC() -- center the sprite
+    local _scale = self.scale or CSprite.SCALE01
+    self.screenx = self.screenx - (3 * _scale) - _scale + 1-- center the sprite
+    self.screeny = self.screeny - (3 * _scale) - _scale + 1
+    self:drawS()
+    self:_load()
+end
+
+function CSprite:drawS2C() -- draw a sprite -- SCREEN -- MIDDLE -- CENTERED
+    self:_save{"screenx", "screeny",}
+    self.screenx = self.screenx + Tic.SCREENW2-- middle the sprite
+    self.screeny = self.screeny + Tic.SCREENH2
+    self:drawSC()
+    self:_load()
+end
+
+function CSprite:drawW() -- draw a sprite -- WORLD WINDOW -- DEFAULT
+    self:_save{"screenx", "screeny",}
+    self.screenx = self.screenx + Tic.WORLDWX -- move the sprite into the world window
+    self.screeny = self.screeny + Tic.WORLDWY
+    self:drawS()
+    self:_load()
+end
+
+function CSprite:drawW2() -- draw a sprite -- WORLD WINDOW -- MIDDLE
+    self:_save{"screenx", "screeny",}
+    self.screenx = self.screenx + Tic.WORLDWW2-- middle the sprite
+    self.screeny = self.screeny + Tic.WORLDWH2
+    self:drawW()
+    self:_load()
+end
+
+function CSprite:drawWC() -- draw a sprite -- WORLD WINDOW -- CENTERED
+    self:_save{"screenx", "screeny",}
+    local _scale = self.scale or CSprite.SCALE01
+    self.screenx = self.screenx - (3 * _scale) - _scale + 1-- center the sprite
+    self.screeny = self.screeny - (3 * _scale) - _scale + 1
+    self:drawW()
+    self:_load()
+end
+
+function CSprite:drawW2C() -- draw a sprite -- WORLD WINDOW -- MIDDLE -- CENTERED
+    self:_save{"screenx", "screeny",}
+    self.screenx = self.screenx + Tic.WORLDWW2-- middle the sprite
+    self.screeny = self.screeny + Tic.WORLDWH2
+    self:drawWC()
     self:_load()
 end
 
@@ -742,7 +789,7 @@ function CSpriteFGBoard:new(_argt)
     self:_argt(_argt) -- override if any
 end
 
-function CSpriteFGBoard:draw()
+function CSpriteFGBoard:drawS()
     Tic:boardPaint(self.sprite, self.directives)
     CSpriteFGBoard.super.draw(self)
 end
@@ -1009,8 +1056,8 @@ function CEntity:randomWorldRegion(_lf, _rg, _up, _dw) -- random worldx worldy i
 end
 
 function CEntity:randomWorldWindow() -- random worldx worldy into the world window region
-    self:randomWorldRegion(Nums:neg(Tic.WORLDWW // 2), Nums:pos(Tic.WORLDWW // 2),
-        Nums:neg(Tic.WORLDWH // 2), Nums:pos(Tic.WORLDWH // 2)
+    self:randomWorldRegion(Nums:neg(Tic.WORLDWW2), Nums:pos(Tic.WORLDWW2),
+        Nums:neg(Tic.WORLDWH2), Nums:pos(Tic.WORLDWH2)
     )
 end
 
@@ -1095,7 +1142,7 @@ function CEntityDrawable:draw()
     _musprite.screeny = self.screeny
     _musprite.palette = _palette
     _musprite.flip    = self.dirx
-    _musprite:draw()
+    _musprite:drawS()
 end
 
 
@@ -1446,7 +1493,7 @@ function CCharacter:new(_argt)
     self.kind         = CEntity.KINDCHARACTER
     self.name         = CEntity.NAMECHARACTER
     self.size         = CCharacter.SIZEM -- size
-    self.portraitx    = Tic.SCREENW // 2 -- portrait positions
+    self.portraitx    = Tic.SCREENW2 -- portrait positions
     self.portraity    = Tic.SCREENH - (8 * CSprite.SCALE02) + 4
     self.statsx       = self.portraitx - 21 -- stats positions
     self.statsy       = self.portraity
@@ -1499,7 +1546,7 @@ function CCharacter:drawPortrait(_idle, _border, _infos) -- draw the portrait --
         self.state = Tic.STATESTANDIDLE
         self.frame = CSprite.FRAME00
     end
-    self:draw()
+    self:drawS()
     if _infos then
         Tic:print(self.portraitx + (12 * self.scale), self.portraity, self.name)
         Tic:print(self.portraitx + (12 * self.scale), self.portraity + (6 * self.scale), self.kind)
@@ -1584,7 +1631,7 @@ function CCharacter:_drawStatus()
     _musprite.flip    = self.dirx
     _musprite.scale   = self.scale
     _musprite:palettize(_palette)
-    _musprite:draw()
+    _musprite:drawS()
 end
 
 function CCharacter:_drawWeapon()
@@ -1752,7 +1799,7 @@ function CCharacterHumanoid:_drawBody()
         [Tic.COLORPANTS] = self.colorpants,
         [Tic.COLORHANDS] = self.colorhands,
     }
-    _musprite:draw()
+    _musprite:drawS()
 end
 
 function CCharacterHumanoid:_drawHead()
@@ -1784,7 +1831,7 @@ function CCharacterHumanoid:_drawHead()
         [Tic.COLOREXTRA]   = self.colorextra,
         [Tic.COLORSKIN]    = self.colorskin,
     }
-    _musprite:draw()
+    _musprite:drawS()
 
     -- draw eyes
     local _coloreyesfg   = self.coloreyesfg
@@ -1813,7 +1860,7 @@ function CCharacterHumanoid:_drawHead()
         [Tic.COLOREYESBGMD] = _coloreyesbgmd,
         [Tic.COLOREYESBGDW] = _coloreyesbgdw,
     }
-    _musprite:draw()
+    _musprite:drawS()
 end
 
 
@@ -2080,7 +2127,7 @@ end
 --
 local Truduk = CPlayerDwarf{name = "Truduk",
 }
-Truduk:randomWorldWindow()
+-- Truduk:randomWorldWindow()
 -- local Prinnn = CPlayerGnome{name = "Prinnn",
 --     coloreyesbg  = Tic.COLORRED,
 --     coloreyesfg  = Tic.COLORORANGE,
@@ -2132,8 +2179,8 @@ goto runit
 -- Sprites -- TESTING
 --
 local SpriteSFB = CSpriteFGBoard{
-    screenx = Tic.SCREENW // 2,
-    screeny = Tic.SCREENH // 2,
+    screenx = Tic.SCREENW2,
+    screeny = Tic.SCREENH2,
     directives = {
         {x = 2, y = 1, color = Tic.COLORORANGE,},
         {x = 1, y = 2, color = Tic.COLORORANGE,},
@@ -2154,9 +2201,10 @@ local SpriteSFB = CSpriteFGBoard{
     },
 }
 local SpriteFG = CSpriteFG{
-    sprite = 442,
-    screenx = Tic.SCREENW // 2,
-    screeny = Tic.SCREENH // 2,
+    sprite = 477,
+    screenx = 0,
+    screeny = 0,
+    scale = CSprite.SCALE04,
 }
 
 
@@ -2175,8 +2223,16 @@ function Tic:draw()
     Tic:drawScreenGuides()
     Tic:drawWorldWGuides()
 
+    SpriteFG:drawS()
+    SpriteFG:drawSC()
+    SpriteFG:drawS2()
+    SpriteFG:drawS2C()
+    SpriteFG:drawW()
+    SpriteFG:drawWC()
+    SpriteFG:drawW2()
+    SpriteFG:drawW2C()
     -- Tic:drawLog()
-    Tic:logPrint()
+    -- Tic:logPrint()
 
     Tic:tick() -- /!\ required in the draw function 
 end
@@ -2195,12 +2251,12 @@ function Tic:drawScreenGuides()
         Tic.SCREENX + Tic.SCREENW - 1, Tic.SCREENY,
         _drawcolor
     )
-    line(Tic.SCREENX, Tic.SCREENY + (Tic.SCREENH // 2) - 1, -- hline md
-        Tic.SCREENX + Tic.SCREENW - 1, Tic.SCREENY + (Tic.SCREENH // 2) - 1,
+    rect(Tic.SCREENX, Tic.SCREENY + Tic.SCREENH2, -- hline md
+        Tic.SCREENW, 2,
         _drawcolor
     )
-    line(Tic.SCREENX + (Tic.SCREENW // 2), Tic.SCREENY, -- vline md
-        Tic.SCREENX + (Tic.SCREENW // 2), Tic.SCREENY + Tic.SCREENH - 1,
+    rect(Tic.SCREENX + Tic.SCREENW2, Tic.SCREENY, -- vline md
+        2, Tic.SCREENH,
         _drawcolor
     )
 end
@@ -2252,12 +2308,12 @@ function Tic:drawWorldWGuides()
         Tic.WORLDWX + Tic.WORLDWW - 1, Tic.WORLDWY,
         _drawcolor
     )
-    line(Tic.WORLDWX, Tic.WORLDWY + (Tic.WORLDWH // 2) - 1, -- hline md
-        Tic.WORLDWX + Tic.WORLDWW - 1, Tic.WORLDWY + (Tic.WORLDWH // 2),
+    rect(Tic.WORLDWX, Tic.WORLDWY + Tic.WORLDWH2, -- hline md
+        Tic.WORLDWW, 2,
         _drawcolor
     )
-    line(Tic.WORLDWX + (Tic.WORLDWW // 2), Tic.WORLDWY, -- vline md
-        Tic.WORLDWX + (Tic.WORLDWW // 2), Tic.WORLDWY + Tic.WORLDWH - 1,
+    rect(Tic.WORLDWX + Tic.WORLDWW2, Tic.WORLDWY, -- vline md
+        2, Tic.WORLDWH,
         _drawcolor
     )
 end
@@ -2292,9 +2348,9 @@ function Tic:drawPlayerActual()
             for _entity, _ in pairs(_entitiesaround[_keyy][_keyx]) do -- draw entities at the same x y
                 local _offsetx  = _entity.worldx - _worldx
                 local _offsety  = _entity.worldy - _worldy
-                _entity.screenx = (Tic.SCREENW // 2) + _offsetx
-                _entity.screeny = (Tic.SCREENH // 2) + _offsety
-                _entity:drawW()
+                _entity.screenx = _offsetx
+                _entity.screeny = _offsety
+                _entity:drawS()
             end
         end
     end
