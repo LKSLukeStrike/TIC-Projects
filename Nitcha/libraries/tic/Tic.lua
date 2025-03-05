@@ -1051,13 +1051,15 @@ function CEntity:randomWorldRegion(_lf, _rg, _up, _dw) -- random worldx worldy i
     local _maxx = math.max(_lf, _rg)
     local _miny = math.min(_up, _dw)
     local _maxy = math.max(_up, _dw)
+    self.world:entityRemove(self) -- remove itself from its old position
     self.worldx = math.random(_minx, _maxx)
     self.worldy = math.random(_miny, _maxy)
+    self.world:entityAppend(self) -- append itself from its new position
 end
 
 function CEntity:randomWorldWindow() -- random worldx worldy into the world window region
-    self:randomWorldRegion(Nums:neg(Tic.WORLDWW2), Nums:pos(Tic.WORLDWW2),
-        Nums:neg(Tic.WORLDWH2), Nums:pos(Tic.WORLDWH2)
+    self:randomWorldRegion(Nums:neg(Tic.WORLDWW2 // 2), Nums:pos(Tic.WORLDWW2 // 2),
+        Nums:neg(Tic.WORLDWH2 // 2), Nums:pos(Tic.WORLDWH2 // 2)
     )
 end
 
@@ -1119,7 +1121,7 @@ function CEntityDrawable:new(_argt)
     self.world:entityAppend(self) -- append itself to the world
 end
 
-function CEntityDrawable:draw()
+function CEntityDrawable:draw() -- default draw for drawable entities -- override if any
     local _tick00      = Tic.TICK00.actvalue
     local _palette     = self.palette
 
@@ -1142,7 +1144,7 @@ function CEntityDrawable:draw()
     _musprite.screeny = self.screeny
     _musprite.palette = _palette
     _musprite.flip    = self.dirx
-    _musprite:drawS()
+    _musprite:drawW2C() -- display centered in the world window
 end
 
 
@@ -1260,16 +1262,16 @@ function CPlaceTreesAnim:new(_argt)
     CPlaceTreesAnim.super.new(self, _argt)
     self.animations = {
         CAnimation{ -- leaf 1
-            frequence = Tic.FREQUENCE240,
-            percent0  = 0.6,
-            palette0  = {[Tic.COLORWHITE] = Tic.COLORGREYD,},
-            palette1  = {[Tic.COLORWHITE] = Tic.COLORORANGE,},
+            frequence = Tic.FREQUENCE060,
+            percent0  = 0.8,
+            palette0  = {[Tic.COLORWHITE] = Tic.COLORGREENM,},
+            palette1  = {[Tic.COLORWHITE] = Tic.COLORGREEND,},
         },
         CAnimation{ -- leaf 2
-            frequence = Tic.FREQUENCE120,
-            percent0  = 0.1,
-            palette0  = {[Tic.COLORYELLOW] = Tic.COLORGREYD,},
-            palette1  = {[Tic.COLORYELLOW] = Tic.COLORORANGE,},
+            frequence = Tic.FREQUENCE240,
+            percent0  = 0.8,
+            palette0  = {[Tic.COLORYELLOW] = Tic.COLORGREENM,},
+            palette1  = {[Tic.COLORYELLOW] = Tic.COLORGREEND,},
         },
     }
     self:_argt(_argt) -- override if any
@@ -1631,7 +1633,7 @@ function CCharacter:_drawStatus()
     _musprite.flip    = self.dirx
     _musprite.scale   = self.scale
     _musprite:palettize(_palette)
-    _musprite:drawS()
+    _musprite:drawW2C() -- display centered in the world window
 end
 
 function CCharacter:_drawWeapon()
@@ -1799,7 +1801,7 @@ function CCharacterHumanoid:_drawBody()
         [Tic.COLORPANTS] = self.colorpants,
         [Tic.COLORHANDS] = self.colorhands,
     }
-    _musprite:drawS()
+    _musprite:drawW2C() -- display centered in the world window
 end
 
 function CCharacterHumanoid:_drawHead()
@@ -1831,7 +1833,7 @@ function CCharacterHumanoid:_drawHead()
         [Tic.COLOREXTRA]   = self.colorextra,
         [Tic.COLORSKIN]    = self.colorskin,
     }
-    _musprite:drawS()
+    _musprite:drawW2C() -- display centered in the world window
 
     -- draw eyes
     local _coloreyesfg   = self.coloreyesfg
@@ -1860,7 +1862,7 @@ function CCharacterHumanoid:_drawHead()
         [Tic.COLOREYESBGMD] = _coloreyesbgmd,
         [Tic.COLOREYESBGDW] = _coloreyesbgdw,
     }
-    _musprite:drawS()
+    _musprite:drawW2C() -- display centered in the world window
 end
 
 
@@ -2088,37 +2090,31 @@ local CEnnemy = CCharacter:extend() -- ennemy characters
 --
 -- Places
 --
-if false then
+if true then
 local House01 = CPlaceHouseAnim{
-    worldx = -15,
-    worldy = 5,
 }
+House01:randomWorldWindow()
 
 local House02 = CPlaceHouseIdle{
-    worldx = 20,
-    worldy = 20,
     palette = Tables:merge(CPlaceHouse.PALETTE, {[Tic.COLORRED] = Tic.COLORGREENM,}),
 }
+House02:randomWorldWindow()
 
 local Tower01 = CPlaceTowerAnim{
-    worldx = -10,
-    worldy = 25,
 }
+Tower01:randomWorldWindow()
 
 local Tower02 = CPlaceTowerIdle{
-    worldx = 15,
-    worldy = -10,
 }
+Tower02:randomWorldWindow()
 
-local Trees01 = CPlaceTreesIdle{
-    worldx = 25,
-    worldy = 15,
+local Trees01 = CPlaceTreesAnim{
 }
+Trees01:randomWorldWindow()
 
 local Trees02 = CPlaceTreesIdle{
-    worldx = -20,
-    worldy = -7,
 }
+Trees02:randomWorldWindow()
 end
 
 
@@ -2127,7 +2123,7 @@ end
 --
 local Truduk = CPlayerDwarf{name = "Truduk",
 }
--- Truduk:randomWorldWindow()
+Truduk:randomWorldWindow()
 -- local Prinnn = CPlayerGnome{name = "Prinnn",
 --     coloreyesbg  = Tic.COLORRED,
 --     coloreyesfg  = Tic.COLORORANGE,
@@ -2163,10 +2159,9 @@ local Truduk = CPlayerDwarf{name = "Truduk",
 --     colorpants   = Tic.COLORRED,
 -- }
 -- local Daemok = CPlayerDemon{name = "Daemok",}
--- local Golith = CPlayerGogol{name = "Golith",
---     worldx = math.random(0 - Tic.WORLDWLF, Tic.WORLDWRG),
---     worldy = math.random(0 - Tic.WORLDWUP, Tic.WORLDWDW),
--- }
+local Golith = CPlayerGogol{name = "Golith",
+}
+Golith:randomWorldWindow()
 -- local Wulfie = CPlayerWolfe{name = "Wulfie",
 --     colorextra = Tic.COLORRED,
 -- }
@@ -2217,22 +2212,24 @@ function Tic:draw()
 
     Tic:drawWorldWGround()
 
+    -- Tic:drawScreenGuides()
+    -- Tic:drawWorldWGuides()
+
     Tic:drawPlayerActual()
 
-    -- Tic:drawWorldWFrames()
-    Tic:drawScreenGuides()
-    Tic:drawWorldWGuides()
+    Tic:drawWorldWFrames()
 
-    SpriteFG:drawS()
-    SpriteFG:drawSC()
-    SpriteFG:drawS2()
-    SpriteFG:drawS2C()
-    SpriteFG:drawW()
-    SpriteFG:drawWC()
-    SpriteFG:drawW2()
-    SpriteFG:drawW2C()
+    -- SpriteFG:drawS()
+    -- SpriteFG:drawSC()
+    -- SpriteFG:drawS2()
+    -- SpriteFG:drawS2C()
+    -- SpriteFG:drawW()
+    -- SpriteFG:drawWC()
+    -- SpriteFG:drawW2()
+    -- SpriteFG:drawW2C()
     -- Tic:drawLog()
-    -- Tic:logPrint()
+
+    Tic:logPrint()
 
     Tic:tick() -- /!\ required in the draw function 
 end
@@ -2269,27 +2266,31 @@ function Tic:drawWorldWGround()
     )
 end
 
-function Tic:drawWorldWFrames()
-    local _maskcolor = Tic.COLORRED --Tic.COLORHUDSCREEN -- to hide the surrounding rectangle
+function Tic:drawWorldWFrames() -- draw border and caches around
     local _drawcolor = Tic.COLORGREYL
+    Tic:drawWorldWCaches()
+    rectb(Tic.WORLDWX, Tic.WORLDWY, -- border
+        Tic.WORLDWW, Tic.WORLDWH,
+        _drawcolor
+    )
+end
+
+function Tic:drawWorldWCaches()
+    local _drawcolor = Tic.COLORHUDSCREEN
     rect(Tic.WORLDWX - 8, Tic.WORLDWY, -- lf mask
         8, Tic.WORLDWH,
-        _maskcolor
+        _drawcolor
     )
     rect(Tic.WORLDWX + Tic.WORLDWW, Tic.WORLDWY, -- rg mask
         8, Tic.WORLDWH,
-        _maskcolor
+        _drawcolor
     )
     rect(Tic.WORLDWX - 8, Tic.WORLDWY - 8, -- up mask
         Tic.WORLDWW + 16, 8,
-        _maskcolor
+        _drawcolor
     )
     rect(Tic.WORLDWX - 8, Tic.WORLDWY + Tic.WORLDWH, -- dw mask
         Tic.WORLDWW + 16, 8,
-        _maskcolor
-    )
-    rectb(Tic.WORLDWX, Tic.WORLDWY, -- border
-        Tic.WORLDWW, Tic.WORLDWH,
         _drawcolor
     )
 end
@@ -2350,22 +2351,15 @@ function Tic:drawPlayerActual()
                 local _offsety  = _entity.worldy - _worldy
                 _entity.screenx = _offsetx
                 _entity.screeny = _offsety
-                _entity:drawS()
+                _entity:draw()
             end
         end
     end
-
-    Tic:logAppend("WLF:", Tic.WORLDWLF)
-    Tic:logAppend("WRG:", Tic.WORLDWRG)
-    Tic:logAppend("WUP:", Tic.WORLDWUP)
-    Tic:logAppend("WDW:", Tic.WORLDWDW)
 
     Tic:logAppend(_playeractual.name)
 
     Tic:logAppend("WOX:", _playeractual.worldx)
     Tic:logAppend("WOY:", _playeractual.worldy)
-    Tic:logAppend("SCX:", _playeractual.screenx)
-    Tic:logAppend("SCY:", _playeractual.screeny)
 
     -- _playeractual:drawStatsC(true)
     -- _playeractual:drawPortraitC(nil, true, true)
