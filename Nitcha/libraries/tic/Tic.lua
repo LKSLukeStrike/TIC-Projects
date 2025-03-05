@@ -1009,6 +1009,9 @@ function CEntity:randomWorldRegion(_lf, _rg, _up, _dw) -- random worldx worldy i
 end
 
 function CEntity:randomWorldWindow() -- random worldx worldy into the world window region
+    self:randomWorldRegion(Nums:neg(Tic.WORLDWW // 2), Nums:pos(Tic.WORLDWW // 2),
+        Nums:neg(Tic.WORLDWH // 2), Nums:pos(Tic.WORLDWH // 2)
+    )
 end
 
 
@@ -2077,7 +2080,7 @@ end
 --
 local Truduk = CPlayerDwarf{name = "Truduk",
 }
-Truduk:randomWorldRegion()
+Truduk:randomWorldWindow()
 -- local Prinnn = CPlayerGnome{name = "Prinnn",
 --     coloreyesbg  = Tic.COLORRED,
 --     coloreyesfg  = Tic.COLORORANGE,

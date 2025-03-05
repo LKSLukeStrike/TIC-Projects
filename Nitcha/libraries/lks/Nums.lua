@@ -15,6 +15,16 @@ function Nums:yes2int(_yes) -- convert a boolean to integer 0|1
 end
 
 
+-- Signs
+function Nums:neg(_num) -- negative num
+    return (_num <= 0) and _num or 0 - math.abs(_num)
+end
+
+function Nums:pos(_num) -- positive num
+    return (_num >= 0) and _num or 0 + math.abs(_num)
+end
+
+
 -- Random
 function Nums:random01(_percent0) -- returns random 0 or 1 -- use _percent0 to adjust -- default 1/2
     _percent0 = (_percent0 and Nums:isBW(_percent0, 0, 1)) and _percent0 or 0.5
