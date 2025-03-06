@@ -2265,9 +2265,10 @@ local CEnnemy = CCharacter:extend() -- ennemy characters
 --
 -- Places
 --
-if true then
-local NumberPlaces = 10
-CPlace.PLACEKINDS = { -- TODO val can contain parameters such as percent etc
+if true then -- generate places -- TODO move under CPlaces
+
+CPlace.PLACECOUNT = 10 -- default number of generated places
+CPlace.PLACEKINDS = {  -- TODO val can contain parameters such as percent etc
     [CPlaceHouseAnim] = {},
     [CPlaceHouseIdle] = {},
     [CPlaceTowerAnim] = {},
@@ -2286,12 +2287,39 @@ CPlace.PLACEKINDS = { -- TODO val can contain parameters such as percent etc
     [CPlaceTree1Idle] = {},
 }
 
-for _ = 1, 6 do --NumberPlaces do
-    local _kind = Tables:randompickkey(CPlace.PLACEKINDS)
-    _entity = _kind() -- random kind
-    _entity:randomWorldWindow() -- random position
+function CPlace:generateRandomWorldWindow(_count, _kinds)
+    _count = (_count) and _count or CPlace.PLACECOUNT
+    _kinds = (_kinds) and _kinds or CPlace.PLACEKINDS
+    for _ = 1, _count do
+        local _kind = Tables:randompickkey(_kinds)
+        _entity = _kind() -- random kind
+        _entity:randomWorldWindow() -- random position
+    end
 end
-end
+
+-- CPlace:generateRandomWorldWindow()
+-- CPlace:generateRandomWorldWindow(nil, {
+--     [CPlaceTree0Anim] = {},
+--     [CPlaceTree0Idle] = {},
+--     [CPlaceTree1Anim] = {},
+--     [CPlaceTree1Idle] = {},
+-- })
+CPlace:generateRandomWorldWindow(nil, {
+    [CPlaceHouseAnim] = {},
+    [CPlaceHouseIdle] = {},
+    [CPlaceTowerAnim] = {},
+    [CPlaceTowerIdle] = {},
+    [CPlaceManorAnim] = {},
+    [CPlaceManorIdle] = {},
+    [CPlaceAltarAnim] = {},
+    [CPlaceAltarIdle] = {},
+    [CPlaceWaterAnim] = {},
+    [CPlaceWaterIdle] = {},
+    [CPlaceStallAnim] = {},
+    [CPlaceStallIdle] = {},
+})
+
+end -- generate places
 
 
 --
