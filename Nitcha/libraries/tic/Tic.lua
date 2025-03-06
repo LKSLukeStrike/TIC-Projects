@@ -1174,8 +1174,8 @@ function CPlaceHouse:new(_argt)
     CPlaceHouse.super.new(self, _argt)
     self.kind = CEntity.KINDHOUSE
     self.name = CEntity.NAMEHOUSE
-    self.sprite   = CSpriteBG.PLACEHOUSE
-    self.palette  = CPlaceHouse.PALETTE
+    self.sprite  = CSpriteBG.PLACEHOUSE
+    self.palette = CPlaceHouse.PALETTE
     self:_argt(_argt) -- override if any
 end
 
@@ -1213,8 +1213,8 @@ function CPlaceTower:new(_argt)
     CPlaceTower.super.new(self, _argt)
     self.kind = CEntity.KINDTOWER
     self.name = CEntity.NAMETOWER
-    self.sprite   = CSpriteBG.PLACETOWER
-    self.palette  = CPlaceTower.PALETTE
+    self.sprite  = CSpriteBG.PLACETOWER
+    self.palette = CPlaceTower.PALETTE
     self:_argt(_argt) -- override if any
 end
 
@@ -1242,6 +1242,162 @@ local CPlaceTowerIdle = CPlaceTower:extend() -- idle towers
 
 
 --
+-- CPlaceManor
+--
+local CPlaceManor = CPlace:extend() -- manors
+CPlaceManor.PALETTE = {[Tic.COLORWHITE] = Tic.COLORGREYD, [Tic.COLORYELLOW] = Tic.COLORGREYD,}
+CEntity.KINDMANOR = "Manor" -- Manor kind
+CEntity.NAMEMANOR = "Manor" -- Manor name
+function CPlaceManor:new(_argt)
+    CPlaceManor.super.new(self, _argt)
+    self.kind = CEntity.KINDMANOR
+    self.name = CEntity.NAMEMANOR
+    self.sprite  = CSpriteBG.PLACEMANOR
+    self.palette = CPlaceManor.PALETTE
+    self:_argt(_argt) -- override if any
+end
+
+local CPlaceManorAnim = CPlaceManor:extend() -- anim manors
+function CPlaceManorAnim:new(_argt)
+    CPlaceManorAnim.super.new(self, _argt)
+    self.animations = {
+        CAnimation{ -- window 1
+            frequence = Tic.FREQUENCE240,
+            percent0  = 0.6,
+            palette0  = {[Tic.COLORWHITE] = Tic.COLORGREYD,},
+            palette1  = {[Tic.COLORWHITE] = Tic.COLORORANGE,},
+        },
+        CAnimation{ -- window 2
+            frequence = Tic.FREQUENCE120,
+            percent0  = 0.1,
+            palette0  = {[Tic.COLORYELLOW] = Tic.COLORGREYD,},
+            palette1  = {[Tic.COLORYELLOW] = Tic.COLORORANGE,},
+        },
+    }
+    self:_argt(_argt) -- override if any
+end
+
+local CPlaceManorIdle = CPlaceManor:extend() -- idle manors
+
+
+--
+-- CPlaceAltar
+--
+local CPlaceAltar = CPlace:extend() -- altars
+CPlaceAltar.PALETTE = {[Tic.COLORWHITE] = Tic.COLORGREYD, [Tic.COLORYELLOW] = Tic.COLORGREYD,}
+CEntity.KINDALTAR = "Altar" -- Altar kind
+CEntity.NAMEALTAR = "Altar" -- Altar name
+function CPlaceAltar:new(_argt)
+    CPlaceAltar.super.new(self, _argt)
+    self.kind = CEntity.KINDALTAR
+    self.name = CEntity.NAMEALTAR
+    self.sprite  = CSpriteBG.PLACEALTAR
+    self.palette = CPlaceAltar.PALETTE
+    self:_argt(_argt) -- override if any
+end
+
+local CPlaceAltarAnim = CPlaceAltar:extend() -- anim altars
+function CPlaceAltarAnim:new(_argt)
+    CPlaceAltarAnim.super.new(self, _argt)
+    self.animations = {
+        CAnimation{ -- window 1
+            frequence = Tic.FREQUENCE240,
+            percent0  = 0.6,
+            palette0  = {[Tic.COLORWHITE] = Tic.COLORGREYD,},
+            palette1  = {[Tic.COLORWHITE] = Tic.COLORBLUEL,},
+        },
+        CAnimation{ -- window 2
+            frequence = Tic.FREQUENCE240,
+            percent0  = 0.1,
+            palette0  = {[Tic.COLORYELLOW] = Tic.COLORBLUEM,},
+            palette1  = {[Tic.COLORYELLOW] = Tic.COLORBLUEM,},
+        },
+    }
+    self:_argt(_argt) -- override if any
+end
+
+local CPlaceAltarIdle = CPlaceAltar:extend() -- idle altars
+
+
+--
+-- CPlaceWater
+--
+local CPlaceWater = CPlace:extend() -- waters
+CPlaceWater.PALETTE = {[Tic.COLORWHITE] = Tic.COLORGREYD, [Tic.COLORYELLOW] = Tic.COLORGREYD,}
+CEntity.KINDWATER = "Water" -- Water kind
+CEntity.NAMEWATER = "Water" -- Water name
+function CPlaceWater:new(_argt)
+    CPlaceWater.super.new(self, _argt)
+    self.kind = CEntity.KINDWATER
+    self.name = CEntity.NAMEWATER
+    self.sprite  = CSpriteBG.PLACEWATER
+    self.palette = CPlaceWater.PALETTE
+    self:_argt(_argt) -- override if any
+end
+
+local CPlaceWaterAnim = CPlaceWater:extend() -- anim waters
+function CPlaceWaterAnim:new(_argt)
+    CPlaceWaterAnim.super.new(self, _argt)
+    self.animations = {
+        CAnimation{ -- water 1
+            frequence = Tic.FREQUENCE240,
+            percent0  = 0.6,
+            palette0  = {[Tic.COLORWHITE] = Tic.COLORBLUEL,},
+            palette1  = {[Tic.COLORWHITE] = Tic.COLORBLUEL,},
+        },
+        CAnimation{ -- water 2
+            frequence = Tic.FREQUENCE120,
+            percent0  = 0.1,
+            palette0  = {[Tic.COLORYELLOW] = Tic.COLORBLUEM,},
+            palette1  = {[Tic.COLORYELLOW] = Tic.COLORBLUEM,},
+        },
+    }
+    self:_argt(_argt) -- override if any
+end
+
+local CPlaceWaterIdle = CPlaceWater:extend() -- idle waters
+
+
+--
+-- CPlaceStall
+--
+local CPlaceStall = CPlace:extend() -- stalls
+CPlaceStall.PALETTE = {[Tic.COLORWHITE] = Tic.COLORGREYD, [Tic.COLORYELLOW] = Tic.COLORGREYD,}
+CEntity.KINDSTALL = "Stall" -- Stall kind
+CEntity.NAMESTALL = "Stall" -- Stall name
+function CPlaceStall:new(_argt)
+    CPlaceStall.super.new(self, _argt)
+    self.kind = CEntity.KINDSTALL
+    self.name = CEntity.NAMESTALL
+    self.sprite  = CSpriteBG.PLACESTALL
+    self.palette = CPlaceStall.PALETTE
+    self:_argt(_argt) -- override if any
+end
+
+local CPlaceStallAnim = CPlaceStall:extend() -- anim stalls
+function CPlaceStallAnim:new(_argt)
+    CPlaceStallAnim.super.new(self, _argt)
+    self.animations = {
+        CAnimation{ -- water 1
+            frequence = Tic.FREQUENCE240,
+            percent0  = 0.6,
+            palette0  = {[Tic.COLORWHITE] = Tic.COLORBLUEL,},
+            palette1  = {[Tic.COLORWHITE] = Tic.COLORBLUEL,},
+        },
+        CAnimation{ -- water 2
+            frequence = Tic.FREQUENCE120,
+            percent0  = 0.1,
+            palette0  = {[Tic.COLORYELLOW] = Tic.COLORBLUEM,},
+            palette1  = {[Tic.COLORYELLOW] = Tic.COLORBLUEM,},
+        },
+    }
+    self:_argt(_argt) -- override if any
+end
+
+local CPlaceStallIdle = CPlaceStall:extend() -- idle stalls
+
+
+--
 -- CPlaceTrees
 --
 local CPlaceTrees = CPlace:extend() -- trees
@@ -1252,8 +1408,8 @@ function CPlaceTrees:new(_argt)
     CPlaceTrees.super.new(self, _argt)
     self.kind = CEntity.KINDTREES
     self.name = CEntity.NAMETREES
-    self.sprite   = CSpriteBG.PLACETREE0
-    self.palette  = CPlaceTrees.PALETTE
+    self.sprite  = CSpriteBG.PLACETREE0
+    self.palette = CPlaceTrees.PALETTE
     self:_argt(_argt) -- override if any
 end
 
@@ -2091,30 +2247,45 @@ local CEnnemy = CCharacter:extend() -- ennemy characters
 -- Places
 --
 if true then
-local House01 = CPlaceHouseAnim{
+local NumberPlaces = 10
+local RandomPlaces = {
+    CPlaceHouse = {
+        CPlaceHouseAnim = CPlaceHouseAnim,
+        CPlaceHouseIdle = CPlaceHouseIdle,
+    },
+    CPlaceTower = {
+        CPlaceTowerAnim = CPlaceTowerAnim,
+        CPlaceTowerIdle = CPlaceTowerIdle,
+    },
+    CPlaceManor = {
+        CPlaceManorAnim = CPlaceManorAnim,
+        CPlaceManorIdle = CPlaceManorIdle,
+    },
+    CPlaceAltar = {
+        CPlaceAltarAnim = CPlaceAltarAnim,
+        CPlaceAltarIdle = CPlaceAltarIdle,
+    },
+    CPlaceWater = {
+        CPlaceWaterAnim = CPlaceWaterAnim,
+        CPlaceWaterIdle = CPlaceWaterIdle,
+    },
+    CPlaceStall = {
+        CPlaceStallAnim = CPlaceStallAnim,
+        CPlaceStallIdle = CPlaceStallIdle,
+    },
+    CPlaceTrees = {
+        CPlaceTreesAnim = CPlaceTreesAnim,
+        CPlaceTreesIdle = CPlaceTreesIdle,
+    },
 }
-House01:randomWorldWindow()
 
-local House02 = CPlaceHouseIdle{
-    palette = Tables:merge(CPlaceHouse.PALETTE, {[Tic.COLORRED] = Tic.COLORGREENM,}),
-}
-House02:randomWorldWindow()
-
-local Tower01 = CPlaceTowerAnim{
-}
-Tower01:randomWorldWindow()
-
-local Tower02 = CPlaceTowerIdle{
-}
-Tower02:randomWorldWindow()
-
-local Trees01 = CPlaceTreesAnim{
-}
-Trees01:randomWorldWindow()
-
-local Trees02 = CPlaceTreesIdle{
-}
-Trees02:randomWorldWindow()
+for _ = 1, NumberPlaces do --NumberPlaces do
+    local _kind = nil
+    _kind = Tables:randompick(RandomPlaces)
+    _kind = Tables:randompick(_kind)
+    _entity = _kind() -- random kind
+    _entity:randomWorldWindow() -- random position
+end
 end
 
 

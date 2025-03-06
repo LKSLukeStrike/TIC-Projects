@@ -1,7 +1,13 @@
 -- Tables object
 -- Instance only once
 -- Contains constants, globals and general functions
--- 
+--
+
+-- Packages
+package.path = package.path..";G:/TIC80 1.1/TICProjects/Nitcha/?.lua"
+local Nums   = require("libraries/lks/Nums")
+
+
 local Tables = {}
 
 
@@ -38,6 +44,15 @@ function Tables:vals(_table) -- vals of a table -- SORTED
     return _result
 end
 
+function Tables:pick(_table, _keyn) -- return the nth key value of a table
+    local _keys = Tables:keys(_table)
+    return _table[_keys[_keyn]] -- nil if not found
+end
+
+function Tables:randompick(_table) -- return a random item in a table
+    return Tables:pick(_table, math.random(Tables:size(_table))) -- nil if no items
+end
+
 function Tables:find(_table, _find) -- return the key of _val else nil if not found
     for _key, _val in pairs(_table or {}) do
         if _val == _find then return _key end
@@ -63,13 +78,14 @@ end
 
 
 function Tables:dump(_table, _argt) -- dump a table -- SORTED -- RECURSIVE -- INDENT -- DEPTH
+    _argt = (_argt) and _argt or {}
     local _indent  = _argt.indent or ""
     local _depth   = _argt.depth or Nums.MAXINTEGER
     local _verbose = (_argt.verbose == true) or false
-    local _hide    = _argt.hide -- hide keys
-    local _show    = _argt.show -- override hidden keys if any
-    local _skip    = _argt.skip -- skip tables with those keys
-    local _keep    = _argt.keep -- override skipped tables with those keys if any
+    local _hide    = _argt.hide or {} -- hide keys
+    local _show    = _argt.show or {} -- override hidden keys if any
+    local _skip    = _argt.skip or {} -- skip tables with those keys
+    local _keep    = _argt.keep or {} -- override skipped tables with those keys if any
 
     local _tablesdumped = {} -- already dumped tables to avoid dead loops
     function _dump(_table, _argt)
