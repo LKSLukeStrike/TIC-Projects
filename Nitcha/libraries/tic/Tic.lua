@@ -718,6 +718,7 @@ CSpriteBG.PLACEWATER  = CSpriteBG.STANDSBANK + 0
 CSpriteBG.PLACESTALL  = CSpriteBG.STANDSBANK + 1
 CSpriteBG.FORESTBANK  = 48 -- forests
 CSpriteBG.PLACETREE0  = CSpriteBG.FORESTBANK + 0
+CSpriteBG.PLACETREE1  = CSpriteBG.FORESTBANK + 1
 function CSpriteBG:new(_argt)
     CSpriteBG.super.new(self, _argt)
     self:_argt(_argt) -- override if any
@@ -1378,17 +1379,17 @@ local CPlaceStallAnim = CPlaceStall:extend() -- anim stalls
 function CPlaceStallAnim:new(_argt)
     CPlaceStallAnim.super.new(self, _argt)
     self.animations = {
-        CAnimation{ -- water 1
+        CAnimation{ -- owner
             frequence = Tic.FREQUENCE240,
             percent0  = 0.6,
-            palette0  = {[Tic.COLORWHITE] = Tic.COLORBLUEL,},
-            palette1  = {[Tic.COLORWHITE] = Tic.COLORBLUEL,},
+            palette0  = {[Tic.COLORWHITE] = Tic.COLORWHITE,},
+            palette1  = {[Tic.COLORWHITE] = Tic.COLORGREYD,},
         },
-        CAnimation{ -- water 2
+        CAnimation{ -- content
             frequence = Tic.FREQUENCE120,
             percent0  = 0.1,
-            palette0  = {[Tic.COLORYELLOW] = Tic.COLORBLUEM,},
-            palette1  = {[Tic.COLORYELLOW] = Tic.COLORBLUEM,},
+            palette0  = {[Tic.COLORYELLOW] = Tic.COLORYELLOW,},
+            palette1  = {[Tic.COLORYELLOW] = Tic.COLORORANGE,},
         },
     }
     self:_argt(_argt) -- override if any
@@ -1434,6 +1435,24 @@ function CPlaceTreesAnim:new(_argt)
 end
 
 local CPlaceTreesIdle = CPlaceTrees:extend() -- idle trees
+
+local CPlaceTree0Anim = CPlaceTreesAnim:extend() -- anim tree0
+
+local CPlaceTree0Idle = CPlaceTreesIdle:extend() -- idle tree0
+
+local CPlaceTree1Anim = CPlaceTreesAnim:extend() -- anim tree1
+function CPlaceTree1Anim:new(_argt)
+    CPlaceTree1Anim.super.new(self, _argt)
+    self.sprite  = CSpriteBG.PLACETREE1
+    self:_argt(_argt) -- override if any
+end
+
+local CPlaceTree1Idle = CPlaceTreesIdle:extend() -- idle tree1
+function CPlaceTree1Idle:new(_argt)
+    CPlaceTree1Idle.super.new(self, _argt)
+    self.sprite  = CSpriteBG.PLACETREE1
+    self:_argt(_argt) -- override if any
+end
 
 
 --
@@ -2248,41 +2267,27 @@ local CEnnemy = CCharacter:extend() -- ennemy characters
 --
 if true then
 local NumberPlaces = 10
-local RandomPlaces = {
-    CPlaceHouse = {
-        CPlaceHouseAnim = CPlaceHouseAnim,
-        CPlaceHouseIdle = CPlaceHouseIdle,
-    },
-    CPlaceTower = {
-        CPlaceTowerAnim = CPlaceTowerAnim,
-        CPlaceTowerIdle = CPlaceTowerIdle,
-    },
-    CPlaceManor = {
-        CPlaceManorAnim = CPlaceManorAnim,
-        CPlaceManorIdle = CPlaceManorIdle,
-    },
-    CPlaceAltar = {
-        CPlaceAltarAnim = CPlaceAltarAnim,
-        CPlaceAltarIdle = CPlaceAltarIdle,
-    },
-    CPlaceWater = {
-        CPlaceWaterAnim = CPlaceWaterAnim,
-        CPlaceWaterIdle = CPlaceWaterIdle,
-    },
-    CPlaceStall = {
-        CPlaceStallAnim = CPlaceStallAnim,
-        CPlaceStallIdle = CPlaceStallIdle,
-    },
-    CPlaceTrees = {
-        CPlaceTreesAnim = CPlaceTreesAnim,
-        CPlaceTreesIdle = CPlaceTreesIdle,
-    },
+CPlace.PLACEKINDS = { -- TODO val can contain parameters such as percent etc
+    [CPlaceHouseAnim] = {},
+    [CPlaceHouseIdle] = {},
+    [CPlaceTowerAnim] = {},
+    [CPlaceTowerIdle] = {},
+    [CPlaceManorAnim] = {},
+    [CPlaceManorIdle] = {},
+    [CPlaceAltarAnim] = {},
+    [CPlaceAltarIdle] = {},
+    [CPlaceWaterAnim] = {},
+    [CPlaceWaterIdle] = {},
+    [CPlaceStallAnim] = {},
+    [CPlaceStallIdle] = {},
+    [CPlaceTree0Anim] = {},
+    [CPlaceTree0Idle] = {},
+    [CPlaceTree1Anim] = {},
+    [CPlaceTree1Idle] = {},
 }
 
-for _ = 1, NumberPlaces do --NumberPlaces do
-    local _kind = nil
-    _kind = Tables:randompick(RandomPlaces)
-    _kind = Tables:randompick(_kind)
+for _ = 1, 6 do --NumberPlaces do
+    local _kind = Tables:randompickkey(CPlace.PLACEKINDS)
     _entity = _kind() -- random kind
     _entity:randomWorldWindow() -- random position
 end

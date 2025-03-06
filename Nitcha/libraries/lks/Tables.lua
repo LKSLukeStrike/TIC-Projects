@@ -25,8 +25,8 @@ function Tables:keys(_table) -- keys of a table -- SORTED
         table.insert(_result, _key)
     end
     table.sort(_result, function(_a, _b)
-        if type(_a) == type(_b) then
-            if type(_a) == "table" then return _a == _b end -- TODO more types ?
+       if type(_a) == type(_b) then
+            if type(_a) == "table" then return false end -- /!\ dont sort tables, sort crash is same table
             return _a < _b
         end
         return tostring(_a) < tostring(_b)
