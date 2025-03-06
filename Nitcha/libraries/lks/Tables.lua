@@ -44,13 +44,21 @@ function Tables:vals(_table) -- vals of a table -- SORTED
     return _result
 end
 
-function Tables:pick(_table, _keyn) -- return the nth key value of a table
+function Tables:pickkey(_table, _keyn) -- return the nth key of a table
     local _keys = Tables:keys(_table)
-    return _table[_keys[_keyn]] -- nil if not found
+    return _keys[_keyn] -- nil if not found
 end
 
-function Tables:randompick(_table) -- return a random item in a table
-    return Tables:pick(_table, math.random(Tables:size(_table))) -- nil if no items
+function Tables:pickval(_table, _keyn) -- return the nth val of a table
+    return _table[Tables:pickkey(_table, _keyn)] -- nil if not found
+end
+
+function Tables:randompickkey(_table) -- return a random key in a table
+    return Tables:pickkey(_table, math.random(Tables:size(_table))) -- nil if no items
+end
+
+function Tables:randompickval(_table) -- return a random val in a table
+    return _table[Tables:randompickkey(_table)] -- nil if no items
 end
 
 function Tables:find(_table, _find) -- return the key of _val else nil if not found
