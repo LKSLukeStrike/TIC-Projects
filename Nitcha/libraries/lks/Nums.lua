@@ -26,6 +26,12 @@ end
 
 
 -- Random
+function Nums:random(_num1, _num2) -- solid random, ensure correct interval
+    local _min = math.min(_num1, _num2)
+    local _max = math.max(_num1, _num2)
+    return math.random(_min, _max)
+end
+
 function Nums:random01(_percent0) -- returns random 0 or 1 -- use _percent0 to adjust -- default 1/2
     _percent0 = (_percent0 and Nums:isBW(_percent0, 0, 1)) and _percent0 or 0.5
     return (math.random() <= _percent0) and 0 or 1

@@ -811,6 +811,33 @@ end
 
 
 --
+-- CRegion
+--
+local CRegion = Classic:extend() -- general region -- -lf +rg -up +dw around a point
+function CRegion:new(_argt)
+    CRegion.super.new(self, _argt)
+    self.lf = Nums.MININTEGER -- negative
+    self.rg = Nums.MAXINTEGER -- positive
+    self.up = Nums.MININTEGER -- negative
+    self.dw = Nums.MAXINTEGER -- positive
+    self:_argt(_argt) -- override if any
+end
+
+function CRegion:randomWH(_width, _height) -- returns a region of random width and height
+    _width  = (_width)  and _width  or Nums.MAXINTEGER -- be careful with that ;)
+    _height = (_height) and _height or Nums.MAXINTEGER
+    _width  = (_width == 0)  and 1  or _width -- avoid weird results with math.random(0)
+    _height = (_height == 0) and 1  or _height
+    return CRegion{
+        lf = Nums:neg(math.random(_width)),
+        rg = Nums:pos(math.random(_width)),
+        up = Nums:neg(math.random(_height)),
+        dw = Nums:pos(math.random(_height)),
+    }
+end
+
+
+--
 -- CLocations
 --
 local CLocations = Classic:extend() -- general entities locations -- {worldy {worldx {entity = entity}}}
@@ -852,12 +879,12 @@ function CLocations:moveXY(_entity, _worldx, _worldy) -- move an existing entity
     self:append(_entity)
 end
 
-function CLocations:entitiesWorldXYRegion(_worldx, _worldy, _lf, _rg, _up, _dw) -- entities in region
-    if not _worldx or not _worldy or not _lf or not _rg or not _up or not _dw then return end -- mandatory
-    local _rangelf = _worldx - _lf -- region around world xy -- /!\ all borders are supposed to be positive
-    local _rangerg = _worldx + _rg
-    local _rangeup = _worldy - _up
-    local _rangedw = _worldy + _dw
+function CLocations:entitiesWorldXYRegion(_worldx, _worldy, _region) -- entities in region around world xy
+    if not _worldx or not _worldy or not _region then return end -- mandatory
+    local _rangelf = _worldx + _region.lf -- negative lf
+    local _rangerg = _worldx + _region.rg -- positive rg
+    local _rangeup = _worldy + _region.up -- negative up
+    local _rangedw = _worldy + _region.dw -- positive dw
     local _result  = {}
 
     for _keyy, _valy in pairs(self.locations) do -- search for y in range
@@ -882,15 +909,20 @@ end
 
 function CLocations:entitiesWorldXYAround(_worldx, _worldy, _rangex, _rangey) -- entities in ranges
     if not _worldx or not _worldy or not _rangex or not _rangey then return end -- mandatory
-    return self:entitiesWorldXYRegion(_worldx, _worldy, _rangex, _rangex, _rangey, _rangey)
+    return self:entitiesWorldXYRegion(_worldx, _worldy, CRegion{
+        lf = Nums:neg(_rangex),
+        rg = Nums:pos(_rangex),
+        up = Nums:neg(_rangey),
+        dw = Nums:pos(_rangey),
+    })
 end
 
-function CLocations:entitiesEntityRegion(_entity, _lf, _rg, _up, _dw) -- entities in region
-    if not _entity or not _lf or not _rg or not _up or not _dw then return end -- mandatory
+function CLocations:entitiesEntityRegion(_entity, _region) -- entities in region
+    if not _entity or not __region then return end -- mandatory
     local _worldx = _entity.worldx
     local _worldy = _entity.worldy
 
-    return self:entitiesWorldXYRegion(_worldx, _worldy, _lf, _rg, _up, _dw)
+    return self:entitiesWorldXYRegion(_worldx, _worldy, _region)
 end
 
 function CLocations:entitiesEntityAround(_entity, _rangex, _rangey) -- entities in ranges
@@ -932,9 +964,9 @@ function CEntitiesLocations:moveXY(_entity, _worldx, _worldy) -- move an existin
     self.locations:moveXY(_entity, _worldx, _worldy)
 end
 
-function CEntitiesLocations:entitiesWorldXYRegion(_worldx, _worldy, _lf, _rg, _up, _dw) -- entities in region
-    if not _worldx or not _worldy or not _lf or not _rg or not _up or not _dw then return end -- mandatory
-    return self.locations:entitiesWorldXYRegion(_worldx, _worldy, _lf, _rg, _up, _dw)
+function CEntitiesLocations:entitiesWorldXYRegion(_worldx, _worldy, _region) -- entities in region
+    if not _worldx or not _worldy or not _region then return end -- mandatory
+    return self.locations:entitiesWorldXYRegion(_worldx, _worldy, _region)
 end
 
 function CEntitiesLocations:entitiesWorldXYAround(_worldx, _worldy, _rangex, _rangey) -- entities in ranges
@@ -942,9 +974,9 @@ function CEntitiesLocations:entitiesWorldXYAround(_worldx, _worldy, _rangex, _ra
     return self.locations:entitiesWorldXYAround(_worldx, _worldy, _rangex, _rangey)
 end
 
-function CEntitiesLocations:entitiesEntityRegion(_entity, _lf, _rg, _up, _dw) -- entities in region
-    if not _entity or not _lf or not _rg or not _up or not _dw then return end -- mandatory
-    return self.locations:entitiesEntityRegion(_entity, _lf, _rg, _up, _dw)
+function CEntitiesLocations:entitiesEntityRegion(_entity, _region) -- entities in region
+    if not _entity or not _region then return end -- mandatory
+    return self.locations:entitiesEntityRegion(_entity, _region)
 end
 
 function CEntitiesLocations:entitiesEntityAround(_entity, _rangex, _rangey) -- entities in ranges
@@ -985,9 +1017,9 @@ function CWorld:entityMoveXY(_entity, _worldx, _worldy) -- move an entity into t
     _entity:focus() -- focus its camera on itself
 end
 
-function CWorld:entitiesWorldXYRegion(_worldx, _worldy, _lf, _rg, _up, _dw) -- entities in region
-    if not _worldx or not _worldy or not _lf or not _rg or not _up or not _dw then return end -- mandatory
-    return self.entitieslocations:entitiesWorldXYRegion(_worldx, _worldy, _lf, _rg, _up, _dw)
+function CWorld:entitiesWorldXYRegion(_worldx, _worldy, _region) -- entities in region
+    if not _worldx or not _worldy or not _region then return end -- mandatory
+    return self.entitieslocations:entitiesWorldXYRegion(_worldx, _worldy, _region)
 end
 
 function CWorld:entitiesWorldXYAround(_worldx, _worldy, _rangex, _rangey) -- entities in ranges
@@ -995,9 +1027,9 @@ function CWorld:entitiesWorldXYAround(_worldx, _worldy, _rangex, _rangey) -- ent
     return self.entitieslocations:entitiesWorldXYAround(_worldx, _worldy, _rangex, _rangey)
 end
 
-function CWorld:entitiesEntityRegion(_entity, _lf, _rg, _up, _dw) -- entities in region
-    if not _entity or not _lf or not _rg or not _up or not _dw then return end -- mandatory
-    return self.entitieslocations:entitiesEntityRegion(_entity, _lf, _rg, _up, _dw)
+function CWorld:entitiesEntityRegion(_entity, _region) -- entities in region
+    if not _entity or not _region then return end -- mandatory
+    return self.entitieslocations:entitiesEntityRegion(_entity, _region)
 end
 
 function CWorld:entitiesEntityAround(_entity, _rangex, _rangey) -- entities in ranges
@@ -1030,11 +1062,11 @@ function CEntity:focus() -- focus camera on itself
     self.camera:focusEntity(self)
 end
 
-function CEntity:entitiesRegion(_lf, _rg, _up, _dw) -- entities in region from a itself
-    if not _lf or not _rg or not _up or not _dw then return end -- mandatory
+function CEntity:entitiesRegion(_region) -- entities in region from a itself
+    if not _region then return end -- mandatory
     if not self.camera then return end -- requires a camera
     self:focus()
-    return self.camera:entitiesRegion( _lf, _rg, _up, _dw)
+    return self.camera:entitiesRegion(_region)
 end
 
 function CEntity:entitiesAround() -- entities around itself
@@ -1043,25 +1075,20 @@ function CEntity:entitiesAround() -- entities around itself
     return self.camera:entitiesAround()
 end
 
-function CEntity:randomWorldRegion(_lf, _rg, _up, _dw) -- random worldx worldy in a region -- default min/max
-    _lf = _lf or Nums.MININTEGER
-    _rg = _rg or Nums.MAXINTEGER
-    _up = _up or Nums.MININTEGER
-    _dw = _dw or Nums.MAXINTEGER
-    local _minx = math.min(_lf, _rg) -- ensure correct order for random
-    local _maxx = math.max(_lf, _rg)
-    local _miny = math.min(_up, _dw)
-    local _maxy = math.max(_up, _dw)
+function CEntity:randomWorldRegion(_region) -- random worldx worldy in a region -- default min/max
     self.world:entityRemove(self) -- remove itself from its old position
-    self.worldx = math.random(_minx, _maxx)
-    self.worldy = math.random(_miny, _maxy)
+    self.worldx = Nums:random(_region.lf, _region.rg)
+    self.worldy = Nums:random(_region.up, _region.dw)
     self.world:entityAppend(self) -- append itself from its new position
 end
 
 function CEntity:randomWorldWindow() -- random worldx worldy into the world window region
-    self:randomWorldRegion(Nums:neg(Tic.WORLDWW2 // 2), Nums:pos(Tic.WORLDWW2 // 2),
-        Nums:neg(Tic.WORLDWH2 // 2), Nums:pos(Tic.WORLDWH2 // 2)
-    )
+    self:randomWorldRegion(CRegion{
+        lf = Nums:neg(Tic.WORLDWW2 // 2),
+        rg = Nums:pos(Tic.WORLDWW2 // 2),
+        up = Nums:neg(Tic.WORLDWH2 // 2),
+        dw = Nums:pos(Tic.WORLDWH2 // 2),
+    })
 end
 
 
@@ -1092,9 +1119,9 @@ function CCamera:focusEntity(_entity) -- focus camera on an entity world positio
     self:focusXY(_entity.worldx, _entity.worldy)
 end
 
-function CCamera:entitiesRegion( _lf, _rg, _up, _dw) -- entities in region from a camera
-    if not _lf or not _rg or not _up or not _dw then return end -- mandatory
-    return self.world:entitiesEntityRegion(self, _lf, _rg, _up, _dw)
+function CCamera:entitiesRegion(_region) -- entities in region from a camera
+    if not _region then return end -- mandatory
+    return self.world:entitiesEntityRegion(self, _region)
 end
 
 function CCamera:entitiesAround() -- entities in a camera ranges
