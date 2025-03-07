@@ -1076,6 +1076,7 @@ function CEntity:entitiesAround() -- entities around itself
 end
 
 function CEntity:randomWorldRegion(_region) -- random worldx worldy in a region -- default min/max
+    _region = (_region) and _region or CRegion{}
     self.world:entityRemove(self) -- remove itself from its old position
     self.worldx = Nums:random(_region.lf, _region.rg)
     self.worldy = Nums:random(_region.up, _region.dw)
@@ -2314,12 +2315,23 @@ CPlace.PLACEKINDS = {  -- TODO val can contain parameters such as percent etc
     [CPlaceTree1Idle] = {},
 }
 
-function CPlace:generateRandomWorldWindow(_count, _kinds)
+function CPlace:generateRandomWorldWindow(_count, _kinds) -- random number of places of kinds in world window
     _count = (_count) and _count or CPlace.PLACECOUNT
     _kinds = (_kinds) and _kinds or CPlace.PLACEKINDS
     for _ = 1, _count do
-        local _kind = Tables:randompickkey(_kinds)
-        _entity = _kind() -- random kind
+        local _kind = Tables:randompickkey(_kinds) -- random kind
+        _entity = _kind()
+        _entity:randomWorldWindow() -- random position
+    end
+end
+
+function CPlace:generateRandomWorldRegion(_count, _kinds, _region) -- random number of places of kinds in world region
+    _count  = (_count)  and _count  or CPlace.PLACECOUNT
+    _kinds  = (_kinds)  and _kinds  or CPlace.PLACEKINDS
+    _region = (_region) and _region or CRegion{}
+    for _ = 1, _count do
+        local _kind = Tables:randompickkey(_kinds) -- random kind
+        _entity = _kind()
         _entity:randomWorldWindow() -- random position
     end
 end
@@ -2439,16 +2451,15 @@ local SpriteFG = CSpriteFG{
 --
 local _statustick01 = 0
 function Tic:draw()
-    cls(Tic.COLORHUDSCREEN)
+    Tic:drawScreenGround()
 
     Tic:drawWorldWGround()
 
-    -- Tic:drawScreenGuides()
-    -- Tic:drawWorldWGuides()
+    -- Tic:drawScreenBorder()
 
     Tic:drawPlayerActual()
 
-    Tic:drawWorldWFrames()
+    Tic:drawWorldWUseful()
 
     -- SpriteFG:drawS()
     -- SpriteFG:drawSC()
@@ -2465,12 +2476,27 @@ function Tic:draw()
     Tic:tick() -- /!\ required in the draw function 
 end
 
-function Tic:drawScreenGuides()
+-- screen
+function Tic:drawScreenGround() -- draw screen ground
+    local _drawcolor = Tic.COLORHUDSCREEN
+    cls(_drawcolor) -- quick and easy ;)
+end
+
+function Tic:drawScreenFrames() -- draw screen border and guides
+    Tic:drawScreenBorder()
+    Tic:drawScreenGuides()
+end
+
+function Tic:drawScreenBorder() -- draw screen border
     local _drawcolor = Tic.COLORYELLOW
-    rectb(Tic.SCREENX, Tic.SCREENY, -- border
+    rectb(Tic.SCREENX, Tic.SCREENY,
         Tic.SCREENW, Tic.SCREENH,
         _drawcolor
     )
+end
+
+function Tic:drawScreenGuides() -- draw screen guides
+    local _drawcolor = Tic.COLORYELLOW
     line(Tic.SCREENX, Tic.SCREENY, -- diag up lf - dw rg
         Tic.SCREENX + Tic.SCREENW - 1, Tic.SCREENY + Tic.SCREENH - 1,
         _drawcolor
@@ -2489,7 +2515,8 @@ function Tic:drawScreenGuides()
     )
 end
 
-function Tic:drawWorldWGround()
+-- world window
+function Tic:drawWorldWGround() -- draw world window ground
     local _drawcolor = Tic:biomeActual()
     rect(Tic.WORLDWX, Tic.WORLDWY,
         Tic.WORLDWW, Tic.WORLDWH,
@@ -2497,16 +2524,18 @@ function Tic:drawWorldWGround()
     )
 end
 
-function Tic:drawWorldWFrames() -- draw border and caches around
-    local _drawcolor = Tic.COLORGREYL
+function Tic:drawWorldWFrames() -- draw world window caches, border and guides
     Tic:drawWorldWCaches()
-    rectb(Tic.WORLDWX, Tic.WORLDWY, -- border
-        Tic.WORLDWW, Tic.WORLDWH,
-        _drawcolor
-    )
+    Tic:drawWorldWBorder()
+    Tic:drawWorldWGuides()
 end
 
-function Tic:drawWorldWCaches()
+function Tic:drawWorldWUseful() -- draw world window caches and border
+    Tic:drawWorldWCaches()
+    Tic:drawWorldWBorder()
+end
+
+function Tic:drawWorldWCaches() -- draw world window caches
     local _drawcolor = Tic.COLORHUDSCREEN
     rect(Tic.WORLDWX - 8, Tic.WORLDWY, -- lf mask
         8, Tic.WORLDWH,
@@ -2526,12 +2555,16 @@ function Tic:drawWorldWCaches()
     )
 end
 
-function Tic:drawWorldWGuides()
-    local _drawcolor = Tic.COLORGREENL
+function Tic:drawWorldWBorder() -- draw world window border
+    local _drawcolor = Tic.COLORGREYL
     rectb(Tic.WORLDWX, Tic.WORLDWY, -- border
         Tic.WORLDWW, Tic.WORLDWH,
         _drawcolor
     )
+end
+
+function Tic:drawWorldWGuides() -- draw world window guides
+    local _drawcolor = Tic.COLORGREENL
     line(Tic.WORLDWX, Tic.WORLDWY, -- diag up lf - dw rg
         Tic.WORLDWX + Tic.WORLDWW - 1, Tic.WORLDWY + Tic.WORLDWH - 1,
         _drawcolor
@@ -2550,6 +2583,7 @@ function Tic:drawWorldWGuides()
     )
 end
 
+-- actual player
 function Tic:drawPlayerActual()
     local _playeractual = Tic:playerActual()
     local _idlecycler  = _playeractual.idlecycler
