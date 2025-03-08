@@ -825,6 +825,18 @@ function CRegion:new(_argt)
     self:_argt(_argt) -- override if any
 end
 
+function CRegion:borderw() -- border width
+    return self.rg - self.lf + 1
+end
+
+function CRegion:borderh() -- border height
+    return self.dw - self.up + 1
+end
+
+function CRegion:surface() -- region surface
+    return self:borderw() * self:borderh()
+end
+
 function CRegion:randomWH(_width, _height) -- returns a region of random width and height
     _width  = (_width)  and _width  or Nums.MAXINTEGER -- be careful with that ;)
     _height = (_height) and _height or Nums.MAXINTEGER
@@ -843,8 +855,8 @@ function CRegion:drawBorderScreenXY(_screenx, _screeny) -- draw border of a regi
     local _screeny = (_screeny) and _screeny or Tic.SCREENY
     local _borderx = _screenx + self.lf -- dont forget they are negatives
     local _bordery = _screeny + self.up
-    local _borderw = self.rg - self.lf + 1
-    local _borderh = self.dw - self.up + 1
+    local _borderw = self:borderw()
+    local _borderh = self:borderh()
     local _drawcolor = Tic.COLORGREYL
     rectb(_borderx, _bordery,
         _borderw, _borderh,
@@ -1120,6 +1132,25 @@ function CWorldRegion:new(_argt)
     self.name = CEntity.NAMEREGION
     self.region = CRegion()
     self:_argt(_argt) -- override if any
+end
+
+function CWorldRegion:borderw() -- border width
+    return self.region:borderw()
+end
+
+function CWorldRegion:borderh() -- border height
+    return self.region:borderh()
+end
+
+function CWorldRegion:surface() -- region surface
+    return self.region:surface()
+end
+
+function CWorldRegion:drawBorderWorldWC() -- draw region border relative to world window center
+    self.region:drawBorderScreenXY(
+        Tic.WORLDWXC + self.worldx,
+        Tic.WORLDWYC + self.worldy
+    )
 end
 
 
@@ -2366,7 +2397,17 @@ function CPlace:generateRandomWorldRegion(_count, _kinds, _region) -- random num
     end
 end
 
+function CPlace:generateRandomWorldWCRegion(_count, _kinds, _region) -- random number of places of kinds in world window centered region
+    _region = (_region) and _region or CRegion{}
+    local _wwcregion = CRegion{
+        -- FIXME
+    }
+    CPlace:generateRandomWorldRegion(_count, _kinds, _wwcregion)
+end
+
 WorldRegionTrees = CWorldRegion{
+    worldx = -20,
+    worldy = -20,
     region = CRegion{
         lf = -10,
         rg = 10,
@@ -2374,6 +2415,15 @@ WorldRegionTrees = CWorldRegion{
         dw = 5,
     },    
 }
+CPlace:generateRandomWorldRegion(nil,
+    {
+        [CPlaceTree0Anim] = {},
+        [CPlaceTree0Idle] = {},
+        [CPlaceTree1Anim] = {},
+        [CPlaceTree1Idle] = {},
+    },
+    WorldRegionTrees.region
+)
 
 -- CPlace:generateRandomWorldWindow()
 -- CPlace:generateRandomWorldWindow(nil, {
@@ -2441,12 +2491,12 @@ Truduk:randomWorldWindow()
 --     colorpants   = Tic.COLORRED,
 -- }
 -- local Daemok = CPlayerDemon{name = "Daemok",}
-local Golith = CPlayerGogol{name = "Golith",
-}
-Golith:randomWorldWindow()
--- local Wulfie = CPlayerWolfe{name = "Wulfie",
---     colorextra = Tic.COLORRED,
+-- local Golith = CPlayerGogol{name = "Golith",
 -- }
+-- Golith:randomWorldWindow()
+local Wulfie = CPlayerWolfe{name = "Wulfie",
+    colorextra = Tic.COLORRED,
+}
 
 goto runit
 ::debug::
@@ -2511,7 +2561,13 @@ function Tic:draw()
 
     Tic:drawWorldWUseful()
 
-    WorldRegionTrees.region:drawBorderScreenXY(Tic.WORLDWXC, Tic.WORLDWYC)
+    WorldRegionTrees:drawBorderWorldWC()
+    Tic:logAppend(WorldRegionTrees.name)
+    Tic:logAppend("REX:", WorldRegionTrees.worldx)
+    Tic:logAppend("REY:", WorldRegionTrees.worldy)
+    Tic:logAppend("REW:", WorldRegionTrees:borderw())
+    Tic:logAppend("REH:", WorldRegionTrees:borderh())
+    Tic:logAppend("RES:", WorldRegionTrees:surface())
 
     -- SpriteFG:drawS()
     -- SpriteFG:drawSC()
@@ -2523,7 +2579,7 @@ function Tic:draw()
     -- SpriteFG:drawW2C()
     -- Tic:drawLog()
 
-    -- Tic:logPrint()
+    Tic:logPrint()
 
     Tic:tick() -- /!\ required in the draw function 
 end
@@ -2698,33 +2754,31 @@ function Tic:drawLog()
     local _dirx    = _playeractual.dirx
     local _diry    = _playeractual.diry
 
-    -- Tic:logAppend("K01:", peek(Tic.KEYBOARDKEYS + 0))
-    -- Tic:logAppend("K02:", peek(Tic.KEYBOARDKEYS + 1))
-    -- Tic:logAppend("K03:", peek(Tic.KEYBOARDKEYS + 2))
-    -- Tic:logAppend("K04:", peek(Tic.KEYBOARDKEYS + 3))
+    -- -- Tic:logAppend("K01:", peek(Tic.KEYBOARDKEYS + 0))
+    -- -- Tic:logAppend("K02:", peek(Tic.KEYBOARDKEYS + 1))
+    -- -- Tic:logAppend("K03:", peek(Tic.KEYBOARDKEYS + 2))
+    -- -- Tic:logAppend("K04:", peek(Tic.KEYBOARDKEYS + 3))
+    -- -- Tic:logAppend()
+    -- Tic:logAppend("PHY:", _playeractual.statphyact, "/", _playeractual.statphymax)
+    -- Tic:logAppend("MEN:", _playeractual.statmenact, "/", _playeractual.statmenmax)
+    -- Tic:logAppend("PSY:", _playeractual.statpsyact, "/", _playeractual.statpsymax)
+    -- Tic:logAppend("TOT:", _playeractual.statphyact + _playeractual.statmenact + _playeractual.statpsyact)
     -- Tic:logAppend()
-    Tic:logAppend("PHY:", _playeractual.statphyact, "/", _playeractual.statphymax)
-    Tic:logAppend("MEN:", _playeractual.statmenact, "/", _playeractual.statmenmax)
-    Tic:logAppend("PSY:", _playeractual.statpsyact, "/", _playeractual.statpsymax)
-    Tic:logAppend("TOT:", _playeractual.statphyact + _playeractual.statmenact + _playeractual.statpsyact)
-    Tic:logAppend()
-    Tic:logAppend("STA:", _state)
-    Tic:logAppend("POS:", _posture)
-    Tic:logAppend("STS:", _status)
-    Tic:logAppend("DIX:", _dirx)
-    Tic:logAppend("DIY:", _diry)
-    Tic:logAppend()
-    -- Tic:logAppend("T60:", _tick60)
-    -- Tic:logAppend("FRM:", _frame)
-    -- Tic:logAppend("T00:", _tick00)
-    -- Tic:logAppend("IDL:", _playeractual.idlecycler.actvalue)
-    Tic:logAppend("SCX:", _playeractual.screenx)
-    Tic:logAppend("SCY:", _playeractual.screeny)
-    Tic:logAppend()
-    Tic:logAppend("CAX:", _playeractual.camera.worldx)
-    Tic:logAppend("CAY:", _playeractual.camera.worldy)
-
-    Tic:logPrint()
+    -- Tic:logAppend("STA:", _state)
+    -- Tic:logAppend("POS:", _posture)
+    -- Tic:logAppend("STS:", _status)
+    -- Tic:logAppend("DIX:", _dirx)
+    -- Tic:logAppend("DIY:", _diry)
+    -- Tic:logAppend()
+    -- -- Tic:logAppend("T60:", _tick60)
+    -- -- Tic:logAppend("FRM:", _frame)
+    -- -- Tic:logAppend("T00:", _tick00)
+    -- -- Tic:logAppend("IDL:", _playeractual.idlecycler.actvalue)
+    -- Tic:logAppend("SCX:", _playeractual.screenx)
+    -- Tic:logAppend("SCY:", _playeractual.screeny)
+    -- Tic:logAppend()
+    -- Tic:logAppend("CAX:", _playeractual.camera.worldx)
+    -- Tic:logAppend("CAY:", _playeractual.camera.worldy)
 end
 
 
