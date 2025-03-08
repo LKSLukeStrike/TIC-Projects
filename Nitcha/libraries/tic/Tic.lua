@@ -32,7 +32,9 @@ Tic.WORLDWW2 = (Tic.WORLDWW // 2) - 1 -- middle world window width
 Tic.WORLDWH  = 100 --Tic.SCREENH -- world window height
 Tic.WORLDWH2 = (Tic.WORLDWH // 2) - 1 -- middle world window height
 Tic.WORLDWX  = 130 --Tic.SCREENW // 2 -- world window x position -- TODO compute that ?
+Tic.WORLDWXC = Tic.WORLDWX + Tic.WORLDWW2 -- world window center x position
 Tic.WORLDWY  = 18  --Tic.SCREENH // 2 -- world window y position
+Tic.WORLDWYC = Tic.WORLDWY + Tic.WORLDWH2 -- world window center y position
 
 -- Palette map
 Tic.PALETTEMAP = 0x3FF0 * 2 -- vram bank 1
@@ -836,6 +838,19 @@ function CRegion:randomWH(_width, _height) -- returns a region of random width a
     }
 end
 
+function CRegion:drawBorderScreenXY(_screenx, _screeny) -- draw border of a region around screen xy
+    local _screenx = (_screenx) and _screenx or Tic.SCREENX
+    local _screeny = (_screeny) and _screeny or Tic.SCREENY
+    local _borderx = _screenx + self.lf -- dont forget they are negatives
+    local _bordery = _screeny + self.up
+    local _borderw = self.rg - self.lf + 1
+    local _borderh = self.dw - self.up + 1
+    local _drawcolor = Tic.COLORGREYL
+    rectb(_borderx, _bordery,
+        _borderw, _borderh,
+        _drawcolor
+    )
+end
 
 --
 -- CLocations
@@ -1050,7 +1065,7 @@ function CEntity:new(_argt)
     CEntity.super.new(self, _argt)
     self.kind = CEntity.KINDENTITY
     self.name = CEntity.NAMEENTITY
-    self.world = World -- world that contains the entity -- to override if any
+    self.world  = World -- world that contains the entity -- to override if any
     self.worldx = CEntity.WORLDX -- world positions
     self.worldy = CEntity.WORLDY
     self.camera = nil -- optional camera that follows the entity -- to override if any
@@ -1090,6 +1105,21 @@ function CEntity:randomWorldWindow() -- random worldx worldy into the world wind
         up = Nums:neg(Tic.WORLDWH2 // 2),
         dw = Nums:pos(Tic.WORLDWH2 // 2),
     })
+end
+
+
+--
+-- CWorldRegion
+--
+local CWorldRegion = CEntity:extend() -- world region
+CEntity.KINDREGION = "Region" -- World Region kind
+CEntity.NAMEREGION = "Region" -- World Region name
+function CWorldRegion:new(_argt)
+    CWorldRegion.super.new(self, _argt)
+    self.kind = CEntity.KINDREGION
+    self.name = CEntity.NAMEREGION
+    self.region = CRegion()
+    self:_argt(_argt) -- override if any
 end
 
 
@@ -2332,9 +2362,18 @@ function CPlace:generateRandomWorldRegion(_count, _kinds, _region) -- random num
     for _ = 1, _count do
         local _kind = Tables:randompickkey(_kinds) -- random kind
         _entity = _kind()
-        _entity:randomWorldWindow() -- random position
+        _entity:randomWorldRegion(_region) -- random position
     end
 end
+
+WorldRegionTrees = CWorldRegion{
+    region = CRegion{
+        lf = -10,
+        rg = 10,
+        up = -5,
+        dw = 5,
+    },    
+}
 
 -- CPlace:generateRandomWorldWindow()
 -- CPlace:generateRandomWorldWindow(nil, {
@@ -2343,20 +2382,20 @@ end
 --     [CPlaceTree1Anim] = {},
 --     [CPlaceTree1Idle] = {},
 -- })
-CPlace:generateRandomWorldWindow(nil, {
-    [CPlaceHouseAnim] = {},
-    [CPlaceHouseIdle] = {},
-    [CPlaceTowerAnim] = {},
-    [CPlaceTowerIdle] = {},
-    [CPlaceManorAnim] = {},
-    [CPlaceManorIdle] = {},
-    [CPlaceAltarAnim] = {},
-    [CPlaceAltarIdle] = {},
-    [CPlaceWaterAnim] = {},
-    [CPlaceWaterIdle] = {},
-    [CPlaceStallAnim] = {},
-    [CPlaceStallIdle] = {},
-})
+-- CPlace:generateRandomWorldWindow(nil, {
+--     [CPlaceHouseAnim] = {},
+--     [CPlaceHouseIdle] = {},
+--     [CPlaceTowerAnim] = {},
+--     [CPlaceTowerIdle] = {},
+--     [CPlaceManorAnim] = {},
+--     [CPlaceManorIdle] = {},
+--     [CPlaceAltarAnim] = {},
+--     [CPlaceAltarIdle] = {},
+--     [CPlaceWaterAnim] = {},
+--     [CPlaceWaterIdle] = {},
+--     [CPlaceStallAnim] = {},
+--     [CPlaceStallIdle] = {},
+-- })
 
 end -- generate places
 
@@ -2445,6 +2484,16 @@ local SpriteFG = CSpriteFG{
     scale = CSprite.SCALE04,
 }
 
+--
+-- Regions -- TESTING
+--
+local Region = CRegion{
+    lf = -10,
+    rg = 10,
+    up = -10,
+    dw = 10,
+}
+
 
 --
 -- Drawing
@@ -2456,10 +2505,13 @@ function Tic:draw()
     Tic:drawWorldWGround()
 
     -- Tic:drawScreenBorder()
+    -- Tic:drawScreenGuides()
 
     Tic:drawPlayerActual()
 
     Tic:drawWorldWUseful()
+
+    WorldRegionTrees.region:drawBorderScreenXY(Tic.WORLDWXC, Tic.WORLDWYC)
 
     -- SpriteFG:drawS()
     -- SpriteFG:drawSC()
@@ -2471,7 +2523,7 @@ function Tic:draw()
     -- SpriteFG:drawW2C()
     -- Tic:drawLog()
 
-    Tic:logPrint()
+    -- Tic:logPrint()
 
     Tic:tick() -- /!\ required in the draw function 
 end
@@ -2577,7 +2629,7 @@ function Tic:drawWorldWGuides() -- draw world window guides
         Tic.WORLDWW, 2,
         _drawcolor
     )
-    rect(Tic.WORLDWX + Tic.WORLDWW2, Tic.WORLDWY, -- vline md
+    rect(Tic.WORLDWXC, Tic.WORLDWY, -- vline md
         2, Tic.WORLDWH,
         _drawcolor
     )
