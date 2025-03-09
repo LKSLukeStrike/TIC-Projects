@@ -1104,7 +1104,7 @@ end
 
 function CEntity:randomWorldRegion(_region) -- random worldx worldy in a region -- default min/max
     _region = (_region) and _region or CRegion{}
-    self.world:entityRemove(self) -- remove itself from its old position
+    self.world:entityRemove(self) -- remove itself from its old position -- FIXME why remove/append here ?
     self.worldx = Nums:random(_region.lf, _region.rg)
     self.worldy = Nums:random(_region.up, _region.dw)
     self.world:entityAppend(self) -- append itself from its new position
@@ -1236,7 +1236,6 @@ function CEntityDrawable:draw() -- default draw for drawable entities -- overrid
     _musprite.flip    = self.dirx
     _musprite:drawW2C() -- display centered in the world window
 end
-
 
 
 --
@@ -2376,7 +2375,7 @@ CPlace.PLACEKINDS = {  -- TODO val can contain parameters such as percent etc
     [CPlaceTree1Idle] = {},
 }
 
-function CPlace:generateRandomWorldWindow(_count, _kinds) -- random number of places of kinds in world window
+function CPlace:generateRandomWorldWindow(_count, _kinds) -- random count of places of kinds in world window
     _count = (_count) and _count or CPlace.PLACECOUNT
     _kinds = (_kinds) and _kinds or CPlace.PLACEKINDS
     for _ = 1, _count do
@@ -2386,44 +2385,78 @@ function CPlace:generateRandomWorldWindow(_count, _kinds) -- random number of pl
     end
 end
 
-function CPlace:generateRandomWorldRegion(_count, _kinds, _region) -- random number of places of kinds in world region
-    _count  = (_count)  and _count  or CPlace.PLACECOUNT
-    _kinds  = (_kinds)  and _kinds  or CPlace.PLACEKINDS
-    _region = (_region) and _region or CRegion{}
+function CPlace:generateRandomWorldRegionCount(_count, _kinds, _worldregion) -- random number of places of kinds in world region
+    _count        = (_count)       and _count       or CPlace.PLACECOUNT
+    _kinds        = (_kinds)       and _kinds       or CPlace.PLACEKINDS
+    _worldregion  = (_worldregion) and _worldregion or CWorldRegion{}
+    local _region = CRegion{
+        lf = _worldregion.worldx + _worldregion.region.lf,
+        rg = _worldregion.worldx + _worldregion.region.rg,
+        up = _worldregion.worldy + _worldregion.region.up,
+        dw = _worldregion.worldy + _worldregion.region.dw,
+    }
+
     for _ = 1, _count do
         local _kind = Tables:randompickkey(_kinds) -- random kind
+        while _kinds[_kind].percent and math.random(0, 100) >_kinds[_kind].percent do
+            _kind = Tables:randompickkey(_kinds) -- choose another kind
+        end
         _entity = _kind()
         _entity:randomWorldRegion(_region) -- random position
     end
 end
 
-function CPlace:generateRandomWorldWCRegion(_count, _kinds, _region) -- random number of places of kinds in world window centered region
-    _region = (_region) and _region or CRegion{}
-    local _wwcregion = CRegion{
-        -- FIXME
-    }
-    CPlace:generateRandomWorldRegion(_count, _kinds, _wwcregion)
+function CPlace:generateRandomWorldRegionPercent(_percent, _kinds, _worldregion) -- random percent of places of kinds in world region
+    _percent      = (_percent)     and _percent     or 100
+    _kinds        = (_kinds)       and _kinds       or CPlace.PLACEKINDS
+    _worldregion  = (_worldregion) and _worldregion or CWorldRegion{}
+    local _count  = math.sqrt(_worldregion.region:surface()) * _percent // 100
+    CPlace:generateRandomWorldRegionCount(_count, _kinds, _worldregion)
 end
 
-WorldRegionTrees = CWorldRegion{
+WorldRegionTree0 = CWorldRegion{
     worldx = -20,
     worldy = -20,
     region = CRegion{
-        lf = -10,
-        rg = 10,
+        lf = -20,
+        rg = 20,
         up = -5,
         dw = 5,
     },    
 }
-CPlace:generateRandomWorldRegion(nil,
+CPlace:generateRandomWorldRegionPercent(
+    100,
     {
         [CPlaceTree0Anim] = {},
         [CPlaceTree0Idle] = {},
         [CPlaceTree1Anim] = {},
         [CPlaceTree1Idle] = {},
     },
-    WorldRegionTrees.region
+    WorldRegionTree0
 )
+
+WorldRegionTown0 = CWorldRegion{
+    worldx = 25,
+    worldy = 25,
+    region = CRegion{
+        lf = -15,
+        rg = 15,
+        up = -15,
+        dw = 15,
+    },
+}
+CPlace:generateRandomWorldRegionPercent(
+    25,
+    {
+        [CPlaceHouseAnim] = {},
+        [CPlaceHouseIdle] = {},
+        [CPlaceTowerAnim] = {percent = 10,},
+        [CPlaceTowerIdle] = {percent = 10,},
+        [CPlaceWaterAnim] = {percent = 10,},
+    },
+    WorldRegionTown0
+)
+-- exit()
 
 -- CPlace:generateRandomWorldWindow()
 -- CPlace:generateRandomWorldWindow(nil, {
@@ -2561,13 +2594,15 @@ function Tic:draw()
 
     Tic:drawWorldWUseful()
 
-    WorldRegionTrees:drawBorderWorldWC()
-    Tic:logAppend(WorldRegionTrees.name)
-    Tic:logAppend("REX:", WorldRegionTrees.worldx)
-    Tic:logAppend("REY:", WorldRegionTrees.worldy)
-    Tic:logAppend("REW:", WorldRegionTrees:borderw())
-    Tic:logAppend("REH:", WorldRegionTrees:borderh())
-    Tic:logAppend("RES:", WorldRegionTrees:surface())
+    -- WorldRegionTree0:drawBorderWorldWC()
+    Tic:logAppend(WorldRegionTree0.name)
+    Tic:logAppend("REX:", WorldRegionTree0.worldx)
+    Tic:logAppend("REY:", WorldRegionTree0.worldy)
+    Tic:logAppend("REW:", WorldRegionTree0:borderw())
+    Tic:logAppend("REH:", WorldRegionTree0:borderh())
+    Tic:logAppend("RES:", WorldRegionTree0:surface())
+
+    -- WorldRegionTown0:drawBorderWorldWC()
 
     -- SpriteFG:drawS()
     -- SpriteFG:drawSC()
