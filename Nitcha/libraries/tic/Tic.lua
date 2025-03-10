@@ -1856,13 +1856,29 @@ function CCharacter:drawStatsC(_border) -- draw the stats CENTERED
     self:_load()
 end
 
-function CCharacter:drawDirs() -- draw the directions and ranges
+function CCharacter:drawDirs() -- draw the directions and ranges around the player
     local _drawcolor = Tic.COLORWHITE
-    local _screenx   = self.screenx
-    local _screeny   = self.screeny
-    circb(_screenx, _screeny, 10, _drawcolor)
+    local _screenx   = Tic.WORLDWXC + self.dirx
+    local _screeny   = Tic.WORLDWYC
+    local _range     = self.statphyact * self.scale
+    local _statesettings = Tic.STATESETTINGS[self.state]
+    local _posture       = _statesettings.posture
+    _screeny = (_posture == Tic.POSTUREKNEEL) and _screeny + 2 or _screeny
+    _range   = (_posture == Tic.POSTUREKNEEL) and _range   / 2 or _range
+
+    Tic:logAppend("CIX:", _screenx)
+    Tic:logAppend("CIY:", _screeny)
+    Tic:logAppend("RAN:", _range)
+
+    circb(_screenx, _screeny, _range, _drawcolor)
     for _, _offsets in pairs(Tic.DIRS2OFFSETS) do
-        line(_screenx, _screeny, _screenx + _offsets.offsetx, _screeny + _offsets.offsety, _drawcolor)
+        line(
+            _screenx,
+            _screeny,
+            _screenx + (_offsets.offsetx * _range // Tic.OFFSETLINE),
+            _screeny + (_offsets.offsety * _range // Tic.OFFSETLINE),
+            Tic.COLORRED --_drawcolor
+        )
     end
 end
 
@@ -1872,7 +1888,7 @@ function CCharacter:draw()
     -- self:_drawWeapon()
     -- self:_drawShield()
     self:_drawBody()
-    self:_drawHead()
+    -- self:_drawHead()
 end
 
 function CCharacter:_drawStatus()
@@ -2424,16 +2440,16 @@ WorldRegionTree0 = CWorldRegion{
         dw = 5,
     },    
 }
-CPlace:generateRandomWorldRegionPercent(
-    100,
-    {
-        [CPlaceTree0Anim] = {},
-        [CPlaceTree0Idle] = {},
-        [CPlaceTree1Anim] = {},
-        [CPlaceTree1Idle] = {},
-    },
-    WorldRegionTree0
-)
+-- CPlace:generateRandomWorldRegionPercent(
+--     100,
+--     {
+--         [CPlaceTree0Anim] = {},
+--         [CPlaceTree0Idle] = {},
+--         [CPlaceTree1Anim] = {},
+--         [CPlaceTree1Idle] = {},
+--     },
+--     WorldRegionTree0
+-- )
 
 WorldRegionTown0 = CWorldRegion{
     worldx = 25,
@@ -2445,17 +2461,17 @@ WorldRegionTown0 = CWorldRegion{
         dw = 15,
     },
 }
-CPlace:generateRandomWorldRegionPercent(
-    25,
-    {
-        [CPlaceHouseAnim] = {},
-        [CPlaceHouseIdle] = {},
-        [CPlaceTowerAnim] = {percent = 10,},
-        [CPlaceTowerIdle] = {percent = 10,},
-        [CPlaceWaterAnim] = {percent = 10,},
-    },
-    WorldRegionTown0
-)
+-- CPlace:generateRandomWorldRegionPercent(
+--     25,
+--     {
+--         [CPlaceHouseAnim] = {},
+--         [CPlaceHouseIdle] = {},
+--         [CPlaceTowerAnim] = {percent = 10,},
+--         [CPlaceTowerIdle] = {percent = 10,},
+--         [CPlaceWaterAnim] = {percent = 10,},
+--     },
+--     WorldRegionTown0
+-- )
 -- exit()
 
 -- CPlace:generateRandomWorldWindow()
@@ -2486,9 +2502,9 @@ end -- generate places
 --
 -- Players
 --
-local Truduk = CPlayerDwarf{name = "Truduk",
-}
-Truduk:randomWorldWindow()
+-- local Truduk = CPlayerDwarf{name = "Truduk",
+-- }
+-- Truduk:randomWorldWindow()
 -- local Prinnn = CPlayerGnome{name = "Prinnn",
 --     coloreyesbg  = Tic.COLORRED,
 --     coloreyesfg  = Tic.COLORORANGE,
@@ -2529,6 +2545,7 @@ Truduk:randomWorldWindow()
 -- Golith:randomWorldWindow()
 local Wulfie = CPlayerWolfe{name = "Wulfie",
     colorextra = Tic.COLORRED,
+    scale = CSprite.SCALE04
 }
 
 goto runit
@@ -2771,7 +2788,7 @@ function Tic:drawPlayerActual()
 
     -- _playeractual:drawStatsC(true)
     -- _playeractual:drawPortraitC(nil, true, true)
-    -- _playeractual:drawDirs()
+    _playeractual:drawDirs()
 end
 
 function Tic:drawLog()
