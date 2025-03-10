@@ -127,48 +127,64 @@ Tic.DIRS2OFFSETS = { -- directions to x y offsets and dirs
     [Tic.DIR000] = {
         offsetx = 0 + Tic.OFFSETZERO,
         offsety = 0 - Tic.OFFSETLINE,
+        screenx = nil, -- double line
+        screeny = 0,
         dirx = nil,
         diry = Tic.DIRYUP,
     },
     [Tic.DIR045] = {
         offsetx = 0 + Tic.OFFSETDIAG,
         offsety = 0 - Tic.OFFSETDIAG,
+        screenx = 2,
+        screeny = 0,
         dirx = Tic.DIRXRG,
         diry = Tic.DIRYUP,
     },
     [Tic.DIR090] = {
         offsetx = 0 + Tic.OFFSETLINE,
         offsety = 0 + Tic.OFFSETZERO,
+        screenx = 1,
+        screeny = nil, -- double line
         dirx = Tic.DIRXRG,
         diry = Tic.DIRYMD,
     },
     [Tic.DIR135] = {
         offsetx = 0 + Tic.OFFSETDIAG,
         offsety = 0 + Tic.OFFSETDIAG,
+        screenx = 2,
+        screeny = 2,
         dirx = Tic.DIRXRG,
         diry = Tic.DIRYDW,
     },
     [Tic.DIR180] = {
         offsetx = 0 + Tic.OFFSETZERO,
         offsety = 0 + Tic.OFFSETLINE,
+        screenx = nil, -- double line
+        screeny = 0,
         dirx = nil,
         diry = Tic.DIRYDW,
     },
     [Tic.DIR225] = {
         offsetx = 0 - Tic.OFFSETDIAG,
         offsety = 0 + Tic.OFFSETDIAG,
+        screenx = 0,
+        screeny = 2,
         dirx = Tic.DIRXLF,
         diry = Tic.DIRYDW,
     },
     [Tic.DIR270] = {
         offsetx = 0 - Tic.OFFSETLINE,
         offsety = 0 + Tic.OFFSETZERO,
+        screenx = 0,
+        screeny = nil, -- double line
         dirx = Tic.DIRXLF,
         diry = Tic.DIRYMD,
     },
     [Tic.DIR315] = {
         offsetx = 0 - Tic.OFFSETDIAG,
         offsety = 0 - Tic.OFFSETDIAG,
+        screenx = 0,
+        screeny = 0,
         dirx = Tic.DIRXLF,
         diry = Tic.DIRYUP,
     },
@@ -219,6 +235,7 @@ Tic.KEY_NUMPADMINUS    = 90
 Tic.KEY_NUMPADMULTIPLY = 91
 Tic.KEY_NUMPADDIVIDE   = 92
 Tic.KEY_B              = 02
+Tic.KEY_S              = 19
 
 -- Actions values
 Tic.ACTIONPLAYERPREV  = "playerPrev"
@@ -239,6 +256,7 @@ Tic.ACTIONMOVE315     = "move315"
 Tic.ACTIONDECPHYACT   = "decPhyAct"
 Tic.ACTIONINCPHYACT   = "incPhyAct"
 Tic.ACTIONBIOMENEXT   = "biomeNext"
+Tic.ACTIONSCALENEXT   = "scaleNext"
 
 -- Keys to Actions
 Tic.KEYS2ACTIONS = {
@@ -260,6 +278,7 @@ Tic.KEYS2ACTIONS = {
     [Tic.KEY_NUMPADMINUS]  = Tic.ACTIONDECPHYACT,
     [Tic.KEY_NUMPADPLUS]   = Tic.ACTIONINCPHYACT,
     [Tic.KEY_B]            = Tic.ACTIONBIOMENEXT,
+    [Tic.KEY_S]            = Tic.ACTIONSCALENEXT,
 }
 
 -- Actions to Functions
@@ -282,6 +301,7 @@ Tic.ACTIONS2FUNCTIONS = {
     [Tic.ACTIONDECPHYACT]   = function() Tic:stat('dec', "statphyact", 1) end,
     [Tic.ACTIONINCPHYACT]   = function() Tic:stat('inc', "statphyact", 1) end,
     [Tic.ACTIONBIOMENEXT]   = function() Tic:biomeNext() end,
+    [Tic.ACTIONSCALENEXT]   = function() Tic:scaleNext() end,
 }
 
 
@@ -458,6 +478,23 @@ end
 
 function Tic:biomeActual() -- actual biome in the stack
     return Tic.BIOMES.actvalue
+end
+
+
+-- Scales System -- handle scales
+Tic.SCALES = CCyclerInt{ -- scales cycler from 1-4
+    minindex = 1,
+    maxindex = 4,
+}
+
+function Tic:scaleNext() -- next scale in the stack
+    Tic.SCALES:next()
+    Tic:playerActual().scale = Tic:scaleActual()
+    return Tic:scaleActual()
+end
+
+function Tic:scaleActual() -- actual scale in the stack
+    return Tic.SCALES.actvalue
 end
 
 
@@ -1858,7 +1895,7 @@ end
 
 function CCharacter:drawDirs() -- draw the directions and ranges around the player
     local _drawcolor = Tic.COLORWHITE
-    local _screenx   = Tic.WORLDWXC + self.dirx
+    local _screenx   = Tic.WORLDWXC
     local _screeny   = Tic.WORLDWYC
     local _range     = self.statphyact * self.scale
     local _statesettings = Tic.STATESETTINGS[self.state]
@@ -1871,14 +1908,33 @@ function CCharacter:drawDirs() -- draw the directions and ranges around the play
     Tic:logAppend("RAN:", _range)
 
     circb(_screenx, _screeny, _range, _drawcolor)
+    circb(_screenx + 1, _screeny, _range, _drawcolor)
     for _, _offsets in pairs(Tic.DIRS2OFFSETS) do
         line(
-            _screenx,
-            _screeny,
-            _screenx + (_offsets.offsetx * _range // Tic.OFFSETLINE),
-            _screeny + (_offsets.offsety * _range // Tic.OFFSETLINE),
+            _screenx + (_offsets.screenx or 0),
+            _screeny + (_offsets.screeny or 0),
+            _screenx + (_offsets.screenx or 0) + (_offsets.offsetx * _range // Tic.OFFSETLINE),
+            _screeny + (_offsets.screeny or 0) + (_offsets.offsety * _range // Tic.OFFSETLINE),
             Tic.COLORRED --_drawcolor
         )
+        if not _offsets.screenx then -- double line
+            line(
+                _screenx + 1,
+                _screeny + (_offsets.screeny or 0),
+                _screenx + 1 + (_offsets.offsetx * _range // Tic.OFFSETLINE),
+                _screeny + (_offsets.screeny or 0) + (_offsets.offsety * _range // Tic.OFFSETLINE),
+                Tic.COLORRED --_drawcolor
+            )
+        end
+        if not _offsets.screeny then -- double line
+            line(
+                _screenx + (_offsets.screenx or 0),
+                _screeny + 1,
+                _screenx + (_offsets.screenx or 0) + (_offsets.offsetx * _range // Tic.OFFSETLINE),
+                _screeny + 1 + (_offsets.offsety * _range // Tic.OFFSETLINE),
+                Tic.COLORRED --_drawcolor
+            )
+        end
     end
 end
 
@@ -2607,9 +2663,10 @@ function Tic:draw()
     -- Tic:drawScreenBorder()
     -- Tic:drawScreenGuides()
 
-    Tic:drawPlayerActual()
+    -- Tic:drawWorldWUseful()
+    Tic:drawWorldWFrames()
 
-    Tic:drawWorldWUseful()
+    Tic:drawPlayerActual()
 
     -- WorldRegionTree0:drawBorderWorldWC()
     Tic:logAppend(WorldRegionTree0.name)
@@ -2785,6 +2842,7 @@ function Tic:drawPlayerActual()
 
     Tic:logAppend("WOX:", _playeractual.worldx)
     Tic:logAppend("WOY:", _playeractual.worldy)
+    Tic:logAppend("SCA:", _playeractual.scale)
 
     -- _playeractual:drawStatsC(true)
     -- _playeractual:drawPortraitC(nil, true, true)
