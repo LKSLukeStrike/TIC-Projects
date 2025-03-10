@@ -135,7 +135,7 @@ Tic.DIRS2OFFSETS = { -- directions to x y offsets and dirs
     [Tic.DIR045] = {
         offsetx = 0 + Tic.OFFSETDIAG,
         offsety = 0 - Tic.OFFSETDIAG,
-        screenx = 2,
+        screenx = 1,
         screeny = 0,
         dirx = Tic.DIRXRG,
         diry = Tic.DIRYUP,
@@ -151,8 +151,8 @@ Tic.DIRS2OFFSETS = { -- directions to x y offsets and dirs
     [Tic.DIR135] = {
         offsetx = 0 + Tic.OFFSETDIAG,
         offsety = 0 + Tic.OFFSETDIAG,
-        screenx = 2,
-        screeny = 2,
+        screenx = 1,
+        screeny = 1,
         dirx = Tic.DIRXRG,
         diry = Tic.DIRYDW,
     },
@@ -168,7 +168,7 @@ Tic.DIRS2OFFSETS = { -- directions to x y offsets and dirs
         offsetx = 0 - Tic.OFFSETDIAG,
         offsety = 0 + Tic.OFFSETDIAG,
         screenx = 0,
-        screeny = 2,
+        screeny = 1,
         dirx = Tic.DIRXLF,
         diry = Tic.DIRYDW,
     },
@@ -1900,38 +1900,46 @@ function CCharacter:drawDirs() -- draw the directions and ranges around the play
     local _range     = self.statphyact * self.scale
     local _statesettings = Tic.STATESETTINGS[self.state]
     local _posture       = _statesettings.posture
-    _screeny = (_posture == Tic.POSTUREKNEEL) and _screeny + 2 or _screeny
-    _range   = (_posture == Tic.POSTUREKNEEL) and _range   / 2 or _range
+    -- _screeny = (_posture == Tic.POSTUREKNEEL) and _screeny + 2 or _screeny
+    _range   = (_posture == Tic.POSTUREKNEEL) and Nums:roundmax(_range / 2) or _range
 
-    Tic:logAppend("CIX:", _screenx)
-    Tic:logAppend("CIY:", _screeny)
+    Tic:logAppend("SCX:", _screenx)
+    Tic:logAppend("SCY:", _screeny)
     Tic:logAppend("RAN:", _range)
+    Tic:logAppend()
 
     circb(_screenx, _screeny, _range, _drawcolor)
     circb(_screenx + 1, _screeny, _range, _drawcolor)
-    for _, _offsets in pairs(Tic.DIRS2OFFSETS) do
+    -- for _dir, _offsets in pairs(Tic.DIRS2OFFSETS) do
+    for _, _dir in pairs(Tables:keys(Tic.DIRS2OFFSETS)) do
+        local _offsets  = Tic.DIRS2OFFSETS[_dir]
+        local _oscreenx = _offsets.screenx or 0
+        local _oscreeny = _offsets.screeny or 0
+        local _ooffsetx = Nums:roundmax(_offsets.offsetx * _range / Tic.OFFSETLINE)
+        local _ooffsety = Nums:roundmax(_offsets.offsety * _range / Tic.OFFSETLINE)
+        Tic:logAppend(_dir, _oscreenx, _oscreeny, _ooffsetx, _ooffsety)
         line(
-            _screenx + (_offsets.screenx or 0),
-            _screeny + (_offsets.screeny or 0),
-            _screenx + (_offsets.screenx or 0) + (_offsets.offsetx * _range // Tic.OFFSETLINE),
-            _screeny + (_offsets.screeny or 0) + (_offsets.offsety * _range // Tic.OFFSETLINE),
+            _screenx + _oscreenx,
+            _screeny + _oscreeny,
+            _screenx + _oscreenx + _ooffsetx,
+            _screeny + _oscreeny + _ooffsety,
             Tic.COLORRED --_drawcolor
         )
         if not _offsets.screenx then -- double line
             line(
                 _screenx + 1,
-                _screeny + (_offsets.screeny or 0),
-                _screenx + 1 + (_offsets.offsetx * _range // Tic.OFFSETLINE),
-                _screeny + (_offsets.screeny or 0) + (_offsets.offsety * _range // Tic.OFFSETLINE),
+                _screeny + _oscreeny,
+                _screenx + 1 + _ooffsetx,
+                _screeny + _oscreeny + _ooffsety,
                 Tic.COLORRED --_drawcolor
             )
         end
         if not _offsets.screeny then -- double line
             line(
-                _screenx + (_offsets.screenx or 0),
+                _screenx + _oscreenx,
                 _screeny + 1,
-                _screenx + (_offsets.screenx or 0) + (_offsets.offsetx * _range // Tic.OFFSETLINE),
-                _screeny + 1 + (_offsets.offsety * _range // Tic.OFFSETLINE),
+                _screenx + _oscreenx + _ooffsetx,
+                _screeny + 1 + _ooffsety,
                 Tic.COLORRED --_drawcolor
             )
         end
@@ -2601,7 +2609,7 @@ end -- generate places
 -- Golith:randomWorldWindow()
 local Wulfie = CPlayerWolfe{name = "Wulfie",
     colorextra = Tic.COLORRED,
-    scale = CSprite.SCALE04
+    -- scale = CSprite.SCALE04
 }
 
 goto runit
@@ -2669,12 +2677,12 @@ function Tic:draw()
     Tic:drawPlayerActual()
 
     -- WorldRegionTree0:drawBorderWorldWC()
-    Tic:logAppend(WorldRegionTree0.name)
-    Tic:logAppend("REX:", WorldRegionTree0.worldx)
-    Tic:logAppend("REY:", WorldRegionTree0.worldy)
-    Tic:logAppend("REW:", WorldRegionTree0:borderw())
-    Tic:logAppend("REH:", WorldRegionTree0:borderh())
-    Tic:logAppend("RES:", WorldRegionTree0:surface())
+    -- Tic:logAppend(WorldRegionTree0.name)
+    -- Tic:logAppend("REX:", WorldRegionTree0.worldx)
+    -- Tic:logAppend("REY:", WorldRegionTree0.worldy)
+    -- Tic:logAppend("REW:", WorldRegionTree0:borderw())
+    -- Tic:logAppend("REH:", WorldRegionTree0:borderh())
+    -- Tic:logAppend("RES:", WorldRegionTree0:surface())
 
     -- WorldRegionTown0:drawBorderWorldWC()
 
@@ -2839,10 +2847,10 @@ function Tic:drawPlayerActual()
     end
 
     Tic:logAppend(_playeractual.name)
-
     Tic:logAppend("WOX:", _playeractual.worldx)
     Tic:logAppend("WOY:", _playeractual.worldy)
     Tic:logAppend("SCA:", _playeractual.scale)
+    Tic:logAppend("FHY:", _playeractual.statphyact)
 
     -- _playeractual:drawStatsC(true)
     -- _playeractual:drawPortraitC(nil, true, true)

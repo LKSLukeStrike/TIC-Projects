@@ -25,6 +25,16 @@ function Nums:pos(_num) -- positive num
 end
 
 
+-- Rounding
+function Nums:roundmax(_num) -- max rounded num
+    return (_num >= 0) and math.ceil(_num) or math.floor(_num)
+end
+
+function Nums:roundmin(_num) -- min rounded num
+    return (_num >= 0) and math.floor(_num) or math.ceil(_num)
+end
+
+
 -- Random
 function Nums:random(_num1, _num2) -- solid random, ensure correct interval
     local _min = math.min(_num1, _num2)
