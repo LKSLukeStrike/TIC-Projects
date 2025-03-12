@@ -60,6 +60,16 @@ function Nums:toggle01(_num) -- toggle btw 0 1
 end
 
 
+-- Odd / Even
+function Nums:isOdd(_num) -- if num is odd
+    return (_num % 2) == 1
+end
+
+function Nums:isEven(_num) -- if num is even
+    return (_num % 2) == 0
+end
+
+
 -- Comparisons
 function Nums:_isFctAny(_num, _fct, ...) -- if _fct true on any ... -- false by default
     local _args = {...}

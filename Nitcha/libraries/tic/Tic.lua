@@ -18,29 +18,23 @@ require("includes/tic/CCycler")
 --
 -- Tic
 --
--- Screen sizes and positions
-Tic.SCREENW  = 240 -- screen width
-Tic.SCREENW2 = (Tic.SCREENW // 2) - 1 -- middle screen width
-Tic.SCREENH  = 136 -- screen height
-Tic.SCREENH2 = (Tic.SCREENH // 2) - 1 -- middle screen height
+-- Screen positions and sizes
 Tic.SCREENX  = 0 -- screen x position
 Tic.SCREENY  = 0 -- screen y position
+Tic.SCREENW  = 240 -- screen width
+Tic.SCREENH  = 136 -- screen height
 
--- World Window sizes and positions (hud)
-Tic.WORLDWW  = 100 --Tic.SCREENH -- world window width
-Tic.WORLDWW2 = (Tic.WORLDWW // 2) - 1 -- middle world window width
-Tic.WORLDWH  = 100 --Tic.SCREENH -- world window height
-Tic.WORLDWH2 = (Tic.WORLDWH // 2) - 1 -- middle world window height
+-- World Window positions and sizes (hud)
 Tic.WORLDWX  = 100 --Tic.SCREENW // 2 -- world window x position -- TODO compute that ?
-Tic.WORLDWXC = Tic.WORLDWX + Tic.WORLDWW2 -- world window center x position
 Tic.WORLDWY  = 18  --Tic.SCREENH // 2 -- world window y position
-Tic.WORLDWYC = Tic.WORLDWY + Tic.WORLDWH2 -- world window center y position
+Tic.WORLDWW  = 100 --Tic.SCREENH -- world window width
+Tic.WORLDWH  = 100 --Tic.SCREENH -- world window height
 
--- Portrait Window sizes and positions
-Tic.PORTRAITWW  = 16 -- portrait window width
-Tic.PORTRAITWH  = 16 -- portrait window height
-Tic.PORTRAITWX  = 210 -- portrait window x position
-Tic.PORTRAITWY  = 20  -- portrait window y position
+-- Portrait Window positions and sizes (hud)
+Tic.PORTRAITWX  = 215 -- portrait window x position -- TODO compute that ?
+Tic.PORTRAITWY  = 18  -- portrait window y position
+Tic.PORTRAITWW  = 16  -- portrait window width
+Tic.PORTRAITWH  = 16  -- portrait window height
 
 -- Palette map
 Tic.PALETTEMAP = 0x3FF0 * 2 -- vram bank 1
@@ -88,11 +82,11 @@ Tic.COLORGREYD  = Tic.COLOR15 -- d grey
 Tic.COLORHUDSCREEN = Tic.COLORBLUED
 
 -- Palette colors for biomes
-Tic.COLORBIONIGHT = Tic.COLORBLACK -- TODO rename all ?
-Tic.COLORBIOSNOWY = Tic.COLORWHITE
-Tic.COLORBIOSANDY = Tic.COLORYELLOW
-Tic.COLORBIOGREEN = Tic.COLORGREENM
-Tic.COLORBIOROCKY = Tic.COLORGREYL
+Tic.COLORBIOMENIGHT = Tic.COLORBLACK
+Tic.COLORBIOMESNOWY = Tic.COLORWHITE
+Tic.COLORBIOMESANDY = Tic.COLORYELLOW
+Tic.COLORBIOMEGREEN = Tic.COLORGREENM
+Tic.COLORBIOMEROCKY = Tic.COLORGREYL
 
 -- Special palette colors that can be replaced
 Tic.COLORKEY   = Tic.COLOR00 -- transparent color
@@ -470,11 +464,11 @@ end
 -- Biomes System -- set the current biome
 Tic.BIOMES = CCyclerTable{ -- biomes cycler
     acttable = {
-        Tic.COLORBIONIGHT, -- TODO add real biomes instead of just colors ?
-        Tic.COLORBIOSNOWY,
-        Tic.COLORBIOSANDY,
-        Tic.COLORBIOGREEN,
-        Tic.COLORBIOROCKY,
+        Tic.COLORBIOMENIGHT, -- TODO add real biomes instead of just colors ?
+        Tic.COLORBIOMESNOWY,
+        Tic.COLORBIOMESANDY,
+        Tic.COLORBIOMEGREEN,
+        Tic.COLORBIOMEROCKY,
     },
 }
 
@@ -797,11 +791,144 @@ end
 local CWindow = Classic:extend() -- general window for displaying stuff
 function CWindow:new(_argt)
     CWindow.super.new(self, _argt)
-    self.screenx = 0 -- positions
-    self.screeny = 0
-    self.screenw = 0 -- sizes
-    self.screenh = 0
+    self.screenx = Tic.SCREENX -- positions
+    self.screeny = Tic.SCREENY
+    self.screenw = Tic.SCREENW -- sizes
+    self.screenh = Tic.SCREENH
+    self.colorground = Tic.COLORHUDSCREEN
+    self.colorguides = Tic.COLORGREYM
+    self.colorcaches = Tic.COLORHUDSCREEN
+    self.colorborder = Tic.COLORGREYM -- border color
+    self.colorframe1 = Tic.COLORWHITE -- frames colors
+    self.colorframe2 = Tic.COLORGREYL
     self:_argt(_argt) -- override if any
+end
+
+function CWindow:drawGround() -- window ground
+    rect(
+        self.screenx,
+        self.screeny,
+        self.screenw,
+        self.screenh,
+        self.colorground
+    )
+end
+
+function CWindow:drawGuides() -- window guides -- FIXME still not working -- use ratio w h ?
+    rect( -- hline md
+		self.screenx,
+		self.screeny + ((Nums:isEven(self.screenh)) and (self.screenh // 2) - 1 or (self.screenh // 2)),
+        self.screenw,
+		(Nums:isEven(self.screenh)) and 2 or 1,
+        self.colorguides
+    )
+    rect( -- vline md
+		self.screenx + ((Nums:isEven(self.screenw)) and (self.screenw // 2) - 1 or (self.screenw // 2)),
+		self.screeny,
+        (Nums:isEven(self.screenw)) and 2 or 1,
+		self.screenh,
+        self.colorguides
+    )
+    line( -- diag up lf - dw rg
+		self.screenx,
+		self.screeny,
+        self.screenx + self.screenw - 1,
+		self.screeny + self.screenh - 1,
+        self.colorguides
+    )
+    line( -- diag dw lf - up rg
+		self.screenx,
+		self.screeny + self.screenh - 1,
+        self.screenx + self.screenw - 1,
+		self.screeny,
+        self.colorguides
+    )
+end
+
+function CWindow:drawCaches() -- window caches
+end
+
+function CWindow:drawBorder() -- window single border
+    rectb(
+        self.screenx,
+        self.screeny,
+        self.screenw,
+        self.screenh,
+        self.colorborder
+    )
+end
+
+function CWindow:drawFrames() -- window double frames
+    rectb( -- bg frame
+        self.screenx - 2,
+        self.screeny - 2,
+        self.screenw + 5,
+        self.screenh + 5,
+        self.colorframe2
+    )
+    rectb( -- fg frame
+        self.screenx - 3,
+        self.screeny - 3,
+        self.screenw + 5,
+        self.screenh + 5,
+        self.colorframe1
+    )
+end
+
+
+--
+-- CWindowScreen
+--
+local CWindowScreen = CWindow:extend() -- window screen
+function CWindowScreen:new(_argt)
+    CWindowScreen.super.new(self, _argt)
+    self:_argt(_argt) -- override if any
+end
+-- CWindowScreen instance
+local WindowScreen = CWindowScreen{}
+
+
+--
+-- CWindowWorld
+--
+local CWindowWorld = CWindow:extend() -- window world
+function CWindowWorld:new(_argt)
+    CWindowWorld.super.new(self, _argt)
+    self.screenx = Tic.WORLDWX -- positions
+    self.screeny = Tic.WORLDWY
+    self.screenw = Tic.WORLDWW -- sizes
+    self.screenh = Tic.WORLDWH
+    self.colorground = Tic.COLORBIOMENIGHT
+    self:_argt(_argt) -- override if any
+end
+-- CWindowWorld instance
+local WindowWorld = CWindowWorld{}
+
+function CWindowWorld:drawGround() -- window world ground
+    self.colorground = Tic:biomeActual()
+    CWindowWorld.super.drawGround(self)
+end
+
+
+--
+-- CWindowPortrait
+--
+local CWindowPortrait = CWindow:extend() -- window portrait
+function CWindowPortrait:new(_argt)
+    CWindowPortrait.super.new(self, _argt)
+    self.screenx = Tic.PORTRAITWX -- positions
+    self.screeny = Tic.PORTRAITWY
+    self.screenw = Tic.PORTRAITWW -- sizes
+    self.screenh = Tic.PORTRAITWH
+    self.colorground = Tic.COLORBIOMENIGHT
+    self:_argt(_argt) -- override if any
+end
+-- CWindowPortrait instance
+local WindowPortrait = CWindowPortrait{}
+
+function CWindowPortrait:drawGround() -- window portrait ground
+    self.colorground = Tic:biomeActual()
+    CWindowPortrait.super.drawGround(self)
 end
 
 
@@ -1032,7 +1159,7 @@ function CWorld:new(_argt)
     self.entitieslocations = CEntitiesLocations{} -- record world entities and their locations
     self:_argt(_argt) -- override if any
 end
--- World instance
+-- CWorld instance
 local World = CWorld{}
 
 function CWorld:entityAppend(_entity) -- add a new entity in the world
@@ -1857,8 +1984,8 @@ end
 
 function CCharacter:drawDirs() -- draw the directions and ranges around the player
     local _drawcolor = Tic.COLORWHITE
-    local _screenx   = Tic.WORLDWXC
-    local _screeny   = Tic.WORLDWYC
+    local _screenx   = Tic.WORLDWX + ((Tic.WORLDWW - Tic.WORLDWX) // 2)
+    local _screeny   = Tic.WORLDWY + ((Tic.WORLDWH - Tic.WORLDWY) // 2)
     local _range     = self.statphyact * self.scale
     local _statesettings = Tic.STATESETTINGS[self.state]
     local _posture       = _statesettings.posture
@@ -2624,15 +2751,21 @@ local Region = CRegion{
 --
 local _statustick01 = 0
 function Tic:draw()
-    Tic:drawScreenGround()
+    Tic:keysDo(20, 10) -- handle keyboard
 
-    Tic:drawWorldWGround()
+    WindowScreen:drawGround()
+    WindowScreen:drawBorder()
+    -- WindowScreen:drawGuides()
 
-    -- Tic:drawScreenBorder()
-    -- Tic:drawScreenGuides()
+    WindowWorld:drawGround()
+    -- WindowWorld:drawBorder()
+    WindowWorld:drawFrames()
+    -- WindowWorld:drawGuides()
 
-    -- Tic:drawWorldWUseful()
-    Tic:drawWorldWFrames()
+    WindowPortrait:drawGround()
+    -- WindowPortrait:drawBorder()
+    WindowPortrait:drawFrames()
+    -- WindowPortrait:drawGuides()
 
     Tic:drawPlayerActual()
 
@@ -2648,49 +2781,13 @@ function Tic:draw()
 
     -- Tic:drawLog()
 
+    -- Tic:logAppend(Tic.SCREENW)
+    -- Tic:logAppend(Tic.SCREENH)
     Tic:logPrint()
 
     Tic:tick() -- /!\ required in the draw function 
 end
 
--- screen
-function Tic:drawScreenGround() -- draw screen ground
-    local _drawcolor = Tic.COLORHUDSCREEN
-    cls(_drawcolor) -- quick and easy ;)
-end
-
-function Tic:drawScreenFrames() -- draw screen border and guides
-    Tic:drawScreenBorder()
-    Tic:drawScreenGuides()
-end
-
-function Tic:drawScreenBorder() -- draw screen border
-    local _drawcolor = Tic.COLORYELLOW
-    rectb(Tic.SCREENX, Tic.SCREENY,
-        Tic.SCREENW, Tic.SCREENH,
-        _drawcolor
-    )
-end
-
-function Tic:drawScreenGuides() -- draw screen guides
-    local _drawcolor = Tic.COLORYELLOW
-    line(Tic.SCREENX, Tic.SCREENY, -- diag up lf - dw rg
-        Tic.SCREENX + Tic.SCREENW - 1, Tic.SCREENY + Tic.SCREENH - 1,
-        _drawcolor
-    )
-    line(Tic.SCREENX, Tic.SCREENY + Tic.SCREENH - 1, -- diag dw lf - up rg
-        Tic.SCREENX + Tic.SCREENW - 1, Tic.SCREENY,
-        _drawcolor
-    )
-    rect(Tic.SCREENX, Tic.SCREENY + Tic.SCREENH2, -- hline md
-        Tic.SCREENW, 2,
-        _drawcolor
-    )
-    rect(Tic.SCREENX + Tic.SCREENW2, Tic.SCREENY, -- vline md
-        2, Tic.SCREENH,
-        _drawcolor
-    )
-end
 
 -- world window
 function Tic:drawWorldWGround() -- draw world window ground
@@ -2766,7 +2863,6 @@ function Tic:drawPlayerActual()
     local _idlecycler  = _playeractual.idlecycler
     _idlecycler:next()
 
-    Tic:keysDo(20, 10)
     local _state   = _playeractual.state
     local _posture = Tic.STATESETTINGS[_state].posture
     local _status  = Tic.STATESETTINGS[_state].status
@@ -2798,14 +2894,14 @@ function Tic:drawPlayerActual()
         end
     end
 
-    Tic:logAppend(_playeractual.name)
-    Tic:logAppend("WOX:", _playeractual.worldx)
-    Tic:logAppend("WOY:", _playeractual.worldy)
-    Tic:logAppend("SCA:", _playeractual.scale)
-    Tic:logAppend("FHY:", _playeractual.statphyact)
+    -- Tic:logAppend(_playeractual.name)
+    -- Tic:logAppend("WOX:", _playeractual.worldx)
+    -- Tic:logAppend("WOY:", _playeractual.worldy)
+    -- Tic:logAppend("SCA:", _playeractual.scale)
+    -- Tic:logAppend("FHY:", _playeractual.statphyact)
 
     -- _playeractual:drawStatsC(true)
-    _playeractual:drawPortrait(nil, true, true)
+    -- _playeractual:drawPortrait(nil, true, true)
     _playeractual:drawDirs()
 end
 
