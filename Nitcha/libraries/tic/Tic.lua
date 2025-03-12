@@ -36,6 +36,12 @@ Tic.PORTRAITWY  = 18  -- portrait window y position
 Tic.PORTRAITWW  = 16  -- portrait window width
 Tic.PORTRAITWH  = 16  -- portrait window height
 
+-- Stats Window positions and sizes (hud)
+Tic.STATSWX  = 215 -- stats window x position -- TODO compute that ?
+Tic.STATSWY  = 48  -- stats window y position
+Tic.STATSWW  = 16  -- stats window width
+Tic.STATSWH  = 16  -- stats window height
+
 -- Palette map
 Tic.PALETTEMAP = 0x3FF0 * 2 -- vram bank 1
 
@@ -723,7 +729,7 @@ CSpriteFG.HEADANGEL   = CSpriteFG.HEADBANK + 4
 CSpriteFG.HEADHORNE   = CSpriteFG.HEADBANK + 5
 CSpriteFG.HEADMEDUZ   = CSpriteFG.HEADBANK + 6
 CSpriteFG.HEADGNOLL   = CSpriteFG.HEADBANK + 7
-CSpriteFG.BODYBANK    = 288 -- characters bodies
+CSpriteFG.BODYBANK    = 400 -- characters bodies
 CSpriteFG.BODYHUMAN   = CSpriteFG.BODYBANK + 0 -- humanoid bodies
 CSpriteFG.BODYHUMANSTANDIDLE = CSpriteFG.BODYHUMAN + 0
 CSpriteFG.BODYHUMANSTANDWORK = CSpriteFG.BODYHUMAN + 1
@@ -887,6 +893,11 @@ end
 -- CWindowScreen instance
 local WindowScreen = CWindowScreen{}
 
+function CWindowScreen:draw() -- window screen
+    self:drawGround()
+    self:drawBorder()
+end
+
 
 --
 -- CWindowWorld
@@ -904,6 +915,11 @@ end
 -- CWindowWorld instance
 local WindowWorld = CWindowWorld{}
 
+function CWindowWorld:draw() -- window world
+    self:drawGround()
+    self:drawFrames()
+end
+
 function CWindowWorld:drawGround() -- window world ground
     self.colorground = Tic:biomeActual()
     CWindowWorld.super.drawGround(self)
@@ -920,15 +936,137 @@ function CWindowPortrait:new(_argt)
     self.screeny = Tic.PORTRAITWY
     self.screenw = Tic.PORTRAITWW -- sizes
     self.screenh = Tic.PORTRAITWH
+    self.idle    = false -- idle or animated portrait
     self.colorground = Tic.COLORBIOMENIGHT
     self:_argt(_argt) -- override if any
 end
 -- CWindowPortrait instance
 local WindowPortrait = CWindowPortrait{}
 
+function CWindowPortrait:draw() -- window portrait
+    self:drawGround()
+    self:drawFrames()
+    self:drawPlayer()
+end
+
 function CWindowPortrait:drawGround() -- window portrait ground
     self.colorground = Tic:biomeActual()
     CWindowPortrait.super.drawGround(self)
+end
+
+function CWindowPortrait:drawPlayer() -- actual player portrait
+    local _playeractual = Tic:playerActual()
+    _playeractual:_save{"screenx", "screeny", "scale", "dirx", "diry", "state", "frame",}
+    _playeractual.screenx = self.screenx -- force character attributes
+    _playeractual.screeny = self.screeny
+    _playeractual.scale   = CSprite.SCALE02
+    if self.idle then
+        _playeractual.dirx  = Tic.DIRXLF
+        _playeractual.diry  = Tic.DIRYMD
+        _playeractual.state = Tic.STATESTANDIDLE
+        _playeractual.frame = CSprite.FRAME00
+    end
+    _playeractual:draw()
+    _playeractual:_load()
+end
+
+
+--
+-- CWindowStats
+--
+local CWindowStats = CWindow:extend() -- window stats
+function CWindowStats:new(_argt)
+    CWindowStats.super.new(self, _argt)
+    self.screenx = Tic.STATSWX -- positions
+    self.screeny = Tic.STATSWY
+    self.screenw = Tic.STATSWW -- sizes
+    self.screenh = Tic.STATSWH
+    self.border  = false -- border or not
+    self.colorground = Tic.COLORBIOMENIGHT
+    self.colorborder = Tic.COLORWHITE
+    self.colorphyact = Tic.COLORRED
+    self.colormenact = Tic.COLORGREENM
+    self.colorpsyact = Tic.COLORBLUEM
+    self.colorlesser = Tic.COLORGREYL -- if the act stat is lesser than the max stat
+    self:_argt(_argt) -- override if any
+end
+-- CWindowStats instance
+local WindowStats = CWindowStats{}
+
+function CWindowStats:draw() -- window stats
+    self:drawGround()
+    self:drawFrames()
+    self:drawPlayer()
+end
+
+function CWindowStats:drawPlayer() -- actual player stats
+    local _playeractual = Tic:playerActual()
+    if self.border then
+        self:drawBorder()
+    end
+    rectb( -- phy bar border
+        self.screenx + 01,
+        self.screeny + 02,
+        04,
+        12,
+        self.colorborder
+    )
+    rectb( -- men bar border
+        self.screenx + 06,
+        self.screeny + 02,
+        04,
+        12,
+        self.colorborder
+    )
+    rectb( -- psy bar border
+        self.screenx + 11,
+        self.screeny + 02,
+        04,
+        12,
+        self.colorborder
+    )
+    rect ( -- phy act bar
+        self.screenx + 02,
+        self.screeny + 02 + Tic.STATSMAX - _playeractual.statphyact + 1,
+        02,
+        _playeractual.statphyact,
+        self.colorphyact
+    )
+    rect ( -- men act bar
+        self.screenx + 07,
+        self.screeny + 02 + Tic.STATSMAX - _playeractual.statmenact + 1,
+        02,
+        _playeractual.statmenact,
+        self.colormenact
+    )
+    rect ( -- psy act bar
+        self.screenx + 12,
+        self.screeny + 02 + Tic.STATSMAX - _playeractual.statpsyact + 1,
+        02,
+        _playeractual.statpsyact,
+        self.colorpsyact
+    )
+    rectb( -- phy max line
+        self.screenx + 02,
+        self.screeny + 03 + Tic.STATSMAX - _playeractual.statphymax,
+        02,
+        01,
+        (_playeractual.statphyact >= _playeractual.statphymax) and self.colorborder or self.colorlesser
+    )
+    rectb( -- men max line
+        self.screenx + 07,
+        self.screeny + 03 + Tic.STATSMAX - _playeractual.statmenmax,
+        02,
+        01,
+        (_playeractual.statmenact >= _playeractual.statmenmax) and self.colorborder or self.colorlesser
+    )
+    rectb( -- psy max line
+        self.screenx + 12,
+        self.screeny + 03 + Tic.STATSMAX - _playeractual.statpsymax,
+        02,
+        01,
+        (_playeractual.statpsyact >= _playeractual.statpsymax) and self.colorborder or self.colorlesser
+    )
 end
 
 
@@ -1931,22 +2069,6 @@ function CCharacter:drawPortrait(_idle, _border, _infos) -- draw the portrait --
     self.screenx = Tic.PORTRAITWX -- force character attributes
     self.screeny = Tic.PORTRAITWY
     self.scale = CSprite.SCALE02
-    if _border then
-        rectb(
-            self.screenx - 2,
-            self.screeny - 2,
-            Tic.PORTRAITWW + 5,
-            Tic.PORTRAITWH + 5,
-            Tic.COLORPORTRAITBG
-        )
-        rectb(
-            self.screenx - 3,
-            self.screeny - 3,
-            Tic.PORTRAITWW + 5,
-            Tic.PORTRAITWH + 5,
-            Tic.COLORPORTRAITFG
-        )
-    end
     if _idle then
         self.dirx = Tic.DIRXLF
         self.diry = Tic.DIRYMD
@@ -2753,19 +2875,10 @@ local _statustick01 = 0
 function Tic:draw()
     Tic:keysDo(20, 10) -- handle keyboard
 
-    WindowScreen:drawGround()
-    WindowScreen:drawBorder()
-    -- WindowScreen:drawGuides()
-
-    WindowWorld:drawGround()
-    -- WindowWorld:drawBorder()
-    WindowWorld:drawFrames()
-    -- WindowWorld:drawGuides()
-
-    WindowPortrait:drawGround()
-    -- WindowPortrait:drawBorder()
-    WindowPortrait:drawFrames()
-    -- WindowPortrait:drawGuides()
+    WindowScreen:draw()
+    WindowWorld:draw()
+    WindowPortrait:draw()
+    WindowStats:draw()
 
     Tic:drawPlayerActual()
 
@@ -2790,25 +2903,6 @@ end
 
 
 -- world window
-function Tic:drawWorldWGround() -- draw world window ground
-    local _drawcolor = Tic:biomeActual()
-    rect(Tic.WORLDWX, Tic.WORLDWY,
-        Tic.WORLDWW, Tic.WORLDWH,
-        _drawcolor
-    )
-end
-
-function Tic:drawWorldWFrames() -- draw world window caches, border and guides
-    Tic:drawWorldWCaches()
-    Tic:drawWorldWBorder()
-    Tic:drawWorldWGuides()
-end
-
-function Tic:drawWorldWUseful() -- draw world window caches and border
-    Tic:drawWorldWCaches()
-    Tic:drawWorldWBorder()
-end
-
 function Tic:drawWorldWCaches() -- draw world window caches
     local _drawcolor = Tic.COLORHUDSCREEN
     rect(Tic.WORLDWX - 8, Tic.WORLDWY, -- lf mask
@@ -2829,33 +2923,6 @@ function Tic:drawWorldWCaches() -- draw world window caches
     )
 end
 
-function Tic:drawWorldWBorder() -- draw world window border
-    local _drawcolor = Tic.COLORGREYL
-    rectb(Tic.WORLDWX, Tic.WORLDWY, -- border
-        Tic.WORLDWW, Tic.WORLDWH,
-        _drawcolor
-    )
-end
-
-function Tic:drawWorldWGuides() -- draw world window guides
-    local _drawcolor = Tic.COLORGREENL
-    line(Tic.WORLDWX, Tic.WORLDWY, -- diag up lf - dw rg
-        Tic.WORLDWX + Tic.WORLDWW - 1, Tic.WORLDWY + Tic.WORLDWH - 1,
-        _drawcolor
-    )
-    line(Tic.WORLDWX, Tic.WORLDWY + Tic.WORLDWH - 1, -- diag dw lf - up rg
-        Tic.WORLDWX + Tic.WORLDWW - 1, Tic.WORLDWY,
-        _drawcolor
-    )
-    rect(Tic.WORLDWX, Tic.WORLDWY + Tic.WORLDWH2, -- hline md
-        Tic.WORLDWW, 2,
-        _drawcolor
-    )
-    rect(Tic.WORLDWXC, Tic.WORLDWY, -- vline md
-        2, Tic.WORLDWH,
-        _drawcolor
-    )
-end
 
 -- actual player
 function Tic:drawPlayerActual()
