@@ -30,22 +30,22 @@ Tic.SCREENW  = 240 -- screen width
 Tic.SCREENH  = 136 -- screen height
 
 -- World Window positions and sizes (hud)
-Tic.WORLDWX  = 100 --Tic.SCREENW // 2 -- world window x position -- TODO compute that ?
-Tic.WORLDWY  = 18  --Tic.SCREENH // 2 -- world window y position
-Tic.WORLDWW  = 100 --Tic.SCREENH -- world window width
+Tic.WORLDWW  = 160 --Tic.SCREENH -- world window width
 Tic.WORLDWH  = 100 --Tic.SCREENH -- world window height
+Tic.WORLDWX  = (Tic.SCREENW - Tic.WORLDWW) // 2 -- world window x position
+Tic.WORLDWY  = (Tic.SCREENH - Tic.WORLDWH) // 2 -- world window y position
 
 -- Portrait Window positions and sizes (hud)
-Tic.PORTRAITWX  = 215 -- portrait window x position -- TODO compute that ?
-Tic.PORTRAITWY  = 18  -- portrait window y position
 Tic.PORTRAITWW  = 16  -- portrait window width
 Tic.PORTRAITWH  = 16  -- portrait window height
+Tic.PORTRAITWX  = Tic.SCREENW - Tic.PORTRAITWW - ((Tic.WORLDWX - Tic.PORTRAITWW) // 2) -- portrait window x position
+Tic.PORTRAITWY  = Tic.WORLDWY  -- portrait window y position
 
 -- Stats Window positions and sizes (hud)
-Tic.STATSWX  = 215 -- stats window x position -- TODO compute that ?
-Tic.STATSWY  = 48  -- stats window y position
 Tic.STATSWW  = 16  -- stats window width
 Tic.STATSWH  = 16  -- stats window height
+Tic.STATSWX  = Tic.PORTRAITWX -- stats window x position
+Tic.STATSWY  = 48  -- stats window y position
 
 -- Palette map
 Tic.PALETTEMAP = 0x3FF0 * 2 -- vram bank 1
@@ -968,33 +968,34 @@ function CWindowText:drawInside() -- window text content
 end
 
 function CWindowText:drawTextFG() -- window text fg text
-	local _screenx = self.screenx + self.marginsh
-	local _screeny = self.screeny + self.marginsv
+	local _screenx = self.screenx
+	local _screeny = self.screeny
 	local _color   = self.colortextfg
 	local _fixed   = true -- TODO accept also not fixed fonts ?
 	local _scale   = 1 -- TODO accept also other scales ?
 	local _small   = self.small
 	local _fontw   = (self.small) and Tic.FONTWS or Tic.FONTWL
-	for _line = 1, self.lines do
+    local _offsetx = self.marginsh
+    local _offsety = self.marginsv
+	for _line = 1, self.lines do -- draw each line
         local _text = self.texts[_line] or ""
         local _size = string.len(_text) * _fontw
-        local _offsetx = 0
         _offsetx = (self.align == CWindowText.ALIGNMD)
-            and (self.screenw - self.marginsh - _size) // 2
+            and (self.screenw - _size) // 2
             or  _offsetx
         _offsetx = (self.align == CWindowText.ALIGNRG)
-            and self.screenw - self.marginsh - _size
+            and self.screenw - self.marginsh - _size + 1
             or  _offsetx
 		print(
 			_text,
 			_screenx + _offsetx,
-			_screeny + 1, -- y offset font in each line
+			_screeny + _offsety + 1, -- y offset font in each line
 			_color,
 			_fixed,
 			_scale,
 			_small
 		)
-		_screeny = _screeny + Tic.FONTH + 2 + self.linessep
+		_offsety = _offsety + Tic.FONTH + 2 + self.linessep
 	end
 end
 
@@ -2912,8 +2913,8 @@ end -- generate places
 --     coloreyesbg  = Tic.COLORBLUEM,
 --     coloreyesfg  = Tic.COLORBLUEL,
 -- }
--- local Nitcha = CPlayerDrowe{name = "Nitcha",
--- }
+local Nitcha = CPlayerDrowe{name = "Nitcha",
+}
 -- local Zariel = CPlayerAngel{name = "Zariel",}
 -- local Zikkow = CPlayerTifel{name = "Zikkow",
 --     colorhairsbg = Tic.COLORGREENM,
@@ -2937,7 +2938,6 @@ end -- generate places
 -- Golith:randomWorldWindow()
 local Wulfie = CPlayerWolfe{name = "Wulfie",
     colorextra = Tic.COLORRED,
-    -- scale = CSprite.SCALE04
 }
 
 goto runit
@@ -3000,51 +3000,18 @@ local WindowTextL = CWindowText{
     align = CWindowText.ALIGNMD,
     texts = {"Wolfye", "Dwarf"},
 }
-
-local WindowTextS1 = CWindowText{
+local WindowTextS = CWindowText{
     colorground = Tic.COLORBIOMENIGHT,
     screenx = 30,
     screeny = 50,
     lines = 2,
     chars = 6,
-    marginsh = 1,
+    marginsh = 0,
     marginsv = 0,
     small = true,
     align = CWindowText.ALIGNLF,
     drawguides = false,
-    drawborder = false,
-    drawframes = true,
-    texts = {"Wolfye", "Droye"},
-}
-
-local WindowTextS2 = CWindowText{
-    colorground = Tic.COLORBIOMENIGHT,
-    screenx = 30,
-    screeny = 80,
-    lines = 2,
-    chars = 6,
-    marginsh = 1,
-    marginsv = 0,
-    small = true,
-    align = CWindowText.ALIGNMD,
-    drawguides = false,
-    drawborder = false,
-    drawframes = true,
-    texts = {"Wolfye", "Droye"},
-}
-
-local WindowTextS3 = CWindowText{
-    colorground = Tic.COLORBIOMENIGHT,
-    screenx = 30,
-    screeny = 110,
-    lines = 2,
-    chars = 6,
-    marginsh = 1,
-    marginsv = 0,
-    small = true,
-    align = CWindowText.ALIGNRG,
-    drawguides = false,
-    drawborder = false,
+    drawborder = true,
     drawframes = true,
     texts = {"Wolfye", "Droye"},
 }
@@ -3061,11 +3028,6 @@ function Tic:draw()
     WindowWorld:draw()
     WindowPortrait:draw()
     WindowStats:draw()
-
-    WindowTextL:draw()
-    WindowTextS1:draw()
-    WindowTextS2:draw()
-    WindowTextS3:draw()
     
     -- Tic:drawPlayerActual()
 
