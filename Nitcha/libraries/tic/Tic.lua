@@ -35,17 +35,23 @@ Tic.WORLDWH  = 100 --Tic.SCREENH -- world window height
 Tic.WORLDWX  = (Tic.SCREENW - Tic.WORLDWW) // 2 -- world window x position
 Tic.WORLDWY  = (Tic.SCREENH - Tic.WORLDWH) // 2 -- world window y position
 
+-- Infos Window positions and sizes (hud)
+Tic.INFOSWW  = 26  -- infos window width
+Tic.INFOSWH  = 16  -- infos window height
+Tic.INFOSWX  = Tic.SCREENW - Tic.INFOSWW - ((Tic.WORLDWX - Tic.INFOSWW) // 2) -- infos window x position
+Tic.INFOSWY  = Tic.WORLDWY  -- infos window y position
+
 -- Portrait Window positions and sizes (hud)
 Tic.PORTRAITWW  = 16  -- portrait window width
 Tic.PORTRAITWH  = 16  -- portrait window height
 Tic.PORTRAITWX  = Tic.SCREENW - Tic.PORTRAITWW - ((Tic.WORLDWX - Tic.PORTRAITWW) // 2) -- portrait window x position
-Tic.PORTRAITWY  = Tic.WORLDWY  -- portrait window y position
+Tic.PORTRAITWY  = Tic.INFOSWY + 25  -- portrait window y position
 
 -- Stats Window positions and sizes (hud)
 Tic.STATSWW  = 16  -- stats window width
 Tic.STATSWH  = 16  -- stats window height
 Tic.STATSWX  = Tic.PORTRAITWX -- stats window x position
-Tic.STATSWY  = 48  -- stats window y position
+Tic.STATSWY  = Tic.PORTRAITWY + 25  -- stats window y position
 
 -- Palette map
 Tic.PALETTEMAP = 0x3FF0 * 2 -- vram bank 1
@@ -935,24 +941,28 @@ end
 
 
 --
--- CWindowText
+-- CWindowInfos
 --
-local CWindowText = CWindow:extend() -- window text
-CWindowText.ALIGNLF = "alignlf"
-CWindowText.ALIGNMD = "alignmd"
-CWindowText.ALIGNRG = "alignrg"
-function CWindowText:new(_argt)
-    CWindowText.super.new(self, _argt)
+local CWindowInfos = CWindow:extend() -- window infos
+CWindowInfos.ALIGNLF = "alignlf"
+CWindowInfos.ALIGNMD = "alignmd"
+CWindowInfos.ALIGNRG = "alignrg"
+function CWindowInfos:new(_argt)
+    CWindowInfos.super.new(self, _argt)
 	self.lines = 1 -- number of lines
 	self.chars = 8 -- number of chars per lines
 	self.small = false -- small fonts or large fonts
-	self.texts = {} -- lines content -- {text1, textN,...}
-	self.align = CWindowText.ALIGNLF -- h alignment
+	self.infos = {} -- lines content -- {info1, infoN,...}
+	self.align = CWindowInfos.ALIGNLF -- h alignment
 	self.marginsh = 1 -- h margins in px
 	self.marginsv = 0 -- v margins in px
 	self.linessep = 0 -- separator in px
-    self.colortextfg = Tic.COLORWHITE
-    self.colortextbg = Tic.COLORGREYL -- TODO for shadow
+    self.shadow = false
+    self.colorinfofg = Tic.COLORWHITE
+    self.colorinfobg = Tic.COLORGREYL -- for shadow
+    self.drawguides = false
+    self.drawcaches = false
+    self.drawborder = false
     self:_argt(_argt) -- override if any
 	-- TODO separate _argt ?
 	local _fontw = (self.small) and Tic.FONTWS or Tic.FONTWL
@@ -963,14 +973,14 @@ function CWindowText:new(_argt)
 	return self.screenw, self.screenh
 end
 
-function CWindowText:drawInside() -- window text content
+function CWindowInfos:drawInside() -- window info content
     self:drawTextFG()
 end
 
-function CWindowText:drawTextFG() -- window text fg text
+function CWindowInfos:drawTextFG() -- window info fg info
 	local _screenx = self.screenx
 	local _screeny = self.screeny
-	local _color   = self.colortextfg
+	local _color   = self.colorinfofg
 	local _fixed   = true -- TODO accept also not fixed fonts ?
 	local _scale   = 1 -- TODO accept also other scales ?
 	local _small   = self.small
@@ -978,16 +988,16 @@ function CWindowText:drawTextFG() -- window text fg text
     local _offsetx = self.marginsh
     local _offsety = self.marginsv
 	for _line = 1, self.lines do -- draw each line
-        local _text = self.texts[_line] or ""
-        local _size = string.len(_text) * _fontw
-        _offsetx = (self.align == CWindowText.ALIGNMD)
+        local _info = self.infos[_line] or ""
+        local _size = string.len(_info) * _fontw
+        _offsetx = (self.align == CWindowInfos.ALIGNMD)
             and (self.screenw - _size) // 2
             or  _offsetx
-        _offsetx = (self.align == CWindowText.ALIGNRG)
+        _offsetx = (self.align == CWindowInfos.ALIGNRG)
             and self.screenw - self.marginsh - _size + 1
             or  _offsetx
 		print(
-			_text,
+			_info,
 			_screenx + _offsetx,
 			_screeny + _offsety + 1, -- y offset font in each line
 			_color,
@@ -2989,7 +2999,7 @@ local Region = CRegion{
 --
 -- Window Text -- TESTING
 --
-local WindowTextL = CWindowText{
+local WindowInfosL = CWindowInfos{
     screenx = 30,
     screeny = 10,
     lines = 2,
@@ -2997,23 +3007,18 @@ local WindowTextL = CWindowText{
     marginsh = 10,
     marginsv = 2,
     small = false,
-    align = CWindowText.ALIGNMD,
-    texts = {"Wolfye", "Dwarf"},
+    align = CWindowInfos.ALIGNMD,
+    infos = {"Wolfye", "Dwarf"},
 }
-local WindowTextS = CWindowText{
+local WindowInfosS = CWindowInfos{
     colorground = Tic.COLORBIOMENIGHT,
-    screenx = 30,
-    screeny = 50,
+    screenx = Tic.INFOSWX,
+    screeny = Tic.INFOSWY,
     lines = 2,
     chars = 6,
-    marginsh = 0,
-    marginsv = 0,
     small = true,
-    align = CWindowText.ALIGNLF,
-    drawguides = false,
-    drawborder = true,
-    drawframes = true,
-    texts = {"Wolfye", "Droye"},
+    align = CWindowInfos.ALIGNMD,
+    infos = {"Wolfye", "Droye"},
 }
 
 
@@ -3028,7 +3033,8 @@ function Tic:draw()
     WindowWorld:draw()
     WindowPortrait:draw()
     WindowStats:draw()
-    
+    WindowInfosS:draw()
+
     -- Tic:drawPlayerActual()
 
     -- WorldRegionTree0:drawBorderWorldWC()
