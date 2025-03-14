@@ -18,6 +18,11 @@ require("includes/tic/CCycler")
 --
 -- Tic
 --
+-- Fonts sizes
+Tic.FONTWL = 6 -- large font width
+Tic.FONTWS = 4 -- small font width
+Tic.FONTH  = 6 -- both font height
+
 -- Screen positions and sizes
 Tic.SCREENX  = 0 -- screen x position
 Tic.SCREENY  = 0 -- screen y position
@@ -801,13 +806,29 @@ function CWindow:new(_argt)
     self.screeny = Tic.SCREENY
     self.screenw = Tic.SCREENW -- sizes
     self.screenh = Tic.SCREENH
+    self.cachest = 8 -- caches thickness
     self.colorground = Tic.COLORHUDSCREEN
     self.colorguides = Tic.COLORGREYM
     self.colorcaches = Tic.COLORHUDSCREEN
     self.colorborder = Tic.COLORGREYM -- border color
     self.colorframe1 = Tic.COLORWHITE -- frames colors
     self.colorframe2 = Tic.COLORGREYL
+    self.drawground = true -- draw behevior
+    self.drawguides = true
+    self.drawcaches = true
+    self.drawborder = true
+    self.drawframes = true
+    self.drawinside = true
     self:_argt(_argt) -- override if any
+end
+
+function CWindow:draw() -- window
+    if self.drawground then self:drawGround() end
+    if self.drawguides then self:drawGuides() end
+    if self.drawcaches then self:drawCaches() end
+    if self.drawborder then self:drawBorder() end
+    if self.drawframes then self:drawFrames() end
+    if self.drawinside then self:drawInside() end
 end
 
 function CWindow:drawGround() -- window ground
@@ -852,6 +873,34 @@ function CWindow:drawGuides() -- window guides -- FIXME still not working -- use
 end
 
 function CWindow:drawCaches() -- window caches
+    rect( -- lf cache
+		self.screenx - self.cachest,
+		self.screeny,
+        self.cachest,
+		self.screenh,
+        self.colorcaches
+    )
+    rect( -- rg cache
+		self.screenx + self.screenw,
+		self.screeny,
+        self.cachest,
+		self.screenh,
+        self.colorcaches
+    )
+    rect( -- up cache
+		self.screenx - self.cachest,
+		self.screeny - self.cachest,
+        self.screenw + (self.cachest * 2),
+		self.cachest,
+        self.colorcaches
+    )
+    rect( -- dw cache
+		self.screenx - self.cachest,
+		self.screeny + self.screenh,
+        self.screenw + (self.cachest * 2),
+		self.cachest,
+        self.colorcaches
+    )
 end
 
 function CWindow:drawBorder() -- window single border
@@ -879,6 +928,74 @@ function CWindow:drawFrames() -- window double frames
         self.screenh + 5,
         self.colorframe1
     )
+end
+
+function CWindow:drawInside() -- window content
+end
+
+
+--
+-- CWindowText
+--
+local CWindowText = CWindow:extend() -- window text
+CWindowText.ALIGNLF = "alignlf"
+CWindowText.ALIGNMD = "alignmd"
+CWindowText.ALIGNRG = "alignrg"
+function CWindowText:new(_argt)
+    CWindowText.super.new(self, _argt)
+	self.lines = 1 -- number of lines
+	self.chars = 8 -- number of chars per lines
+	self.small = false -- small fonts or large fonts
+	self.texts = {} -- lines content -- {text1, textN,...}
+	self.align = CWindowText.ALIGNLF -- h alignment
+	self.marginsh = 1 -- h margins in px
+	self.marginsv = 0 -- v margins in px
+	self.linessep = 0 -- separator in px
+    self.colortextfg = Tic.COLORWHITE
+    self.colortextbg = Tic.COLORGREYL -- TODO for shadow
+    self:_argt(_argt) -- override if any
+	-- TODO separate _argt ?
+	local _fontw = (self.small) and Tic.FONTWS or Tic.FONTWL
+	local _fonth = Tic.FONTH + 2
+	local _seppx = math.min(0, self.lines - 1) * self.linessep
+	self.screenw = (self.chars * _fontw) + (self.marginsh * 2)
+	self.screenh = (self.lines * _fonth) + (self.marginsv * 2) + _seppx
+	return self.screenw, self.screenh
+end
+
+function CWindowText:drawInside() -- window text content
+    self:drawTextFG()
+end
+
+function CWindowText:drawTextFG() -- window text fg text
+	local _screenx = self.screenx + self.marginsh
+	local _screeny = self.screeny + self.marginsv
+	local _color   = self.colortextfg
+	local _fixed   = true -- TODO accept also not fixed fonts ?
+	local _scale   = 1 -- TODO accept also other scales ?
+	local _small   = self.small
+	local _fontw   = (self.small) and Tic.FONTWS or Tic.FONTWL
+	for _line = 1, self.lines do
+        local _text = self.texts[_line] or ""
+        local _size = string.len(_text) * _fontw
+        local _offsetx = 0
+        _offsetx = (self.align == CWindowText.ALIGNMD)
+            and (self.screenw - self.marginsh - _size) // 2
+            or  _offsetx
+        _offsetx = (self.align == CWindowText.ALIGNRG)
+            and self.screenw - self.marginsh - _size
+            or  _offsetx
+		print(
+			_text,
+			_screenx + _offsetx,
+			_screeny + 1, -- y offset font in each line
+			_color,
+			_fixed,
+			_scale,
+			_small
+		)
+		_screeny = _screeny + Tic.FONTH + 2 + self.linessep
+	end
 end
 
 
@@ -917,6 +1034,9 @@ local WindowWorld = CWindowWorld{}
 
 function CWindowWorld:draw() -- window world
     self:drawGround()
+    -- TODO drawPlayer here
+    self:drawCaches()
+    self:drawBorder()
     self:drawFrames()
 end
 
@@ -2121,7 +2241,6 @@ function CCharacter:drawDirs() -- draw the directions and ranges around the play
 
     circb(_screenx, _screeny, _range, _drawcolor)
     circb(_screenx + 1, _screeny, _range, _drawcolor)
-    -- for _dir, _offsets in pairs(Tic.DIRS2OFFSETS) do
     for _, _dir in pairs(Tables:keys(Tic.DIRS2OFFSETS)) do
         local _offsets  = Tic.DIRS2OFFSETS[_dir]
         local _oscreenx = _offsets.screenx or 0
@@ -2867,6 +2986,69 @@ local Region = CRegion{
     dw = 10,
 }
 
+--
+-- Window Text -- TESTING
+--
+local WindowTextL = CWindowText{
+    screenx = 30,
+    screeny = 10,
+    lines = 2,
+    chars = 6,
+    marginsh = 10,
+    marginsv = 2,
+    small = false,
+    align = CWindowText.ALIGNMD,
+    texts = {"Wolfye", "Dwarf"},
+}
+
+local WindowTextS1 = CWindowText{
+    colorground = Tic.COLORBIOMENIGHT,
+    screenx = 30,
+    screeny = 50,
+    lines = 2,
+    chars = 6,
+    marginsh = 1,
+    marginsv = 0,
+    small = true,
+    align = CWindowText.ALIGNLF,
+    drawguides = false,
+    drawborder = false,
+    drawframes = true,
+    texts = {"Wolfye", "Droye"},
+}
+
+local WindowTextS2 = CWindowText{
+    colorground = Tic.COLORBIOMENIGHT,
+    screenx = 30,
+    screeny = 80,
+    lines = 2,
+    chars = 6,
+    marginsh = 1,
+    marginsv = 0,
+    small = true,
+    align = CWindowText.ALIGNMD,
+    drawguides = false,
+    drawborder = false,
+    drawframes = true,
+    texts = {"Wolfye", "Droye"},
+}
+
+local WindowTextS3 = CWindowText{
+    colorground = Tic.COLORBIOMENIGHT,
+    screenx = 30,
+    screeny = 110,
+    lines = 2,
+    chars = 6,
+    marginsh = 1,
+    marginsv = 0,
+    small = true,
+    align = CWindowText.ALIGNRG,
+    drawguides = false,
+    drawborder = false,
+    drawframes = true,
+    texts = {"Wolfye", "Droye"},
+}
+
 
 --
 -- Drawing
@@ -2880,7 +3062,12 @@ function Tic:draw()
     WindowPortrait:draw()
     WindowStats:draw()
 
-    Tic:drawPlayerActual()
+    WindowTextL:draw()
+    WindowTextS1:draw()
+    WindowTextS2:draw()
+    WindowTextS3:draw()
+    
+    -- Tic:drawPlayerActual()
 
     -- WorldRegionTree0:drawBorderWorldWC()
     -- Tic:logAppend(WorldRegionTree0.name)
