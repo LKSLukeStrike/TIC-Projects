@@ -26,7 +26,7 @@ function Tables:keys(_table) -- keys of a table -- SORTED
     end
     table.sort(_result, function(_a, _b)
        if type(_a) == type(_b) then
-            if type(_a) == "table" then return false end -- /!\ dont sort tables, sort crash is same table
+            if type(_a) == "table" then return false end -- [!] dont sort tables, sort crash if same table
             return _a < _b
         end
         return tostring(_a) < tostring(_b)

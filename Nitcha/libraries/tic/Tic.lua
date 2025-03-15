@@ -654,7 +654,7 @@ CSprite.SCALE02 = 02
 CSprite.SCALE03 = 03
 CSprite.SCALE04 = 04
 CSprite.FRAMEOF = 16 -- sprites frames offset multiplier
-CSprite.FRAME00 = 00 -- sprites frames -- /!\ start at 0, used to compute the offset
+CSprite.FRAME00 = 00 -- sprites frames -- [!] start at 0, used to compute the offset
 CSprite.FRAME01 = 01
 CSprite.ROTATE000 = 0 -- sprite rotations
 CSprite.ROTATE090 = 1
@@ -740,7 +740,7 @@ CSpriteFG.HEADANGEL   = CSpriteFG.HEADBANK + 4
 CSpriteFG.HEADHORNE   = CSpriteFG.HEADBANK + 5
 CSpriteFG.HEADMEDUZ   = CSpriteFG.HEADBANK + 6
 CSpriteFG.HEADGNOLL   = CSpriteFG.HEADBANK + 7
-CSpriteFG.BODYBANK    = 400 -- characters bodies
+CSpriteFG.BODYBANK    = 288 -- characters bodies
 CSpriteFG.BODYHUMAN   = CSpriteFG.BODYBANK + 0 -- humanoid bodies
 CSpriteFG.BODYHUMANSTANDIDLE = CSpriteFG.BODYHUMAN + 0
 CSpriteFG.BODYHUMANSTANDWORK = CSpriteFG.BODYHUMAN + 1
@@ -808,33 +808,33 @@ end
 local CWindow = Classic:extend() -- general window for displaying stuff
 function CWindow:new(_argt)
     CWindow.super.new(self, _argt)
-    self.screenx = Tic.SCREENX -- positions
-    self.screeny = Tic.SCREENY
-    self.screenw = Tic.SCREENW -- sizes
-    self.screenh = Tic.SCREENH
-    self.cachest = 8 -- caches thickness
+    self.screenx     = Tic.SCREENX -- positions
+    self.screeny     = Tic.SCREENY
+    self.screenw     = Tic.SCREENW -- sizes
+    self.screenh     = Tic.SCREENH
+    self.cachest     = 8 -- caches thickness
     self.colorground = Tic.COLORHUDSCREEN
     self.colorguides = Tic.COLORGREYM
     self.colorcaches = Tic.COLORHUDSCREEN
     self.colorborder = Tic.COLORGREYM -- border color
     self.colorframe1 = Tic.COLORWHITE -- frames colors
     self.colorframe2 = Tic.COLORGREYL
-    self.drawground = true -- draw behevior
-    self.drawguides = true
-    self.drawcaches = true
-    self.drawborder = true
-    self.drawframes = true
-    self.drawinside = true
+    self.drawground  = true -- draw behevior
+    self.drawguides  = true
+    self.drawinside  = true
+    self.drawcaches  = true
+    self.drawborder  = true
+    self.drawframes  = true
     self:_argt(_argt) -- override if any
 end
 
 function CWindow:draw() -- window
     if self.drawground then self:drawGround() end
     if self.drawguides then self:drawGuides() end
+    if self.drawinside then self:drawInside() end
     if self.drawcaches then self:drawCaches() end
     if self.drawborder then self:drawBorder() end
     if self.drawframes then self:drawFrames() end
-    if self.drawinside then self:drawInside() end
 end
 
 function CWindow:drawGround() -- window ground
@@ -937,7 +937,48 @@ function CWindow:drawFrames() -- window double frames
 end
 
 function CWindow:drawInside() -- window content
-    Tic:trace("CWindow:drawInside()")
+end
+
+
+--
+-- CWindowScreen
+--
+local CWindowScreen = CWindow:extend() -- window screen
+function CWindowScreen:new(_argt)
+    CWindowScreen.super.new(self, _argt)
+    self.drawguides = false
+    self.drawcaches = false
+    self.drawframes = false
+    self:_argt(_argt) -- override if any
+end
+-- CWindowScreen instance
+local WindowScreen = CWindowScreen{}
+
+
+--
+-- CWindowWorld
+--
+local CWindowWorld = CWindow:extend() -- window world
+function CWindowWorld:new(_argt)
+    CWindowWorld.super.new(self, _argt)
+    self.screenx     = Tic.WORLDWX -- positions
+    self.screeny     = Tic.WORLDWY
+    self.screenw     = Tic.WORLDWW -- sizes
+    self.screenh     = Tic.WORLDWH
+    self.colorground = Tic.COLORBIOMENIGHT
+    self.drawguides  = false
+    self:_argt(_argt) -- override if any
+end
+-- CWindowWorld instance
+local WindowWorld = CWindowWorld{}
+
+function CWindowWorld:drawGround() -- window world ground
+    self.colorground = Tic:biomeActual()
+    CWindowWorld.super.drawGround(self)
+end
+
+function CWindowWorld:drawInside() -- window world content
+    -- TODO drawPlayer here
 end
 
 
@@ -950,23 +991,23 @@ CWindowInfos.ALIGNMD = "alignmd"
 CWindowInfos.ALIGNRG = "alignrg"
 function CWindowInfos:new(_argt)
     CWindowInfos.super.new(self, _argt)
-	self.lines = 2 -- number of lines
-	self.chars = 6 -- number of chars per lines
-	self.fixed = true -- TODO accept also not fixed fonts ?
-	self.scale = CSprite.SCALE01 -- TODO accept also other scales ?
-	self.small = true -- small fonts or large fonts
-	self.infos = {} -- lines content -- {info1, infoN,...}
-	self.align = CWindowInfos.ALIGNLF -- h alignment
-	self.marginsh = 1 -- h margins in px
-	self.marginsv = 0 -- v margins in px
-	self.linessep = 0 -- separator in px
-    self.shadow = false
-    self.colorinfofg = Tic.COLORWHITE
+	self.lines       = 2 -- number of lines
+	self.chars       = 6 -- number of chars per lines
+	self.fixed       = true -- TODO accept also not fixed fonts ?
+	self.scale       = CSprite.SCALE01 -- TODO accept also other scales ?
+	self.small       = true -- small fonts or large fonts
+	self.infos       = {} -- lines content -- {info1, infoN,...}
+	self.align       = CWindowInfos.ALIGNLF -- h alignment
+	self.marginsh    = 1 -- h margins in px
+	self.marginsv    = 0 -- v margins in px
+	self.linessep    = 0 -- separator in px
+    self.shadow      = false
+    self.colorinfofg = Tic.COLORGREYL
     self.colorinfobg = Tic.COLORGREYD -- for shadow
     self.colorground = Tic.COLORBIOMENIGHT
-    self.drawguides = false
-    self.drawcaches = false
-    self.drawborder = false
+    self.drawguides  = false
+    self.drawcaches  = false
+    self.drawborder  = false
     self:_argt(_argt) -- override if any
 	local _fontw = (self.small) and Tic.FONTWS or Tic.FONTWL
 	local _fonth = Tic.FONTH + 2
@@ -977,7 +1018,6 @@ function CWindowInfos:new(_argt)
 end
 
 function CWindowInfos:drawInside() -- window info content
-    Tic:trace("CWindowInfos:drawInside()")
 	local _fontw   = (self.small) and Tic.FONTWS or Tic.FONTWL
     local _offsetx = self.marginsh
     local _offsety = self.marginsv
@@ -1021,23 +1061,21 @@ end
 local CWindowInfosEntity = CWindowInfos:extend() -- window infos for entities
 function CWindowInfosEntity:new(_argt)
     CWindowInfosEntity.super.new(self, _argt)
-    self.lines = 2
-    self.chars = 6
-    self.small = true
-    self.align = CWindowInfos.ALIGNMD
+    self.lines  = 2
+    self.chars  = 6
+    self.small  = true
+    self.align  = CWindowInfos.ALIGNMD
     self.shadow = true
-    --self.drawborder = true
 	self.entity = nil -- override
     self:_argt(_argt) -- override if any
 end
 
 function CWindowInfosEntity:drawInside() -- window infos content for entities
-    Tic:trace("CWindowInfosEntity:drawInside()")
     if not self.entity then return end -- mandatory
     local _info1 = self.entity.name or ""
     local _info2 = self.entity.kind or ""
 	self.infos = {_info1, _info2}
-    self.super.drawInside(self)
+    CWindowInfosEntity.super.drawInside(self)
 end
 
 
@@ -1049,62 +1087,16 @@ function CWindowInfosPlayer:new(_argt)
     CWindowInfosPlayer.super.new(self, _argt)
     self.screenx = Tic.INFOSWX
     self.screeny = Tic.INFOSWY
-	self.entity = Tic:playerActual()
+	self.entity  = Tic:playerActual()
     self:_argt(_argt) -- override if any
 end
 
 function CWindowInfosPlayer:drawInside() -- window infos content for player
-    Tic:trace("CWindowInfosPlayer:drawInside()")
 	self.entity = Tic:playerActual()
-    self.super.drawInside(self)
+    CWindowInfosPlayer.super.drawInside(self)
 end
-
-
---
--- CWindowScreen
---
-local CWindowScreen = CWindow:extend() -- window screen
-function CWindowScreen:new(_argt)
-    CWindowScreen.super.new(self, _argt)
-    self:_argt(_argt) -- override if any
-end
--- CWindowScreen instance
-local WindowScreen = CWindowScreen{}
-
-function CWindowScreen:draw() -- window screen
-    self:drawGround()
-    self:drawBorder()
-end
-
-
---
--- CWindowWorld
---
-local CWindowWorld = CWindow:extend() -- window world
-function CWindowWorld:new(_argt)
-    CWindowWorld.super.new(self, _argt)
-    self.screenx = Tic.WORLDWX -- positions
-    self.screeny = Tic.WORLDWY
-    self.screenw = Tic.WORLDWW -- sizes
-    self.screenh = Tic.WORLDWH
-    self.colorground = Tic.COLORBIOMENIGHT
-    self:_argt(_argt) -- override if any
-end
--- CWindowWorld instance
-local WindowWorld = CWindowWorld{}
-
-function CWindowWorld:draw() -- window world
-    self:drawGround()
-    -- TODO drawPlayer here
-    self:drawCaches()
-    self:drawBorder()
-    self:drawFrames()
-end
-
-function CWindowWorld:drawGround() -- window world ground
-    self.colorground = Tic:biomeActual()
-    CWindowWorld.super.drawGround(self)
-end
+-- CWindowInfosPlayer instance
+local WindowInfosPlayer = CWindowInfosPlayer{}
 
 
 --
@@ -1113,21 +1105,13 @@ end
 local CWindowPortrait = CWindow:extend() -- window portrait
 function CWindowPortrait:new(_argt)
     CWindowPortrait.super.new(self, _argt)
-    self.screenx = Tic.PORTRAITWX -- positions
-    self.screeny = Tic.PORTRAITWY
-    self.screenw = Tic.PORTRAITWW -- sizes
-    self.screenh = Tic.PORTRAITWH
-    self.idle    = false -- idle or animated portrait
+    self.screenw     = Tic.PORTRAITWW
+    self.screenh     = Tic.PORTRAITWH
     self.colorground = Tic.COLORBIOMENIGHT
+    self.drawguides  = false
+    self.drawcaches  = false
+    self.drawborder  = false
     self:_argt(_argt) -- override if any
-end
--- CWindowPortrait instance
-local WindowPortrait = CWindowPortrait{}
-
-function CWindowPortrait:draw() -- window portrait
-    self:drawGround()
-    self:drawFrames()
-    self:drawPlayer()
 end
 
 function CWindowPortrait:drawGround() -- window portrait ground
@@ -1135,21 +1119,53 @@ function CWindowPortrait:drawGround() -- window portrait ground
     CWindowPortrait.super.drawGround(self)
 end
 
-function CWindowPortrait:drawPlayer() -- actual player portrait
-    local _playeractual = Tic:playerActual()
-    _playeractual:_save{"screenx", "screeny", "scale", "dirx", "diry", "state", "frame",}
-    _playeractual.screenx = self.screenx -- force character attributes
-    _playeractual.screeny = self.screeny
-    _playeractual.scale   = CSprite.SCALE02
-    if self.idle then
-        _playeractual.dirx  = Tic.DIRXLF
-        _playeractual.diry  = Tic.DIRYMD
-        _playeractual.state = Tic.STATESTANDIDLE
-        _playeractual.frame = CSprite.FRAME00
-    end
-    _playeractual:draw()
-    _playeractual:_load()
+
+--
+-- CWindowPortraitDrawable
+--
+local CWindowPortraitDrawable = CWindowPortrait:extend() -- window portrait for -- [!] drawable entities
+function CWindowPortraitDrawable:new(_argt)
+    CWindowPortraitDrawable.super.new(self, _argt)
+    self.idle   = false -- idle portait or not
+	self.entity = nil -- override
+    self:_argt(_argt) -- override if any
 end
+
+function CWindowPortraitDrawable:drawInside() -- window portrait content for -- [!] drawable entities
+    if not self.entity then return end -- mandatory
+    self.entity:_save{"screenx", "screeny", "scale", "dirx", "frame", "animations"}
+    self.entity.screenx = self.screenx -- force character attributes
+    self.entity.screeny = self.screeny
+    self.entity.scale   = CSprite.SCALE02
+    if self.idle then
+        self.entity.dirx       = Tic.DIRXLF
+        self.entity.frame      = CSprite.FRAME00
+        self.entity.animations = {}
+    end
+    self.entity:draw()
+    self.entity:_load()
+    CWindowPortraitDrawable.super.drawInside(self)
+end
+
+
+--
+-- CWindowPortraitPlayer
+--
+local CWindowPortraitPlayer = CWindowPortraitDrawable:extend() -- window portrait for player
+function CWindowPortraitPlayer:new(_argt)
+    CWindowPortraitPlayer.super.new(self, _argt)
+    self.screenx = Tic.PORTRAITWX
+    self.screeny = Tic.PORTRAITWY
+	self.entity  = Tic:playerActual()
+    self:_argt(_argt) -- override if any
+end
+
+function CWindowPortraitPlayer:drawInside() -- window portrait content for player
+	self.entity = Tic:playerActual()
+    CWindowPortraitPlayer.super.drawInside(self)
+end
+-- CWindowPortraitPlayer instance
+local WindowPortraitPlayer = CWindowPortraitPlayer{}
 
 
 --
@@ -1171,8 +1187,6 @@ function CWindowStats:new(_argt)
     self.colorlesser = Tic.COLORGREYL -- if the act stat is lesser than the max stat
     self:_argt(_argt) -- override if any
 end
--- CWindowStats instance
-local WindowStats = CWindowStats{}
 
 function CWindowStats:draw() -- window stats
     self:drawGround()
@@ -1249,6 +1263,8 @@ function CWindowStats:drawPlayer() -- actual player stats
         (_playeractual.statpsyact >= _playeractual.statpsymax) and self.colorborder or self.colorlesser
     )
 end
+-- CWindowStats instance
+local WindowStatsPlayer = CWindowStats{}
 
 
 --
@@ -1327,7 +1343,7 @@ function CLocations:new(_argt)
     self:_argt(_argt) -- override if any
 end
 
-function CLocations:append(_entity) -- add a new entity -- /!\ allows doublons
+function CLocations:append(_entity) -- add a new entity -- [!] allows doublons
     if not _entity then return end -- mandatory
     local _worldx = _entity.worldx
     local _worldy = _entity.worldy
@@ -1655,11 +1671,13 @@ function CEntityDrawable:new(_argt)
     CEntityDrawable.super.new(self, _argt)
     self.kind = CEntity.KINDDRAWABLE
     self.name = CEntity.NAMEDRAWABLE
-    self.sprite  = CSpriteBG.SPRITEEMPTY
-    self.screenx = 0 -- screen positions -- used to draw the sprite
-    self.screeny = 0
-    self.dirx    = Nums:random01() -- random flip lf/rg
-    self.solid   = true -- can be traversed or not
+    self.sprite     = CSpriteBG.SPRITEEMPTY
+    self.screenx    = 0 -- screen positions -- used to draw the sprite
+    self.screeny    = 0
+    self.dirx       = Nums:random01() -- random flip lf/rg
+    self.scale      = CSprite.SCALE01
+    self.animations = nil -- override if any
+    self.solid      = true -- can be traversed or not
     self:_argt(_argt) -- override if any
     self.world:entityAppend(self) -- append itself to the world
 end
@@ -1685,9 +1703,10 @@ function CEntityDrawable:draw() -- default draw for drawable entities -- overrid
     _musprite.sprite  = self.sprite
     _musprite.screenx = self.screenx
     _musprite.screeny = self.screeny
-    _musprite.palette = _palette
     _musprite.flip    = self.dirx
-    _musprite:draw() -- display centered in the world window
+    _musprite.scale   = self.scale
+    _musprite.palette = _palette
+    _musprite:draw()
 end
 
 
@@ -2343,7 +2362,7 @@ function CCharacter:draw()
     -- self:_drawWeapon()
     -- self:_drawShield()
     self:_drawBody()
-    -- self:_drawHead()
+    self:_drawHead()
 end
 
 function CCharacter:_drawStatus()
@@ -2367,7 +2386,7 @@ function CCharacter:_drawStatus()
     _musprite.flip    = self.dirx
     _musprite.scale   = self.scale
     _musprite:palettize(_palette)
-    _musprite:draw() -- display centered in the world window
+    _musprite:draw()
 end
 
 function CCharacter:_drawWeapon()
@@ -2535,7 +2554,7 @@ function CCharacterHumanoid:_drawBody()
         [Tic.COLORPANTS] = self.colorpants,
         [Tic.COLORHANDS] = self.colorhands,
     }
-    _musprite:draw() -- display centered in the world window
+    _musprite:draw()
 end
 
 function CCharacterHumanoid:_drawHead()
@@ -2567,7 +2586,7 @@ function CCharacterHumanoid:_drawHead()
         [Tic.COLOREXTRA]   = self.colorextra,
         [Tic.COLORSKIN]    = self.colorskin,
     }
-    _musprite:draw() -- display centered in the world window
+    _musprite:draw()
 
     -- draw eyes
     local _coloreyesfg   = self.coloreyesfg
@@ -2596,7 +2615,7 @@ function CCharacterHumanoid:_drawHead()
         [Tic.COLOREYESBGMD] = _coloreyesbgmd,
         [Tic.COLOREYESBGDW] = _coloreyesbgdw,
     }
-    _musprite:draw() -- display centered in the world window
+    _musprite:draw()
 end
 
 
@@ -3047,21 +3066,13 @@ local Region = CRegion{
 }
 
 --
--- Window Text -- TESTING
+-- Windows -- TESTING
 --
-local WindowInfosL = CWindowInfos{
-    screenx = 30,
-    screeny = 10,
-    lines = 2,
-    chars = 6,
-    marginsh = 10,
-    marginsv = 2,
-    small = false,
-    align = CWindowInfos.ALIGNMD,
-    infos = {"Wolfye", "Dwarf"},
-}
-local WindowInfosS = CWindowInfosPlayer{
-    entity = Nitcha,
+local TreeTest = CPlaceTree0Anim{}
+local WindowTest = CWindowPortraitDrawable{
+    screenx = 10,
+    screeny = 18,
+    entity = TreeTest,
 }
 
 
@@ -3074,13 +3085,10 @@ function Tic:draw()
 
     WindowScreen:draw()
     WindowWorld:draw()
-    WindowPortrait:draw()
-    WindowStats:draw()
-    WindowInfosS:draw()
-    Tic:logAppend(WindowInfosS.screenx or "?")
-    Tic:logAppend(WindowInfosS.screeny or "?")
-    Tic:logAppend(WindowInfosS.screenw or "?")
-    Tic:logAppend(WindowInfosS.screenh or "?")
+    WindowInfosPlayer:draw()
+    WindowPortraitPlayer:draw()
+    WindowTest:draw()
+    WindowStatsPlayer:draw()
 
     -- Tic:drawPlayerActual()
 
@@ -3100,7 +3108,7 @@ function Tic:draw()
     -- Tic:logAppend(Tic.SCREENH)
     Tic:logPrint()
 
-    Tic:tick() -- /!\ required in the draw function 
+    Tic:tick() -- [!] required in the draw function 
 end
 
 
