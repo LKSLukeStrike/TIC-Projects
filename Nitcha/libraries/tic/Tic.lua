@@ -937,6 +937,7 @@ function CWindow:drawFrames() -- window double frames
 end
 
 function CWindow:drawInside() -- window content
+    Tic:trace("CWindow:drawInside()")
 end
 
 
@@ -949,11 +950,11 @@ CWindowInfos.ALIGNMD = "alignmd"
 CWindowInfos.ALIGNRG = "alignrg"
 function CWindowInfos:new(_argt)
     CWindowInfos.super.new(self, _argt)
-	self.lines = 1 -- number of lines
-	self.chars = 8 -- number of chars per lines
+	self.lines = 2 -- number of lines
+	self.chars = 6 -- number of chars per lines
 	self.fixed = true -- TODO accept also not fixed fonts ?
 	self.scale = CSprite.SCALE01 -- TODO accept also other scales ?
-	self.small = false -- small fonts or large fonts
+	self.small = true -- small fonts or large fonts
 	self.infos = {} -- lines content -- {info1, infoN,...}
 	self.align = CWindowInfos.ALIGNLF -- h alignment
 	self.marginsh = 1 -- h margins in px
@@ -967,7 +968,6 @@ function CWindowInfos:new(_argt)
     self.drawcaches = false
     self.drawborder = false
     self:_argt(_argt) -- override if any
-	-- TODO separate _argt ?
 	local _fontw = (self.small) and Tic.FONTWS or Tic.FONTWL
 	local _fonth = Tic.FONTH + 2
 	local _seppx = math.min(0, self.lines - 1) * self.linessep
@@ -977,6 +977,7 @@ function CWindowInfos:new(_argt)
 end
 
 function CWindowInfos:drawInside() -- window info content
+    Tic:trace("CWindowInfos:drawInside()")
 	local _fontw   = (self.small) and Tic.FONTWS or Tic.FONTWL
     local _offsetx = self.marginsh
     local _offsety = self.marginsv
@@ -1031,10 +1032,30 @@ function CWindowInfosEntity:new(_argt)
 end
 
 function CWindowInfosEntity:drawInside() -- window infos content for entities
+    Tic:trace("CWindowInfosEntity:drawInside()")
     if not self.entity then return end -- mandatory
     local _info1 = self.entity.name or ""
     local _info2 = self.entity.kind or ""
 	self.infos = {_info1, _info2}
+    self.super.drawInside(self)
+end
+
+
+--
+-- CWindowInfosPlayer
+--
+local CWindowInfosPlayer = CWindowInfosEntity:extend() -- window infos for player
+function CWindowInfosPlayer:new(_argt)
+    CWindowInfosPlayer.super.new(self, _argt)
+    self.screenx = Tic.INFOSWX
+    self.screeny = Tic.INFOSWY
+	self.entity = Tic:playerActual()
+    self:_argt(_argt) -- override if any
+end
+
+function CWindowInfosPlayer:drawInside() -- window infos content for player
+    Tic:trace("CWindowInfosPlayer:drawInside()")
+	self.entity = Tic:playerActual()
     self.super.drawInside(self)
 end
 
@@ -3039,10 +3060,8 @@ local WindowInfosL = CWindowInfos{
     align = CWindowInfos.ALIGNMD,
     infos = {"Wolfye", "Dwarf"},
 }
-local WindowInfosS = CWindowInfosEntity{
-    screenx = Tic.INFOSWX,
-    screeny = Tic.INFOSWY,
-    infos = {"Wolfye", "Droye"},
+local WindowInfosS = CWindowInfosPlayer{
+    entity = Nitcha,
 }
 
 
@@ -3058,8 +3077,10 @@ function Tic:draw()
     WindowPortrait:draw()
     WindowStats:draw()
     WindowInfosS:draw()
-    Tic:logAppend(WindowInfosS.screenw)
-    Tic:logAppend(WindowInfosS.screenh)
+    Tic:logAppend(WindowInfosS.screenx or "?")
+    Tic:logAppend(WindowInfosS.screeny or "?")
+    Tic:logAppend(WindowInfosS.screenw or "?")
+    Tic:logAppend(WindowInfosS.screenh or "?")
 
     -- Tic:drawPlayerActual()
 
