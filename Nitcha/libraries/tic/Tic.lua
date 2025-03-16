@@ -1146,7 +1146,6 @@ function CWindowPortraitDrawable:drawInside() -- window portrait content for -- 
     end
     self.entity:draw()
     self.entity:_load()
-    CWindowPortraitDrawable.super.drawInside(self)
 end
 
 
@@ -1190,11 +1189,20 @@ function CWindowStats:new(_argt)
     self:_argt(_argt) -- override if any
 end
 
-function CWindowStats:drawPlayer() -- actual player stats
-    local _playeractual = Tic:playerActual()
-    if self.border then
-        self:drawBorder()
-    end
+
+--
+-- CWindowStatsCharacter
+--
+local CWindowStatsCharacter = CWindowStats:extend() -- window portrait for -- [!] characters
+function CWindowStatsCharacter:new(_argt)
+    CWindowStatsCharacter.super.new(self, _argt)
+	self.entity = nil -- override
+    self:_argt(_argt) -- override if any
+end
+
+function CWindowStatsCharacter:drawInside() -- window portrait content for -- [!] characters
+    if not self.entity then return end -- mandatory
+    -- if not self.entity:is(CCharacter) then return end -- mandatory -- FIXME declare after CCharacter
     rectb( -- phy bar border
         self.screenx + 01,
         self.screeny + 02,
@@ -1218,49 +1226,67 @@ function CWindowStats:drawPlayer() -- actual player stats
     )
     rect ( -- phy act bar
         self.screenx + 02,
-        self.screeny + 02 + Tic.STATSMAX - _playeractual.statphyact + 1,
+        self.screeny + 02 + Tic.STATSMAX - self.entity.statphyact + 1,
         02,
-        _playeractual.statphyact,
+        self.entity.statphyact,
         self.colorphyact
     )
     rect ( -- men act bar
         self.screenx + 07,
-        self.screeny + 02 + Tic.STATSMAX - _playeractual.statmenact + 1,
+        self.screeny + 02 + Tic.STATSMAX - self.entity.statmenact + 1,
         02,
-        _playeractual.statmenact,
+        self.entity.statmenact,
         self.colormenact
     )
     rect ( -- psy act bar
         self.screenx + 12,
-        self.screeny + 02 + Tic.STATSMAX - _playeractual.statpsyact + 1,
+        self.screeny + 02 + Tic.STATSMAX - self.entity.statpsyact + 1,
         02,
-        _playeractual.statpsyact,
+        self.entity.statpsyact,
         self.colorpsyact
     )
     rectb( -- phy max line
         self.screenx + 02,
-        self.screeny + 03 + Tic.STATSMAX - _playeractual.statphymax,
+        self.screeny + 03 + Tic.STATSMAX - self.entity.statphymax,
         02,
         01,
-        (_playeractual.statphyact >= _playeractual.statphymax) and self.colorborder or self.colorlesser
+        (self.entity.statphyact >= self.entity.statphymax) and self.colorborder or self.colorlesser
     )
     rectb( -- men max line
         self.screenx + 07,
-        self.screeny + 03 + Tic.STATSMAX - _playeractual.statmenmax,
+        self.screeny + 03 + Tic.STATSMAX - self.entity.statmenmax,
         02,
         01,
-        (_playeractual.statmenact >= _playeractual.statmenmax) and self.colorborder or self.colorlesser
+        (self.entity.statmenact >= self.entity.statmenmax) and self.colorborder or self.colorlesser
     )
     rectb( -- psy max line
         self.screenx + 12,
-        self.screeny + 03 + Tic.STATSMAX - _playeractual.statpsymax,
+        self.screeny + 03 + Tic.STATSMAX - self.entity.statpsymax,
         02,
         01,
-        (_playeractual.statpsyact >= _playeractual.statpsymax) and self.colorborder or self.colorlesser
+        (self.entity.statpsyact >= self.entity.statpsymax) and self.colorborder or self.colorlesser
     )
 end
--- CWindowStats instance
-local WindowStatsPlayer = CWindowStats{}
+
+
+--
+-- CWindowStatsPlayer
+--
+local CWindowStatsPlayer = CWindowStatsCharacter:extend() -- window stats for player
+function CWindowStatsPlayer:new(_argt)
+    CWindowStatsPlayer.super.new(self, _argt)
+    self.screenx = Tic.STATSWX
+    self.screeny = Tic.STATSWY
+	self.entity  = Tic:playerActual()
+    self:_argt(_argt) -- override if any
+end
+
+function CWindowStatsPlayer:drawInside() -- window stats content for player
+	self.entity = Tic:playerActual()
+    CWindowStatsPlayer.super.drawInside(self)
+end
+-- CWindowStatsPlayer instance
+local WindowStatsPlayer = CWindowStatsPlayer{}
 
 
 --
@@ -3065,10 +3091,15 @@ local Region = CRegion{
 -- Windows -- TESTING
 --
 local TreeTest = CPlaceTree0Anim{}
-local WindowTest = CWindowPortraitDrawable{
+local WindowTest1 = CWindowPortraitDrawable{
     screenx = 10,
     screeny = 18,
     entity = TreeTest,
+}
+local WindowTest2 = CWindowStatsCharacter{
+    screenx = 10,
+    screeny = 44,
+    entity = Nitcha,
 }
 
 
@@ -3083,8 +3114,10 @@ function Tic:draw()
     WindowWorld:draw()
     WindowInfosPlayer:draw()
     WindowPortraitPlayer:draw()
-    WindowTest:draw()
-    -- WindowStatsPlayer:draw()
+    WindowStatsPlayer:draw()
+
+    WindowTest1:draw()
+    WindowTest2:draw()
 
     -- Tic:drawPlayerActual()
 
