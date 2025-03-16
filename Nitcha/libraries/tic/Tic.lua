@@ -803,493 +803,6 @@ end
 
 
 --
--- CWindow
---
-local CWindow = Classic:extend() -- general window for displaying stuff
-function CWindow:new(_argt)
-    CWindow.super.new(self, _argt)
-    self.screenx     = Tic.SCREENX -- positions
-    self.screeny     = Tic.SCREENY
-    self.screenw     = Tic.SCREENW -- sizes
-    self.screenh     = Tic.SCREENH
-    self.cachest     = 8 -- caches thickness
-    self.colorground = Tic.COLORHUDSCREEN
-    self.colorguides = Tic.COLORGREYM
-    self.colorcaches = Tic.COLORHUDSCREEN
-    self.colorborder = Tic.COLORGREYM -- border color
-    self.colorframe1 = Tic.COLORWHITE -- frames colors
-    self.colorframe2 = Tic.COLORGREYL
-    self.drawground  = true -- draw behevior
-    self.drawguides  = true
-    self.drawinside  = true
-    self.drawcaches  = true
-    self.drawborder  = true
-    self.drawframes  = true
-    self:_argt(_argt) -- override if any
-end
-
-function CWindow:draw() -- window
-    if self.drawground then self:drawGround() end
-    if self.drawguides then self:drawGuides() end
-    if self.drawinside then self:drawInside() end
-    if self.drawcaches then self:drawCaches() end
-    if self.drawborder then self:drawBorder() end
-    if self.drawframes then self:drawFrames() end
-end
-
-function CWindow:drawGround() -- window ground
-    rect(
-        self.screenx,
-        self.screeny,
-        self.screenw,
-        self.screenh,
-        self.colorground
-    )
-end
-
-function CWindow:drawGuides() -- window guides -- FIXME still not working -- use ratio w h ?
-    rect( -- hline md
-		self.screenx,
-		self.screeny + ((Nums:isEven(self.screenh)) and (self.screenh // 2) - 1 or (self.screenh // 2)),
-        self.screenw,
-		(Nums:isEven(self.screenh)) and 2 or 1,
-        self.colorguides
-    )
-    rect( -- vline md
-		self.screenx + ((Nums:isEven(self.screenw)) and (self.screenw // 2) - 1 or (self.screenw // 2)),
-		self.screeny,
-        (Nums:isEven(self.screenw)) and 2 or 1,
-		self.screenh,
-        self.colorguides
-    )
-    line( -- diag up lf - dw rg
-		self.screenx,
-		self.screeny,
-        self.screenx + self.screenw - 1,
-		self.screeny + self.screenh - 1,
-        self.colorguides
-    )
-    line( -- diag dw lf - up rg
-		self.screenx,
-		self.screeny + self.screenh - 1,
-        self.screenx + self.screenw - 1,
-		self.screeny,
-        self.colorguides
-    )
-end
-
-function CWindow:drawCaches() -- window caches
-    rect( -- lf cache
-		self.screenx - self.cachest,
-		self.screeny,
-        self.cachest,
-		self.screenh,
-        self.colorcaches
-    )
-    rect( -- rg cache
-		self.screenx + self.screenw,
-		self.screeny,
-        self.cachest,
-		self.screenh,
-        self.colorcaches
-    )
-    rect( -- up cache
-		self.screenx - self.cachest,
-		self.screeny - self.cachest,
-        self.screenw + (self.cachest * 2),
-		self.cachest,
-        self.colorcaches
-    )
-    rect( -- dw cache
-		self.screenx - self.cachest,
-		self.screeny + self.screenh,
-        self.screenw + (self.cachest * 2),
-		self.cachest,
-        self.colorcaches
-    )
-end
-
-function CWindow:drawBorder() -- window single border
-    rectb(
-        self.screenx,
-        self.screeny,
-        self.screenw,
-        self.screenh,
-        self.colorborder
-    )
-end
-
-function CWindow:drawFrames() -- window double frames
-    rectb( -- bg frame
-        self.screenx - 2,
-        self.screeny - 2,
-        self.screenw + 5,
-        self.screenh + 5,
-        self.colorframe2
-    )
-    rectb( -- fg frame
-        self.screenx - 3,
-        self.screeny - 3,
-        self.screenw + 5,
-        self.screenh + 5,
-        self.colorframe1
-    )
-end
-
-function CWindow:drawInside() -- window content
-end
-
-
---
--- CWindowScreen
---
-local CWindowScreen = CWindow:extend() -- window screen
-function CWindowScreen:new(_argt)
-    CWindowScreen.super.new(self, _argt)
-    self.drawguides = false
-    self.drawcaches = false
-    self.drawframes = false
-    self:_argt(_argt) -- override if any
-end
--- CWindowScreen instance
-local WindowScreen = CWindowScreen{}
-
-
---
--- CWindowWorld
---
-local CWindowWorld = CWindow:extend() -- window world
-function CWindowWorld:new(_argt)
-    CWindowWorld.super.new(self, _argt)
-    self.screenx     = Tic.WORLDWX -- positions
-    self.screeny     = Tic.WORLDWY
-    self.screenw     = Tic.WORLDWW -- sizes
-    self.screenh     = Tic.WORLDWH
-    self.colorground = Tic.COLORBIOMENIGHT
-    self.drawguides  = false
-    self:_argt(_argt) -- override if any
-end
--- CWindowWorld instance
-local WindowWorld = CWindowWorld{}
-
-function CWindowWorld:drawGround() -- window world ground
-    self.colorground = Tic:biomeActual()
-    CWindowWorld.super.drawGround(self)
-end
-
-function CWindowWorld:drawInside() -- window world content
-    -- TODO drawPlayer here
-end
-
-
---
--- CWindowInfos
---
-local CWindowInfos = CWindow:extend() -- window infos
-CWindowInfos.ALIGNLF = "alignlf"
-CWindowInfos.ALIGNMD = "alignmd"
-CWindowInfos.ALIGNRG = "alignrg"
-function CWindowInfos:new(_argt)
-    CWindowInfos.super.new(self, _argt)
-	self.lines       = 2 -- number of lines
-	self.chars       = 6 -- number of chars per lines
-	self.fixed       = true -- TODO accept also not fixed fonts ?
-	self.scale       = CSprite.SCALE01 -- TODO accept also other scales ?
-	self.small       = true -- small fonts or large fonts
-	self.infos       = {} -- lines content -- {info1, infoN,...}
-	self.align       = CWindowInfos.ALIGNLF -- h alignment
-	self.marginsh    = 1 -- h margins in px
-	self.marginsv    = 0 -- v margins in px
-	self.linessep    = 0 -- separator in px
-    self.shadow      = false
-    self.colorinfofg = Tic.COLORGREYL
-    self.colorinfobg = Tic.COLORGREYD -- for shadow
-    self.colorground = Tic.COLORBIOMENIGHT
-    self.drawguides  = false
-    self.drawcaches  = false
-    self.drawborder  = false
-    self:_argt(_argt) -- override if any
-	local _fontw = (self.small) and Tic.FONTWS or Tic.FONTWL
-	local _fonth = Tic.FONTH + 2
-	local _seppx = math.min(0, self.lines - 1) * self.linessep
-	self.screenw = (self.chars * _fontw) + (self.marginsh * 2)
-	self.screenh = (self.lines * _fonth) + (self.marginsv * 2) + _seppx
-	return self.screenw, self.screenh
-end
-
-function CWindowInfos:drawInside() -- window info content
-	local _fontw   = (self.small) and Tic.FONTWS or Tic.FONTWL
-    local _offsetx = self.marginsh
-    local _offsety = self.marginsv
-	for _line = 1, self.lines do -- draw each line
-        local _info = self.infos[_line] or ""
-        local _size = string.len(_info) * _fontw
-        _offsetx = (self.align == CWindowInfos.ALIGNMD)
-            and (self.screenw - _size) // 2
-            or  _offsetx
-        _offsetx = (self.align == CWindowInfos.ALIGNRG)
-            and self.screenw - self.marginsh - _size + 1
-            or  _offsetx
-		if self.shadow then
-			print(
-				_info,
-				self.screenx + _offsetx + 1,
-				self.screeny + _offsety + 2, -- y offset font in each line
-				self.colorinfobg,
-				self.fixed,
-				self.scale,
-				self.small
-			)
-		end
-		print(
-			_info,
-			self.screenx + _offsetx,
-			self.screeny + _offsety + 1, -- y offset font in each line
-			self.colorinfofg,
-			self.fixed,
-			self.scale,
-			self.small
-		)
-		_offsety = _offsety + Tic.FONTH + 2 + self.linessep
-	end
-end
-
-
---
--- CWindowInfosEntity
---
-local CWindowInfosEntity = CWindowInfos:extend() -- window infos for entities
-function CWindowInfosEntity:new(_argt)
-    CWindowInfosEntity.super.new(self, _argt)
-    self.lines  = 2
-    self.chars  = 6
-    self.small  = true
-    self.align  = CWindowInfos.ALIGNMD
-    self.shadow = true
-	self.entity = nil -- override
-    self:_argt(_argt) -- override if any
-end
-
-function CWindowInfosEntity:drawInside() -- window infos content for entities
-    if not self.entity then return end -- mandatory
-    -- if not self.entity:is(CEntity) then return end -- mandatory -- FIXME declare after CEntity
-    local _info1 = self.entity.name or ""
-    local _info2 = self.entity.kind or ""
-	self.infos = {_info1, _info2}
-    CWindowInfosEntity.super.drawInside(self)
-end
-
-
---
--- CWindowInfosPlayer
---
-local CWindowInfosPlayer = CWindowInfosEntity:extend() -- window infos for player
-function CWindowInfosPlayer:new(_argt)
-    CWindowInfosPlayer.super.new(self, _argt)
-    self.screenx = Tic.INFOSWX
-    self.screeny = Tic.INFOSWY
-	self.entity  = Tic:playerActual()
-    self:_argt(_argt) -- override if any
-end
-
-function CWindowInfosPlayer:drawInside() -- window infos content for player
-	self.entity = Tic:playerActual()
-    CWindowInfosPlayer.super.drawInside(self)
-end
--- CWindowInfosPlayer instance
-local WindowInfosPlayer = CWindowInfosPlayer{}
-
-
---
--- CWindowPortrait
---
-local CWindowPortrait = CWindow:extend() -- window portrait
-function CWindowPortrait:new(_argt)
-    CWindowPortrait.super.new(self, _argt)
-    self.screenw     = Tic.PORTRAITWW -- sizes
-    self.screenh     = Tic.PORTRAITWH
-    self.cachest     = 4 -- caches thickness
-    self.colorground = Tic.COLORBIOMENIGHT
-    self.drawguides  = false
-    self.drawborder  = false
-    self:_argt(_argt) -- override if any
-end
-
-function CWindowPortrait:drawGround() -- window portrait ground
-    self.colorground = Tic:biomeActual()
-    CWindowPortrait.super.drawGround(self)
-end
-
-
---
--- CWindowPortraitDrawable
---
-local CWindowPortraitDrawable = CWindowPortrait:extend() -- window portrait for -- [!] drawable entities
-function CWindowPortraitDrawable:new(_argt)
-    CWindowPortraitDrawable.super.new(self, _argt)
-    self.idle   = false -- idle portait or not
-	self.entity = nil -- override
-    self:_argt(_argt) -- override if any
-end
-
-function CWindowPortraitDrawable:drawInside() -- window portrait content for -- [!] drawable entities
-    if not self.entity then return end -- mandatory
-    -- if not self.entity:is(CEntityDrawable) then return end -- mandatory -- FIXME declare after CEntity
-    self.entity:_save{"screenx", "screeny", "scale", "dirx", "frame", "animations"}
-    self.entity.screenx = self.screenx -- force character attributes
-    self.entity.screeny = self.screeny
-    self.entity.scale   = CSprite.SCALE02
-    if self.idle then
-        self.entity.dirx       = Tic.DIRXLF
-        self.entity.frame      = CSprite.FRAME00
-        self.entity.animations = {}
-    end
-    self.entity:draw()
-    self.entity:_load()
-end
-
-
---
--- CWindowPortraitPlayer
---
-local CWindowPortraitPlayer = CWindowPortraitDrawable:extend() -- window portrait for player
-function CWindowPortraitPlayer:new(_argt)
-    CWindowPortraitPlayer.super.new(self, _argt)
-    self.screenx = Tic.PORTRAITWX
-    self.screeny = Tic.PORTRAITWY
-	self.entity  = Tic:playerActual()
-    self:_argt(_argt) -- override if any
-end
-
-function CWindowPortraitPlayer:drawInside() -- window portrait content for player
-	self.entity = Tic:playerActual()
-    CWindowPortraitPlayer.super.drawInside(self)
-end
--- CWindowPortraitPlayer instance
-local WindowPortraitPlayer = CWindowPortraitPlayer{}
-
-
---
--- CWindowStats
---
-local CWindowStats = CWindow:extend() -- window stats
-function CWindowStats:new(_argt)
-    CWindowStats.super.new(self, _argt)
-    self.screenw     = Tic.STATSWW -- sizes
-    self.screenh     = Tic.STATSWH
-    self.colorground = Tic.COLORBIOMENIGHT
-    self.colorborder = Tic.COLORWHITE
-    self.colorphyact = Tic.COLORRED -- stats colors
-    self.colormenact = Tic.COLORGREENM
-    self.colorpsyact = Tic.COLORBLUEM
-    self.colorlesser = Tic.COLORGREYL -- if the act stat is lesser than the max stat
-    self.drawguides  = false
-    self.drawcaches  = false
-    self.drawborder  = false
-    self:_argt(_argt) -- override if any
-end
-
-
---
--- CWindowStatsCharacter
---
-local CWindowStatsCharacter = CWindowStats:extend() -- window portrait for -- [!] characters
-function CWindowStatsCharacter:new(_argt)
-    CWindowStatsCharacter.super.new(self, _argt)
-	self.entity = nil -- override
-    self:_argt(_argt) -- override if any
-end
-
-function CWindowStatsCharacter:drawInside() -- window portrait content for -- [!] characters
-    if not self.entity then return end -- mandatory
-    -- if not self.entity:is(CCharacter) then return end -- mandatory -- FIXME declare after CCharacter
-    rectb( -- phy bar border
-        self.screenx + 01,
-        self.screeny + 02,
-        04,
-        12,
-        self.colorborder
-    )
-    rectb( -- men bar border
-        self.screenx + 06,
-        self.screeny + 02,
-        04,
-        12,
-        self.colorborder
-    )
-    rectb( -- psy bar border
-        self.screenx + 11,
-        self.screeny + 02,
-        04,
-        12,
-        self.colorborder
-    )
-    rect ( -- phy act bar
-        self.screenx + 02,
-        self.screeny + 02 + Tic.STATSMAX - self.entity.statphyact + 1,
-        02,
-        self.entity.statphyact,
-        self.colorphyact
-    )
-    rect ( -- men act bar
-        self.screenx + 07,
-        self.screeny + 02 + Tic.STATSMAX - self.entity.statmenact + 1,
-        02,
-        self.entity.statmenact,
-        self.colormenact
-    )
-    rect ( -- psy act bar
-        self.screenx + 12,
-        self.screeny + 02 + Tic.STATSMAX - self.entity.statpsyact + 1,
-        02,
-        self.entity.statpsyact,
-        self.colorpsyact
-    )
-    rectb( -- phy max line
-        self.screenx + 02,
-        self.screeny + 03 + Tic.STATSMAX - self.entity.statphymax,
-        02,
-        01,
-        (self.entity.statphyact >= self.entity.statphymax) and self.colorborder or self.colorlesser
-    )
-    rectb( -- men max line
-        self.screenx + 07,
-        self.screeny + 03 + Tic.STATSMAX - self.entity.statmenmax,
-        02,
-        01,
-        (self.entity.statmenact >= self.entity.statmenmax) and self.colorborder or self.colorlesser
-    )
-    rectb( -- psy max line
-        self.screenx + 12,
-        self.screeny + 03 + Tic.STATSMAX - self.entity.statpsymax,
-        02,
-        01,
-        (self.entity.statpsyact >= self.entity.statpsymax) and self.colorborder or self.colorlesser
-    )
-end
-
-
---
--- CWindowStatsPlayer
---
-local CWindowStatsPlayer = CWindowStatsCharacter:extend() -- window stats for player
-function CWindowStatsPlayer:new(_argt)
-    CWindowStatsPlayer.super.new(self, _argt)
-    self.screenx = Tic.STATSWX
-    self.screeny = Tic.STATSWY
-	self.entity  = Tic:playerActual()
-    self:_argt(_argt) -- override if any
-end
-
-function CWindowStatsPlayer:drawInside() -- window stats content for player
-	self.entity = Tic:playerActual()
-    CWindowStatsPlayer.super.drawInside(self)
-end
--- CWindowStatsPlayer instance
-local WindowStatsPlayer = CWindowStatsPlayer{}
-
-
---
 -- CAnimation
 --
 local CAnimation = Classic:extend() -- general palette animation for entities
@@ -2283,49 +1796,6 @@ function CCharacter:new(_argt)
     self:focus() -- focus its camera on itself
 end
 
-function CCharacter:drawPortrait(_idle, _border, _infos) -- draw the portrait -- _idle ? -- _border ? -- _infos ?
-    _idle   = (_idle == true)  and true or false
-    _border = (_border == true) and true or false
-    _infos  = (_infos == true)  and true or false
-    self:_save{"screenx", "screeny", "scale", "dirx", "diry", "state", "frame",}
-    self.screenx = Tic.PORTRAITWX -- force character attributes
-    self.screeny = Tic.PORTRAITWY
-    self.scale = CSprite.SCALE02
-    if _idle then
-        self.dirx = Tic.DIRXLF
-        self.diry = Tic.DIRYMD
-        self.state = Tic.STATESTANDIDLE
-        self.frame = CSprite.FRAME00
-    end
-    self:draw()
-    if _infos then
-        Tic:print(self.screenx + (12 * self.scale), self.screeny, self.name)
-        Tic:print(self.screenx + (12 * self.scale), self.screeny + (6 * self.scale), self.kind)
-        Tic:print(self.screenx + (36 * self.scale), self.screeny, "WOX:", self.worldx)
-        Tic:print(self.screenx + (36 * self.scale), self.screeny + (6 * self.scale), "WOY:", self.worldy)
-    end
-    self:_load()
-end
-
-function CCharacter:drawStats(_border) -- draw the stats -- _border ?
-    self:_save{"scale",} -- TODO change to use constant
-    self.scale = CSprite.SCALE02
-    if _border then
-        rectb(self.statsx - self.scale, self.statsy - self.scale, (11 * self.scale), (11 * self.scale), Tic.COLORPORTRAITBG)
-        rectb(self.statsx - self.scale - 1, self.statsy - self.scale - 1, (11 * self.scale), (11 * self.scale), Tic.COLORPORTRAITFG)
-    end
-    rectb(self.statsx + 01, self.statsy + 2, 4, 12, Tic.COLORWHITE) -- phy bar
-    rect (self.statsx + 02, self.statsy + 2 + Tic.STATSMAX - self.statphyact + 1, 2, self.statphyact, Tic.COLORRED)
-    rectb(self.statsx + 01, self.statsy + 2 + Tic.STATSMAX - self.statphymax, 4, 1, Tic.COLORWHITE)
-    rectb(self.statsx + 06, self.statsy + 2, 4, 12, Tic.COLORWHITE) -- men bar
-    rect (self.statsx + 07, self.statsy + 2 + Tic.STATSMAX - self.statmenact + 1, 2, self.statmenact, Tic.COLORBLUEM)
-    rectb(self.statsx + 06, self.statsy + 2 + Tic.STATSMAX - self.statmenmax, 4, 1, Tic.COLORWHITE)
-    rectb(self.statsx + 11, self.statsy + 2, 4, 12, Tic.COLORWHITE) -- psy bar
-    rect (self.statsx + 12, self.statsy + 2 + Tic.STATSMAX - self.statpsyact + 1, 2, self.statpsymax, Tic.COLORGREENM)
-    rectb(self.statsx + 11, self.statsy + 2 + Tic.STATSMAX - self.statpsymax, 4, 1, Tic.COLORWHITE)
-    self:_load()
-end
-
 function CCharacter:drawDirs() -- draw the directions and ranges around the player
     local _drawcolor = Tic.COLORWHITE
     local _screenx   = Tic.WORLDWX + ((Tic.WORLDWW - Tic.WORLDWX) // 2)
@@ -2861,6 +2331,493 @@ local CNeutral= CCharacter:extend() -- neutral characters
 local CEnnemy = CCharacter:extend() -- ennemy characters
 
 
+--
+-- CWindow
+--
+local CWindow = Classic:extend() -- general window for displaying stuff
+function CWindow:new(_argt)
+    CWindow.super.new(self, _argt)
+    self.screenx     = Tic.SCREENX -- positions
+    self.screeny     = Tic.SCREENY
+    self.screenw     = Tic.SCREENW -- sizes
+    self.screenh     = Tic.SCREENH
+    self.cachest     = 8 -- caches thickness
+    self.colorground = Tic.COLORHUDSCREEN
+    self.colorguides = Tic.COLORGREYM
+    self.colorcaches = Tic.COLORHUDSCREEN
+    self.colorborder = Tic.COLORGREYM -- border color
+    self.colorframe1 = Tic.COLORWHITE -- frames colors
+    self.colorframe2 = Tic.COLORGREYL
+    self.drawground  = true -- draw behevior
+    self.drawguides  = true
+    self.drawinside  = true
+    self.drawcaches  = true
+    self.drawborder  = true
+    self.drawframes  = true
+    self:_argt(_argt) -- override if any
+end
+
+function CWindow:draw() -- window
+    if self.drawground then self:drawGround() end
+    if self.drawguides then self:drawGuides() end
+    if self.drawinside then self:drawInside() end
+    if self.drawcaches then self:drawCaches() end
+    if self.drawborder then self:drawBorder() end
+    if self.drawframes then self:drawFrames() end
+end
+
+function CWindow:drawGround() -- window ground
+    rect(
+        self.screenx,
+        self.screeny,
+        self.screenw,
+        self.screenh,
+        self.colorground
+    )
+end
+
+function CWindow:drawGuides() -- window guides -- FIXME still not working -- use ratio w h ?
+    rect( -- hline md
+		self.screenx,
+		self.screeny + ((Nums:isEven(self.screenh)) and (self.screenh // 2) - 1 or (self.screenh // 2)),
+        self.screenw,
+		(Nums:isEven(self.screenh)) and 2 or 1,
+        self.colorguides
+    )
+    rect( -- vline md
+		self.screenx + ((Nums:isEven(self.screenw)) and (self.screenw // 2) - 1 or (self.screenw // 2)),
+		self.screeny,
+        (Nums:isEven(self.screenw)) and 2 or 1,
+		self.screenh,
+        self.colorguides
+    )
+    line( -- diag up lf - dw rg
+		self.screenx,
+		self.screeny,
+        self.screenx + self.screenw - 1,
+		self.screeny + self.screenh - 1,
+        self.colorguides
+    )
+    line( -- diag dw lf - up rg
+		self.screenx,
+		self.screeny + self.screenh - 1,
+        self.screenx + self.screenw - 1,
+		self.screeny,
+        self.colorguides
+    )
+end
+
+function CWindow:drawCaches() -- window caches
+    rect( -- lf cache
+		self.screenx - self.cachest,
+		self.screeny,
+        self.cachest,
+		self.screenh,
+        self.colorcaches
+    )
+    rect( -- rg cache
+		self.screenx + self.screenw,
+		self.screeny,
+        self.cachest,
+		self.screenh,
+        self.colorcaches
+    )
+    rect( -- up cache
+		self.screenx - self.cachest,
+		self.screeny - self.cachest,
+        self.screenw + (self.cachest * 2),
+		self.cachest,
+        self.colorcaches
+    )
+    rect( -- dw cache
+		self.screenx - self.cachest,
+		self.screeny + self.screenh,
+        self.screenw + (self.cachest * 2),
+		self.cachest,
+        self.colorcaches
+    )
+end
+
+function CWindow:drawBorder() -- window single border
+    rectb(
+        self.screenx,
+        self.screeny,
+        self.screenw,
+        self.screenh,
+        self.colorborder
+    )
+end
+
+function CWindow:drawFrames() -- window double frames
+    rectb( -- bg frame
+        self.screenx - 2,
+        self.screeny - 2,
+        self.screenw + 5,
+        self.screenh + 5,
+        self.colorframe2
+    )
+    rectb( -- fg frame
+        self.screenx - 3,
+        self.screeny - 3,
+        self.screenw + 5,
+        self.screenh + 5,
+        self.colorframe1
+    )
+end
+
+function CWindow:drawInside() -- window content
+end
+
+
+--
+-- CWindowScreen
+--
+local CWindowScreen = CWindow:extend() -- window screen
+function CWindowScreen:new(_argt)
+    CWindowScreen.super.new(self, _argt)
+    self.drawguides = false
+    self.drawcaches = false
+    self.drawframes = false
+    self:_argt(_argt) -- override if any
+end
+-- CWindowScreen instance
+local WindowScreen = CWindowScreen{}
+
+
+--
+-- CWindowWorld
+--
+local CWindowWorld = CWindow:extend() -- window world
+function CWindowWorld:new(_argt)
+    CWindowWorld.super.new(self, _argt)
+    self.screenx     = Tic.WORLDWX -- positions
+    self.screeny     = Tic.WORLDWY
+    self.screenw     = Tic.WORLDWW -- sizes
+    self.screenh     = Tic.WORLDWH
+    self.colorground = Tic.COLORBIOMENIGHT
+    self.drawguides  = false
+    self:_argt(_argt) -- override if any
+end
+-- CWindowWorld instance
+local WindowWorld = CWindowWorld{}
+
+function CWindowWorld:drawGround() -- window world ground
+    self.colorground = Tic:biomeActual()
+    CWindowWorld.super.drawGround(self)
+end
+
+function CWindowWorld:drawInside() -- window world content
+    -- TODO drawPlayer here
+end
+
+
+--
+-- CWindowInfos
+--
+local CWindowInfos = CWindow:extend() -- window infos
+CWindowInfos.ALIGNLF = "alignlf"
+CWindowInfos.ALIGNMD = "alignmd"
+CWindowInfos.ALIGNRG = "alignrg"
+function CWindowInfos:new(_argt)
+    CWindowInfos.super.new(self, _argt)
+	self.lines       = 2 -- number of lines
+	self.chars       = 6 -- number of chars per lines
+	self.fixed       = true -- TODO accept also not fixed fonts ?
+	self.scale       = CSprite.SCALE01 -- TODO accept also other scales ?
+	self.small       = true -- small fonts or large fonts
+	self.infos       = {} -- lines content -- {info1, infoN,...}
+	self.align       = CWindowInfos.ALIGNLF -- h alignment
+	self.marginsh    = 1 -- h margins in px
+	self.marginsv    = 0 -- v margins in px
+	self.linessep    = 0 -- separator in px
+    self.shadow      = false
+    self.colorinfofg = Tic.COLORGREYL
+    self.colorinfobg = Tic.COLORGREYD -- for shadow
+    self.colorground = Tic.COLORBIOMENIGHT
+    self.drawguides  = false
+    self.drawcaches  = false
+    self.drawborder  = false
+    self:_argt(_argt) -- override if any
+	local _fontw = (self.small) and Tic.FONTWS or Tic.FONTWL
+	local _fonth = Tic.FONTH + 2
+	local _seppx = math.min(0, self.lines - 1) * self.linessep
+	self.screenw = (self.chars * _fontw) + (self.marginsh * 2)
+	self.screenh = (self.lines * _fonth) + (self.marginsv * 2) + _seppx
+	return self.screenw, self.screenh
+end
+
+function CWindowInfos:drawInside() -- window info content
+	local _fontw   = (self.small) and Tic.FONTWS or Tic.FONTWL
+    local _offsetx = self.marginsh
+    local _offsety = self.marginsv
+	for _line = 1, self.lines do -- draw each line
+        local _info = self.infos[_line] or ""
+        local _size = string.len(_info) * _fontw
+        _offsetx = (self.align == CWindowInfos.ALIGNMD)
+            and (self.screenw - _size) // 2
+            or  _offsetx
+        _offsetx = (self.align == CWindowInfos.ALIGNRG)
+            and self.screenw - self.marginsh - _size + 1
+            or  _offsetx
+		if self.shadow then
+			print(
+				_info,
+				self.screenx + _offsetx + 1,
+				self.screeny + _offsety + 2, -- y offset font in each line
+				self.colorinfobg,
+				self.fixed,
+				self.scale,
+				self.small
+			)
+		end
+		print(
+			_info,
+			self.screenx + _offsetx,
+			self.screeny + _offsety + 1, -- y offset font in each line
+			self.colorinfofg,
+			self.fixed,
+			self.scale,
+			self.small
+		)
+		_offsety = _offsety + Tic.FONTH + 2 + self.linessep
+	end
+end
+
+
+--
+-- CWindowInfosEntity
+--
+local CWindowInfosEntity = CWindowInfos:extend() -- window infos for entities
+function CWindowInfosEntity:new(_argt)
+    CWindowInfosEntity.super.new(self, _argt)
+    self.lines  = 2
+    self.chars  = 6
+    self.small  = true
+    self.align  = CWindowInfos.ALIGNMD
+    self.shadow = true
+	self.entity = nil -- override
+    self:_argt(_argt) -- override if any
+end
+
+function CWindowInfosEntity:drawInside() -- window infos content for entities
+    if not self.entity then return end -- mandatory
+    if not self.entity:is(CEntity) then return end -- mandatory
+    local _info1 = self.entity.name or ""
+    local _info2 = self.entity.kind or ""
+	self.infos = {_info1, _info2}
+    CWindowInfosEntity.super.drawInside(self)
+end
+
+
+--
+-- CWindowInfosPlayer
+--
+local CWindowInfosPlayer = CWindowInfosEntity:extend() -- window infos for player
+function CWindowInfosPlayer:new(_argt)
+    CWindowInfosPlayer.super.new(self, _argt)
+    self.screenx = Tic.INFOSWX
+    self.screeny = Tic.INFOSWY
+	self.entity  = Tic:playerActual()
+    self:_argt(_argt) -- override if any
+end
+
+function CWindowInfosPlayer:drawInside() -- window infos content for player
+	self.entity = Tic:playerActual()
+    CWindowInfosPlayer.super.drawInside(self)
+end
+-- CWindowInfosPlayer instance
+local WindowInfosPlayer = CWindowInfosPlayer{}
+
+
+--
+-- CWindowPortrait
+--
+local CWindowPortrait = CWindow:extend() -- window portrait
+function CWindowPortrait:new(_argt)
+    CWindowPortrait.super.new(self, _argt)
+    self.screenw     = Tic.PORTRAITWW -- sizes
+    self.screenh     = Tic.PORTRAITWH
+    self.cachest     = 4 -- caches thickness
+    self.colorground = Tic.COLORBIOMENIGHT
+    self.drawguides  = false
+    self.drawborder  = false
+    self:_argt(_argt) -- override if any
+end
+
+function CWindowPortrait:drawGround() -- window portrait ground
+    self.colorground = Tic:biomeActual()
+    CWindowPortrait.super.drawGround(self)
+end
+
+
+--
+-- CWindowPortraitDrawable
+--
+local CWindowPortraitDrawable = CWindowPortrait:extend() -- window portrait for -- [!] drawable entities
+function CWindowPortraitDrawable:new(_argt)
+    CWindowPortraitDrawable.super.new(self, _argt)
+    self.idle   = false -- idle portait or not
+	self.entity = nil -- override
+    self:_argt(_argt) -- override if any
+end
+
+function CWindowPortraitDrawable:drawInside() -- window portrait content for -- [!] drawable entities
+    if not self.entity then return end -- mandatory
+    if not self.entity:is(CEntityDrawable) then return end -- mandatory
+    self.entity:_save{"screenx", "screeny", "scale", "dirx", "frame", "animations"}
+    self.entity.screenx = self.screenx -- force character attributes
+    self.entity.screeny = self.screeny
+    self.entity.scale   = CSprite.SCALE02
+    if self.idle then
+        self.entity.dirx       = Tic.DIRXLF
+        self.entity.frame      = CSprite.FRAME00
+        self.entity.animations = {}
+    end
+    self.entity:draw()
+    self.entity:_load()
+end
+
+
+--
+-- CWindowPortraitPlayer
+--
+local CWindowPortraitPlayer = CWindowPortraitDrawable:extend() -- window portrait for player
+function CWindowPortraitPlayer:new(_argt)
+    CWindowPortraitPlayer.super.new(self, _argt)
+    self.screenx = Tic.PORTRAITWX
+    self.screeny = Tic.PORTRAITWY
+	self.entity  = Tic:playerActual()
+    self:_argt(_argt) -- override if any
+end
+
+function CWindowPortraitPlayer:drawInside() -- window portrait content for player
+	self.entity = Tic:playerActual()
+    CWindowPortraitPlayer.super.drawInside(self)
+end
+-- CWindowPortraitPlayer instance
+local WindowPortraitPlayer = CWindowPortraitPlayer{}
+
+
+--
+-- CWindowStats
+--
+local CWindowStats = CWindow:extend() -- window stats
+function CWindowStats:new(_argt)
+    CWindowStats.super.new(self, _argt)
+    self.screenw     = Tic.STATSWW -- sizes
+    self.screenh     = Tic.STATSWH
+    self.colorground = Tic.COLORBIOMENIGHT
+    self.colorborder = Tic.COLORWHITE
+    self.colorphyact = Tic.COLORRED -- stats colors
+    self.colormenact = Tic.COLORGREENM
+    self.colorpsyact = Tic.COLORBLUEM
+    self.colorlesser = Tic.COLORGREYL -- if the act stat is lesser than the max stat
+    self.drawguides  = false
+    self.drawcaches  = false
+    self.drawborder  = false
+    self:_argt(_argt) -- override if any
+end
+
+
+--
+-- CWindowStatsCharacter
+--
+local CWindowStatsCharacter = CWindowStats:extend() -- window portrait for -- [!] characters
+function CWindowStatsCharacter:new(_argt)
+    CWindowStatsCharacter.super.new(self, _argt)
+	self.entity = nil -- override
+    self:_argt(_argt) -- override if any
+end
+
+function CWindowStatsCharacter:drawInside() -- window portrait content for -- [!] characters
+    if not self.entity then return end -- mandatory
+    if not self.entity:is(CCharacter) then return end -- mandatory
+    rectb( -- phy bar border
+        self.screenx + 01,
+        self.screeny + 02,
+        04,
+        12,
+        self.colorborder
+    )
+    rectb( -- men bar border
+        self.screenx + 06,
+        self.screeny + 02,
+        04,
+        12,
+        self.colorborder
+    )
+    rectb( -- psy bar border
+        self.screenx + 11,
+        self.screeny + 02,
+        04,
+        12,
+        self.colorborder
+    )
+    rect ( -- phy act bar
+        self.screenx + 02,
+        self.screeny + 02 + Tic.STATSMAX - self.entity.statphyact + 1,
+        02,
+        self.entity.statphyact,
+        self.colorphyact
+    )
+    rect ( -- men act bar
+        self.screenx + 07,
+        self.screeny + 02 + Tic.STATSMAX - self.entity.statmenact + 1,
+        02,
+        self.entity.statmenact,
+        self.colormenact
+    )
+    rect ( -- psy act bar
+        self.screenx + 12,
+        self.screeny + 02 + Tic.STATSMAX - self.entity.statpsyact + 1,
+        02,
+        self.entity.statpsyact,
+        self.colorpsyact
+    )
+    rectb( -- phy max line
+        self.screenx + 02,
+        self.screeny + 03 + Tic.STATSMAX - self.entity.statphymax,
+        02,
+        01,
+        (self.entity.statphyact >= self.entity.statphymax) and self.colorborder or self.colorlesser
+    )
+    rectb( -- men max line
+        self.screenx + 07,
+        self.screeny + 03 + Tic.STATSMAX - self.entity.statmenmax,
+        02,
+        01,
+        (self.entity.statmenact >= self.entity.statmenmax) and self.colorborder or self.colorlesser
+    )
+    rectb( -- psy max line
+        self.screenx + 12,
+        self.screeny + 03 + Tic.STATSMAX - self.entity.statpsymax,
+        02,
+        01,
+        (self.entity.statpsyact >= self.entity.statpsymax) and self.colorborder or self.colorlesser
+    )
+end
+
+
+--
+-- CWindowStatsPlayer
+--
+local CWindowStatsPlayer = CWindowStatsCharacter:extend() -- window stats for player
+function CWindowStatsPlayer:new(_argt)
+    CWindowStatsPlayer.super.new(self, _argt)
+    self.screenx = Tic.STATSWX
+    self.screeny = Tic.STATSWY
+	self.entity  = Tic:playerActual()
+    self:_argt(_argt) -- override if any
+end
+
+function CWindowStatsPlayer:drawInside() -- window stats content for player
+	self.entity = Tic:playerActual()
+    CWindowStatsPlayer.super.drawInside(self)
+end
+-- CWindowStatsPlayer instance
+local WindowStatsPlayer = CWindowStatsPlayer{}
+
+
 
 --
 -- Places
@@ -3141,28 +3098,6 @@ function Tic:draw()
 end
 
 
--- world window
-function Tic:drawWorldWCaches() -- draw world window caches
-    local _drawcolor = Tic.COLORHUDSCREEN
-    rect(Tic.WORLDWX - 8, Tic.WORLDWY, -- lf mask
-        8, Tic.WORLDWH,
-        _drawcolor
-    )
-    rect(Tic.WORLDWX + Tic.WORLDWW, Tic.WORLDWY, -- rg mask
-        8, Tic.WORLDWH,
-        _drawcolor
-    )
-    rect(Tic.WORLDWX - 8, Tic.WORLDWY - 8, -- up mask
-        Tic.WORLDWW + 16, 8,
-        _drawcolor
-    )
-    rect(Tic.WORLDWX - 8, Tic.WORLDWY + Tic.WORLDWH, -- dw mask
-        Tic.WORLDWW + 16, 8,
-        _drawcolor
-    )
-end
-
-
 -- actual player
 function Tic:drawPlayerActual()
     local _playeractual = Tic:playerActual()
@@ -3206,12 +3141,10 @@ function Tic:drawPlayerActual()
     -- Tic:logAppend("SCA:", _playeractual.scale)
     -- Tic:logAppend("FHY:", _playeractual.statphyact)
 
-    -- _playeractual:drawStatsC(true)
-    -- _playeractual:drawPortrait(nil, true, true)
     _playeractual:drawDirs()
 end
 
-function Tic:drawLog()
+function Tic:drawLog() -- [-] remove
     local _tick00 = Tic.TICK00.actvalue
     local _tick60 = Tic.TICK60.actvalue
     local _frame = _tick60 // 30
