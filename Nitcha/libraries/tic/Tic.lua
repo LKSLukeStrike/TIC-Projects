@@ -1072,6 +1072,7 @@ end
 
 function CWindowInfosEntity:drawInside() -- window infos content for entities
     if not self.entity then return end -- mandatory
+    -- if not self.entity:is(CEntity) then return end -- mandatory -- FIXME declare after CEntity
     local _info1 = self.entity.name or ""
     local _info2 = self.entity.kind or ""
 	self.infos = {_info1, _info2}
@@ -1105,11 +1106,11 @@ local WindowInfosPlayer = CWindowInfosPlayer{}
 local CWindowPortrait = CWindow:extend() -- window portrait
 function CWindowPortrait:new(_argt)
     CWindowPortrait.super.new(self, _argt)
-    self.screenw     = Tic.PORTRAITWW
+    self.screenw     = Tic.PORTRAITWW -- sizes
     self.screenh     = Tic.PORTRAITWH
+    self.cachest     = 4 -- caches thickness
     self.colorground = Tic.COLORBIOMENIGHT
     self.drawguides  = false
-    self.drawcaches  = false
     self.drawborder  = false
     self:_argt(_argt) -- override if any
 end
@@ -1133,6 +1134,7 @@ end
 
 function CWindowPortraitDrawable:drawInside() -- window portrait content for -- [!] drawable entities
     if not self.entity then return end -- mandatory
+    -- if not self.entity:is(CEntityDrawable) then return end -- mandatory -- FIXME declare after CEntity
     self.entity:_save{"screenx", "screeny", "scale", "dirx", "frame", "animations"}
     self.entity.screenx = self.screenx -- force character attributes
     self.entity.screeny = self.screeny
@@ -1174,24 +1176,18 @@ local WindowPortraitPlayer = CWindowPortraitPlayer{}
 local CWindowStats = CWindow:extend() -- window stats
 function CWindowStats:new(_argt)
     CWindowStats.super.new(self, _argt)
-    self.screenx = Tic.STATSWX -- positions
-    self.screeny = Tic.STATSWY
-    self.screenw = Tic.STATSWW -- sizes
-    self.screenh = Tic.STATSWH
-    self.border  = false -- border or not
+    self.screenw     = Tic.STATSWW -- sizes
+    self.screenh     = Tic.STATSWH
     self.colorground = Tic.COLORBIOMENIGHT
     self.colorborder = Tic.COLORWHITE
-    self.colorphyact = Tic.COLORRED
+    self.colorphyact = Tic.COLORRED -- stats colors
     self.colormenact = Tic.COLORGREENM
     self.colorpsyact = Tic.COLORBLUEM
     self.colorlesser = Tic.COLORGREYL -- if the act stat is lesser than the max stat
+    self.drawguides  = false
+    self.drawcaches  = false
+    self.drawborder  = false
     self:_argt(_argt) -- override if any
-end
-
-function CWindowStats:draw() -- window stats
-    self:drawGround()
-    self:drawFrames()
-    self:drawPlayer()
 end
 
 function CWindowStats:drawPlayer() -- actual player stats
@@ -2976,8 +2972,8 @@ end -- generate places
 --
 -- Players
 --
--- local Truduk = CPlayerDwarf{name = "Truduk",
--- }
+local Truduk = CPlayerDwarf{name = "Truduk",
+}
 -- Truduk:randomWorldWindow()
 -- local Prinnn = CPlayerGnome{name = "Prinnn",
 --     coloreyesbg  = Tic.COLORRED,
@@ -2985,7 +2981,7 @@ end -- generate places
 --     worldx = -20,
 --     worldy = -10,
 -- }
--- local Kaptan = CPlayerMeduz{name = "Kaptan",}
+local Kaptan = CPlayerMeduz{name = "Kaptan",}
 -- local Kaptin = CPlayerMeduz{name = "Kaptin",
 --     colorhairsbg = Tic.COLORBLUEL,
 --     colorhairsfg = Tic.COLORBLUEM,
@@ -3088,7 +3084,7 @@ function Tic:draw()
     WindowInfosPlayer:draw()
     WindowPortraitPlayer:draw()
     WindowTest:draw()
-    WindowStatsPlayer:draw()
+    -- WindowStatsPlayer:draw()
 
     -- Tic:drawPlayerActual()
 

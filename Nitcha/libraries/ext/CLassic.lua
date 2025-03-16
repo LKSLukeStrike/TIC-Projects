@@ -43,13 +43,13 @@ function Classic:implement(...) -- implement only new functions -- original vers
 end
 
 
-function Classic:is(T)
-  local mt = getmetatable(self)
-  while mt do
-    if mt == T then
+function Classic:is(_type)
+  local _metatable = getmetatable(self)
+  while _metatable do
+    if _metatable == _type then
       return true
     end
-    mt = getmetatable(mt)
+    _metatable = getmetatable(_metatable)
   end
   return false
 end
