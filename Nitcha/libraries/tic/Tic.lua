@@ -30,7 +30,7 @@ Tic.SCREENW  = 240 -- screen width
 Tic.SCREENH  = 136 -- screen height
 
 -- World Window positions and sizes (hud)
-Tic.WORLDWW  = 160 --Tic.SCREENH -- world window width
+Tic.WORLDWW  = 120 --Tic.SCREENH -- world window width
 Tic.WORLDWH  = 100 --Tic.SCREENH -- world window height
 Tic.WORLDWX  = (Tic.SCREENW - Tic.WORLDWW) // 2 -- world window x position
 Tic.WORLDWY  = (Tic.SCREENH - Tic.WORLDWH) // 2 -- world window y position
@@ -734,7 +734,7 @@ CSpriteFG.SPRITEBOARD = CSpriteFG.SPRITEBANK + 2 -- board sprite -- for creating
 CSpriteFG.HEADBANK    = 272 -- characters heads
 CSpriteFG.HEADDWARF   = CSpriteFG.HEADBANK + 0
 CSpriteFG.HEADGNOME   = CSpriteFG.HEADBANK + 1
-CSpriteFG.HEADDROWE   = CSpriteFG.HEADBANK + 2
+CSpriteFG.HEADELVWE   = CSpriteFG.HEADBANK + 2
 CSpriteFG.HEADGOGOL   = CSpriteFG.HEADBANK + 3
 CSpriteFG.HEADANGEL   = CSpriteFG.HEADBANK + 4
 CSpriteFG.HEADHORNE   = CSpriteFG.HEADBANK + 5
@@ -1783,7 +1783,7 @@ function CCharacter:new(_argt)
     self.colorpants   = Tic.COLORPANTS
     self.colorhands   = Tic.COLORHANDS
     self.bodysprite   = CSpriteFG.BODYHUMAN -- body
-    self.headsprite   = CSpriteFG.HEADDROWE -- head
+    self.headsprite   = CSpriteFG.HEADELVWE -- head
     self.eyessprite   = CSpriteFG.EYESHUMAN -- eyes
     self.statphymax   = 5 -- max stats -- 0-Tic.STATSMAX
     self.statmenmax   = 5
@@ -2126,7 +2126,7 @@ function CPlayerHumanoid:new(_argt)
 end
 
 
-local CPlayerDwarf = CPlayerHumanoid:extend() -- dwarf player characters
+local CPlayerDwarf = CPlayerHumanoid:extend() -- Dwarf player characters
 CEntity.KINDDWARF = "Dwarf" -- Dwarf kind
 function CPlayerDwarf:new(_argt)
     CPlayerDwarf.super.new(self, _argt)
@@ -2145,7 +2145,7 @@ function CPlayerDwarf:new(_argt)
 end
 
 
-local CPlayerGnome = CPlayerHumanoid:extend() -- gnome player characters
+local CPlayerGnome = CPlayerHumanoid:extend() -- Gnome player characters
 CEntity.KINDGNOME = "Gnome" -- Gnome kind
 function CPlayerGnome:new(_argt)
     CPlayerGnome.super.new(self, _argt)
@@ -2165,7 +2165,28 @@ function CPlayerGnome:new(_argt)
 end
 
 
-local CPlayerDrowe = CPlayerHumanoid:extend() -- drowe player characters
+local CPlayerElvwe = CPlayerHumanoid:extend() -- Elvwe player characters
+CEntity.KINDELVWE = "Elvwe" -- Elvwe kind
+function CPlayerElvwe:new(_argt)
+    CPlayerElvwe.super.new(self, _argt)
+    self.kind         = CEntity.KINDELVWE
+    self.size         = CCharacter.SIZEL -- size
+    self.coloreyesfg  = Tic.COLORGREENM -- colors
+    self.coloreyesbg  = Tic.COLORGREEND
+    self.colorhairsfg = Tic.COLORORANGE
+    self.colorhairsbg = Tic.COLORYELLOW
+    self.headsprite   = CSpriteFG.HEADELVWE -- head
+    self.statphymax   = 4
+    self.statphyact   = self.statphymax
+    self.statmenmax   = 6
+    self.statmenact   = self.statmenmax
+    self.statpsymax   = 5
+    self.statpsyact   = self.statpsymax
+    self:_argt(_argt) -- override if any
+end
+
+
+local CPlayerDrowe = CPlayerHumanoid:extend() -- Drowe player characters
 CEntity.KINDDROWE = "Drowe" -- Drowe kind
 function CPlayerDrowe:new(_argt)
     CPlayerDrowe.super.new(self, _argt)
@@ -2173,7 +2194,7 @@ function CPlayerDrowe:new(_argt)
     self.size         = CCharacter.SIZEM -- size
     self.coloreyesfg  = Tic.COLORRED -- colors
     self.coloreyesbg  = Tic.COLORPURPLE
-    self.headsprite   = CSpriteFG.HEADDROWE -- head
+    self.headsprite   = CSpriteFG.HEADELVWE -- head
     self.statphymax   = 5
     self.statphyact   = self.statphymax
     self.statmenmax   = 6
@@ -2184,7 +2205,7 @@ function CPlayerDrowe:new(_argt)
 end
 
 
-local CPlayerAngel = CPlayerHumanoid:extend() -- angel player characters
+local CPlayerAngel = CPlayerHumanoid:extend() -- Angel player characters
 CEntity.KINDANGEL = "Angel" -- Angel kind
 function CPlayerAngel:new(_argt)
     CPlayerAngel.super.new(self, _argt)
@@ -2204,7 +2225,7 @@ function CPlayerAngel:new(_argt)
 end
 
 
-local CPlayerGogol = CPlayerHumanoid:extend() -- gogol player characters
+local CPlayerGogol = CPlayerHumanoid:extend() -- Gogol player characters
 CEntity.KINDGOGOL = "Gogol" -- Gogol kind
 function CPlayerGogol:new(_argt)
     CPlayerGogol.super.new(self, _argt)
@@ -2226,7 +2247,7 @@ function CPlayerGogol:new(_argt)
 end
 
 
-local CPlayerHorne = CPlayerHumanoid:extend() -- horne player characters
+local CPlayerHorne = CPlayerHumanoid:extend() -- Horne player characters
 CEntity.KINDHORNE = "Horne" -- Horne kind
 function CPlayerHorne:new(_argt)
     CPlayerHorne.super.new(self, _argt)
@@ -2247,7 +2268,7 @@ function CPlayerHorne:new(_argt)
 end
 
 
-local CPlayerDemon = CPlayerHorne:extend() -- demon player characters
+local CPlayerDemon = CPlayerHorne:extend() -- Demon player characters
 CEntity.KINDDEMON = "Demon" -- Demon kind
 function CPlayerDemon:new(_argt)
     CPlayerDemon.super.new(self, _argt)
@@ -2262,7 +2283,7 @@ function CPlayerDemon:new(_argt)
 end
 
 
-local CPlayerTifel = CPlayerHorne:extend() -- tifel player characters
+local CPlayerTifel = CPlayerHorne:extend() -- Tifel player characters
 CEntity.KINDTIFEL = "Tifel" -- Tifel kind
 function CPlayerTifel:new(_argt)
     CPlayerTifel.super.new(self, _argt)
@@ -2278,7 +2299,7 @@ function CPlayerTifel:new(_argt)
 end
 
 
-local CPlayerMeduz = CPlayerHumanoid:extend() -- meduz player characters
+local CPlayerMeduz = CPlayerHumanoid:extend() -- Meduz player characters
 CEntity.KINDMEDUZ = "Meduz" -- Meduz kind
 function CPlayerMeduz:new(_argt)
     CPlayerMeduz.super.new(self, _argt)
@@ -2297,7 +2318,7 @@ function CPlayerMeduz:new(_argt)
 end
 
 
-local CPlayerGnoll = CPlayerHumanoid:extend() -- gnoll player characters
+local CPlayerGnoll = CPlayerHumanoid:extend() -- Gnoll player characters
 CEntity.KINDGNOLL = "Gnoll" -- Gnoll kind
 function CPlayerGnoll:new(_argt)
     CPlayerGnoll.super.new(self, _argt)
@@ -2316,7 +2337,7 @@ function CPlayerGnoll:new(_argt)
 end
 
 
-local CPlayerWolfe = CPlayerGnoll:extend() -- wolfe player characters
+local CPlayerWolfe = CPlayerGnoll:extend() -- Wolfe player characters
 CEntity.KINDWOLFE = "Wolfe" -- Wolfe kind
 function CPlayerWolfe:new(_argt)
     CPlayerWolfe.super.new(self, _argt)
@@ -2971,6 +2992,11 @@ local Kaptan = CPlayerMeduz{name = "Kaptan",}
 --     coloreyesbg  = Tic.COLORBLUEM,
 --     coloreyesfg  = Tic.COLORBLUEL,
 -- }
+local Aegeon = CPlayerElvwe{name = "Aegeon",
+    colorshirt   = Tic.COLORGREENL,
+    colorarmor   = Tic.COLORGREEND,
+    colorpants   = Tic.COLORGREENM,
+}
 local Nitcha = CPlayerDrowe{name = "Nitcha",
 }
 -- local Zariel = CPlayerAngel{name = "Zariel",}
@@ -2981,15 +3007,15 @@ local Nitcha = CPlayerDrowe{name = "Nitcha",
 --     coloreyesbg  = Tic.COLORGREENM,
 --     coloreyesfg  = Tic.COLORGREENL,
 -- }
--- local Kaainn = CPlayerDemon{name = "Kaainn",
---     colorhairsbg = Tic.COLORGREYL,
---     colorhairsfg = Tic.COLORWHITE,
---     coloreyesbg  = Tic.COLORBLUEM,
---     coloreyesfg  = Tic.COLORBLUEL,
---     size         = CCharacter.SIZEM,
---     colorshirt   = Tic.COLORPURPLE,
---     colorpants   = Tic.COLORRED,
--- }
+local Kaainn = CPlayerDemon{name = "Kaainn",
+    colorhairsbg = Tic.COLORGREYL,
+    colorhairsfg = Tic.COLORWHITE,
+    coloreyesbg  = Tic.COLORBLUEM,
+    coloreyesfg  = Tic.COLORBLUEL,
+    size         = CCharacter.SIZEM,
+    colorshirt   = Tic.COLORPURPLE,
+    colorpants   = Tic.COLORRED,
+}
 -- local Daemok = CPlayerDemon{name = "Daemok",}
 -- local Golith = CPlayerGogol{name = "Golith",
 -- }
