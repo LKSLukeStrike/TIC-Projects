@@ -1792,7 +1792,7 @@ function CCharacter:new(_argt)
     self.statmenact   = self.statmenmax
     self.statpsyact   = self.statpsymax
     self:_argt(_argt) -- override if any
-    self.camera       = CCamera{name = self.name.." "..CEntity.NAMECAMERA} -- each character has its own camera
+    self.camera       = CCamera{name = self.name.." "..CEntity.NAMECAMERA} -- one camera per character
     self:focus() -- focus its camera on itself
 end
 
@@ -2256,7 +2256,6 @@ function CPlayerHorne:new(_argt)
     self.colorhairsfg = Tic.COLORPURPLE -- colors
     self.colorhairsbg = Tic.COLORRED
     self.colorextra   = Tic.COLORGREYD
-    self.size         = CCharacter.SIZEM -- size
     self.headsprite   = CSpriteFG.HEADHORNE -- head
     self.statphymax   = 3
     self.statphyact   = self.statphymax
@@ -2979,19 +2978,18 @@ end -- generate places
 local Truduk = CPlayerDwarf{name = "Truduk",
 }
 -- Truduk:randomWorldWindow()
--- local Prinnn = CPlayerGnome{name = "Prinnn",
---     coloreyesbg  = Tic.COLORRED,
---     coloreyesfg  = Tic.COLORORANGE,
---     worldx = -20,
---     worldy = -10,
--- }
-local Kaptan = CPlayerMeduz{name = "Kaptan",}
--- local Kaptin = CPlayerMeduz{name = "Kaptin",
---     colorhairsbg = Tic.COLORBLUEL,
---     colorhairsfg = Tic.COLORBLUEM,
---     coloreyesbg  = Tic.COLORBLUEM,
---     coloreyesfg  = Tic.COLORBLUEL,
--- }
+local Prinnn = CPlayerGnome{name = "Prinnn",
+    coloreyesbg  = Tic.COLORRED,
+    coloreyesfg  = Tic.COLORORANGE,
+}
+local Kaptan = CPlayerMeduz{name = "Kaptan",
+}
+local Kaptin = CPlayerMeduz{name = "Kaptin",
+    colorhairsbg = Tic.COLORBLUEL,
+    colorhairsfg = Tic.COLORBLUEM,
+    coloreyesbg  = Tic.COLORBLUEM,
+    coloreyesfg  = Tic.COLORBLUEL,
+}
 local Aegeon = CPlayerElvwe{name = "Aegeon",
     colorshirt   = Tic.COLORGREENL,
     colorarmor   = Tic.COLORGREEND,
@@ -2999,14 +2997,15 @@ local Aegeon = CPlayerElvwe{name = "Aegeon",
 }
 local Nitcha = CPlayerDrowe{name = "Nitcha",
 }
--- local Zariel = CPlayerAngel{name = "Zariel",}
--- local Zikkow = CPlayerTifel{name = "Zikkow",
---     colorhairsbg = Tic.COLORGREENM,
---     colorhairsfg = Tic.COLORGREEND,
---     colorextra   = Tic.COLORGREYM,
---     coloreyesbg  = Tic.COLORGREENM,
---     coloreyesfg  = Tic.COLORGREENL,
--- }
+local Zariel = CPlayerAngel{name = "Zariel",
+}
+local Zikkow = CPlayerTifel{name = "Zikkow",
+    colorhairsbg = Tic.COLORGREENM,
+    colorhairsfg = Tic.COLORGREEND,
+    colorextra   = Tic.COLORGREYM,
+    coloreyesbg  = Tic.COLORGREENM,
+    coloreyesfg  = Tic.COLORGREENL,
+}
 local Kaainn = CPlayerDemon{name = "Kaainn",
     colorhairsbg = Tic.COLORGREYL,
     colorhairsfg = Tic.COLORWHITE,
@@ -3016,9 +3015,10 @@ local Kaainn = CPlayerDemon{name = "Kaainn",
     colorshirt   = Tic.COLORPURPLE,
     colorpants   = Tic.COLORRED,
 }
--- local Daemok = CPlayerDemon{name = "Daemok",}
--- local Golith = CPlayerGogol{name = "Golith",
--- }
+local Daemok = CPlayerDemon{name = "Daemok",
+}
+local Golith = CPlayerGogol{name = "Golith",
+}
 -- Golith:randomWorldWindow()
 local Wulfie = CPlayerWolfe{name = "Wulfie",
     colorextra = Tic.COLORRED,
@@ -3104,20 +3104,32 @@ function Tic:draw()
 
     -- Tic:drawPlayerActual()
 
-    -- WorldRegionTree0:drawBorderWorldWC()
-    -- Tic:logAppend(WorldRegionTree0.name)
-    -- Tic:logAppend("REX:", WorldRegionTree0.worldx)
-    -- Tic:logAppend("REY:", WorldRegionTree0.worldy)
-    -- Tic:logAppend("REW:", WorldRegionTree0:borderw())
-    -- Tic:logAppend("REH:", WorldRegionTree0:borderh())
-    -- Tic:logAppend("RES:", WorldRegionTree0:surface())
+    Tic:logAppend("WOX:", Tic.playerActual().worldx)
+    Tic:logAppend("WOY:", Tic.playerActual().worldy)
+    Tic:logAppend()
+    Tic:logAppend()
+    Tic:logAppend()
+    Tic:logAppend()
+    Tic:logAppend()
+    Tic:logAppend()
+    Tic:logAppend()
+    Tic:logAppend("PHX:", Tic.playerActual().statphymax)
+    Tic:logAppend("PHA:", Tic.playerActual().statphyact, (
+        (Tic.playerActual().statphymax == Tic.playerActual().statphyact) and "ok" or "??"
+    ))
+    Tic:logAppend("MEX:", Tic.playerActual().statmenmax)
+    Tic:logAppend("MEA:", Tic.playerActual().statmenact, (
+        (Tic.playerActual().statmenmax == Tic.playerActual().statmenact) and "ok" or "??"
+    ))
+    Tic:logAppend("PSX:", Tic.playerActual().statpsymax)
+    Tic:logAppend("PSA:", Tic.playerActual().statpsyact, (
+        (Tic.playerActual().statpsymax == Tic.playerActual().statpsyact) and "ok" or "??"
+    ))
+    Tic:logAppend("TOT:", Tic.playerActual().statphymax
+        + Tic.playerActual().statmenmax
+        + Tic.playerActual().statpsymax)
+    Tic:logAppend("CAM:", Tic.playerActual().camera.name)
 
-    -- WorldRegionTown0:drawBorderWorldWC()
-
-    -- Tic:drawLog()
-
-    -- Tic:logAppend(Tic.SCREENW)
-    -- Tic:logAppend(Tic.SCREENH)
     Tic:logPrint()
 
     Tic:tick() -- [!] required in the draw function 
