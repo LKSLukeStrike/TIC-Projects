@@ -106,21 +106,19 @@ Tic.COLORBIOMEGREEN = Tic.COLORGREENM
 Tic.COLORBIOMEROCKY = Tic.COLORGREYL
 
 -- Special palette colors that can be replaced
-Tic.COLORKEY   = Tic.COLOR00 -- transparent color
-Tic.COLORARMOR = Tic.COLOR15 -- 4 colors for the bodies
-Tic.COLORSHIRT = Tic.COLOR14
-Tic.COLORPANTS = Tic.COLOR13
-Tic.COLORHANDS = Tic.COLOR12
-Tic.COLORHAIRSFG = Tic.COLOR15 -- 4 colors for the heads
-Tic.COLORHAIRSBG = Tic.COLOR14
-Tic.COLOREXTRA   = Tic.COLOR13
-Tic.COLORSKIN    = Tic.COLOR12
-Tic.COLOREYESFG   = Tic.COLOR15 -- 4 colors for the eyes
-Tic.COLOREYESBGUP = Tic.COLOR14
-Tic.COLOREYESBGMD = Tic.COLOR13
-Tic.COLOREYESBGDW = Tic.COLOR12
-Tic.COLORPORTRAITFG = Tic.COLORWHITE -- 2 colors for portrait frame
-Tic.COLORPORTRAITBG = Tic.COLORGREYL
+Tic.COLORKEY      = Tic.COLORBLACK -- transparent color
+Tic.COLORARMOR    = Tic.COLORGREYD -- 4 colors for the bodies
+Tic.COLORSHIRT    = Tic.COLORGREYM
+Tic.COLORPANTS    = Tic.COLORGREYL
+Tic.COLORHANDS    = Tic.COLORWHITE
+Tic.COLORHAIRSFG  = Tic.COLORGREYD -- 4 colors for the heads
+Tic.COLORHAIRSBG  = Tic.COLORGREYM
+Tic.COLOREXTRA    = Tic.COLORGREYL
+Tic.COLORSKIN     = Tic.COLORWHITE
+Tic.COLOREYESFG   = Tic.COLORGREYD -- 4 colors for the eyes
+Tic.COLOREYESBGUP = Tic.COLORGREYM
+Tic.COLOREYESBGMD = Tic.COLORGREYL
+Tic.COLOREYESBGDW = Tic.COLORWHITE
 -- TODO weapons fg/bg + status
 
 -- Directions
@@ -2186,7 +2184,7 @@ function CPlayerElvwe:new(_argt)
 end
 
 
-local CPlayerDrowe = CPlayerHumanoid:extend() -- Drowe player characters
+local CPlayerDrowe = CPlayerElvwe:extend() -- Drowe player characters
 CEntity.KINDDROWE = "Drowe" -- Drowe kind
 function CPlayerDrowe:new(_argt)
     CPlayerDrowe.super.new(self, _argt)
@@ -2194,7 +2192,8 @@ function CPlayerDrowe:new(_argt)
     self.size         = CCharacter.SIZEM -- size
     self.coloreyesfg  = Tic.COLORRED -- colors
     self.coloreyesbg  = Tic.COLORPURPLE
-    self.headsprite   = CSpriteFG.HEADELVWE -- head
+    self.colorhairsfg = Tic.COLORGREYD
+    self.colorhairsbg = Tic.COLORGREYM
     self.statphymax   = 5
     self.statphyact   = self.statphymax
     self.statmenmax   = 6
