@@ -1,0 +1,3 @@
+- animation system
+- autofill act stats at creation
+- maybe more

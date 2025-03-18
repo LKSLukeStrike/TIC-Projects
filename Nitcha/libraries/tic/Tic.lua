@@ -53,6 +53,13 @@ Tic.STATSWH  = 16  -- stats window height
 Tic.STATSWX  = Tic.PORTRAITWX -- stats window x position
 Tic.STATSWY  = Tic.PORTRAITWY + 25  -- stats window y position
 
+-- State Window positions and sizes (hud)
+Tic.STATEWW  = 26  -- state window width
+Tic.STATEWH  = 16  -- state window height
+Tic.STATEWX  = Tic.SCREENW - Tic.STATEWW - ((Tic.WORLDWX - Tic.STATEWW) // 2) -- state window x position
+Tic.STATEWY  = Tic.STATSWY + 25  -- state window y position
+
+
 -- Palette map
 Tic.PALETTEMAP = 0x3FF0 * 2 -- vram bank 1
 
@@ -1513,13 +1520,13 @@ function CPlaceTreesAnim:new(_argt)
     self.animations = {
         CAnimation{ -- leaf 1
             frequence = Tic.FREQUENCE600,
-            percent0  = 0.8,
+            percent0  = 0.3,
             palette0  = {[Tic.COLORWHITE] = Tic.COLORGREENM,},
             palette1  = {[Tic.COLORWHITE] = Tic.COLORGREYD,},
         },
         CAnimation{ -- leaf 2
             frequence = Tic.FREQUENCE300,
-            percent0  = 0.8,
+            percent0  = 0.3,
             palette0  = {[Tic.COLORYELLOW] = Tic.COLORGREYD,},
             palette1  = {[Tic.COLORYELLOW] = Tic.COLORGREENM,},
         },
@@ -2580,7 +2587,8 @@ function CWindowInfos:new(_argt)
 	self.marginsh    = 1 -- h margins in px
 	self.marginsv    = 0 -- v margins in px
 	self.linessep    = 0 -- separator in px
-    self.shadow      = false
+    self.shadow      = false -- add a shadow
+    self.fupper      = true -- uppercase the first char
     self.colorinfofg = Tic.COLORGREYL
     self.colorinfobg = Tic.COLORGREYD -- for shadow
     self.colorground = Tic.COLORBIOMENIGHT
@@ -2609,6 +2617,9 @@ function CWindowInfos:drawInside() -- window info content
         _offsetx = (self.align == CWindowInfos.ALIGNRG)
             and self.screenw - self.marginsh - _size + 1
             or  _offsetx
+        _info = (self.fupper) -- uppercase first char if any
+            and _info:lower():gsub("^%l", string.upper)
+            or  _info
 		if self.shadow then
 			print(
 				_info,
