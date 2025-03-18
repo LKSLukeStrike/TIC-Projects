@@ -2588,7 +2588,7 @@ function CWindowInfos:new(_argt)
 	self.marginsv    = 0 -- v margins in px
 	self.linessep    = 0 -- separator in px
     self.shadow      = false -- add a shadow
-    self.fupper      = true -- uppercase the first char
+    self.fupper      = false -- uppercase the first char
     self.colorinfofg = Tic.COLORGREYL
     self.colorinfobg = Tic.COLORGREYD -- for shadow
     self.colorground = Tic.COLORBIOMENIGHT
@@ -2879,6 +2879,33 @@ end
 local WindowStatsPlayer = CWindowStatsPlayer{}
 
 
+--
+-- CWindowStatePlayer
+--
+local CWindowStatePlayer = CWindowInfos:extend() -- window state for player
+function CWindowStatePlayer:new(_argt)
+    CWindowStatePlayer.super.new(self, _argt)
+    self.screenx = Tic.STATEWX
+    self.screeny = Tic.STATEWY
+    self.align   = CWindowInfos.ALIGNMD
+    self.fupper  = true
+	self.entity  = Tic:playerActual()
+    self:_argt(_argt) -- override if any
+end
+
+function CWindowStatePlayer:drawInside() -- window state content for player
+	self.entity          = Tic:playerActual()
+    local _state         = self.entity.state
+    local _statesettings = Tic.STATESETTINGS[_state]
+    local _posture       = _statesettings.posture
+    local _status        = _statesettings.status
+    self.infos = {_posture, _status}
+    CWindowStatePlayer.super.drawInside(self)
+end
+-- CWindowStatePlayer instance
+local WindowStatePlayer = CWindowStatePlayer{}
+
+
 
 --
 -- Places
@@ -3139,6 +3166,7 @@ function Tic:draw()
     WindowInfosPlayer:draw()
     WindowPortraitPlayer:draw()
     WindowStatsPlayer:draw()
+    WindowStatePlayer:draw()
 
     WindowTest1:draw()
     WindowTest2:draw()
