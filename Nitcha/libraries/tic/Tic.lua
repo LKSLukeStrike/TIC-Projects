@@ -1512,16 +1512,16 @@ function CPlaceTreesAnim:new(_argt)
     CPlaceTreesAnim.super.new(self, _argt)
     self.animations = {
         CAnimation{ -- leaf 1
-            frequence = Tic.FREQUENCE060,
+            frequence = Tic.FREQUENCE600,
             percent0  = 0.8,
             palette0  = {[Tic.COLORWHITE] = Tic.COLORGREENM,},
-            palette1  = {[Tic.COLORWHITE] = Tic.COLORGREEND,},
+            palette1  = {[Tic.COLORWHITE] = Tic.COLORGREYD,},
         },
         CAnimation{ -- leaf 2
-            frequence = Tic.FREQUENCE240,
+            frequence = Tic.FREQUENCE300,
             percent0  = 0.8,
-            palette0  = {[Tic.COLORYELLOW] = Tic.COLORGREENM,},
-            palette1  = {[Tic.COLORYELLOW] = Tic.COLORGREEND,},
+            palette0  = {[Tic.COLORYELLOW] = Tic.COLORGREYD,},
+            palette1  = {[Tic.COLORYELLOW] = Tic.COLORGREENM,},
         },
     }
     self:_argt(_argt) -- override if any
@@ -1769,7 +1769,8 @@ function CCharacter:new(_argt)
     self.diry         = Tic.DIRYMD
     self.solid        = false -- can be traversed
     self.state        = Tic.STATESTANDIDLE -- state
-    self.idlecycler   = CCyclerInt{maxindex = 59, mode = CCycler.MODEBLOCK,} -- cycler to get back to idle
+    self.idlecycler   = CCyclerInt{maxindex = 59,} -- cycler to get back to idle
+    self.workcycler   = CCyclerInt{maxindex = 179,} -- cycler to animate work
     self.colorhairsfg = Tic.COLORHAIRSFG -- colors
     self.colorhairsbg = Tic.COLORHAIRSBG
     self.colorextra   = Tic.COLOREXTRA
@@ -1848,11 +1849,41 @@ end
 
 function CCharacter:draw()
     self.posture = Tic.STATESETTINGS[self.state].posture -- force the posture
+    self:_cycle() -- cycle the cyclers
     self:_drawStatus()
     -- self:_drawWeapon()
     -- self:_drawShield()
     self:_drawBody()
     self:_drawHead()
+end
+
+function CCharacter:_cycle()
+    self:_cycleIdle()
+    self:_cycleWork()
+end
+
+function CCharacter:_cycleIdle() -- reset to idle after a delay
+    local _posture = Tic.STATESETTINGS[self.state].posture
+    local _status  = Tic.STATESETTINGS[self.state].status
+    if _posture == Tic.POSTUREFLOOR then return end -- mandatory stand or kneel
+    if _status  == Tic.STATUSWORK then return end -- is at work
+
+    self.idlecycler:next()
+	if self.idlecycler:isMAX() then -- trigger idlecycler
+		self.state = _posture..Tic.STATUSIDLE
+	end
+end
+
+function CCharacter:_cycleWork() -- animate work after a delay
+    local _posture = Tic.STATESETTINGS[self.state].posture
+    local _status  = Tic.STATESETTINGS[self.state].status
+    if _posture == Tic.POSTUREFLOOR then return end -- mandatory stand or kneel
+    if _status  ~= Tic.STATUSWORK then return end -- not at work
+
+    self.workcycler:next()
+	if self.workcycler:isGEH() then -- trigger workcycler
+		self:toggleFrame()
+	end
 end
 
 function CCharacter:_drawStatus()

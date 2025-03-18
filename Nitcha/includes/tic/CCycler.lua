@@ -73,6 +73,19 @@ function CCycler:next() -- next cycler value
     return self.actvalue
 end
 
+function CCycler:isMIN() -- if its min cycler value
+    return self.actvalue == self.minindex 
+end
+
+function CCycler:isMAX() -- if its max cycler value
+    return self.actvalue == self.maxindex 
+end
+
+function CCycler:isGEH() -- if its ge half of cycler range -- FIXME probably doent word with non numerics
+    return self.actvalue >= ((self.maxindex - self.minindex) // 2)
+end
+-- TODO add more tests ?
+
 
 CCyclerNum = CCycler:extend() -- numeric cyclers
 function CCyclerNum:new(_argt)
