@@ -10,6 +10,7 @@ local Tic = {}
 local Classic = require("libraries/ext/Classic")                
 local Nums    = require("libraries/lks/Nums")
 local Tables  = require("libraries/lks/Tables")
+local Names   = require("libraries/lks/Names")
 --
 -- Includes
 require("includes/tic/CCycler")                
@@ -24,40 +25,44 @@ Tic.FONTWS = 4 -- small font width
 Tic.FONTH  = 6 -- both font height
 
 -- Screen positions and sizes
-Tic.SCREENX  = 0 -- screen x position
-Tic.SCREENY  = 0 -- screen y position
 Tic.SCREENW  = 240 -- screen width
 Tic.SCREENH  = 136 -- screen height
+Tic.SCREENW2 = Tic.SCREENW // 2 -- half screen width
+Tic.SCREENH2 = Tic.SCREENH // 2 -- half screen height
+Tic.SCREENX  = 0 -- screen x position
+Tic.SCREENY  = 0 -- screen y position
 
 -- World Window positions and sizes (hud)
 Tic.WORLDWW  = 120 --Tic.SCREENH -- world window width
 Tic.WORLDWH  = 100 --Tic.SCREENH -- world window height
+Tic.WORLDWW2 = Tic.WORLDWW // 2 -- half world window width
+Tic.WORLDWH2 = Tic.WORLDWH // 2 -- half world window height
 Tic.WORLDWX  = (Tic.SCREENW - Tic.WORLDWW) // 2 -- world window x position
 Tic.WORLDWY  = (Tic.SCREENH - Tic.WORLDWH) // 2 -- world window y position
 
 -- Infos Window positions and sizes (hud)
-Tic.INFOSWW  = 26  -- infos window width
-Tic.INFOSWH  = 16  -- infos window height
-Tic.INFOSWX  = Tic.SCREENW - Tic.INFOSWW - ((Tic.WORLDWX - Tic.INFOSWW) // 2) -- infos window x position
-Tic.INFOSWY  = Tic.WORLDWY  -- infos window y position
+Tic.INFOSWW = 26 -- infos window width
+Tic.INFOSWH = 16 -- infos window height
+Tic.INFOSWX = Tic.SCREENW - Tic.INFOSWW - ((Tic.WORLDWX - Tic.INFOSWW) // 2) -- infos window x position
+Tic.INFOSWY = Tic.WORLDWY -- infos window y position
 
 -- Portrait Window positions and sizes (hud)
-Tic.PORTRAITWW  = 16  -- portrait window width
-Tic.PORTRAITWH  = 16  -- portrait window height
-Tic.PORTRAITWX  = Tic.SCREENW - Tic.PORTRAITWW - ((Tic.WORLDWX - Tic.PORTRAITWW) // 2) -- portrait window x position
-Tic.PORTRAITWY  = Tic.INFOSWY + 25  -- portrait window y position
+Tic.PORTRAITWW = 16 -- portrait window width
+Tic.PORTRAITWH = 16 -- portrait window height
+Tic.PORTRAITWX = Tic.SCREENW - Tic.PORTRAITWW - ((Tic.WORLDWX - Tic.PORTRAITWW) // 2) -- portrait window x position
+Tic.PORTRAITWY = Tic.INFOSWY + 25 -- portrait window y position
 
 -- Stats Window positions and sizes (hud)
-Tic.STATSWW  = 16  -- stats window width
-Tic.STATSWH  = 16  -- stats window height
-Tic.STATSWX  = Tic.PORTRAITWX -- stats window x position
-Tic.STATSWY  = Tic.PORTRAITWY + 25  -- stats window y position
+Tic.STATSWW = 16 -- stats window width
+Tic.STATSWH = 16 -- stats window height
+Tic.STATSWX = Tic.PORTRAITWX -- stats window x position
+Tic.STATSWY = Tic.PORTRAITWY + 25 -- stats window y position
 
 -- State Window positions and sizes (hud)
-Tic.STATEWW  = 26  -- state window width
-Tic.STATEWH  = 16  -- state window height
-Tic.STATEWX  = Tic.SCREENW - Tic.STATEWW - ((Tic.WORLDWX - Tic.STATEWW) // 2) -- state window x position
-Tic.STATEWY  = Tic.STATSWY + 25  -- state window y position
+Tic.STATEWW = 26 -- state window width
+Tic.STATEWH = 16 -- state window height
+Tic.STATEWX = Tic.SCREENW - Tic.STATEWW - ((Tic.WORLDWX - Tic.STATEWW) // 2) -- state window x position
+Tic.STATEWY = Tic.STATSWY + 25 -- state window y position
 
 
 -- Palette map
@@ -1121,10 +1126,10 @@ end
 
 function CEntity:randomWorldWindow() -- random worldx worldy into the world window region
     self:randomWorldRegion(CRegion{
-        lf = Nums:neg(Tic.WORLDWW2 // 2),
-        rg = Nums:pos(Tic.WORLDWW2 // 2),
-        up = Nums:neg(Tic.WORLDWH2 // 2),
-        dw = Nums:pos(Tic.WORLDWH2 // 2),
+        lf = Nums:neg(Tic.WORLDWW2),
+        rg = Nums:pos(Tic.WORLDWW2),
+        up = Nums:neg(Tic.WORLDWH2),
+        dw = Nums:pos(Tic.WORLDWH2),
     })
 end
 
@@ -2564,7 +2569,7 @@ function CWindowWorld:drawGround() -- window world ground
 end
 
 function CWindowWorld:drawInside() -- window world content
-    -- TODO drawPlayer here
+    Tic:drawPlayerActual()
 end
 
 
@@ -2618,7 +2623,7 @@ function CWindowInfos:drawInside() -- window info content
             and self.screenw - self.marginsh - _size + 1
             or  _offsetx
         _info = (self.fupper) -- uppercase first char if any
-            and _info:lower():gsub("^%l", string.upper)
+            and Names:fupper(_info)
             or  _info
 		if self.shadow then
 			print(
@@ -2725,7 +2730,7 @@ end
 function CWindowPortraitDrawable:drawInside() -- window portrait content for -- [!] drawable entities
     if not self.entity then return end -- mandatory
     if not self.entity:is(CEntityDrawable) then return end -- mandatory
-    self.entity:_save{"screenx", "screeny", "scale", "dirx", "frame", "animations"}
+    self.entity:_save{"screenx", "screeny", "scale", "dirx", "frame", "animations",}
     self.entity.screenx = self.screenx -- force character attributes
     self.entity.screeny = self.screeny
     self.entity.scale   = CSprite.SCALE02
@@ -3043,54 +3048,55 @@ end -- generate places
 --
 -- Players
 --
-local Truduk = CPlayerDwarf{name = "Truduk",
-}
+-- local Truduk = CPlayerDwarf{name = "Truduk",
+-- }
 -- Truduk:randomWorldWindow()
-local Prinnn = CPlayerGnome{name = "Prinnn",
-    coloreyesbg  = Tic.COLORRED,
-    coloreyesfg  = Tic.COLORORANGE,
-}
-local Kaptan = CPlayerMeduz{name = "Kaptan",
-}
-local Kaptin = CPlayerMeduz{name = "Kaptin",
-    colorhairsbg = Tic.COLORBLUEL,
-    colorhairsfg = Tic.COLORBLUEM,
-    coloreyesbg  = Tic.COLORBLUEM,
-    coloreyesfg  = Tic.COLORBLUEL,
-}
-local Aegeon = CPlayerElvwe{name = "Aegeon",
-    colorshirt   = Tic.COLORGREENL,
-    colorarmor   = Tic.COLORGREEND,
-    colorpants   = Tic.COLORGREENM,
-}
-local Nitcha = CPlayerDrowe{name = "Nitcha",
-}
-local Zariel = CPlayerAngel{name = "Zariel",
-}
-local Zikkow = CPlayerTifel{name = "Zikkow",
-    colorhairsbg = Tic.COLORGREENM,
-    colorhairsfg = Tic.COLORGREEND,
-    colorextra   = Tic.COLORGREYM,
-    coloreyesbg  = Tic.COLORGREENM,
-    coloreyesfg  = Tic.COLORGREENL,
-}
-local Kaainn = CPlayerDemon{name = "Kaainn",
-    colorhairsbg = Tic.COLORGREYL,
-    colorhairsfg = Tic.COLORWHITE,
-    coloreyesbg  = Tic.COLORBLUEM,
-    coloreyesfg  = Tic.COLORBLUEL,
-    size         = CCharacter.SIZEM,
-    colorshirt   = Tic.COLORPURPLE,
-    colorpants   = Tic.COLORRED,
-}
-local Daemok = CPlayerDemon{name = "Daemok",
-}
+-- local Prinnn = CPlayerGnome{name = "Prinnn",
+--     coloreyesbg  = Tic.COLORRED,
+--     coloreyesfg  = Tic.COLORORANGE,
+-- }
+-- local Kaptan = CPlayerMeduz{name = "Kaptan",
+-- }
+-- local Kaptin = CPlayerMeduz{name = "Kaptin",
+--     colorhairsbg = Tic.COLORBLUEL,
+--     colorhairsfg = Tic.COLORBLUEM,
+--     coloreyesbg  = Tic.COLORBLUEM,
+--     coloreyesfg  = Tic.COLORBLUEL,
+-- }
+-- local Aegeon = CPlayerElvwe{name = "Aegeon",
+--     colorshirt   = Tic.COLORGREENL,
+--     colorarmor   = Tic.COLORGREEND,
+--     colorpants   = Tic.COLORGREENM,
+-- }
+-- local Nitcha = CPlayerDrowe{name = "Nitcha",
+-- }
+-- local Zariel = CPlayerAngel{name = "Zariel",
+-- }
+-- local Zikkow = CPlayerTifel{name = "Zikkow",
+--     colorhairsbg = Tic.COLORGREENM,
+--     colorhairsfg = Tic.COLORGREEND,
+--     colorextra   = Tic.COLORGREYM,
+--     coloreyesbg  = Tic.COLORGREENM,
+--     coloreyesfg  = Tic.COLORGREENL,
+-- }
+-- local Kaainn = CPlayerDemon{name = "Kaainn",
+--     colorhairsbg = Tic.COLORGREYL,
+--     colorhairsfg = Tic.COLORWHITE,
+--     coloreyesbg  = Tic.COLORBLUEM,
+--     coloreyesfg  = Tic.COLORBLUEL,
+--     size         = CCharacter.SIZEM,
+--     colorshirt   = Tic.COLORPURPLE,
+--     colorpants   = Tic.COLORRED,
+-- }
+-- local Daemok = CPlayerDemon{name = "Daemok",
+-- }
 local Golith = CPlayerGogol{name = "Golith",
 }
--- Golith:randomWorldWindow()
+Golith:randomWorldWindow()
 local Wulfie = CPlayerWolfe{name = "Wulfie",
     colorextra = Tic.COLORRED,
 }
+Wulfie:randomWorldWindow()
 
 goto runit
 ::debug::
@@ -3171,8 +3177,6 @@ function Tic:draw()
     WindowTest1:draw()
     WindowTest2:draw()
 
-    -- Tic:drawPlayerActual()
-
     Tic:logAppend("WOX:", Tic.playerActual().worldx)
     Tic:logAppend("WOY:", Tic.playerActual().worldy)
     Tic:logAppend()
@@ -3208,23 +3212,8 @@ end
 -- actual player
 function Tic:drawPlayerActual()
     local _playeractual = Tic:playerActual()
-    local _idlecycler  = _playeractual.idlecycler
-    _idlecycler:next()
-
-    local _state   = _playeractual.state
-    local _posture = Tic.STATESETTINGS[_state].posture
-    local _status  = Tic.STATESETTINGS[_state].status
-    if _posture ~= Tic.POSTUREFLOOR then -- stand or kneel
-        if _status == Tic.STATUSWORK and _idlecycler.actvalue == _idlecycler.maxindex then -- animate work
-            _playeractual:toggleFrame()
-            _idlecycler:min()
-        else -- reset to idle if any
-            _playeractual.state = (_idlecycler.actvalue == _idlecycler.maxindex)
-                and _posture..Tic.STATUSIDLE
-                or  _playeractual.state
-        end
-    end
-
+    local _worldwx2 = Tic.WORLDWX + Tic.WORLDWW2
+    local _worldwy2 = Tic.WORLDWY + Tic.WORLDWH2
     local _worldx         = _playeractual.worldx
     local _worldy         = _playeractual.worldy
     local _entitiesaround = _playeractual:entitiesAround()
@@ -3235,20 +3224,16 @@ function Tic:drawPlayerActual()
             for _entity, _ in pairs(_entitiesaround[_keyy][_keyx]) do -- draw entities at the same x y
                 local _offsetx  = _entity.worldx - _worldx
                 local _offsety  = _entity.worldy - _worldy
-                _entity.screenx = _offsetx
-                _entity.screeny = _offsety
+                _entity:_save{"screenx", "screeny",}
+                _entity.screenx = _worldwx2 + _offsetx - 4
+                _entity.screeny = _worldwy2 + _offsety - 4
                 _entity:draw()
+                _entity:_load()
             end
         end
     end
 
-    -- Tic:logAppend(_playeractual.name)
-    -- Tic:logAppend("WOX:", _playeractual.worldx)
-    -- Tic:logAppend("WOY:", _playeractual.worldy)
-    -- Tic:logAppend("SCA:", _playeractual.scale)
-    -- Tic:logAppend("FHY:", _playeractual.statphyact)
-
-    _playeractual:drawDirs()
+    -- _playeractual:drawDirs()
 end
 
 function Tic:drawLog() -- [-] remove
