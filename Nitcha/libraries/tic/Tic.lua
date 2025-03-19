@@ -1,12 +1,10 @@
 -- Tic object
 -- Instance only once
--- Contains constants, globals and general functions
 -- 
-local Tic = {}
-
 
 --
 -- Packages
+package.path  = package.path..";G:/TIC80 1.1/TICProjects/Nitcha/?.lua"
 local Classic = require("libraries/ext/Classic")                
 local Nums    = require("libraries/lks/Nums")
 local Tables  = require("libraries/lks/Tables")
@@ -14,11 +12,14 @@ local Names   = require("libraries/lks/Names")
 --
 -- Includes
 require("includes/tic/CCycler")                
-            
+
 
 --
 -- Tic
 --
+local Tic = {}
+
+
 -- Fonts sizes
 Tic.FONTWL = 6 -- large font width
 Tic.FONTWS = 4 -- small font width

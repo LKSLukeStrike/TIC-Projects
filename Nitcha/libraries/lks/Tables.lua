@@ -1,13 +1,15 @@
 -- Tables object
 -- Instance only once
--- Contains constants, globals and general functions
 --
 
+--
 -- Packages
-package.path = package.path..";G:/TIC80 1.1/TICProjects/Nitcha/?.lua"
-local Nums   = require("libraries/lks/Nums")
+package.path  = package.path..";G:/TIC80 1.1/TICProjects/Nitcha/?.lua"
 
 
+--
+-- Tables
+--
 local Tables = {}
 
 

@@ -1,8 +1,17 @@
 -- Nums object
 -- Instance only once
--- Contains constants, globals and general functions
 -- 
+
+--
+-- Packages
+package.path  = package.path..";G:/TIC80 1.1/TICProjects/Nitcha/?.lua"
+
+
+--
+-- Nums
+--
 local Nums = {}
+
 
 -- Constants
 Nums.MAXINTEGER = 0 + 2^31 -- due to lua 5.3
