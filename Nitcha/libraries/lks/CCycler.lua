@@ -1,20 +1,21 @@
 -- CCycler classic
 -- Instance only once
--- Contains constants, globals and general functions
 -- 
-
 
 --
 -- Packages
+package.path  = package.path..";G:/TIC80 1.1/TICProjects/Nitcha/?.lua"
 local Classic = require("libraries/ext/Classic")                
 local Nums    = require("libraries/lks/Nums")
 local Tables  = require("libraries/lks/Tables")
-            
+
 
 --
 -- CCycler
 --
-CCycler = Classic:extend() -- general cyclers
+local CCycler = Classic:extend() -- general cyclers
+
+
 CCycler.MININDEX = 0
 CCycler.MAXINDEX = 0
 CCycler.ACTINDEX = CCycler.MININDEX
@@ -152,7 +153,7 @@ function CCyclerTable:remove(_at) -- remove an item from table _at (end by defau
     -- TODO
 end
 
-function CCyclerTable:prev() -- ^rev cycler value
+function CCyclerTable:prev() -- prev cycler value
     CCyclerTable.super.prev(self)
     self.actvalue = self.acttable[self.actindex]
     return self.actvalue
@@ -163,3 +164,8 @@ function CCyclerTable:next() -- next cycler value
     self.actvalue = self.acttable[self.actindex]
     return self.actvalue
 end
+
+
+
+-- END
+return CCycler

@@ -9,9 +9,7 @@ local Classic = require("libraries/ext/Classic")
 local Nums    = require("libraries/lks/Nums")
 local Tables  = require("libraries/lks/Tables")
 local Names   = require("libraries/lks/Names")
---
--- Includes
-require("includes/tic/CCycler")                
+local CCycler = require("libraries/lks/CCycler")                
 
 
 --
