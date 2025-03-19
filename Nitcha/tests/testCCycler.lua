@@ -1,60 +1,34 @@
 --
 -- Packages
-package.path = package.path..";G:/TIC80 1.1/TICProjects/Nitcha/?.lua"
-
---
--- Includes
-require("includes/tic/CCycler")                
+package.path  = package.path..";G:/TIC80 1.1/TICProjects/Nitcha/?.lua"
+local CCycler = require("libraries/lks/CCycler")                
 
 
--- local CyclerINT = CCyclerInt({
---     maxindex = 2
--- })
+local CyclerTable = CCyclerTable()
 
--- print(CyclerINT.minindex, CyclerINT.maxindex, CyclerINT.actindex, CyclerINT.actvalue)
--- CyclerINT:next()
--- print(CyclerINT.minindex, CyclerINT.maxindex, CyclerINT.actindex, CyclerINT.actvalue)
--- CyclerINT:next()
--- print(CyclerINT.minindex, CyclerINT.maxindex, CyclerINT.actindex, CyclerINT.actvalue)
--- CyclerINT:next()
--- print(CyclerINT.minindex, CyclerINT.maxindex, CyclerINT.actindex, CyclerINT.actvalue)
--- CyclerINT:next()
--- print(CyclerINT.minindex, CyclerINT.maxindex, CyclerINT.actindex, CyclerINT.actvalue)
--- CyclerINT:prev()
--- print(CyclerINT.minindex, CyclerINT.maxindex, CyclerINT.actindex, CyclerINT.actvalue)
--- CyclerINT:prev()
--- print(CyclerINT.minindex, CyclerINT.maxindex, CyclerINT.actindex, CyclerINT.actvalue)
--- CyclerINT:prev()
--- print(CyclerINT.minindex, CyclerINT.maxindex, CyclerINT.actindex, CyclerINT.actvalue)
--- CyclerINT:prev()
--- print(CyclerINT.minindex, CyclerINT.maxindex, CyclerINT.actindex, CyclerINT.actvalue)
+print(CyclerTable.minindex, CyclerTable.maxindex, CyclerTable.actindex, CyclerTable.actvalue)
+CyclerTable:insert(10)
+print(CyclerTable.minindex, CyclerTable.maxindex, CyclerTable.actindex, CyclerTable.actvalue)
+CyclerTable:insert(20)
+print(CyclerTable.minindex, CyclerTable.maxindex, CyclerTable.actindex, CyclerTable.actvalue)
+CyclerTable:insert(5, 1)
+print(CyclerTable.minindex, CyclerTable.maxindex, CyclerTable.actindex, CyclerTable.actvalue)
+CyclerTable:insert(30, 100)
+print(CyclerTable.minindex, CyclerTable.maxindex, CyclerTable.actindex, CyclerTable.actvalue)
+CyclerTable:insert(25, CyclerTable.maxindex)
+print(CyclerTable.minindex, CyclerTable.maxindex, CyclerTable.actindex, CyclerTable.actvalue)
 
+print(table.unpack(CyclerTable.acttable))
 
-local CyclerTAB = CCyclerTab()
-
-print(CyclerTAB.minindex, CyclerTAB.maxindex, CyclerTAB.actindex, CyclerTAB.actvalue)
-CyclerTAB:insert(10)
-print(CyclerTAB.minindex, CyclerTAB.maxindex, CyclerTAB.actindex, CyclerTAB.actvalue)
-CyclerTAB:insert(20)
-print(CyclerTAB.minindex, CyclerTAB.maxindex, CyclerTAB.actindex, CyclerTAB.actvalue)
-CyclerTAB:insert(5, 1)
-print(CyclerTAB.minindex, CyclerTAB.maxindex, CyclerTAB.actindex, CyclerTAB.actvalue)
-CyclerTAB:insert(30, 100)
-print(CyclerTAB.minindex, CyclerTAB.maxindex, CyclerTAB.actindex, CyclerTAB.actvalue)
-CyclerTAB:insert(25, CyclerTAB.maxindex)
-print(CyclerTAB.minindex, CyclerTAB.maxindex, CyclerTAB.actindex, CyclerTAB.actvalue)
-
-print(table.unpack(CyclerTAB.acttable))
-
-CyclerTAB:next()
-print(CyclerTAB.minindex, CyclerTAB.maxindex, CyclerTAB.actindex, CyclerTAB.actvalue)
-CyclerTAB:next()
-print(CyclerTAB.minindex, CyclerTAB.maxindex, CyclerTAB.actindex, CyclerTAB.actvalue)
-CyclerTAB:next()
-print(CyclerTAB.minindex, CyclerTAB.maxindex, CyclerTAB.actindex, CyclerTAB.actvalue)
-CyclerTAB:prev()
-print(CyclerTAB.minindex, CyclerTAB.maxindex, CyclerTAB.actindex, CyclerTAB.actvalue)
-CyclerTAB:prev()
-print(CyclerTAB.minindex, CyclerTAB.maxindex, CyclerTAB.actindex, CyclerTAB.actvalue)
-CyclerTAB:prev()
-print(CyclerTAB.minindex, CyclerTAB.maxindex, CyclerTAB.actindex, CyclerTAB.actvalue)
+CyclerTable:next()
+print(CyclerTable.minindex, CyclerTable.maxindex, CyclerTable.actindex, CyclerTable.actvalue)
+CyclerTable:next()
+print(CyclerTable.minindex, CyclerTable.maxindex, CyclerTable.actindex, CyclerTable.actvalue)
+CyclerTable:next()
+print(CyclerTable.minindex, CyclerTable.maxindex, CyclerTable.actindex, CyclerTable.actvalue)
+CyclerTable:prev()
+print(CyclerTable.minindex, CyclerTable.maxindex, CyclerTable.actindex, CyclerTable.actvalue)
+CyclerTable:prev()
+print(CyclerTable.minindex, CyclerTable.maxindex, CyclerTable.actindex, CyclerTable.actvalue)
+CyclerTable:prev()
+print(CyclerTable.minindex, CyclerTable.maxindex, CyclerTable.actindex, CyclerTable.actvalue)

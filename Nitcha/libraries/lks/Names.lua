@@ -5,6 +5,7 @@
 --
 -- Packages
 package.path  = package.path..";G:/TIC80 1.1/TICProjects/Nitcha/?.lua"
+local Nums    = require("libraries/lks/Nums")
 local Tables  = require("libraries/lks/Tables")
 
 
@@ -76,6 +77,24 @@ Names.CONSOS = {
 function Names:fupper(_string) -- uppercase first letter, lowercase the rest
     _string = _string or ""
     return _string:lower():gsub("^.", string.upper)
+end
+
+
+function Names:random(_minlen, _maxlen, _vowels, _consos) -- random name of a random length from 2 letters sets
+	_minlen = _minlen or 2
+	_maxlen = _maxlen or 6
+	_vowels = _vowels or Names.VOWELS
+	_consos = _consos or Names.CONSOS
+	local _reslen = Nums:random(_minlen, _maxlen)
+    local _result = ""
+
+    if math.random() < 0.5 then
+        _result = Tables:randompickval(_vowels)
+    end
+    while #_result < _reslen do
+        _result = _result..Tables:randompickval(_consos)..Tables:randompickval(_vowels)
+    end
+    return string.sub(_result, 1, _reslen)
 end
 
 
