@@ -1828,24 +1828,20 @@ function CCharacter:new(_argt)
     self.statphyact   = self.statphymax -- act stats -- 0-max
     self.statmenact   = self.statmenmax
     self.statpsyact   = self.statpsymax
+    self.drawdirs     = true -- draw behaviour
     self:_argt(_argt) -- override if any
     self.camera       = CCamera{name = self.name.." "..CEntity.NAMECAMERA} -- one camera per character
     self:focus() -- focus its camera on itself
 end
 
-function CCharacter:drawDirs() -- draw the directions and ranges around the player
+function CCharacter:drawDirs() -- draw the directions and ranges around the character
     local _drawcolor     = Tic.COLORWHITE
-    local _screenx       = Tic.WORLDWX + Tic.WORLDWW2 - 1
-    local _screeny       = Tic.WORLDWY + Tic.WORLDWH2
+    local _screenx       = Tic.WORLDWX + Tic.WORLDWW2 - (Tic:playerActual().worldx - self.worldx) - 1 --relative to actual player -- feet
+    local _screeny       = Tic.WORLDWY + Tic.WORLDWH2 - (Tic:playerActual().worldy - self.worldy) + 2
     local _range         = self.statphyact * self.scale
     local _statesettings = Tic.STATESETTINGS[self.state]
     local _posture       = _statesettings.posture
     _range               = (_posture == Tic.POSTUREKNEEL) and Nums:roundmax(_range / 2) or _range
-
-    -- Tic:logAppend("SCX:", _screenx)
-    -- Tic:logAppend("SCY:", _screeny)
-    -- Tic:logAppend("RAN:", _range)
-    -- Tic:logAppend()
 
     circb(_screenx, _screeny, _range, _drawcolor)
     circb(_screenx + 1, _screeny, _range, _drawcolor)
@@ -1887,6 +1883,7 @@ end
 function CCharacter:draw()
     self.posture = Tic.STATESETTINGS[self.state].posture -- force the posture
     self:_cycle() -- cycle the cyclers
+    if self.drawdirs then self:drawDirs() end
     self:_drawStatus()
     -- self:_drawWeapon()
     -- self:_drawShield()
@@ -2606,8 +2603,6 @@ function CWindowWorld:drawPlayerActual()
     local _entitiesaround = _playeractual:entitiesAround()
     local _keyys          = Tables:keys(_entitiesaround)
 
-    _playeractual:drawDirs()
-
     for _, _keyy in pairs(_keyys) do -- draw entities visible by the actual player sorted by y first
         local _keyxs      = Tables:keys(_entitiesaround[_keyy])
         for _, _keyx in pairs(_keyxs) do -- sorted by x next
@@ -2782,10 +2777,11 @@ end
 function CWindowPortraitDrawable:drawInside() -- window portrait content for -- [!] drawable entities
     if not self.entity then return end -- mandatory
     if not self.entity:is(CEntityDrawable) then return end -- mandatory
-    self.entity:_save{"screenx", "screeny", "scale", "dirx", "frame", "animations",}
-    self.entity.screenx = self.screenx -- force character attributes
-    self.entity.screeny = self.screeny
-    self.entity.scale   = CSprite.SCALE02
+    self.entity:_save{"screenx", "screeny", "scale", "drawdirs", "dirx", "frame", "animations",}
+    self.entity.screenx  = self.screenx -- force character attributes
+    self.entity.screeny  = self.screeny
+    self.entity.scale    = CSprite.SCALE02
+    self.entity.drawdirs = false
     if self.idle then
         self.entity.dirx       = Tic.DIRXLF
         self.entity.frame      = CSprite.FRAME00
@@ -3148,7 +3144,7 @@ Golith:randomWorldWindow()
 local Wulfie = CPlayerWolfe{name = "Wulfie",
     colorextra = Tic.COLORRED,
 }
-Wulfie:randomWorldWindow()
+-- Wulfie:randomWorldWindow()
 
 goto runit
 ::debug::
