@@ -658,17 +658,21 @@ end
 --
 local CSprite = Classic:extend() -- general sprites
 CSprite.SPRITEBANK = 0
-CSprite.SCALE01   = 01 -- sprites scales
-CSprite.SCALE02   = 02
-CSprite.SCALE03   = 03
-CSprite.SCALE04   = 04
-CSprite.FRAMEOF   = 16 -- sprites frames offset multiplier
-CSprite.FRAME00   = 00 -- sprites frames -- [!] start at 0, used to compute the offset
-CSprite.FRAME01   = 01
-CSprite.ROTATE000 = 0 -- sprite rotations
-CSprite.ROTATE090 = 1
-CSprite.ROTATE180 = 2
-CSprite.ROTATE270 = 3
+CSprite.SIGNALBANK  = CSprite.SPRITEBANK -- signals
+CSprite.SIGNQUESTM  = CSprite.SIGNALBANK + 0 -- question mark
+CSprite.SIGNSPOTSQ  = CSprite.SIGNALBANK + 1 -- spotted square
+CSprite.SIGNINTBUB  = CSprite.SIGNALBANK + 2 -- interact bubble
+CSprite.SCALE01    = 01 -- sprites scales
+CSprite.SCALE02    = 02
+CSprite.SCALE03    = 03
+CSprite.SCALE04    = 04
+CSprite.FRAMEOF    = 16 -- sprites frames offset multiplier
+CSprite.FRAME00    = 00 -- sprites frames -- [!] start at 0, used to compute the offset
+CSprite.FRAME01    = 01
+CSprite.ROTATE000  = 0 -- sprite rotations
+CSprite.ROTATE090  = 1
+CSprite.ROTATE180  = 2
+CSprite.ROTATE270  = 3
 function CSprite:new(_argt)
     CSprite.super.new(self, _argt)
     self.spritebank = CSprite.SPRITEBANK
@@ -688,7 +692,6 @@ function CSprite:new(_argt)
 end
 
 function CSprite:draw() -- draw a sprite -- SCREEN -- DEFAULT
-    self:spot()
     Tic:paletteChange(self.palette) -- change palette colors if any
     spr(
         self.sprite + (self.frame *  CSprite.FRAMEOF),
@@ -701,18 +704,8 @@ function CSprite:draw() -- draw a sprite -- SCREEN -- DEFAULT
         self.width,
         self.height
     )
+    self:spot()
     Tic:paletteReset() -- restore palette colors
-end
-
-function CSprite:spot() -- draw a border if spotted
-    if not self.spotted then return end -- nothing to draw
-    rectb(
-        self.screenx,
-        self.screeny,
-        self.width  * self.scale * 8, -- [-] not tested
-        self.height * self.scale * 8,
-        Tic.COLORGREYL
-    )
 end
 
 function CSprite:palettize(_palette) -- change palette colors if any
@@ -721,13 +714,32 @@ function CSprite:palettize(_palette) -- change palette colors if any
     end
 end
 
+function CSprite:spot() -- draw a border if spotted
+    if not self.spotted then return end -- nothing to draw
+    -- rectb(
+    --     self.screenx,
+    --     self.screeny,
+    --     self.width  * self.scale * 8, -- [-] not tested
+    --     self.height * self.scale * 8,
+    --     Tic.COLORGREYL
+    -- )
+    local _musprite = CSprite() -- multi usage unique sprite
+    _musprite.sprite  = CSprite.SIGNSPOTSQ
+    _musprite.screenx = self.screenx
+    _musprite.screeny = self.screeny
+    _musprite.flip    = self.dirx
+    _musprite.scale   = self.scale
+    _musprite.palette = {[Tic.COLORGREYM] = Tic.COLORWHITE,}
+    _musprite.spotted = false -- avoid dead loop
+    _musprite:draw()
+end
+
 
 --
 -- CSpriteBG
 --
 local CSpriteBG = CSprite:extend() -- bg sprites aka tic tiles
 CSpriteBG.SPRITEBANK  = 0
-CSpriteBG.SPRITEEMPTY = CSpriteBG.SPRITEBANK + 0 -- empty sprite
 CSpriteBG.BUILDSBANK  = 16 -- buildings
 CSpriteBG.PLACEHOUSE  = CSpriteBG.BUILDSBANK + 0
 CSpriteBG.PLACETOWER  = CSpriteBG.BUILDSBANK + 1
@@ -1228,7 +1240,7 @@ function CEntityDrawable:new(_argt)
     CEntityDrawable.super.new(self, _argt)
     self.kind = CEntity.KINDDRAWABLE
     self.name = CEntity.NAMEDRAWABLE
-    self.sprite     = CSpriteBG.SPRITEEMPTY
+    self.sprite     = CSpriteFG.SPRITEEMPTY
     self.screenx    = 0 -- screen positions -- used to draw the sprite
     self.screeny    = 0
     self.dirx       = Nums:random01() -- random flip lf/rg
