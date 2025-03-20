@@ -658,13 +658,13 @@ end
 --
 local CSprite = Classic:extend() -- general sprites
 CSprite.SPRITEBANK = 0
-CSprite.SCALE01 = 01 -- sprites scales
-CSprite.SCALE02 = 02
-CSprite.SCALE03 = 03
-CSprite.SCALE04 = 04
-CSprite.FRAMEOF = 16 -- sprites frames offset multiplier
-CSprite.FRAME00 = 00 -- sprites frames -- [!] start at 0, used to compute the offset
-CSprite.FRAME01 = 01
+CSprite.SCALE01   = 01 -- sprites scales
+CSprite.SCALE02   = 02
+CSprite.SCALE03   = 03
+CSprite.SCALE04   = 04
+CSprite.FRAMEOF   = 16 -- sprites frames offset multiplier
+CSprite.FRAME00   = 00 -- sprites frames -- [!] start at 0, used to compute the offset
+CSprite.FRAME01   = 01
 CSprite.ROTATE000 = 0 -- sprite rotations
 CSprite.ROTATE090 = 1
 CSprite.ROTATE180 = 2
@@ -672,21 +672,23 @@ CSprite.ROTATE270 = 3
 function CSprite:new(_argt)
     CSprite.super.new(self, _argt)
     self.spritebank = CSprite.SPRITEBANK
-    self.sprite = self.spritebank -- initial sprite number
-    self.screenx = 0 -- screen positions
-    self.screeny = 0
-    self.frame = CSprite.FRAME00
-    self.colorkey = Tic.COLORKEY -- default colorkey
-    self.scale = CSprite.SCALE01 -- default scale
-    self.flip = Tic.DIRXLF -- all sprites are dir h left by default
-    self.rotate = CSprite.ROTATE000 -- no rotation by default
-    self.width = 1 -- sprite 1x1 by default
-    self.height = 1
-    self.palette = {} -- empty by default, can be filled later
+    self.sprite    = self.spritebank -- initial sprite number
+    self.screenx   = 0 -- screen positions
+    self.screeny   = 0
+    self.frame     = CSprite.FRAME00
+    self.colorkey  = Tic.COLORKEY -- default colorkey
+    self.scale     = CSprite.SCALE01 -- default scale
+    self.flip      = Tic.DIRXLF -- all sprites are dir h left by default
+    self.rotate    = CSprite.ROTATE000 -- no rotation by default
+    self.width     = 1 -- sprite 1x1 by default
+    self.height    = 1
+    self.palette   = {} -- empty by default, can be filled later
+    self.spotted   = false -- use spotted to draw a border
     self:_argt(_argt) -- override if any
 end
 
 function CSprite:draw() -- draw a sprite -- SCREEN -- DEFAULT
+    self:spot()
     Tic:paletteChange(self.palette) -- change palette colors if any
     spr(
         self.sprite + (self.frame *  CSprite.FRAMEOF),
@@ -700,6 +702,17 @@ function CSprite:draw() -- draw a sprite -- SCREEN -- DEFAULT
         self.height
     )
     Tic:paletteReset() -- restore palette colors
+end
+
+function CSprite:spot() -- draw a border if spotted
+    if not self.spotted then return end -- nothing to draw
+    rectb(
+        self.screenx,
+        self.screeny,
+        self.width  * self.scale * 8, -- [-] not tested
+        self.height * self.scale * 8,
+        Tic.COLORGREYL
+    )
 end
 
 function CSprite:palettize(_palette) -- change palette colors if any
@@ -1222,6 +1235,7 @@ function CEntityDrawable:new(_argt)
     self.scale      = CSprite.SCALE01
     self.animations = nil -- override if any
     self.solid      = true -- can be traversed or not
+    self.spotted    = false -- use spotted to draw a border
     self:_argt(_argt) -- override if any
     self.world:entityAppend(self) -- append itself to the world
 end
@@ -1250,6 +1264,7 @@ function CEntityDrawable:draw() -- default draw for drawable entities -- overrid
     _musprite.flip    = self.dirx
     _musprite.scale   = self.scale
     _musprite.palette = _palette
+    _musprite.spotted = self.spotted
     _musprite:draw()
 end
 
@@ -1807,19 +1822,18 @@ function CCharacter:new(_argt)
 end
 
 function CCharacter:drawDirs() -- draw the directions and ranges around the player
-    local _drawcolor = Tic.COLORWHITE
-    local _screenx   = Tic.WORLDWX + ((Tic.WORLDWW - Tic.WORLDWX) // 2)
-    local _screeny   = Tic.WORLDWY + ((Tic.WORLDWH - Tic.WORLDWY) // 2)
-    local _range     = self.statphyact * self.scale
+    local _drawcolor     = Tic.COLORWHITE
+    local _screenx       = Tic.WORLDWX + Tic.WORLDWW2 - 1
+    local _screeny       = Tic.WORLDWY + Tic.WORLDWH2
+    local _range         = self.statphyact * self.scale
     local _statesettings = Tic.STATESETTINGS[self.state]
     local _posture       = _statesettings.posture
-    -- _screeny = (_posture == Tic.POSTUREKNEEL) and _screeny + 2 or _screeny
-    _range   = (_posture == Tic.POSTUREKNEEL) and Nums:roundmax(_range / 2) or _range
+    _range               = (_posture == Tic.POSTUREKNEEL) and Nums:roundmax(_range / 2) or _range
 
-    Tic:logAppend("SCX:", _screenx)
-    Tic:logAppend("SCY:", _screeny)
-    Tic:logAppend("RAN:", _range)
-    Tic:logAppend()
+    -- Tic:logAppend("SCX:", _screenx)
+    -- Tic:logAppend("SCY:", _screeny)
+    -- Tic:logAppend("RAN:", _range)
+    -- Tic:logAppend()
 
     circb(_screenx, _screeny, _range, _drawcolor)
     circb(_screenx + 1, _screeny, _range, _drawcolor)
@@ -1829,7 +1843,7 @@ function CCharacter:drawDirs() -- draw the directions and ranges around the play
         local _oscreeny = _offsets.screeny or 0
         local _ooffsetx = Nums:roundmax(_offsets.offsetx * _range / Tic.OFFSETLINE)
         local _ooffsety = Nums:roundmax(_offsets.offsety * _range / Tic.OFFSETLINE)
-        Tic:logAppend(_dir, _oscreenx, _oscreeny, _ooffsetx, _ooffsety)
+        -- Tic:logAppend(_dir, _oscreenx, _oscreeny, _ooffsetx, _ooffsety)
         line(
             _screenx + _oscreenx,
             _screeny + _oscreeny,
@@ -2568,7 +2582,34 @@ function CWindowWorld:drawGround() -- window world ground
 end
 
 function CWindowWorld:drawInside() -- window world content
-    Tic:drawPlayerActual()
+    CWindowWorld:drawPlayerActual()
+end
+
+function CWindowWorld:drawPlayerActual()
+    local _playeractual = Tic:playerActual()
+    local _worldwx2 = Tic.WORLDWX + Tic.WORLDWW2
+    local _worldwy2 = Tic.WORLDWY + Tic.WORLDWH2
+    local _worldx         = _playeractual.worldx
+    local _worldy         = _playeractual.worldy
+    local _entitiesaround = _playeractual:entitiesAround()
+    local _keyys          = Tables:keys(_entitiesaround)
+
+    _playeractual:drawDirs()
+
+    for _, _keyy in pairs(_keyys) do -- draw entities visible by the actual player sorted by y first
+        local _keyxs      = Tables:keys(_entitiesaround[_keyy])
+        for _, _keyx in pairs(_keyxs) do -- sorted by x next
+            for _entity, _ in pairs(_entitiesaround[_keyy][_keyx]) do -- draw entities at the same x y
+                local _offsetx  = _entity.worldx - _worldx
+                local _offsety  = _entity.worldy - _worldy
+                _entity:_save{"screenx", "screeny",}
+                _entity.screenx = _worldwx2 + _offsetx - 4
+                _entity.screeny = _worldwy2 + _offsety - 4
+                _entity:draw()
+                _entity:_load()
+            end
+        end
+    end
 end
 
 
@@ -3146,7 +3187,7 @@ local Region = CRegion{
 --
 -- Windows -- TESTING
 --
-local TreeTest = CPlaceTree0Anim{}
+local TreeTest = CPlaceTree0Anim{spotted = true,}
 local WindowTest1 = CWindowPortraitDrawable{
     screenx = 10,
     screeny = 18,
@@ -3208,32 +3249,6 @@ function Tic:draw()
 end
 
 
--- actual player
-function Tic:drawPlayerActual()
-    local _playeractual = Tic:playerActual()
-    local _worldwx2 = Tic.WORLDWX + Tic.WORLDWW2
-    local _worldwy2 = Tic.WORLDWY + Tic.WORLDWH2
-    local _worldx         = _playeractual.worldx
-    local _worldy         = _playeractual.worldy
-    local _entitiesaround = _playeractual:entitiesAround()
-    local _keyys          = Tables:keys(_entitiesaround)
-    for _, _keyy in pairs(_keyys) do -- draw entities visible by the actual player sorted by y first
-        local _keyxs      = Tables:keys(_entitiesaround[_keyy])
-        for _, _keyx in pairs(_keyxs) do -- sorted by x next
-            for _entity, _ in pairs(_entitiesaround[_keyy][_keyx]) do -- draw entities at the same x y
-                local _offsetx  = _entity.worldx - _worldx
-                local _offsety  = _entity.worldy - _worldy
-                _entity:_save{"screenx", "screeny",}
-                _entity.screenx = _worldwx2 + _offsetx - 4
-                _entity.screeny = _worldwy2 + _offsety - 4
-                _entity:draw()
-                _entity:_load()
-            end
-        end
-    end
-
-    -- _playeractual:drawDirs()
-end
 
 function Tic:drawLog() -- [-] remove
     local _tick00 = Tic.TICK00.actvalue
