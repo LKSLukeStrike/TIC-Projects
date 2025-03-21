@@ -682,7 +682,7 @@ function CSprite:new(_argt)
     self.frame     = CSprite.FRAME00
     self.colorkey  = Tic.COLORKEY -- default colorkey
     self.scale     = CSprite.SCALE01 -- default scale
-    self.flip      = Tic.DIRXLF -- all sprites are dir h left by default
+    self.flip      = Tic.DIRXLF -- all sprites are dir x left by default
     self.rotate    = CSprite.ROTATE000 -- no rotation by default
     self.width     = 1 -- sprite 1x1 by default
     self.height    = 1
@@ -835,6 +835,39 @@ function CSpriteFGBoard:draw()
     CSpriteFGBoard.super.draw(self)
 end
 
+
+--
+-- CSolid
+--
+local CSolid = Classic:extend() -- general solid region you cannot enter
+CSolid.SCREENW = 8 -- simple sprite sizes
+CSolid.SCREENH = 8
+function CSolid:new(_argt)
+    CSolid.super.new(self, _argt)
+    self.screenx = 0 -- positions
+    self.screeny = 0
+    self.screenw = CSolid.SCREENW
+    self.screenh = CSolid.SCREENH
+	self.dirx    = Tic.DIRXLF
+    self:_argt(_argt) -- override if any
+end
+
+function CSolid:draw()
+	local _drawcolor = Tic.COLORYELLOW
+	local _screenx   = self.screenx
+	local _screeny   = self.screeny
+	local _screenw   = self.screenw
+	local _screenh   = self.screenh
+	-- TODO use dirx
+	-- TODO ? use scale ?
+	rect(
+		_screenx,
+		_screeny,
+		_screenw,
+		_screenh,
+		_drawcolor
+	)
+end
 
 --
 -- CAnimation
@@ -1246,7 +1279,7 @@ function CEntityDrawable:new(_argt)
     self.dirx       = Nums:random01() -- random flip lf/rg
     self.scale      = CSprite.SCALE01
     self.animations = nil -- override if any
-    self.solid      = true -- can be traversed or not
+    self.solid      = nil -- area that cannot be traversed if any
     self.spotted    = false -- use spotted to draw a border
     self:_argt(_argt) -- override if any
     self.world:entityAppend(self) -- append itself to the world
@@ -1805,7 +1838,7 @@ function CCharacter:new(_argt)
     self.frame        = CSprite.FRAME00 -- frame
     self.dirx         = Tic.DIRXLF -- directions
     self.diry         = Tic.DIRYMD
-    self.solid        = false -- can be traversed
+    self.solid        = nil -- can be traversed
     self.state        = Tic.STATESTANDIDLE -- state
     self.idlecycler   = CCyclerInt{maxindex = 59,} -- cycler to get back to idle
     self.workcycler   = CCyclerInt{maxindex = 179,} -- cycler to animate work
@@ -1828,7 +1861,7 @@ function CCharacter:new(_argt)
     self.statphyact   = self.statphymax -- act stats -- 0-max
     self.statmenact   = self.statmenmax
     self.statpsyact   = self.statpsymax
-    self.drawdirs     = true -- draw behaviour
+    self.drawdirs     = false -- draw behaviour
     self:_argt(_argt) -- override if any
     self.camera       = CCamera{name = self.name.." "..CEntity.NAMECAMERA} -- one camera per character
     self:focus() -- focus its camera on itself
@@ -3144,7 +3177,7 @@ Golith:randomWorldWindow()
 local Wulfie = CPlayerWolfe{name = "Wulfie",
     colorextra = Tic.COLORRED,
 }
--- Wulfie:randomWorldWindow()
+Wulfie:randomWorldWindow()
 
 goto runit
 ::debug::
