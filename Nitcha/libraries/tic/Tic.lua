@@ -837,39 +837,6 @@ end
 
 
 --
--- CSolid
---
-local CSolid = Classic:extend() -- general solid region you cannot enter
-CSolid.SCREENW = 8 -- simple sprite sizes
-CSolid.SCREENH = 8
-function CSolid:new(_argt)
-    CSolid.super.new(self, _argt)
-    self.screenx = 0 -- positions
-    self.screeny = 0
-    self.screenw = CSolid.SCREENW
-    self.screenh = CSolid.SCREENH
-	self.dirx    = Tic.DIRXLF
-    self:_argt(_argt) -- override if any
-end
-
-function CSolid:draw()
-	local _drawcolor = Tic.COLORYELLOW
-	local _screenx   = self.screenx
-	local _screeny   = self.screeny
-	local _screenw   = self.screenw
-	local _screenh   = self.screenh
-	-- TODO use dirx
-	-- TODO ? use scale ?
-	rect(
-		_screenx,
-		_screeny,
-		_screenw,
-		_screenh,
-		_drawcolor
-	)
-end
-
---
 -- CAnimation
 --
 local CAnimation = Classic:extend() -- general palette animation for entities
@@ -896,16 +863,16 @@ function CRegion:new(_argt)
     self:_argt(_argt) -- override if any
 end
 
-function CRegion:borderw() -- border width
+function CRegion:borderW() -- border width
     return self.rg - self.lf + 1
 end
 
-function CRegion:borderh() -- border height
+function CRegion:borderH() -- border height
     return self.dw - self.up + 1
 end
 
 function CRegion:surface() -- region surface
-    return self:borderw() * self:borderh()
+    return self:borderW() * self:borderH()
 end
 
 function CRegion:randomWH(_width, _height) -- returns a region of random width and height
@@ -926,14 +893,56 @@ function CRegion:drawBorderScreenXY(_screenx, _screeny) -- draw border of a regi
     local _screeny = (_screeny) and _screeny or Tic.SCREENY
     local _borderx = _screenx + self.lf -- dont forget they are negatives
     local _bordery = _screeny + self.up
-    local _borderw = self:borderw()
-    local _borderh = self:borderh()
+    local _borderw = self:borderW()
+    local _borderh = self:borderH()
     local _drawcolor = Tic.COLORGREYL
     rectb(_borderx, _bordery,
         _borderw, _borderh,
         _drawcolor
     )
 end
+
+
+--
+-- CSolid
+--
+local CSolid = Classic:extend() -- general solid region you cannot enter
+CSolid.REGIONLF = 0 -- solid region sizes
+CSolid.REGIONRG = 7
+CSolid.REGIONUP = 0
+CSolid.REGIONDW = 7
+function CSolid:new(_argt)
+    CSolid.super.new(self, _argt)
+    self.screenx = 0 -- positions
+    self.screeny = 0
+	self.dirx    = Tic.DIRXLF
+    self.scale   = CSprite.SCALE01
+    self.region = CRegion{
+        lf = CSolid.REGIONLF,
+        rg = CSolid.REGIONRG,
+        up = CSolid.REGIONUP,
+        dw = CSolid.REGIONDW,
+    }
+    self:_argt(_argt) -- override if any
+end
+
+function CSolid:draw()
+	local _drawcolor = Tic.COLORYELLOW
+	local _screenx   = self.screenx
+	local _screeny   = self.screeny
+	local _dirx      = self.dirx
+	local _scale     = self.scale
+	local _region    = self.region
+
+    rectb(
+		(_dirx == Tic.DIRXLF) and _screenx + _region.lf or _screenx + CSolid.REGIONRG - _region:borderW() + 1,
+		_screeny + _region.up,
+		_region:borderW() * _scale,
+		_region:borderH() * _scale,
+		_drawcolor
+	)
+end
+
 
 --
 -- CLocations
@@ -1205,12 +1214,12 @@ function CWorldRegion:new(_argt)
     self:_argt(_argt) -- override if any
 end
 
-function CWorldRegion:borderw() -- border width
-    return self.region:borderw()
+function CWorldRegion:borderW() -- border width
+    return self.region:borderW()
 end
 
-function CWorldRegion:borderh() -- border height
-    return self.region:borderh()
+function CWorldRegion:borderH() -- border height
+    return self.region:borderH()
 end
 
 function CWorldRegion:surface() -- region surface
@@ -1279,8 +1288,9 @@ function CEntityDrawable:new(_argt)
     self.dirx       = Nums:random01() -- random flip lf/rg
     self.scale      = CSprite.SCALE01
     self.animations = nil -- override if any
-    self.solid      = nil -- area that cannot be traversed if any
     self.spotted    = false -- use spotted to draw a border
+    self.solid      = CSolid() -- area that cannot be traversed if any
+    self.drawsolid  = false -- draw behaviour
     self:_argt(_argt) -- override if any
     self.world:entityAppend(self) -- append itself to the world
 end
@@ -1311,6 +1321,14 @@ function CEntityDrawable:draw() -- default draw for drawable entities -- overrid
     _musprite.palette = _palette
     _musprite.spotted = self.spotted
     _musprite:draw()
+
+    if self.drawsolid and self.solid then
+        self.solid.screenx = self.screenx
+        self.solid.screeny = self.screeny
+        self.solid.dirx    = self.dirx
+        self.solid.scale   = self.scale
+        self.solid:draw()
+    end
 end
 
 
@@ -3228,7 +3246,7 @@ local Region = CRegion{
 --
 -- Windows -- TESTING
 --
-local TreeTest = CPlaceTree0Anim{spotted = true,}
+local TreeTest = CPlaceTree0Anim{spotted = false, drawsolid = true,}
 local WindowTest1 = CWindowPortraitDrawable{
     screenx = 10,
     screeny = 18,
@@ -3266,7 +3284,7 @@ function Tic:draw()
     Tic:logAppend()
     Tic:logAppend()
     Tic:logAppend()
-    Tic:logAppend()
+    Tic:logAppend("DIX:", TreeTest.dirx)
     Tic:logAppend("PHX:", Tic.playerActual().statphymax)
     Tic:logAppend("PHA:", Tic.playerActual().statphyact, (
         (Tic.playerActual().statphymax == Tic.playerActual().statphyact) and "ok" or "??"
