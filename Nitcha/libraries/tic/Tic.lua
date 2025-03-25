@@ -774,7 +774,7 @@ CSpriteFG.HEADANGEL   = CSpriteFG.HEADBANK + 4
 CSpriteFG.HEADHORNE   = CSpriteFG.HEADBANK + 5
 CSpriteFG.HEADMEDUZ   = CSpriteFG.HEADBANK + 6
 CSpriteFG.HEADGNOLL   = CSpriteFG.HEADBANK + 7
-CSpriteFG.BODYBANK    = 288 -- characters bodies
+CSpriteFG.BODYBANK    = 400 -- characters bodies
 CSpriteFG.BODYHUMAN   = CSpriteFG.BODYBANK + 0 -- humanoid bodies
 CSpriteFG.BODYHUMANSTANDIDLE = CSpriteFG.BODYHUMAN + 0
 CSpriteFG.BODYHUMANSTANDWORK = CSpriteFG.BODYHUMAN + 1
@@ -863,12 +863,14 @@ function CRegion:new(_argt)
     self:_argt(_argt) -- override if any
 end
 
-function CRegion:borderW() -- border width
-    return self.rg - self.lf + 1
+function CRegion:borderW(_scale) -- border width
+    _scale = _scale or CSprite.SCALE01
+    return self.rg - self.lf + (1 * _scale)
 end
 
-function CRegion:borderH() -- border height
-    return self.dw - self.up + 1
+function CRegion:borderH(_scale) -- border height
+    _scale = _scale or CSprite.SCALE01
+    return self.dw - self.up + (1 * _scale)
 end
 
 function CRegion:surface() -- region surface
@@ -928,19 +930,30 @@ end
 
 function CSolid:draw()
 	local _drawcolor = Tic.COLORYELLOW
-	local _screenx   = self.screenx
-	local _screeny   = self.screeny
-	local _dirx      = self.dirx
-	local _scale     = self.scale
-	local _region    = self.region
+	local _region    = self:regionScreen()
 
     rectb(
-		(_dirx == Tic.DIRXLF) and _screenx + _region.lf or _screenx + CSolid.REGIONRG - _region:borderW() + 1,
-		_screeny + _region.up,
-		_region:borderW() * _scale,
-		_region:borderH() * _scale,
+		_region.lf,
+		_region.up,
+		_region:borderW(self.scale),
+		_region:borderH(self.scale),
 		_drawcolor
 	)
+end
+
+function CSolid:regionScreen() -- screen coordinates of its region -- depends on dirx and scale
+    local _result   = CRegion()
+    local _offsetlf = (self.region.lf - CSolid.REGIONLF) * self.scale
+    local _offsetrg = (CSolid.REGIONRG - self.region.rg) * self.scale
+    local _borderw  = self.region:borderW(self.scale)
+
+    _result.lf = (self.dirx == Tic.DIRXLF)
+        and self.screenx + _offsetlf
+        or  self.screenx + _offsetrg
+    _result.rg = _result.lf + _borderw
+    _result.up = self.screeny + (self.region.up * self.scale)
+    _result.dw = self.screeny + (self.region.dw * self.scale)
+    return _result
 end
 
 
@@ -1322,7 +1335,7 @@ function CEntityDrawable:draw() -- default draw for drawable entities -- overrid
     _musprite.spotted = self.spotted
     _musprite:draw()
 
-    if self.drawsolid and self.solid then
+    if self.drawsolid and self.solid then -- draw solid if any
         self.solid.screenx = self.screenx
         self.solid.screeny = self.screeny
         self.solid.dirx    = self.dirx
@@ -1593,6 +1606,10 @@ function CPlaceTrees:new(_argt)
     self.name = CEntity.NAMETREES
     self.sprite  = CSpriteBG.PLACETREE0
     self.palette = CPlaceTrees.PALETTE
+    self.solid.region.lf = 2
+    self.solid.region.rg = 4
+    self.solid.region.up = 6
+    self.solid.region.dw = 7
     self:_argt(_argt) -- override if any
 end
 
@@ -1880,12 +1897,19 @@ function CCharacter:new(_argt)
     self.statmenact   = self.statmenmax
     self.statpsyact   = self.statpsymax
     self.drawdirs     = false -- draw behaviour
+    self.drawsolid    = true
+    self.solid        = CSolid()
+    self.solid.region.lf = 0
+    self.solid.region.rg = 3
+    self.solid.region.up = 0
+    self.solid.region.dw = 7
     self:_argt(_argt) -- override if any
     self.camera       = CCamera{name = self.name.." "..CEntity.NAMECAMERA} -- one camera per character
     self:focus() -- focus its camera on itself
 end
 
 function CCharacter:drawDirs() -- draw the directions and ranges around the character
+    if not self.drawdirs then return end -- nothing to draw
     local _drawcolor     = Tic.COLORWHITE
     local _screenx       = Tic.WORLDWX + Tic.WORLDWW2 - (Tic:playerActual().worldx - self.worldx) - 1 --relative to actual player -- feet
     local _screeny       = Tic.WORLDWY + Tic.WORLDWH2 - (Tic:playerActual().worldy - self.worldy) + 2
@@ -1931,15 +1955,17 @@ function CCharacter:drawDirs() -- draw the directions and ranges around the char
     end
 end
 
-function CCharacter:draw()
+
+function CCharacter:draw() -- set animations and draw layers
     self.posture = Tic.STATESETTINGS[self.state].posture -- force the posture
     self:_cycle() -- cycle the cyclers
-    if self.drawdirs then self:drawDirs() end
+    self:drawDirs()
     self:_drawStatus()
     -- self:_drawWeapon()
     -- self:_drawShield()
     self:_drawBody()
-    self:_drawHead()
+    -- self:_drawHead()
+    if self.drawsolid then self.solid:draw() end
 end
 
 function CCharacter:_cycle()
@@ -3189,10 +3215,10 @@ end -- generate places
 -- }
 -- local Daemok = CPlayerDemon{name = "Daemok",
 -- }
-local Golith = CPlayerGogol{name = "Golith",
+local Golith = CPlayerGogol{name = "Golith", drawdirs = false,
 }
 Golith:randomWorldWindow()
-local Wulfie = CPlayerWolfe{name = "Wulfie",
+local Wulfie = CPlayerWolfe{name = "Wulfie", drawdirs = true,
     colorextra = Tic.COLORRED,
 }
 Wulfie:randomWorldWindow()
@@ -3285,22 +3311,26 @@ function Tic:draw()
     Tic:logAppend()
     Tic:logAppend()
     Tic:logAppend("DIX:", TreeTest.dirx)
-    Tic:logAppend("PHX:", Tic.playerActual().statphymax)
-    Tic:logAppend("PHA:", Tic.playerActual().statphyact, (
-        (Tic.playerActual().statphymax == Tic.playerActual().statphyact) and "ok" or "??"
-    ))
-    Tic:logAppend("MEX:", Tic.playerActual().statmenmax)
-    Tic:logAppend("MEA:", Tic.playerActual().statmenact, (
-        (Tic.playerActual().statmenmax == Tic.playerActual().statmenact) and "ok" or "??"
-    ))
-    Tic:logAppend("PSX:", Tic.playerActual().statpsymax)
-    Tic:logAppend("PSA:", Tic.playerActual().statpsyact, (
-        (Tic.playerActual().statpsymax == Tic.playerActual().statpsyact) and "ok" or "??"
-    ))
-    Tic:logAppend("TOT:", Tic.playerActual().statphymax
-        + Tic.playerActual().statmenmax
-        + Tic.playerActual().statpsymax)
-    Tic:logAppend("CAM:", Tic.playerActual().camera.name)
+    Tic:logAppend("SLF:", TreeTest.solid.region.lf)
+    Tic:logAppend("SRG:", TreeTest.solid.region.rg)
+    Tic:logAppend("SUP:", TreeTest.solid.region.up)
+    Tic:logAppend("SDW:", TreeTest.solid.region.dw)
+    -- Tic:logAppend("PHX:", Tic.playerActual().statphymax)
+    -- Tic:logAppend("PHA:", Tic.playerActual().statphyact, (
+    --     (Tic.playerActual().statphymax == Tic.playerActual().statphyact) and "ok" or "??"
+    -- ))
+    -- Tic:logAppend("MEX:", Tic.playerActual().statmenmax)
+    -- Tic:logAppend("MEA:", Tic.playerActual().statmenact, (
+    --     (Tic.playerActual().statmenmax == Tic.playerActual().statmenact) and "ok" or "??"
+    -- ))
+    -- Tic:logAppend("PSX:", Tic.playerActual().statpsymax)
+    -- Tic:logAppend("PSA:", Tic.playerActual().statpsyact, (
+    --     (Tic.playerActual().statpsymax == Tic.playerActual().statpsyact) and "ok" or "??"
+    -- ))
+    -- Tic:logAppend("TOT:", Tic.playerActual().statphymax
+    --     + Tic.playerActual().statmenmax
+    --     + Tic.playerActual().statpsymax)
+    -- Tic:logAppend("CAM:", Tic.playerActual().camera.name)
 
     Tic:logPrint()
 
