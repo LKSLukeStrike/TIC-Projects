@@ -10,7 +10,7 @@ function CCharacter:new(_argt)
   self.sprite = 1
   self.x = 2
   self.y = 3
-  self:_argt(_argt)
+  self:argt(_argt)
 end
 
 function CCharacter:print(_title)
@@ -25,7 +25,7 @@ end
 CPlayer = CCharacter:extend()
 function CPlayer:new(_argt)
   CPlayer.super.new(self, _argt)
-  self:_argt(_argt)
+  self:argt(_argt)
 end
 
 
@@ -35,7 +35,7 @@ Jeandu = CPlayer{
   nom = "du",
 }
 
-Jeandu:_argt{
+Jeandu:argt{
   y = 300,
   x = 200,
   sprite = 100,
@@ -43,14 +43,14 @@ Jeandu:_argt{
   race = "Human",
 }
 
-Jeandu:_save{"age", "race"}
-Jeandu:_argt{
+Jeandu:save{"age", "race"}
+Jeandu:argt{
   age = 1234,
   race = "Thing",
 }
 Jeandu:print(":Jeandu 3:")
 
-Jeandu:_load()
+Jeandu:load()
 Jeandu:print(":Jeandu 4:")
 
 print("Classic", Jeandu:is(Classic))

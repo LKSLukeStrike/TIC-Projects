@@ -171,7 +171,7 @@ function Tables:dump(_table, _argt) -- dump a table -- SORTED -- RECURSIVE -- IN
             end
 
             if _dokeep then -- keep digging a table
-                _argt._indent = _indent.._argt.indent
+                _argt._indent = _indent..argt.indent
                 _argt.depth   = _depth - 1
                 _result       = _result.._dump(_val, _argt)
             end

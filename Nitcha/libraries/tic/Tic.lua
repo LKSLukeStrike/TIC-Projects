@@ -688,7 +688,7 @@ function CSprite:new(_argt)
     self.height    = 1
     self.palette   = {} -- empty by default, can be filled later
     self.spotted   = false -- use spotted to draw a border
-    self:_argt(_argt) -- override if any
+    self:argt(_argt) -- override if any
 end
 
 function CSprite:draw() -- draw a sprite -- SCREEN -- DEFAULT
@@ -753,7 +753,7 @@ CSpriteBG.PLACETREE0  = CSpriteBG.FORESTBANK + 0
 CSpriteBG.PLACETREE1  = CSpriteBG.FORESTBANK + 1
 function CSpriteBG:new(_argt)
     CSpriteBG.super.new(self, _argt)
-    self:_argt(_argt) -- override if any
+    self:argt(_argt) -- override if any
 end
 
 
@@ -774,7 +774,7 @@ CSpriteFG.HEADANGEL   = CSpriteFG.HEADBANK + 4
 CSpriteFG.HEADHORNE   = CSpriteFG.HEADBANK + 5
 CSpriteFG.HEADMEDUZ   = CSpriteFG.HEADBANK + 6
 CSpriteFG.HEADGNOLL   = CSpriteFG.HEADBANK + 7
-CSpriteFG.BODYBANK    = 400 -- characters bodies
+CSpriteFG.BODYBANK    = 288 -- characters bodies
 CSpriteFG.BODYHUMAN   = CSpriteFG.BODYBANK + 0 -- humanoid bodies
 CSpriteFG.BODYHUMANSTANDIDLE = CSpriteFG.BODYHUMAN + 0
 CSpriteFG.BODYHUMANSTANDWORK = CSpriteFG.BODYHUMAN + 1
@@ -793,7 +793,7 @@ function CSpriteFG:new(_argt)
     CSpriteFG.super.new(self, _argt)
     self.spritebank = CSpriteFG.SPRITEBANK
     self.sprite = self.spritebank
-    self:_argt(_argt) -- override if any
+    self:argt(_argt) -- override if any
 end
 
 
@@ -804,7 +804,7 @@ local CSpriteFGEmpty = CSpriteFG:extend() -- empty sprites
 function CSpriteFGEmpty:new(_argt)
     CSpriteFGEmpty.super.new(self, _argt)
     self.sprite = CSpriteFG.SPRITEEMPTY
-    self:_argt(_argt) -- override if any
+    self:argt(_argt) -- override if any
 end
 
 
@@ -815,7 +815,7 @@ local CSpriteFGPixel = CSpriteFG:extend() -- pixel sprites
 function CSpriteFGPixel:new(_argt)
     CSpriteFGPixel.super.new(self, _argt)
     self.sprite = CSpriteFG.SPRITEPIXEL
-    self:_argt(_argt) -- override if any
+    self:argt(_argt) -- override if any
 end
 
 
@@ -827,7 +827,7 @@ function CSpriteFGBoard:new(_argt)
     CSpriteFGBoard.super.new(self, _argt)
     self.sprite = CSpriteFG.SPRITEBOARD
     self.directives = {} -- table of painting directives {{x = 0-7, y = 0-7, color = 0-15,}, ...}
-    self:_argt(_argt) -- override if any
+    self:argt(_argt) -- override if any
 end
 
 function CSpriteFGBoard:draw()
@@ -846,7 +846,7 @@ function CAnimation:new(_argt)
     self.percent0  = 0.5
     self.palette0  = {}
     self.palette1  = {}
-    self:_argt(_argt) -- override if any
+    self:argt(_argt) -- override if any
 end
 
 
@@ -860,7 +860,7 @@ function CRegion:new(_argt)
     self.rg = Nums.MAXINTEGER -- positive
     self.up = Nums.MININTEGER -- negative
     self.dw = Nums.MAXINTEGER -- positive
-    self:_argt(_argt) -- override if any
+    self:argt(_argt) -- override if any
 end
 
 function CRegion:borderW(_scale) -- border width
@@ -925,7 +925,7 @@ function CSolid:new(_argt)
         up = CSolid.REGIONUP,
         dw = CSolid.REGIONDW,
     }
-    self:_argt(_argt) -- override if any
+    self:argt(_argt) -- override if any
 end
 
 function CSolid:draw()
@@ -943,14 +943,14 @@ end
 
 function CSolid:regionScreen() -- screen coordinates of its region -- depends on dirx and scale
     local _result   = CRegion()
-    local _offsetlf = (self.region.lf - CSolid.REGIONLF) * self.scale
-    local _offsetrg = (CSolid.REGIONRG - self.region.rg) * self.scale
-    local _borderw  = self.region:borderW(self.scale)
+    local _widthlf = (self.region.lf - CSolid.REGIONLF)
+    local _widthmd = (self.region.rg - self.region.lf )
+    local _widthrg = (CSolid.REGIONRG - self.region.rg)
 
     _result.lf = (self.dirx == Tic.DIRXLF)
-        and self.screenx + _offsetlf
-        or  self.screenx + _offsetrg
-    _result.rg = _result.lf + _borderw
+        and self.screenx + (_widthlf * self.scale)
+        or  self.screenx + (_widthrg * self.scale)
+    _result.rg = _result.lf + (_widthmd * self.scale)
     _result.up = self.screeny + (self.region.up * self.scale)
     _result.dw = self.screeny + (self.region.dw * self.scale)
     return _result
@@ -964,7 +964,7 @@ local CLocations = Classic:extend() -- general entities locations -- {worldy {wo
 function CLocations:new(_argt)
     CLocations.super.new(self, _argt)
     self.locations = {}
-    self:_argt(_argt) -- override if any
+    self:argt(_argt) -- override if any
 end
 
 function CLocations:append(_entity) -- add a new entity -- [!] allows doublons
@@ -1061,7 +1061,7 @@ function CEntitiesLocations:new(_argt)
     CEntitiesLocations.super.new(self, _argt)
     self.entities  = {} -- record each entity -- has to have worldx and worldy attributes
     self.locations = CLocations{} -- record each entity locations
-    self:_argt(_argt) -- override if any
+    self:argt(_argt) -- override if any
 end
 
 function CEntitiesLocations:append(_entity) -- add a new entity
@@ -1116,7 +1116,7 @@ function CWorld:new(_argt)
     self.kind = CWorld.KINDWORLD
     self.name = CWorld.NAMEWORLD
     self.entitieslocations = CEntitiesLocations{} -- record world entities and their locations
-    self:_argt(_argt) -- override if any
+    self:argt(_argt) -- override if any
 end
 -- CWorld instance
 local World = CWorld{}
@@ -1174,7 +1174,7 @@ function CEntity:new(_argt)
     self.worldx = CEntity.WORLDX -- world positions
     self.worldy = CEntity.WORLDY
     self.camera = nil -- optional camera that follows the entity -- to override if any
-    self:_argt(_argt) -- override if any
+    self:argt(_argt) -- override if any
 end
 
 function CEntity:focus() -- focus camera on itself
@@ -1224,7 +1224,7 @@ function CWorldRegion:new(_argt)
     self.kind = CEntity.KINDREGION
     self.name = CEntity.NAMEREGION
     self.region = CRegion()
-    self:_argt(_argt) -- override if any
+    self:argt(_argt) -- override if any
 end
 
 function CWorldRegion:borderW() -- border width
@@ -1261,7 +1261,7 @@ function CCamera:new(_argt)
     self.name = CEntity.NAMECAMERA
     self.rangex = CCamera.RANGEX
     self.rangey = CCamera.RANGEY
-    self:_argt(_argt) -- override if any
+    self:argt(_argt) -- override if any
 end
 
 function CCamera:focusXY(_worldx, _worldy) -- focus camera on world positions -- default to center
@@ -1304,7 +1304,7 @@ function CEntityDrawable:new(_argt)
     self.spotted    = false -- use spotted to draw a border
     self.solid      = CSolid() -- area that cannot be traversed if any
     self.drawsolid  = false -- draw behaviour
-    self:_argt(_argt) -- override if any
+    self:argt(_argt) -- override if any
     self.world:entityAppend(self) -- append itself to the world
 end
 
@@ -1335,13 +1335,16 @@ function CEntityDrawable:draw() -- default draw for drawable entities -- overrid
     _musprite.spotted = self.spotted
     _musprite:draw()
 
-    if self.drawsolid and self.solid then -- draw solid if any
-        self.solid.screenx = self.screenx
-        self.solid.screeny = self.screeny
-        self.solid.dirx    = self.dirx
-        self.solid.scale   = self.scale
-        self.solid:draw()
-    end
+    self:drawSolid()
+end
+
+function CEntityDrawable:drawSolid() -- draw solid if any
+    if not self.drawsolid or not self.solid then return end -- nothing to draw
+    self.solid.screenx = self.screenx
+    self.solid.screeny = self.screeny
+    self.solid.dirx    = self.dirx
+    self.solid.scale   = self.scale
+    self.solid:draw()
 end
 
 
@@ -1355,7 +1358,7 @@ function CPlace:new(_argt)
     CPlace.super.new(self, _argt)
     self.kind = CEntity.KINDPLACE
     self.name = CEntity.NAMEPLACE
-    self:_argt(_argt) -- override if any
+    self:argt(_argt) -- override if any
 end
 
 
@@ -1372,7 +1375,7 @@ function CPlaceHouse:new(_argt)
     self.name = CEntity.NAMEHOUSE
     self.sprite  = CSpriteBG.PLACEHOUSE
     self.palette = CPlaceHouse.PALETTE
-    self:_argt(_argt) -- override if any
+    self:argt(_argt) -- override if any
 end
 
 local CPlaceHouseAnim = CPlaceHouse:extend() -- anim houses
@@ -1392,7 +1395,7 @@ function CPlaceHouseAnim:new(_argt)
             palette1  = {[Tic.COLORYELLOW] = Tic.COLORORANGE,},
         },
     }
-    self:_argt(_argt) -- override if any
+    self:argt(_argt) -- override if any
 end
 
 local CPlaceHouseIdle = CPlaceHouse:extend() -- idle houses
@@ -1411,7 +1414,7 @@ function CPlaceTower:new(_argt)
     self.name = CEntity.NAMETOWER
     self.sprite  = CSpriteBG.PLACETOWER
     self.palette = CPlaceTower.PALETTE
-    self:_argt(_argt) -- override if any
+    self:argt(_argt) -- override if any
 end
 
 local CPlaceTowerAnim = CPlaceTower:extend() -- anim towers
@@ -1431,7 +1434,7 @@ function CPlaceTowerAnim:new(_argt)
             palette1  = {[Tic.COLORYELLOW] = Tic.COLORORANGE,},
         },
     }
-    self:_argt(_argt) -- override if any
+    self:argt(_argt) -- override if any
 end
 
 local CPlaceTowerIdle = CPlaceTower:extend() -- idle towers
@@ -1450,7 +1453,7 @@ function CPlaceManor:new(_argt)
     self.name = CEntity.NAMEMANOR
     self.sprite  = CSpriteBG.PLACEMANOR
     self.palette = CPlaceManor.PALETTE
-    self:_argt(_argt) -- override if any
+    self:argt(_argt) -- override if any
 end
 
 local CPlaceManorAnim = CPlaceManor:extend() -- anim manors
@@ -1470,7 +1473,7 @@ function CPlaceManorAnim:new(_argt)
             palette1  = {[Tic.COLORYELLOW] = Tic.COLORORANGE,},
         },
     }
-    self:_argt(_argt) -- override if any
+    self:argt(_argt) -- override if any
 end
 
 local CPlaceManorIdle = CPlaceManor:extend() -- idle manors
@@ -1489,7 +1492,7 @@ function CPlaceAltar:new(_argt)
     self.name = CEntity.NAMEALTAR
     self.sprite  = CSpriteBG.PLACEALTAR
     self.palette = CPlaceAltar.PALETTE
-    self:_argt(_argt) -- override if any
+    self:argt(_argt) -- override if any
 end
 
 local CPlaceAltarAnim = CPlaceAltar:extend() -- anim altars
@@ -1509,7 +1512,7 @@ function CPlaceAltarAnim:new(_argt)
             palette1  = {[Tic.COLORYELLOW] = Tic.COLORBLUEM,},
         },
     }
-    self:_argt(_argt) -- override if any
+    self:argt(_argt) -- override if any
 end
 
 local CPlaceAltarIdle = CPlaceAltar:extend() -- idle altars
@@ -1528,7 +1531,7 @@ function CPlaceWater:new(_argt)
     self.name = CEntity.NAMEWATER
     self.sprite  = CSpriteBG.PLACEWATER
     self.palette = CPlaceWater.PALETTE
-    self:_argt(_argt) -- override if any
+    self:argt(_argt) -- override if any
 end
 
 local CPlaceWaterAnim = CPlaceWater:extend() -- anim waters
@@ -1548,7 +1551,7 @@ function CPlaceWaterAnim:new(_argt)
             palette1  = {[Tic.COLORYELLOW] = Tic.COLORBLUEM,},
         },
     }
-    self:_argt(_argt) -- override if any
+    self:argt(_argt) -- override if any
 end
 
 local CPlaceWaterIdle = CPlaceWater:extend() -- idle waters
@@ -1567,7 +1570,7 @@ function CPlaceStall:new(_argt)
     self.name = CEntity.NAMESTALL
     self.sprite  = CSpriteBG.PLACESTALL
     self.palette = CPlaceStall.PALETTE
-    self:_argt(_argt) -- override if any
+    self:argt(_argt) -- override if any
 end
 
 local CPlaceStallAnim = CPlaceStall:extend() -- anim stalls
@@ -1587,7 +1590,7 @@ function CPlaceStallAnim:new(_argt)
             palette1  = {[Tic.COLORYELLOW] = Tic.COLORORANGE,},
         },
     }
-    self:_argt(_argt) -- override if any
+    self:argt(_argt) -- override if any
 end
 
 local CPlaceStallIdle = CPlaceStall:extend() -- idle stalls
@@ -1610,7 +1613,7 @@ function CPlaceTrees:new(_argt)
     self.solid.region.rg = 4
     self.solid.region.up = 6
     self.solid.region.dw = 7
-    self:_argt(_argt) -- override if any
+    self:argt(_argt) -- override if any
 end
 
 local CPlaceTreesAnim = CPlaceTrees:extend() -- anim trees
@@ -1630,7 +1633,7 @@ function CPlaceTreesAnim:new(_argt)
             palette1  = {[Tic.COLORYELLOW] = Tic.COLORGREENM,},
         },
     }
-    self:_argt(_argt) -- override if any
+    self:argt(_argt) -- override if any
 end
 
 local CPlaceTreesIdle = CPlaceTrees:extend() -- idle trees
@@ -1643,14 +1646,14 @@ local CPlaceTree1Anim = CPlaceTreesAnim:extend() -- anim tree1
 function CPlaceTree1Anim:new(_argt)
     CPlaceTree1Anim.super.new(self, _argt)
     self.sprite  = CSpriteBG.PLACETREE1
-    self:_argt(_argt) -- override if any
+    self:argt(_argt) -- override if any
 end
 
 local CPlaceTree1Idle = CPlaceTreesIdle:extend() -- idle tree1
 function CPlaceTree1Idle:new(_argt)
     CPlaceTree1Idle.super.new(self, _argt)
     self.sprite  = CSpriteBG.PLACETREE1
-    self:_argt(_argt) -- override if any
+    self:argt(_argt) -- override if any
 end
 
 
@@ -1899,11 +1902,11 @@ function CCharacter:new(_argt)
     self.drawdirs     = false -- draw behaviour
     self.drawsolid    = true
     self.solid        = CSolid()
-    self.solid.region.lf = 0
-    self.solid.region.rg = 3
-    self.solid.region.up = 0
+    self.solid.region.lf = 2
+    self.solid.region.rg = 4
+    self.solid.region.up = 5
     self.solid.region.dw = 7
-    self:_argt(_argt) -- override if any
+    self:argt(_argt) -- override if any
     self.camera       = CCamera{name = self.name.." "..CEntity.NAMECAMERA} -- one camera per character
     self:focus() -- focus its camera on itself
 end
@@ -1958,22 +1961,22 @@ end
 
 function CCharacter:draw() -- set animations and draw layers
     self.posture = Tic.STATESETTINGS[self.state].posture -- force the posture
-    self:_cycle() -- cycle the cyclers
+    self:cycle() -- cycle the cyclers
     self:drawDirs()
-    self:_drawStatus()
-    -- self:_drawWeapon()
-    -- self:_drawShield()
-    self:_drawBody()
-    -- self:_drawHead()
-    if self.drawsolid then self.solid:draw() end
+    self:drawStatus()
+    self:drawWeapon()
+    self:drawShield()
+    self:drawBody()
+    self:drawHead()
+    self:drawSolid()
 end
 
-function CCharacter:_cycle()
-    self:_cycleIdle()
-    self:_cycleWork()
+function CCharacter:cycle()
+    self:cycleIdle()
+    self:cycleWork()
 end
 
-function CCharacter:_cycleIdle() -- reset to idle after a delay
+function CCharacter:cycleIdle() -- reset to idle after a delay
     local _posture = Tic.STATESETTINGS[self.state].posture
     local _status  = Tic.STATESETTINGS[self.state].status
     if _posture == Tic.POSTUREFLOOR then return end -- mandatory stand or kneel
@@ -1985,7 +1988,7 @@ function CCharacter:_cycleIdle() -- reset to idle after a delay
 	end
 end
 
-function CCharacter:_cycleWork() -- animate work after a delay
+function CCharacter:cycleWork() -- animate work after a delay
     local _posture = Tic.STATESETTINGS[self.state].posture
     local _status  = Tic.STATESETTINGS[self.state].status
     if _posture == Tic.POSTUREFLOOR then return end -- mandatory stand or kneel
@@ -1997,7 +2000,7 @@ function CCharacter:_cycleWork() -- animate work after a delay
 	end
 end
 
-function CCharacter:_drawStatus()
+function CCharacter:drawStatus()
     local _state            = self.state
     local _statesettings    = Tic.STATESETTINGS[_state]
     local _posture          = _statesettings.posture
@@ -2021,10 +2024,10 @@ function CCharacter:_drawStatus()
     _musprite:draw()
 end
 
-function CCharacter:_drawWeapon()
+function CCharacter:drawWeapon()
 end
 
-function CCharacter:_drawShield()
+function CCharacter:drawShield()
 end
 
 function CCharacter:statePrev() -- prev state in the stack
@@ -2146,10 +2149,10 @@ function CCharacterHumanoid:new(_argt)
     self.colorshirt   = Tic.COLORGREYM
     self.colorpants   = Tic.COLORGREYL
     self.colorhands   = self.colorskin
-    self:_argt(_argt) -- override if any
+    self:argt(_argt) -- override if any
 end
 
-function CCharacterHumanoid:_drawBody()
+function CCharacterHumanoid:drawBody()
     local _state            = self.state
     local _statesettings    = Tic.STATESETTINGS[_state]
     local _posture          = _statesettings.posture
@@ -2189,7 +2192,7 @@ function CCharacterHumanoid:_drawBody()
     _musprite:draw()
 end
 
-function CCharacterHumanoid:_drawHead()
+function CCharacterHumanoid:drawHead()
     local _state            = self.state
     local _statesettings    = Tic.STATESETTINGS[_state]
     local _posture          = _statesettings.posture
@@ -2262,7 +2265,7 @@ CPlayerHumanoid:implement(IPlayer)
 function CPlayerHumanoid:new(_argt)
     CPlayerHumanoid.super.new(self, _argt)
     self:playerAppend()
-    self:_argt(_argt) -- override if any
+    self:argt(_argt) -- override if any
 end
 
 
@@ -2281,7 +2284,7 @@ function CPlayerDwarf:new(_argt)
     self.statmenact   = self.statmenmax
     self.statpsymax   = 2
     self.statpsyact   = self.statpsymax
-    self:_argt(_argt) -- override if any
+    self:argt(_argt) -- override if any
 end
 
 
@@ -2301,7 +2304,7 @@ function CPlayerGnome:new(_argt)
     self.statmenact   = self.statmenmax
     self.statpsymax   = 6
     self.statpsyact   = self.statpsymax
-    self:_argt(_argt) -- override if any
+    self:argt(_argt) -- override if any
 end
 
 
@@ -2322,7 +2325,7 @@ function CPlayerElvwe:new(_argt)
     self.statmenact   = self.statmenmax
     self.statpsymax   = 5
     self.statpsyact   = self.statpsymax
-    self:_argt(_argt) -- override if any
+    self:argt(_argt) -- override if any
 end
 
 
@@ -2342,7 +2345,7 @@ function CPlayerDrowe:new(_argt)
     self.statmenact   = self.statmenmax
     self.statpsymax   = 4
     self.statpsyact   = self.statpsymax
-    self:_argt(_argt) -- override if any
+    self:argt(_argt) -- override if any
 end
 
 
@@ -2362,7 +2365,7 @@ function CPlayerAngel:new(_argt)
     self.statmenact   = self.statmenmax
     self.statpsymax   = 5
     self.statpsyact   = self.statpsymax
-    self:_argt(_argt) -- override if any
+    self:argt(_argt) -- override if any
 end
 
 
@@ -2384,7 +2387,7 @@ function CPlayerGogol:new(_argt)
     self.statmenact   = self.statmenmax
     self.statpsymax   = 1
     self.statpsyact   = self.statpsymax
-    self:_argt(_argt) -- override if any
+    self:argt(_argt) -- override if any
 end
 
 
@@ -2404,7 +2407,7 @@ function CPlayerHorne:new(_argt)
     self.statmenact   = self.statmenmax
     self.statpsymax   = 7
     self.statpsyact   = self.statpsymax
-    self:_argt(_argt) -- override if any
+    self:argt(_argt) -- override if any
 end
 
 
@@ -2419,7 +2422,7 @@ function CPlayerDemon:new(_argt)
     self.statmenact   = self.statmenmax
     self.statpsymax   = 7
     self.statpsyact   = self.statpsymax
-    self:_argt(_argt) -- override if any
+    self:argt(_argt) -- override if any
 end
 
 
@@ -2435,7 +2438,7 @@ function CPlayerTifel:new(_argt)
     self.statmenact   = self.statmenmax
     self.statpsymax   = 5
     self.statpsyact   = self.statpsymax
-    self:_argt(_argt) -- override if any
+    self:argt(_argt) -- override if any
 end
 
 
@@ -2454,7 +2457,7 @@ function CPlayerMeduz:new(_argt)
     self.statmenact   = self.statmenmax
     self.statpsymax   = 5
     self.statpsyact   = self.statpsymax
-    self:_argt(_argt) -- override if any
+    self:argt(_argt) -- override if any
 end
 
 
@@ -2473,7 +2476,7 @@ function CPlayerGnoll:new(_argt)
     self.statmenact   = self.statmenmax
     self.statpsymax   = 2
     self.statpsyact   = self.statpsymax
-    self:_argt(_argt) -- override if any
+    self:argt(_argt) -- override if any
 end
 
 
@@ -2482,7 +2485,7 @@ CEntity.KINDWOLFE = "Wolfe" -- Wolfe kind
 function CPlayerWolfe:new(_argt)
     CPlayerWolfe.super.new(self, _argt)
     self.kind         = CEntity.KINDWOLFE
-    self:_argt(_argt) -- override if any
+    self:argt(_argt) -- override if any
 end
 
 
@@ -2515,7 +2518,7 @@ function CWindow:new(_argt)
     self.drawcaches  = true
     self.drawborder  = true
     self.drawframes  = true
-    self:_argt(_argt) -- override if any
+    self:argt(_argt) -- override if any
 end
 
 function CWindow:draw() -- window
@@ -2639,7 +2642,7 @@ function CWindowScreen:new(_argt)
     self.drawguides = false
     self.drawcaches = false
     self.drawframes = false
-    self:_argt(_argt) -- override if any
+    self:argt(_argt) -- override if any
 end
 -- CWindowScreen instance
 local WindowScreen = CWindowScreen{}
@@ -2657,7 +2660,7 @@ function CWindowWorld:new(_argt)
     self.screenh     = Tic.WORLDWH
     self.colorground = Tic.COLORBIOMENIGHT
     self.drawguides  = false
-    self:_argt(_argt) -- override if any
+    self:argt(_argt) -- override if any
 end
 -- CWindowWorld instance
 local WindowWorld = CWindowWorld{}
@@ -2686,11 +2689,11 @@ function CWindowWorld:drawPlayerActual()
             for _entity, _ in pairs(_entitiesaround[_keyy][_keyx]) do -- draw entities at the same x y
                 local _offsetx  = _entity.worldx - _worldx
                 local _offsety  = _entity.worldy - _worldy
-                _entity:_save{"screenx", "screeny",}
+                _entity:save{"screenx", "screeny",}
                 _entity.screenx = _worldwx2 + _offsetx - 4
                 _entity.screeny = _worldwy2 + _offsety - 4
                 _entity:draw()
-                _entity:_load()
+                _entity:load()
             end
         end
     end
@@ -2724,7 +2727,7 @@ function CWindowInfos:new(_argt)
     self.drawguides  = false
     self.drawcaches  = false
     self.drawborder  = false
-    self:_argt(_argt) -- override if any
+    self:argt(_argt) -- override if any
 	local _fontw = (self.small) and Tic.FONTWS or Tic.FONTWL
 	local _fonth = Tic.FONTH + 2
 	local _seppx = math.min(0, self.lines - 1) * self.linessep
@@ -2786,7 +2789,7 @@ function CWindowInfosEntity:new(_argt)
     self.align  = CWindowInfos.ALIGNMD
     self.shadow = true
 	self.entity = nil -- override
-    self:_argt(_argt) -- override if any
+    self:argt(_argt) -- override if any
 end
 
 function CWindowInfosEntity:drawInside() -- window infos content for entities
@@ -2808,7 +2811,7 @@ function CWindowInfosPlayer:new(_argt)
     self.screenx = Tic.INFOSWX
     self.screeny = Tic.INFOSWY
 	self.entity  = Tic:playerActual()
-    self:_argt(_argt) -- override if any
+    self:argt(_argt) -- override if any
 end
 
 function CWindowInfosPlayer:drawInside() -- window infos content for player
@@ -2831,7 +2834,7 @@ function CWindowPortrait:new(_argt)
     self.colorground = Tic.COLORBIOMENIGHT
     self.drawguides  = false
     self.drawborder  = false
-    self:_argt(_argt) -- override if any
+    self:argt(_argt) -- override if any
 end
 
 function CWindowPortrait:drawGround() -- window portrait ground
@@ -2848,13 +2851,13 @@ function CWindowPortraitDrawable:new(_argt)
     CWindowPortraitDrawable.super.new(self, _argt)
     self.idle   = false -- idle portait or not
 	self.entity = nil -- override
-    self:_argt(_argt) -- override if any
+    self:argt(_argt) -- override if any
 end
 
 function CWindowPortraitDrawable:drawInside() -- window portrait content for -- [!] drawable entities
     if not self.entity then return end -- mandatory
     if not self.entity:is(CEntityDrawable) then return end -- mandatory
-    self.entity:_save{"screenx", "screeny", "scale", "drawdirs", "dirx", "frame", "animations",}
+    self.entity:save{"screenx", "screeny", "scale", "drawdirs", "dirx", "frame", "animations",}
     self.entity.screenx  = self.screenx -- force character attributes
     self.entity.screeny  = self.screeny
     self.entity.scale    = CSprite.SCALE02
@@ -2865,7 +2868,7 @@ function CWindowPortraitDrawable:drawInside() -- window portrait content for -- 
         self.entity.animations = {}
     end
     self.entity:draw()
-    self.entity:_load()
+    self.entity:load()
 end
 
 
@@ -2878,7 +2881,7 @@ function CWindowPortraitPlayer:new(_argt)
     self.screenx = Tic.PORTRAITWX
     self.screeny = Tic.PORTRAITWY
 	self.entity  = Tic:playerActual()
-    self:_argt(_argt) -- override if any
+    self:argt(_argt) -- override if any
 end
 
 function CWindowPortraitPlayer:drawInside() -- window portrait content for player
@@ -2906,7 +2909,7 @@ function CWindowStats:new(_argt)
     self.drawguides  = false
     self.drawcaches  = false
     self.drawborder  = false
-    self:_argt(_argt) -- override if any
+    self:argt(_argt) -- override if any
 end
 
 
@@ -2917,7 +2920,7 @@ local CWindowStatsCharacter = CWindowStats:extend() -- window portrait for -- [!
 function CWindowStatsCharacter:new(_argt)
     CWindowStatsCharacter.super.new(self, _argt)
 	self.entity = nil -- override
-    self:_argt(_argt) -- override if any
+    self:argt(_argt) -- override if any
 end
 
 function CWindowStatsCharacter:drawInside() -- window portrait content for -- [!] characters
@@ -2998,7 +3001,7 @@ function CWindowStatsPlayer:new(_argt)
     self.screenx = Tic.STATSWX
     self.screeny = Tic.STATSWY
 	self.entity  = Tic:playerActual()
-    self:_argt(_argt) -- override if any
+    self:argt(_argt) -- override if any
 end
 
 function CWindowStatsPlayer:drawInside() -- window stats content for player
@@ -3020,7 +3023,7 @@ function CWindowStatePlayer:new(_argt)
     self.align   = CWindowInfos.ALIGNMD
     self.fupper  = true
 	self.entity  = Tic:playerActual()
-    self:_argt(_argt) -- override if any
+    self:argt(_argt) -- override if any
 end
 
 function CWindowStatePlayer:drawInside() -- window state content for player
@@ -3218,7 +3221,7 @@ end -- generate places
 local Golith = CPlayerGogol{name = "Golith", drawdirs = false,
 }
 Golith:randomWorldWindow()
-local Wulfie = CPlayerWolfe{name = "Wulfie", drawdirs = true,
+local Wulfie = CPlayerWolfe{name = "Wulfie", drawdirs = false,
     colorextra = Tic.COLORRED,
 }
 Wulfie:randomWorldWindow()
