@@ -658,10 +658,6 @@ end
 --
 local CSprite = Classic:extend() -- general sprites
 CSprite.SPRITEBANK = 0
-CSprite.SIGNALBANK  = CSprite.SPRITEBANK -- signals
-CSprite.SIGNQUESTM  = CSprite.SIGNALBANK + 0 -- question mark
-CSprite.SIGNSPOTSQ  = CSprite.SIGNALBANK + 1 -- spotted square
-CSprite.SIGNINTBUB  = CSprite.SIGNALBANK + 2 -- interact bubble
 CSprite.SCALE01    = 01 -- sprites scales
 CSprite.SCALE02    = 02
 CSprite.SCALE03    = 03
@@ -687,7 +683,6 @@ function CSprite:new(_argt)
     self.width     = 1 -- sprite 1x1 by default
     self.height    = 1
     self.palette   = {} -- empty by default, can be filled later
-    self.spotted   = false -- use spotted to draw a border
     self:argt(_argt) -- override if any
 end
 
@@ -704,7 +699,6 @@ function CSprite:draw() -- draw a sprite -- SCREEN -- DEFAULT
         self.width,
         self.height
     )
-    self:spot()
     Tic:paletteReset() -- restore palette colors
 end
 
@@ -714,32 +708,16 @@ function CSprite:palettize(_palette) -- change palette colors if any
     end
 end
 
-function CSprite:spot() -- draw a border if spotted
-    if not self.spotted then return end -- nothing to draw
-    -- rectb(
-    --     self.screenx,
-    --     self.screeny,
-    --     self.width  * self.scale * 8, -- [-] not tested
-    --     self.height * self.scale * 8,
-    --     Tic.COLORGREYL
-    -- )
-    local _musprite = CSprite() -- multi usage unique sprite
-    _musprite.sprite  = CSprite.SIGNSPOTSQ
-    _musprite.screenx = self.screenx
-    _musprite.screeny = self.screeny
-    _musprite.flip    = self.dirx
-    _musprite.scale   = self.scale
-    _musprite.palette = {[Tic.COLORGREYM] = Tic.COLORWHITE,}
-    _musprite.spotted = false -- avoid dead loop
-    _musprite:draw()
-end
-
 
 --
 -- CSpriteBG
 --
 local CSpriteBG = CSprite:extend() -- bg sprites aka tic tiles
 CSpriteBG.SPRITEBANK  = 0
+CSpriteBG.SIGNALBANK  = 0  -- signals
+CSpriteBG.SIGNQUESTM  = CSpriteBG.SIGNALBANK + 0 -- question mark
+CSpriteBG.SIGNSPOTSQ  = CSpriteBG.SIGNALBANK + 1 -- spotted square
+CSpriteBG.SIGNINTBUB  = CSpriteBG.SIGNALBANK + 2 -- interact bubble
 CSpriteBG.BUILDSBANK  = 16 -- buildings
 CSpriteBG.PLACEHOUSE  = CSpriteBG.BUILDSBANK + 0
 CSpriteBG.PLACETOWER  = CSpriteBG.BUILDSBANK + 1
@@ -906,30 +884,31 @@ end
 
 
 --
--- CSolid
+-- CHitbox
 --
-local CSolid = Classic:extend() -- general solid region you cannot enter
-CSolid.REGIONLF = 0 -- solid region sizes
-CSolid.REGIONRG = 7
-CSolid.REGIONUP = 0
-CSolid.REGIONDW = 7
-function CSolid:new(_argt)
-    CSolid.super.new(self, _argt)
-    self.screenx = 0 -- positions
-    self.screeny = 0
-	self.dirx    = Tic.DIRXLF
-    self.scale   = CSprite.SCALE01
-    self.region = CRegion{
-        lf = CSolid.REGIONLF,
-        rg = CSolid.REGIONRG,
-        up = CSolid.REGIONUP,
-        dw = CSolid.REGIONDW,
+local CHitbox = Classic:extend() -- general hitbox region
+CHitbox.REGIONLF = 0 -- hitbox region sizes
+CHitbox.REGIONRG = 7
+CHitbox.REGIONUP = 0
+CHitbox.REGIONDW = 7
+function CHitbox:new(_argt)
+    CHitbox.super.new(self, _argt)
+    self.screenx  = 0 -- positions
+    self.screeny  = 0
+	self.dirx     = Tic.DIRXLF
+    self.scale    = CSprite.SCALE01
+    self.collided = false -- is collided or not
+    self.region   = CRegion{
+        lf = CHitbox.REGIONLF,
+        rg = CHitbox.REGIONRG,
+        up = CHitbox.REGIONUP,
+        dw = CHitbox.REGIONDW,
     }
     self:argt(_argt) -- override if any
 end
 
-function CSolid:draw()
-	local _drawcolor = Tic.COLORYELLOW
+function CHitbox:draw()
+	local _drawcolor = (self.collided) and Tic.COLORORANGE or Tic.COLORYELLOW
 	local _region    = self:regionScreen()
 
     rectb(
@@ -941,11 +920,11 @@ function CSolid:draw()
 	)
 end
 
-function CSolid:regionScreen() -- screen coordinates of its region -- depends on dirx and scale
+function CHitbox:regionScreen() -- screen coordinates of its region -- depends on dirx and scale
     local _result   = CRegion()
-    local _widthlf = (self.region.lf - CSolid.REGIONLF)
+    local _widthlf = (self.region.lf - CHitbox.REGIONLF)
     local _widthmd = (self.region.rg - self.region.lf )
-    local _widthrg = (CSolid.REGIONRG - self.region.rg)
+    local _widthrg = (CHitbox.REGIONRG - self.region.rg)
 
     _result.lf = (self.dirx == Tic.DIRXLF)
         and self.screenx + (_widthlf * self.scale)
@@ -1302,8 +1281,10 @@ function CEntityDrawable:new(_argt)
     self.scale      = CSprite.SCALE01
     self.animations = nil -- override if any
     self.spotted    = false -- use spotted to draw a border
-    self.solid      = CSolid() -- area that cannot be traversed if any
-    self.drawsolid  = false -- draw behaviour
+    self.hitbox     = CHitbox() -- hitbox region
+    self.solid      = true -- hitbox can be traversed or not
+    self.collided   = false -- is the hitbox collided or not
+    self.drawhitbox = false -- draw behaviour
     self:argt(_argt) -- override if any
     self.world:entityAppend(self) -- append itself to the world
 end
@@ -1332,19 +1313,33 @@ function CEntityDrawable:draw() -- default draw for drawable entities -- overrid
     _musprite.flip    = self.dirx
     _musprite.scale   = self.scale
     _musprite.palette = _palette
-    _musprite.spotted = self.spotted
     _musprite:draw()
 
-    self:drawSolid()
+    self:drawSpotted()
+
+    self:drawHitbox()
 end
 
-function CEntityDrawable:drawSolid() -- draw solid if any
-    if not self.drawsolid or not self.solid then return end -- nothing to draw
-    self.solid.screenx = self.screenx
-    self.solid.screeny = self.screeny
-    self.solid.dirx    = self.dirx
-    self.solid.scale   = self.scale
-    self.solid:draw()
+function CEntityDrawable:drawSpotted() -- draw spotted if any
+    if not self.spotted then return end -- nothing to draw
+    local _musprite = CSpriteBG() -- multi usage unique sprite
+    _musprite.sprite  = CSpriteBG.SIGNSPOTSQ
+    _musprite.screenx = self.screenx
+    _musprite.screeny = self.screeny
+    _musprite.flip    = self.dirx
+    _musprite.scale   = self.scale
+    _musprite.palette = {[Tic.COLORGREYM] = Tic.COLORWHITE,}
+    _musprite:draw()
+end
+
+function CEntityDrawable:drawHitbox() -- draw hitbox if any
+    if not self.drawhitbox or not self.hitbox then return end -- nothing to draw
+    self.hitbox.screenx  = self.screenx
+    self.hitbox.screeny  = self.screeny
+    self.hitbox.dirx     = self.dirx
+    self.hitbox.scale    = self.scale
+    self.hitbox.collided = self.collided
+    self.hitbox:draw()
 end
 
 
@@ -1609,10 +1604,10 @@ function CPlaceTrees:new(_argt)
     self.name = CEntity.NAMETREES
     self.sprite  = CSpriteBG.PLACETREE0
     self.palette = CPlaceTrees.PALETTE
-    self.solid.region.lf = 2
-    self.solid.region.rg = 4
-    self.solid.region.up = 6
-    self.solid.region.dw = 7
+    self.hitbox.region.lf = 2
+    self.hitbox.region.rg = 4
+    self.hitbox.region.up = 6
+    self.hitbox.region.dw = 7
     self:argt(_argt) -- override if any
 end
 
@@ -1876,7 +1871,7 @@ function CCharacter:new(_argt)
     self.frame        = CSprite.FRAME00 -- frame
     self.dirx         = Tic.DIRXLF -- directions
     self.diry         = Tic.DIRYMD
-    self.solid        = nil -- can be traversed
+    self.hitbox        = nil -- can be traversed
     self.state        = Tic.STATESTANDIDLE -- state
     self.idlecycler   = CCyclerInt{maxindex = 59,} -- cycler to get back to idle
     self.workcycler   = CCyclerInt{maxindex = 179,} -- cycler to animate work
@@ -1900,15 +1895,57 @@ function CCharacter:new(_argt)
     self.statmenact   = self.statmenmax
     self.statpsyact   = self.statpsymax
     self.drawdirs     = false -- draw behaviour
-    self.drawsolid    = true
-    self.solid        = CSolid()
-    self.solid.region.lf = 2
-    self.solid.region.rg = 4
-    self.solid.region.up = 5
-    self.solid.region.dw = 7
+    self.drawhitbox   = true
+    self.hitbox       = CHitbox()
+    self.hitbox.region.lf = 2
+    self.hitbox.region.rg = 4
+    self.hitbox.region.up = 5
+    self.hitbox.region.dw = 7
     self:argt(_argt) -- override if any
     self.camera       = CCamera{name = self.name.." "..CEntity.NAMECAMERA} -- one camera per character
     self:focus() -- focus its camera on itself
+end
+
+function CCharacter:draw() -- set animations and draw layers
+    self.posture = Tic.STATESETTINGS[self.state].posture -- force the posture
+    self:cycle() -- cycle the cyclers
+    self:drawDirs()
+    self:drawStatus()
+    self:drawWeapon()
+    self:drawShield()
+    self:drawBody()
+    self:drawHead()
+    self:drawSpotted()
+    self:drawHitbox()
+end
+
+function CCharacter:cycle()
+    self:cycleIdle()
+    self:cycleWork()
+end
+
+function CCharacter:cycleIdle() -- reset to idle after a delay
+    local _posture = Tic.STATESETTINGS[self.state].posture
+    local _status  = Tic.STATESETTINGS[self.state].status
+    if _posture == Tic.POSTUREFLOOR then return end -- mandatory stand or kneel
+    if _status  == Tic.STATUSWORK then return end -- is at work
+
+    self.idlecycler:next()
+	if self.idlecycler:isMAX() then -- trigger idlecycler
+		self.state = _posture..Tic.STATUSIDLE
+	end
+end
+
+function CCharacter:cycleWork() -- animate work after a delay
+    local _posture = Tic.STATESETTINGS[self.state].posture
+    local _status  = Tic.STATESETTINGS[self.state].status
+    if _posture == Tic.POSTUREFLOOR then return end -- mandatory stand or kneel
+    if _status  ~= Tic.STATUSWORK then return end -- not at work
+
+    self.workcycler:next()
+	if self.workcycler:isGEH() then -- trigger workcycler
+		self:toggleFrame()
+	end
 end
 
 function CCharacter:drawDirs() -- draw the directions and ranges around the character
@@ -1956,48 +1993,6 @@ function CCharacter:drawDirs() -- draw the directions and ranges around the char
             )
         end
     end
-end
-
-
-function CCharacter:draw() -- set animations and draw layers
-    self.posture = Tic.STATESETTINGS[self.state].posture -- force the posture
-    self:cycle() -- cycle the cyclers
-    self:drawDirs()
-    self:drawStatus()
-    self:drawWeapon()
-    self:drawShield()
-    self:drawBody()
-    self:drawHead()
-    self:drawSolid()
-end
-
-function CCharacter:cycle()
-    self:cycleIdle()
-    self:cycleWork()
-end
-
-function CCharacter:cycleIdle() -- reset to idle after a delay
-    local _posture = Tic.STATESETTINGS[self.state].posture
-    local _status  = Tic.STATESETTINGS[self.state].status
-    if _posture == Tic.POSTUREFLOOR then return end -- mandatory stand or kneel
-    if _status  == Tic.STATUSWORK then return end -- is at work
-
-    self.idlecycler:next()
-	if self.idlecycler:isMAX() then -- trigger idlecycler
-		self.state = _posture..Tic.STATUSIDLE
-	end
-end
-
-function CCharacter:cycleWork() -- animate work after a delay
-    local _posture = Tic.STATESETTINGS[self.state].posture
-    local _status  = Tic.STATESETTINGS[self.state].status
-    if _posture == Tic.POSTUREFLOOR then return end -- mandatory stand or kneel
-    if _status  ~= Tic.STATUSWORK then return end -- not at work
-
-    self.workcycler:next()
-	if self.workcycler:isGEH() then -- trigger workcycler
-		self:toggleFrame()
-	end
 end
 
 function CCharacter:drawStatus()
@@ -2505,7 +2500,7 @@ function CWindow:new(_argt)
     self.screeny     = Tic.SCREENY
     self.screenw     = Tic.SCREENW -- sizes
     self.screenh     = Tic.SCREENH
-    self.cachest     = 8 -- caches thickness
+    self.cachest     = 8 -- caches thickness -- FIXME enlarge this to the whole screen
     self.colorground = Tic.COLORHUDSCREEN
     self.colorguides = Tic.COLORGREYM
     self.colorcaches = Tic.COLORHUDSCREEN
@@ -3218,10 +3213,10 @@ end -- generate places
 -- }
 -- local Daemok = CPlayerDemon{name = "Daemok",
 -- }
-local Golith = CPlayerGogol{name = "Golith", drawdirs = false,
+local Golith = CPlayerGogol{name = "Golith", drawdirs = false, scale = 2,
 }
 Golith:randomWorldWindow()
-local Wulfie = CPlayerWolfe{name = "Wulfie", drawdirs = false,
+local Wulfie = CPlayerWolfe{spotted = false, collided = false, name = "Wulfie", drawdirs = false, scale = 2,
     colorextra = Tic.COLORRED,
 }
 Wulfie:randomWorldWindow()
@@ -3275,7 +3270,7 @@ local Region = CRegion{
 --
 -- Windows -- TESTING
 --
-local TreeTest = CPlaceTree0Anim{spotted = false, drawsolid = true,}
+local TreeTest = CPlaceTree0Anim{spotted = false, collided = false, drawhitbox = true, scale = 2,}
 local WindowTest1 = CWindowPortraitDrawable{
     screenx = 10,
     screeny = 18,
@@ -3314,10 +3309,10 @@ function Tic:draw()
     Tic:logAppend()
     Tic:logAppend()
     Tic:logAppend("DIX:", TreeTest.dirx)
-    Tic:logAppend("SLF:", TreeTest.solid.region.lf)
-    Tic:logAppend("SRG:", TreeTest.solid.region.rg)
-    Tic:logAppend("SUP:", TreeTest.solid.region.up)
-    Tic:logAppend("SDW:", TreeTest.solid.region.dw)
+    Tic:logAppend("SLF:", TreeTest.hitbox.region.lf)
+    Tic:logAppend("SRG:", TreeTest.hitbox.region.rg)
+    Tic:logAppend("SUP:", TreeTest.hitbox.region.up)
+    Tic:logAppend("SDW:", TreeTest.hitbox.region.dw)
     -- Tic:logAppend("PHX:", Tic.playerActual().statphymax)
     -- Tic:logAppend("PHA:", Tic.playerActual().statphyact, (
     --     (Tic.playerActual().statphymax == Tic.playerActual().statphyact) and "ok" or "??"

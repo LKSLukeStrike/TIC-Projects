@@ -1,3 +1,9 @@
-- animation system
-- autofill act stats at creation
-- maybe more
+-- [-] animation system for characters
+-- [-] autofill act stats at creation
+
+-- FIXME extend the caches areas
+
+-- [-] add hitboxes to places etc
+
+-- TODO add detection of shift/ctrl/? to reduce de move
+
