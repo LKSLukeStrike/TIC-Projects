@@ -1063,22 +1063,22 @@ function CEntitiesLocations:moveXY(_entity, _worldx, _worldy) -- move an existin
     self.locations:moveXY(_entity, _worldx, _worldy)
 end
 
-function CEntitiesLocations:entitiesWorldXYRegion(_worldx, _worldy, _region) -- entities in region
+function CEntitiesLocations:entitiesWorldXYRegion(_worldx, _worldy, _region) -- entities in world xy region
     if not _worldx or not _worldy or not _region then return end -- mandatory
     return self.locations:entitiesWorldXYRegion(_worldx, _worldy, _region)
 end
 
-function CEntitiesLocations:entitiesWorldXYAround(_worldx, _worldy, _rangex, _rangey) -- entities in ranges
+function CEntitiesLocations:entitiesWorldXYAround(_worldx, _worldy, _rangex, _rangey) -- entities in world xy ranges
     if not _worldx or not _worldy or not _rangex or not _rangey then return end -- mandatory
     return self.locations:entitiesWorldXYAround(_worldx, _worldy, _rangex, _rangey)
 end
 
-function CEntitiesLocations:entitiesEntityRegion(_entity, _region) -- entities in region
+function CEntitiesLocations:entitiesEntityRegion(_entity, _region) -- entities in entity region
     if not _entity or not _region then return end -- mandatory
     return self.locations:entitiesEntityRegion(_entity, _region)
 end
 
-function CEntitiesLocations:entitiesEntityAround(_entity, _rangex, _rangey) -- entities in ranges
+function CEntitiesLocations:entitiesEntityAround(_entity, _rangex, _rangey) -- entities in entity ranges
     if not _entity or not _rangex or not _rangey then return end -- mandatory
     return self.locations:entitiesEntityAround(_entity, _rangex, _rangey)
 end
@@ -1370,6 +1370,10 @@ function CPlaceHouse:new(_argt)
     self.name = CEntity.NAMEHOUSE
     self.sprite  = CSpriteBG.PLACEHOUSE
     self.palette = CPlaceHouse.PALETTE
+    self.hitbox.region.lf = 1
+    self.hitbox.region.rg = 5
+    self.hitbox.region.up = 5
+    self.hitbox.region.dw = 7
     self:argt(_argt) -- override if any
 end
 
@@ -3270,16 +3274,19 @@ local Region = CRegion{
 --
 -- Windows -- TESTING
 --
-local TreeTest = CPlaceTree0Anim{spotted = false, collided = false, drawhitbox = true, scale = 2,}
+local Tree0Test = CPlaceTree0Anim{spotted = false, collided = false, drawhitbox = true, scale = 2,}
+Tree0Test:randomWorldWindow()
 local WindowTest1 = CWindowPortraitDrawable{
     screenx = 10,
     screeny = 18,
-    entity = TreeTest,
+    entity = Tree0Test,
 }
-local WindowTest2 = CWindowStatsCharacter{
+local HouseTest = CPlaceHouseAnim{spotted = false, collided = false, drawhitbox = true, scale = 2,}
+HouseTest:randomWorldWindow()
+local WindowTest2 = CWindowPortraitDrawable{
     screenx = 10,
     screeny = 44,
-    entity = Nitcha,
+    entity = HouseTest,
 }
 
 
@@ -3300,35 +3307,36 @@ function Tic:draw()
     WindowTest1:draw()
     WindowTest2:draw()
 
-    Tic:logAppend("WOX:", Tic.playerActual().worldx)
-    Tic:logAppend("WOY:", Tic.playerActual().worldy)
+    Tic:logAppend("WOX:", Tic:playerActual().worldx)
+    Tic:logAppend("WOY:", Tic:playerActual().worldy)
     Tic:logAppend()
     Tic:logAppend()
     Tic:logAppend()
     Tic:logAppend()
     Tic:logAppend()
     Tic:logAppend()
-    Tic:logAppend("DIX:", TreeTest.dirx)
-    Tic:logAppend("SLF:", TreeTest.hitbox.region.lf)
-    Tic:logAppend("SRG:", TreeTest.hitbox.region.rg)
-    Tic:logAppend("SUP:", TreeTest.hitbox.region.up)
-    Tic:logAppend("SDW:", TreeTest.hitbox.region.dw)
-    -- Tic:logAppend("PHX:", Tic.playerActual().statphymax)
-    -- Tic:logAppend("PHA:", Tic.playerActual().statphyact, (
-    --     (Tic.playerActual().statphymax == Tic.playerActual().statphyact) and "ok" or "??"
+    Tic:logAppend("DIX:", Tic:playerActual().dirx)
+    Tic:logAppend("DIY:", Tic:playerActual().diry)
+    -- Tic:logAppend("SRG:", Tree0Test.hitbox.region.rg)
+    -- Tic:logAppend("SUP:", Tree0Test.hitbox.region.up)
+    -- Tic:logAppend("SDW:", Tree0Test.hitbox.region.dw)
+
+    -- Tic:logAppend("PHX:", Tic:playerActual().statphymax)
+    -- Tic:logAppend("PHA:", Tic:playerActual().statphyact, (
+    --     (Tic:playerActual().statphymax == Tic:playerActual().statphyact) and "ok" or "??"
     -- ))
-    -- Tic:logAppend("MEX:", Tic.playerActual().statmenmax)
-    -- Tic:logAppend("MEA:", Tic.playerActual().statmenact, (
-    --     (Tic.playerActual().statmenmax == Tic.playerActual().statmenact) and "ok" or "??"
+    -- Tic:logAppend("MEX:", Tic:playerActual().statmenmax)
+    -- Tic:logAppend("MEA:", Tic:playerActual().statmenact, (
+    --     (Tic:playerActual().statmenmax == Tic:playerActual().statmenact) and "ok" or "??"
     -- ))
-    -- Tic:logAppend("PSX:", Tic.playerActual().statpsymax)
-    -- Tic:logAppend("PSA:", Tic.playerActual().statpsyact, (
-    --     (Tic.playerActual().statpsymax == Tic.playerActual().statpsyact) and "ok" or "??"
+    -- Tic:logAppend("PSX:", Tic:playerActual().statpsymax)
+    -- Tic:logAppend("PSA:", Tic:playerActual().statpsyact, (
+    --     (Tic:playerActual().statpsymax == Tic:playerActual().statpsyact) and "ok" or "??"
     -- ))
-    -- Tic:logAppend("TOT:", Tic.playerActual().statphymax
-    --     + Tic.playerActual().statmenmax
-    --     + Tic.playerActual().statpsymax)
-    -- Tic:logAppend("CAM:", Tic.playerActual().camera.name)
+    -- Tic:logAppend("TOT:", Tic:playerActual().statphymax
+    --     + Tic:playerActual().statmenmax
+    --     + Tic:playerActual().statpsymax)
+    -- Tic:logAppend("CAM:", Tic:playerActual().camera.name)
 
     Tic:logPrint()
 
