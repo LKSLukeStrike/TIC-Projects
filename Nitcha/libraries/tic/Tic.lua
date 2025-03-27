@@ -1899,6 +1899,7 @@ function CCharacter:new(_argt)
     self.statmenact   = self.statmenmax
     self.statpsyact   = self.statpsymax
     self.drawdirs     = false -- draw behaviour
+    self.drawview     = true
     self.drawhitbox   = true
     self.hitbox       = CHitbox()
     self.hitbox.region.lf = 2
@@ -1908,6 +1909,23 @@ function CCharacter:new(_argt)
     self:argt(_argt) -- override if any
     self.camera       = CCamera{name = self.name.." "..CEntity.NAMECAMERA} -- one camera per character
     self:focus() -- focus its camera on itself
+end
+
+function CCharacter:regionScreenView() -- viewable screen region depending on dirx, diry
+    return CRegion{
+        lf  = (self.dirx == Tic.DIRXLF)
+            and Tic.WORLDWX + 1
+            or  self.screenx,
+        rg  = (self.dirx == Tic.DIRXLF)
+            and self.screenx + (8 * self.scale)
+            or  Tic.WORLDWX + Tic.WORLDWW - 1,
+        up  = (self.diry == Tic.DIRYUP or self.diry == Tic.DIRYMD)
+            and Tic.WORLDWY + 1
+            or  self.screeny,
+        dw  = (self.diry == Tic.DIRYMD or self.diry == Tic.DIRYDW)
+            and Tic.WORLDWY + Tic.WORLDWH - 1
+            or  self.screeny + (8 * self.scale),
+    }
 end
 
 function CCharacter:draw() -- set animations and draw layers
@@ -1921,6 +1939,7 @@ function CCharacter:draw() -- set animations and draw layers
     self:drawHead()
     self:drawSpotted()
     self:drawHitbox()
+    self:drawView()
 end
 
 function CCharacter:cycle()
@@ -1970,7 +1989,7 @@ function CCharacter:drawDirs() -- draw the directions and ranges around the char
         local _oscreeny = _offsets.screeny or 0
         local _ooffsetx = Nums:roundmax(_offsets.offsetx * _range / Tic.OFFSETLINE)
         local _ooffsety = Nums:roundmax(_offsets.offsety * _range / Tic.OFFSETLINE)
-        -- Tic:logAppend(_dir, _oscreenx, _oscreeny, _ooffsetx, _ooffsety)
+
         line(
             _screenx + _oscreenx,
             _screeny + _oscreeny,
@@ -1997,6 +2016,27 @@ function CCharacter:drawDirs() -- draw the directions and ranges around the char
             )
         end
     end
+end
+
+function CCharacter:drawView() -- draw the view of a character
+    if not self.drawview then return end -- nothing to draw
+    -- if not (self == Tic:playerActual()) then return end -- only actual player
+    local _drawcolor = Tic.COLORGREENL
+    local _regionscreenview = self:regionScreenView()
+    local _screenlf  = _regionscreenview.lf
+    local _screenrg  = _regionscreenview.rg
+    local _screenup  = _regionscreenview.up
+    local _screendw  = _regionscreenview.dw
+
+    Tic:logAppend("???:", self.name)
+    Tic:logAppend("SX:", self.screenx)
+    Tic:logAppend("SY:", self.screeny)
+    Tic:logAppend("LF:", _screenlf)
+    Tic:logAppend("RG:", _screenrg)
+    Tic:logAppend("UP:", _screenup)
+    Tic:logAppend("DW:", _screendw)
+
+    rectb(_screenlf, _screenup, _screenrg - _screenlf, _screendw - _screenup, _drawcolor)
 end
 
 function CCharacter:drawStatus()
@@ -2689,8 +2729,8 @@ function CWindowWorld:drawPlayerActual()
                 local _offsetx  = _entity.worldx - _worldx
                 local _offsety  = _entity.worldy - _worldy
                 _entity:save{"screenx", "screeny",}
-                _entity.screenx = _worldwx2 + _offsetx - 4
-                _entity.screeny = _worldwy2 + _offsety - 4
+                _entity.screenx = _worldwx2 + _offsetx - (4 * _entity.scale)
+                _entity.screeny = _worldwy2 + _offsety - (4 * _entity.scale)
                 _entity:draw()
                 _entity:load()
             end
@@ -2856,11 +2896,12 @@ end
 function CWindowPortraitDrawable:drawInside() -- window portrait content for -- [!] drawable entities
     if not self.entity then return end -- mandatory
     if not self.entity:is(CEntityDrawable) then return end -- mandatory
-    self.entity:save{"screenx", "screeny", "scale", "drawdirs", "dirx", "frame", "animations",}
+    self.entity:save{"screenx", "screeny", "scale", "drawdirs", "drawview","dirx", "frame", "animations",}
     self.entity.screenx  = self.screenx -- force character attributes
     self.entity.screeny  = self.screeny
     self.entity.scale    = CSprite.SCALE02
     self.entity.drawdirs = false
+    self.entity.drawview = false
     if self.idle then
         self.entity.dirx       = Tic.DIRXLF
         self.entity.frame      = CSprite.FRAME00
@@ -3220,7 +3261,7 @@ end -- generate places
 local Golith = CPlayerGogol{name = "Golith", drawdirs = false, scale = 2,
 }
 Golith:randomWorldWindow()
-local Wulfie = CPlayerWolfe{spotted = false, collided = false, name = "Wulfie", drawdirs = false, scale = 2,
+local Wulfie = CPlayerWolfe{spotted = true, collided = false, name = "Wulfie", drawdirs = false, scale = 2,
     colorextra = Tic.COLORRED,
 }
 Wulfie:randomWorldWindow()
