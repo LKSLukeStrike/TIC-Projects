@@ -79,6 +79,16 @@ function Nums:isEven(_num) -- if num is even
 end
 
 
+-- Distances
+function Nums:distancePoints(_pointx0, _pointy0, _pointx1, _pointy1) -- distance between 2 points
+    _pointx0 = _pointx0 or 0
+    _pointy0 = _pointy0 or 0
+    _pointx1 = _pointx1 or 0
+    _pointy1 = _pointy1 or 0
+    return math.sqrt(((_pointx0 - _pointx1) ^ 2) + ((_pointy0 - _pointy1) ^ 2))
+end
+
+
 -- Comparisons
 function Nums:_isFctAny(_num, _fct, ...) -- if _fct true on any ... -- false by default
     local _args = {...}
