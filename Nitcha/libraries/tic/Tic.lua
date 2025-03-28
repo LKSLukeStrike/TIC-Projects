@@ -885,6 +885,14 @@ function CRegion:drawBorderScreenXY(_screenx, _screeny) -- draw border of a regi
     )
 end
 
+function CRegion:isInsidePoint(_pointx, _pointy) -- is a point inside a region ?
+    _pointx = _pointx or 0
+    _pointy = _pointy or 0
+	if not Nums:isBW(_pointx, self.lf, self.rg) then return false end
+	if not Nums:isBW(_pointy, self.up, self.dw) then return false end
+	return true
+end
+
 
 --
 -- CHitbox
@@ -1935,20 +1943,40 @@ function CCharacter:new(_argt)
     self:focus() -- focus its camera on itself
 end
 
-function CCharacter:regionScreenView() -- viewable screen region depending on dirx, diry
+function CCharacter:regionViewOffsets() -- viewable offsets region depending on dirx, diry
     return CRegion{
         lf  = (self.dirx == Tic.DIRXLF)
-            and Tic.WORLDWX + 1
-            or  self.screenx,
+            and self.screenx - Tic.WORLDWX - 1
+            or  0,
         rg  = (self.dirx == Tic.DIRXLF)
-            and self.screenx + (8 * self.scale)
-            or  Tic.WORLDWX + Tic.WORLDWW - 1,
+            and 8 * self.scale
+            or  Tic.WORLDWX + Tic.WORLDWW - 1 - self.screenx,
         up  = (self.diry == Tic.DIRYUP or self.diry == Tic.DIRYMD)
-            and Tic.WORLDWY + 1
-            or  self.screeny,
+            and self.screeny - Tic.WORLDWY - 1
+            or  0,
         dw  = (self.diry == Tic.DIRYMD or self.diry == Tic.DIRYDW)
-            and Tic.WORLDWY + Tic.WORLDWH - 1
-            or  self.screeny + (8 * self.scale),
+            and Tic.WORLDWY + Tic.WORLDWH - 1 - self.screeny
+            or  8 * self.scale,
+    }
+end
+
+function CCharacter:regionViewScreen() -- viewable screen region depending on dirx, diry
+    local _viewoffsets = self:regionViewOffsets()
+    return CRegion{
+        lf = self.screenx - _viewoffsets.lf,
+        rg = self.screenx + _viewoffsets.rg,
+        up = self.screeny - _viewoffsets.up,
+        dw = self.screeny + _viewoffsets.dw,
+    }
+end
+
+function CCharacter:regionViewWorld() -- viewable world region depending on dirx, diry
+    local _viewoffsets = self:regionViewOffsets()
+    return CRegion{
+        lf = self.worldx - _viewoffsets.lf,
+        rg = self.worldx + _viewoffsets.rg,
+        up = self.worldy - _viewoffsets.up,
+        dw = self.worldy + _viewoffsets.dw,
     }
 end
 
@@ -2046,19 +2074,11 @@ function CCharacter:drawView() -- draw the view of a character
     if not self.drawview then return end -- nothing to draw
     -- if not (self == Tic:playerActual()) then return end -- only actual player
     local _drawcolor = Tic.COLORGREENL
-    local _regionscreenview = self:regionScreenView()
+    local _regionscreenview = self:regionViewScreen()
     local _screenlf  = _regionscreenview.lf
     local _screenrg  = _regionscreenview.rg
     local _screenup  = _regionscreenview.up
     local _screendw  = _regionscreenview.dw
-
-    Tic:logAppend("???:", self.name)
-    Tic:logAppend("SX:", self.screenx)
-    Tic:logAppend("SY:", self.screeny)
-    Tic:logAppend("LF:", _screenlf)
-    Tic:logAppend("RG:", _screenrg)
-    Tic:logAppend("UP:", _screenup)
-    Tic:logAppend("DW:", _screendw)
 
     rectb(_screenlf, _screenup, _screenrg - _screenlf, _screendw - _screenup, _drawcolor)
 end
@@ -3323,7 +3343,7 @@ end -- generate places
 -- }
 -- Wulfie:randomWorldWindow()
 
-local Oxboow = CPlayerGhost{spotted = false, collided = false, name = "Oxboow", drawdirs = false, drawhitbox = false, drawview = false,
+local Oxboow = CPlayerGhost{spotted = false, collided = false, name = "Oxboow", drawdirs = false, drawhitbox = false, drawview = true,
 scale = 1,
 }
 Oxboow:randomWorldWindow()
