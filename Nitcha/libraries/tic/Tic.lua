@@ -752,6 +752,7 @@ CSpriteFG.HEADANGEL   = CSpriteFG.HEADBANK + 4
 CSpriteFG.HEADHORNE   = CSpriteFG.HEADBANK + 5
 CSpriteFG.HEADMEDUZ   = CSpriteFG.HEADBANK + 6
 CSpriteFG.HEADGNOLL   = CSpriteFG.HEADBANK + 7
+CSpriteFG.HEADGHOST   = CSpriteFG.HEADBANK + 8
 CSpriteFG.BODYBANK    = 288 -- characters bodies
 CSpriteFG.BODYHUMAN   = CSpriteFG.BODYBANK + 0 -- humanoid bodies
 CSpriteFG.BODYHUMANSTANDIDLE = CSpriteFG.BODYHUMAN + 0
@@ -2528,6 +2529,26 @@ function CPlayerWolfe:new(_argt)
 end
 
 
+local CPlayerGhost = CPlayerHumanoid:extend() -- Ghost player characters
+CEntity.KINDGHOST = "Ghost" -- Ghost kind
+function CPlayerGhost:new(_argt)
+    CPlayerGhost.super.new(self, _argt)
+    self.kind         = CEntity.KINDGHOST
+    self.size         = CCharacter.SIZEL -- size
+    self.coloreyesfg  = Tic.COLORRED -- colors
+    self.coloreyesbg  = Tic.COLORPURPLE
+    self.colorhands   = Tic.COLORPURPLE
+    self.headsprite   = CSpriteFG.HEADGHOST -- head
+    self.statphymax   = 4
+    self.statphyact   = self.statphymax
+    self.statmenmax   = 5
+    self.statmenact   = self.statmenmax
+    self.statpsymax   = 6
+    self.statpsyact   = self.statpsymax
+    self:argt(_argt) -- override if any
+end
+
+
 local CNeutral= CCharacter:extend() -- neutral characters
 
 
@@ -3258,13 +3279,21 @@ end -- generate places
 -- }
 -- local Daemok = CPlayerDemon{name = "Daemok",
 -- }
-local Golith = CPlayerGogol{name = "Golith", drawdirs = false, scale = 2,
+
+-- local Golith = CPlayerGogol{name = "Golith", drawdirs = false, scale = 2,
+-- }
+-- Golith:randomWorldWindow()
+
+-- local Wulfie = CPlayerWolfe{spotted = true, collided = false, name = "Wulfie", drawdirs = false, scale = 2,
+--     colorextra = Tic.COLORRED,
+-- }
+-- Wulfie:randomWorldWindow()
+
+local Oxboow = CPlayerGhost{spotted = false, collided = false, name = "Oxboow", drawdirs = false, drawhitbox = false, drawview = false,
+scale = 1,
 }
-Golith:randomWorldWindow()
-local Wulfie = CPlayerWolfe{spotted = true, collided = false, name = "Wulfie", drawdirs = false, scale = 2,
-    colorextra = Tic.COLORRED,
-}
-Wulfie:randomWorldWindow()
+Oxboow:randomWorldWindow()
+
 
 goto runit
 ::debug::
