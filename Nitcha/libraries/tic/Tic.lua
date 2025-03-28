@@ -38,6 +38,8 @@ Tic.WORLDWW2 = Tic.WORLDWW // 2 -- half world window width
 Tic.WORLDWH2 = Tic.WORLDWH // 2 -- half world window height
 Tic.WORLDWX  = (Tic.SCREENW - Tic.WORLDWW) // 2 -- world window x position
 Tic.WORLDWY  = (Tic.SCREENH - Tic.WORLDWH) // 2 -- world window y position
+Tic.WORLDWX2 = Tic.WORLDWX + Tic.WORLDWW2 -- half world window x position
+Tic.WORLDWY2 = Tic.WORLDWY + Tic.WORLDWH2 -- half world window y position
 
 -- Infos Window positions and sizes (hud)
 Tic.INFOSWW = 26 -- infos window width
@@ -1192,6 +1194,16 @@ function CEntity:randomWorldWindow() -- random worldx worldy into the world wind
     })
 end
 
+function CEntity:distanceEntityReal(_entity) -- real distance from itself to another entity
+    if not _entity then return 0 end -- mandatory
+    return Nums:distancePointsReal(self.worldx, self.worldy, _entity.worldx, _entity.worldy)
+end
+
+function CEntity:distanceEntitySquared(_entity) -- squared distance from itself to another entity -- faster
+    if not _entity then return 0 end -- mandatory
+    return Nums:distancePointsSquared(self.worldx, self.worldy, _entity.worldx, _entity.worldy)
+end
+
 
 --
 -- CWorldRegion
@@ -1341,6 +1353,17 @@ function CEntityDrawable:drawHitbox() -- draw hitbox if any
     self.hitbox.scale    = self.scale
     self.hitbox.collided = self.collided
     self.hitbox:draw()
+end
+
+function CEntityDrawable:drawRelativeToEntity(_entity) -- draw an entity relative to an other one in world positions
+    if not _entity then return end -- mandatory
+	local _offsetx = self.worldx - _entity.worldx
+	local _offsety = self.worldy - _entity.worldy
+	self:save{"screenx", "screeny",}
+	self.screenx = Tic.WORLDWX2 + _offsetx - (4 * self.scale)
+	self.screeny = Tic.WORLDWY2 + _offsety - (4 * self.scale)
+	self:draw()
+	self:load()
 end
 
 
@@ -2735,26 +2758,37 @@ function CWindowWorld:drawInside() -- window world content
 end
 
 function CWindowWorld:drawPlayerActual()
-    local _playeractual = Tic:playerActual()
-    local _worldwx2 = Tic.WORLDWX + Tic.WORLDWW2
-    local _worldwy2 = Tic.WORLDWY + Tic.WORLDWH2
-    local _worldx         = _playeractual.worldx
-    local _worldy         = _playeractual.worldy
+    local _playeractual   = Tic:playerActual()
     local _entitiesaround = _playeractual:entitiesAround()
-    local _keyys          = Tables:keys(_entitiesaround)
 
+    local _nearest = nil -- nearest entity if any -- except itself
+    local _keyys   = Tables:keys(_entitiesaround)
     for _, _keyy in pairs(_keyys) do -- draw entities visible by the actual player sorted by y first
-        local _keyxs      = Tables:keys(_entitiesaround[_keyy])
+        local _keyxs = Tables:keys(_entitiesaround[_keyy])
         for _, _keyx in pairs(_keyxs) do -- sorted by x next
             for _entity, _ in pairs(_entitiesaround[_keyy][_keyx]) do -- draw entities at the same x y
-                local _offsetx  = _entity.worldx - _worldx
-                local _offsety  = _entity.worldy - _worldy
-                _entity:save{"screenx", "screeny",}
-                _entity.screenx = _worldwx2 + _offsetx - (4 * _entity.scale)
-                _entity.screeny = _worldwy2 + _offsety - (4 * _entity.scale)
-                _entity:draw()
-                _entity:load()
+                _entity.spotted = false -- unspot entities -- TODO check if spotted by another player ?
+
+                if not (_entity == _playeractual) then -- avoid to spot itself
+                    if _nearest == nil then
+                        _nearest = _entity -- first nearest entity
+                    elseif _playeractual:distanceEntitySquared(_entity) < _playeractual:distanceEntitySquared(_nearest) then
+                        _nearest = _entity -- new nearest entity
+                    end
+                end
+
+                _entity:drawRelativeToEntity(_playeractual)
             end
+        end
+    end
+
+    if _nearest then -- spot the nearest if any
+        _nearest:save{"spotted",}
+        _nearest.spotted = true
+        _nearest:drawRelativeToEntity(_playeractual)
+        _nearest:load()
+        if _playeractual.worldy >= _nearest.worldy then -- redraw actual player in front if needed
+            _playeractual:drawRelativeToEntity(_playeractual)
         end
     end
 end
@@ -3175,16 +3209,16 @@ WorldRegionTree0 = CWorldRegion{
         dw = 5,
     },    
 }
--- CPlace:generateRandomWorldRegionPercent(
---     100,
---     {
---         [CPlaceTree0Anim] = {},
---         [CPlaceTree0Idle] = {},
---         [CPlaceTree1Anim] = {},
---         [CPlaceTree1Idle] = {},
---     },
---     WorldRegionTree0
--- )
+CPlace:generateRandomWorldRegionPercent(
+    100,
+    {
+        [CPlaceTree0Anim] = {},
+        [CPlaceTree0Idle] = {},
+        [CPlaceTree1Anim] = {},
+        [CPlaceTree1Idle] = {},
+    },
+    WorldRegionTree0
+)
 
 WorldRegionTown0 = CWorldRegion{
     worldx = 25,
@@ -3196,17 +3230,17 @@ WorldRegionTown0 = CWorldRegion{
         dw = 15,
     },
 }
--- CPlace:generateRandomWorldRegionPercent(
---     25,
---     {
---         [CPlaceHouseAnim] = {},
---         [CPlaceHouseIdle] = {},
---         [CPlaceTowerAnim] = {percent = 10,},
---         [CPlaceTowerIdle] = {percent = 10,},
---         [CPlaceWaterAnim] = {percent = 10,},
---     },
---     WorldRegionTown0
--- )
+CPlace:generateRandomWorldRegionPercent(
+    25,
+    {
+        [CPlaceHouseAnim] = {},
+        [CPlaceHouseIdle] = {},
+        [CPlaceTowerAnim] = {percent = 10,},
+        [CPlaceTowerIdle] = {percent = 10,},
+        [CPlaceWaterAnim] = {percent = 10,},
+    },
+    WorldRegionTown0
+)
 -- exit()
 
 -- CPlace:generateRandomWorldWindow()
@@ -3344,14 +3378,17 @@ local Region = CRegion{
 --
 -- Windows -- TESTING
 --
-local Tree0Test = CPlaceTree0Anim{spotted = false, collided = false, drawhitbox = true, scale = 2,}
+local Tree0Test = CPlaceTree0Anim{spotted = false, collided = false, drawhitbox = true, scale = 1,
+}
 Tree0Test:randomWorldWindow()
 local WindowTest1 = CWindowPortraitDrawable{
     screenx = 10,
     screeny = 18,
     entity = Tree0Test,
 }
-local HouseTest = CPlaceHouseAnim{spotted = false, collided = false, drawhitbox = true, scale = 2,}
+local HouseTest = CPlaceHouseAnim{spotted = false, collided = false, drawhitbox = true, scale = 1,
+name = Names:fupper(Names:random()),
+}
 HouseTest:randomWorldWindow()
 local WindowTest2 = CWindowPortraitDrawable{
     screenx = 10,
@@ -3377,36 +3414,16 @@ function Tic:draw()
     WindowTest1:draw()
     WindowTest2:draw()
 
-    Tic:logAppend("WOX:", Tic:playerActual().worldx)
-    Tic:logAppend("WOY:", Tic:playerActual().worldy)
+    -- Tic:logAppend("WOX:", Tic:playerActual().worldx)
+    -- Tic:logAppend("WOY:", Tic:playerActual().worldy)
     Tic:logAppend()
     Tic:logAppend()
     Tic:logAppend()
     Tic:logAppend()
     Tic:logAppend()
     Tic:logAppend()
-    Tic:logAppend("DIX:", Tic:playerActual().dirx)
-    Tic:logAppend("DIY:", Tic:playerActual().diry)
-    -- Tic:logAppend("SRG:", Tree0Test.hitbox.region.rg)
-    -- Tic:logAppend("SUP:", Tree0Test.hitbox.region.up)
-    -- Tic:logAppend("SDW:", Tree0Test.hitbox.region.dw)
-
-    -- Tic:logAppend("PHX:", Tic:playerActual().statphymax)
-    -- Tic:logAppend("PHA:", Tic:playerActual().statphyact, (
-    --     (Tic:playerActual().statphymax == Tic:playerActual().statphyact) and "ok" or "??"
-    -- ))
-    -- Tic:logAppend("MEX:", Tic:playerActual().statmenmax)
-    -- Tic:logAppend("MEA:", Tic:playerActual().statmenact, (
-    --     (Tic:playerActual().statmenmax == Tic:playerActual().statmenact) and "ok" or "??"
-    -- ))
-    -- Tic:logAppend("PSX:", Tic:playerActual().statpsymax)
-    -- Tic:logAppend("PSA:", Tic:playerActual().statpsyact, (
-    --     (Tic:playerActual().statpsymax == Tic:playerActual().statpsyact) and "ok" or "??"
-    -- ))
-    -- Tic:logAppend("TOT:", Tic:playerActual().statphymax
-    --     + Tic:playerActual().statmenmax
-    --     + Tic:playerActual().statpsymax)
-    -- Tic:logAppend("CAM:", Tic:playerActual().camera.name)
+    -- Tic:logAppend("n:", WindowTest1.entity.name)
+    -- Tic:logAppend("n:", WindowTest2.entity.name)
 
     Tic:logPrint()
 
