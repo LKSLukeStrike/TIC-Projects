@@ -72,6 +72,9 @@ Tic.PALETTEMAP = 0x3FF0 * 2 -- vram bank 1
 -- Sprites bank
 Tic.SPRITEBANK = 0x4000 -- start at tiles sprites
 
+-- Sprites size
+Tic.SPRITESIZE = 8 -- sprites size in pixels
+
 -- Palette colors
 Tic.COLOR00 = 00
 Tic.COLOR01 = 01
@@ -557,7 +560,7 @@ end
 function Tic:logPrint() -- print the log then clear it
     for _line, _item in ipairs(Tic.Log) do
         _line = _line - 1 -- line start from 0
-        Tic:print(0, _line * 8, _item) -- one item per "line"
+        Tic:print(0, _line * Tic.SPRITESIZE, _item) -- one item per "line"
       end    
     Tic:logClear()
 end
@@ -632,7 +635,7 @@ function Tic:boardPixel(_sprite, _x, _y, _color) -- paint a pixel to a board spr
     _x = _x or 0
     _y = _y or 0
     _color = _color or Tic.COLORKEY -- transparent by default
-    poke4(((Tic.SPRITEBANK + (32 * _sprite)) * 2) + ((_y * 8) + _x), _color)
+    poke4(((Tic.SPRITEBANK + (32 * _sprite)) * 2) + ((_y * Tic.SPRITESIZE) + _x), _color)
 end
 
 function Tic:boardClean(_sprite) -- clean a board sprite
@@ -885,7 +888,7 @@ function CRegion:drawBorderScreenXY(_screenx, _screeny) -- draw border of a regi
     )
 end
 
-function CRegion:isInsidePoint(_pointx, _pointy) -- is a point inside a region ?
+function CRegion:hasInsidePoint(_pointx, _pointy) -- is a point inside a region ?
     _pointx = _pointx or 0
     _pointy = _pointy or 0
 	if not Nums:isBW(_pointx, self.lf, self.rg) then return false end
@@ -1944,28 +1947,35 @@ function CCharacter:new(_argt)
 end
 
 function CCharacter:regionViewOffsets() -- viewable offsets region depending on dirx, diry
+    local _size    = Tic.SPRITESIZE * self.scale
+    local _rangewh = Tic.WORLDWH -- use world window height as range -- TODO change that later ?
+    local _offsets = ((_rangewh - _size) // 2) - 1
     return CRegion{
         lf  = (self.dirx == Tic.DIRXLF)
-            and self.screenx - Tic.WORLDWX - 1
+            and Nums:neg(_offsets)
             or  0,
         rg  = (self.dirx == Tic.DIRXLF)
-            and 8 * self.scale
-            or  Tic.WORLDWX + Tic.WORLDWW - 1 - self.screenx,
-        up  = (self.diry == Tic.DIRYUP or self.diry == Tic.DIRYMD)
-            and self.screeny - Tic.WORLDWY - 1
-            or  0,
-        dw  = (self.diry == Tic.DIRYMD or self.diry == Tic.DIRYDW)
-            and Tic.WORLDWY + Tic.WORLDWH - 1 - self.screeny
-            or  8 * self.scale,
+            and _size
+            or  _size + _offsets,
+        up  = (self.diry == Tic.DIRYUP)
+            and Nums:neg(_offsets)
+            or  (self.diry == Tic.DIRYMD)
+                and Nums:neg(_offsets // 2)
+                or  0,
+        dw  = (self.diry == Tic.DIRYUP)
+            and _size
+            or  (self.diry == Tic.DIRYMD)
+                and _size + (_offsets // 2)
+                or  _size + _offsets,
     }
 end
 
 function CCharacter:regionViewScreen() -- viewable screen region depending on dirx, diry
     local _viewoffsets = self:regionViewOffsets()
     return CRegion{
-        lf = self.screenx - _viewoffsets.lf,
+        lf = self.screenx + _viewoffsets.lf,
         rg = self.screenx + _viewoffsets.rg,
-        up = self.screeny - _viewoffsets.up,
+        up = self.screeny + _viewoffsets.up,
         dw = self.screeny + _viewoffsets.dw,
     }
 end
@@ -1973,9 +1983,9 @@ end
 function CCharacter:regionViewWorld() -- viewable world region depending on dirx, diry
     local _viewoffsets = self:regionViewOffsets()
     return CRegion{
-        lf = self.worldx - _viewoffsets.lf,
+        lf = self.worldx + _viewoffsets.lf,
         rg = self.worldx + _viewoffsets.rg,
-        up = self.worldy - _viewoffsets.up,
+        up = self.worldy + _viewoffsets.up,
         dw = self.worldy + _viewoffsets.dw,
     }
 end
@@ -2608,7 +2618,7 @@ function CWindow:new(_argt)
     self.screeny     = Tic.SCREENY
     self.screenw     = Tic.SCREENW -- sizes
     self.screenh     = Tic.SCREENH
-    self.cachest     = 8 -- caches thickness -- FIXME enlarge this to the whole screen
+    self.cachest     = Tic.SCREENW -- caches thickness -- FIXME enlarge this to the whole screen
     self.colorground = Tic.COLORHUDSCREEN
     self.colorguides = Tic.COLORGREYM
     self.colorcaches = Tic.COLORHUDSCREEN
@@ -2778,8 +2788,29 @@ function CWindowWorld:drawInside() -- window world content
 end
 
 function CWindowWorld:drawPlayerActual()
-    local _playeractual   = Tic:playerActual()
-    local _entitiesaround = _playeractual:entitiesAround()
+    local _playeractual      = Tic:playerActual()
+    local _entitiesaround    = _playeractual:entitiesAround()
+    local _regionviewworld   = _playeractual:regionViewWorld()
+    local _regionviewscreen  = _playeractual:regionViewScreen()
+    local _regionviewoffsets = _playeractual:regionViewOffsets()
+    Tic:logAppend("wx:", Tic:playerActual().worldx)
+    Tic:logAppend("wy:", Tic:playerActual().worldy)
+    Tic:logAppend("lf:", _regionviewworld.lf)
+    Tic:logAppend("up:", _regionviewworld.up)
+    Tic:logAppend("rg:", _regionviewworld.rg)
+    Tic:logAppend("dw:", _regionviewworld.dw)
+    Tic:logAppend()
+    Tic:logAppend("sx:", Tic:playerActual().screenx)
+    Tic:logAppend("sy:", Tic:playerActual().screeny)
+    -- Tic:logAppend("lf:", _regionviewscreen.lf)
+    -- Tic:logAppend("up:", _regionviewscreen.up)
+    -- Tic:logAppend("rg:", _regionviewscreen.rg)
+    -- Tic:logAppend("dw:", _regionviewscreen.dw)
+    Tic:logAppend("lf:", _regionviewoffsets.lf)
+    Tic:logAppend("up:", _regionviewoffsets.up)
+    Tic:logAppend("rg:", _regionviewoffsets.rg)
+    Tic:logAppend("dw:", _regionviewoffsets.dw)
+ 
 
     local _nearest = nil -- nearest entity if any -- except itself
     local _keyys   = Tables:keys(_entitiesaround)
@@ -2790,10 +2821,12 @@ function CWindowWorld:drawPlayerActual()
                 _entity.spotted = false -- unspot entities -- TODO check if spotted by another player ?
 
                 if not (_entity == _playeractual) then -- avoid to spot itself
-                    if _nearest == nil then
-                        _nearest = _entity -- first nearest entity
-                    elseif _playeractual:distanceEntitySquared(_entity) < _playeractual:distanceEntitySquared(_nearest) then
-                        _nearest = _entity -- new nearest entity
+                    if _regionviewworld:hasInsidePoint(_entity.worldx, _entity.worldy) then -- only if in view
+                        if _nearest == nil then
+                            _nearest = _entity -- first nearest entity
+                        elseif _playeractual:distanceEntitySquared(_entity) < _playeractual:distanceEntitySquared(_nearest) then
+                            _nearest = _entity -- new nearest entity
+                        end
                     end
                 end
 
@@ -2833,7 +2866,7 @@ function CWindowInfos:new(_argt)
 	self.marginsh    = 1 -- h margins in px
 	self.marginsv    = 0 -- v margins in px
 	self.linessep    = 0 -- separator in px
-    self.shadow      = false -- add a shadow
+    self.shadow      = true -- add a shadow
     self.fupper      = false -- uppercase the first char
     self.colorinfofg = Tic.COLORGREYL
     self.colorinfobg = Tic.COLORGREYD -- for shadow
@@ -3431,8 +3464,8 @@ function Tic:draw()
     WindowStatsPlayer:draw()
     WindowStatePlayer:draw()
 
-    WindowTest1:draw()
-    WindowTest2:draw()
+    -- WindowTest1:draw()
+    -- WindowTest2:draw()
 
     -- Tic:logAppend("WOX:", Tic:playerActual().worldx)
     -- Tic:logAppend("WOY:", Tic:playerActual().worldy)
