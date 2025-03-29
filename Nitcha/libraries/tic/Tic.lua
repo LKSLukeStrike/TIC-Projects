@@ -73,7 +73,8 @@ Tic.PALETTEMAP = 0x3FF0 * 2 -- vram bank 1
 Tic.SPRITEBANK = 0x4000 -- start at tiles sprites
 
 -- Sprites size
-Tic.SPRITESIZE = 8 -- sprites size in pixels
+Tic.SPRITESIZE  = 8 -- sprites size in pixels
+Tic.SPRITESIZE2 = Tic.SPRITESIZE // 2 -- half sprites size in pixels
 
 -- Palette colors
 Tic.COLOR00 = 00
@@ -896,6 +897,15 @@ function CRegion:hasInsidePoint(_pointx, _pointy) -- is a point inside a region 
 	return true
 end
 
+function CRegion:hasInsideRegion(_region) -- is a region inside a region ?
+	if not _region then return false end -- mandatory
+	if self:hasInsidePoint(_region.lf, _region.up) then return true end
+	if self:hasInsidePoint(_region.rg, _region.up) then return true end
+	if self:hasInsidePoint(_region.lf, _region.dw) then return true end
+	if self:hasInsidePoint(_region.rg, _region.dw) then return true end
+	return false
+end
+
 
 --
 -- CHitbox
@@ -1371,10 +1381,19 @@ function CEntityDrawable:drawRelativeToEntity(_entity) -- draw an entity relativ
 	local _offsetx = self.worldx - _entity.worldx
 	local _offsety = self.worldy - _entity.worldy
 	self:save{"screenx", "screeny",}
-	self.screenx = Tic.WORLDWX2 + _offsetx - (4 * self.scale)
-	self.screeny = Tic.WORLDWY2 + _offsety - (4 * self.scale)
+	self.screenx = Tic.WORLDWX2 + _offsetx - (Tic.SPRITESIZE2 * self.scale)
+	self.screeny = Tic.WORLDWY2 + _offsety - (Tic.SPRITESIZE2 * self.scale)
 	self:draw()
 	self:load()
+end
+
+function CEntityDrawable:regionWorld() -- return its own region in world
+    return CRegion{
+        lf = self.worldx,
+        up = self.worldy,
+        rg = self.worldx + (Tic.SPRITESIZE * self.scale),
+        dw = self.worldy + (Tic.SPRITESIZE * self.scale),
+    }
 end
 
 
@@ -1946,10 +1965,19 @@ function CCharacter:new(_argt)
     self:focus() -- focus its camera on itself
 end
 
-function CCharacter:regionViewOffsets() -- viewable offsets region depending on dirx, diry
-    local _size    = Tic.SPRITESIZE * self.scale
-    local _rangewh = Tic.WORLDWH -- use world window height as range -- TODO change that later ?
-    local _offsets = ((_rangewh - _size) // 2) - 1
+function CCharacter:regionViewOffsets() -- viewable offsets region depending on dirx, diry, statphyact and -- TODO posture
+    local _statesettings = Tic.STATESETTINGS[self.state]
+    local _posture       = _statesettings.posture
+    local _posturekneel  = _posture == Tic.POSTUREKNEEL
+    local _size          = Tic.SPRITESIZE * self.scale
+    local _rangewh       = Tic.WORLDWH -- use world window height as range -- TODO change that later ?
+    -- local _offsets       = (_posturekneel) -- FIXME here the posture
+    --     and ((((_rangewh - _size) // 2) - 1) * (self.statphyact / Tic.STATSMAX)) // 2
+    --     or  ((((_rangewh - _size) // 2) - 1) * (self.statphyact / Tic.STATSMAX)) // 1
+    local _offsets       =  ((((_rangewh - _size) // 2) - 1) * (self.statphyact / Tic.STATSMAX)) // 1
+    -- Tic:logAppend("pa:", self.statphyact)
+    -- Tic:logAppend("of:", _offsets)
+
     return CRegion{
         lf  = (self.dirx == Tic.DIRXLF)
             and Nums:neg(_offsets)
@@ -2038,9 +2066,9 @@ function CCharacter:drawDirs() -- draw the directions and ranges around the char
     local _drawcolor     = Tic.COLORWHITE
     local _screenx       = Tic.WORLDWX + Tic.WORLDWW2 - (Tic:playerActual().worldx - self.worldx) - 1 --relative to actual player -- feet
     local _screeny       = Tic.WORLDWY + Tic.WORLDWH2 - (Tic:playerActual().worldy - self.worldy) + 2
-    local _range         = self.statphyact * self.scale
     local _statesettings = Tic.STATESETTINGS[self.state]
     local _posture       = _statesettings.posture
+    local _range         = self.statphyact * self.scale
     _range               = (_posture == Tic.POSTUREKNEEL) and Nums:roundmax(_range / 2) or _range
 
     circb(_screenx, _screeny, _range, _drawcolor)
@@ -2793,15 +2821,15 @@ function CWindowWorld:drawPlayerActual()
     local _regionviewworld   = _playeractual:regionViewWorld()
     local _regionviewscreen  = _playeractual:regionViewScreen()
     local _regionviewoffsets = _playeractual:regionViewOffsets()
-    Tic:logAppend("wx:", Tic:playerActual().worldx)
-    Tic:logAppend("wy:", Tic:playerActual().worldy)
-    Tic:logAppend("lf:", _regionviewworld.lf)
-    Tic:logAppend("up:", _regionviewworld.up)
-    Tic:logAppend("rg:", _regionviewworld.rg)
-    Tic:logAppend("dw:", _regionviewworld.dw)
+    -- Tic:logAppend("wx:", Tic:playerActual().worldx)
+    -- Tic:logAppend("wy:", Tic:playerActual().worldy)
+    -- Tic:logAppend("lf:", _regionviewworld.lf)
+    -- Tic:logAppend("up:", _regionviewworld.up)
+    -- Tic:logAppend("rg:", _regionviewworld.rg)
+    -- Tic:logAppend("dw:", _regionviewworld.dw)
     Tic:logAppend()
-    Tic:logAppend("sx:", Tic:playerActual().screenx)
-    Tic:logAppend("sy:", Tic:playerActual().screeny)
+    -- Tic:logAppend("sx:", Tic:playerActual().screenx)
+    -- Tic:logAppend("sy:", Tic:playerActual().screeny)
     -- Tic:logAppend("lf:", _regionviewscreen.lf)
     -- Tic:logAppend("up:", _regionviewscreen.up)
     -- Tic:logAppend("rg:", _regionviewscreen.rg)
@@ -2821,7 +2849,7 @@ function CWindowWorld:drawPlayerActual()
                 _entity.spotted = false -- unspot entities -- TODO check if spotted by another player ?
 
                 if not (_entity == _playeractual) then -- avoid to spot itself
-                    if _regionviewworld:hasInsidePoint(_entity.worldx, _entity.worldy) then -- only if in view
+                    if _regionviewworld:hasInsideRegion(_entity:regionWorld()) then -- only if in view
                         if _nearest == nil then
                             _nearest = _entity -- first nearest entity
                         elseif _playeractual:distanceEntitySquared(_entity) < _playeractual:distanceEntitySquared(_nearest) then
@@ -3469,7 +3497,7 @@ function Tic:draw()
 
     -- Tic:logAppend("WOX:", Tic:playerActual().worldx)
     -- Tic:logAppend("WOY:", Tic:playerActual().worldy)
-    Tic:logAppend()
+    -- Tic:logAppend("ap:", Tic:playerActual().statphyact)
     Tic:logAppend()
     Tic:logAppend()
     Tic:logAppend()
