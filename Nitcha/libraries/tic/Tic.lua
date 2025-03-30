@@ -2846,6 +2846,8 @@ function CWindowWorld:drawPlayerActual()
         local _keyxs = Tables:keys(_entitiesaround[_keyy])
         for _, _keyx in pairs(_keyxs) do -- sorted by x next
             for _entity, _ in pairs(_entitiesaround[_keyy][_keyx]) do -- draw entities at the same x y
+                local _draw = true
+
                 _entity.spotted = false -- unspot entities -- TODO check if spotted by another player ?
 
                 if not (_entity == _playeractual) then -- avoid to spot itself
@@ -2855,10 +2857,14 @@ function CWindowWorld:drawPlayerActual()
                         elseif _playeractual:distanceEntitySquared(_entity) < _playeractual:distanceEntitySquared(_nearest) then
                             _nearest = _entity -- new nearest entity
                         end
+                    else
+                        _draw = false
                     end
                 end
 
-                _entity:drawRelativeToEntity(_playeractual)
+                if _draw then
+                    _entity:drawRelativeToEntity(_playeractual)
+                end
             end
         end
     end
