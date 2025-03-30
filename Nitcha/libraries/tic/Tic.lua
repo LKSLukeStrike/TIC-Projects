@@ -1310,25 +1310,27 @@ function CEntityDrawable:new(_argt)
     CEntityDrawable.super.new(self, _argt)
     self.kind = CEntity.KINDDRAWABLE
     self.name = CEntity.NAMEDRAWABLE
-    self.sprite     = CSpriteFG.SPRITEEMPTY
-    self.screenx    = 0 -- screen positions -- used to draw the sprite
-    self.screeny    = 0
-    self.dirx       = Nums:random01() -- random flip lf/rg
-    self.scale      = CSprite.SCALE01
-    self.animations = nil -- override if any
-    self.spotted    = false -- use spotted to draw a border
-    self.hitbox     = CHitbox() -- hitbox region
-    self.solid      = true -- hitbox can be traversed or not
-    self.collided   = false -- is the hitbox collided or not
-    self.drawhitbox = false -- draw behaviour
-    self.drawfade   = false
-    self:argt(_argt) -- override if any
+    self.sprite      = CSpriteFG.SPRITEEMPTY
+    self.screenx     = 0 -- screen positions -- used to draw the sprite
+    self.screeny     = 0
+    self.dirx        = Nums:random01() -- random flip lf/rg
+    self.scale       = CSprite.SCALE01
+    self.animations  = nil -- override if any
+    self.spotted     = false -- use spotted to draw a border
+    self.hitbox      = CHitbox() -- hitbox region
+    self.solid       = true -- hitbox can be traversed or not
+    self.collided    = false -- is the hitbox collided or not
+    self.drawhitbox  = false -- draw behaviour
+    self.drawfade    = false
+   self:argt(_argt) -- override if any
     self.world:entityAppend(self) -- append itself to the world
 end
 
 function CEntityDrawable:draw() -- default draw for drawable entities -- override if any
     local _tick00      = Tic.TICK00.actvalue
-    local _palette     = self.palette
+    local _palette     = (self.drawfade)
+        and Tables.merge(self.palette, self.palettefade)
+        or  self.palette
 
     for _, _animation in pairs(self.animations or {}) do -- animate
         local _frequence   = _animation.frequence
@@ -1439,8 +1441,12 @@ function CPlaceHouse:new(_argt)
     CPlaceHouse.super.new(self, _argt)
     self.kind = CEntity.KINDHOUSE
     self.name = CEntity.NAMEHOUSE
-    self.sprite  = CSpriteBG.PLACEHOUSE
-    self.palette = CPlaceHouse.PALETTE
+    self.sprite      = CSpriteBG.PLACEHOUSE
+    self.palette     = CPlaceHouse.PALETTE
+    self.palettefade = Tables:merge(CPlaceHouse.PALETTE, {
+        [CPlaceHouse.COLORROOF]   = Tic.COLORGREYD,
+        [CPlaceHouse.COLORDOOR]   = Tic.COLORGREYM,    
+    })
     self.hitbox.region.lf = 1
     self.hitbox.region.rg = 5
     self.hitbox.region.up = 5
