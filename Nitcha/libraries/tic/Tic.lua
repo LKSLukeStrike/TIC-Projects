@@ -553,7 +553,7 @@ function Tic:logAppend(...) -- add item to the log
     local _args = {...}
     local _item = ""
     for _, _val in ipairs(_args) do
-        _item = _item.._val.." "
+        _item = _item..Tic:val2string(_val).." "
     end
     table.insert(Tic.Log, _item)
 end
@@ -1329,8 +1329,8 @@ end
 function CEntityDrawable:draw() -- default draw for drawable entities -- override if any
     local _tick00      = Tic.TICK00.actvalue
     local _palette     = (self.drawfade)
-        and Tables.merge(self.palette, self.palettefade)
-        or  self.palette
+        and Tables:merge(self.palette, self.palettefade)
+        or  Tables:merge(self.palette, {})
 
     for _, _animation in pairs(self.animations or {}) do -- animate
         local _frequence   = _animation.frequence
@@ -1352,6 +1352,7 @@ function CEntityDrawable:draw() -- default draw for drawable entities -- overrid
     _musprite.flip    = self.dirx
     _musprite.scale   = self.scale
     _musprite.palette = _palette
+    -- _musprite:palettize(_palette)
     _musprite:draw()
 
     self:drawSpotted()
@@ -1407,6 +1408,10 @@ end
 -- CPlace
 --
 local CPlace = CEntityDrawable:extend() -- places
+CPlace.COLOREMPTY  = Tic.COLORKEY
+CPlace.COLORANIM01 = Tic.COLORWHITE
+CPlace.COLORANIM02 = Tic.COLORYELLOW
+CPlace.COLORANIM03 = Tic.COLORORANGE
 CEntity.KINDPLACE = "Place" -- Place kind
 CEntity.NAMEPLACE = "Place" -- Place name
 function CPlace:new(_argt)
@@ -1418,23 +1423,40 @@ end
 
 
 --
+-- CPlaceBuild
+--
+local CPlaceBuild = CPlace:extend() -- builds
+CPlaceBuild.COLORSMOKE    = CPlace.COLORANIM01
+CPlaceBuild.COLORWINDOW01 = CPlace.COLORANIM02
+CPlaceBuild.COLORWINDOW02 = CPlace.COLORANIM03
+CPlaceBuild.COLORROOF     = Tic.COLORRED
+CPlaceBuild.COLORDOOR     = Tic.COLORGREYL
+CPlaceBuild.COLORFACADE   = Tic.COLORGREYM
+CPlaceBuild.COLORWALLS    = Tic.COLORGREYD
+CPlaceBuild.COLORFOAM     = Tic.COLORGREEND
+CPlaceBuild.COLORLIGHT    = Tic.COLORORANGE
+CEntity.KINDBUILD = "Build" -- Build kind
+CEntity.NAMEBUILD = "Build" -- Build name
+function CPlaceBuild:new(_argt)
+    CPlaceBuild.super.new(self, _argt)
+    self.kind = CEntity.KINDBUILD
+    self.name = CEntity.NAMEBUILD
+    self.palettefade = {
+        [CPlaceBuild.COLORSMOKE]    = CPlace.COLOREMPTY,
+        [CPlaceBuild.COLORWINDOW01] = CPlaceBuild.COLORWALLS,
+        [CPlaceBuild.COLORWINDOW02] = CPlaceBuild.COLORWALLS,
+        [CPlaceBuild.COLORROOF]     = CPlaceBuild.COLORWALLS,
+        [CPlaceBuild.COLORDOOR]     = CPlaceBuild.COLORFACADE,    
+        [CPlaceBuild.COLORFOAM]     = CPlaceBuild.COLORWALLS,    
+    }
+    self:argt(_argt) -- override if any
+end
+
+
+--
 -- CPlaceHouse
 --
-local CPlaceHouse = CPlace:extend() -- houses
-CPlaceHouse.COLORSMOKE  = Tic.COLORWHITE
-CPlaceHouse.COLORWINDOW = Tic.COLORYELLOW
-CPlaceHouse.COLORROOF   = Tic.COLORRED
-CPlaceHouse.COLORDOOR   = Tic.COLORGREYL
-CPlaceHouse.COLORFACADE = Tic.COLORGREYM
-CPlaceHouse.COLORWALLS  = Tic.COLORGREYD
-CPlaceHouse.PALETTE     = {
-    [CPlaceHouse.COLORSMOKE]  = CPlaceHouse.COLORSMOKE,
-    [CPlaceHouse.COLORWINDOW] = CPlaceHouse.COLORWINDOW,
-    [CPlaceHouse.COLORROOF]   = CPlaceHouse.COLORROOF,
-    [CPlaceHouse.COLORDOOR]   = CPlaceHouse.COLORDOOR,
-    [CPlaceHouse.COLORFACADE] = CPlaceHouse.COLORFACADE,
-    [CPlaceHouse.COLORWALLS]  = CPlaceHouse.COLORWALLS,
-}
+local CPlaceHouse = CPlaceBuild:extend() -- houses
 CEntity.KINDHOUSE = "House" -- House kind
 CEntity.NAMEHOUSE = "House" -- House name
 function CPlaceHouse:new(_argt)
@@ -1442,11 +1464,6 @@ function CPlaceHouse:new(_argt)
     self.kind = CEntity.KINDHOUSE
     self.name = CEntity.NAMEHOUSE
     self.sprite      = CSpriteBG.PLACEHOUSE
-    self.palette     = CPlaceHouse.PALETTE
-    self.palettefade = Tables:merge(CPlaceHouse.PALETTE, {
-        [CPlaceHouse.COLORROOF]   = Tic.COLORGREYD,
-        [CPlaceHouse.COLORDOOR]   = Tic.COLORGREYM,    
-    })
     self.hitbox.region.lf = 1
     self.hitbox.region.rg = 5
     self.hitbox.region.up = 5
@@ -1459,16 +1476,16 @@ function CPlaceHouseAnim:new(_argt)
     CPlaceHouseAnim.super.new(self, _argt)
     self.animations = {
         CAnimation{ -- smoke
-            frequence = Tic.FREQUENCE180,
+            frequence = Tic.FREQUENCE300,
             percent0  = 0.9,
-            palette0  = {[CPlaceHouse.COLORSMOKE] = CPlaceHouse.COLORSMOKE,},
-            palette1  = {[CPlaceHouse.COLORSMOKE] = Tic.COLORORANGE,},
+            palette0  = {[CPlaceBuild.COLORSMOKE] = CPlaceBuild.COLORSMOKE,},
+            palette1  = {[CPlaceBuild.COLORSMOKE] = CPlaceBuild.COLORLIGHT,},
         },
         CAnimation{ -- window
             frequence = Tic.FREQUENCE600,
             percent0  = 0.1,
-            palette0  = {[CPlaceHouse.COLORWINDOW] = Tic.COLORGREYD},
-            palette1  = {[CPlaceHouse.COLORWINDOW] = Tic.COLORORANGE,},
+            palette0  = {[CPlaceBuild.COLORWINDOW02] = CPlaceBuild.COLORWALLS},
+            palette1  = {[CPlaceBuild.COLORWINDOW02] = CPlaceBuild.COLORLIGHT,},
         },
     }
     self:argt(_argt) -- override if any
@@ -1478,10 +1495,10 @@ local CPlaceHouseIdle = CPlaceHouse:extend() -- idle houses
 function CPlaceHouseIdle:new(_argt)
     CPlaceHouseIdle.super.new(self, _argt)
     self.name = CEntity.NAMEEMPTY
-    self.palette = Tables.merge(self.palette, {
-        [CPlaceHouse.COLORSMOKE]  = Tic.COLORKEY,
-        [CPlaceHouse.COLORWINDOW] = Tic.COLORGREYD,
-    })
+    self.palette = {
+        [CPlaceBuild.COLORSMOKE]    = CPlace.COLOREMPTY,
+        [CPlaceBuild.COLORWINDOW02] = CPlaceBuild.COLORWALLS,
+    }
     self:argt(_argt) -- override if any
 end
 
@@ -2860,6 +2877,7 @@ function CWindowWorld:drawPlayerActual()
         for _, _keyx in pairs(_keyxs) do -- sorted by x next
             for _entity, _ in pairs(_entitiesaround[_keyy][_keyx]) do -- draw entities at the same x y
                 _entity.spotted  = false -- unspot entities -- TODO check if spotted by another player ?
+                _entity.discovered = true -- HERE
 
                 if not (_entity == _playeractual) then -- avoid to spot itself
                     if _regionviewworld:hasInsideRegion(_entity:regionWorld()) then -- if in view
@@ -2868,6 +2886,7 @@ function CWindowWorld:drawPlayerActual()
                         elseif _playeractual:distanceEntitySquared(_entity) < _playeractual:distanceEntitySquared(_nearest) then
                             _nearest = _entity -- new nearest entity
                         end
+                        _entity.drawfade = false
                         _entity.discovered = true
                     else -- not in view
                         _entity.drawfade = true
@@ -2882,6 +2901,7 @@ function CWindowWorld:drawPlayerActual()
     if _nearest then -- spot the nearest if any
         Tic:logAppend("K:", _nearest.kind)
         Tic:logAppend("N:", _nearest.name)
+        Tic:logAppend("D:", _nearest.discovered)
         _nearest:save{"spotted",}
         _nearest.spotted = true
         _nearest:drawRelativeToEntity(_playeractual)
