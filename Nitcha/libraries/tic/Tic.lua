@@ -41,29 +41,29 @@ Tic.WORLDWY  = (Tic.SCREENH - Tic.WORLDWH) // 2 -- world window y position
 Tic.WORLDWX2 = Tic.WORLDWX + Tic.WORLDWW2 -- half world window x position
 Tic.WORLDWY2 = Tic.WORLDWY + Tic.WORLDWH2 -- half world window y position
 
--- Infos Window positions and sizes (hud)
-Tic.INFOSWW = 26 -- infos window width
-Tic.INFOSWH = 16 -- infos window height
-Tic.INFOSWX = Tic.SCREENW - Tic.INFOSWW - ((Tic.WORLDWX - Tic.INFOSWW) // 2) -- infos window x position
-Tic.INFOSWY = Tic.WORLDWY -- infos window y position
+-- Player Infos Window positions and sizes (hud)
+Tic.PLAYERINFOSWW = 26 -- infos window width
+Tic.PLAYERINFOSWH = 16 -- infos window height
+Tic.PLAYERINFOSWX = Tic.SCREENW - Tic.PLAYERINFOSWW - ((Tic.WORLDWX - Tic.PLAYERINFOSWW) // 2) -- infos window x position
+Tic.PLAYERINFOSWY = Tic.WORLDWY -- infos window y position
 
--- Portrait Window positions and sizes (hud)
-Tic.PORTRAITWW = 16 -- portrait window width
-Tic.PORTRAITWH = 16 -- portrait window height
-Tic.PORTRAITWX = Tic.SCREENW - Tic.PORTRAITWW - ((Tic.WORLDWX - Tic.PORTRAITWW) // 2) -- portrait window x position
-Tic.PORTRAITWY = Tic.INFOSWY + 25 -- portrait window y position
+-- Player Portrait Window positions and sizes (hud)
+Tic.PLAYERPORTRAITWW = 16 -- portrait window width
+Tic.PLAYERPORTRAITWH = 16 -- portrait window height
+Tic.PLAYERPORTRAITWX = Tic.SCREENW - Tic.PLAYERPORTRAITWW - ((Tic.WORLDWX - Tic.PLAYERPORTRAITWW) // 2) -- portrait window x position
+Tic.PLAYERPORTRAITWY = Tic.PLAYERINFOSWY + 25 -- portrait window y position
 
--- Stats Window positions and sizes (hud)
-Tic.STATSWW = 16 -- stats window width
-Tic.STATSWH = 16 -- stats window height
-Tic.STATSWX = Tic.PORTRAITWX -- stats window x position
-Tic.STATSWY = Tic.PORTRAITWY + 25 -- stats window y position
+-- Player Stats Window positions and sizes (hud)
+Tic.PLAYERSTATSWW = 16 -- stats window width
+Tic.PLAYERSTATSWH = 16 -- stats window height
+Tic.PLAYERSTATSWX = Tic.PLAYERPORTRAITWX -- stats window x position
+Tic.PLAYERSTATSWY = Tic.PLAYERPORTRAITWY + 25 -- stats window y position
 
--- State Window positions and sizes (hud)
-Tic.STATEWW = 26 -- state window width
-Tic.STATEWH = 16 -- state window height
-Tic.STATEWX = Tic.SCREENW - Tic.STATEWW - ((Tic.WORLDWX - Tic.STATEWW) // 2) -- state window x position
-Tic.STATEWY = Tic.STATSWY + 25 -- state window y position
+-- Player State Window positions and sizes (hud)
+Tic.PLAYERSTATEWW = 26 -- state window width
+Tic.PLAYERSTATEWH = 16 -- state window height
+Tic.PLAYERSTATEWX = Tic.SCREENW - Tic.PLAYERSTATEWW - ((Tic.WORLDWX - Tic.PLAYERSTATEWW) // 2) -- state window x position
+Tic.PLAYERSTATEWY = Tic.PLAYERSTATSWY + 25 -- state window y position
 
 
 -- Palette map
@@ -3021,8 +3021,8 @@ end
 local CWindowInfosPlayer = CWindowInfosEntity:extend() -- window infos for player
 function CWindowInfosPlayer:new(_argt)
     CWindowInfosPlayer.super.new(self, _argt)
-    self.screenx = Tic.INFOSWX
-    self.screeny = Tic.INFOSWY
+    self.screenx = Tic.PLAYERINFOSWX
+    self.screeny = Tic.PLAYERINFOSWY
 	self.entity  = Tic:playerActual()
     self:argt(_argt) -- override if any
 end
@@ -3041,8 +3041,8 @@ local WindowInfosPlayer = CWindowInfosPlayer{}
 local CWindowPortrait = CWindow:extend() -- window portrait
 function CWindowPortrait:new(_argt)
     CWindowPortrait.super.new(self, _argt)
-    self.screenw     = Tic.PORTRAITWW -- sizes
-    self.screenh     = Tic.PORTRAITWH
+    self.screenw     = Tic.PLAYERPORTRAITWW -- sizes
+    self.screenh     = Tic.PLAYERPORTRAITWH
     self.cachest     = 4 -- caches thickness
     self.colorground = Tic.COLORBIOMENIGHT
     self.drawguides  = false
@@ -3092,8 +3092,8 @@ end
 local CWindowPortraitPlayer = CWindowPortraitDrawable:extend() -- window portrait for player
 function CWindowPortraitPlayer:new(_argt)
     CWindowPortraitPlayer.super.new(self, _argt)
-    self.screenx = Tic.PORTRAITWX
-    self.screeny = Tic.PORTRAITWY
+    self.screenx = Tic.PLAYERPORTRAITWX
+    self.screeny = Tic.PLAYERPORTRAITWY
 	self.entity  = Tic:playerActual()
     self:argt(_argt) -- override if any
 end
@@ -3112,8 +3112,8 @@ local WindowPortraitPlayer = CWindowPortraitPlayer{}
 local CWindowStats = CWindow:extend() -- window stats
 function CWindowStats:new(_argt)
     CWindowStats.super.new(self, _argt)
-    self.screenw     = Tic.STATSWW -- sizes
-    self.screenh     = Tic.STATSWH
+    self.screenw     = Tic.PLAYERSTATSWW -- sizes
+    self.screenh     = Tic.PLAYERSTATSWH
     self.colorground = Tic.COLORBIOMENIGHT
     self.colorborder = Tic.COLORWHITE
     self.colorphyact = Tic.COLORRED -- stats colors
@@ -3212,8 +3212,8 @@ end
 local CWindowStatsPlayer = CWindowStatsCharacter:extend() -- window stats for player
 function CWindowStatsPlayer:new(_argt)
     CWindowStatsPlayer.super.new(self, _argt)
-    self.screenx = Tic.STATSWX
-    self.screeny = Tic.STATSWY
+    self.screenx = Tic.PLAYERSTATSWX
+    self.screeny = Tic.PLAYERSTATSWY
 	self.entity  = Tic:playerActual()
     self:argt(_argt) -- override if any
 end
@@ -3232,8 +3232,8 @@ local WindowStatsPlayer = CWindowStatsPlayer{}
 local CWindowStatePlayer = CWindowInfos:extend() -- window state for player
 function CWindowStatePlayer:new(_argt)
     CWindowStatePlayer.super.new(self, _argt)
-    self.screenx = Tic.STATEWX
-    self.screeny = Tic.STATEWY
+    self.screenx = Tic.PLAYERSTATEWX
+    self.screeny = Tic.PLAYERSTATEWY
     self.align   = CWindowInfos.ALIGNMD
     self.fupper  = true
 	self.entity  = Tic:playerActual()
