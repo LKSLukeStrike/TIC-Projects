@@ -1452,20 +1452,25 @@ CPlaceBuild.PALETTEIDLE   = {
     [CPlace.COLORANIM02]  = CPlaceBuild.COLORFACADE,
     [CPlace.COLORANIM03]  = CPlaceBuild.COLORWALLS,
 }
+CPlaceBuild.PALETTEFADE   = {
+    [CPlaceBuild.COLORSMOKE]    = CPlace.COLOREMPTY,
+    [CPlaceBuild.COLORWINDOW01] = CPlaceBuild.COLORWALLS,
+    [CPlaceBuild.COLORWINDOW02] = CPlaceBuild.COLORWALLS,
+    [CPlaceBuild.COLORROOF]     = CPlaceBuild.COLORWALLS,
+    [CPlaceBuild.COLORDOOR]     = CPlaceBuild.COLORFACADE,    
+    [CPlaceBuild.COLORFOAM]     = CPlaceBuild.COLORWALLS,    
+}
 CEntity.KINDBUILD = "Build" -- Build kind
 CEntity.NAMEBUILD = "Build" -- Build name
 function CPlaceBuild:new(_argt)
     CPlaceBuild.super.new(self, _argt)
     self.kind = CEntity.KINDBUILD
     self.name = CEntity.NAMEBUILD
-    self.palettefade = {
-        [CPlaceBuild.COLORSMOKE]    = CPlace.COLOREMPTY,
-        [CPlaceBuild.COLORWINDOW01] = CPlaceBuild.COLORWALLS,
-        [CPlaceBuild.COLORWINDOW02] = CPlaceBuild.COLORWALLS,
-        [CPlaceBuild.COLORROOF]     = CPlaceBuild.COLORWALLS,
-        [CPlaceBuild.COLORDOOR]     = CPlaceBuild.COLORFACADE,    
-        [CPlaceBuild.COLORFOAM]     = CPlaceBuild.COLORWALLS,    
-    }
+    self.hitbox.region.lf = 1
+    self.hitbox.region.rg = 5
+    self.hitbox.region.up = 5
+    self.hitbox.region.dw = 7
+    self.palettefade = CPlaceBuild.PALETTEFADE
     self:argt(_argt) -- override if any
 end
 
@@ -1481,10 +1486,6 @@ function CPlaceHouse:new(_argt)
     self.kind = CEntity.KINDHOUSE
     self.name = CEntity.NAMEHOUSE
     self.sprite      = CSpriteBG.PLACEHOUSE
-    self.hitbox.region.lf = 1
-    self.hitbox.region.rg = 5
-    self.hitbox.region.up = 5
-    self.hitbox.region.dw = 7
     self:argt(_argt) -- override if any
 end
 
@@ -1520,8 +1521,7 @@ end
 --
 -- CPlaceTower
 --
-local CPlaceTower = CPlace:extend() -- towers
-CPlaceTower.PALETTE = {[Tic.COLORWHITE] = Tic.COLORGREYD, [Tic.COLORYELLOW] = Tic.COLORGREYD,}
+local CPlaceTower = CPlaceBuild:extend() -- towers
 CEntity.KINDTOWER = "Tower" -- Tower kind
 CEntity.NAMETOWER = "Tower" -- Tower name
 function CPlaceTower:new(_argt)
@@ -1529,7 +1529,6 @@ function CPlaceTower:new(_argt)
     self.kind = CEntity.KINDTOWER
     self.name = CEntity.NAMETOWER
     self.sprite  = CSpriteBG.PLACETOWER
-    self.palette = CPlaceTower.PALETTE
     self:argt(_argt) -- override if any
 end
 
@@ -1540,20 +1539,26 @@ function CPlaceTowerAnim:new(_argt)
         CAnimation{ -- window 1
             frequence = Tic.FREQUENCE240,
             percent0  = 0.6,
-            palette0  = {[Tic.COLORWHITE] = Tic.COLORGREYD,},
-            palette1  = {[Tic.COLORWHITE] = Tic.COLORORANGE,},
+            palette0  = {[CPlaceBuild.COLORWINDOW01] = CPlaceBuild.COLORWALLS},
+            palette1  = {[CPlaceBuild.COLORWINDOW01] = CPlaceBuild.COLORLIGHT,},
         },
         CAnimation{ -- window 2
             frequence = Tic.FREQUENCE120,
             percent0  = 0.1,
-            palette0  = {[Tic.COLORYELLOW] = Tic.COLORGREYD,},
-            palette1  = {[Tic.COLORYELLOW] = Tic.COLORORANGE,},
+            palette0  = {[CPlaceBuild.COLORWINDOW02] = CPlaceBuild.COLORWALLS},
+            palette1  = {[CPlaceBuild.COLORWINDOW02] = CPlaceBuild.COLORLIGHT,},
         },
     }
     self:argt(_argt) -- override if any
 end
 
 local CPlaceTowerIdle = CPlaceTower:extend() -- idle towers
+function CPlaceTowerIdle:new(_argt)
+    CPlaceTowerIdle.super.new(self, _argt)
+    self.name = CEntity.NAMEEMPTY
+    self.palette = CPlaceBuild.PALETTEIDLE
+    self:argt(_argt) -- override if any
+end
 
 
 --
@@ -3301,7 +3306,7 @@ end
 --
 -- Places
 --
-if true then -- generate places -- TODO move under CPlaces
+if false then -- generate places -- TODO move under CPlaces
 
 CPlace.PLACECOUNT = 10 -- default number of generated places
 CPlace.PLACEKINDS = {  -- TODO val can contain parameters such as percent etc
@@ -3539,16 +3544,22 @@ local Region = CRegion{
 }
 
 --
--- Windows -- TESTING
+-- Places -- TESTING
 --
-local Tree0Test = CPlaceTree0Anim{spotted = false, collided = false, drawhitbox = true, scale = 1,
-}
-Tree0Test:randomWorldWindow()
+local Tree0Anim = CPlaceTree0Anim{drawhitbox = true,}
+Tree0Anim:randomWorldWindow()
+local Tree0Idle = CPlaceTree0Idle{drawhitbox = true,}
+Tree0Idle:randomWorldWindow()
 
-local HouseTest01 = CPlaceHouseAnim{spotted = false, collided = false, drawhitbox = true, scale = 1,
-name = Names:fupper(Names:random()),
-}
-local HouseTest02 = CPlaceHouseIdle{spotted = false, collided = false, drawhitbox = false, scale = 1,}
+local HouseAnim = CPlaceHouseAnim{drawhitbox = true,}
+HouseAnim:randomWorldWindow()
+local HouseIdle = CPlaceHouseIdle{drawhitbox = true,}
+HouseIdle:randomWorldWindow()
+
+local TowerAnim = CPlaceTowerAnim{drawhitbox = true,}
+TowerAnim:randomWorldWindow()
+local TowerIdle = CPlaceTowerIdle{drawhitbox = true,}
+TowerIdle:randomWorldWindow()
 
 
 
