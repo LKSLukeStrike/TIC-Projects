@@ -1564,8 +1564,7 @@ end
 --
 -- CPlaceManor
 --
-local CPlaceManor = CPlace:extend() -- manors
-CPlaceManor.PALETTE = {[Tic.COLORWHITE] = Tic.COLORGREYD, [Tic.COLORYELLOW] = Tic.COLORGREYD,}
+local CPlaceManor = CPlaceBuild:extend() -- manors
 CEntity.KINDMANOR = "Manor" -- Manor kind
 CEntity.NAMEMANOR = "Manor" -- Manor name
 function CPlaceManor:new(_argt)
@@ -1573,7 +1572,8 @@ function CPlaceManor:new(_argt)
     self.kind = CEntity.KINDMANOR
     self.name = CEntity.NAMEMANOR
     self.sprite  = CSpriteBG.PLACEMANOR
-    self.palette = CPlaceManor.PALETTE
+    self.hitbox.region.lf = 0
+    self.hitbox.region.rg = 5
     self:argt(_argt) -- override if any
 end
 
@@ -1581,23 +1581,35 @@ local CPlaceManorAnim = CPlaceManor:extend() -- anim manors
 function CPlaceManorAnim:new(_argt)
     CPlaceManorAnim.super.new(self, _argt)
     self.animations = {
+        CAnimation{ -- smoke
+            frequence = Tic.FREQUENCE300,
+            percent0  = 0.9,
+            palette0  = {[CPlaceBuild.COLORSMOKE] = CPlaceBuild.COLORSMOKE,},
+            palette1  = {[CPlaceBuild.COLORSMOKE] = CPlaceBuild.COLORLIGHT,},
+        },
         CAnimation{ -- window 1
             frequence = Tic.FREQUENCE240,
             percent0  = 0.6,
-            palette0  = {[Tic.COLORWHITE] = Tic.COLORGREYD,},
-            palette1  = {[Tic.COLORWHITE] = Tic.COLORORANGE,},
+            palette0  = {[CPlaceBuild.COLORWINDOW01] = CPlaceBuild.COLORWALLS},
+            palette1  = {[CPlaceBuild.COLORWINDOW01] = CPlaceBuild.COLORLIGHT,},
         },
         CAnimation{ -- window 2
             frequence = Tic.FREQUENCE120,
             percent0  = 0.1,
-            palette0  = {[Tic.COLORYELLOW] = Tic.COLORGREYD,},
-            palette1  = {[Tic.COLORYELLOW] = Tic.COLORORANGE,},
+            palette0  = {[CPlaceBuild.COLORWINDOW02] = CPlaceBuild.COLORWALLS},
+            palette1  = {[CPlaceBuild.COLORWINDOW02] = CPlaceBuild.COLORLIGHT,},
         },
     }
     self:argt(_argt) -- override if any
 end
 
 local CPlaceManorIdle = CPlaceManor:extend() -- idle manors
+function CPlaceManorIdle:new(_argt)
+    CPlaceManorIdle.super.new(self, _argt)
+    self.name = CEntity.NAMEEMPTY
+    self.palette = CPlaceBuild.PALETTEIDLE
+    self:argt(_argt) -- override if any
+end
 
 
 --
@@ -3546,20 +3558,26 @@ local Region = CRegion{
 --
 -- Places -- TESTING
 --
-local Tree0Anim = CPlaceTree0Anim{drawhitbox = true,}
+local _drawhitbox = false
+local Tree0Anim = CPlaceTree0Anim{drawhitbox = _drawhitbox,}
 Tree0Anim:randomWorldWindow()
-local Tree0Idle = CPlaceTree0Idle{drawhitbox = true,}
+local Tree0Idle = CPlaceTree0Idle{drawhitbox = _drawhitbox,}
 Tree0Idle:randomWorldWindow()
 
-local HouseAnim = CPlaceHouseAnim{drawhitbox = true,}
+local HouseAnim = CPlaceHouseAnim{drawhitbox = _drawhitbox,}
 HouseAnim:randomWorldWindow()
-local HouseIdle = CPlaceHouseIdle{drawhitbox = true,}
+local HouseIdle = CPlaceHouseIdle{drawhitbox = _drawhitbox,}
 HouseIdle:randomWorldWindow()
 
-local TowerAnim = CPlaceTowerAnim{drawhitbox = true,}
+local TowerAnim = CPlaceTowerAnim{drawhitbox = _drawhitbox,}
 TowerAnim:randomWorldWindow()
-local TowerIdle = CPlaceTowerIdle{drawhitbox = true,}
+local TowerIdle = CPlaceTowerIdle{drawhitbox = _drawhitbox,}
 TowerIdle:randomWorldWindow()
+
+local ManorAnim = CPlaceManorAnim{drawhitbox = _drawhitbox,}
+ManorAnim:randomWorldWindow()
+local ManorIdle = CPlaceManorIdle{drawhitbox = _drawhitbox,}
+ManorIdle:randomWorldWindow()
 
 
 
