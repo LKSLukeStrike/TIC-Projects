@@ -280,28 +280,34 @@ Tic.KEY_NUMPADMINUS    = 90
 Tic.KEY_NUMPADMULTIPLY = 91
 Tic.KEY_NUMPADDIVIDE   = 92
 Tic.KEY_B              = 02
+Tic.KEY_H              = 08
 Tic.KEY_S              = 19
+Tic.KEY_V              = 22
+Tic.KEY_Z              = 26
 
 -- Actions values
-Tic.ACTIONPLAYERPREV  = "playerPrev"
-Tic.ACTIONPLAYERNEXT  = "playerNext"
-Tic.ACTIONSTATEPREV   = "statePrev"
-Tic.ACTIONSTATENEXT   = "stateNext"
-Tic.ACTIONTOGGLEWORK  = "toggleWork"
-Tic.ACTIONTOGGLEKNEEL = "toggleKneel"
-Tic.ACTIONTOGGLESLEEP = "toggleSleep"
-Tic.ACTIONMOVE000     = "move000"
-Tic.ACTIONMOVE045     = "move045"
-Tic.ACTIONMOVE090     = "move090"
-Tic.ACTIONMOVE135     = "move135"
-Tic.ACTIONMOVE180     = "move180"
-Tic.ACTIONMOVE225     = "move225"
-Tic.ACTIONMOVE270     = "move270"
-Tic.ACTIONMOVE315     = "move315"
-Tic.ACTIONDECPHYACT   = "decPhyAct"
-Tic.ACTIONINCPHYACT   = "incPhyAct"
-Tic.ACTIONBIOMENEXT   = "biomeNext"
-Tic.ACTIONSCALENEXT   = "scaleNext"
+Tic.ACTIONPLAYERPREV   = "playerPrev"
+Tic.ACTIONPLAYERNEXT   = "playerNext"
+Tic.ACTIONSTATEPREV    = "statePrev"
+Tic.ACTIONSTATENEXT    = "stateNext"
+Tic.ACTIONTOGGLEWORK   = "toggleWork"
+Tic.ACTIONTOGGLEKNEEL  = "toggleKneel"
+Tic.ACTIONTOGGLESLEEP  = "toggleSleep"
+Tic.ACTIONMOVE000      = "move000"
+Tic.ACTIONMOVE045      = "move045"
+Tic.ACTIONMOVE090      = "move090"
+Tic.ACTIONMOVE135      = "move135"
+Tic.ACTIONMOVE180      = "move180"
+Tic.ACTIONMOVE225      = "move225"
+Tic.ACTIONMOVE270      = "move270"
+Tic.ACTIONMOVE315      = "move315"
+Tic.ACTIONDECPHYACT    = "decPhyAct"
+Tic.ACTIONINCPHYACT    = "incPhyAct"
+Tic.ACTIONBIOMENEXT    = "biomeNext"
+Tic.ACTIONTOGGLEHITBOX = "toggleHitbox"
+Tic.ACTIONTOGGLESPOT   = "toggleSpot"
+Tic.ACTIONTOGGLEVIEW   = "toggleView"
+Tic.ACTIONSCALENEXT    = "scaleNext"
 
 -- Keys to Actions
 Tic.KEYS2ACTIONS = {
@@ -323,7 +329,7 @@ Tic.KEYS2ACTIONS = {
     [Tic.KEY_NUMPADMINUS]  = Tic.ACTIONDECPHYACT,
     [Tic.KEY_NUMPADPLUS]   = Tic.ACTIONINCPHYACT,
     [Tic.KEY_B]            = Tic.ACTIONBIOMENEXT,
-    [Tic.KEY_S]            = Tic.ACTIONSCALENEXT,
+    [Tic.KEY_Z]            = Tic.ACTIONSCALENEXT,
 }
 
 -- Actions to Functions
