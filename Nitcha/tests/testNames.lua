@@ -8,12 +8,26 @@ local Names  = require("libraries/lks/Names")
 -- end
 
 for _ = 1, 20 do
-    print(Names:random(3, 3,
+    print(Names:random(3, 10,
     {
         "o",
-    },
+        "a",
+        "u",
+        "oh",
+        "ah",
+        "uh",
+        "uh",
+        "og",
+        "ag",
+        "ug",
+   },
     {
-        "x",
+        "v",
+        "w",
+        "k",
+        "vv",
+        "ww",
+        "kk",
     },
     1
 ))

@@ -4,16 +4,23 @@ local Classic = require("libraries/ext/Classic")
 local Tables  = require("libraries/lks/Tables")
 
 
+XHello = Classic:extend()
+function XHello:sayHello()
+  print"Hello"
+end
+XHello.message = "My Message"
+
 CCharacter = Classic:extend()
+CCharacter:implementx(XHello)
 function CCharacter:new(_argt)
   CCharacter.super.new(self, _argt)
-  self.sprite = 1
-  self.x = 2
-  self.y = 3
+  self.x = 1
+  self.y = 2
+  self.z = 3
   self:argt(_argt)
 end
 
-function CCharacter:print(_title)
+function CCharacter:printMe(_title)
   print()
   if _title then print(_title) end
   print("Size:", self:_size())
@@ -36,9 +43,9 @@ Jeandu = CPlayer{
 }
 
 Jeandu:argt{
-  y = 300,
-  x = 200,
-  sprite = 100,
+  y = 200,
+  x = 100,
+  z = 300,
   age = 24,
   race = "Human",
 }
@@ -48,12 +55,27 @@ Jeandu:argt{
   age = 1234,
   race = "Thing",
 }
-Jeandu:print(":Jeandu 3:")
+Jeandu:printMe(":Jeandu 3:")
 
 Jeandu:load()
-Jeandu:print(":Jeandu 4:")
+Jeandu:printMe(":Jeandu 4:")
 
+print()
 print("Classic", Jeandu:is(Classic))
 print("CCharacter", Jeandu:is(CCharacter))
 print("CPlayer", Jeandu:is(CPlayer))
 print("CPlayer", Jeandu:is(CVoid))
+
+print()
+Jeandu:sayHello()
+print("message:", Jeandu.message)
+
+-- print()
+-- print("XHello")
+-- Tables:print(XHello)
+-- print("CCharacter")
+-- Tables:print(CCharacter)
+-- print("CPlayer")
+-- Tables:print(CPlayer)
+-- print("Jeandu")
+-- Tables:print(Jeandu)

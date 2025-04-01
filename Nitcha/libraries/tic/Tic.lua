@@ -62,8 +62,21 @@ Tic.PLAYERSTATSWY = Tic.PLAYERPORTRAITWY + 25 -- stats window y position
 -- Player State Window positions and sizes (hud)
 Tic.PLAYERSTATEWW = 26 -- state window width
 Tic.PLAYERSTATEWH = 16 -- state window height
-Tic.PLAYERSTATEWX = Tic.SCREENW - Tic.PLAYERSTATEWW - ((Tic.WORLDWX - Tic.PLAYERSTATEWW) // 2) -- state window x position
+-- Tic.PLAYERSTATEWX = Tic.SCREENW - Tic.PLAYERSTATEWW - ((Tic.WORLDWX - Tic.PLAYERSTATEWW) // 2) -- state window x position
+Tic.PLAYERSTATEWX = Tic.PLAYERINFOSWX -- state window x position
 Tic.PLAYERSTATEWY = Tic.PLAYERSTATSWY + 25 -- state window y position
+
+-- Spotted Infos Window positions and sizes (hud)
+Tic.SPOTTEDINFOSWW = 26 -- infos window width
+Tic.SPOTTEDINFOSWH = 16 -- infos window height
+Tic.SPOTTEDINFOSWX = ((Tic.WORLDWX - Tic.SPOTTEDINFOSWW) // 2) -- infos window x position
+Tic.SPOTTEDINFOSWY = Tic.WORLDWY -- infos window y position
+
+-- Spotted Portrait Window positions and sizes (hud)
+Tic.SPOTTEDPORTRAITWW = 16 -- portrait window width
+Tic.SPOTTEDPORTRAITWH = 16 -- portrait window height
+Tic.SPOTTEDPORTRAITWX = ((Tic.WORLDWX - Tic.SPOTTEDPORTRAITWW) // 2) -- portrait window x position
+Tic.SPOTTEDPORTRAITWY = Tic.SPOTTEDINFOSWY + 25 -- portrait window y position
 
 
 -- Palette map
@@ -1303,7 +1316,6 @@ end
 -- CEntityDrawable
 --
 local CEntityDrawable = CEntity:extend() -- general entities with a sprite representation
-CEntityDrawable:implement(CSprite)
 CEntity.KINDDRAWABLE = "Drawable" -- Drawable kind
 CEntity.NAMEDRAWABLE = "Drawable" -- Drawable name
 function CEntityDrawable:new(_argt)
@@ -2840,80 +2852,6 @@ local WindowScreen = CWindowScreen{}
 
 
 --
--- CWindowWorld
---
-local CWindowWorld = CWindow:extend() -- window world
-function CWindowWorld:new(_argt)
-    CWindowWorld.super.new(self, _argt)
-    self.screenx     = Tic.WORLDWX -- positions
-    self.screeny     = Tic.WORLDWY
-    self.screenw     = Tic.WORLDWW -- sizes
-    self.screenh     = Tic.WORLDWH
-    self.colorground = Tic.COLORBIOMENIGHT
-    self.drawguides  = false
-    self:argt(_argt) -- override if any
-end
--- CWindowWorld instance
-local WindowWorld = CWindowWorld{}
-
-function CWindowWorld:drawGround() -- window world ground
-    self.colorground = Tic:biomeActual()
-    CWindowWorld.super.drawGround(self)
-end
-
-function CWindowWorld:drawInside() -- window world content
-    CWindowWorld:drawPlayerActual()
-end
-
-function CWindowWorld:drawPlayerActual()
-    local _playeractual      = Tic:playerActual()
-    local _entitiesaround    = _playeractual:entitiesAround()
-    local _regionviewworld   = _playeractual:regionViewWorld()
-
-    local _nearest = nil -- nearest entity if any -- except itself
-    local _keyys   = Tables:keys(_entitiesaround)
-    for _, _keyy in pairs(_keyys) do -- draw entities visible by the actual player sorted by y first
-        local _keyxs = Tables:keys(_entitiesaround[_keyy])
-        for _, _keyx in pairs(_keyxs) do -- sorted by x next
-            for _entity, _ in pairs(_entitiesaround[_keyy][_keyx]) do -- draw entities at the same x y
-                _entity.spotted  = false -- unspot entities -- TODO check if spotted by another player ?
-                _entity.discovered = true -- HERE
-
-                if not (_entity == _playeractual) then -- avoid to spot itself
-                    if _regionviewworld:hasInsideRegion(_entity:regionWorld()) then -- if in view
-                        if _nearest == nil then
-                            _nearest = _entity -- first nearest entity
-                        elseif _playeractual:distanceEntitySquared(_entity) < _playeractual:distanceEntitySquared(_nearest) then
-                            _nearest = _entity -- new nearest entity
-                        end
-                        _entity.drawfade = false
-                        _entity.discovered = true
-                    else -- not in view
-                        _entity.drawfade = true
-                    end
-                end
-
-                _entity:drawRelativeToEntity(_playeractual)
-            end
-        end
-    end
-
-    if _nearest then -- spot the nearest if any
-        Tic:logAppend("K:", _nearest.kind)
-        Tic:logAppend("N:", _nearest.name)
-        Tic:logAppend("D:", _nearest.discovered)
-        _nearest:save{"spotted",}
-        _nearest.spotted = true
-        _nearest:drawRelativeToEntity(_playeractual)
-        _nearest:load()
-        if _playeractual.worldy >= _nearest.worldy then -- redraw actual player in front if needed
-            _playeractual:drawRelativeToEntity(_playeractual)
-        end
-    end
-end
-
-
---
 -- CWindowInfos
 --
 local CWindowInfos = CWindow:extend() -- window infos
@@ -3253,6 +3191,110 @@ end
 local WindowStatePlayer = CWindowStatePlayer{}
 
 
+--
+-- CWindowInfosSpotted
+--
+local CWindowInfosSpotted = CWindowInfosEntity:extend() -- window infos for spotted
+function CWindowInfosSpotted:new(_argt)
+    CWindowInfosSpotted.super.new(self, _argt)
+    self.screenx = Tic.SPOTTEDINFOSWX
+    self.screeny = Tic.SPOTTEDINFOSWY
+    self:argt(_argt) -- override if any
+end
+-- CWindowInfosSpotted instance
+local WindowInfosSpotted = CWindowInfosSpotted{}
+
+
+--
+-- CWindowPortraitSpotted
+--
+local CWindowPortraitSpotted = CWindowPortraitDrawable:extend() -- window portrait for spotted
+function CWindowPortraitSpotted:new(_argt)
+    CWindowPortraitSpotted.super.new(self, _argt)
+    self.screenx = Tic.SPOTTEDPORTRAITWX
+    self.screeny = Tic.SPOTTEDPORTRAITWY
+    self:argt(_argt) -- override if any
+end
+-- CWindowPortraitSpotted instance
+local WindowPortraitSpotted = CWindowPortraitSpotted{}
+
+
+--
+-- CWindowWorld
+--
+local CWindowWorld = CWindow:extend() -- window world
+function CWindowWorld:new(_argt)
+    CWindowWorld.super.new(self, _argt)
+    self.screenx     = Tic.WORLDWX -- positions
+    self.screeny     = Tic.WORLDWY
+    self.screenw     = Tic.WORLDWW -- sizes
+    self.screenh     = Tic.WORLDWH
+    self.colorground = Tic.COLORBIOMENIGHT
+    self.drawguides  = false
+    self:argt(_argt) -- override if any
+end
+-- CWindowWorld instance
+local WindowWorld = CWindowWorld{}
+
+function CWindowWorld:drawGround() -- window world ground
+    self.colorground = Tic:biomeActual()
+    CWindowWorld.super.drawGround(self)
+end
+
+function CWindowWorld:drawInside() -- window world content
+    CWindowWorld:drawPlayerActual()
+end
+
+function CWindowWorld:drawPlayerActual()
+    local _playeractual      = Tic:playerActual()
+    local _entitiesaround    = _playeractual:entitiesAround()
+    local _regionviewworld   = _playeractual:regionViewWorld()
+
+    local _nearest = nil -- nearest entity if any -- except itself
+    local _keyys   = Tables:keys(_entitiesaround)
+    for _, _keyy in pairs(_keyys) do -- draw entities visible by the actual player sorted by y first
+        local _keyxs = Tables:keys(_entitiesaround[_keyy])
+        for _, _keyx in pairs(_keyxs) do -- sorted by x next
+            for _entity, _ in pairs(_entitiesaround[_keyy][_keyx]) do -- draw entities at the same x y
+                _entity.spotted  = false -- unspot entities -- TODO check if spotted by another player ?
+                _entity.discovered = true -- HERE
+
+                if not (_entity == _playeractual) then -- avoid to spot itself
+                    if _regionviewworld:hasInsideRegion(_entity:regionWorld()) then -- if in view
+                        if _nearest == nil then
+                            _nearest = _entity -- first nearest entity
+                        elseif _playeractual:distanceEntitySquared(_entity) < _playeractual:distanceEntitySquared(_nearest) then
+                            _nearest = _entity -- new nearest entity
+                        end
+                        _entity.drawfade = false
+                        _entity.discovered = true
+                    else -- not in view
+                        _entity.drawfade = true
+                    end
+                end
+
+                _entity:drawRelativeToEntity(_playeractual)
+            end
+        end
+    end
+
+    if _nearest then -- spot the nearest if any
+        WindowInfosSpotted.entity    = _nearest
+        WindowPortraitSpotted.entity = _nearest
+        _nearest:save{"spotted",}
+        _nearest.spotted = true
+        _nearest:drawRelativeToEntity(_playeractual)
+        _nearest:load()
+        if _playeractual.worldy >= _nearest.worldy then -- redraw actual player in front if needed
+            _playeractual:drawRelativeToEntity(_playeractual)
+        end
+    else
+        WindowInfosSpotted.entity    = nil
+        WindowPortraitSpotted.entity = nil
+    end
+end
+
+
 
 --
 -- Places
@@ -3529,6 +3571,8 @@ function Tic:draw()
     WindowPortraitPlayer:draw()
     WindowStatsPlayer:draw()
     WindowStatePlayer:draw()
+    WindowInfosSpotted:draw()
+    WindowPortraitSpotted:draw()
 
     -- WindowTest1:draw()
     -- WindowTest2:draw()
