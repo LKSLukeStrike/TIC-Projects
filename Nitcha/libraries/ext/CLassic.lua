@@ -78,17 +78,6 @@ function Classic:defaultArg(_arg, _default, ...) -- return _arg if _arg in allow
 end
 
 
-function Classic:implementx(...) -- implement (only) new functions and attributes -- modified original version
-  for _, _classic in pairs({...}) do
-    for _key, _val in pairs(_classic) do
-      if self[_key] == nil then
-        self[_key] = _val
-      end
-    end
-  end
-end
-
-
 -- FIXME still doesnt work -- seems to destroy stuff
 function Classic:expand(_new, _type, ...) -- implement vars or fcts or both (depending of _type) if they exist or not (depending of _new)
   _new  = Classic:defaultArg(_new, "all", "new", "all") -- new = only if not existing, all = even existing

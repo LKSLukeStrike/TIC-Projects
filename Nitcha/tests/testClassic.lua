@@ -11,7 +11,7 @@ end
 XHello.message = "My Message"
 
 CCharacter = Classic:extend()
-CCharacter:implementx(XHello)
+CCharacter:implementNew(XHello)
 function CCharacter:new(_argt)
   CCharacter.super.new(self, _argt)
   self.x = 1

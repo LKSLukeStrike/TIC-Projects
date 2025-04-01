@@ -1447,6 +1447,11 @@ CPlaceBuild.COLORFACADE   = Tic.COLORGREYM
 CPlaceBuild.COLORWALLS    = Tic.COLORGREYD
 CPlaceBuild.COLORFOAM     = Tic.COLORGREEND
 CPlaceBuild.COLORLIGHT    = Tic.COLORORANGE
+CPlaceBuild.PALETTEIDLE   = {
+    [CPlace.COLORANIM01]  = CPlace.COLOREMPTY,
+    [CPlace.COLORANIM02]  = CPlaceBuild.COLORFACADE,
+    [CPlace.COLORANIM03]  = CPlaceBuild.COLORWALLS,
+}
 CEntity.KINDBUILD = "Build" -- Build kind
 CEntity.NAMEBUILD = "Build" -- Build name
 function CPlaceBuild:new(_argt)
@@ -1507,10 +1512,7 @@ local CPlaceHouseIdle = CPlaceHouse:extend() -- idle houses
 function CPlaceHouseIdle:new(_argt)
     CPlaceHouseIdle.super.new(self, _argt)
     self.name = CEntity.NAMEEMPTY
-    self.palette = {
-        [CPlaceBuild.COLORSMOKE]    = CPlace.COLOREMPTY,
-        [CPlaceBuild.COLORWINDOW02] = CPlaceBuild.COLORWALLS,
-    }
+    self.palette = CPlaceBuild.PALETTEIDLE
     self:argt(_argt) -- override if any
 end
 
@@ -2946,8 +2948,8 @@ end
 function CWindowInfosEntity:drawInside() -- window infos content for entities
     if not self.entity then return end -- mandatory
     if not self.entity:is(CEntity) then return end -- mandatory
-    local _info1 = self.entity.name or ""
-    local _info2 = self.entity.kind or ""
+    local _info1 = self.entity.name
+    local _info2 = self.entity.kind
 	self.infos = {_info1, _info2}
     CWindowInfosEntity.super.drawInside(self)
 end
@@ -3542,20 +3544,12 @@ local Region = CRegion{
 local Tree0Test = CPlaceTree0Anim{spotted = false, collided = false, drawhitbox = true, scale = 1,
 }
 Tree0Test:randomWorldWindow()
-local WindowTest1 = CWindowPortraitDrawable{
-    screenx = 10,
-    screeny = 18,
-    entity = Tree0Test,
-}
-local HouseTest = CPlaceHouseAnim{spotted = false, collided = false, drawhitbox = true, scale = 1,
+
+local HouseTest01 = CPlaceHouseAnim{spotted = false, collided = false, drawhitbox = true, scale = 1,
 name = Names:fupper(Names:random()),
 }
-HouseTest:randomWorldWindow()
-local WindowTest2 = CWindowPortraitDrawable{
-    screenx = 10,
-    screeny = 44,
-    entity = HouseTest,
-}
+local HouseTest02 = CPlaceHouseIdle{spotted = false, collided = false, drawhitbox = false, scale = 1,}
+
 
 
 --
@@ -3573,9 +3567,6 @@ function Tic:draw()
     WindowStatePlayer:draw()
     WindowInfosSpotted:draw()
     WindowPortraitSpotted:draw()
-
-    -- WindowTest1:draw()
-    -- WindowTest2:draw()
 
     -- Tic:logAppend("WOX:", Tic:playerActual().worldx)
     -- Tic:logAppend("WOY:", Tic:playerActual().worldy)
