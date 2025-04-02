@@ -3602,31 +3602,22 @@ local Region = CRegion{
 --
 -- Places -- TESTING
 --
-local _drawhitbox = false
-local Tree0Anim = CPlaceTree0Anim{drawhitbox = _drawhitbox,}
-Tree0Anim:randomWorldWindow()
-local Tree0Idle = CPlaceTree0Idle{drawhitbox = _drawhitbox,}
-Tree0Idle:randomWorldWindow()
-
-local HouseAnim = CPlaceHouseAnim{drawhitbox = _drawhitbox,}
-HouseAnim:randomWorldWindow()
-local HouseIdle = CPlaceHouseIdle{drawhitbox = _drawhitbox,}
-HouseIdle:randomWorldWindow()
-
-local TowerAnim = CPlaceTowerAnim{drawhitbox = _drawhitbox,}
-TowerAnim:randomWorldWindow()
-local TowerIdle = CPlaceTowerIdle{drawhitbox = _drawhitbox,}
-TowerIdle:randomWorldWindow()
-
-local ManorAnim = CPlaceManorAnim{drawhitbox = _drawhitbox,}
-ManorAnim:randomWorldWindow()
-local ManorIdle = CPlaceManorIdle{drawhitbox = _drawhitbox,}
-ManorIdle:randomWorldWindow()
-
-local AltarAnim = CPlaceAltarAnim{drawhitbox = _drawhitbox,}
-AltarAnim:randomWorldWindow()
-local AltarIdle = CPlaceAltarIdle{drawhitbox = _drawhitbox,}
-AltarIdle:randomWorldWindow()
+Tic.DRAWHITBOX = false
+for _, _cplace in pairs({
+    CPlaceTree0Anim,
+    CPlaceTree0Idle,
+    CPlaceHouseAnim,
+    CPlaceHouseIdle,
+    CPlaceTowerAnim,
+    CPlaceTowerIdle,
+    CPlaceManorAnim,
+    CPlaceManorIdle,
+    CPlaceAltarAnim,
+    CPlaceAltarIdle,
+}) do
+    local _place = _cplace()
+    _place:randomWorldWindow()
+end
 
 
 
