@@ -1378,7 +1378,7 @@ function CEntityDrawable:draw() -- default draw for drawable entities -- overrid
         and Tables:merge(self.palette, self.palettefade)
         or  Tables:merge(self.palette, {})
 
-    for _, _animation in pairs(self.animations or {}) do -- animate
+    for _, _animation in pairs(self.animations or {}) do -- animate -- FIXME something wrong in frequences
         local _frequence   = _animation.frequence
         local _percent0    = _animation.percent0
         local _palette0    = _animation.palette0
@@ -1456,10 +1456,10 @@ end
 -- CPlace
 --
 local CPlace = CEntityDrawable:extend() -- places
-CPlace.COLOREMPTY  = Tic.COLORKEY
-CPlace.COLORANIM01 = Tic.COLORWHITE
-CPlace.COLORANIM02 = Tic.COLORYELLOW
-CPlace.COLORANIM03 = Tic.COLORORANGE
+CPlace.EMPTY  = Tic.COLORKEY
+CPlace.ANIM01 = Tic.COLORWHITE
+CPlace.ANIM02 = Tic.COLORYELLOW
+CPlace.ANIM03 = Tic.COLORORANGE
 CEntity.KINDPLACE = "Place" -- Place kind
 CEntity.NAMEPLACE = "Place" -- Place name
 function CPlace:new(_argt)
@@ -1474,29 +1474,38 @@ end
 -- CPlaceBuild
 --
 local CPlaceBuild = CPlace:extend() -- builds
-CPlaceBuild.COLORSMOKE    = CPlace.COLORANIM01
-CPlaceBuild.COLORWINDOW01 = CPlace.COLORANIM02
-CPlaceBuild.COLORWINDOW02 = CPlace.COLORANIM03
-CPlaceBuild.COLORROOF     = Tic.COLORRED
-CPlaceBuild.COLORDOOR     = Tic.COLORGREYL
-CPlaceBuild.COLORFACADE   = Tic.COLORGREYM
-CPlaceBuild.COLORWALLS    = Tic.COLORGREYD
-CPlaceBuild.COLORFOAM     = Tic.COLORGREEND
+CPlaceBuild.SMOKE    = CPlace.ANIM01
+CPlaceBuild.WINDOW01 = CPlace.ANIM02
+CPlaceBuild.WINDOW02 = CPlace.ANIM03
+CPlaceBuild.ROOF     = Tic.COLORRED
+CPlaceBuild.DOOR     = Tic.COLORGREYL
+CPlaceBuild.FACADE   = Tic.COLORGREYM
+CPlaceBuild.WALLS    = Tic.COLORGREYD
+CPlaceBuild.FOAM     = Tic.COLORGREEND
+CPlaceBuild.WATER01  = CPlace.ANIM02
+CPlaceBuild.WATER02  = CPlace.ANIM03
+CPlaceBuild.OWNER    = CPlace.ANIM01
+CPlaceBuild.GOODS01  = CPlace.ANIM02
+CPlaceBuild.GOODS02  = CPlace.ANIM03
 CPlaceBuild.COLORLIGHT    = Tic.COLORORANGE
 CPlaceBuild.COLORGLASS01  = Tic.COLORCYAN
 CPlaceBuild.COLORGLASS02  = Tic.COLORBLUEL
+CPlaceBuild.COLORWATER01  = Tic.COLORBLUEL
+CPlaceBuild.COLORWATER02  = Tic.COLORBLUEM
+CPlaceBuild.COLORGOODS01  = Tic.COLORGREENM
+CPlaceBuild.COLORGOODS02  = Tic.COLORGREEND
 CPlaceBuild.PALETTEIDLE   = {
-    [CPlace.COLORANIM01]  = CPlace.COLOREMPTY,
-    [CPlace.COLORANIM02]  = CPlaceBuild.COLORWALLS,
-    [CPlace.COLORANIM03]  = CPlaceBuild.COLORWALLS,
+    [CPlace.ANIM01]  = CPlace.EMPTY,
+    [CPlace.ANIM02]  = CPlaceBuild.WALLS,
+    [CPlace.ANIM03]  = CPlaceBuild.WALLS,
 }
 CPlaceBuild.PALETTEFADE   = {
-    [CPlaceBuild.COLORSMOKE]    = CPlace.COLOREMPTY,
-    [CPlaceBuild.COLORWINDOW01] = CPlaceBuild.COLORWALLS,
-    [CPlaceBuild.COLORWINDOW02] = CPlaceBuild.COLORWALLS,
-    [CPlaceBuild.COLORROOF]     = CPlaceBuild.COLORWALLS,
-    [CPlaceBuild.COLORDOOR]     = CPlaceBuild.COLORFACADE,    
-    [CPlaceBuild.COLORFOAM]     = CPlaceBuild.COLORWALLS,    
+    [CPlaceBuild.SMOKE]    = CPlace.EMPTY,
+    [CPlaceBuild.WINDOW01] = CPlaceBuild.WALLS,
+    [CPlaceBuild.WINDOW02] = CPlaceBuild.WALLS,
+    [CPlaceBuild.ROOF]     = CPlaceBuild.WALLS,
+    [CPlaceBuild.DOOR]     = CPlaceBuild.FACADE,    
+    [CPlaceBuild.FOAM]     = CPlaceBuild.WALLS,    
 }
 CEntity.KINDBUILD = "Build" -- Build kind
 CEntity.NAMEBUILD = "Build" -- Build name
@@ -1534,14 +1543,14 @@ function CPlaceHouseAnim:new(_argt)
         CAnimation{ -- smoke
             frequence = Tic.FREQUENCE300,
             percent0  = 0.9,
-            palette0  = {[CPlaceBuild.COLORSMOKE] = CPlaceBuild.COLORSMOKE,},
-            palette1  = {[CPlaceBuild.COLORSMOKE] = CPlaceBuild.COLORLIGHT,},
+            palette0  = {[CPlaceBuild.SMOKE] = CPlaceBuild.SMOKE,},
+            palette1  = {[CPlaceBuild.SMOKE] = CPlaceBuild.COLORLIGHT,},
         },
         CAnimation{ -- window
             frequence = Tic.FREQUENCE600,
             percent0  = 0.1,
-            palette0  = {[CPlaceBuild.COLORWINDOW02] = CPlaceBuild.COLORWALLS},
-            palette1  = {[CPlaceBuild.COLORWINDOW02] = CPlaceBuild.COLORLIGHT,},
+            palette0  = {[CPlaceBuild.WINDOW02] = CPlaceBuild.WALLS},
+            palette1  = {[CPlaceBuild.WINDOW02] = CPlaceBuild.COLORLIGHT,},
         },
     }
     self:argt(_argt) -- override if any
@@ -1577,14 +1586,14 @@ function CPlaceTowerAnim:new(_argt)
         CAnimation{ -- window 1
             frequence = Tic.FREQUENCE240,
             percent0  = 0.6,
-            palette0  = {[CPlaceBuild.COLORWINDOW01] = CPlaceBuild.COLORWALLS},
-            palette1  = {[CPlaceBuild.COLORWINDOW01] = CPlaceBuild.COLORLIGHT,},
+            palette0  = {[CPlaceBuild.WINDOW01] = CPlaceBuild.WALLS},
+            palette1  = {[CPlaceBuild.WINDOW01] = CPlaceBuild.COLORLIGHT,},
         },
         CAnimation{ -- window 2
             frequence = Tic.FREQUENCE120,
             percent0  = 0.1,
-            palette0  = {[CPlaceBuild.COLORWINDOW02] = CPlaceBuild.COLORWALLS},
-            palette1  = {[CPlaceBuild.COLORWINDOW02] = CPlaceBuild.COLORLIGHT,},
+            palette0  = {[CPlaceBuild.WINDOW02] = CPlaceBuild.WALLS},
+            palette1  = {[CPlaceBuild.WINDOW02] = CPlaceBuild.COLORLIGHT,},
         },
     }
     self:argt(_argt) -- override if any
@@ -1622,20 +1631,20 @@ function CPlaceManorAnim:new(_argt)
         CAnimation{ -- smoke
             frequence = Tic.FREQUENCE300,
             percent0  = 0.9,
-            palette0  = {[CPlaceBuild.COLORSMOKE] = CPlaceBuild.COLORSMOKE,},
-            palette1  = {[CPlaceBuild.COLORSMOKE] = CPlaceBuild.COLORLIGHT,},
+            palette0  = {[CPlaceBuild.SMOKE] = CPlaceBuild.SMOKE,},
+            palette1  = {[CPlaceBuild.SMOKE] = CPlaceBuild.COLORLIGHT,},
         },
         CAnimation{ -- window 1
             frequence = Tic.FREQUENCE240,
             percent0  = 0.6,
-            palette0  = {[CPlaceBuild.COLORWINDOW01] = CPlaceBuild.COLORWALLS},
-            palette1  = {[CPlaceBuild.COLORWINDOW01] = CPlaceBuild.COLORLIGHT,},
+            palette0  = {[CPlaceBuild.WINDOW01] = CPlaceBuild.WALLS},
+            palette1  = {[CPlaceBuild.WINDOW01] = CPlaceBuild.COLORLIGHT,},
         },
         CAnimation{ -- window 2
             frequence = Tic.FREQUENCE120,
             percent0  = 0.1,
-            palette0  = {[CPlaceBuild.COLORWINDOW02] = CPlaceBuild.COLORWALLS},
-            palette1  = {[CPlaceBuild.COLORWINDOW02] = CPlaceBuild.COLORLIGHT,},
+            palette0  = {[CPlaceBuild.WINDOW02] = CPlaceBuild.WALLS},
+            palette1  = {[CPlaceBuild.WINDOW02] = CPlaceBuild.COLORLIGHT,},
         },
     }
     self:argt(_argt) -- override if any
@@ -1671,16 +1680,16 @@ function CPlaceAltarAnim:new(_argt)
     CPlaceAltarAnim.super.new(self, _argt)
     self.animations = {
         CAnimation{ -- window 1
-            frequence = Tic.FREQUENCE240,
-            percent0  = 0.6,
-            palette0  = {[CPlaceBuild.COLORWINDOW01] = CPlaceBuild.COLORWALLS,},
-            palette1  = {[CPlaceBuild.COLORWINDOW01] = CPlaceBuild.COLORGLASS01,},
+            frequence = Tic.FREQUENCE600,
+            percent0  = 0.9,
+            palette0  = {[CPlaceBuild.WINDOW01] = CPlaceBuild.WALLS,},
+            palette1  = {[CPlaceBuild.WINDOW01] = CPlaceBuild.COLORGLASS01,},
         },
         CAnimation{ -- window 2
-            frequence = Tic.FREQUENCE240,
+            frequence = Tic.FREQUENCE600,
             percent0  = 0.1,
-            palette0  = {[CPlaceBuild.COLORWINDOW02] = CPlaceBuild.COLORWALLS,},
-            palette1  = {[CPlaceBuild.COLORWINDOW02] = CPlaceBuild.COLORGLASS02,},
+            palette0  = {[CPlaceBuild.WINDOW02] = CPlaceBuild.WALLS,},
+            palette1  = {[CPlaceBuild.WINDOW02] = CPlaceBuild.COLORGLASS02,},
         },
     }
     self:argt(_argt) -- override if any
@@ -1698,8 +1707,7 @@ end
 --
 -- CPlaceWater
 --
-local CPlaceWater = CPlace:extend() -- waters
-CPlaceWater.PALETTE = {[Tic.COLORWHITE] = Tic.COLORGREYD, [Tic.COLORYELLOW] = Tic.COLORGREYD,}
+local CPlaceWater = CPlaceBuild:extend() -- waters
 CEntity.KINDWATER = "Water" -- Water kind
 CEntity.NAMEWATER = "Water" -- Water name
 function CPlaceWater:new(_argt)
@@ -1707,7 +1715,8 @@ function CPlaceWater:new(_argt)
     self.kind = CEntity.KINDWATER
     self.name = CEntity.NAMEWATER
     self.sprite  = CSpriteBG.PLACEWATER
-    self.palette = CPlaceWater.PALETTE
+    self.hitbox.region.lf = 1
+    self.hitbox.region.rg = 4
     self:argt(_argt) -- override if any
 end
 
@@ -1718,27 +1727,32 @@ function CPlaceWaterAnim:new(_argt)
         CAnimation{ -- water 1
             frequence = Tic.FREQUENCE240,
             percent0  = 0.6,
-            palette0  = {[Tic.COLORWHITE] = Tic.COLORBLUEL,},
-            palette1  = {[Tic.COLORWHITE] = Tic.COLORBLUEL,},
+            palette0  = {[CPlaceBuild.WATER01] = CPlaceBuild.COLORWATER01,},
+            palette1  = {[CPlaceBuild.WATER01] = CPlaceBuild.COLORWATER02,},
         },
         CAnimation{ -- water 2
             frequence = Tic.FREQUENCE120,
             percent0  = 0.1,
-            palette0  = {[Tic.COLORYELLOW] = Tic.COLORBLUEM,},
-            palette1  = {[Tic.COLORYELLOW] = Tic.COLORBLUEM,},
+            palette0  = {[CPlaceBuild.WATER02] = CPlaceBuild.COLORWATER01,},
+            palette1  = {[CPlaceBuild.WATER02] = CPlaceBuild.COLORWATER02,},
         },
     }
     self:argt(_argt) -- override if any
 end
 
 local CPlaceWaterIdle = CPlaceWater:extend() -- idle waters
+function CPlaceWaterIdle:new(_argt)
+    CPlaceWaterIdle.super.new(self, _argt)
+    self.name = CEntity.NAMEEMPTY
+    self.palette = CPlaceBuild.PALETTEIDLE
+    self:argt(_argt) -- override if any
+end
 
 
 --
 -- CPlaceStall
 --
-local CPlaceStall = CPlace:extend() -- stalls
-CPlaceStall.PALETTE = {[Tic.COLORWHITE] = Tic.COLORGREYD, [Tic.COLORYELLOW] = Tic.COLORGREYD,}
+local CPlaceStall = CPlaceBuild:extend() -- stalls
 CEntity.KINDSTALL = "Stall" -- Stall kind
 CEntity.NAMESTALL = "Stall" -- Stall name
 function CPlaceStall:new(_argt)
@@ -1746,7 +1760,8 @@ function CPlaceStall:new(_argt)
     self.kind = CEntity.KINDSTALL
     self.name = CEntity.NAMESTALL
     self.sprite  = CSpriteBG.PLACESTALL
-    self.palette = CPlaceStall.PALETTE
+    self.hitbox.region.lf = 0
+    self.hitbox.region.rg = 3
     self:argt(_argt) -- override if any
 end
 
@@ -1757,20 +1772,32 @@ function CPlaceStallAnim:new(_argt)
         CAnimation{ -- owner
             frequence = Tic.FREQUENCE240,
             percent0  = 0.6,
-            palette0  = {[Tic.COLORWHITE] = Tic.COLORWHITE,},
-            palette1  = {[Tic.COLORWHITE] = Tic.COLORGREYD,},
+            palette0  = {[CPlaceBuild.OWNER] = Tic.COLORWHITE,},
+            palette1  = {[CPlaceBuild.OWNER] = Tic.COLORKEY,},
         },
-        CAnimation{ -- content
+        CAnimation{ -- goods 1
             frequence = Tic.FREQUENCE120,
             percent0  = 0.1,
-            palette0  = {[Tic.COLORYELLOW] = Tic.COLORYELLOW,},
-            palette1  = {[Tic.COLORYELLOW] = Tic.COLORORANGE,},
+            palette0  = {[CPlaceBuild.GOODS01] = CPlaceBuild.COLORGOODS01,},
+            palette1  = {[CPlaceBuild.GOODS01] = CPlaceBuild.COLORGOODS02,},
+        },
+        CAnimation{ -- goods 2
+            frequence = Tic.FREQUENCE120,
+            percent0  = 0.1,
+            palette0  = {[CPlaceBuild.GOODS02] = CPlaceBuild.COLORGOODS01,},
+            palette1  = {[CPlaceBuild.GOODS02] = CPlaceBuild.COLORGOODS02,},
         },
     }
     self:argt(_argt) -- override if any
 end
 
 local CPlaceStallIdle = CPlaceStall:extend() -- idle stalls
+function CPlaceStallIdle:new(_argt)
+    CPlaceStallIdle.super.new(self, _argt)
+    self.name = CEntity.NAMEEMPTY
+    self.palette = CPlaceBuild.PALETTEIDLE
+    self:argt(_argt) -- override if any
+end
 
 
 --
@@ -3614,6 +3641,10 @@ for _, _cplace in pairs({
     CPlaceManorIdle,
     CPlaceAltarAnim,
     CPlaceAltarIdle,
+    CPlaceWaterAnim,
+    CPlaceWaterIdle,
+    CPlaceStallAnim,
+    CPlaceStallIdle,
 }) do
     local _place = _cplace()
     _place:randomWorldWindow()
