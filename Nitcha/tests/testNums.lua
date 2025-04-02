@@ -79,3 +79,8 @@ print(Nums:distancePointsSquared())
 print(Nums:distancePointsSquared(0, 0, 10, 10))
 print(Nums:distancePointsSquared(0, 0, -10, -10))
 print(Nums:distancePointsSquared(-10, -10, 0, 0))
+
+print()
+print(Nums:toggleTF(true))
+print(Nums:toggleTF(false))
+print(Nums:toggleTF())

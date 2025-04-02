@@ -286,28 +286,28 @@ Tic.KEY_V              = 22
 Tic.KEY_Z              = 26
 
 -- Actions values
-Tic.ACTIONPLAYERPREV   = "playerPrev"
-Tic.ACTIONPLAYERNEXT   = "playerNext"
-Tic.ACTIONSTATEPREV    = "statePrev"
-Tic.ACTIONSTATENEXT    = "stateNext"
-Tic.ACTIONTOGGLEWORK   = "toggleWork"
-Tic.ACTIONTOGGLEKNEEL  = "toggleKneel"
-Tic.ACTIONTOGGLESLEEP  = "toggleSleep"
-Tic.ACTIONMOVE000      = "move000"
-Tic.ACTIONMOVE045      = "move045"
-Tic.ACTIONMOVE090      = "move090"
-Tic.ACTIONMOVE135      = "move135"
-Tic.ACTIONMOVE180      = "move180"
-Tic.ACTIONMOVE225      = "move225"
-Tic.ACTIONMOVE270      = "move270"
-Tic.ACTIONMOVE315      = "move315"
-Tic.ACTIONDECPHYACT    = "decPhyAct"
-Tic.ACTIONINCPHYACT    = "incPhyAct"
-Tic.ACTIONBIOMENEXT    = "biomeNext"
-Tic.ACTIONTOGGLEHITBOX = "toggleHitbox"
-Tic.ACTIONTOGGLESPOT   = "toggleSpot"
-Tic.ACTIONTOGGLEVIEW   = "toggleView"
-Tic.ACTIONSCALENEXT    = "scaleNext"
+Tic.ACTIONPLAYERPREV    = "playerPrev"
+Tic.ACTIONPLAYERNEXT    = "playerNext"
+Tic.ACTIONSTATEPREV     = "statePrev"
+Tic.ACTIONSTATENEXT     = "stateNext"
+Tic.ACTIONTOGGLEWORK    = "toggleWork"
+Tic.ACTIONTOGGLEKNEEL   = "toggleKneel"
+Tic.ACTIONTOGGLESLEEP   = "toggleSleep"
+Tic.ACTIONMOVE000       = "move000"
+Tic.ACTIONMOVE045       = "move045"
+Tic.ACTIONMOVE090       = "move090"
+Tic.ACTIONMOVE135       = "move135"
+Tic.ACTIONMOVE180       = "move180"
+Tic.ACTIONMOVE225       = "move225"
+Tic.ACTIONMOVE270       = "move270"
+Tic.ACTIONMOVE315       = "move315"
+Tic.ACTIONDECPHYACT     = "decPhyAct"
+Tic.ACTIONINCPHYACT     = "incPhyAct"
+Tic.ACTIONBIOMENEXT     = "biomeNext"
+Tic.ACTIONTOGGLEHITBOX  = "toggleHitbox"
+Tic.ACTIONTOGGLESPOTTED = "toggleSpotted"
+Tic.ACTIONTOGGLEVIEW    = "toggleView"
+Tic.ACTIONSCALENEXT     = "scaleNext"
 
 -- Keys to Actions
 Tic.KEYS2ACTIONS = {
@@ -329,30 +329,36 @@ Tic.KEYS2ACTIONS = {
     [Tic.KEY_NUMPADMINUS]  = Tic.ACTIONDECPHYACT,
     [Tic.KEY_NUMPADPLUS]   = Tic.ACTIONINCPHYACT,
     [Tic.KEY_B]            = Tic.ACTIONBIOMENEXT,
+    [Tic.KEY_H]            = Tic.ACTIONTOGGLEHITBOX,
+    [Tic.KEY_S]            = Tic.ACTIONTOGGLESPOTTED,
+    [Tic.KEY_V]            = Tic.ACTIONTOGGLEVIEW,
     [Tic.KEY_Z]            = Tic.ACTIONSCALENEXT,
 }
 
 -- Actions to Functions
 Tic.ACTIONS2FUNCTIONS = {
-    [Tic.ACTIONPLAYERPREV]  = function() Tic:playerPrev() end,
-    [Tic.ACTIONPLAYERNEXT]  = function() Tic:playerNext() end,
-    [Tic.ACTIONSTATEPREV]   = function() Tic:statePrev() end,
-    [Tic.ACTIONSTATENEXT]   = function() Tic:stateNext() end,
-    [Tic.ACTIONTOGGLEWORK]  = function() Tic:toggleWork() end,
-    [Tic.ACTIONTOGGLEKNEEL] = function() Tic:toggleKneel() end,
-    [Tic.ACTIONTOGGLESLEEP] = function() Tic:toggleSleep() end,
-    [Tic.ACTIONMOVE000]     = function() Tic:moveDirection(Tic.DIR000) end,
-    [Tic.ACTIONMOVE045]     = function() Tic:moveDirection(Tic.DIR045) end,
-    [Tic.ACTIONMOVE090]     = function() Tic:moveDirection(Tic.DIR090) end,
-    [Tic.ACTIONMOVE135]     = function() Tic:moveDirection(Tic.DIR135) end,
-    [Tic.ACTIONMOVE180]     = function() Tic:moveDirection(Tic.DIR180) end,
-    [Tic.ACTIONMOVE225]     = function() Tic:moveDirection(Tic.DIR225) end,
-    [Tic.ACTIONMOVE270]     = function() Tic:moveDirection(Tic.DIR270) end,
-    [Tic.ACTIONMOVE315]     = function() Tic:moveDirection(Tic.DIR315) end,
-    [Tic.ACTIONDECPHYACT]   = function() Tic:stat('dec', "statphyact", 1) end,
-    [Tic.ACTIONINCPHYACT]   = function() Tic:stat('inc', "statphyact", 1) end,
-    [Tic.ACTIONBIOMENEXT]   = function() Tic:biomeNext() end,
-    [Tic.ACTIONSCALENEXT]   = function() Tic:scaleNext() end,
+    [Tic.ACTIONPLAYERPREV]    = function() Tic:playerPrev() end,
+    [Tic.ACTIONPLAYERNEXT]    = function() Tic:playerNext() end,
+    [Tic.ACTIONSTATEPREV]     = function() Tic:statePrev() end,
+    [Tic.ACTIONSTATENEXT]     = function() Tic:stateNext() end,
+    [Tic.ACTIONTOGGLEWORK]    = function() Tic:toggleWork() end,
+    [Tic.ACTIONTOGGLEKNEEL]   = function() Tic:toggleKneel() end,
+    [Tic.ACTIONTOGGLESLEEP]   = function() Tic:toggleSleep() end,
+    [Tic.ACTIONMOVE000]       = function() Tic:moveDirection(Tic.DIR000) end,
+    [Tic.ACTIONMOVE045]       = function() Tic:moveDirection(Tic.DIR045) end,
+    [Tic.ACTIONMOVE090]       = function() Tic:moveDirection(Tic.DIR090) end,
+    [Tic.ACTIONMOVE135]       = function() Tic:moveDirection(Tic.DIR135) end,
+    [Tic.ACTIONMOVE180]       = function() Tic:moveDirection(Tic.DIR180) end,
+    [Tic.ACTIONMOVE225]       = function() Tic:moveDirection(Tic.DIR225) end,
+    [Tic.ACTIONMOVE270]       = function() Tic:moveDirection(Tic.DIR270) end,
+    [Tic.ACTIONMOVE315]       = function() Tic:moveDirection(Tic.DIR315) end,
+    [Tic.ACTIONDECPHYACT]     = function() Tic:stat('dec', "statphyact", 1) end,
+    [Tic.ACTIONINCPHYACT]     = function() Tic:stat('inc', "statphyact", 1) end,
+    [Tic.ACTIONBIOMENEXT]     = function() Tic:biomeNext() end,
+    [Tic.ACTIONTOGGLEHITBOX]  = function() Tic:toggleHitbox() end,
+    [Tic.ACTIONTOGGLESPOTTED] = function() Tic:toggleSpotted() end,
+    [Tic.ACTIONTOGGLEVIEW]    = function() Tic:toggleView() end,
+    [Tic.ACTIONSCALENEXT]     = function() Tic:scaleNext() end,
 }
 
 
@@ -529,6 +535,27 @@ end
 
 function Tic:biomeActual() -- actual biome in the stack
     return Tic.BIOMES.actvalue
+end
+
+
+-- Hitbox System -- toggle hitbox display
+Tic.DRAWHITBOX = true
+function Tic:toggleHitbox()
+	Tic.DRAWHITBOX = Nums:toggleTF(Tic.DRAWHITBOX)
+end
+
+
+-- Spotted System -- toggle spotted display
+Tic.DRAWSPOTTED = true
+function Tic:toggleSpotted()
+	Tic.DRAWSPOTTED = Nums:toggleTF(Tic.DRAWSPOTTED)
+end
+
+
+-- View System -- toggle view display
+Tic.DRAWVIEW = true
+function Tic:toggleView()
+	Tic.DRAWVIEW = Nums:toggleTF(Tic.DRAWVIEW)
 end
 
 
@@ -1379,6 +1406,7 @@ function CEntityDrawable:draw() -- default draw for drawable entities -- overrid
 end
 
 function CEntityDrawable:drawSpotted() -- draw spotted if any
+    self.drawspotted = Tic.DRAWSPOTTED -- use Tic as master
     if not self.spotted then return end -- nothing to draw
     local _musprite = CSpriteBG() -- multi usage unique sprite
     _musprite.sprite  = CSpriteBG.SIGNSPOTSQ
@@ -1391,6 +1419,7 @@ function CEntityDrawable:drawSpotted() -- draw spotted if any
 end
 
 function CEntityDrawable:drawHitbox() -- draw hitbox if any
+    self.drawhitbox = Tic.DRAWHITBOX -- use Tic as master
     if not self.drawhitbox or not self.hitbox then return end -- nothing to draw
     self.hitbox.screenx  = self.screenx
     self.hitbox.screeny  = self.screeny
@@ -2195,6 +2224,7 @@ function CCharacter:drawDirs() -- draw the directions and ranges around the char
 end
 
 function CCharacter:drawView() -- draw the view of a character
+    self.drawview = Tic.DRAWVIEW -- use Tic as master
     if not self.drawview then return end -- nothing to draw
     -- if not (self == Tic:playerActual()) then return end -- only actual player
     local _drawcolor = Tic.COLORGREENL
@@ -3606,9 +3636,9 @@ function Tic:draw()
     -- Tic:logAppend("WOX:", Tic:playerActual().worldx)
     -- Tic:logAppend("WOY:", Tic:playerActual().worldy)
     -- Tic:logAppend("ap:", Tic:playerActual().statphyact)
-    Tic:logAppend()
-    Tic:logAppend()
-    Tic:logAppend()
+    Tic:logAppend("h:", Tic.DRAWHITBOX)
+    Tic:logAppend("s:", Tic.DRAWSPOTTED)
+    Tic:logAppend("v:", Tic.DRAWVIEW)
     Tic:logAppend()
     Tic:logAppend()
     -- Tic:logAppend("n:", WindowTest1.entity.name)

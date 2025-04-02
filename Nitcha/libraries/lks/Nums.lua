@@ -68,6 +68,11 @@ function Nums:toggle01(_num) -- toggle btw 0 1
     return (_num == 0) and 1 or 0
 end
 
+function Nums:toggleTF(_tf) -- toggle btw true false
+    if _tf or _tf == nil then return false end
+    return true
+end
+
 
 -- Odd / Even
 function Nums:isOdd(_num) -- if num is odd
