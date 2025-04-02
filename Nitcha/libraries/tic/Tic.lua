@@ -539,21 +539,21 @@ end
 
 
 -- Hitbox System -- toggle hitbox display
-Tic.DRAWHITBOX = true
+Tic.DRAWHITBOX = false
 function Tic:toggleHitbox()
 	Tic.DRAWHITBOX = Nums:toggleTF(Tic.DRAWHITBOX)
 end
 
 
 -- Spotted System -- toggle spotted display
-Tic.DRAWSPOTTED = true
+Tic.DRAWSPOTTED = false
 function Tic:toggleSpotted()
 	Tic.DRAWSPOTTED = Nums:toggleTF(Tic.DRAWSPOTTED)
 end
 
 
 -- View System -- toggle view display
-Tic.DRAWVIEW = true
+Tic.DRAWVIEW = false
 function Tic:toggleView()
 	Tic.DRAWVIEW = Nums:toggleTF(Tic.DRAWVIEW)
 end
@@ -1366,6 +1366,7 @@ function CEntityDrawable:new(_argt)
     self.solid       = true -- hitbox can be traversed or not
     self.collided    = false -- is the hitbox collided or not
     self.drawhitbox  = false -- draw behaviour
+    self.drawspotted = false
     self.drawfade    = false
    self:argt(_argt) -- override if any
     self.world:entityAppend(self) -- append itself to the world
@@ -1407,7 +1408,7 @@ end
 
 function CEntityDrawable:drawSpotted() -- draw spotted if any
     self.drawspotted = Tic.DRAWSPOTTED -- use Tic as master
-    if not self.spotted then return end -- nothing to draw
+    if not self.drawspotted or not self.spotted then return end -- nothing to draw
     local _musprite = CSpriteBG() -- multi usage unique sprite
     _musprite.sprite  = CSpriteBG.SIGNSPOTSQ
     _musprite.screenx = self.screenx
@@ -1482,9 +1483,11 @@ CPlaceBuild.COLORFACADE   = Tic.COLORGREYM
 CPlaceBuild.COLORWALLS    = Tic.COLORGREYD
 CPlaceBuild.COLORFOAM     = Tic.COLORGREEND
 CPlaceBuild.COLORLIGHT    = Tic.COLORORANGE
+CPlaceBuild.COLORGLASS01  = Tic.COLORCYAN
+CPlaceBuild.COLORGLASS02  = Tic.COLORBLUEL
 CPlaceBuild.PALETTEIDLE   = {
     [CPlace.COLORANIM01]  = CPlace.COLOREMPTY,
-    [CPlace.COLORANIM02]  = CPlaceBuild.COLORFACADE,
+    [CPlace.COLORANIM02]  = CPlaceBuild.COLORWALLS,
     [CPlace.COLORANIM03]  = CPlaceBuild.COLORWALLS,
 }
 CPlaceBuild.PALETTEFADE   = {
@@ -1650,8 +1653,7 @@ end
 --
 -- CPlaceAltar
 --
-local CPlaceAltar = CPlace:extend() -- altars
-CPlaceAltar.PALETTE = {[Tic.COLORWHITE] = Tic.COLORGREYD, [Tic.COLORYELLOW] = Tic.COLORGREYD,}
+local CPlaceAltar = CPlaceBuild:extend() -- altars
 CEntity.KINDALTAR = "Altar" -- Altar kind
 CEntity.NAMEALTAR = "Altar" -- Altar name
 function CPlaceAltar:new(_argt)
@@ -1659,7 +1661,8 @@ function CPlaceAltar:new(_argt)
     self.kind = CEntity.KINDALTAR
     self.name = CEntity.NAMEALTAR
     self.sprite  = CSpriteBG.PLACEALTAR
-    self.palette = CPlaceAltar.PALETTE
+    self.hitbox.region.lf = 0
+    self.hitbox.region.rg = 5
     self:argt(_argt) -- override if any
 end
 
@@ -1670,20 +1673,26 @@ function CPlaceAltarAnim:new(_argt)
         CAnimation{ -- window 1
             frequence = Tic.FREQUENCE240,
             percent0  = 0.6,
-            palette0  = {[Tic.COLORWHITE] = Tic.COLORGREYD,},
-            palette1  = {[Tic.COLORWHITE] = Tic.COLORBLUEL,},
+            palette0  = {[CPlaceBuild.COLORWINDOW01] = CPlaceBuild.COLORWALLS,},
+            palette1  = {[CPlaceBuild.COLORWINDOW01] = CPlaceBuild.COLORGLASS01,},
         },
         CAnimation{ -- window 2
             frequence = Tic.FREQUENCE240,
             percent0  = 0.1,
-            palette0  = {[Tic.COLORYELLOW] = Tic.COLORBLUEM,},
-            palette1  = {[Tic.COLORYELLOW] = Tic.COLORBLUEM,},
+            palette0  = {[CPlaceBuild.COLORWINDOW02] = CPlaceBuild.COLORWALLS,},
+            palette1  = {[CPlaceBuild.COLORWINDOW02] = CPlaceBuild.COLORGLASS02,},
         },
     }
     self:argt(_argt) -- override if any
 end
 
 local CPlaceAltarIdle = CPlaceAltar:extend() -- idle altars
+function CPlaceAltarIdle:new(_argt)
+    CPlaceAltarIdle.super.new(self, _argt)
+    self.name = CEntity.NAMEEMPTY
+    self.palette = CPlaceBuild.PALETTEIDLE
+    self:argt(_argt) -- override if any
+end
 
 
 --
@@ -3534,13 +3543,12 @@ end -- generate places
 -- }
 -- Golith:randomWorldWindow()
 
--- local Wulfie = CPlayerWolfe{spotted = true, collided = false, name = "Wulfie", drawdirs = false, scale = 2,
---     colorextra = Tic.COLORRED,
--- }
--- Wulfie:randomWorldWindow()
+local Wulfie = CPlayerWolfe{name = "Wulfie",
+    colorextra = Tic.COLORRED,
+}
+Wulfie:randomWorldWindow()
 
-local Oxboow = CPlayerGhost{spotted = false, collided = false, name = "Oxboow", drawdirs = false, drawhitbox = false, drawview = true,
-scale = 1,
+local Oxboow = CPlayerGhost{name = "Oxboow",
 }
 Oxboow:randomWorldWindow()
 
@@ -3615,6 +3623,11 @@ ManorAnim:randomWorldWindow()
 local ManorIdle = CPlaceManorIdle{drawhitbox = _drawhitbox,}
 ManorIdle:randomWorldWindow()
 
+local AltarAnim = CPlaceAltarAnim{drawhitbox = _drawhitbox,}
+AltarAnim:randomWorldWindow()
+local AltarIdle = CPlaceAltarIdle{drawhitbox = _drawhitbox,}
+AltarIdle:randomWorldWindow()
+
 
 
 --
@@ -3636,9 +3649,9 @@ function Tic:draw()
     -- Tic:logAppend("WOX:", Tic:playerActual().worldx)
     -- Tic:logAppend("WOY:", Tic:playerActual().worldy)
     -- Tic:logAppend("ap:", Tic:playerActual().statphyact)
-    Tic:logAppend("h:", Tic.DRAWHITBOX)
-    Tic:logAppend("s:", Tic.DRAWSPOTTED)
-    Tic:logAppend("v:", Tic.DRAWVIEW)
+    -- Tic:logAppend("h:", Tic.DRAWHITBOX)
+    -- Tic:logAppend("s:", Tic.DRAWSPOTTED)
+    -- Tic:logAppend("v:", Tic.DRAWVIEW)
     Tic:logAppend()
     Tic:logAppend()
     -- Tic:logAppend("n:", WindowTest1.entity.name)
