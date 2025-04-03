@@ -708,7 +708,7 @@ end
 --
 -- CSprite
 --
-local CSprite = Classic:extend() -- general sprites
+local CSprite = Classic:extend() -- generic sprites
 CSprite.SPRITEBANK = 0
 CSprite.SCALE01    = 01 -- sprites scales
 CSprite.SCALE02    = 02
@@ -781,7 +781,7 @@ CSpriteBG.PLACESTALL  = CSpriteBG.STANDSBANK + 1
 CSpriteBG.FORESTBANK  = 48 -- forests
 CSpriteBG.PLACETREE0  = CSpriteBG.FORESTBANK + 0
 CSpriteBG.PLACETREE1  = CSpriteBG.FORESTBANK + 1
-function CSpriteBG:new(_argt)
+function CSpriteBG:new(_argt) -- FIXME can be removed ?
     CSpriteBG.super.new(self, _argt)
     self:argt(_argt) -- override if any
 end
@@ -870,7 +870,7 @@ end
 --
 -- CAnimation
 --
-local CAnimation = Classic:extend() -- general palette animation for entities
+local CAnimation = Classic:extend() -- generic palette animation for entities
 function CAnimation:new(_argt)
     CAnimation.super.new(self, _argt)
     self.frequence = Tic.FREQUENCE060
@@ -884,7 +884,7 @@ end
 --
 -- CRegion
 --
-local CRegion = Classic:extend() -- general region -- -lf +rg -up +dw around a point
+local CRegion = Classic:extend() -- generic region -- -lf +rg -up +dw around a point
 function CRegion:new(_argt)
     CRegion.super.new(self, _argt)
     self.lf = Nums.MININTEGER -- negative
@@ -956,7 +956,7 @@ end
 --
 -- CHitbox
 --
-local CHitbox = Classic:extend() -- general hitbox region
+local CHitbox = Classic:extend() -- generic hitbox region
 CHitbox.REGIONLF = 0 -- hitbox region sizes
 CHitbox.REGIONRG = 7
 CHitbox.REGIONUP = 0
@@ -1009,7 +1009,7 @@ end
 --
 -- CLocations
 --
-local CLocations = Classic:extend() -- general entities locations -- {worldy {worldx {entity = entity}}}
+local CLocations = Classic:extend() -- generic entities locations -- {worldy {worldx {entity = entity}}}
 function CLocations:new(_argt)
     CLocations.super.new(self, _argt)
     self.locations = {}
@@ -1105,7 +1105,7 @@ end
 --
 -- CEntitiesLocations
 --
-local CEntitiesLocations = Classic:extend() -- general locations for entities
+local CEntitiesLocations = Classic:extend() -- generic locations for entities
 function CEntitiesLocations:new(_argt)
     CEntitiesLocations.super.new(self, _argt)
     self.entities  = {} -- record each entity -- has to have worldx and worldy attributes
@@ -1157,7 +1157,7 @@ end
 --
 -- CWorld
 --
-local CWorld = Classic:extend() -- general world that contains entities
+local CWorld = Classic:extend() -- generic world that contains entities
 CWorld.KINDWORLD = "World" -- World kind
 CWorld.NAMEWORLD = "World" -- World name
 function CWorld:new(_argt)
@@ -1210,10 +1210,10 @@ end
 --
 -- CEntity
 --
-local CEntity = Classic:extend() -- general entities like places, objects, characters, cameras ...
+local CEntity = Classic:extend() -- generic entities like places, objects, characters, cameras ...
 CEntity.KINDENTITY = "Entity" -- Entity kind
 CEntity.NAMEENTITY = "Entity" -- Entity name
-CEntity.NAMEEMPTY  = "Empty"  -- Empty name
+CEntity.NAMEIDLE   = "Idle"   -- Idle name
 CEntity.WORLDX = 0
 CEntity.WORLDY = 0
 function CEntity:new(_argt)
@@ -1348,7 +1348,7 @@ end
 --
 -- CEntityDrawable
 --
-local CEntityDrawable = CEntity:extend() -- general entities with a sprite representation
+local CEntityDrawable = CEntity:extend() -- generic entities with a sprite representation
 CEntity.KINDDRAWABLE = "Drawable" -- Drawable kind
 CEntity.NAMEDRAWABLE = "Drawable" -- Drawable name
 function CEntityDrawable:new(_argt)
@@ -1487,19 +1487,19 @@ CPlaceBuild.WATER02  = CPlace.ANIM03
 CPlaceBuild.OWNER    = CPlace.ANIM01
 CPlaceBuild.GOODS01  = CPlace.ANIM02
 CPlaceBuild.GOODS02  = CPlace.ANIM03
-CPlaceBuild.COLORLIGHT    = Tic.COLORORANGE
-CPlaceBuild.COLORGLASS01  = Tic.COLORCYAN
-CPlaceBuild.COLORGLASS02  = Tic.COLORBLUEL
-CPlaceBuild.COLORWATER01  = Tic.COLORBLUEL
-CPlaceBuild.COLORWATER02  = Tic.COLORBLUEM
-CPlaceBuild.COLORGOODS01  = Tic.COLORGREENM
-CPlaceBuild.COLORGOODS02  = Tic.COLORGREEND
-CPlaceBuild.PALETTEIDLE   = {
-    [CPlace.ANIM01]  = CPlace.EMPTY,
-    [CPlace.ANIM02]  = CPlaceBuild.WALLS,
-    [CPlace.ANIM03]  = CPlaceBuild.WALLS,
+CPlaceBuild.COLORLIGHT   = Tic.COLORORANGE
+CPlaceBuild.COLORGLASS01 = Tic.COLORCYAN
+CPlaceBuild.COLORGLASS02 = Tic.COLORBLUEL
+CPlaceBuild.COLORWATER01 = Tic.COLORBLUEL
+CPlaceBuild.COLORWATER02 = Tic.COLORBLUEM
+CPlaceBuild.COLORGOODS01 = Tic.COLORGREENM
+CPlaceBuild.COLORGOODS02 = Tic.COLORGREEND
+CPlaceBuild.PALETTEIDLE  = {
+    [CPlace.ANIM01] = CPlace.EMPTY,
+    [CPlace.ANIM02] = CPlaceBuild.WALLS,
+    [CPlace.ANIM03] = CPlaceBuild.WALLS,
 }
-CPlaceBuild.PALETTEFADE   = {
+CPlaceBuild.PALETTEFADE  = {
     [CPlaceBuild.SMOKE]    = CPlace.EMPTY,
     [CPlaceBuild.WINDOW01] = CPlaceBuild.WALLS,
     [CPlaceBuild.WINDOW02] = CPlaceBuild.WALLS,
@@ -1559,7 +1559,7 @@ end
 local CPlaceHouseIdle = CPlaceHouse:extend() -- idle houses
 function CPlaceHouseIdle:new(_argt)
     CPlaceHouseIdle.super.new(self, _argt)
-    self.name = CEntity.NAMEEMPTY
+    self.name = CEntity.NAMEIDLE
     self.palette = CPlaceBuild.PALETTEIDLE
     self:argt(_argt) -- override if any
 end
@@ -1602,7 +1602,7 @@ end
 local CPlaceTowerIdle = CPlaceTower:extend() -- idle towers
 function CPlaceTowerIdle:new(_argt)
     CPlaceTowerIdle.super.new(self, _argt)
-    self.name = CEntity.NAMEEMPTY
+    self.name = CEntity.NAMEIDLE
     self.palette = CPlaceBuild.PALETTEIDLE
     self:argt(_argt) -- override if any
 end
@@ -1653,7 +1653,7 @@ end
 local CPlaceManorIdle = CPlaceManor:extend() -- idle manors
 function CPlaceManorIdle:new(_argt)
     CPlaceManorIdle.super.new(self, _argt)
-    self.name = CEntity.NAMEEMPTY
+    self.name = CEntity.NAMEIDLE
     self.palette = CPlaceBuild.PALETTEIDLE
     self:argt(_argt) -- override if any
 end
@@ -1698,7 +1698,7 @@ end
 local CPlaceAltarIdle = CPlaceAltar:extend() -- idle altars
 function CPlaceAltarIdle:new(_argt)
     CPlaceAltarIdle.super.new(self, _argt)
-    self.name = CEntity.NAMEEMPTY
+    self.name = CEntity.NAMEIDLE
     self.palette = CPlaceBuild.PALETTEIDLE
     self:argt(_argt) -- override if any
 end
@@ -1743,7 +1743,7 @@ end
 local CPlaceWaterIdle = CPlaceWater:extend() -- idle waters
 function CPlaceWaterIdle:new(_argt)
     CPlaceWaterIdle.super.new(self, _argt)
-    self.name = CEntity.NAMEEMPTY
+    self.name = CEntity.NAMEIDLE
     self.palette = CPlaceBuild.PALETTEIDLE
     self:argt(_argt) -- override if any
 end
@@ -1794,7 +1794,7 @@ end
 local CPlaceStallIdle = CPlaceStall:extend() -- idle stalls
 function CPlaceStallIdle:new(_argt)
     CPlaceStallIdle.super.new(self, _argt)
-    self.name = CEntity.NAMEEMPTY
+    self.name = CEntity.NAMEIDLE
     self.palette = CPlaceBuild.PALETTEIDLE
     self:argt(_argt) -- override if any
 end
@@ -1804,47 +1804,89 @@ end
 -- CPlaceTrees
 --
 local CPlaceTrees = CPlace:extend() -- trees
-CPlaceTrees.PALETTE = {[Tic.COLORWHITE] = Tic.COLORGREYM, [Tic.COLORYELLOW] = Tic.COLORGREYM,}
+CPlaceTrees.NEST    = CPlace.ANIM01
+CPlaceTrees.FLOOR01 = CPlace.ANIM02
+CPlaceTrees.FLOOR02 = CPlace.ANIM03
+CPlaceTrees.LEAFSFG = Tic.COLORGREENM
+CPlaceTrees.LEAFSBG = Tic.COLORGREEND
+CPlaceTrees.TRUNK   = Tic.COLORGREYM
+CPlaceTrees.BARK    = Tic.COLORGREYD
+CPlaceTrees.COLORFLOOR01  = CPlaceTrees.LEAFSFG
+CPlaceTrees.COLORFLOOR02  = CPlaceTrees.LEAFSBG
+CPlaceTrees.COLORNEST     = Tic.COLORGREYL
+CPlaceTrees.PALETTEIDLE   = {
+    [CPlace.ANIM01]  = CPlace.EMPTY,
+    [CPlace.ANIM02]  = CPlaceTrees.BARK,
+    [CPlace.ANIM03]  = CPlaceTrees.BARK,
+}
+CPlaceTrees.PALETTEFADE   = {
+    [CPlaceTrees.NEST]    = CPlace.EMPTY,
+    [CPlaceTrees.FLOOR01] = CPlaceTrees.BARK,
+    [CPlaceTrees.FLOOR02] = CPlaceTrees.BARK,
+    [CPlaceTrees.LEAFSFG] = CPlaceTrees.TRUNK,
+    [CPlaceTrees.LEAFSBG] = CPlaceTrees.BARK,    
+}
 CEntity.KINDTREES = "Trees" -- Trees kind
 CEntity.NAMETREES = "Trees" -- Trees name
 function CPlaceTrees:new(_argt)
     CPlaceTrees.super.new(self, _argt)
     self.kind = CEntity.KINDTREES
     self.name = CEntity.NAMETREES
-    self.sprite  = CSpriteBG.PLACETREE0
-    self.palette = CPlaceTrees.PALETTE
     self.hitbox.region.lf = 2
     self.hitbox.region.rg = 4
     self.hitbox.region.up = 6
     self.hitbox.region.dw = 7
+    self.palettefade = CPlaceTrees.PALETTEFADE
     self:argt(_argt) -- override if any
 end
 
-local CPlaceTreesAnim = CPlaceTrees:extend() -- anim trees
+local CPlaceTreesAnim = CPlaceTrees:extend() -- generic anim trees
 function CPlaceTreesAnim:new(_argt)
     CPlaceTreesAnim.super.new(self, _argt)
     self.animations = {
-        CAnimation{ -- leaf 1
+        CAnimation{ -- nest
+            frequence = Tic.FREQUENCE600,
+            percent0  = 0.9,
+            palette0  = {[CPlaceTrees.NEST] = CPlaceTrees.TRUNK,},
+            palette1  = {[CPlaceTrees.NEST] = CPlaceTrees.COLORNEST,},
+        },
+        CAnimation{ -- floor 1
             frequence = Tic.FREQUENCE600,
             percent0  = 0.3,
-            palette0  = {[Tic.COLORWHITE] = Tic.COLORGREENM,},
-            palette1  = {[Tic.COLORWHITE] = Tic.COLORGREYD,},
+            palette0  = {[CPlaceTrees.FLOOR01] = CPlaceTrees.COLORFLOOR01,},
+            palette1  = {[CPlaceTrees.FLOOR01] = CPlaceTrees.COLORFLOOR02,},
         },
-        CAnimation{ -- leaf 2
+        CAnimation{ -- floor 2
             frequence = Tic.FREQUENCE300,
             percent0  = 0.3,
-            palette0  = {[Tic.COLORYELLOW] = Tic.COLORGREYD,},
-            palette1  = {[Tic.COLORYELLOW] = Tic.COLORGREENM,},
+            palette0  = {[CPlaceTrees.FLOOR02] = CPlaceTrees.COLORFLOOR01,},
+            palette1  = {[CPlaceTrees.FLOOR02] = CPlaceTrees.COLORFLOOR02,},
         },
     }
     self:argt(_argt) -- override if any
 end
 
-local CPlaceTreesIdle = CPlaceTrees:extend() -- idle trees
+local CPlaceTreesIdle = CPlaceTrees:extend() -- generic idle trees
+function CPlaceTreesIdle:new(_argt)
+    CPlaceTreesIdle.super.new(self, _argt)
+    self.name = CEntity.NAMEIDLE
+    self.palette = CPlaceTrees.PALETTEIDLE
+    self:argt(_argt) -- override if any
+end
 
 local CPlaceTree0Anim = CPlaceTreesAnim:extend() -- anim tree0
+function CPlaceTree0Anim:new(_argt)
+    CPlaceTree0Anim.super.new(self, _argt)
+    self.sprite  = CSpriteBG.PLACETREE0
+    self:argt(_argt) -- override if any
+end
 
 local CPlaceTree0Idle = CPlaceTreesIdle:extend() -- idle tree0
+function CPlaceTree0Idle:new(_argt)
+    CPlaceTree0Idle.super.new(self, _argt)
+    self.sprite  = CSpriteBG.PLACETREE0
+    self:argt(_argt) -- override if any
+end
 
 local CPlaceTree1Anim = CPlaceTreesAnim:extend() -- anim tree1
 function CPlaceTree1Anim:new(_argt)
@@ -2792,7 +2834,7 @@ local CEnnemy = CCharacter:extend() -- ennemy characters
 --
 -- CWindow
 --
-local CWindow = Classic:extend() -- general window for displaying stuff
+local CWindow = Classic:extend() -- generic window for displaying stuff
 function CWindow:new(_argt)
     CWindow.super.new(self, _argt)
     self.screenx     = Tic.SCREENX -- positions
@@ -3645,6 +3687,10 @@ for _, _cplace in pairs({
     CPlaceWaterIdle,
     CPlaceStallAnim,
     CPlaceStallIdle,
+    CPlaceTree0Anim,
+    CPlaceTree0Idle,
+    CPlaceTree1Anim,
+    CPlaceTree1Idle,
 }) do
     local _place = _cplace()
     _place:randomWorldWindow()
