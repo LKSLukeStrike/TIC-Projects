@@ -5,5 +5,8 @@
 
 -- [-] add hitboxes to places etc
 
--- TODO add detection of shift/ctrl/? to reduce de move
+-- TODO add detection of shift/ctrl/? to reduce the move
 
+-- FIXME adjust animations frequences
+
+-- [-] reduce the view around

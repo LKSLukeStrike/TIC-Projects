@@ -261,10 +261,22 @@ Tic.FREQUENCE600 = 600 -- each 10 second
 
 Tic.KEYBOARDKEYS = 0xFF88 -- keyboard state -- up to 4 pressed keys
 -- Keys values
+Tic.KEY_B              = 02
+Tic.KEY_H              = 08
+Tic.KEY_M              = 13
+Tic.KEY_P              = 16
+Tic.KEY_S              = 19
+Tic.KEY_V              = 22
+Tic.KEY_Y              = 25
+Tic.KEY_Z              = 26
 Tic.KEY_UP             = 58
 Tic.KEY_DOWN           = 59
 Tic.KEY_LEFT           = 60
 Tic.KEY_RIGHT          = 61
+Tic.KEY_CAPSLOCK       = 62
+Tic.KEY_CTRL           = 63
+Tic.KEY_SHIFT          = 64
+Tic.KEY_ALT            = 65
 Tic.KEY_NUMPAD0        = 79
 Tic.KEY_NUMPAD1        = 80
 Tic.KEY_NUMPAD2        = 81
@@ -279,11 +291,6 @@ Tic.KEY_NUMPADPLUS     = 89
 Tic.KEY_NUMPADMINUS    = 90
 Tic.KEY_NUMPADMULTIPLY = 91
 Tic.KEY_NUMPADDIVIDE   = 92
-Tic.KEY_B              = 02
-Tic.KEY_H              = 08
-Tic.KEY_S              = 19
-Tic.KEY_V              = 22
-Tic.KEY_Z              = 26
 
 -- Actions values
 Tic.ACTIONPLAYERPREV    = "playerPrev"
@@ -301,8 +308,9 @@ Tic.ACTIONMOVE180       = "move180"
 Tic.ACTIONMOVE225       = "move225"
 Tic.ACTIONMOVE270       = "move270"
 Tic.ACTIONMOVE315       = "move315"
-Tic.ACTIONDECPHYACT     = "decPhyAct"
-Tic.ACTIONINCPHYACT     = "incPhyAct"
+Tic.ACTIONSTATPHYACT    = "statPhyAct"
+Tic.ACTIONSTATMENACT    = "statMenAct"
+Tic.ACTIONSTATPSYACT    = "statPsyAct"
 Tic.ACTIONBIOMENEXT     = "biomeNext"
 Tic.ACTIONTOGGLEHITBOX  = "toggleHitbox"
 Tic.ACTIONTOGGLESPOTTED = "toggleSpotted"
@@ -326,12 +334,13 @@ Tic.KEYS2ACTIONS = {
     [Tic.KEY_NUMPAD1]      = Tic.ACTIONMOVE225,
     [Tic.KEY_NUMPAD4]      = Tic.ACTIONMOVE270,
     [Tic.KEY_NUMPAD7]      = Tic.ACTIONMOVE315,
-    [Tic.KEY_NUMPADMINUS]  = Tic.ACTIONDECPHYACT,
-    [Tic.KEY_NUMPADPLUS]   = Tic.ACTIONINCPHYACT,
     [Tic.KEY_B]            = Tic.ACTIONBIOMENEXT,
     [Tic.KEY_H]            = Tic.ACTIONTOGGLEHITBOX,
+    [Tic.KEY_M]            = Tic.ACTIONSTATMENACT,
+    [Tic.KEY_P]            = Tic.ACTIONSTATPHYACT,
     [Tic.KEY_S]            = Tic.ACTIONTOGGLESPOTTED,
     [Tic.KEY_V]            = Tic.ACTIONTOGGLEVIEW,
+    [Tic.KEY_Y]            = Tic.ACTIONSTATPSYACT,
     [Tic.KEY_Z]            = Tic.ACTIONSCALENEXT,
 }
 
@@ -352,8 +361,9 @@ Tic.ACTIONS2FUNCTIONS = {
     [Tic.ACTIONMOVE225]       = function() Tic:moveDirection(Tic.DIR225) end,
     [Tic.ACTIONMOVE270]       = function() Tic:moveDirection(Tic.DIR270) end,
     [Tic.ACTIONMOVE315]       = function() Tic:moveDirection(Tic.DIR315) end,
-    [Tic.ACTIONDECPHYACT]     = function() Tic:stat('dec', "statphyact", 1) end,
-    [Tic.ACTIONINCPHYACT]     = function() Tic:stat('inc', "statphyact", 1) end,
+    [Tic.ACTIONSTATPHYACT]    = function() Tic:statPhyAct() end,
+    [Tic.ACTIONSTATMENACT]    = function() Tic:statMenAct() end,
+    [Tic.ACTIONSTATPSYACT]    = function() Tic:statPsyAct() end,
     [Tic.ACTIONBIOMENEXT]     = function() Tic:biomeNext() end,
     [Tic.ACTIONTOGGLEHITBOX]  = function() Tic:toggleHitbox() end,
     [Tic.ACTIONTOGGLESPOTTED] = function() Tic:toggleSpotted() end,
@@ -363,12 +373,31 @@ Tic.ACTIONS2FUNCTIONS = {
 
 
 -- Keyboard System -- handle keys pressed to actions to functions
+Tic.MODIFIERKEYS = { -- record modifier keys pressed
+    [Tic.KEY_CAPSLOCK] = false,
+    [Tic.KEY_CTRL]     = false,
+    [Tic.KEY_SHIFT]    = false,
+    [Tic.KEY_ALT]      = false,
+}
 function Tic:keysPressed(_hold, _period) -- returns the pressed keys in a table
     local _result = {}
+
+    for _key, _ in pairs(Tic.MODIFIERKEYS) do -- reset modifier keys
+        Tic.MODIFIERKEYS[_key] = false
+    end
+
     for _i = 0, 3 do
         local _key = peek(Tic.KEYBOARDKEYS + _i)
-        if _key > 0 and keyp(_key, _hold, _period) then table.insert(_result, _key) end
+        if _key > 0 then -- key pressed
+            local _modifier = Tables:findKey(Tic.MODIFIERKEYS, _key)
+            if _modifier then -- modifier key
+                Tic.MODIFIERKEYS[_modifier] = true
+            elseif keyp(_key, _hold, _period) then -- normal key holded
+                 table.insert(_result, _key)
+            end
+        end
     end
+
     return _result
 end
 
@@ -385,7 +414,7 @@ end
 -- Players System -- handle a players stack
 Tic.PLAYERS = CCyclerTable()
 function Tic:playerAppend(_player) -- stack a new player
-    if Tables:find(Tic.PLAYERS, _player) then return end -- avoid doublons
+    if Tables:findVal(Tic.PLAYERS, _player) then return end -- avoid doublons
     return Tic.PLAYERS:insert(_player)
 end
 
@@ -501,16 +530,56 @@ end
 
 
 -- Stats System -- change a stat value
-function Tic:stat(_action, _stat, _value, _character) -- modify a stat -- set/dec/inc
-    if not _action or not _stat or not _value then return end -- mandatory
+Tic.STATSET = "set"
+Tic.STATDEC = "dec"
+Tic.STATINC = "inc"
+Tic.STATMAX = "max"
+function Tic:statPhyAct(_character)
+    local _stat = "statphyact"
+    if Tic.MODIFIERKEYS[Tic.KEY_SHIFT] then
+        Tic:statAct(Tic.STATINC, _stat, 1, _character)
+    elseif Tic.MODIFIERKEYS[Tic.KEY_CTRL] then
+        Tic:statAct(Tic.STATDEC, _stat, 1, _character)
+    else
+        Tic:statAct(Tic.STATMAX, _stat, 1, _character)
+    end
+end
+
+function Tic:statMenAct(_character)
+    local _stat = "statmenact"
+    if Tic.MODIFIERKEYS[Tic.KEY_SHIFT] then
+        Tic:statAct(Tic.STATINC, _stat, 1, _character)
+    elseif Tic.MODIFIERKEYS[Tic.KEY_CTRL] then
+        Tic:statAct(Tic.STATDEC, _stat, 1, _character)
+    else
+        Tic:statAct(Tic.STATMAX, _stat, 1, _character)
+    end
+end
+
+function Tic:statPsyAct(_character)
+    local _stat = "statpsyact"
+    if Tic.MODIFIERKEYS[Tic.KEY_SHIFT] then
+        Tic:statAct(Tic.STATINC, _stat, 1, _character)
+    elseif Tic.MODIFIERKEYS[Tic.KEY_CTRL] then
+        Tic:statAct(Tic.STATDEC, _stat, 1, _character)
+    else
+        Tic:statAct(Tic.STATMAX, _stat, 1, _character)
+    end
+end
+
+function Tic:statAct(_action, _stat, _value, _character) -- modify an act stat -- set/dec/inc/max
+    if not _action or not _stat then return end -- mandatory
+    _value     = _value or 0
     _character = _character or Tic:playerActual()
     if not _character[_stat] then return end -- unknown stat
-    if _action == "set" then
+    if _action == Tic.STATSET then
         _character[_stat] = _value
-    elseif _action == "dec" then
+    elseif _action == Tic.STATDEC then
         _character[_stat] = _character[_stat] - _value
-    elseif _action == "inc" then
+    elseif _action == Tic.STATINC then
         _character[_stat] = _character[_stat] + _value
+    elseif _action == Tic.STATMAX then
+        _character[_stat] = _character[string.gsub(_stat, "act", "max")]
     end
     _character[_stat] = math.max(_character[_stat], Tic.STATSMIN) -- stay in range
     _character[_stat] = math.min(_character[_stat], Tic.STATSMAX)
@@ -3390,7 +3459,7 @@ function CWindowWorld:drawPlayerActual()
         for _, _keyx in pairs(_keyxs) do -- sorted by x next
             for _entity, _ in pairs(_entitiesaround[_keyy][_keyx]) do -- draw entities at the same x y
                 _entity.spotted  = false -- unspot entities -- TODO check if spotted by another player ?
-                _entity.discovered = true -- HERE
+                -- _entity.discovered = true -- HERE
 
                 if not (_entity == _playeractual) then -- avoid to spot itself
                     if _regionviewworld:hasInsideRegion(_entity:regionWorld()) then -- if in view
@@ -3432,7 +3501,7 @@ end
 --
 -- Places
 --
-if false then -- generate places -- TODO move under CPlaces
+if true then -- generate places -- TODO move under CPlaces
 
 CPlace.PLACECOUNT = 10 -- default number of generated places
 CPlace.PLACEKINDS = {  -- TODO val can contain parameters such as percent etc
@@ -3618,6 +3687,7 @@ local Wulfie = CPlayerWolfe{name = "Wulfie",
 Wulfie:randomWorldWindow()
 
 local Oxboow = CPlayerGhost{name = "Oxboow",
+statphyact = 10,
 }
 Oxboow:randomWorldWindow()
 
@@ -3671,6 +3741,7 @@ local Region = CRegion{
 --
 -- Places -- TESTING
 --
+if true then
 Tic.DRAWHITBOX = false
 for _, _cplace in pairs({
     CPlaceTree0Anim,
@@ -3695,7 +3766,7 @@ for _, _cplace in pairs({
     local _place = _cplace()
     _place:randomWorldWindow()
 end
-
+end
 
 
 --
@@ -3714,16 +3785,9 @@ function Tic:draw()
     WindowInfosSpotted:draw()
     WindowPortraitSpotted:draw()
 
-    -- Tic:logAppend("WOX:", Tic:playerActual().worldx)
-    -- Tic:logAppend("WOY:", Tic:playerActual().worldy)
-    -- Tic:logAppend("ap:", Tic:playerActual().statphyact)
-    -- Tic:logAppend("h:", Tic.DRAWHITBOX)
-    -- Tic:logAppend("s:", Tic.DRAWSPOTTED)
-    -- Tic:logAppend("v:", Tic.DRAWVIEW)
-    Tic:logAppend()
-    Tic:logAppend()
-    -- Tic:logAppend("n:", WindowTest1.entity.name)
-    -- Tic:logAppend("n:", WindowTest2.entity.name)
+    for _key, _val in pairs(Tic.MODIFIERKEYS) do
+        Tic:logAppend(_key, _val)
+    end
 
     Tic:logPrint()
 

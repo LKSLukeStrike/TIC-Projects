@@ -64,7 +64,14 @@ function Tables:randompickval(_table) -- return a random val in a table
     return _table[Tables:randompickkey(_table)] -- nil if no items
 end
 
-function Tables:find(_table, _find) -- return the key of _val else nil if not found
+function Tables:findKey(_table, _find) -- return the key of key _find else nil if not found
+    for _key, _val in pairs(_table or {}) do
+        if _key == _find then return _key end
+    end
+    return -- nil
+end
+
+function Tables:findVal(_table, _find) -- return the key of val _find else nil if not found
     for _key, _val in pairs(_table or {}) do
         if _val == _find then return _key end
     end
@@ -119,25 +126,25 @@ function Tables:dump(_table, _argt) -- dump a table -- SORTED -- RECURSIVE -- IN
             local _val = _table[_key]
 
             if _hide and _doshow then -- TODO add more patterns ?
-                if Tables:find(_hide, _key) then
+                if Tables:findVal(_hide, _key) then
                     _doshow = false -- hide some keys
-                elseif Tables:find(_hide, "*all*") then
+                elseif Tables:findVal(_hide, "*all*") then
                     _doshow = false -- hide all keys -- special pattern
-                elseif Tables:find(_hide, "*num*") and type(_key) == "number" then
+                elseif Tables:findVal(_hide, "*num*") and type(_key) == "number" then
                     _doshow = false -- hide num keys -- special pattern
-                elseif Tables:find(_hide, "*str*") and type(_key) == "string" then
+                elseif Tables:findVal(_hide, "*str*") and type(_key) == "string" then
                     _doshow = false -- hide str keys -- special pattern
                 end
             end
 
             if _show and not _doshow then -- override hidden keys if any
-                if Tables:find(_show, _key) then
+                if Tables:findVal(_show, _key) then
                     _doshow = true -- show some keys
-                elseif Tables:find(_show, "*all*") then
+                elseif Tables:findVal(_show, "*all*") then
                     _doshow = true -- show all keys -- special pattern
-                elseif Tables:find(_show, "*num*") and type(_key) == "number" then
+                elseif Tables:findVal(_show, "*num*") and type(_key) == "number" then
                     _doshow = true -- show num keys -- special pattern
-                elseif Tables:find(_show, "*str*") and type(_key) == "string" then
+                elseif Tables:findVal(_show, "*str*") and type(_key) == "string" then
                     _doshow = true -- show str keys -- special pattern
                 end
             end
@@ -147,25 +154,25 @@ function Tables:dump(_table, _argt) -- dump a table -- SORTED -- RECURSIVE -- IN
             end
 
             if _skip and _dokeep and type(_val) == "table" then -- skip tables with those keys
-                if Tables:find(_skip, _key) then
+                if Tables:findVal(_skip, _key) then
                     _dokeep = false -- skip some keys
-                elseif Tables:find(_skip, "*all*") then
+                elseif Tables:findVal(_skip, "*all*") then
                     _dokeep = false -- skip all keys -- special pattern
-                elseif Tables:find(_skip, "*num*") and type(_key) == "number" then
+                elseif Tables:findVal(_skip, "*num*") and type(_key) == "number" then
                     _dokeep = false -- skip num keys -- special pattern
-                elseif Tables:find(_skip, "*str*") and type(_key) == "string" then
+                elseif Tables:findVal(_skip, "*str*") and type(_key) == "string" then
                     _dokeep = false -- skip str keys -- special pattern
                 end
             end
 
             if _keep and not _dokeep and type(_val) == "table" then -- override skipped tables if any
-                if Tables:find(_keep, _key) then
+                if Tables:findVal(_keep, _key) then
                     _dokeep = true -- keep some keys
-                elseif Tables:find(_keep, "*all*") then
+                elseif Tables:findVal(_keep, "*all*") then
                     _dokeep = true -- keep all keys -- special pattern
-                elseif Tables:find(_keep, "*num*") and type(_key) == "number" then
+                elseif Tables:findVal(_keep, "*num*") and type(_key) == "number" then
                     _dokeep = true -- keep num keys -- special pattern
-                elseif Tables:find(_keep, "*str*") and type(_key) == "string" then
+                elseif Tables:findVal(_keep, "*str*") and type(_key) == "string" then
                     _dokeep = true -- keep str keys -- special pattern
                 end
             end
