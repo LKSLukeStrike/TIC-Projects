@@ -262,6 +262,7 @@ Tic.FREQUENCE600 = 600 -- each 10 second
 Tic.KEYBOARDKEYS = 0xFF88 -- keyboard state -- up to 4 pressed keys
 -- Keys values
 Tic.KEY_B              = 02
+Tic.KEY_D              = 04
 Tic.KEY_H              = 08
 Tic.KEY_M              = 13
 Tic.KEY_P              = 16
@@ -315,6 +316,7 @@ Tic.ACTIONBIOMENEXT     = "biomeNext"
 Tic.ACTIONTOGGLEHITBOX  = "toggleHitbox"
 Tic.ACTIONTOGGLESPOTTED = "toggleSpotted"
 Tic.ACTIONTOGGLEVIEW    = "toggleView"
+Tic.ACTIONTOGGLEMIND    = "toggleMind"
 Tic.ACTIONSCALENEXT     = "scaleNext"
 
 -- Keys to Actions
@@ -335,6 +337,7 @@ Tic.KEYS2ACTIONS = {
     [Tic.KEY_NUMPAD4]      = Tic.ACTIONMOVE270,
     [Tic.KEY_NUMPAD7]      = Tic.ACTIONMOVE315,
     [Tic.KEY_B]            = Tic.ACTIONBIOMENEXT,
+    [Tic.KEY_D]            = Tic.ACTIONTOGGLEMIND,
     [Tic.KEY_H]            = Tic.ACTIONTOGGLEHITBOX,
     [Tic.KEY_M]            = Tic.ACTIONSTATMENACT,
     [Tic.KEY_P]            = Tic.ACTIONSTATPHYACT,
@@ -368,6 +371,7 @@ Tic.ACTIONS2FUNCTIONS = {
     [Tic.ACTIONTOGGLEHITBOX]  = function() Tic:toggleHitbox() end,
     [Tic.ACTIONTOGGLESPOTTED] = function() Tic:toggleSpotted() end,
     [Tic.ACTIONTOGGLEVIEW]    = function() Tic:toggleView() end,
+    [Tic.ACTIONTOGGLEMIND]    = function() Tic:toggleMind() end,
     [Tic.ACTIONSCALENEXT]     = function() Tic:scaleNext() end,
 }
 
@@ -541,7 +545,7 @@ function Tic:statPhyAct(_character)
     elseif Tic.MODIFIERKEYS[Tic.KEY_CTRL] then
         Tic:statAct(Tic.STATDEC, _stat, 1, _character)
     else
-        Tic:statAct(Tic.STATMAX, _stat, 1, _character)
+        Tic:statAct(Tic.STATMAX, _stat, nil, _character)
     end
 end
 
@@ -552,7 +556,7 @@ function Tic:statMenAct(_character)
     elseif Tic.MODIFIERKEYS[Tic.KEY_CTRL] then
         Tic:statAct(Tic.STATDEC, _stat, 1, _character)
     else
-        Tic:statAct(Tic.STATMAX, _stat, 1, _character)
+        Tic:statAct(Tic.STATMAX, _stat, nil, _character)
     end
 end
 
@@ -563,7 +567,7 @@ function Tic:statPsyAct(_character)
     elseif Tic.MODIFIERKEYS[Tic.KEY_CTRL] then
         Tic:statAct(Tic.STATDEC, _stat, 1, _character)
     else
-        Tic:statAct(Tic.STATMAX, _stat, 1, _character)
+        Tic:statAct(Tic.STATMAX, _stat, nil, _character)
     end
 end
 
@@ -625,6 +629,13 @@ end
 Tic.DRAWVIEW = false
 function Tic:toggleView()
 	Tic.DRAWVIEW = Nums:toggleTF(Tic.DRAWVIEW)
+end
+
+
+-- Mind System -- toggle mind display
+Tic.DRAWMIND = false
+function Tic:toggleMind()
+	Tic.DRAWMIND = Nums:toggleTF(Tic.DRAWMIND)
 end
 
 
@@ -2228,16 +2239,17 @@ function CCharacter:new(_argt)
 end
 
 function CCharacter:regionViewOffsets() -- viewable offsets region depending on dirx, diry, statphyact and -- TODO posture
+    local _stat          = self.statphyact
     local _statesettings = Tic.STATESETTINGS[self.state]
     local _posture       = _statesettings.posture
     local _posturekneel  = _posture == Tic.POSTUREKNEEL
     local _size          = Tic.SPRITESIZE * self.scale
     local _rangewh       = Tic.WORLDWH -- use world window height as range -- TODO change that later ?
+    local _offsets       =  ((((_rangewh - _size) // 2) - 1) * (_stat / Tic.STATSMAX)) // 1
     -- local _offsets       = (_posturekneel) -- FIXME here the posture
-    --     and ((((_rangewh - _size) // 2) - 1) * (self.statphyact / Tic.STATSMAX)) // 2
-    --     or  ((((_rangewh - _size) // 2) - 1) * (self.statphyact / Tic.STATSMAX)) // 1
-    local _offsets       =  ((((_rangewh - _size) // 2) - 1) * (self.statphyact / Tic.STATSMAX)) // 1
-    -- Tic:logAppend("pa:", self.statphyact)
+    --     and ((((_rangewh - _size) // 2) - 1) * (_stat / Tic.STATSMAX)) // 2
+    --     or  ((((_rangewh - _size) // 2) - 1) * (_stat / Tic.STATSMAX)) // 1
+    -- Tic:logAppend("pa:", _stat)
     -- Tic:logAppend("of:", _offsets)
 
     return CRegion{
@@ -2261,22 +2273,59 @@ function CCharacter:regionViewOffsets() -- viewable offsets region depending on 
 end
 
 function CCharacter:regionViewScreen() -- viewable screen region depending on dirx, diry
-    local _viewoffsets = self:regionViewOffsets()
+    local _regionviewoffsets = self:regionViewOffsets()
     return CRegion{
-        lf = self.screenx + _viewoffsets.lf,
-        rg = self.screenx + _viewoffsets.rg,
-        up = self.screeny + _viewoffsets.up,
-        dw = self.screeny + _viewoffsets.dw,
+        lf = self.screenx + _regionviewoffsets.lf,
+        rg = self.screenx + _regionviewoffsets.rg,
+        up = self.screeny + _regionviewoffsets.up,
+        dw = self.screeny + _regionviewoffsets.dw,
     }
 end
 
 function CCharacter:regionViewWorld() -- viewable world region depending on dirx, diry
-    local _viewoffsets = self:regionViewOffsets()
+    local _regionviewoffsets = self:regionViewOffsets()
     return CRegion{
-        lf = self.worldx + _viewoffsets.lf,
-        rg = self.worldx + _viewoffsets.rg,
-        up = self.worldy + _viewoffsets.up,
-        dw = self.worldy + _viewoffsets.dw,
+        lf = self.worldx + _regionviewoffsets.lf,
+        rg = self.worldx + _regionviewoffsets.rg,
+        up = self.worldy + _regionviewoffsets.up,
+        dw = self.worldy + _regionviewoffsets.dw,
+    }
+end
+
+function CCharacter:regionMindOffsets() -- mindable offsets region depending on dirx, diry, statmenact
+    local _stat          = self.statmenact
+    local _statesettings = Tic.STATESETTINGS[self.state]
+    local _posture       = _statesettings.posture
+    local _posturekneel  = _posture == Tic.POSTUREKNEEL
+    local _size          = Tic.SPRITESIZE * self.scale
+    local _rangewh       = Tic.WORLDWH -- use world window height as range -- TODO change that later ?
+    local _offsets       =  ((((_rangewh - _size) // 2) - 1) * (_stat / Tic.STATSMAX)) // 1
+
+    return CRegion{
+        lf  = Nums:neg(_offsets),
+        rg  = _size + _offsets,
+        up  = Nums:neg(_offsets),
+        dw  = _size + _offsets,
+    }
+end
+
+function CCharacter:regionMindScreen() -- mindable screen region depending on dirx, diry
+    local _regionmindoffsets = self:regionMindOffsets()
+    return CRegion{
+        lf = self.screenx + _regionmindoffsets.lf,
+        rg = self.screenx + _regionmindoffsets.rg,
+        up = self.screeny + _regionmindoffsets.up,
+        dw = self.screeny + _regionmindoffsets.dw,
+    }
+end
+
+function CCharacter:regionMindWorld() -- mindable world region depending on dirx, diry
+    local _regionmindoffsets = self:regionMindOffsets()
+    return CRegion{
+        lf = self.worldx + _regionmindoffsets.lf,
+        rg = self.worldx + _regionmindoffsets.rg,
+        up = self.worldy + _regionmindoffsets.up,
+        dw = self.worldy + _regionmindoffsets.dw,
     }
 end
 
@@ -2292,6 +2341,7 @@ function CCharacter:draw() -- set animations and draw layers
     self:drawSpotted()
     self:drawHitbox()
     self:drawView()
+    self:drawMind()
 end
 
 function CCharacter:cycle()
@@ -2375,11 +2425,25 @@ function CCharacter:drawView() -- draw the view of a character
     if not self.drawview then return end -- nothing to draw
     -- if not (self == Tic:playerActual()) then return end -- only actual player
     local _drawcolor = Tic.COLORGREENL
-    local _regionscreenview = self:regionViewScreen()
-    local _screenlf  = _regionscreenview.lf
-    local _screenrg  = _regionscreenview.rg
-    local _screenup  = _regionscreenview.up
-    local _screendw  = _regionscreenview.dw
+    local _regionviewscreen = self:regionViewScreen()
+    local _screenlf  = _regionviewscreen.lf
+    local _screenrg  = _regionviewscreen.rg
+    local _screenup  = _regionviewscreen.up
+    local _screendw  = _regionviewscreen.dw
+
+    rectb(_screenlf, _screenup, _screenrg - _screenlf, _screendw - _screenup, _drawcolor)
+end
+
+function CCharacter:drawMind() -- draw the mind of a character
+    self.drawmind = Tic.DRAWMIND -- use Tic as master
+    if not self.drawmind then return end -- nothing to draw
+    -- if not (self == Tic:playerActual()) then return end -- only actual player
+    local _drawcolor = Tic.COLORGREENM
+    local _regionmindscreen = self:regionMindScreen()
+    local _screenlf  = _regionmindscreen.lf
+    local _screenrg  = _regionmindscreen.rg
+    local _screenup  = _regionmindscreen.up
+    local _screendw  = _regionmindscreen.dw
 
     rectb(_screenlf, _screenup, _screenrg - _screenlf, _screendw - _screenup, _drawcolor)
 end
@@ -3451,15 +3515,15 @@ function CWindowWorld:drawPlayerActual()
     local _playeractual      = Tic:playerActual()
     local _entitiesaround    = _playeractual:entitiesAround()
     local _regionviewworld   = _playeractual:regionViewWorld()
+    local _regionmindworld   = _playeractual:regionMindWorld()
+
+    local _keyys   = Tables:keys(_entitiesaround)
 
     local _nearest = nil -- nearest entity if any -- except itself
-    local _keyys   = Tables:keys(_entitiesaround)
-    for _, _keyy in pairs(_keyys) do -- draw entities visible by the actual player sorted by y first
-        local _keyxs = Tables:keys(_entitiesaround[_keyy])
-        for _, _keyx in pairs(_keyxs) do -- sorted by x next
-            for _entity, _ in pairs(_entitiesaround[_keyy][_keyx]) do -- draw entities at the same x y
-                _entity.spotted  = false -- unspot entities -- TODO check if spotted by another player ?
-                -- _entity.discovered = true -- HERE
+    for _, _keyy in pairs(_keyys) do -- sorted by y first
+        for _, _keyx in pairs(Tables:keys(_entitiesaround[_keyy])) do -- sorted by x next
+            for _entity, _ in pairs(_entitiesaround[_keyy][_keyx]) do -- entities around actual player
+                _entity.spotted  = false -- unspot all entities -- TODO check if spotted by another player ?
 
                 if not (_entity == _playeractual) then -- avoid to spot itself
                     if _regionviewworld:hasInsideRegion(_entity:regionWorld()) then -- if in view
@@ -3474,8 +3538,6 @@ function CWindowWorld:drawPlayerActual()
                         _entity.drawfade = true
                     end
                 end
-
-                _entity:drawRelativeToEntity(_playeractual)
             end
         end
     end
@@ -3483,16 +3545,20 @@ function CWindowWorld:drawPlayerActual()
     if _nearest then -- spot the nearest if any
         WindowInfosSpotted.entity    = _nearest
         WindowPortraitSpotted.entity = _nearest
-        _nearest:save{"spotted",}
         _nearest.spotted = true
-        _nearest:drawRelativeToEntity(_playeractual)
-        _nearest:load()
-        if _playeractual.worldy >= _nearest.worldy then -- redraw actual player in front if needed
-            _playeractual:drawRelativeToEntity(_playeractual)
-        end
     else
         WindowInfosSpotted.entity    = nil
         WindowPortraitSpotted.entity = nil
+    end
+
+    for _, _keyy in pairs(_keyys) do -- draw entities -- sorted by y first
+        for _, _keyx in pairs(Tables:keys(_entitiesaround[_keyy])) do -- sorted by x next
+            for _entity, _ in pairs(_entitiesaround[_keyy][_keyx]) do -- entities around actual player
+                if (_entity.drawfade == false) or (_regionmindworld:hasInsideRegion(_entity:regionWorld())) then -- draw entity ?
+                    _entity:drawRelativeToEntity(_playeractual)
+                end
+            end
+        end
     end
 end
 
