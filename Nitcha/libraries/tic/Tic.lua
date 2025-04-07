@@ -249,15 +249,15 @@ Tic.WEAPONMAGIC = 2
 Tic.WEAPONLIGHT = 3
 Tic.WEAPONALCHE = 4
 
-Tic.FREQUENCE000 = 000 -- frequences -- each 0 second
-Tic.FREQUENCE030 = 030 -- each 0.5 second
-Tic.FREQUENCE060 = 060 -- each 1 second
-Tic.FREQUENCE090 = 090 -- each 1.5 second
-Tic.FREQUENCE120 = 120 -- each 2 second
-Tic.FREQUENCE180 = 180 -- each 3 second
-Tic.FREQUENCE240 = 240 -- each 4 second
-Tic.FREQUENCE300 = 300 -- each 5 second
-Tic.FREQUENCE600 = 600 -- each 10 second
+Tic.FREQUENCE0000 = 0000 -- frequences -- each 0 second
+Tic.FREQUENCE0030 = 0030 -- each 0.5 second
+Tic.FREQUENCE0060 = 0060 -- each 1 second
+Tic.FREQUENCE0090 = 0090 -- each 1.5 second
+Tic.FREQUENCE0120 = 0120 -- each 2 second
+Tic.FREQUENCE0180 = 0180 -- each 3 second
+Tic.FREQUENCE0240 = 0240 -- each 4 second
+Tic.FREQUENCE0300 = 0300 -- each 5 second
+Tic.FREQUENCE0600 = 0600 -- each 10 second
 
 Tic.KEYBOARDKEYS = 0xFF88 -- keyboard state -- up to 4 pressed keys
 -- Keys values
@@ -953,7 +953,7 @@ end
 local CAnimation = Classic:extend() -- generic palette animation for entities
 function CAnimation:new(_argt)
     CAnimation.super.new(self, _argt)
-    self.frequence = Tic.FREQUENCE060
+    self.frequence = Tic.FREQUENCE0060
     self.percent0  = 0.5
     self.palette0  = {}
     self.palette1  = {}
@@ -1047,7 +1047,8 @@ function CHitbox:new(_argt)
     self.screeny  = 0
 	self.dirx     = Tic.DIRXLF
     self.scale    = CSprite.SCALE01
-    self.collided = false -- is collided or not
+    self.hitto    = {} -- entities hit to -- table
+    self.hitby    = {} -- entities hit by -- table
     self.region   = CRegion{
         lf = CHitbox.REGIONLF,
         rg = CHitbox.REGIONRG,
@@ -1058,31 +1059,55 @@ function CHitbox:new(_argt)
 end
 
 function CHitbox:draw()
-	local _drawcolor = (self.collided) and Tic.COLORORANGE or Tic.COLORYELLOW
-	local _region    = self:regionScreen()
+	local _drawcolor = Tic.COLORYELLOW
+    _drawcolor = (Tables:size(self.hitto) > 0) and Tic.COLORORANGE or _drawcolor
+    _drawcolor = (Tables:size(self.hitby) > 0) and Tic.COLORRED    or _drawcolor
+	local _regionscreen = self:regionScreen()
 
     rectb(
-		_region.lf,
-		_region.up,
-		_region:borderW(self.scale),
-		_region:borderH(self.scale),
+		_regionscreen.lf,
+		_regionscreen.up,
+		_regionscreen:borderW(self.scale),
+		_regionscreen:borderH(self.scale),
 		_drawcolor
 	)
 end
 
-function CHitbox:regionScreen() -- screen coordinates of its region -- depends on dirx and scale
-    local _result   = CRegion()
-    local _widthlf = (self.region.lf - CHitbox.REGIONLF)
+function CHitbox:regionOffsets() -- screen coordinates of its region -- depends on dirx and scale
+    local _result  = CRegion()
+    local _widthlf = (self.region.lf - CHitbox.REGIONLF) -- |lf|md|rg| widths
     local _widthmd = (self.region.rg - self.region.lf )
     local _widthrg = (CHitbox.REGIONRG - self.region.rg)
 
     _result.lf = (self.dirx == Tic.DIRXLF)
-        and self.screenx + (_widthlf * self.scale)
-        or  self.screenx + (_widthrg * self.scale)
+        and _widthlf * self.scale
+        or  _widthrg * self.scale
     _result.rg = _result.lf + (_widthmd * self.scale)
-    _result.up = self.screeny + (self.region.up * self.scale)
-    _result.dw = self.screeny + (self.region.dw * self.scale)
+    _result.up = self.region.up * self.scale
+    _result.dw = self.region.dw * self.scale
     return _result
+end
+
+function CHitbox:regionScreen() -- screen coordinates of its region -- depends on dirx and scale
+    local _regionoffsets = self:regionOffsets()
+    return CRegion{
+        lf = self.screenx + _regionoffsets.lf,
+        rg = self.screenx + _regionoffsets.rg,
+        up = self.screeny + _regionoffsets.up,
+        dw = self.screeny + _regionoffsets.dw,
+    }
+    -- local _result  = CRegion()
+    -- local _widthlf = (self.region.lf - CHitbox.REGIONLF) -- |lf|md|rg| widths
+    -- local _widthmd = (self.region.rg - self.region.lf )
+    -- local _widthrg = (CHitbox.REGIONRG - self.region.rg)
+
+    -- _result.lf = (self.dirx == Tic.DIRXLF)
+    --     and self.screenx + (_widthlf * self.scale)
+    --     or  self.screenx + (_widthrg * self.scale)
+    -- _result.rg = _result.lf + (_widthmd * self.scale)
+    -- _result.up = self.screeny + (self.region.up * self.scale)
+    -- _result.dw = self.screeny + (self.region.dw * self.scale)
+    -- return _result
 end
 
 
@@ -1313,7 +1338,7 @@ function CEntity:focus() -- focus camera on itself
     self.camera:focusEntity(self)
 end
 
-function CEntity:entitiesRegion(_region) -- entities in region from a itself
+function CEntity:entitiesRegion(_region) -- entities in a region from itself
     if not _region then return end -- mandatory
     if not self.camera then return end -- requires a camera
     self:focus()
@@ -1443,8 +1468,6 @@ function CEntityDrawable:new(_argt)
     self.animations  = nil -- override if any
     self.spotted     = false -- use spotted to draw a border
     self.hitbox      = CHitbox() -- hitbox region
-    self.solid       = true -- hitbox can be traversed or not
-    self.collided    = false -- is the hitbox collided or not
     self.drawhitbox  = false -- draw behaviour
     self.drawspotted = false
     self.drawfade    = false
@@ -1465,7 +1488,7 @@ function CEntityDrawable:draw() -- default draw for drawable entities -- overrid
         local _palette1    = _animation.palette1
         local _frequence01 = Nums:frequence01(_tick00, _frequence)
         local _random01    = Nums:random01(_percent0)
-        local _palette01   = _frequence01 * _random01
+        local _palette01   = _frequence01 * _random01 -- palette0 if frequence0 or random0
         _palette = (_palette01 == 0)
             and Tables:merge(_palette, _palette0)
             or  Tables:merge(_palette, _palette1)
@@ -1478,7 +1501,6 @@ function CEntityDrawable:draw() -- default draw for drawable entities -- overrid
     _musprite.flip    = self.dirx
     _musprite.scale   = self.scale
     _musprite.palette = _palette
-    -- _musprite:palettize(_palette)
     _musprite:draw()
 
     self:drawSpotted()
@@ -1506,7 +1528,6 @@ function CEntityDrawable:drawHitbox() -- draw hitbox if any
     self.hitbox.screeny  = self.screeny
     self.hitbox.dirx     = self.dirx
     self.hitbox.scale    = self.scale
-    self.hitbox.collided = self.collided
     self.hitbox:draw()
 end
 
@@ -1621,13 +1642,13 @@ function CPlaceHouseAnim:new(_argt)
     CPlaceHouseAnim.super.new(self, _argt)
     self.animations = {
         CAnimation{ -- smoke
-            frequence = Tic.FREQUENCE300,
+            frequence = Tic.FREQUENCE0300,
             percent0  = 0.9,
             palette0  = {[CPlaceBuild.SMOKE] = CPlaceBuild.SMOKE,},
             palette1  = {[CPlaceBuild.SMOKE] = CPlaceBuild.COLORLIGHT,},
         },
         CAnimation{ -- window
-            frequence = Tic.FREQUENCE600,
+            frequence = Tic.FREQUENCE0600,
             percent0  = 0.1,
             palette0  = {[CPlaceBuild.WINDOW02] = CPlaceBuild.WALLS},
             palette1  = {[CPlaceBuild.WINDOW02] = CPlaceBuild.COLORLIGHT,},
@@ -1664,13 +1685,13 @@ function CPlaceTowerAnim:new(_argt)
     CPlaceTowerAnim.super.new(self, _argt)
     self.animations = {
         CAnimation{ -- window 1
-            frequence = Tic.FREQUENCE240,
+            frequence = Tic.FREQUENCE0240,
             percent0  = 0.6,
             palette0  = {[CPlaceBuild.WINDOW01] = CPlaceBuild.WALLS},
             palette1  = {[CPlaceBuild.WINDOW01] = CPlaceBuild.COLORLIGHT,},
         },
         CAnimation{ -- window 2
-            frequence = Tic.FREQUENCE120,
+            frequence = Tic.FREQUENCE0120,
             percent0  = 0.1,
             palette0  = {[CPlaceBuild.WINDOW02] = CPlaceBuild.WALLS},
             palette1  = {[CPlaceBuild.WINDOW02] = CPlaceBuild.COLORLIGHT,},
@@ -1709,20 +1730,20 @@ function CPlaceManorAnim:new(_argt)
     CPlaceManorAnim.super.new(self, _argt)
     self.animations = {
         CAnimation{ -- smoke
-            frequence = Tic.FREQUENCE300,
+            frequence = Tic.FREQUENCE0300,
             percent0  = 0.9,
             palette0  = {[CPlaceBuild.SMOKE] = CPlaceBuild.SMOKE,},
             palette1  = {[CPlaceBuild.SMOKE] = CPlaceBuild.COLORLIGHT,},
         },
         CAnimation{ -- window 1
-            frequence = Tic.FREQUENCE240,
-            percent0  = 0.6,
+            frequence = Tic.FREQUENCE0240,
+            percent0  = 0.9,
             palette0  = {[CPlaceBuild.WINDOW01] = CPlaceBuild.WALLS},
             palette1  = {[CPlaceBuild.WINDOW01] = CPlaceBuild.COLORLIGHT,},
         },
         CAnimation{ -- window 2
-            frequence = Tic.FREQUENCE120,
-            percent0  = 0.1,
+            frequence = Tic.FREQUENCE0120,
+            percent0  = 0.5,
             palette0  = {[CPlaceBuild.WINDOW02] = CPlaceBuild.WALLS},
             palette1  = {[CPlaceBuild.WINDOW02] = CPlaceBuild.COLORLIGHT,},
         },
@@ -1760,13 +1781,13 @@ function CPlaceAltarAnim:new(_argt)
     CPlaceAltarAnim.super.new(self, _argt)
     self.animations = {
         CAnimation{ -- window 1
-            frequence = Tic.FREQUENCE600,
+            frequence = Tic.FREQUENCE0600,
             percent0  = 0.9,
             palette0  = {[CPlaceBuild.WINDOW01] = CPlaceBuild.WALLS,},
             palette1  = {[CPlaceBuild.WINDOW01] = CPlaceBuild.COLORGLASS01,},
         },
         CAnimation{ -- window 2
-            frequence = Tic.FREQUENCE600,
+            frequence = Tic.FREQUENCE0600,
             percent0  = 0.1,
             palette0  = {[CPlaceBuild.WINDOW02] = CPlaceBuild.WALLS,},
             palette1  = {[CPlaceBuild.WINDOW02] = CPlaceBuild.COLORGLASS02,},
@@ -1805,13 +1826,13 @@ function CPlaceWaterAnim:new(_argt)
     CPlaceWaterAnim.super.new(self, _argt)
     self.animations = {
         CAnimation{ -- water 1
-            frequence = Tic.FREQUENCE240,
+            frequence = Tic.FREQUENCE0240,
             percent0  = 0.6,
             palette0  = {[CPlaceBuild.WATER01] = CPlaceBuild.COLORWATER01,},
             palette1  = {[CPlaceBuild.WATER01] = CPlaceBuild.COLORWATER02,},
         },
         CAnimation{ -- water 2
-            frequence = Tic.FREQUENCE120,
+            frequence = Tic.FREQUENCE0120,
             percent0  = 0.1,
             palette0  = {[CPlaceBuild.WATER02] = CPlaceBuild.COLORWATER01,},
             palette1  = {[CPlaceBuild.WATER02] = CPlaceBuild.COLORWATER02,},
@@ -1850,19 +1871,19 @@ function CPlaceStallAnim:new(_argt)
     CPlaceStallAnim.super.new(self, _argt)
     self.animations = {
         CAnimation{ -- owner
-            frequence = Tic.FREQUENCE240,
+            frequence = Tic.FREQUENCE0240,
             percent0  = 0.6,
             palette0  = {[CPlaceBuild.OWNER] = Tic.COLORWHITE,},
             palette1  = {[CPlaceBuild.OWNER] = Tic.COLORKEY,},
         },
         CAnimation{ -- goods 1
-            frequence = Tic.FREQUENCE120,
+            frequence = Tic.FREQUENCE0120,
             percent0  = 0.1,
             palette0  = {[CPlaceBuild.GOODS01] = CPlaceBuild.COLORGOODS01,},
             palette1  = {[CPlaceBuild.GOODS01] = CPlaceBuild.COLORGOODS02,},
         },
         CAnimation{ -- goods 2
-            frequence = Tic.FREQUENCE120,
+            frequence = Tic.FREQUENCE0120,
             percent0  = 0.1,
             palette0  = {[CPlaceBuild.GOODS02] = CPlaceBuild.COLORGOODS01,},
             palette1  = {[CPlaceBuild.GOODS02] = CPlaceBuild.COLORGOODS02,},
@@ -1925,21 +1946,21 @@ function CPlaceTreesAnim:new(_argt)
     CPlaceTreesAnim.super.new(self, _argt)
     self.animations = {
         CAnimation{ -- nest
-            frequence = Tic.FREQUENCE600,
+            frequence = Tic.FREQUENCE0600,
             percent0  = 0.9,
             palette0  = {[CPlaceTrees.NEST] = CPlaceTrees.TRUNK,},
             palette1  = {[CPlaceTrees.NEST] = CPlaceTrees.COLORNEST,},
         },
         CAnimation{ -- floor 1
-            frequence = Tic.FREQUENCE600,
-            percent0  = 0.3,
-            palette0  = {[CPlaceTrees.FLOOR01] = CPlaceTrees.COLORFLOOR01,},
-            palette1  = {[CPlaceTrees.FLOOR01] = CPlaceTrees.COLORFLOOR02,},
+            frequence = Tic.FREQUENCE0600,
+            percent0  = 0.5,
+            palette0  = {[CPlaceTrees.FLOOR01] = CPlaceTrees.TRUNK,},
+            palette1  = {[CPlaceTrees.FLOOR01] = CPlaceTrees.COLORFLOOR01,},
         },
         CAnimation{ -- floor 2
-            frequence = Tic.FREQUENCE300,
+            frequence = Tic.FREQUENCE0600,
             percent0  = 0.3,
-            palette0  = {[CPlaceTrees.FLOOR02] = CPlaceTrees.COLORFLOOR01,},
+            palette0  = {[CPlaceTrees.FLOOR02] = CPlaceTrees.BARK,},
             palette1  = {[CPlaceTrees.FLOOR02] = CPlaceTrees.COLORFLOOR02,},
         },
     }
@@ -2000,83 +2021,83 @@ Tic.STATESETTINGS = { -- states settings
     [Tic.STATESTANDIDLE] = {
         posture = Tic.POSTURESTAND,
         status  = Tic.STATUSIDLE,
-        frequence = Tic.FREQUENCE060,
+        frequence = Tic.FREQUENCE0060,
     },
     [Tic.STATESTANDWORK] = {
         posture = Tic.POSTURESTAND,
         status  = Tic.STATUSWORK,
-        frequence = Tic.FREQUENCE060,
+        frequence = Tic.FREQUENCE0060,
     },
     [Tic.STATESTANDMOVE] = {
         posture = Tic.POSTURESTAND,
         status  = Tic.STATUSMOVE,
-        frequence = Tic.FREQUENCE060,
+        frequence = Tic.FREQUENCE0060,
     },
     [Tic.STATEKNEELIDLE] = {
         posture = Tic.POSTUREKNEEL,
         status  = Tic.STATUSIDLE,
-        frequence = Tic.FREQUENCE060,
+        frequence = Tic.FREQUENCE0060,
     },
     [Tic.STATEKNEELWORK] = {
         posture = Tic.POSTUREKNEEL,
         status  = Tic.STATUSWORK,
-        frequence = Tic.FREQUENCE060,
+        frequence = Tic.FREQUENCE0060,
     },
     [Tic.STATEKNEELMOVE] = {
         posture = Tic.POSTUREKNEEL,
         status  = Tic.STATUSMOVE,
-        frequence = Tic.FREQUENCE060,
+        frequence = Tic.FREQUENCE0060,
     },
     [Tic.STATEFLOORSLEEP] = {
         posture = Tic.POSTUREFLOOR,
         status  = Tic.STATUSSLEEP,
         statussprite = CSpriteFG.STATUSSLEEP,
-        frequence = Tic.FREQUENCE090,
+        frequence = Tic.FREQUENCE0090,
     },
     [Tic.STATEFLOORBLEED] = {
         posture = Tic.POSTUREFLOOR,
         status  = Tic.STATUSBLEED,
-        frequence = Tic.FREQUENCE030,
+        frequence = Tic.FREQUENCE0030,
     },
     [Tic.STATEFLOORMAGIC] = {
         posture = Tic.POSTUREFLOOR,
         status  = Tic.STATUSMAGIC,
-        frequence = Tic.FREQUENCE030,
+        frequence = Tic.FREQUENCE0030,
     },
     [Tic.STATEFLOORALCHE] = {
         posture = Tic.POSTUREFLOOR,
         status  = Tic.STATUSALCHE,
-        frequence = Tic.FREQUENCE030,
+        frequence = Tic.FREQUENCE0030,
     },
     [Tic.STATEFLOORKNOCK] = {
         posture = Tic.POSTUREFLOOR,
         status  = Tic.STATUSKNOCK,
-        frequence = Tic.FREQUENCE030,
+        frequence = Tic.FREQUENCE0030,
     },
     [Tic.STATEFLOORFLAME] = {
         posture = Tic.POSTUREFLOOR,
         status  = Tic.STATUSFLAME,
-        frequence = Tic.FREQUENCE030,
+        frequence = Tic.FREQUENCE0030,
     },
     [Tic.STATEFLOORWATER] = {
         posture = Tic.POSTUREFLOOR,
         status  = Tic.STATUSWATER,
-        frequence = Tic.FREQUENCE030,
+        frequence = Tic.FREQUENCE0030,
     },
     [Tic.STATEFLOORSTONE] = {
         posture = Tic.POSTUREFLOOR,
         status  = Tic.STATUSSTONE,
-        frequence = Tic.FREQUENCE030,
+        frequence = Tic.FREQUENCE0030,
     },
     [Tic.STATEFLOORBREEZ] = {
         posture = Tic.POSTUREFLOOR,
         status  = Tic.STATUSBREEZ,
-        frequence = Tic.FREQUENCE030,
+        frequence = Tic.FREQUENCE0030,
     },
     [Tic.STATEFLOORDEATH] = {
         posture = Tic.POSTUREFLOOR,
         status  = Tic.STATUSDEATH,
-        frequence = Tic.FREQUENCE120,
+        frequence = Tic.FREQUENCE0120,
     },
 }
 Tic.POSTURESETTINGS = { -- postures settings
@@ -2568,12 +2589,25 @@ function CCharacter:moveDirection(_direction)
     end
     self.state = _posture..Tic.STATUSMOVE
     self:toggleFrame() -- animate continuous move in the same dirx
-    _offsetx = _offsetx * (self.statphyact / Tic.STATSMAX) -- depends of phy act
-    _offsety = _offsety * (self.statphyact / Tic.STATSMAX)
-    _offsetx = (_posture == Tic.POSTURESTAND) and _offsetx or _offsetx / 2 -- half if kneel
-    _offsety = (_posture == Tic.POSTURESTAND) and _offsety or _offsety / 2 -- half if kneel
-    _offsetx = (_offsetx < 0) and math.ceil(_offsetx) or math.floor(_offsetx)
-    _offsety = (_offsety < 0) and math.ceil(_offsety) or math.floor(_offsety)
+    if Tic.MODIFIERKEYS[Tic.KEY_CTRL] then -- slow move
+        _offsetx = (_offsetx < 0)
+            and -1
+            or  (_offsetx > 0)
+                and 1
+                or  0
+        _offsety = (_offsety < 0)
+            and -1
+            or  (_offsety > 0)
+                and 1
+                or  0
+    else
+        _offsetx = _offsetx * (self.statphyact / Tic.STATSMAX) -- depends of phy act
+        _offsety = _offsety * (self.statphyact / Tic.STATSMAX)
+        _offsetx = (_posture == Tic.POSTURESTAND) and _offsetx or _offsetx / 2 -- half if kneel
+        _offsety = (_posture == Tic.POSTURESTAND) and _offsety or _offsety / 2 -- half if kneel
+        _offsetx = (_offsetx < 0) and math.ceil(_offsetx) or math.floor(_offsetx)
+        _offsety = (_offsety < 0) and math.ceil(_offsety) or math.floor(_offsety)
+    end
     self:moveXY(self.worldx + _offsetx, self.worldy + _offsety)
     self.idlecycler:min() -- reset the idle cycler
 end
@@ -3567,7 +3601,7 @@ end
 --
 -- Places
 --
-if true then -- generate places -- TODO move under CPlaces
+if false then -- generate places -- TODO move under CPlaces
 
 CPlace.PLACECOUNT = 10 -- default number of generated places
 CPlace.PLACEKINDS = {  -- TODO val can contain parameters such as percent etc
@@ -3753,9 +3787,10 @@ local Wulfie = CPlayerWolfe{name = "Wulfie",
 Wulfie:randomWorldWindow()
 
 local Oxboow = CPlayerGhost{name = "Oxboow",
+worldx = 10,
 statphyact = 10,
 }
-Oxboow:randomWorldWindow()
+-- Oxboow:randomWorldWindow()
 
 
 goto runit
@@ -3810,27 +3845,27 @@ local Region = CRegion{
 if true then
 Tic.DRAWHITBOX = false
 for _, _cplace in pairs({
+    -- CPlaceTree0Anim,
+    -- CPlaceTree0Idle,
+    -- CPlaceHouseAnim,
+    -- CPlaceHouseIdle,
+    -- CPlaceTowerAnim,
+    -- CPlaceTowerIdle,
+    -- CPlaceManorAnim,
+    -- CPlaceManorIdle,
+    -- CPlaceAltarAnim,
+    -- CPlaceAltarIdle,
+    -- CPlaceWaterAnim,
+    -- CPlaceWaterIdle,
+    -- CPlaceStallAnim,
+    -- CPlaceStallIdle,
     CPlaceTree0Anim,
-    CPlaceTree0Idle,
-    CPlaceHouseAnim,
-    CPlaceHouseIdle,
-    CPlaceTowerAnim,
-    CPlaceTowerIdle,
-    CPlaceManorAnim,
-    CPlaceManorIdle,
-    CPlaceAltarAnim,
-    CPlaceAltarIdle,
-    CPlaceWaterAnim,
-    CPlaceWaterIdle,
-    CPlaceStallAnim,
-    CPlaceStallIdle,
-    CPlaceTree0Anim,
-    CPlaceTree0Idle,
-    CPlaceTree1Anim,
-    CPlaceTree1Idle,
+    -- CPlaceTree0Idle,
+    -- CPlaceTree1Anim,
+    -- CPlaceTree1Idle,
 }) do
     local _place = _cplace()
-    _place:randomWorldWindow()
+    -- _place:randomWorldWindow()
 end
 end
 
@@ -3838,7 +3873,6 @@ end
 --
 -- Drawing
 --
-local _statustick01 = 0
 function Tic:draw()
     Tic:keysDo(20, 10) -- handle keyboard
 
@@ -3851,10 +3885,7 @@ function Tic:draw()
     WindowInfosSpotted:draw()
     WindowPortraitSpotted:draw()
 
-    for _key, _val in pairs(Tic.MODIFIERKEYS) do
-        Tic:logAppend(_key, _val)
-    end
-
+    Tic:drawLog()
     Tic:logPrint()
 
     Tic:tick() -- [!] required in the draw function 
@@ -3865,11 +3896,6 @@ end
 function Tic:drawLog() -- [-] remove
     local _tick00 = Tic.TICK00.actvalue
     local _tick60 = Tic.TICK60.actvalue
-    local _frame = _tick60 // 30
-
-    if Nums:frequence01(_tick00, Tic.FREQUENCE240) ~= _statustick01 then
-        _statustick01 = Nums:frequence01(_tick00, Tic.FREQUENCE240)
-    end
     local _playeractual = Tic:playerActual()
     local _state   = _playeractual.state
     local _posture = Tic.STATESETTINGS[_state].posture
@@ -3877,31 +3903,15 @@ function Tic:drawLog() -- [-] remove
     local _dirx    = _playeractual.dirx
     local _diry    = _playeractual.diry
 
-    -- -- Tic:logAppend("K01:", peek(Tic.KEYBOARDKEYS + 0))
-    -- -- Tic:logAppend("K02:", peek(Tic.KEYBOARDKEYS + 1))
-    -- -- Tic:logAppend("K03:", peek(Tic.KEYBOARDKEYS + 2))
-    -- -- Tic:logAppend("K04:", peek(Tic.KEYBOARDKEYS + 3))
-    -- -- Tic:logAppend()
-    -- Tic:logAppend("PHY:", _playeractual.statphyact, "/", _playeractual.statphymax)
-    -- Tic:logAppend("MEN:", _playeractual.statmenact, "/", _playeractual.statmenmax)
-    -- Tic:logAppend("PSY:", _playeractual.statpsyact, "/", _playeractual.statpsymax)
-    -- Tic:logAppend("TOT:", _playeractual.statphyact + _playeractual.statmenact + _playeractual.statpsyact)
-    -- Tic:logAppend()
-    -- Tic:logAppend("STA:", _state)
-    -- Tic:logAppend("POS:", _posture)
-    -- Tic:logAppend("STS:", _status)
-    -- Tic:logAppend("DIX:", _dirx)
-    -- Tic:logAppend("DIY:", _diry)
-    -- Tic:logAppend()
-    -- -- Tic:logAppend("T60:", _tick60)
-    -- -- Tic:logAppend("FRM:", _frame)
-    -- -- Tic:logAppend("T00:", _tick00)
-    -- -- Tic:logAppend("IDL:", _playeractual.idlecycler.actvalue)
-    -- Tic:logAppend("SCX:", _playeractual.screenx)
-    -- Tic:logAppend("SCY:", _playeractual.screeny)
-    -- Tic:logAppend()
-    -- Tic:logAppend("CAX:", _playeractual.camera.worldx)
-    -- Tic:logAppend("CAY:", _playeractual.camera.worldy)
+    
+    -- for _key, _val in pairs(Tic.MODIFIERKEYS) do -- modifier keys state
+    --     Tic:logAppend(_key, _val)
+    -- end
+
+    Tic:logAppend("x", _playeractual.worldx)
+    Tic:logAppend("y", _playeractual.worldy)
+
+    Tic:logAppend(Nums:frequence01(_tick00, Tic.FREQUENCE0240))
 end
 
 
