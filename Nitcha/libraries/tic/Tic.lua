@@ -1096,18 +1096,6 @@ function CHitbox:regionScreen() -- screen coordinates of its region -- depends o
         up = self.screeny + _regionoffsets.up,
         dw = self.screeny + _regionoffsets.dw,
     }
-    -- local _result  = CRegion()
-    -- local _widthlf = (self.region.lf - CHitbox.REGIONLF) -- |lf|md|rg| widths
-    -- local _widthmd = (self.region.rg - self.region.lf )
-    -- local _widthrg = (CHitbox.REGIONRG - self.region.rg)
-
-    -- _result.lf = (self.dirx == Tic.DIRXLF)
-    --     and self.screenx + (_widthlf * self.scale)
-    --     or  self.screenx + (_widthrg * self.scale)
-    -- _result.rg = _result.lf + (_widthmd * self.scale)
-    -- _result.up = self.screeny + (self.region.up * self.scale)
-    -- _result.dw = self.screeny + (self.region.dw * self.scale)
-    -- return _result
 end
 
 
@@ -1349,6 +1337,26 @@ function CEntity:entitiesAround() -- entities around itself
     if not self.camera then return end -- requires a camera
     self:focus()
     return self.camera:entitiesAround()
+end
+
+function CEntity:nearestEntityAround() -- nearest entity around itself, except itself
+    local _nearestentity  = nil
+    local _entitiesaround = self:entitiesAround()
+
+    for _, _keyy in pairs(Tables:keys(_entitiesaround)) do -- sorted by y first
+        for _, _keyx in pairs(Tables:keys(_entitiesaround[_keyy])) do -- sorted by x next
+            for _entity, _ in pairs(_entitiesaround[_keyy][_keyx]) do
+				if not (_entity == self) then -- avoid to spot itself
+					if _nearestentity == nil then
+						_nearestentity = _entity -- first nearest entity
+					elseif self:distanceEntitySquared(_entity) < self:distanceEntitySquared(_nearestentity) then
+						_nearestentity = _entity -- new nearest entity
+					end
+                end
+            end
+        end
+    end
+	return _nearestentity
 end
 
 function CEntity:randomWorldRegion(_region) -- random worldx worldy in a region -- default min/max
@@ -3546,51 +3554,45 @@ function CWindowWorld:drawInside() -- window world content
 end
 
 function CWindowWorld:drawPlayerActual()
-    local _playeractual      = Tic:playerActual()
-    local _entitiesaround    = _playeractual:entitiesAround()
-    local _regionviewworld   = _playeractual:regionViewWorld()
-    local _regionmindworld   = _playeractual:regionMindWorld()
+    local _playeractual    = Tic:playerActual()
+    local _entitiesaround  = _playeractual:entitiesAround()
+    local _regionviewworld = _playeractual:regionViewWorld()
+    local _regionmindworld = _playeractual:regionMindWorld()
+    local _nearestentity   = _playeractual:nearestEntityAround() -- nearest entity if any -- except itself
 
-    local _keyys   = Tables:keys(_entitiesaround)
+    _nearestentity = (_nearestentity and _regionviewworld:hasInsideRegion(_nearestentity:regionWorld())) -- keep it only if in view
+        and _nearestentity
+        or  nil
 
-    local _nearest = nil -- nearest entity if any -- except itself
-    for _, _keyy in pairs(_keyys) do -- sorted by y first
-        for _, _keyx in pairs(Tables:keys(_entitiesaround[_keyy])) do -- sorted by x next
-            for _entity, _ in pairs(_entitiesaround[_keyy][_keyx]) do -- entities around actual player
-                _entity.spotted  = false -- unspot all entities -- TODO check if spotted by another player ?
-
-                if not (_entity == _playeractual) then -- avoid to spot itself
-                    if _regionviewworld:hasInsideRegion(_entity:regionWorld()) then -- if in view
-                        if _nearest == nil then
-                            _nearest = _entity -- first nearest entity
-                        elseif _playeractual:distanceEntitySquared(_entity) < _playeractual:distanceEntitySquared(_nearest) then
-                            _nearest = _entity -- new nearest entity
-                        end
-                        _entity.drawfade = false
-                        _entity.discovered = true
-                    else -- not in view
-                        _entity.drawfade = true
-                    end
-                end
-            end
-        end
-    end
-
-    if _nearest then -- spot the nearest if any
-        WindowInfosSpotted.entity    = _nearest
-        WindowPortraitSpotted.entity = _nearest
-        _nearest.spotted = true
+    if _nearestentity then -- fill up the spotted windows if any
+        WindowInfosSpotted.entity    = _nearestentity
+        WindowPortraitSpotted.entity = _nearestentity
     else
         WindowInfosSpotted.entity    = nil
         WindowPortraitSpotted.entity = nil
     end
+    
 
-    for _, _keyy in pairs(_keyys) do -- draw entities -- sorted by y first
+    for _, _keyy in pairs(Tables:keys(_entitiesaround)) do -- draw entities -- sorted by y first
         for _, _keyx in pairs(Tables:keys(_entitiesaround[_keyy])) do -- sorted by x next
             for _entity, _ in pairs(_entitiesaround[_keyy][_keyx]) do -- entities around actual player
-                if (_entity.drawfade == false) or (_regionmindworld:hasInsideRegion(_entity:regionWorld())) then -- draw entity ?
+                local _entityregionworld = _entity:regionWorld()
+
+                _entity.spotted = (_entity == _nearestentity) -- unspot all entities except nearest one if any (in view)
+                    and true
+                    or  false
+
+                if _regionviewworld:hasInsideRegion(_entityregionworld) then -- if in view
+                    _entity.drawfade = false
+                    _entity.discovered = true
+                else -- not in view
+                    _entity.drawfade = true
+                end
+
+                if (_entity.drawfade == false) or (_regionmindworld:hasInsideRegion(_entityregionworld)) then -- draw entity ?
                     _entity:drawRelativeToEntity(_playeractual)
                 end
+
             end
         end
     end
