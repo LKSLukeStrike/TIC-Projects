@@ -1475,7 +1475,7 @@ function CEntityDrawable:new(_argt)
     self.scale       = CSprite.SCALE01
     self.animations  = nil -- override if any
     self.spotted     = false -- use spotted to draw a border
-    self.hitbox      = CHitbox() -- hitbox region
+    self.hitbox      = nil -- hitbox region if any
     self.drawhitbox  = false -- draw behaviour
     self.drawspotted = false
     self.drawfade    = false
@@ -1575,6 +1575,7 @@ function CPlace:new(_argt)
     CPlace.super.new(self, _argt)
     self.kind = CEntity.KINDPLACE
     self.name = CEntity.NAMEPLACE
+    self.hitbox = CHitbox()
     self:argt(_argt) -- override if any
 end
 
@@ -1941,6 +1942,7 @@ function CPlaceTrees:new(_argt)
     CPlaceTrees.super.new(self, _argt)
     self.kind = CEntity.KINDTREES
     self.name = CEntity.NAMETREES
+    self.hitbox = CHitbox()
     self.hitbox.region.lf = 2
     self.hitbox.region.rg = 4
     self.hitbox.region.up = 6
@@ -2231,7 +2233,7 @@ function CCharacter:new(_argt)
     self.frame        = CSprite.FRAME00 -- frame
     self.dirx         = Tic.DIRXLF -- directions
     self.diry         = Tic.DIRYMD
-    self.hitbox        = nil -- can be traversed
+    self.hitbox       = CHitbox()
     self.state        = Tic.STATESTANDIDLE -- state
     self.idlecycler   = CCyclerInt{maxindex = 59,} -- cycler to get back to idle
     self.workcycler   = CCyclerInt{maxindex = 179,} -- cycler to animate work
@@ -2580,35 +2582,33 @@ function CCharacter:moveDirection(_direction)
     self.dirx = (_dirx) and _dirx or self.dirx -- adjust dirx and diry
     self.diry = (_diry) and _diry or self.diry
     if _posture == Tic.POSTUREFLOOR and _status ~= Tic.STATUSSLEEP then return end -- cannot move
+
     if _state == Tic.STATEFLOORSLEEP then -- sleep to stand
         self.state = Tic.STATESTANDIDLE
         return
     end
+
     if _status == Tic.STATUSWORK then -- interrupt work and goes to idle
         self.state = _posture..Tic.STATUSIDLE
         return
     end
+
     if _status == Tic.STATUSIDLE and self.dirx ~= _oldx then -- simply change dirx
         return
     end
+
     if _status == Tic.STATUSMOVE and self.dirx ~= _oldx then -- change dirx and goes to idle
         self.state = _posture..Tic.STATUSIDLE
         return
     end
+
     self.state = _posture..Tic.STATUSMOVE
     self:toggleFrame() -- animate continuous move in the same dirx
-    if Tic.MODIFIERKEYS[Tic.KEY_CTRL] then -- slow move
-        _offsetx = (_offsetx < 0)
-            and -1
-            or  (_offsetx > 0)
-                and 1
-                or  0
-        _offsety = (_offsety < 0)
-            and -1
-            or  (_offsety > 0)
-                and 1
-                or  0
-    else
+
+    if Tic.MODIFIERKEYS[Tic.KEY_CTRL] then -- slow move -1, 0, +1
+        _offsetx = Nums:sign(_offsetx)
+        _offsety = Nums:sign(_offsety)
+    else -- normal move
         _offsetx = _offsetx * (self.statphyact / Tic.STATSMAX) -- depends of phy act
         _offsety = _offsety * (self.statphyact / Tic.STATSMAX)
         _offsetx = (_posture == Tic.POSTURESTAND) and _offsetx or _offsetx / 2 -- half if kneel
@@ -2616,7 +2616,19 @@ function CCharacter:moveDirection(_direction)
         _offsetx = (_offsetx < 0) and math.ceil(_offsetx) or math.floor(_offsetx)
         _offsety = (_offsety < 0) and math.ceil(_offsety) or math.floor(_offsety)
     end
-    self:moveXY(self.worldx + _offsetx, self.worldy + _offsety)
+
+    local _move = true -- calculate the maximum move step by step
+    local _movebyx = Nums:sign(_offsetx)
+    local _movebyy = Nums:sign(_offsety)
+    local _movetox = 0
+    local _movetoy = 0
+    while _move do
+        if Nums:pos(_movetox) < Nums:pos(_offsetx) then _movetox = _movetox + _movebyx end
+        if Nums:pos(_movetoy) < Nums:pos(_offsety) then _movetoy = _movetoy + _movebyy end
+        if _movetox == _offsetx and _movetoy == _offsety then _move = false end
+    end
+
+    self:moveXY(self.worldx + _movetox, self.worldy + _movetoy)
     self.idlecycler:min() -- reset the idle cycler
 end
 
@@ -3869,6 +3881,9 @@ for _, _cplace in pairs({
     local _place = _cplace()
     -- _place:randomWorldWindow()
 end
+CPlaceTree1Idle{
+    worldx = -10,
+}.hitbox = nil
 end
 
 

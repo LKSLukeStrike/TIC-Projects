@@ -84,3 +84,8 @@ print()
 print(Nums:toggleTF(true))
 print(Nums:toggleTF(false))
 print(Nums:toggleTF())
+
+print()
+print(Nums:sign(-10))
+print(Nums:sign(0))
+print(Nums:sign(10))

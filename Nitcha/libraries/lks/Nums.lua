@@ -33,6 +33,14 @@ function Nums:pos(_num) -- positive num
     return (_num >= 0) and _num or 0 + math.abs(_num)
 end
 
+function Nums:sign(_num) -- sign of num -- -1, 0 or +1
+    return (_num < 0)
+        and -1
+        or  (_num > 0)
+            and 1
+            or  0
+end
+
 
 -- Rounding
 function Nums:roundmax(_num) -- max rounded num
