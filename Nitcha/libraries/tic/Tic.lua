@@ -1001,14 +1001,14 @@ function CRegion:randomWH(_width, _height) -- returns a region of random width a
     }
 end
 
-function CRegion:drawBorderScreenXY(_screenx, _screeny) -- draw border of a region around screen xy
-    local _screenx = (_screenx) and _screenx or Tic.SCREENX
-    local _screeny = (_screeny) and _screeny or Tic.SCREENY
+function CRegion:drawBorderScreenXY(_screenx, _screeny, _drawcolor) -- draw border of a region around screen xy
+    _drawcolor = (_drawcolor) and _drawcolor or Tic.COLORGREYL
+    _screenx = (_screenx) and _screenx or Tic.SCREENX
+    _screeny = (_screeny) and _screeny or Tic.SCREENY
     local _borderx = _screenx + self.lf -- dont forget they are negatives
     local _bordery = _screeny + self.up
     local _borderw = self:borderW()
     local _borderh = self:borderH()
-    local _drawcolor = Tic.COLORGREYL
     rectb(_borderx, _bordery,
         _borderw, _borderh,
         _drawcolor
@@ -1030,6 +1030,11 @@ function CRegion:hasInsideRegion(_region) -- is a region inside a region ?
 	if self:hasInsidePoint(_region.lf, _region.dw) then return true end
 	if self:hasInsidePoint(_region.rg, _region.dw) then return true end
 	return false
+end
+
+function CRegion:hasInsideRegionWorld(_regionworld) -- is a region world inside a region ?
+	if not _regionworld then return false end -- mandatory
+	return self:hasInsideRegion(_regionworld.region)
 end
 
 
@@ -1359,7 +1364,7 @@ function CEntity:nearestEntityAround() -- nearest entity around itself, except i
 	return _nearestentity
 end
 
-function CEntity:randomWorldRegion(_region) -- random worldx worldy in a region -- default min/max
+function CEntity:randomRegionWorld(_region) -- random worldx worldy in a region -- default min/max
     _region = (_region) and _region or CRegion{}
     self.world:entityRemove(self) -- remove itself from its old position -- FIXME why remove/append here ?
     self.worldx = Nums:random(_region.lf, _region.rg)
@@ -1368,7 +1373,7 @@ function CEntity:randomWorldRegion(_region) -- random worldx worldy in a region 
 end
 
 function CEntity:randomWorldWindow() -- random worldx worldy into the world window region
-    self:randomWorldRegion(CRegion{
+    self:randomRegionWorld(CRegion{
         lf = Nums:neg(Tic.WORLDWW2),
         rg = Nums:pos(Tic.WORLDWW2),
         up = Nums:neg(Tic.WORLDWH2),
@@ -1388,36 +1393,46 @@ end
 
 
 --
--- CWorldRegion
+-- CRegionWorld
 --
-local CWorldRegion = CEntity:extend() -- world region
-CEntity.KINDREGION = "Region" -- World Region kind
-CEntity.NAMEREGION = "Region" -- World Region name
-function CWorldRegion:new(_argt)
-    CWorldRegion.super.new(self, _argt)
+local CRegionWorld = CEntity:extend() -- region world
+CEntity.KINDREGION = "Region" -- Region World kind
+CEntity.NAMEREGION = "Region" -- Region World name
+function CRegionWorld:new(_argt)
+    CRegionWorld.super.new(self, _argt)
     self.kind = CEntity.KINDREGION
     self.name = CEntity.NAMEREGION
     self.region = CRegion()
     self:argt(_argt) -- override if any
 end
 
-function CWorldRegion:borderW() -- border width
+function CRegionWorld:borderW() -- border width
     return self.region:borderW()
 end
 
-function CWorldRegion:borderH() -- border height
+function CRegionWorld:borderH() -- border height
     return self.region:borderH()
 end
 
-function CWorldRegion:surface() -- region surface
+function CRegionWorld:surface() -- region surface
     return self.region:surface()
 end
 
-function CWorldRegion:drawBorderWorldWC() -- draw region border relative to world window center
+function CRegionWorld:drawBorderWorldW2() -- draw region border relative to world window center
     self.region:drawBorderScreenXY(
-        Tic.WORLDWXC + self.worldx,
-        Tic.WORLDWYC + self.worldy
+        Tic.WORLDWX2 + self.worldx,
+        Tic.WORLDWY2 + self.worldy
     )
+end
+
+function CRegionWorld:hasInsideRegion(_region) -- is a region inside a region world ?
+	if not _region then return false end -- mandatory
+	return self.region:hasInsideRegion(_region)
+end
+
+function CRegionWorld:hasInsideRegionWorld(_regionworld) -- is a region world inside a region world ?
+	if not _regionworld then return false end -- mandatory
+	return self.region:hasInsideRegion(_regionworld.region)
 end
 
 
@@ -1552,12 +1567,14 @@ function CEntityDrawable:drawRelativeToEntity(_entity) -- draw an entity relativ
 end
 
 function CEntityDrawable:regionWorld() -- return its own region in world
-    return CRegion{
-        lf = self.worldx,
-        up = self.worldy,
-        rg = self.worldx + (Tic.SPRITESIZE * self.scale),
-        dw = self.worldy + (Tic.SPRITESIZE * self.scale),
-    }
+    local _regionworld = CRegionWorld()
+    _regionworld.worldx = self.worldx
+    _regionworld.worldy = self.worldy
+    _regionworld.region.lf = self.worldx
+    _regionworld.region.up = self.worldy
+    _regionworld.region.rg = self.worldx + (Tic.SPRITESIZE * self.scale)
+    _regionworld.region.dw = self.worldy + (Tic.SPRITESIZE * self.scale)
+    return _regionworld
 end
 
 
@@ -2313,7 +2330,7 @@ function CCharacter:regionViewScreen() -- viewable screen region depending on di
     }
 end
 
-function CCharacter:regionViewWorld() -- viewable world region depending on dirx, diry
+function CCharacter:regionViewWorld() -- viewable region world depending on dirx, diry
     local _regionviewoffsets = self:regionViewOffsets()
     return CRegion{
         lf = self.worldx + _regionviewoffsets.lf,
@@ -2350,7 +2367,7 @@ function CCharacter:regionMindScreen() -- mindable screen region depending on di
     }
 end
 
-function CCharacter:regionMindWorld() -- mindable world region depending on dirx, diry
+function CCharacter:regionMindWorld() -- mindable region world depending on dirx, diry
     local _regionmindoffsets = self:regionMindOffsets()
     return CRegion{
         lf = self.worldx + _regionmindoffsets.lf,
@@ -2617,6 +2634,7 @@ function CCharacter:moveDirection(_direction)
         _offsety = (_offsety < 0) and math.ceil(_offsety) or math.floor(_offsety)
     end
 
+    local _regionworld = self:regionWorld()
     local _move = true -- calculate the maximum move step by step
     local _movebyx = Nums:sign(_offsetx)
     local _movebyy = Nums:sign(_offsety)
@@ -2628,7 +2646,7 @@ function CCharacter:moveDirection(_direction)
         if _movetox == _offsetx and _movetoy == _offsety then _move = false end
     end
 
-    self:moveXY(self.worldx + _movetox, self.worldy + _movetoy)
+    -- self:moveXY(self.worldx + _movetox, self.worldy + _movetoy)
     self.idlecycler:min() -- reset the idle cycler
 end
 
@@ -3572,7 +3590,7 @@ function CWindowWorld:drawPlayerActual()
     local _regionmindworld = _playeractual:regionMindWorld()
     local _nearestentity   = _playeractual:nearestEntityAround() -- nearest entity if any -- except itself
 
-    _nearestentity = (_nearestentity and _regionviewworld:hasInsideRegion(_nearestentity:regionWorld())) -- keep it only if in view
+    _nearestentity = (_nearestentity and _regionviewworld:hasInsideRegionWorld(_nearestentity:regionWorld())) -- keep it only if in view
         and _nearestentity
         or  nil
 
@@ -3594,14 +3612,14 @@ function CWindowWorld:drawPlayerActual()
                     and true
                     or  false
 
-                if _regionviewworld:hasInsideRegion(_entityregionworld) then -- if in view
+                if _regionviewworld:hasInsideRegionWorld(_entityregionworld) then -- if in view
                     _entity.drawfade = false
                     _entity.discovered = true
                 else -- not in view
                     _entity.drawfade = true
                 end
 
-                if (_entity.drawfade == false) or (_regionmindworld:hasInsideRegion(_entityregionworld)) then -- draw entity ?
+                if (_entity.drawfade == false) or (_regionmindworld:hasInsideRegionWorld(_entityregionworld)) then -- draw entity ?
                     _entity:drawRelativeToEntity(_playeractual)
                 end
 
@@ -3647,15 +3665,15 @@ function CPlace:generateRandomWorldWindow(_count, _kinds) -- random count of pla
     end
 end
 
-function CPlace:generateRandomWorldRegionCount(_count, _kinds, _worldregion) -- random number of places of kinds in world region
+function CPlace:generateRandomRegionWorldCount(_count, _kinds, _regionworld) -- random number of places of kinds in region world
     _count        = (_count)       and _count       or CPlace.PLACECOUNT
     _kinds        = (_kinds)       and _kinds       or CPlace.PLACEKINDS
-    _worldregion  = (_worldregion) and _worldregion or CWorldRegion{}
+    _regionworld  = (_regionworld) and _regionworld or CRegionWorld{}
     local _region = CRegion{
-        lf = _worldregion.worldx + _worldregion.region.lf,
-        rg = _worldregion.worldx + _worldregion.region.rg,
-        up = _worldregion.worldy + _worldregion.region.up,
-        dw = _worldregion.worldy + _worldregion.region.dw,
+        lf = _regionworld.worldx + _regionworld.region.lf,
+        rg = _regionworld.worldx + _regionworld.region.rg,
+        up = _regionworld.worldy + _regionworld.region.up,
+        dw = _regionworld.worldy + _regionworld.region.dw,
     }
 
     for _ = 1, _count do
@@ -3664,19 +3682,19 @@ function CPlace:generateRandomWorldRegionCount(_count, _kinds, _worldregion) -- 
             _kind = Tables:randompickkey(_kinds) -- choose another kind
         end
         _entity = _kind()
-        _entity:randomWorldRegion(_region) -- random position
+        _entity:randomRegionWorld(_region) -- random position
     end
 end
 
-function CPlace:generateRandomWorldRegionPercent(_percent, _kinds, _worldregion) -- random percent of places of kinds in world region
+function CPlace:generateRandomRegionWorldPercent(_percent, _kinds, _regionworld) -- random percent of places of kinds in region world
     _percent      = (_percent)     and _percent     or 100
     _kinds        = (_kinds)       and _kinds       or CPlace.PLACEKINDS
-    _worldregion  = (_worldregion) and _worldregion or CWorldRegion{}
-    local _count  = math.sqrt(_worldregion.region:surface()) * _percent // 100
-    CPlace:generateRandomWorldRegionCount(_count, _kinds, _worldregion)
+    _regionworld  = (_regionworld) and _regionworld or CRegionWorld{}
+    local _count  = math.sqrt(_regionworld.region:surface()) * _percent // 100
+    CPlace:generateRandomRegionWorldCount(_count, _kinds, _regionworld)
 end
 
-WorldRegionTree0 = CWorldRegion{
+RegionWorldTree0 = CRegionWorld{
     worldx = -20,
     worldy = -20,
     region = CRegion{
@@ -3686,7 +3704,7 @@ WorldRegionTree0 = CWorldRegion{
         dw = 5,
     },    
 }
-CPlace:generateRandomWorldRegionPercent(
+CPlace:generateRandomRegionWorldPercent(
     100,
     {
         [CPlaceTree0Anim] = {},
@@ -3694,10 +3712,10 @@ CPlace:generateRandomWorldRegionPercent(
         [CPlaceTree1Anim] = {},
         [CPlaceTree1Idle] = {},
     },
-    WorldRegionTree0
+    RegionWorldTree0
 )
 
-WorldRegionTown0 = CWorldRegion{
+RegionWorldTown0 = CRegionWorld{
     worldx = 25,
     worldy = 25,
     region = CRegion{
@@ -3707,7 +3725,7 @@ WorldRegionTown0 = CWorldRegion{
         dw = 15,
     },
 }
-CPlace:generateRandomWorldRegionPercent(
+CPlace:generateRandomRegionWorldPercent(
     25,
     {
         [CPlaceHouseAnim] = {},
@@ -3716,7 +3734,7 @@ CPlace:generateRandomWorldRegionPercent(
         [CPlaceTowerIdle] = {percent = 10,},
         [CPlaceWaterAnim] = {percent = 10,},
     },
-    WorldRegionTown0
+    RegionWorldTown0
 )
 -- exit()
 
@@ -3902,6 +3920,8 @@ function Tic:draw()
     WindowInfosSpotted:draw()
     WindowPortraitSpotted:draw()
 
+    Tic:playerActual():regionWorld():drawBorderWorldW2()
+
     Tic:drawLog()
     Tic:logPrint()
 
@@ -3925,8 +3945,10 @@ function Tic:drawLog() -- [-] remove
     --     Tic:logAppend(_key, _val)
     -- end
 
-    Tic:logAppend("x", _playeractual.worldx)
-    Tic:logAppend("y", _playeractual.worldy)
+    Tic:logAppend("wx", _playeractual.worldx)
+    Tic:logAppend("wy", _playeractual.worldy)
+    Tic:logAppend("sx", _playeractual.screenx)
+    Tic:logAppend("sy", _playeractual.screeny)
 
     Tic:logAppend(Nums:frequence01(_tick00, Tic.FREQUENCE0240))
 end
