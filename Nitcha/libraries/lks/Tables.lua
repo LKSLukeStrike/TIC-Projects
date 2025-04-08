@@ -78,6 +78,14 @@ function Tables:findVal(_table, _find) -- return the key of val _find else nil i
     return -- nil
 end
 
+function Tables:keyAppend(_table, _key, _val) -- add/replace a key val entry -- FIXME reinforce tests ?
+    _table[_key] = _val
+end
+
+function Tables:keyRemove(_table, _key) -- remove a key val entry -- FIXME reinforce tests ? -- use keyAppend ?
+    _table[_key] = nil
+end
+
 function Tables:copy(_table) -- copy a table -- SORTED
     local _result = {}
     local _keys = Tables:keys(_table) -- sorted keys

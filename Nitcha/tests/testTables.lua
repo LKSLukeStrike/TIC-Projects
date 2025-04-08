@@ -3,7 +3,6 @@ package.path = package.path..";G:/TIC80 1.1/TICProjects/Nitcha/?.lua"
 local Tables = require("libraries/lks/Tables")
 
 
-local _aaa = "aaa"
 local _tbl = {a = 10, b = 100, c = 1000, d = 10000}
 print"KEYS"
 Tables:print(Tables:keys(_tbl))
@@ -27,3 +26,12 @@ print(Tables:randompickval(_tbl))
 print(Tables:randompickval(_tbl))
 print(Tables:randompickval(_tbl))
 print(Tables:randompickval({14, 15, 16}))
+print"KAPP"
+Tables:print(_tbl)
+Tables:keyAppend(_tbl, "e", 100000)
+Tables:print(_tbl)
+print"KREM"
+Tables:print(_tbl)
+Tables:keyRemove(_tbl, "a")
+Tables:print(_tbl)
+
