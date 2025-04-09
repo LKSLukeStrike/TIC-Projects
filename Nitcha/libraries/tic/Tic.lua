@@ -993,8 +993,8 @@ function CRegion:surface() -- region surface
 end
 
 function CRegion:offsetXY(_offsetx, _offsety) -- offset a region by x y
-    _offsetx = (_offsetx) and _offsetx or 0
-    _offsety = (_offsety) and _offsety or 0
+    _offsetx = _offsetx or 0
+    _offsety = _offsety or 0
     return CRegion{
         lf = self.lf + _offsetx,
         rg = self.rg + _offsetx,
@@ -2621,6 +2621,11 @@ function CCharacter:moveDirection(_direction)
     local _move          = true -- calculate the maximum move step by step
     local _worldregion   = self:worldRegion()
     local _nearestentity = self:nearestEntityAround() -- nearest entity if any -- except itself
+    if _nearestentity then
+        self.hitbox:hittoAppend(_nearestentity)
+    else
+        self.hitbox.hitto = {}
+    end
     local _movebyx       = Nums:sign(_offsetx)
     local _movebyy       = Nums:sign(_offsety)
     local _movetox       = 0
