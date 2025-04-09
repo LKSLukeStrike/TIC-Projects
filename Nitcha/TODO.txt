@@ -13,3 +13,5 @@
 
 -- FIXME still use CRegionWorld ?
 
+-- FIXME check all default args syntax
+

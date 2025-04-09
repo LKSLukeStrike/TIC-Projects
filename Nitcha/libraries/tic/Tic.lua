@@ -992,7 +992,7 @@ function CRegion:surface() -- region surface
     return self:borderW() * self:borderH()
 end
 
-function CRegion:offsetXY(_offsetx, _offsety) -- offset a region by x y
+function CRegion:offsetXY(_offsetx, _offsety) -- offset a region by x y -- TODO modify the region inplace ?
     _offsetx = _offsetx or 0
     _offsety = _offsety or 0
     return CRegion{
@@ -1004,8 +1004,8 @@ function CRegion:offsetXY(_offsetx, _offsety) -- offset a region by x y
 end
 
 function CRegion:randomWH(_width, _height) -- returns a region of random width and height
-    _width  = (_width)  and _width  or Nums.MAXINTEGER -- be careful with that ;)
-    _height = (_height) and _height or Nums.MAXINTEGER
+    _width  = _width  or Nums.MAXINTEGER -- be careful with that ;)
+    _height = _height or Nums.MAXINTEGER
     _width  = (_width == 0)  and 1  or _width -- avoid weird results with math.random(0)
     _height = (_height == 0) and 1  or _height
     return CRegion{
@@ -1017,9 +1017,9 @@ function CRegion:randomWH(_width, _height) -- returns a region of random width a
 end
 
 function CRegion:drawBorderScreenXY(_screenx, _screeny, _drawcolor) -- draw border of a region around screen xy
-    _drawcolor = (_drawcolor) and _drawcolor or Tic.COLORGREYL
-    _screenx = (_screenx) and _screenx or Tic.SCREENX
-    _screeny = (_screeny) and _screeny or Tic.SCREENY
+    _screenx   = _screenx or Tic.SCREENX
+    _screeny   = _screeny or Tic.SCREENY
+    _drawcolor = _drawcolor or Tic.COLORGREYL
     local _borderx = _screenx + self.lf -- dont forget they are negatives
     local _bordery = _screeny + self.up
     local _borderw = self:borderW()
@@ -1395,7 +1395,7 @@ function CEntity:nearestEntityAround() -- nearest entity around itself, except i
 end
 
 function CEntity:randomRegionWorld(_region) -- random worldx worldy in a region -- default min/max
-    _region = (_region) and _region or CRegion{}
+    _region = _region or CRegion{}
     self.world:entityRemove(self) -- remove itself from its old position -- FIXME why remove/append here ?
     self.worldx = Nums:random(_region.lf, _region.rg)
     self.worldy = Nums:random(_region.up, _region.dw)
@@ -3646,8 +3646,8 @@ CPlace.PLACEKINDS = {  -- TODO val can contain parameters such as percent etc
 }
 
 function CPlace:generateRandomWorldWindow(_count, _kinds) -- random count of places of kinds in world window
-    _count = (_count) and _count or CPlace.PLACECOUNT
-    _kinds = (_kinds) and _kinds or CPlace.PLACEKINDS
+    _count = _count or CPlace.PLACECOUNT
+    _kinds = _kinds or CPlace.PLACEKINDS
     for _ = 1, _count do
         local _kind = Tables:randompickkey(_kinds) -- random kind
         _entity = _kind()
@@ -3656,9 +3656,9 @@ function CPlace:generateRandomWorldWindow(_count, _kinds) -- random count of pla
 end
 
 function CPlace:generateRandomRegionWorldCount(_count, _kinds, _worldregion) -- random number of places of kinds in region world
-    _count        = (_count)       and _count       or CPlace.PLACECOUNT
-    _kinds        = (_kinds)       and _kinds       or CPlace.PLACEKINDS
-    _worldregion  = (_worldregion) and _worldregion or CRegionWorld{}
+    _count        = _count       or CPlace.PLACECOUNT
+    _kinds        = _kinds       or CPlace.PLACEKINDS
+    _worldregion  = _worldregion or CRegionWorld{}
     local _region = CRegion{
         lf = _worldregion.worldx + _worldregion.region.lf,
         rg = _worldregion.worldx + _worldregion.region.rg,
@@ -3677,9 +3677,9 @@ function CPlace:generateRandomRegionWorldCount(_count, _kinds, _worldregion) -- 
 end
 
 function CPlace:generateRandomRegionWorldPercent(_percent, _kinds, _worldregion) -- random percent of places of kinds in region world
-    _percent      = (_percent)     and _percent     or 100
-    _kinds        = (_kinds)       and _kinds       or CPlace.PLACEKINDS
-    _worldregion  = (_worldregion) and _worldregion or CRegionWorld{}
+    _percent      = _percent     or 100
+    _kinds        = _kinds       or CPlace.PLACEKINDS
+    _worldregion  = _worldregion or CRegionWorld{}
     local _count  = math.sqrt(_worldregion.region:surface()) * _percent // 100
     CPlace:generateRandomRegionWorldCount(_count, _kinds, _worldregion)
 end
