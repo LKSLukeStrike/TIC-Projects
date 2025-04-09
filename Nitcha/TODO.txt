@@ -1,12 +1,15 @@
 -- [-] animation system for characters
 -- [-] autofill act stats at creation
 
--- FIXME extend the caches areas
+-- [x] FIXME extend the caches areas
 
--- [-] add hitboxes to places etc
+-- [x] add hitboxes to places etc
 
--- TODO add detection of shift/ctrl/? to reduce the move
+-- [x] TODO add detection of shift/ctrl/? to reduce the move
 
 -- FIXME adjust animations frequences
 
 -- [-] reduce the view around
+
+-- FIXME still use CRegionWorld ?
+

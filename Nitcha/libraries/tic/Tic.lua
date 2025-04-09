@@ -259,7 +259,6 @@ Tic.FREQUENCE0240 = 0240 -- each 4 second
 Tic.FREQUENCE0300 = 0300 -- each 5 second
 Tic.FREQUENCE0600 = 0600 -- each 10 second
 
-Tic.KEYBOARDKEYS = 0xFF88 -- keyboard state -- up to 4 pressed keys
 -- Keys values
 Tic.KEY_B              = 02
 Tic.KEY_D              = 04
@@ -377,6 +376,7 @@ Tic.ACTIONS2FUNCTIONS = {
 
 
 -- Keyboard System -- handle keys pressed to actions to functions
+Tic.KEYBOARDKEYS = 0xFF88 -- keyboard state -- up to 4 pressed keys
 Tic.MODIFIERKEYS = { -- record modifier keys pressed
     [Tic.KEY_CAPSLOCK] = false,
     [Tic.KEY_CTRL]     = false,
@@ -965,8 +965,12 @@ end
 -- CRegion
 --
 local CRegion = Classic:extend() -- generic region -- -lf +rg -up +dw around a point
+Classic.KINDREGION = "Region" -- Region kind -- FIXME really needed ?
+Classic.NAMEREGION = "Region" -- Region name
 function CRegion:new(_argt)
     CRegion.super.new(self, _argt)
+    self.kind = Classic.KINDREGION
+    self.name = Classic.NAMEREGION
     self.lf = Nums.MININTEGER -- negative
     self.rg = Nums.MAXINTEGER -- positive
     self.up = Nums.MININTEGER -- negative
@@ -1032,10 +1036,10 @@ function CRegion:hasInsideRegion(_region) -- is a region inside a region ?
 	return false
 end
 
-function CRegion:hasInsideRegionWorld(_regionworld) -- is a region world inside a region ?
-	if not _regionworld then return false end -- mandatory
-	return self:hasInsideRegion(_regionworld.region)
-end
+-- function CRegion:hasInsideRegionWorld(_worldregion) -- is a region world inside a region ?
+-- 	if not _worldregion then return false end -- mandatory
+-- 	return self:hasInsideRegion(_worldregion.region)
+-- end
 
 
 --
@@ -1309,15 +1313,15 @@ end
 -- CEntity
 --
 local CEntity = Classic:extend() -- generic entities like places, objects, characters, cameras ...
-CEntity.KINDENTITY = "Entity" -- Entity kind
-CEntity.NAMEENTITY = "Entity" -- Entity name
-CEntity.NAMEIDLE   = "Idle"   -- Idle name
+Classic.KINDENTITY = "Entity" -- Entity kind
+Classic.NAMEENTITY = "Entity" -- Entity name
+Classic.NAMEIDLE   = "Idle"   -- Idle name
 CEntity.WORLDX = 0
 CEntity.WORLDY = 0
 function CEntity:new(_argt)
     CEntity.super.new(self, _argt)
-    self.kind = CEntity.KINDENTITY
-    self.name = CEntity.NAMEENTITY
+    self.kind = Classic.KINDENTITY
+    self.name = Classic.NAMEENTITY
     self.world  = World -- world that contains the entity -- to override if any
     self.worldx = CEntity.WORLDX -- world positions
     self.worldy = CEntity.WORLDY
@@ -1395,59 +1399,59 @@ end
 --
 -- CRegionWorld
 --
-local CRegionWorld = CEntity:extend() -- region world
-CEntity.KINDREGION = "Region" -- Region World kind
-CEntity.NAMEREGION = "Region" -- Region World name
-function CRegionWorld:new(_argt)
-    CRegionWorld.super.new(self, _argt)
-    self.kind = CEntity.KINDREGION
-    self.name = CEntity.NAMEREGION
-    self.region = CRegion()
-    self:argt(_argt) -- override if any
-end
+-- local CRegionWorld = CEntity:extend() -- region world
+-- function CRegionWorld:new(_argt)
+--     CRegionWorld.super.new(self, _argt)
+--     self.lf = self.worldx
+--     self.rg = Nums.MAXINTEGER -- positive
+--     self.up = Nums.MININTEGER -- negative
+--     self.dw = Nums.MAXINTEGER -- positive
+--     -- self.region = CRegion()
+--     self:argt(_argt) -- override if any
+-- end
 
-function CRegionWorld:borderW() -- border width
-    return self.region:borderW()
-end
+-- function CRegionWorld:borderW() -- border width
+--     return self.region:borderW()
+-- end
 
-function CRegionWorld:borderH() -- border height
-    return self.region:borderH()
-end
+-- function CRegionWorld:borderH() -- border height
+--     return self.region:borderH()
+-- end
 
-function CRegionWorld:surface() -- region surface
-    return self.region:surface()
-end
+-- function CRegionWorld:surface() -- region surface
+--     return self.region:surface()
+-- end
 
-function CRegionWorld:drawBorderWorldW2() -- draw region border relative to world window center
-    self.region:drawBorderScreenXY(
-        Tic.WORLDWX2 + self.worldx,
-        Tic.WORLDWY2 + self.worldy
-    )
-end
+-- function CRegionWorld:drawBorderWorldW2() -- draw region border relative to world window center
+--     self.region:drawBorderScreenXY(
+--         Tic.WORLDWX2, -- + self.worldx,
+--         Tic.WORLDWY2  -- + self.worldy
+--     )
+-- end
 
-function CRegionWorld:hasInsideRegion(_region) -- is a region inside a region world ?
-	if not _region then return false end -- mandatory
-	return self.region:hasInsideRegion(_region)
-end
+-- function CRegionWorld:hasInsideRegion(_region) -- is a region inside a region world ?
+-- 	if not _region then return false end -- mandatory
+-- 	return self.region:hasInsideRegion(_region)
+-- end
 
-function CRegionWorld:hasInsideRegionWorld(_regionworld) -- is a region world inside a region world ?
-	if not _regionworld then return false end -- mandatory
-	return self.region:hasInsideRegion(_regionworld.region)
-end
+-- function CRegionWorld:hasInsideRegionWorld(_worldregion) -- is a region world inside a region world ?
+-- 	if not _worldregion then return false end -- mandatory
+-- 	return self.region:hasInsideRegion(_worldregion.region)
+-- end
 
 
 --
 -- CCamera
 --
 local CCamera = CEntity:extend() -- camera
-CEntity.KINDCAMERA = "Camera" -- Camera kind
-CEntity.NAMECAMERA = "Camera" -- Camera name
+Classic.KINDCAMERA = "Camera" -- Camera kind
+Classic.NAMECAMERA = "Camera" -- Camera name
 CCamera.RANGEX = Tic.WORLDWW / 2
 CCamera.RANGEY = Tic.WORLDWH / 2
 function CCamera:new(_argt)
     CCamera.super.new(self, _argt)
-    self.kind = CEntity.KINDCAMERA
-    self.name = CEntity.NAMECAMERA
+    self.kind = Classic.KINDCAMERA
+    self.name = Classic.NAMECAMERA
     self.rangex = CCamera.RANGEX
     self.rangey = CCamera.RANGEY
     self:argt(_argt) -- override if any
@@ -1477,12 +1481,12 @@ end
 -- CEntityDrawable
 --
 local CEntityDrawable = CEntity:extend() -- generic entities with a sprite representation
-CEntity.KINDDRAWABLE = "Drawable" -- Drawable kind
-CEntity.NAMEDRAWABLE = "Drawable" -- Drawable name
+Classic.KINDDRAWABLE = "Drawable" -- Drawable kind
+Classic.NAMEDRAWABLE = "Drawable" -- Drawable name
 function CEntityDrawable:new(_argt)
     CEntityDrawable.super.new(self, _argt)
-    self.kind = CEntity.KINDDRAWABLE
-    self.name = CEntity.NAMEDRAWABLE
+    self.kind = Classic.KINDDRAWABLE
+    self.name = Classic.NAMEDRAWABLE
     self.sprite      = CSpriteFG.SPRITEEMPTY
     self.screenx     = 0 -- screen positions -- used to draw the sprite
     self.screeny     = 0
@@ -1566,15 +1570,13 @@ function CEntityDrawable:drawRelativeToEntity(_entity) -- draw an entity relativ
 	self:load()
 end
 
-function CEntityDrawable:regionWorld() -- return its own region in world
-    local _regionworld = CRegionWorld()
-    _regionworld.worldx = self.worldx
-    _regionworld.worldy = self.worldy
-    _regionworld.region.lf = self.worldx
-    _regionworld.region.up = self.worldy
-    _regionworld.region.rg = self.worldx + (Tic.SPRITESIZE * self.scale)
-    _regionworld.region.dw = self.worldy + (Tic.SPRITESIZE * self.scale)
-    return _regionworld
+function CEntityDrawable:worldRegion() -- return its own region in world
+    return CRegion{
+        lf = self.worldx,
+        up = self.worldy,
+        rg = self.worldx + (Tic.SPRITESIZE * self.scale),
+        dw = self.worldy + (Tic.SPRITESIZE * self.scale), 
+    }
 end
 
 
@@ -1586,12 +1588,12 @@ CPlace.EMPTY  = Tic.COLORKEY
 CPlace.ANIM01 = Tic.COLORWHITE
 CPlace.ANIM02 = Tic.COLORYELLOW
 CPlace.ANIM03 = Tic.COLORORANGE
-CEntity.KINDPLACE = "Place" -- Place kind
-CEntity.NAMEPLACE = "Place" -- Place name
+Classic.KINDPLACE = "Place" -- Place kind
+Classic.NAMEPLACE = "Place" -- Place name
 function CPlace:new(_argt)
     CPlace.super.new(self, _argt)
-    self.kind = CEntity.KINDPLACE
-    self.name = CEntity.NAMEPLACE
+    self.kind = Classic.KINDPLACE
+    self.name = Classic.NAMEPLACE
     self.hitbox = CHitbox()
     self:argt(_argt) -- override if any
 end
@@ -1634,12 +1636,12 @@ CPlaceBuild.PALETTEFADE  = {
     [CPlaceBuild.DOOR]     = CPlaceBuild.FACADE,    
     [CPlaceBuild.FOAM]     = CPlaceBuild.WALLS,    
 }
-CEntity.KINDBUILD = "Build" -- Build kind
-CEntity.NAMEBUILD = "Build" -- Build name
+Classic.KINDBUILD = "Build" -- Build kind
+Classic.NAMEBUILD = "Build" -- Build name
 function CPlaceBuild:new(_argt)
     CPlaceBuild.super.new(self, _argt)
-    self.kind = CEntity.KINDBUILD
-    self.name = CEntity.NAMEBUILD
+    self.kind = Classic.KINDBUILD
+    self.name = Classic.NAMEBUILD
     self.hitbox.region.lf = 1
     self.hitbox.region.rg = 5
     self.hitbox.region.up = 5
@@ -1653,12 +1655,12 @@ end
 -- CPlaceHouse
 --
 local CPlaceHouse = CPlaceBuild:extend() -- houses
-CEntity.KINDHOUSE = "House" -- House kind
-CEntity.NAMEHOUSE = "House" -- House name
+Classic.KINDHOUSE = "House" -- House kind
+Classic.NAMEHOUSE = "House" -- House name
 function CPlaceHouse:new(_argt)
     CPlaceHouse.super.new(self, _argt)
-    self.kind = CEntity.KINDHOUSE
-    self.name = CEntity.NAMEHOUSE
+    self.kind = Classic.KINDHOUSE
+    self.name = Classic.NAMEHOUSE
     self.sprite      = CSpriteBG.PLACEHOUSE
     self:argt(_argt) -- override if any
 end
@@ -1686,7 +1688,7 @@ end
 local CPlaceHouseIdle = CPlaceHouse:extend() -- idle houses
 function CPlaceHouseIdle:new(_argt)
     CPlaceHouseIdle.super.new(self, _argt)
-    self.name = CEntity.NAMEIDLE
+    self.name = Classic.NAMEIDLE
     self.palette = CPlaceBuild.PALETTEIDLE
     self:argt(_argt) -- override if any
 end
@@ -1696,12 +1698,12 @@ end
 -- CPlaceTower
 --
 local CPlaceTower = CPlaceBuild:extend() -- towers
-CEntity.KINDTOWER = "Tower" -- Tower kind
-CEntity.NAMETOWER = "Tower" -- Tower name
+Classic.KINDTOWER = "Tower" -- Tower kind
+Classic.NAMETOWER = "Tower" -- Tower name
 function CPlaceTower:new(_argt)
     CPlaceTower.super.new(self, _argt)
-    self.kind = CEntity.KINDTOWER
-    self.name = CEntity.NAMETOWER
+    self.kind = Classic.KINDTOWER
+    self.name = Classic.NAMETOWER
     self.sprite  = CSpriteBG.PLACETOWER
     self:argt(_argt) -- override if any
 end
@@ -1729,7 +1731,7 @@ end
 local CPlaceTowerIdle = CPlaceTower:extend() -- idle towers
 function CPlaceTowerIdle:new(_argt)
     CPlaceTowerIdle.super.new(self, _argt)
-    self.name = CEntity.NAMEIDLE
+    self.name = Classic.NAMEIDLE
     self.palette = CPlaceBuild.PALETTEIDLE
     self:argt(_argt) -- override if any
 end
@@ -1739,12 +1741,12 @@ end
 -- CPlaceManor
 --
 local CPlaceManor = CPlaceBuild:extend() -- manors
-CEntity.KINDMANOR = "Manor" -- Manor kind
-CEntity.NAMEMANOR = "Manor" -- Manor name
+Classic.KINDMANOR = "Manor" -- Manor kind
+Classic.NAMEMANOR = "Manor" -- Manor name
 function CPlaceManor:new(_argt)
     CPlaceManor.super.new(self, _argt)
-    self.kind = CEntity.KINDMANOR
-    self.name = CEntity.NAMEMANOR
+    self.kind = Classic.KINDMANOR
+    self.name = Classic.NAMEMANOR
     self.sprite  = CSpriteBG.PLACEMANOR
     self.hitbox.region.lf = 0
     self.hitbox.region.rg = 5
@@ -1780,7 +1782,7 @@ end
 local CPlaceManorIdle = CPlaceManor:extend() -- idle manors
 function CPlaceManorIdle:new(_argt)
     CPlaceManorIdle.super.new(self, _argt)
-    self.name = CEntity.NAMEIDLE
+    self.name = Classic.NAMEIDLE
     self.palette = CPlaceBuild.PALETTEIDLE
     self:argt(_argt) -- override if any
 end
@@ -1790,12 +1792,12 @@ end
 -- CPlaceAltar
 --
 local CPlaceAltar = CPlaceBuild:extend() -- altars
-CEntity.KINDALTAR = "Altar" -- Altar kind
-CEntity.NAMEALTAR = "Altar" -- Altar name
+Classic.KINDALTAR = "Altar" -- Altar kind
+Classic.NAMEALTAR = "Altar" -- Altar name
 function CPlaceAltar:new(_argt)
     CPlaceAltar.super.new(self, _argt)
-    self.kind = CEntity.KINDALTAR
-    self.name = CEntity.NAMEALTAR
+    self.kind = Classic.KINDALTAR
+    self.name = Classic.NAMEALTAR
     self.sprite  = CSpriteBG.PLACEALTAR
     self.hitbox.region.lf = 0
     self.hitbox.region.rg = 5
@@ -1825,7 +1827,7 @@ end
 local CPlaceAltarIdle = CPlaceAltar:extend() -- idle altars
 function CPlaceAltarIdle:new(_argt)
     CPlaceAltarIdle.super.new(self, _argt)
-    self.name = CEntity.NAMEIDLE
+    self.name = Classic.NAMEIDLE
     self.palette = CPlaceBuild.PALETTEIDLE
     self:argt(_argt) -- override if any
 end
@@ -1835,12 +1837,12 @@ end
 -- CPlaceWater
 --
 local CPlaceWater = CPlaceBuild:extend() -- waters
-CEntity.KINDWATER = "Water" -- Water kind
-CEntity.NAMEWATER = "Water" -- Water name
+Classic.KINDWATER = "Water" -- Water kind
+Classic.NAMEWATER = "Water" -- Water name
 function CPlaceWater:new(_argt)
     CPlaceWater.super.new(self, _argt)
-    self.kind = CEntity.KINDWATER
-    self.name = CEntity.NAMEWATER
+    self.kind = Classic.KINDWATER
+    self.name = Classic.NAMEWATER
     self.sprite  = CSpriteBG.PLACEWATER
     self.hitbox.region.lf = 1
     self.hitbox.region.rg = 4
@@ -1870,7 +1872,7 @@ end
 local CPlaceWaterIdle = CPlaceWater:extend() -- idle waters
 function CPlaceWaterIdle:new(_argt)
     CPlaceWaterIdle.super.new(self, _argt)
-    self.name = CEntity.NAMEIDLE
+    self.name = Classic.NAMEIDLE
     self.palette = CPlaceBuild.PALETTEIDLE
     self:argt(_argt) -- override if any
 end
@@ -1880,12 +1882,12 @@ end
 -- CPlaceStall
 --
 local CPlaceStall = CPlaceBuild:extend() -- stalls
-CEntity.KINDSTALL = "Stall" -- Stall kind
-CEntity.NAMESTALL = "Stall" -- Stall name
+Classic.KINDSTALL = "Stall" -- Stall kind
+Classic.NAMESTALL = "Stall" -- Stall name
 function CPlaceStall:new(_argt)
     CPlaceStall.super.new(self, _argt)
-    self.kind = CEntity.KINDSTALL
-    self.name = CEntity.NAMESTALL
+    self.kind = Classic.KINDSTALL
+    self.name = Classic.NAMESTALL
     self.sprite  = CSpriteBG.PLACESTALL
     self.hitbox.region.lf = 0
     self.hitbox.region.rg = 3
@@ -1921,7 +1923,7 @@ end
 local CPlaceStallIdle = CPlaceStall:extend() -- idle stalls
 function CPlaceStallIdle:new(_argt)
     CPlaceStallIdle.super.new(self, _argt)
-    self.name = CEntity.NAMEIDLE
+    self.name = Classic.NAMEIDLE
     self.palette = CPlaceBuild.PALETTEIDLE
     self:argt(_argt) -- override if any
 end
@@ -1953,12 +1955,12 @@ CPlaceTrees.PALETTEFADE   = {
     [CPlaceTrees.LEAFSFG] = CPlaceTrees.TRUNK,
     [CPlaceTrees.LEAFSBG] = CPlaceTrees.BARK,    
 }
-CEntity.KINDTREES = "Trees" -- Trees kind
-CEntity.NAMETREES = "Trees" -- Trees name
+Classic.KINDTREES = "Trees" -- Trees kind
+Classic.NAMETREES = "Trees" -- Trees name
 function CPlaceTrees:new(_argt)
     CPlaceTrees.super.new(self, _argt)
-    self.kind = CEntity.KINDTREES
-    self.name = CEntity.NAMETREES
+    self.kind = Classic.KINDTREES
+    self.name = Classic.NAMETREES
     self.hitbox = CHitbox()
     self.hitbox.region.lf = 2
     self.hitbox.region.rg = 4
@@ -1997,7 +1999,7 @@ end
 local CPlaceTreesIdle = CPlaceTrees:extend() -- generic idle trees
 function CPlaceTreesIdle:new(_argt)
     CPlaceTreesIdle.super.new(self, _argt)
-    self.name = CEntity.NAMEIDLE
+    self.name = Classic.NAMEIDLE
     self.palette = CPlaceTrees.PALETTEIDLE
     self:argt(_argt) -- override if any
 end
@@ -2239,12 +2241,12 @@ Tic.STATUSSETTINGS = { -- statuses settings
         palette1 = {[Tic.COLORRED] = Tic.COLORPURPLE, [Tic.COLORPURPLE] = Tic.COLORRED,},
      },
 }
-CEntity.KINDCHARACTER = "Character" -- Character kind
-CEntity.NAMECHARACTER = "Character" -- Character name
+Classic.KINDCHARACTER = "Character" -- Character kind
+Classic.NAMECHARACTER = "Character" -- Character name
 function CCharacter:new(_argt)
     CCharacter.super.new(self, _argt)
-    self.kind         = CEntity.KINDCHARACTER
-    self.name         = CEntity.NAMECHARACTER
+    self.kind         = Classic.KINDCHARACTER
+    self.name         = Classic.NAMECHARACTER
     self.size         = CCharacter.SIZEM -- size
     self.scale        = CSprite.SCALE01 -- scale
     self.frame        = CSprite.FRAME00 -- frame
@@ -2282,7 +2284,7 @@ function CCharacter:new(_argt)
     self.hitbox.region.up = 5
     self.hitbox.region.dw = 7
     self:argt(_argt) -- override if any
-    self.camera       = CCamera{name = self.name.." "..CEntity.NAMECAMERA} -- one camera per character
+    self.camera       = CCamera{name = self.name.." "..Classic.NAMECAMERA} -- one camera per character
     self:focus() -- focus its camera on itself
 end
 
@@ -2330,7 +2332,7 @@ function CCharacter:regionViewScreen() -- viewable screen region depending on di
     }
 end
 
-function CCharacter:regionViewWorld() -- viewable region world depending on dirx, diry
+function CCharacter:worldRegionView() -- viewable region world depending on dirx, diry
     local _regionviewoffsets = self:regionViewOffsets()
     return CRegion{
         lf = self.worldx + _regionviewoffsets.lf,
@@ -2367,7 +2369,7 @@ function CCharacter:regionMindScreen() -- mindable screen region depending on di
     }
 end
 
-function CCharacter:regionMindWorld() -- mindable region world depending on dirx, diry
+function CCharacter:worldRegionMind() -- mindable region world depending on dirx, diry
     local _regionmindoffsets = self:regionMindOffsets()
     return CRegion{
         lf = self.worldx + _regionmindoffsets.lf,
@@ -2634,7 +2636,7 @@ function CCharacter:moveDirection(_direction)
         _offsety = (_offsety < 0) and math.ceil(_offsety) or math.floor(_offsety)
     end
 
-    local _regionworld = self:regionWorld()
+    local _worldregion = self:worldRegion()
     local _move = true -- calculate the maximum move step by step
     local _movebyx = Nums:sign(_offsetx)
     local _movebyy = Nums:sign(_offsety)
@@ -2646,7 +2648,7 @@ function CCharacter:moveDirection(_direction)
         if _movetox == _offsetx and _movetoy == _offsety then _move = false end
     end
 
-    -- self:moveXY(self.worldx + _movetox, self.worldy + _movetoy)
+    self:moveXY(self.worldx + _movetox, self.worldy + _movetoy)
     self.idlecycler:min() -- reset the idle cycler
 end
 
@@ -2655,10 +2657,10 @@ end
 -- CCharacterHumanoid
 --
 local CCharacterHumanoid = CCharacter:extend() -- humanoid characters
-CEntity.KINDHUMANOID = "Humanoid" -- Humanoid kind
+Classic.KINDHUMANOID = "Humanoid" -- Humanoid kind
 function CCharacterHumanoid:new(_argt)
     CCharacterHumanoid.super.new(self, _argt)
-    self.kind         = CEntity.KINDHUMANOID
+    self.kind         = Classic.KINDHUMANOID
     self.colorhairsfg = Tic.COLORGREYD -- head colors
     self.colorhairsbg = Tic.COLORGREYM
     self.colorskin    = Tic.COLORWHITE
@@ -2774,14 +2776,14 @@ function CCharacterHumanoid:drawHead()
 end
 
 
-local IPlayer = CCharacter:extend() -- players characters interface
+local IPlayer = CCharacter:extend() -- players characters interface -- FIXME really needed ?
 function IPlayer:playerAppend()
     Tic:playerAppend(self) -- record the new player on tic
 end
 
 
 local CPlayerHumanoid = CCharacterHumanoid:extend() -- humanoid player characters
-CPlayerHumanoid:implement(IPlayer)
+CPlayerHumanoid:implement(IPlayer) -- FIXME really needed ?
 function CPlayerHumanoid:new(_argt)
     CPlayerHumanoid.super.new(self, _argt)
     self.discovered = true
@@ -2791,10 +2793,10 @@ end
 
 
 local CPlayerDwarf = CPlayerHumanoid:extend() -- Dwarf player characters
-CEntity.KINDDWARF = "Dwarf" -- Dwarf kind
+Classic.KINDDWARF = "Dwarf" -- Dwarf kind
 function CPlayerDwarf:new(_argt)
     CPlayerDwarf.super.new(self, _argt)
-    self.kind         = CEntity.KINDDWARF
+    self.kind         = Classic.KINDDWARF
     self.size         = CCharacter.SIZES -- size
     self.colorhairsfg = Tic.COLORRED -- colors
     self.colorhairsbg = Tic.COLORORANGE
@@ -2810,10 +2812,10 @@ end
 
 
 local CPlayerGnome = CPlayerHumanoid:extend() -- Gnome player characters
-CEntity.KINDGNOME = "Gnome" -- Gnome kind
+Classic.KINDGNOME = "Gnome" -- Gnome kind
 function CPlayerGnome:new(_argt)
     CPlayerGnome.super.new(self, _argt)
-    self.kind         = CEntity.KINDGNOME
+    self.kind         = Classic.KINDGNOME
     self.size         = CCharacter.SIZES -- size
     self.colorhairsfg = Tic.COLORORANGE -- colors
     self.colorhairsbg = Tic.COLORYELLOW
@@ -2830,10 +2832,10 @@ end
 
 
 local CPlayerElvwe = CPlayerHumanoid:extend() -- Elvwe player characters
-CEntity.KINDELVWE = "Elvwe" -- Elvwe kind
+Classic.KINDELVWE = "Elvwe" -- Elvwe kind
 function CPlayerElvwe:new(_argt)
     CPlayerElvwe.super.new(self, _argt)
-    self.kind         = CEntity.KINDELVWE
+    self.kind         = Classic.KINDELVWE
     self.size         = CCharacter.SIZEL -- size
     self.coloreyesfg  = Tic.COLORGREENM -- colors
     self.coloreyesbg  = Tic.COLORGREEND
@@ -2851,10 +2853,10 @@ end
 
 
 local CPlayerDrowe = CPlayerElvwe:extend() -- Drowe player characters
-CEntity.KINDDROWE = "Drowe" -- Drowe kind
+Classic.KINDDROWE = "Drowe" -- Drowe kind
 function CPlayerDrowe:new(_argt)
     CPlayerDrowe.super.new(self, _argt)
-    self.kind         = CEntity.KINDDROWE
+    self.kind         = Classic.KINDDROWE
     self.size         = CCharacter.SIZEM -- size
     self.coloreyesfg  = Tic.COLORRED -- colors
     self.coloreyesbg  = Tic.COLORPURPLE
@@ -2871,10 +2873,10 @@ end
 
 
 local CPlayerAngel = CPlayerHumanoid:extend() -- Angel player characters
-CEntity.KINDANGEL = "Angel" -- Angel kind
+Classic.KINDANGEL = "Angel" -- Angel kind
 function CPlayerAngel:new(_argt)
     CPlayerAngel.super.new(self, _argt)
-    self.kind         = CEntity.KINDANGEL
+    self.kind         = Classic.KINDANGEL
     self.size         = CCharacter.SIZEM -- size
     self.colorhairsfg = Tic.COLORGREYM -- colors
     self.colorhairsbg = Tic.COLORWHITE
@@ -2891,10 +2893,10 @@ end
 
 
 local CPlayerGogol = CPlayerHumanoid:extend() -- Gogol player characters
-CEntity.KINDGOGOL = "Gogol" -- Gogol kind
+Classic.KINDGOGOL = "Gogol" -- Gogol kind
 function CPlayerGogol:new(_argt)
     CPlayerGogol.super.new(self, _argt)
-    self.kind         = CEntity.KINDGOGOL
+    self.kind         = Classic.KINDGOGOL
     self.size         = CCharacter.SIZEL -- size
     self.colorhairsfg = Tic.COLORWHITE -- colors
     self.colorhairsbg = Tic.COLORWHITE
@@ -2913,10 +2915,10 @@ end
 
 
 local CPlayerHorne = CPlayerHumanoid:extend() -- Horne player characters
-CEntity.KINDHORNE = "Horne" -- Horne kind
+Classic.KINDHORNE = "Horne" -- Horne kind
 function CPlayerHorne:new(_argt)
     CPlayerHorne.super.new(self, _argt)
-    self.kind         = CEntity.KINDHORNE
+    self.kind         = Classic.KINDHORNE
     self.size         = CCharacter.SIZEL -- size
     self.colorhairsfg = Tic.COLORPURPLE -- colors
     self.colorhairsbg = Tic.COLORRED
@@ -2933,10 +2935,10 @@ end
 
 
 local CPlayerDemon = CPlayerHorne:extend() -- Demon player characters
-CEntity.KINDDEMON = "Demon" -- Demon kind
+Classic.KINDDEMON = "Demon" -- Demon kind
 function CPlayerDemon:new(_argt)
     CPlayerDemon.super.new(self, _argt)
-    self.kind         = CEntity.KINDDEMON
+    self.kind         = Classic.KINDDEMON
     self.statphymax   = 3
     self.statphyact   = self.statphymax
     self.statmenmax   = 5
@@ -2948,10 +2950,10 @@ end
 
 
 local CPlayerTifel = CPlayerHorne:extend() -- Tifel player characters
-CEntity.KINDTIFEL = "Tifel" -- Tifel kind
+Classic.KINDTIFEL = "Tifel" -- Tifel kind
 function CPlayerTifel:new(_argt)
     CPlayerTifel.super.new(self, _argt)
-    self.kind         = CEntity.KINDTIFEL
+    self.kind         = Classic.KINDTIFEL
     self.size         = CCharacter.SIZEM -- size
     self.statphymax   = 4
     self.statphyact   = self.statphymax
@@ -2964,10 +2966,10 @@ end
 
 
 local CPlayerMeduz = CPlayerHumanoid:extend() -- Meduz player characters
-CEntity.KINDMEDUZ = "Meduz" -- Meduz kind
+Classic.KINDMEDUZ = "Meduz" -- Meduz kind
 function CPlayerMeduz:new(_argt)
     CPlayerMeduz.super.new(self, _argt)
-    self.kind         = CEntity.KINDMEDUZ
+    self.kind         = Classic.KINDMEDUZ
     self.size         = CCharacter.SIZES -- size
     self.colorhairsfg = Tic.COLORGREEND -- colors
     self.colorhairsbg = Tic.COLORGREENM
@@ -2983,10 +2985,10 @@ end
 
 
 local CPlayerGnoll = CPlayerHumanoid:extend() -- Gnoll player characters
-CEntity.KINDGNOLL = "Gnoll" -- Gnoll kind
+Classic.KINDGNOLL = "Gnoll" -- Gnoll kind
 function CPlayerGnoll:new(_argt)
     CPlayerGnoll.super.new(self, _argt)
-    self.kind         = CEntity.KINDGNOLL
+    self.kind         = Classic.KINDGNOLL
     self.size         = CCharacter.SIZEL -- size
     self.coloreyesfg  = Tic.COLORRED -- colors
     self.coloreyesbg  = Tic.COLORPURPLE
@@ -3002,19 +3004,19 @@ end
 
 
 local CPlayerWolfe = CPlayerGnoll:extend() -- Wolfe player characters
-CEntity.KINDWOLFE = "Wolfe" -- Wolfe kind
+Classic.KINDWOLFE = "Wolfe" -- Wolfe kind
 function CPlayerWolfe:new(_argt)
     CPlayerWolfe.super.new(self, _argt)
-    self.kind         = CEntity.KINDWOLFE
+    self.kind         = Classic.KINDWOLFE
     self:argt(_argt) -- override if any
 end
 
 
 local CPlayerGhost = CPlayerHumanoid:extend() -- Ghost player characters
-CEntity.KINDGHOST = "Ghost" -- Ghost kind
+Classic.KINDGHOST = "Ghost" -- Ghost kind
 function CPlayerGhost:new(_argt)
     CPlayerGhost.super.new(self, _argt)
-    self.kind         = CEntity.KINDGHOST
+    self.kind         = Classic.KINDGHOST
     self.size         = CCharacter.SIZEL -- size
     self.coloreyesfg  = Tic.COLORRED -- colors
     self.coloreyesbg  = Tic.COLORPURPLE
@@ -3586,11 +3588,11 @@ end
 function CWindowWorld:drawPlayerActual()
     local _playeractual    = Tic:playerActual()
     local _entitiesaround  = _playeractual:entitiesAround()
-    local _regionviewworld = _playeractual:regionViewWorld()
-    local _regionmindworld = _playeractual:regionMindWorld()
+    local _worldregionview = _playeractual:worldRegionView()
+    local _worldregionmind = _playeractual:worldRegionMind()
     local _nearestentity   = _playeractual:nearestEntityAround() -- nearest entity if any -- except itself
 
-    _nearestentity = (_nearestentity and _regionviewworld:hasInsideRegionWorld(_nearestentity:regionWorld())) -- keep it only if in view
+    _nearestentity = (_nearestentity and _worldregionview:hasInsideRegion(_nearestentity:worldRegion())) -- keep it only if in view
         and _nearestentity
         or  nil
 
@@ -3606,20 +3608,20 @@ function CWindowWorld:drawPlayerActual()
     for _, _keyy in pairs(Tables:keys(_entitiesaround)) do -- draw entities -- sorted by y first
         for _, _keyx in pairs(Tables:keys(_entitiesaround[_keyy])) do -- sorted by x next
             for _entity, _ in pairs(_entitiesaround[_keyy][_keyx]) do -- entities around actual player
-                local _entityregionworld = _entity:regionWorld()
+                local _entityworldregion = _entity:worldRegion()
 
                 _entity.spotted = (_entity == _nearestentity) -- unspot all entities except nearest one if any (in view)
                     and true
                     or  false
 
-                if _regionviewworld:hasInsideRegionWorld(_entityregionworld) then -- if in view
+                if _worldregionview:hasInsideRegion(_entityworldregion) then -- if in view
                     _entity.drawfade = false
                     _entity.discovered = true
                 else -- not in view
                     _entity.drawfade = true
                 end
 
-                if (_entity.drawfade == false) or (_regionmindworld:hasInsideRegionWorld(_entityregionworld)) then -- draw entity ?
+                if (_entity.drawfade == false) or (_worldregionmind:hasInsideRegion(_entityworldregion)) then -- draw entity ?
                     _entity:drawRelativeToEntity(_playeractual)
                 end
 
@@ -3665,15 +3667,15 @@ function CPlace:generateRandomWorldWindow(_count, _kinds) -- random count of pla
     end
 end
 
-function CPlace:generateRandomRegionWorldCount(_count, _kinds, _regionworld) -- random number of places of kinds in region world
+function CPlace:generateRandomRegionWorldCount(_count, _kinds, _worldregion) -- random number of places of kinds in region world
     _count        = (_count)       and _count       or CPlace.PLACECOUNT
     _kinds        = (_kinds)       and _kinds       or CPlace.PLACEKINDS
-    _regionworld  = (_regionworld) and _regionworld or CRegionWorld{}
+    _worldregion  = (_worldregion) and _worldregion or CRegionWorld{}
     local _region = CRegion{
-        lf = _regionworld.worldx + _regionworld.region.lf,
-        rg = _regionworld.worldx + _regionworld.region.rg,
-        up = _regionworld.worldy + _regionworld.region.up,
-        dw = _regionworld.worldy + _regionworld.region.dw,
+        lf = _worldregion.worldx + _worldregion.region.lf,
+        rg = _worldregion.worldx + _worldregion.region.rg,
+        up = _worldregion.worldy + _worldregion.region.up,
+        dw = _worldregion.worldy + _worldregion.region.dw,
     }
 
     for _ = 1, _count do
@@ -3686,12 +3688,12 @@ function CPlace:generateRandomRegionWorldCount(_count, _kinds, _regionworld) -- 
     end
 end
 
-function CPlace:generateRandomRegionWorldPercent(_percent, _kinds, _regionworld) -- random percent of places of kinds in region world
+function CPlace:generateRandomRegionWorldPercent(_percent, _kinds, _worldregion) -- random percent of places of kinds in region world
     _percent      = (_percent)     and _percent     or 100
     _kinds        = (_kinds)       and _kinds       or CPlace.PLACEKINDS
-    _regionworld  = (_regionworld) and _regionworld or CRegionWorld{}
-    local _count  = math.sqrt(_regionworld.region:surface()) * _percent // 100
-    CPlace:generateRandomRegionWorldCount(_count, _kinds, _regionworld)
+    _worldregion  = (_worldregion) and _worldregion or CRegionWorld{}
+    local _count  = math.sqrt(_worldregion.region:surface()) * _percent // 100
+    CPlace:generateRandomRegionWorldCount(_count, _kinds, _worldregion)
 end
 
 RegionWorldTree0 = CRegionWorld{
@@ -3920,7 +3922,11 @@ function Tic:draw()
     WindowInfosSpotted:draw()
     WindowPortraitSpotted:draw()
 
-    Tic:playerActual():regionWorld():drawBorderWorldW2()
+    local _worldregion = Tic:playerActual():worldRegion()
+    Tic:logAppend("rx", _worldregion.worldx)
+    Tic:logAppend("ry", _worldregion.worldy)
+
+    -- _worldregion:drawBorderWorldW2() -- FIXME doenst work
 
     Tic:drawLog()
     Tic:logPrint()
