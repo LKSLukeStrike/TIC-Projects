@@ -78,11 +78,14 @@ function Tables:findVal(_table, _find) -- return the key of val _find else nil i
     return -- nil
 end
 
-function Tables:keyAppend(_table, _key, _val) -- add/replace a key val entry -- FIXME reinforce tests ?
+function Tables:keyAppend(_table, _key, _val) -- add/replace a key val entry
+    if not _table or not _key then return end -- mandatory
+    _val = (_val) and _val or true
     _table[_key] = _val
 end
 
-function Tables:keyRemove(_table, _key) -- remove a key val entry -- FIXME reinforce tests ? -- use keyAppend ?
+function Tables:keyRemove(_table, _key) -- remove a key val entry
+    if not _table or not _key then return end -- mandatory
     _table[_key] = nil
 end
 

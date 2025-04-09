@@ -992,6 +992,17 @@ function CRegion:surface() -- region surface
     return self:borderW() * self:borderH()
 end
 
+function CRegion:offsetXY(_offsetx, _offsety) -- offset a region by x y
+    _offsetx = (_offsetx) and _offsetx or 0
+    _offsety = (_offsety) and _offsety or 0
+    return CRegion{
+        lf = self.lf + _offsetx,
+        rg = self.rg + _offsetx,
+        up = self.up + _offsety,
+        dw = self.dw + _offsety,
+    }
+end
+
 function CRegion:randomWH(_width, _height) -- returns a region of random width and height
     _width  = (_width)  and _width  or Nums.MAXINTEGER -- be careful with that ;)
     _height = (_height) and _height or Nums.MAXINTEGER
@@ -1036,11 +1047,6 @@ function CRegion:hasInsideRegion(_region) -- is a region inside a region ?
 	return false
 end
 
--- function CRegion:hasInsideRegionWorld(_worldregion) -- is a region world inside a region ?
--- 	if not _worldregion then return false end -- mandatory
--- 	return self:hasInsideRegion(_worldregion.region)
--- end
-
 
 --
 -- CHitbox
@@ -1065,6 +1071,26 @@ function CHitbox:new(_argt)
         dw = CHitbox.REGIONDW,
     }
     self:argt(_argt) -- override if any
+end
+
+function CHitbox:hittoAppend(_entity) -- append an entity hitto
+    if not _entity then return end -- mandatory
+    Tables:keyAppend(self.hitto, _entity)
+end
+
+function CHitbox:hittoRemove(_entity) -- remove an entity hitto
+    if not _entity then return end -- mandatory
+    Tables:keyRemove(self.hitto, _entity)
+end
+
+function CHitbox:hitbyAppend(_entity) -- append an entity hitby
+    if not _entity then return end -- mandatory
+    Tables:keyAppend(self.hitby, _entity)
+end
+
+function CHitbox:hitbyRemove(_entity) -- remove an entity hitby
+    if not _entity then return end -- mandatory
+    Tables:keyRemove(self.hitby, _entity)
 end
 
 function CHitbox:draw()
@@ -1394,50 +1420,6 @@ function CEntity:distanceEntitySquared(_entity) -- squared distance from itself 
     if not _entity then return 0 end -- mandatory
     return Nums:distancePointsSquared(self.worldx, self.worldy, _entity.worldx, _entity.worldy)
 end
-
-
---
--- CRegionWorld
---
--- local CRegionWorld = CEntity:extend() -- region world
--- function CRegionWorld:new(_argt)
---     CRegionWorld.super.new(self, _argt)
---     self.lf = self.worldx
---     self.rg = Nums.MAXINTEGER -- positive
---     self.up = Nums.MININTEGER -- negative
---     self.dw = Nums.MAXINTEGER -- positive
---     -- self.region = CRegion()
---     self:argt(_argt) -- override if any
--- end
-
--- function CRegionWorld:borderW() -- border width
---     return self.region:borderW()
--- end
-
--- function CRegionWorld:borderH() -- border height
---     return self.region:borderH()
--- end
-
--- function CRegionWorld:surface() -- region surface
---     return self.region:surface()
--- end
-
--- function CRegionWorld:drawBorderWorldW2() -- draw region border relative to world window center
---     self.region:drawBorderScreenXY(
---         Tic.WORLDWX2, -- + self.worldx,
---         Tic.WORLDWY2  -- + self.worldy
---     )
--- end
-
--- function CRegionWorld:hasInsideRegion(_region) -- is a region inside a region world ?
--- 	if not _region then return false end -- mandatory
--- 	return self.region:hasInsideRegion(_region)
--- end
-
--- function CRegionWorld:hasInsideRegionWorld(_worldregion) -- is a region world inside a region world ?
--- 	if not _worldregion then return false end -- mandatory
--- 	return self.region:hasInsideRegion(_worldregion.region)
--- end
 
 
 --
@@ -2636,12 +2618,13 @@ function CCharacter:moveDirection(_direction)
         _offsety = (_offsety < 0) and math.ceil(_offsety) or math.floor(_offsety)
     end
 
-    local _worldregion = self:worldRegion()
-    local _move = true -- calculate the maximum move step by step
-    local _movebyx = Nums:sign(_offsetx)
-    local _movebyy = Nums:sign(_offsety)
-    local _movetox = 0
-    local _movetoy = 0
+    local _move          = true -- calculate the maximum move step by step
+    local _worldregion   = self:worldRegion()
+    local _nearestentity = self:nearestEntityAround() -- nearest entity if any -- except itself
+    local _movebyx       = Nums:sign(_offsetx)
+    local _movebyy       = Nums:sign(_offsety)
+    local _movetox       = 0
+    local _movetoy       = 0
     while _move do
         if Nums:pos(_movetox) < Nums:pos(_offsetx) then _movetox = _movetox + _movebyx end
         if Nums:pos(_movetoy) < Nums:pos(_offsety) then _movetoy = _movetoy + _movebyy end
@@ -3922,12 +3905,6 @@ function Tic:draw()
     WindowInfosSpotted:draw()
     WindowPortraitSpotted:draw()
 
-    local _worldregion = Tic:playerActual():worldRegion()
-    Tic:logAppend("rx", _worldregion.worldx)
-    Tic:logAppend("ry", _worldregion.worldy)
-
-    -- _worldregion:drawBorderWorldW2() -- FIXME doenst work
-
     Tic:drawLog()
     Tic:logPrint()
 
@@ -3953,8 +3930,6 @@ function Tic:drawLog() -- [-] remove
 
     Tic:logAppend("wx", _playeractual.worldx)
     Tic:logAppend("wy", _playeractual.worldy)
-    Tic:logAppend("sx", _playeractual.screenx)
-    Tic:logAppend("sy", _playeractual.screeny)
 
     Tic:logAppend(Nums:frequence01(_tick00, Tic.FREQUENCE0240))
 end
