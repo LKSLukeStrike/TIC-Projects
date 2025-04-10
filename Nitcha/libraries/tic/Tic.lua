@@ -2256,6 +2256,8 @@ function CCharacter:new(_argt)
     self.frame        = CSprite.FRAME00 -- frame
     self.dirx         = Tic.DIRXLF -- directions
     self.diry         = Tic.DIRYMD
+    self.offsetx      = 0 -- move offsets
+    self.offsety      = 0
     self.hitbox       = CHitbox()
     self.state        = Tic.STATESTANDIDLE -- state
     self.idlecycler   = CCyclerInt{maxindex = 59,} -- cycler to get back to idle
@@ -2294,7 +2296,7 @@ function CCharacter:new(_argt)
     self:focus() -- focus its camera on itself
 end
 
-function CCharacter:regionViewOffsets() -- viewable offsets region depending on dirx, diry, statphyact and -- TODO posture
+function CCharacter:regionViewOffsets() -- view offsets region depending on dirx, diry, statphyact and -- TODO posture
     local _stat          = self.statphyact
     local _statesettings = Tic.STATESETTINGS[self.state]
     local _posture       = _statesettings.posture
@@ -2328,7 +2330,7 @@ function CCharacter:regionViewOffsets() -- viewable offsets region depending on 
     }
 end
 
-function CCharacter:regionViewScreen() -- viewable screen region depending on dirx, diry
+function CCharacter:regionViewScreen() -- view screen region depending on dirx, diry
     local _regionviewoffsets = self:regionViewOffsets()
     return CRegion{
         lf = self.screenx + _regionviewoffsets.lf,
@@ -2338,7 +2340,7 @@ function CCharacter:regionViewScreen() -- viewable screen region depending on di
     }
 end
 
-function CCharacter:regionViewWorld() -- viewable world region depending on dirx, diry
+function CCharacter:regionViewWorld() -- view world region depending on dirx, diry
     local _regionviewoffsets = self:regionViewOffsets()
     return CRegion{
         lf = self.worldx + _regionviewoffsets.lf,
@@ -2348,7 +2350,7 @@ function CCharacter:regionViewWorld() -- viewable world region depending on dirx
     }
 end
 
-function CCharacter:regionMindOffsets() -- mindable offsets region depending on dirx, diry, statmenact
+function CCharacter:regionMindOffsets() -- mind offsets region depending on dirx, diry, statmenact
     local _stat          = self.statmenact
     local _statesettings = Tic.STATESETTINGS[self.state]
     local _posture       = _statesettings.posture
@@ -2365,7 +2367,7 @@ function CCharacter:regionMindOffsets() -- mindable offsets region depending on 
     }
 end
 
-function CCharacter:regionMindScreen() -- mindable screen region depending on dirx, diry
+function CCharacter:regionMindScreen() -- mind screen region depending on dirx, diry
     local _regionmindoffsets = self:regionMindOffsets()
     return CRegion{
         lf = self.screenx + _regionmindoffsets.lf,
@@ -2375,13 +2377,44 @@ function CCharacter:regionMindScreen() -- mindable screen region depending on di
     }
 end
 
-function CCharacter:regionMindWorld() -- mindable world region depending on dirx, diry
+function CCharacter:regionMindWorld() -- mind world region depending on dirx, diry
     local _regionmindoffsets = self:regionMindOffsets()
     return CRegion{
         lf = self.worldx + _regionmindoffsets.lf,
         rg = self.worldx + _regionmindoffsets.rg,
         up = self.worldy + _regionmindoffsets.up,
         dw = self.worldy + _regionmindoffsets.dw,
+    }
+end
+
+function CCharacter:regionMoveOffsets() -- move offsets region depending on movex, movey
+    local _size          = Tic.SPRITESIZE * self.scale
+
+    return CRegion{
+        lf  = self.offsetx,
+        rg  = self.offsetx + _size,
+        up  = self.offsety,
+        dw  = self.offsety + _size,
+    }
+end
+
+function CCharacter:regionMoveScreen() -- move screen region depending on movex, movey
+    local _regionmoveoffsets = self:regionMoveOffsets()
+    return CRegion{
+        lf = self.screenx + _regionmoveoffsets.lf,
+        rg = self.screenx + _regionmoveoffsets.rg,
+        up = self.screeny + _regionmoveoffsets.up,
+        dw = self.screeny + _regionmoveoffsets.dw,
+    }
+end
+
+function CCharacter:regionMoveWorld() -- move world region depending on movex, movey
+    local _regionmoveoffsets = self:regionMoveOffsets()
+    return CRegion{
+        lf = self.worldx + _regionmoveoffsets.lf,
+        rg = self.worldx + _regionmoveoffsets.rg,
+        up = self.worldy + _regionmoveoffsets.up,
+        dw = self.worldy + _regionmoveoffsets.dw,
     }
 end
 
@@ -2603,12 +2636,12 @@ function CCharacter:toggleFrame() -- toggle frame 0-1
     self.frame = Nums:toggle01(self.frame) -- animate continuous move in the same dirx
 end
 
-function CCharacter:moveXY(_worldx, _worldy)
+function CCharacter:moveXY(_worldx, _worldy) -- move character into world
     if not _worldx or not _worldy then return end -- mandatory
     self.world:entityMoveXY(self, _worldx, _worldy)
 end
 
-function CCharacter:moveDirection(_direction)
+function CCharacter:moveDirection(_direction) -- handle moving a character in a direction
     if not _direction then return end -- mandatory
     local _state = self.state
     local _statesettings = Tic.STATESETTINGS[_state]
@@ -2620,8 +2653,13 @@ function CCharacter:moveDirection(_direction)
     local _dirx    = _offsets.dirx
     local _diry    = _offsets.diry
     local _oldx    = self.dirx -- save actual character dirx
-    self.dirx = (_dirx) and _dirx or self.dirx -- adjust dirx and diry
-    self.diry = (_diry) and _diry or self.diry
+
+    self.dirx = _dirx or self.dirx -- adjust dirx and diry
+    self.diry = _diry or self.diry
+
+    self.offsetx = 0 -- reset move offsets
+    self.offsety = 0
+
     if _posture == Tic.POSTUREFLOOR and _status ~= Tic.STATUSSLEEP then return end -- cannot move
 
     if _state == Tic.STATEFLOORSLEEP then -- sleep to stand
@@ -2658,6 +2696,9 @@ function CCharacter:moveDirection(_direction)
         _offsety = (_offsety < 0) and math.ceil(_offsety) or math.floor(_offsety)
     end
 
+    self.offsetx = _offsetx -- set move offsets
+    self.offsety = _offsety
+
     local _move          = true -- calculate the maximum move step by step
     local _worldregion   = self:worldRegion()
     local _nearestentity = self:nearestEntityAround() -- nearest entity if any -- except itself
@@ -2666,10 +2707,10 @@ function CCharacter:moveDirection(_direction)
     else
         self.hitbox.hitto = {}
     end
-    local _movebyx       = Nums:sign(_offsetx)
-    local _movebyy       = Nums:sign(_offsety)
-    local _movetox       = 0
-    local _movetoy       = 0
+    local _movebyx = Nums:sign(_offsetx)
+    local _movebyy = Nums:sign(_offsety)
+    local _movetox = 0
+    local _movetoy = 0
     while _move do
         if Nums:pos(_movetox) < Nums:pos(_offsetx) then _movetox = _movetox + _movebyx end
         if Nums:pos(_movetoy) < Nums:pos(_offsety) then _movetoy = _movetoy + _movebyy end
@@ -3931,7 +3972,7 @@ for _, _cplace in pairs({
 end
 CPlaceTree1Idle{
     worldx = -10,
-}.hitbox = nil
+}
 end
 
 
