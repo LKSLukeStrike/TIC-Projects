@@ -265,8 +265,10 @@ Tic.KEY_D              = 04
 Tic.KEY_H              = 08
 Tic.KEY_M              = 13
 Tic.KEY_P              = 16
+Tic.KEY_R              = 18
 Tic.KEY_S              = 19
 Tic.KEY_V              = 22
+Tic.KEY_X              = 24
 Tic.KEY_Y              = 25
 Tic.KEY_Z              = 26
 Tic.KEY_UP             = 58
@@ -314,8 +316,10 @@ Tic.ACTIONSTATPSYACT    = "statPsyAct"
 Tic.ACTIONBIOMENEXT     = "biomeNext"
 Tic.ACTIONTOGGLEHITBOX  = "toggleHitbox"
 Tic.ACTIONTOGGLESPOTTED = "toggleSpotted"
+Tic.ACTIONTOGGLEDIRS    = "toggleDirs"
 Tic.ACTIONTOGGLEVIEW    = "toggleView"
 Tic.ACTIONTOGGLEMIND    = "toggleMind"
+Tic.ACTIONTOGGLEMOVE    = "toggleMove"
 Tic.ACTIONSCALENEXT     = "scaleNext"
 
 -- Keys to Actions
@@ -336,12 +340,14 @@ Tic.KEYS2ACTIONS = {
     [Tic.KEY_NUMPAD4]      = Tic.ACTIONMOVE270,
     [Tic.KEY_NUMPAD7]      = Tic.ACTIONMOVE315,
     [Tic.KEY_B]            = Tic.ACTIONBIOMENEXT,
-    [Tic.KEY_D]            = Tic.ACTIONTOGGLEMIND,
+    [Tic.KEY_D]            = Tic.ACTIONTOGGLEDIRS,
     [Tic.KEY_H]            = Tic.ACTIONTOGGLEHITBOX,
     [Tic.KEY_M]            = Tic.ACTIONSTATMENACT,
     [Tic.KEY_P]            = Tic.ACTIONSTATPHYACT,
+    [Tic.KEY_R]            = Tic.ACTIONTOGGLEMIND,
     [Tic.KEY_S]            = Tic.ACTIONTOGGLESPOTTED,
     [Tic.KEY_V]            = Tic.ACTIONTOGGLEVIEW,
+    [Tic.KEY_X]            = Tic.ACTIONTOGGLEMOVE,
     [Tic.KEY_Y]            = Tic.ACTIONSTATPSYACT,
     [Tic.KEY_Z]            = Tic.ACTIONSCALENEXT,
 }
@@ -369,8 +375,10 @@ Tic.ACTIONS2FUNCTIONS = {
     [Tic.ACTIONBIOMENEXT]     = function() Tic:biomeNext() end,
     [Tic.ACTIONTOGGLEHITBOX]  = function() Tic:toggleHitbox() end,
     [Tic.ACTIONTOGGLESPOTTED] = function() Tic:toggleSpotted() end,
+    [Tic.ACTIONTOGGLEDIRS]    = function() Tic:toggleDirs() end,
     [Tic.ACTIONTOGGLEVIEW]    = function() Tic:toggleView() end,
     [Tic.ACTIONTOGGLEMIND]    = function() Tic:toggleMind() end,
+    [Tic.ACTIONTOGGLEMOVE]    = function() Tic:toggleMove() end,
     [Tic.ACTIONSCALENEXT]     = function() Tic:scaleNext() end,
 }
 
@@ -625,6 +633,13 @@ function Tic:toggleSpotted()
 end
 
 
+-- Dirs System -- toggle dirs display
+Tic.DRAWDIRS = false
+function Tic:toggleDirs()
+	Tic.DRAWDIRS = Nums:toggleTF(Tic.DRAWDIRS)
+end
+
+
 -- View System -- toggle view display
 Tic.DRAWVIEW = false
 function Tic:toggleView()
@@ -636,6 +651,13 @@ end
 Tic.DRAWMIND = false
 function Tic:toggleMind()
 	Tic.DRAWMIND = Nums:toggleTF(Tic.DRAWMIND)
+end
+
+
+-- Move System -- toggle move display
+Tic.DRAWMOVE = false
+function Tic:toggleMove()
+	Tic.DRAWMOVE = Nums:toggleTF(Tic.DRAWMOVE)
 end
 
 
@@ -1477,8 +1499,8 @@ function CEntityDrawable:new(_argt)
     self.animations  = nil -- override if any
     self.spotted     = false -- use spotted to draw a border
     self.hitbox      = nil -- hitbox region if any
-    self.drawhitbox  = false -- draw behaviour
-    self.drawspotted = false
+    self.drawspotted = false -- draw behaviour
+    self.drawhitbox  = false
     self.drawfade    = false
    self:argt(_argt) -- override if any
     self.world:entityAppend(self) -- append itself to the world
@@ -2258,8 +2280,10 @@ function CCharacter:new(_argt)
     self.statmenact   = self.statmenmax
     self.statpsyact   = self.statpsymax
     self.drawdirs     = false -- draw behaviour
-    self.drawview     = true
-    self.drawhitbox   = true
+    self.drawview     = false
+    self.drawmind     = false
+    self.drawmove     = false
+    -- self.drawhitbox   = false
     self.hitbox       = CHitbox()
     self.hitbox.region.lf = 2
     self.hitbox.region.rg = 4
@@ -2314,7 +2338,7 @@ function CCharacter:regionViewScreen() -- viewable screen region depending on di
     }
 end
 
-function CCharacter:worldRegionView() -- viewable region world depending on dirx, diry
+function CCharacter:regionViewWorld() -- viewable world region depending on dirx, diry
     local _regionviewoffsets = self:regionViewOffsets()
     return CRegion{
         lf = self.worldx + _regionviewoffsets.lf,
@@ -2351,7 +2375,7 @@ function CCharacter:regionMindScreen() -- mindable screen region depending on di
     }
 end
 
-function CCharacter:worldRegionMind() -- mindable region world depending on dirx, diry
+function CCharacter:regionMindWorld() -- mindable world region depending on dirx, diry
     local _regionmindoffsets = self:regionMindOffsets()
     return CRegion{
         lf = self.worldx + _regionmindoffsets.lf,
@@ -2374,6 +2398,7 @@ function CCharacter:draw() -- set animations and draw layers
     self:drawHitbox()
     self:drawView()
     self:drawMind()
+    self:drawMove()
 end
 
 function CCharacter:cycle()
@@ -2405,7 +2430,8 @@ function CCharacter:cycleWork() -- animate work after a delay
 	end
 end
 
-function CCharacter:drawDirs() -- draw the directions and ranges around the character
+function CCharacter:drawDirs() -- draw the directions and ranges around the character -- FIXME why actual player ???
+    self.drawdirs = Tic.DRAWDIRS -- use Tic as master
     if not self.drawdirs then return end -- nothing to draw
     local _drawcolor     = Tic.COLORWHITE
     local _screenx       = Tic.WORLDWX + Tic.WORLDWW2 - (Tic:playerActual().worldx - self.worldx) - 1 --relative to actual player -- feet
@@ -2476,6 +2502,20 @@ function CCharacter:drawMind() -- draw the mind of a character
     local _screenrg  = _regionmindscreen.rg
     local _screenup  = _regionmindscreen.up
     local _screendw  = _regionmindscreen.dw
+
+    rectb(_screenlf, _screenup, _screenrg - _screenlf, _screendw - _screenup, _drawcolor)
+end
+
+function CCharacter:drawMove() -- draw the move of a character
+    self.drawmove = Tic.DRAWMOVE -- use Tic as master
+    if not self.drawmove then return end -- nothing to draw
+    -- if not (self == Tic:playerActual()) then return end -- only actual player
+    local _drawcolor = Tic.COLORGREEND
+    local _regionmovescreen = self:regionMoveScreen()
+    local _screenlf  = _regionmovescreen.lf
+    local _screenrg  = _regionmovescreen.rg
+    local _screenup  = _regionmovescreen.up
+    local _screendw  = _regionmovescreen.dw
 
     rectb(_screenlf, _screenup, _screenrg - _screenlf, _screendw - _screenup, _drawcolor)
 end
@@ -3576,11 +3616,11 @@ end
 function CWindowWorld:drawPlayerActual()
     local _playeractual    = Tic:playerActual()
     local _entitiesaround  = _playeractual:entitiesAround()
-    local _worldregionview = _playeractual:worldRegionView()
-    local _worldregionmind = _playeractual:worldRegionMind()
+    local _regionviewworld = _playeractual:regionViewWorld()
+    local _regionmindworld = _playeractual:regionMindWorld()
     local _nearestentity   = _playeractual:nearestEntityAround() -- nearest entity if any -- except itself
 
-    _nearestentity = (_nearestentity and _worldregionview:hasInsideRegion(_nearestentity:worldRegion())) -- keep it only if in view
+    _nearestentity = (_nearestentity and _regionviewworld:hasInsideRegion(_nearestentity:worldRegion())) -- keep it only if in view
         and _nearestentity
         or  nil
 
@@ -3602,14 +3642,14 @@ function CWindowWorld:drawPlayerActual()
                     and true
                     or  false
 
-                if _worldregionview:hasInsideRegion(_entityworldregion) then -- if in view
+                if _regionviewworld:hasInsideRegion(_entityworldregion) then -- if in view
                     _entity.drawfade = false
                     _entity.discovered = true
                 else -- not in view
                     _entity.drawfade = true
                 end
 
-                if (_entity.drawfade == false) or (_worldregionmind:hasInsideRegion(_entityworldregion)) then -- draw entity ?
+                if (_entity.drawfade == false) or (_regionmindworld:hasInsideRegion(_entityworldregion)) then -- draw entity ?
                     _entity:drawRelativeToEntity(_playeractual)
                 end
 
