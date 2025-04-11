@@ -1159,7 +1159,7 @@ end
 --
 -- CLocations
 --
-local CLocations = Classic:extend() -- generic entities locations -- {worldy {worldx {entity = entity}}}
+local CLocations = Classic:extend() -- generic entities locations -- {worldy {worldx {entity = entity}}} -- FIXME change entity by true ?
 function CLocations:new(_argt)
     CLocations.super.new(self, _argt)
     self.locations = {}
@@ -1263,16 +1263,21 @@ function CEntitiesLocations:new(_argt)
     self:argt(_argt) -- override if any
 end
 
+function CEntitiesLocations:exists(_entity) -- if exists an entity
+    if not _entity then return false end -- mandatory
+    return self.entities[_entity]
+end
+
 function CEntitiesLocations:append(_entity) -- add a new entity
     if not _entity then return end -- mandatory
-    if self.entities[_entity] then return end -- avoid doublons
-    self.entities[_entity] = _entity
+    if self:exists(_entity) then return end -- avoid doublons
+    self.entities[_entity] = true
     self.locations:append(_entity)
 end
 
 function CEntitiesLocations:remove(_entity) -- remove an entity
     if not _entity then return end -- mandatory
-    if not self.entities[_entity] then return end -- doesnt exist
+    if not self:exists(_entity) then return end -- doesnt exist
     self.entities[_entity] = nil
     self.locations:remove(_entity)
 end
@@ -1581,6 +1586,25 @@ function CEntityDrawable:worldRegion() -- return its own region in world
         rg = self.worldx + (Tic.SPRITESIZE * self.scale),
         dw = self.worldy + (Tic.SPRITESIZE * self.scale), 
     }
+end
+
+function CEntityDrawable:hitAppend(_entities) -- append hit entities
+    for _entity, _ in pairs(_entities or {}) do
+        if self.hitbox then self.hitbox:hittoAppend(_entity) end
+        if _entity.hitbox then _entity.hitbox:hitbyAppend(self) end
+    end
+end
+
+function CEntityDrawable:hitRemove(_entities) -- remove hit entities
+    for _entity, _ in pairs(_entities or {}) do
+        if self.hitbox then self.hitbox:hittoRemove(_entity) end
+        if _entity.hitbox then _entity.hitbox:hitbyRemove(self) end
+    end
+end
+
+function CEntityDrawable:hitDetach() -- detach hit entities
+	if not self.hitbox then return end -- nothing to detach
+	self:hitRemove(self.hitbox.hitto)
 end
 
 
@@ -2699,14 +2723,12 @@ function CCharacter:moveDirection(_direction) -- handle moving a character in a 
     self.offsetx = _offsetx -- set move offsets
     self.offsety = _offsety
 
-    local _move          = true -- calculate the maximum move step by step
-    local _worldregion   = self:worldRegion()
-    local _nearestentity = self:nearestEntityAround() -- nearest entity if any -- except itself
-    if _nearestentity then
-        self.hitbox:hittoAppend(_nearestentity)
-    else
-        self.hitbox.hitto = {}
-    end
+    local _move           = true -- calculate the maximum move step by step
+    local _worldregion    = self:worldRegion()
+    local _entitiesaround = self:entitiesAround() -- nearest entities if any -- except itself
+    -- Tic:traceTable("entitiesaround", _entitiesaround)
+    self:hitAppend(self)
+
     local _movebyx = Nums:sign(_offsetx)
     local _movebyy = Nums:sign(_offsety)
     local _movetox = 0
@@ -3963,16 +3985,15 @@ for _, _cplace in pairs({
     -- CPlaceStallAnim,
     -- CPlaceStallIdle,
     CPlaceTree0Anim,
-    -- CPlaceTree0Idle,
-    -- CPlaceTree1Anim,
-    -- CPlaceTree1Idle,
+    CPlaceTree0Idle,
+    CPlaceTree1Anim,
+    CPlaceTree1Idle,
 }) do
-    local _place = _cplace()
-    -- _place:randomWorldWindow()
+    _cplace{
+        worldx = math.random(-20, 20),
+        worldy = math.random(-20, 20),
+    }
 end
-CPlaceTree1Idle{
-    worldx = -10,
-}
 end
 
 

@@ -107,9 +107,9 @@ end
 
 
 function Tables:dump(_table, _argt) -- dump a table -- SORTED -- RECURSIVE -- INDENT -- DEPTH
-    _argt = (_argt) and _argt or {}
+    _argt = _argt or {}
     local _indent  = _argt.indent or ""
-    local _depth   = _argt.depth or Nums.MAXINTEGER
+    local _depth   = _argt.depth  or Nums.MAXINTEGER
     local _verbose = (_argt.verbose == true) or false
     local _hide    = _argt.hide or {} -- hide keys
     local _show    = _argt.show or {} -- override hidden keys if any
@@ -118,9 +118,9 @@ function Tables:dump(_table, _argt) -- dump a table -- SORTED -- RECURSIVE -- IN
 
     local _tablesdumped = {} -- already dumped tables to avoid dead loops
     function _dump(_table, _argt)
-        local _depth  = _argt.depth
         local _indent = _argt._indent
-
+        local _depth  = _argt.depth
+    
         local _result = ""
         if type(_table) ~= "table" then
             return _result end -- not a table
@@ -161,7 +161,7 @@ function Tables:dump(_table, _argt) -- dump a table -- SORTED -- RECURSIVE -- IN
             end
 
             if _doshow then
-                _result = _result.._indent..tostring(_key).."\t"..tostring(_val).."\n"
+                _result = _result..tostring(_indent)..tostring(_key).."\t"..tostring(_val).."\n"
             end
 
             if _skip and _dokeep and type(_val) == "table" then -- skip tables with those keys
