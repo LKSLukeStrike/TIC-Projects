@@ -260,11 +260,13 @@ Tic.FREQUENCE0300 = 0300 -- each 5 second
 Tic.FREQUENCE0600 = 0600 -- each 10 second
 
 -- Keys values
+Tic.KEY_A              = 01
 Tic.KEY_B              = 02
 Tic.KEY_D              = 04
 Tic.KEY_H              = 08
 Tic.KEY_M              = 13
 Tic.KEY_P              = 16
+Tic.KEY_Q              = 17
 Tic.KEY_R              = 18
 Tic.KEY_S              = 19
 Tic.KEY_V              = 22
@@ -297,6 +299,7 @@ Tic.KEY_NUMPADDIVIDE   = 92
 -- Actions values
 Tic.ACTIONPLAYERPREV    = "playerPrev"
 Tic.ACTIONPLAYERNEXT    = "playerNext"
+Tic.ACTIONPLAYERQUIT    = "playerQuit"
 Tic.ACTIONSTATEPREV     = "statePrev"
 Tic.ACTIONSTATENEXT     = "stateNext"
 Tic.ACTIONTOGGLEWORK    = "toggleWork"
@@ -339,6 +342,7 @@ Tic.KEYS2ACTIONS = {
     [Tic.KEY_NUMPAD1]      = Tic.ACTIONMOVE225,
     [Tic.KEY_NUMPAD4]      = Tic.ACTIONMOVE270,
     [Tic.KEY_NUMPAD7]      = Tic.ACTIONMOVE315,
+    [Tic.KEY_A]            = Tic.ACTIONPLAYERQUIT,
     [Tic.KEY_B]            = Tic.ACTIONBIOMENEXT,
     [Tic.KEY_D]            = Tic.ACTIONTOGGLEDIRS,
     [Tic.KEY_H]            = Tic.ACTIONTOGGLEHITBOX,
@@ -356,6 +360,7 @@ Tic.KEYS2ACTIONS = {
 Tic.ACTIONS2FUNCTIONS = {
     [Tic.ACTIONPLAYERPREV]    = function() Tic:playerPrev() end,
     [Tic.ACTIONPLAYERNEXT]    = function() Tic:playerNext() end,
+    [Tic.ACTIONPLAYERQUIT]    = function() Tic:playerQuit() end,
     [Tic.ACTIONSTATEPREV]     = function() Tic:statePrev() end,
     [Tic.ACTIONSTATENEXT]     = function() Tic:stateNext() end,
     [Tic.ACTIONTOGGLEWORK]    = function() Tic:toggleWork() end,
@@ -444,6 +449,16 @@ end
 
 function Tic:playerPlayers() -- all players in the stack
     return Tic.PLAYERS.acttable
+end
+
+function Tic:playerQuit() -- detach all from actual player
+    if Tic.MODIFIERKEYS[Tic.KEY_SHIFT] then
+        Tic:playerActual():hitboxDetachAllTo()
+    elseif Tic.MODIFIERKEYS[Tic.KEY_CTRL] then
+        Tic:playerActual():hitboxDetachAllBy()
+    else
+        Tic:playerActual():hitboxDetachAll()
+    end
 end
 
 
@@ -1166,6 +1181,21 @@ function CLocations:new(_argt)
     self:argt(_argt) -- override if any
 end
 
+function CLocations:entities(_locations) -- entities in locations
+    if not _locations then return end -- mandatory
+    local _result = {}
+
+    for _keyy, _valy in pairs(_locations or {}) do -- loop on y
+		for _keyx, _valx in pairs(_valy) do -- loop on x
+			for _entity, _ in pairs(_valx) do -- loop on entities
+                -- Tic:trace(_keyy, _keyx, _entity.kind, _entity.name)
+				_result[_entity] = _entity
+			end
+		end
+    end
+    return _result -- entities
+end
+
 function CLocations:append(_entity) -- add a new entity -- [!] allows doublons
     if not _entity then return end -- mandatory
     local _worldx = _entity.worldx
@@ -1198,7 +1228,7 @@ function CLocations:moveXY(_entity, _worldx, _worldy) -- move an existing entity
     self:append(_entity)
 end
 
-function CLocations:entitiesWorldXYRegion(_worldx, _worldy, _region) -- entities in region around world xy
+function CLocations:locationsWorldXYRegion(_worldx, _worldy, _region) -- locations in region around world xy
     if not _worldx or not _worldy or not _region then return end -- mandatory
     local _rangelf = _worldx + _region.lf -- negative lf
     local _rangerg = _worldx + _region.rg -- positive rg
@@ -1210,25 +1240,25 @@ function CLocations:entitiesWorldXYRegion(_worldx, _worldy, _region) -- entities
         if Nums:isBW(_keyy, _rangeup, _rangedw) then
             for _keyx, _valx in pairs(_valy) do -- search for x in range
                 if Nums:isBW(_keyx, _rangelf, _rangerg) then
-                    for _key, _val in pairs(_valx) do
+                    for _entity, _ in pairs(_valx) do -- loop on entities
                         if not _result[_keyy] then -- new worldy entry
                             _result[_keyy] = {}
                         end
                         if not _result[_keyy][_keyx] then -- new worldx entry in existing worldy
                             _result[_keyy][_keyx] = {}
                         end
-                        _result[_keyy][_keyx][_val] = _val
+                        _result[_keyy][_keyx][_entity] = _entity
                     end
                 end
             end
         end
     end
-    return _result
+    return _result -- locations
 end
 
-function CLocations:entitiesWorldXYAround(_worldx, _worldy, _rangex, _rangey) -- entities in ranges
+function CLocations:locationsWorldXYAround(_worldx, _worldy, _rangex, _rangey) -- locations in ranges
     if not _worldx or not _worldy or not _rangex or not _rangey then return end -- mandatory
-    return self:entitiesWorldXYRegion(_worldx, _worldy, CRegion{
+    return self:locationsWorldXYRegion(_worldx, _worldy, CRegion{
         lf = Nums:neg(_rangex),
         rg = Nums:pos(_rangex),
         up = Nums:neg(_rangey),
@@ -1236,20 +1266,20 @@ function CLocations:entitiesWorldXYAround(_worldx, _worldy, _rangex, _rangey) --
     })
 end
 
-function CLocations:entitiesEntityRegion(_entity, _region) -- entities in region
+function CLocations:locationsEntityRegion(_entity, _region) -- locations in region
     if not _entity or not __region then return end -- mandatory
     local _worldx = _entity.worldx
     local _worldy = _entity.worldy
 
-    return self:entitiesWorldXYRegion(_worldx, _worldy, _region)
+    return self:locationsWorldXYRegion(_worldx, _worldy, _region)
 end
 
-function CLocations:entitiesEntityAround(_entity, _rangex, _rangey) -- entities in ranges
+function CLocations:locationsEntityAround(_entity, _rangex, _rangey) -- locations in ranges
     if not _entity or not _rangex or not _rangey then return end -- mandatory
     local _worldx = _entity.worldx
     local _worldy = _entity.worldy
 
-    return self:entitiesWorldXYAround(_worldx, _worldy, _rangex, _rangey)
+    return self:locationsWorldXYAround(_worldx, _worldy, _rangex, _rangey)
 end
 
 --
@@ -1288,24 +1318,24 @@ function CEntitiesLocations:moveXY(_entity, _worldx, _worldy) -- move an existin
     self.locations:moveXY(_entity, _worldx, _worldy)
 end
 
-function CEntitiesLocations:entitiesWorldXYRegion(_worldx, _worldy, _region) -- entities in world xy region
+function CEntitiesLocations:locationsWorldXYRegion(_worldx, _worldy, _region) -- locations in world xy region
     if not _worldx or not _worldy or not _region then return end -- mandatory
-    return self.locations:entitiesWorldXYRegion(_worldx, _worldy, _region)
+    return self.locations:locationsWorldXYRegion(_worldx, _worldy, _region)
 end
 
-function CEntitiesLocations:entitiesWorldXYAround(_worldx, _worldy, _rangex, _rangey) -- entities in world xy ranges
+function CEntitiesLocations:locationsWorldXYAround(_worldx, _worldy, _rangex, _rangey) -- locations in world xy ranges
     if not _worldx or not _worldy or not _rangex or not _rangey then return end -- mandatory
-    return self.locations:entitiesWorldXYAround(_worldx, _worldy, _rangex, _rangey)
+    return self.locations:locationsWorldXYAround(_worldx, _worldy, _rangex, _rangey)
 end
 
-function CEntitiesLocations:entitiesEntityRegion(_entity, _region) -- entities in entity region
+function CEntitiesLocations:locationsEntityRegion(_entity, _region) -- locations in entity region
     if not _entity or not _region then return end -- mandatory
-    return self.locations:entitiesEntityRegion(_entity, _region)
+    return self.locations:locationsEntityRegion(_entity, _region)
 end
 
-function CEntitiesLocations:entitiesEntityAround(_entity, _rangex, _rangey) -- entities in entity ranges
+function CEntitiesLocations:locationsEntityAround(_entity, _rangex, _rangey) -- locations in entity ranges
     if not _entity or not _rangex or not _rangey then return end -- mandatory
-    return self.locations:entitiesEntityAround(_entity, _rangex, _rangey)
+    return self.locations:locationsEntityAround(_entity, _rangex, _rangey)
 end
 
 
@@ -1341,24 +1371,24 @@ function CWorld:entityMoveXY(_entity, _worldx, _worldy) -- move an entity into t
     _entity:focus() -- focus its camera on itself
 end
 
-function CWorld:entitiesWorldXYRegion(_worldx, _worldy, _region) -- entities in region
+function CWorld:locationsWorldXYRegion(_worldx, _worldy, _region) -- locations in region
     if not _worldx or not _worldy or not _region then return end -- mandatory
-    return self.entitieslocations:entitiesWorldXYRegion(_worldx, _worldy, _region)
+    return self.entitieslocations:locationsWorldXYRegion(_worldx, _worldy, _region)
 end
 
-function CWorld:entitiesWorldXYAround(_worldx, _worldy, _rangex, _rangey) -- entities in ranges
+function CWorld:locationsWorldXYAround(_worldx, _worldy, _rangex, _rangey) -- locations in ranges
     if not _worldx or not _worldy or not _rangex or not _rangey then return end -- mandatory
-    return self.entitieslocations:entitiesWorldXYAround(_worldx, _worldy, _rangex, _rangey)
+    return self.entitieslocations:locationsWorldXYAround(_worldx, _worldy, _rangex, _rangey)
 end
 
-function CWorld:entitiesEntityRegion(_entity, _region) -- entities in region
+function CWorld:locationsEntityRegion(_entity, _region) -- locations in region
     if not _entity or not _region then return end -- mandatory
-    return self.entitieslocations:entitiesEntityRegion(_entity, _region)
+    return self.entitieslocations:locationsEntityRegion(_entity, _region)
 end
 
-function CWorld:entitiesEntityAround(_entity, _rangex, _rangey) -- entities in ranges
+function CWorld:locationsEntityAround(_entity, _rangex, _rangey) -- locations in ranges
     if not _entity or not _rangex or not _rangey then return end -- mandatory
-    return self.entitieslocations:entitiesEntityAround(_entity, _rangex, _rangey)
+    return self.entitieslocations:locationsEntityAround(_entity, _rangex, _rangey)
 end
 
 
@@ -1388,26 +1418,26 @@ function CEntity:focus() -- focus camera on itself
     self.camera:focusEntity(self)
 end
 
-function CEntity:entitiesRegion(_region) -- entities in a region from itself
+function CEntity:locationsRegion(_region) -- locations in a region from itself
     if not _region then return end -- mandatory
     if not self.camera then return end -- requires a camera
     self:focus()
-    return self.camera:entitiesRegion(_region)
+    return self.camera:locationsRegion(_region)
 end
 
-function CEntity:entitiesAround() -- entities around itself
+function CEntity:locationsAround() -- locations around itself
     if not self.camera then return end -- requires a camera
     self:focus()
-    return self.camera:entitiesAround()
+    return self.camera:locationsAround()
 end
 
 function CEntity:nearestEntityAround() -- nearest entity around itself, except itself
-    local _nearestentity  = nil
-    local _entitiesaround = self:entitiesAround()
+    local _nearestentity   = nil
+    local _locationsaround = self:locationsAround()
 
-    for _, _keyy in pairs(Tables:keys(_entitiesaround)) do -- sorted by y first
-        for _, _keyx in pairs(Tables:keys(_entitiesaround[_keyy])) do -- sorted by x next
-            for _entity, _ in pairs(_entitiesaround[_keyy][_keyx]) do
+    for _, _keyy in pairs(Tables:keys(_locationsaround)) do -- sorted by y first
+        for _, _keyx in pairs(Tables:keys(_locationsaround[_keyy])) do -- sorted by x next
+            for _entity, _ in pairs(_locationsaround[_keyy][_keyx]) do
 				if not (_entity == self) then -- avoid to spot itself
 					if _nearestentity == nil then
 						_nearestentity = _entity -- first nearest entity
@@ -1476,13 +1506,13 @@ function CCamera:focusEntity(_entity) -- focus camera on an entity world positio
     self:focusXY(_entity.worldx, _entity.worldy)
 end
 
-function CCamera:entitiesRegion(_region) -- entities in region from a camera
+function CCamera:locationsRegion(_region) -- locations in region from a camera
     if not _region then return end -- mandatory
-    return self.world:entitiesEntityRegion(self, _region)
+    return self.world:locationsEntityRegion(self, _region)
 end
 
-function CCamera:entitiesAround() -- entities in a camera ranges
-    return self.world:entitiesEntityAround(self, self.rangex, self.rangey)
+function CCamera:locationsAround() -- locations in a camera ranges
+    return self.world:locationsEntityAround(self, self.rangex, self.rangey)
 end
 
 
@@ -1588,23 +1618,44 @@ function CEntityDrawable:worldRegion() -- return its own region in world
     }
 end
 
-function CEntityDrawable:hitAppend(_entities) -- append hit entities
+function CEntityDrawable:hitboxAttachTo(_entities) -- attach hitto entities
     for _entity, _ in pairs(_entities or {}) do
         if self.hitbox then self.hitbox:hittoAppend(_entity) end
         if _entity.hitbox then _entity.hitbox:hitbyAppend(self) end
     end
 end
 
-function CEntityDrawable:hitRemove(_entities) -- remove hit entities
+function CEntityDrawable:hitboxDetachTo(_entities) -- detach hitto entities
     for _entity, _ in pairs(_entities or {}) do
         if self.hitbox then self.hitbox:hittoRemove(_entity) end
         if _entity.hitbox then _entity.hitbox:hitbyRemove(self) end
     end
 end
 
-function CEntityDrawable:hitDetach() -- detach hit entities
+function CEntityDrawable:hitboxDetachBy(_entities) -- detach hitby entities
+    for _entity, _ in pairs(_entities or {}) do
+        if self.hitbox then self.hitbox:hitbyRemove(_entity) end
+        if _entity.hitbox then _entity.hitbox:hittoRemove(self) end
+    end
+end
+
+function CEntityDrawable:hitboxDetachSelf() -- detach itself from hitto entities
+    self:hitboxDetachTo({[self] = self})
+end
+
+function CEntityDrawable:hitboxDetachAllTo() -- detach all hitto entities
 	if not self.hitbox then return end -- nothing to detach
-	self:hitRemove(self.hitbox.hitto)
+	self:hitboxDetachTo(self.hitbox.hitto)
+end
+
+function CEntityDrawable:hitboxDetachAllBy() -- detach all hitby entities
+	if not self.hitbox then return end -- nothing to detach
+	self:hitboxDetachBy(self.hitbox.hitby)
+end
+
+function CEntityDrawable:hitboxDetachAll() -- detach all hitto/hitby entities
+	self:hitboxDetachAllTo()
+	self:hitboxDetachAllBy()
 end
 
 
@@ -2723,16 +2774,17 @@ function CCharacter:moveDirection(_direction) -- handle moving a character in a 
     self.offsetx = _offsetx -- set move offsets
     self.offsety = _offsety
 
-    local _move           = true -- calculate the maximum move step by step
-    local _worldregion    = self:worldRegion()
-    local _entitiesaround = self:entitiesAround() -- nearest entities if any -- except itself
-    -- Tic:traceTable("entitiesaround", _entitiesaround)
-    self:hitAppend(self)
+    local _locationsaround = self:locationsAround() -- collisions
+    local _entitiesaround  = CLocations:entities(_locationsaround)
+    self:hitboxDetachAll()
+    self:hitboxAttachTo(_entitiesaround)
+    self:hitboxDetachSelf() -- not itself
 
-    local _movebyx = Nums:sign(_offsetx)
+    local _movebyx = Nums:sign(_offsetx) -- calculate the maximum move step by step
     local _movebyy = Nums:sign(_offsety)
     local _movetox = 0
     local _movetoy = 0
+    local _move    = true
     while _move do
         if Nums:pos(_movetox) < Nums:pos(_offsetx) then _movetox = _movetox + _movebyx end
         if Nums:pos(_movetoy) < Nums:pos(_offsety) then _movetoy = _movetoy + _movebyy end
@@ -3677,11 +3729,11 @@ function CWindowWorld:drawInside() -- window world content
 end
 
 function CWindowWorld:drawPlayerActual()
-    local _playeractual    = Tic:playerActual()
-    local _entitiesaround  = _playeractual:entitiesAround()
-    local _regionviewworld = _playeractual:regionViewWorld()
-    local _regionmindworld = _playeractual:regionMindWorld()
-    local _nearestentity   = _playeractual:nearestEntityAround() -- nearest entity if any -- except itself
+    local _playeractual     = Tic:playerActual()
+    local _locationsaround  = _playeractual:locationsAround()
+    local _regionviewworld  = _playeractual:regionViewWorld()
+    local _regionmindworld  = _playeractual:regionMindWorld()
+    local _nearestentity    = _playeractual:nearestEntityAround() -- nearest entity if any -- except itself
 
     _nearestentity = (_nearestentity and _regionviewworld:hasInsideRegion(_nearestentity:worldRegion())) -- keep it only if in view
         and _nearestentity
@@ -3696,9 +3748,9 @@ function CWindowWorld:drawPlayerActual()
     end
     
 
-    for _, _keyy in pairs(Tables:keys(_entitiesaround)) do -- draw entities -- sorted by y first
-        for _, _keyx in pairs(Tables:keys(_entitiesaround[_keyy])) do -- sorted by x next
-            for _entity, _ in pairs(_entitiesaround[_keyy][_keyx]) do -- entities around actual player
+    for _, _keyy in pairs(Tables:keys(_locationsaround)) do -- draw entities -- sorted by y first
+        for _, _keyx in pairs(Tables:keys(_locationsaround[_keyy])) do -- sorted by x next
+            for _entity, _ in pairs(_locationsaround[_keyy][_keyx]) do -- entities around actual player
                 local _entityworldregion = _entity:worldRegion()
 
                 _entity.spotted = (_entity == _nearestentity) -- unspot all entities except nearest one if any (in view)
@@ -3908,12 +3960,12 @@ end -- generate places
 
 local Wulfie = CPlayerWolfe{name = "Wulfie",
     colorextra = Tic.COLORRED,
+    worldx = 10,
 }
-Wulfie:randomWorldWindow()
+-- Wulfie:randomWorldWindow()
 
 local Oxboow = CPlayerGhost{name = "Oxboow",
-worldx = 10,
-statphyact = 10,
+    statphyact = 10,
 }
 -- Oxboow:randomWorldWindow()
 
