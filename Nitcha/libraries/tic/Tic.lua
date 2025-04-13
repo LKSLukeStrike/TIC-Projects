@@ -1212,7 +1212,6 @@ function CLocations:entities(_locations) -- entities in locations
     for _keyy, _valy in pairs(_locations or {}) do -- loop on y
 		for _keyx, _valx in pairs(_valy) do -- loop on x
 			for _entity, _ in pairs(_valx) do -- loop on entities
-                -- Tic:trace(_keyy, _keyx, _entity.kind, _entity.name)
 				_result[_entity] = _entity
 			end
 		end
@@ -1220,7 +1219,7 @@ function CLocations:entities(_locations) -- entities in locations
     return _result -- entities
 end
 
-function CLocations:append(_entity) -- add a new entity -- [!] allows doublons
+function CLocations:appendEntity(_entity) -- add a new entity -- [!] allows doublons
     if not _entity then return end -- mandatory
     local _worldx = _entity.worldx
     local _worldy = _entity.worldy
@@ -1249,7 +1248,7 @@ function CLocations:moveXY(_entity, _worldx, _worldy) -- move an existing entity
     self:remove(_entity)
     _entity.worldx = _worldx
     _entity.worldy = _worldy
-    self:append(_entity)
+    self:appendEntity(_entity)
 end
 
 function CLocations:locationsWorldXYRegion(_worldx, _worldy, _region) -- locations in region around world xy
@@ -1322,11 +1321,11 @@ function CEntitiesLocations:exists(_entity) -- if exists an entity
     return self.entities[_entity]
 end
 
-function CEntitiesLocations:append(_entity) -- add a new entity
+function CEntitiesLocations:appendEntity(_entity) -- add a new entity
     if not _entity then return end -- mandatory
     if self:exists(_entity) then return end -- avoid doublons
     self.entities[_entity] = true
-    self.locations:append(_entity)
+    self.locations:appendEntity(_entity)
 end
 
 function CEntitiesLocations:remove(_entity) -- remove an entity
@@ -1379,9 +1378,9 @@ end
 -- CWorld instance
 local World = CWorld{}
 
-function CWorld:entityAppend(_entity) -- add a new entity in the world
+function CWorld:appendEntity(_entity) -- add a new entity in the world
     if not _entity then return end -- mandatory
-    self.entitieslocations:append(_entity)
+    self.entitieslocations:appendEntity(_entity)
 end
 
 function CWorld:entityRemove(_entity) -- remove an entity from the world
@@ -1480,7 +1479,7 @@ function CEntity:randomRegionWorld(_region) -- random worldx worldy in a region 
     self.world:entityRemove(self) -- remove itself from its old position -- FIXME why remove/append here ?
     self.worldx = Nums:random(_region.lf, _region.rg)
     self.worldy = Nums:random(_region.up, _region.dw)
-    self.world:entityAppend(self) -- append itself from its new position
+    self.world:appendEntity(self) -- append itself from its new position
 end
 
 function CEntity:randomWorldWindow() -- random worldx worldy into the world window region
@@ -1562,7 +1561,7 @@ function CEntityDrawable:new(_argt)
     self.drawhitbox  = false
     self.drawfade    = false
    self:argt(_argt) -- override if any
-    self.world:entityAppend(self) -- append itself to the world
+    self.world:appendEntity(self) -- append itself to the world
 end
 
 function CEntityDrawable:draw() -- default draw for drawable entities -- override if any
@@ -2402,7 +2401,7 @@ function CCharacter:regionViewOffsets() -- view offsets region depending on dirx
     local _posturekneel  = _posture == Tic.POSTUREKNEEL
     local _size          = Tic.SPRITESIZE * self.scale
     local _rangewh       = Tic.WORLDWH -- use world window height as range -- TODO change that later ?
-    local _offsets       =  ((((_rangewh - _size) // 2) - 1) * (_stat / Tic.STATSMAX)) // 1
+    local _offsets       =  math.tointeger(((((_rangewh - _size) // 2) - 1) * (_stat / Tic.STATSMAX)))
     -- local _offsets       = (_posturekneel) -- FIXME here the posture
     --     and ((((_rangewh - _size) // 2) - 1) * (_stat / Tic.STATSMAX)) // 2
     --     or  ((((_rangewh - _size) // 2) - 1) * (_stat / Tic.STATSMAX)) // 1
@@ -2798,14 +2797,18 @@ function CCharacter:moveDirection(_direction) -- handle moving a character in a 
     self.offsetx = _offsetx -- set move offsets
     self.offsety = _offsety
 
+    Tic:logClearRecord()
+    Tic:logRecord("self", self.worldx, self.worldy)
     local _hitboxregion    = self:regionViewWorld() -- hitbox collisions
-    Tic:trace("hreg", Tables:size(_hitboxregion))
-    Tic:traceTable("hreg", _hitboxregion)
-    local _hitboxlocations = self:locationsAround() --self:locationsRegion(_hitboxregion)
-    Tic:trace("hloc", Tables:size(_hitboxlocations))
+    Tic:logRecord("hreg", _hitboxregion.lf..":".._hitboxregion.rg, _hitboxregion.up..":".._hitboxregion.dw)
+    -- Tic:trace("hreg", Tables:size(_hitboxregion))
+    -- Tic:traceTable("hreg", _hitboxregion)
+    local _hitboxlocations = self:locationsAround()
+    -- local _hitboxlocations = self:locationsRegion(_hitboxregion)
+    Tic:logRecord("hloc", Tables:size(_hitboxlocations))
     local _hitboxentities  = CLocations:entities(_hitboxlocations)
-    Tic:trace("hent", Tables:size(_hitboxentities))
-    Tic:logRecordEntities(_hitboxentities, true)
+    -- Tic:trace("hent", Tables:size(_hitboxentities))
+    Tic:logRecordEntities(_hitboxentities)
     self:hitboxDetachAll()
     self:hitboxAttachTo(_hitboxentities)
     self:hitboxDetachSelf() -- not itself
@@ -4117,10 +4120,10 @@ function Tic:drawLog() -- [-] remove
     --     Tic:logAppend(_key, _val)
     -- end
 
-    Tic:logAppend("wx", _playeractual.worldx)
-    Tic:logAppend("wy", _playeractual.worldy)
+    -- Tic:logAppend("wx", _playeractual.worldx)
+    -- Tic:logAppend("wy", _playeractual.worldy)
 
-    Tic:logAppend(Nums:frequence01(_tick00, Tic.FREQUENCE0240))
+    -- Tic:logAppend(Nums:frequence01(_tick00, Tic.FREQUENCE0240))
 end
 
 
