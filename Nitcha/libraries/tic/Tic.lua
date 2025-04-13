@@ -707,26 +707,50 @@ end
 
 
 -- Log System -- store logs to display each frame
-Tic.Log = {}
-function Tic:logClear() -- clear the log
-    Tic.Log = {}
+Tic.LOGBUFFER = {} -- cleared at print
+Tic.LOGRECORD = {} -- cleared manually
+function Tic:logClearBuffer() -- clear the log buffer
+    Tic.LOGBUFFER = {}
 end
 
-function Tic:logAppend(...) -- add item to the log
+function Tic:logClearRecord() -- clear the log record
+    Tic.LOGRECORD = {}
+end
+
+function Tic:logAppend(...) -- add item to the log buffer
     local _args = {...}
     local _item = ""
     for _, _val in ipairs(_args) do
         _item = _item..Tic:val2string(_val).." "
     end
-    table.insert(Tic.Log, _item)
+    table.insert(Tic.LOGBUFFER, _item)
 end
 
-function Tic:logPrint() -- print the log then clear it
-    for _line, _item in ipairs(Tic.Log) do
+function Tic:logRecord(...) -- add item to the log record
+    local _args = {...}
+    local _item = ""
+    for _, _val in ipairs(_args) do
+        _item = _item..Tic:val2string(_val).." "
+    end
+    table.insert(Tic.LOGRECORD, _item)
+end
+
+function Tic:logPrint() -- print the log buffer increased by the log record then clear it
+    for _, _item in ipairs(Tic.LOGRECORD) do
+        table.insert(Tic.LOGBUFFER, _item)
+    end
+    for _line, _item in ipairs(Tic.LOGBUFFER) do
         _line = _line - 1 -- line start from 0
         Tic:print(0, _line * Tic.SPRITESIZE, _item) -- one item per "line"
-      end    
-    Tic:logClear()
+    end
+    Tic:logClearBuffer()
+end
+
+function Tic:logRecordEntities(_entities, _clear) -- record entities
+    if _clear then Tic:logClearRecord() end
+    for _entity, _ in pairs(_entities or {}) do
+        Tic:logRecord(_entity.worldx, _entity.worldy, _entity.kind, _entity.name)
+    end
 end
 
 
@@ -1247,7 +1271,7 @@ function CLocations:locationsWorldXYRegion(_worldx, _worldy, _region) -- locatio
                         if not _result[_keyy][_keyx] then -- new worldx entry in existing worldy
                             _result[_keyy][_keyx] = {}
                         end
-                        _result[_keyy][_keyx][_entity] = _entity
+                        _result[_keyy][_keyx][_entity] = _entity -- build up locations
                     end
                 end
             end
@@ -2774,10 +2798,16 @@ function CCharacter:moveDirection(_direction) -- handle moving a character in a 
     self.offsetx = _offsetx -- set move offsets
     self.offsety = _offsety
 
-    local _locationsaround = self:locationsAround() -- collisions
-    local _entitiesaround  = CLocations:entities(_locationsaround)
+    local _hitboxregion    = self:regionViewWorld() -- hitbox collisions
+    Tic:trace("hreg", Tables:size(_hitboxregion))
+    Tic:traceTable("hreg", _hitboxregion)
+    local _hitboxlocations = self:locationsAround() --self:locationsRegion(_hitboxregion)
+    Tic:trace("hloc", Tables:size(_hitboxlocations))
+    local _hitboxentities  = CLocations:entities(_hitboxlocations)
+    Tic:trace("hent", Tables:size(_hitboxentities))
+    Tic:logRecordEntities(_hitboxentities, true)
     self:hitboxDetachAll()
-    self:hitboxAttachTo(_entitiesaround)
+    self:hitboxAttachTo(_hitboxentities)
     self:hitboxDetachSelf() -- not itself
 
     local _movebyx = Nums:sign(_offsetx) -- calculate the maximum move step by step
