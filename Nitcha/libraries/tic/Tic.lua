@@ -1232,7 +1232,7 @@ function CLocations:appendEntity(_entity) -- add a new entity -- [!] allows doub
     self.locations[_worldy][_worldx][_entity] = _entity
 end
 
-function CLocations:remove(_entity) -- remove an existing entity
+function CLocations:removeEntity(_entity) -- remove an existing entity
     if not _entity then return end -- mandatory
     local _worldx = _entity.worldx
     local _worldy = _entity.worldy
@@ -1242,10 +1242,10 @@ function CLocations:remove(_entity) -- remove an existing entity
     if Tables:size(self.locations[_worldy]) == 0 then self.locations[_worldy] = nil end
 end
 
-function CLocations:moveXY(_entity, _worldx, _worldy) -- move an existing entity
+function CLocations:moveEntityWorldXY(_entity, _worldx, _worldy) -- move an existing entity
     if not _entity or not _worldx or not _worldy then return end -- mandatory
     if not self.locations[_entity.worldy][_entity.worldx][_entity] then return end -- doesnt exist
-    self:remove(_entity)
+    self:removeEntity(_entity)
     _entity.worldx = _worldx
     _entity.worldy = _worldy
     self:appendEntity(_entity)
@@ -1279,7 +1279,7 @@ function CLocations:locationsWorldXYRegion(_worldx, _worldy, _region) -- locatio
     return _result -- locations
 end
 
-function CLocations:locationsWorldXYAround(_worldx, _worldy, _rangex, _rangey) -- locations in ranges
+function CLocations:locationsWorldXYRangeXY(_worldx, _worldy, _rangex, _rangey) -- locations in ranges
     if not _worldx or not _worldy or not _rangex or not _rangey then return end -- mandatory
     return self:locationsWorldXYRegion(_worldx, _worldy, CRegion{
         lf = Nums:neg(_rangex),
@@ -1297,12 +1297,12 @@ function CLocations:locationsEntityRegion(_entity, _region) -- locations in regi
     return self:locationsWorldXYRegion(_worldx, _worldy, _region)
 end
 
-function CLocations:locationsEntityAround(_entity, _rangex, _rangey) -- locations in ranges
+function CLocations:locationsEntityRangeXY(_entity, _rangex, _rangey) -- locations in ranges
     if not _entity or not _rangex or not _rangey then return end -- mandatory
     local _worldx = _entity.worldx
     local _worldy = _entity.worldy
 
-    return self:locationsWorldXYAround(_worldx, _worldy, _rangex, _rangey)
+    return self:locationsWorldXYRangeXY(_worldx, _worldy, _rangex, _rangey)
 end
 
 --
@@ -1328,17 +1328,17 @@ function CEntitiesLocations:appendEntity(_entity) -- add a new entity
     self.locations:appendEntity(_entity)
 end
 
-function CEntitiesLocations:remove(_entity) -- remove an entity
+function CEntitiesLocations:removeEntity(_entity) -- remove an entity
     if not _entity then return end -- mandatory
     if not self:exists(_entity) then return end -- doesnt exist
     self.entities[_entity] = nil
-    self.locations:remove(_entity)
+    self.locations:removeEntity(_entity)
 end
 
-function CEntitiesLocations:moveXY(_entity, _worldx, _worldy) -- move an existing entity
+function CEntitiesLocations:moveEntityWorldXY(_entity, _worldx, _worldy) -- move an existing entity
     if not _entity or not _worldx or not _worldy then return end -- mandatory
     if not self.entities[_entity] then return end -- doesnt exist
-    self.locations:moveXY(_entity, _worldx, _worldy)
+    self.locations:moveEntityWorldXY(_entity, _worldx, _worldy)
 end
 
 function CEntitiesLocations:locationsWorldXYRegion(_worldx, _worldy, _region) -- locations in world xy region
@@ -1346,9 +1346,9 @@ function CEntitiesLocations:locationsWorldXYRegion(_worldx, _worldy, _region) --
     return self.locations:locationsWorldXYRegion(_worldx, _worldy, _region)
 end
 
-function CEntitiesLocations:locationsWorldXYAround(_worldx, _worldy, _rangex, _rangey) -- locations in world xy ranges
+function CEntitiesLocations:locationsWorldXYRangeXY(_worldx, _worldy, _rangex, _rangey) -- locations in world xy ranges
     if not _worldx or not _worldy or not _rangex or not _rangey then return end -- mandatory
-    return self.locations:locationsWorldXYAround(_worldx, _worldy, _rangex, _rangey)
+    return self.locations:locationsWorldXYRangeXY(_worldx, _worldy, _rangex, _rangey)
 end
 
 function CEntitiesLocations:locationsEntityRegion(_entity, _region) -- locations in entity region
@@ -1356,9 +1356,9 @@ function CEntitiesLocations:locationsEntityRegion(_entity, _region) -- locations
     return self.locations:locationsEntityRegion(_entity, _region)
 end
 
-function CEntitiesLocations:locationsEntityAround(_entity, _rangex, _rangey) -- locations in entity ranges
+function CEntitiesLocations:locationsEntityRangeXY(_entity, _rangex, _rangey) -- locations in entity ranges
     if not _entity or not _rangex or not _rangey then return end -- mandatory
-    return self.locations:locationsEntityAround(_entity, _rangex, _rangey)
+    return self.locations:locationsEntityRangeXY(_entity, _rangex, _rangey)
 end
 
 
@@ -1378,19 +1378,19 @@ end
 -- CWorld instance
 local World = CWorld{}
 
-function CWorld:appendEntity(_entity) -- add a new entity in the world
+function CWorld:appendEntity(_entity) -- append an entity in the world
     if not _entity then return end -- mandatory
     self.entitieslocations:appendEntity(_entity)
 end
 
 function CWorld:entityRemove(_entity) -- remove an entity from the world
     if not _entity then return end -- mandatory
-    self.entitieslocations:remove(_entity)
+    self.entitieslocations:removeEntity(_entity)
 end
 
-function CWorld:entityMoveXY(_entity, _worldx, _worldy) -- move an entity into the world
+function CWorld:moveEntityWorldXY(_entity, _worldx, _worldy) -- move an entity into the world
     if not _entity or not _worldx or not _worldy then return end -- mandatory
-    self.entitieslocations:moveXY(_entity, _worldx, _worldy)
+    self.entitieslocations:moveEntityWorldXY(_entity, _worldx, _worldy)
     _entity:focus() -- focus its camera on itself
 end
 
@@ -1399,9 +1399,9 @@ function CWorld:locationsWorldXYRegion(_worldx, _worldy, _region) -- locations i
     return self.entitieslocations:locationsWorldXYRegion(_worldx, _worldy, _region)
 end
 
-function CWorld:locationsWorldXYAround(_worldx, _worldy, _rangex, _rangey) -- locations in ranges
+function CWorld:locationsWorldXYRangeXY(_worldx, _worldy, _rangex, _rangey) -- locations in ranges
     if not _worldx or not _worldy or not _rangex or not _rangey then return end -- mandatory
-    return self.entitieslocations:locationsWorldXYAround(_worldx, _worldy, _rangex, _rangey)
+    return self.entitieslocations:locationsWorldXYRangeXY(_worldx, _worldy, _rangex, _rangey)
 end
 
 function CWorld:locationsEntityRegion(_entity, _region) -- locations in region
@@ -1409,9 +1409,9 @@ function CWorld:locationsEntityRegion(_entity, _region) -- locations in region
     return self.entitieslocations:locationsEntityRegion(_entity, _region)
 end
 
-function CWorld:locationsEntityAround(_entity, _rangex, _rangey) -- locations in ranges
+function CWorld:locationsEntityRangeXY(_entity, _rangex, _rangey) -- locations in ranges
     if not _entity or not _rangex or not _rangey then return end -- mandatory
-    return self.entitieslocations:locationsEntityAround(_entity, _rangex, _rangey)
+    return self.entitieslocations:locationsEntityRangeXY(_entity, _rangex, _rangey)
 end
 
 
@@ -1535,7 +1535,7 @@ function CCamera:locationsRegion(_region) -- locations in region from a camera
 end
 
 function CCamera:locationsAround() -- locations in a camera ranges
-    return self.world:locationsEntityAround(self, self.rangex, self.rangey)
+    return self.world:locationsEntityRangeXY(self, self.rangex, self.rangey)
 end
 
 
@@ -2734,9 +2734,9 @@ function CCharacter:toggleFrame() -- toggle frame 0-1
     self.frame = Nums:toggle01(self.frame) -- animate continuous move in the same dirx
 end
 
-function CCharacter:moveXY(_worldx, _worldy) -- move character into world
+function CCharacter:moveWorldXY(_worldx, _worldy) -- move character into world
     if not _worldx or not _worldy then return end -- mandatory
-    self.world:entityMoveXY(self, _worldx, _worldy)
+    self.world:moveEntityWorldXY(self, _worldx, _worldy)
 end
 
 function CCharacter:moveDirection(_direction) -- handle moving a character in a direction
@@ -2801,14 +2801,11 @@ function CCharacter:moveDirection(_direction) -- handle moving a character in a 
     Tic:logRecord("self", self.worldx, self.worldy)
     local _hitboxregion    = self:regionViewWorld() -- hitbox collisions
     Tic:logRecord("hreg", _hitboxregion.lf..":".._hitboxregion.rg, _hitboxregion.up..":".._hitboxregion.dw)
-    -- Tic:trace("hreg", Tables:size(_hitboxregion))
-    -- Tic:traceTable("hreg", _hitboxregion)
     local _hitboxlocations = self:locationsAround()
-    -- local _hitboxlocations = self:locationsRegion(_hitboxregion)
-    Tic:logRecord("hloc", Tables:size(_hitboxlocations))
     local _hitboxentities  = CLocations:entities(_hitboxlocations)
-    -- Tic:trace("hent", Tables:size(_hitboxentities))
     Tic:logRecordEntities(_hitboxentities)
+    local _hitboxlocations = self:locationsRegion(_hitboxregion)
+
     self:hitboxDetachAll()
     self:hitboxAttachTo(_hitboxentities)
     self:hitboxDetachSelf() -- not itself
@@ -2824,7 +2821,7 @@ function CCharacter:moveDirection(_direction) -- handle moving a character in a 
         if _movetox == _offsetx and _movetoy == _offsety then _move = false end
     end
 
-    self:moveXY(self.worldx + _movetox, self.worldy + _movetoy)
+    self:moveWorldXY(self.worldx + _movetox, self.worldy + _movetoy)
     self.idlecycler:min() -- reset the idle cycler
 end
 
@@ -4094,8 +4091,8 @@ function Tic:draw()
     WindowPortraitPlayer:draw()
     WindowStatsPlayer:draw()
     WindowStatePlayer:draw()
-    WindowInfosSpotted:draw()
-    WindowPortraitSpotted:draw()
+    -- WindowInfosSpotted:draw()
+    -- WindowPortraitSpotted:draw()
 
     Tic:drawLog()
     Tic:logPrint()
