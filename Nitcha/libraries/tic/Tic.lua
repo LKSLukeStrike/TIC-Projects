@@ -3996,6 +3996,8 @@ local Wulfie = CPlayerWolfe{name = "Wulfie",
 
 local Oxboow = CPlayerGhost{name = "Oxboow",
     statphyact = 10,
+    statmenact = 10,
+    statpsyact = 10,
 }
 -- Oxboow:randomWorldWindow()
 
@@ -4053,9 +4055,11 @@ if true then
 Tic.DRAWHITBOX = false
 for _, _cplace in pairs({
     -- CPlaceTree0Anim,
-    -- CPlaceTree0Idle,
+    CPlaceTree0Idle,
+    -- CPlaceTree1Anim,
+    -- CPlaceTree1Idle,
     -- CPlaceHouseAnim,
-    -- CPlaceHouseIdle,
+    CPlaceHouseIdle,
     -- CPlaceTowerAnim,
     -- CPlaceTowerIdle,
     -- CPlaceManorAnim,
@@ -4066,10 +4070,6 @@ for _, _cplace in pairs({
     -- CPlaceWaterIdle,
     -- CPlaceStallAnim,
     -- CPlaceStallIdle,
-    CPlaceTree0Anim,
-    CPlaceTree0Idle,
-    CPlaceTree1Anim,
-    CPlaceTree1Idle,
 }) do
     _cplace{
         worldx = math.random(-20, 20),
