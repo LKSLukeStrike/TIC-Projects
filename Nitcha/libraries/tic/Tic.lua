@@ -301,6 +301,7 @@ Tic.KEY_NUMPADDIVIDE   = 92
 Tic.ACTIONPLAYERPREV    = "playerPrev"
 Tic.ACTIONPLAYERNEXT    = "playerNext"
 Tic.ACTIONPLAYERQUIT    = "playerQuit"
+Tic.ACTIONPLAYERONLY    = "playerOnly"
 Tic.ACTIONSTATEPREV     = "statePrev"
 Tic.ACTIONSTATENEXT     = "stateNext"
 Tic.ACTIONTOGGLEWORK    = "toggleWork"
@@ -348,6 +349,7 @@ Tic.KEYS2ACTIONS = {
     [Tic.KEY_D]            = Tic.ACTIONTOGGLEDIRS,
     [Tic.KEY_H]            = Tic.ACTIONTOGGLEHITBOX,
     [Tic.KEY_M]            = Tic.ACTIONSTATMENACT,
+    [Tic.KEY_O]            = Tic.ACTIONPLAYERONLY,
     [Tic.KEY_P]            = Tic.ACTIONSTATPHYACT,
     [Tic.KEY_R]            = Tic.ACTIONTOGGLEMIND,
     [Tic.KEY_S]            = Tic.ACTIONTOGGLESPOTTED,
@@ -362,6 +364,7 @@ Tic.ACTIONS2FUNCTIONS = {
     [Tic.ACTIONPLAYERPREV]    = function() Tic:playerPrev() end,
     [Tic.ACTIONPLAYERNEXT]    = function() Tic:playerNext() end,
     [Tic.ACTIONPLAYERQUIT]    = function() Tic:playerQuit() end,
+    [Tic.ACTIONPLAYERONLY]    = function() Tic:playerOnly() end,
     [Tic.ACTIONSTATEPREV]     = function() Tic:statePrev() end,
     [Tic.ACTIONSTATENEXT]     = function() Tic:stateNext() end,
     [Tic.ACTIONTOGGLEWORK]    = function() Tic:toggleWork() end,
@@ -430,7 +433,8 @@ end
 
 
 -- Players System -- handle a players stack
-Tic.PLAYERS = CCyclerTable()
+Tic.PLAYERS    = CCyclerTable()
+Tic.PLAYERONLY = false -- to display view, move, etc only for actual player
 function Tic:playerAppend(_player) -- stack a new player
     if Tables:findVal(Tic.PLAYERS, _player) then return end -- avoid doublons
     return Tic.PLAYERS:insert(_player)
@@ -460,6 +464,10 @@ function Tic:playerQuit() -- detach all from actual player
     else
         Tic:playerActual():hitboxDetachAll()
     end
+end
+
+function Tic:playerOnly() -- toggle player only
+    Tic.PLAYERONLY = Nums:toggleTF(Tic.PLAYERONLY)
 end
 
 
@@ -756,14 +764,14 @@ end
 function Tic:logRecordEntities(_entities, _clear) -- record entities
     if _clear then Tic:logClearRecord() end
     for _entity, _ in pairs(_entities or {}) do
-        Tic:logRecord(_entity.worldx, _entity.worldy, _entity.kind, _entity.name)
+        Tic:logRecord(_entity:string())
     end
 end
 
 
 -- Time System -- extend functions based on time
 function Tic:time2seconds() -- time in seconds
-    return math.tointeger(time() // 1000)
+    return Nums:roundint(time() // 1000)
 end
 
 
@@ -1046,6 +1054,10 @@ function CRegion:new(_argt)
     self:argt(_argt) -- override if any
 end
 
+function CRegion:string() -- region as a string
+    return Nums:roundint(self.lf)..":"..Nums:roundint(self.rg), Nums:roundint(self.up)..":"..Nums:roundint(self.dw)
+end
+
 function CRegion:borderW(_scale) -- border width
     _scale = _scale or CSprite.SCALE01
     return self.rg - self.lf + (1 * _scale)
@@ -1260,18 +1272,18 @@ end
 
 function CLocations:locationsWorldXYRegion(_worldx, _worldy, _region) -- locations in region around world xy
     if not _worldx or not _worldy or not _region then return end -- mandatory
-    local _rangelf = _worldx + _region.lf -- negative lf
-    local _rangerg = _worldx + _region.rg -- positive rg
-    local _rangeup = _worldy + _region.up -- negative up
-    local _rangedw = _worldy + _region.dw -- positive dw
+    _region.lf = _worldx + _region.lf -- offset region by world xy
+    _region.rg = _worldx + _region.rg
+    _region.up = _worldy + _region.up
+    _region.dw = _worldy + _region.dw
     local _result  = {}
 
-    Tic:logRecord("rang", math.tointeger(_rangelf)..":"..math.tointeger(_rangerg), math.tointeger(_rangeup)..":"..math.tointeger(_rangedw))
+    Tic:logRecord("rang", _region:string())
 
     for _keyy, _valy in pairs(self.locations) do -- search for y in range
-        if Nums:isBW(_keyy, _rangeup, _rangedw) then
+        if Nums:isBW(_keyy, _region.up, _region.dw) then
             for _keyx, _valx in pairs(_valy) do -- search for x in range
-                if Nums:isBW(_keyx, _rangelf, _rangerg) then
+                if Nums:isBW(_keyx, _region.lf, _region.rg) then
                     for _entity, _ in pairs(_valx) do -- loop on entities
                         if not _result[_keyy] then -- new worldy entry
                             _result[_keyy] = {}
@@ -1299,9 +1311,10 @@ function CLocations:locationsWorldXYRangeXY(_worldx, _worldy, _rangex, _rangey) 
 end
 
 function CLocations:locationsEntityRegion(_entity, _region) -- locations in region
-    if not _entity or not __region then return end -- mandatory
+    if not _entity or not _region then return end -- mandatory
     local _worldx = _entity.worldx
     local _worldy = _entity.worldy
+    -- Tic:logRecord("loc", _entity:string()) ; Tic:logRecord("elo", _region:string())
 
     return self:locationsWorldXYRegion(_worldx, _worldy, _region)
 end
@@ -1362,6 +1375,7 @@ end
 
 function CEntitiesLocations:locationsEntityRegion(_entity, _region) -- locations in entity region
     if not _entity or not _region then return end -- mandatory
+    -- Tic:logRecord("elo", _entity:string()) ; Tic:logRecord("elo", _region:string())
     return self.locations:locationsEntityRegion(_entity, _region)
 end
 
@@ -1443,6 +1457,10 @@ function CEntity:new(_argt)
     self.discovered = false -- discovered by the player ?
     self.camera = nil -- optional camera that follows the entity -- to override if any
     self:argt(_argt) -- override if any
+end
+
+function CEntity:string() -- entity as a string
+    return self.worldx, self.worldy, self.kind, self.name
 end
 
 function CEntity:focus() -- focus camera on itself
@@ -1738,13 +1756,16 @@ CPlaceBuild.PALETTEIDLE  = {
     [CPlace.ANIM01] = CPlace.EMPTY,
     [CPlace.ANIM02] = CPlaceBuild.WALLS,
     [CPlace.ANIM03] = CPlaceBuild.WALLS,
+    [CPlaceBuild.WINDOW01] = CPlaceBuild.WALLS,
+    [CPlaceBuild.WINDOW02] = CPlaceBuild.WALLS,
+    [CPlaceBuild.DOOR]     = CPlaceBuild.FACADE,    
 }
 CPlaceBuild.PALETTEFADE  = {
     [CPlaceBuild.SMOKE]    = CPlace.EMPTY,
     [CPlaceBuild.WINDOW01] = CPlaceBuild.WALLS,
     [CPlaceBuild.WINDOW02] = CPlaceBuild.WALLS,
-    [CPlaceBuild.ROOF]     = CPlaceBuild.WALLS,
     [CPlaceBuild.DOOR]     = CPlaceBuild.FACADE,    
+    [CPlaceBuild.ROOF]     = CPlaceBuild.WALLS,
     [CPlaceBuild.FOAM]     = CPlaceBuild.WALLS,    
 }
 Classic.KINDBUILD = "Build" -- Build kind
@@ -2409,7 +2430,7 @@ function CCharacter:regionViewOffsets() -- view offsets region depending on dirx
     local _size          = Tic.SPRITESIZE * self.scale
     local _rangewh       = Tic.WORLDWH -- use world window height as range -- TODO change that later ?
     local _offsets       = Nums:roundint((((_rangewh - _size) // 2) - 1) * (_stat / Tic.STATSMAX))
-    -- _offsets             = math.tointeger(_offsets)
+    -- _offsets             = Nums:roundint(_offsets)
     -- local _offsets       = (_posturekneel) -- FIXME here the posture
     --     and ((((_rangewh - _size) // 2) - 1) * (_stat / Tic.STATSMAX)) // 2
     --     or  ((((_rangewh - _size) // 2) - 1) * (_stat / Tic.STATSMAX)) // 1
@@ -2570,6 +2591,7 @@ function CCharacter:cycleWork() -- animate work after a delay
 end
 
 function CCharacter:drawDirs() -- draw the directions and ranges around the character -- FIXME why actual player ???
+    if Tic.PLAYERONLY and not (self == Tic:playerActual()) then return end -- only actual player
     self.drawdirs = Tic.DRAWDIRS -- use Tic as master
     if not self.drawdirs then return end -- nothing to draw
     local _drawcolor     = Tic.COLORWHITE
@@ -2618,6 +2640,7 @@ function CCharacter:drawDirs() -- draw the directions and ranges around the char
 end
 
 function CCharacter:drawView() -- draw the view of a character
+    if Tic.PLAYERONLY and not (self == Tic:playerActual()) then return end -- only actual player
     self.drawview = Tic.DRAWVIEW -- use Tic as master
     if not self.drawview then return end -- nothing to draw
     -- if not (self == Tic:playerActual()) then return end -- only actual player
@@ -2632,6 +2655,7 @@ function CCharacter:drawView() -- draw the view of a character
 end
 
 function CCharacter:drawMind() -- draw the mind of a character
+    if Tic.PLAYERONLY and not (self == Tic:playerActual()) then return end -- only actual player
     self.drawmind = Tic.DRAWMIND -- use Tic as master
     if not self.drawmind then return end -- nothing to draw
     -- if not (self == Tic:playerActual()) then return end -- only actual player
@@ -2646,6 +2670,7 @@ function CCharacter:drawMind() -- draw the mind of a character
 end
 
 function CCharacter:drawMove() -- draw the move of a character
+    if Tic.PLAYERONLY and not (self == Tic:playerActual()) then return end -- only actual player
     self.drawmove = Tic.DRAWMOVE -- use Tic as master
     if not self.drawmove then return end -- nothing to draw
     -- if not (self == Tic:playerActual()) then return end -- only actual player
@@ -2814,8 +2839,12 @@ function CCharacter:moveDirection(_direction) -- handle moving a character in a 
     local _hitboxlocations = self:locationsAround()
     local _hitboxentities  = CLocations:entities(_hitboxlocations)
     Tic:logRecordEntities(_hitboxentities)
+    Tic:logRecord()
     local _hitboxlocations = self:locationsRegion(_hitboxregion)
+    Tic:logRecord("size", Tables:size(_hitboxlocations))
+    Tic:logRecordEntities(CLocations:entities(_hitboxlocations))
     Tic:logRecordActive(false)
+    local _hitboxentities  = CLocations:entities(_hitboxlocations)
 
     self:hitboxDetachAll()
     self:hitboxAttachTo(_hitboxentities)
@@ -4074,9 +4103,9 @@ for _, _cplace in pairs({
     -- CPlaceTowerAnim,
     CPlaceTowerIdle,
     -- CPlaceManorAnim,
-    CPlaceManorIdle,
+    -- CPlaceManorIdle,
     -- CPlaceAltarAnim,
-    CPlaceAltarIdle,
+    -- CPlaceAltarIdle,
     -- CPlaceWaterAnim,
     -- CPlaceWaterIdle,
     -- CPlaceStallAnim,
