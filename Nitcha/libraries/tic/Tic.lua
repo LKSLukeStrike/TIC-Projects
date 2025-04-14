@@ -265,6 +265,7 @@ Tic.KEY_B              = 02
 Tic.KEY_D              = 04
 Tic.KEY_H              = 08
 Tic.KEY_M              = 13
+Tic.KEY_O              = 15
 Tic.KEY_P              = 16
 Tic.KEY_Q              = 17
 Tic.KEY_R              = 18
@@ -707,8 +708,9 @@ end
 
 
 -- Log System -- store logs to display each frame
-Tic.LOGBUFFER = {} -- cleared at print
-Tic.LOGRECORD = {} -- cleared manually
+Tic.LOGBUFFER       = {} -- cleared at print
+Tic.LOGRECORD       = {} -- cleared manually
+Tic.LOGRECORDACTIVE = false -- to switch on/off
 function Tic:logClearBuffer() -- clear the log buffer
     Tic.LOGBUFFER = {}
 end
@@ -726,7 +728,12 @@ function Tic:logAppend(...) -- add item to the log buffer
     table.insert(Tic.LOGBUFFER, _item)
 end
 
+function Tic:logRecordActive(_active) -- set log record active on/off
+    Tic.LOGRECORDACTIVE = _active
+end
+
 function Tic:logRecord(...) -- add item to the log record
+    if not Tic.LOGRECORDACTIVE then return end -- log record not active -- do nothing
     local _args = {...}
     local _item = ""
     for _, _val in ipairs(_args) do
@@ -1259,6 +1266,8 @@ function CLocations:locationsWorldXYRegion(_worldx, _worldy, _region) -- locatio
     local _rangedw = _worldy + _region.dw -- positive dw
     local _result  = {}
 
+    Tic:logRecord("rang", math.tointeger(_rangelf)..":"..math.tointeger(_rangerg), math.tointeger(_rangeup)..":"..math.tointeger(_rangedw))
+
     for _keyy, _valy in pairs(self.locations) do -- search for y in range
         if Nums:isBW(_keyy, _rangeup, _rangedw) then
             for _keyx, _valx in pairs(_valy) do -- search for x in range
@@ -1744,8 +1753,8 @@ function CPlaceBuild:new(_argt)
     CPlaceBuild.super.new(self, _argt)
     self.kind = Classic.KINDBUILD
     self.name = Classic.NAMEBUILD
-    self.hitbox.region.lf = 1
-    self.hitbox.region.rg = 5
+    self.hitbox.region.lf = 2
+    self.hitbox.region.rg = 4
     self.hitbox.region.up = 5
     self.hitbox.region.dw = 7
     self.palettefade = CPlaceBuild.PALETTEFADE
@@ -1850,8 +1859,7 @@ function CPlaceManor:new(_argt)
     self.kind = Classic.KINDMANOR
     self.name = Classic.NAMEMANOR
     self.sprite  = CSpriteBG.PLACEMANOR
-    self.hitbox.region.lf = 0
-    self.hitbox.region.rg = 5
+    self.hitbox.region.lf = 1
     self:argt(_argt) -- override if any
 end
 
@@ -1901,8 +1909,7 @@ function CPlaceAltar:new(_argt)
     self.kind = Classic.KINDALTAR
     self.name = Classic.NAMEALTAR
     self.sprite  = CSpriteBG.PLACEALTAR
-    self.hitbox.region.lf = 0
-    self.hitbox.region.rg = 5
+    self.hitbox.region.lf = 1
     self:argt(_argt) -- override if any
 end
 
@@ -2401,7 +2408,8 @@ function CCharacter:regionViewOffsets() -- view offsets region depending on dirx
     local _posturekneel  = _posture == Tic.POSTUREKNEEL
     local _size          = Tic.SPRITESIZE * self.scale
     local _rangewh       = Tic.WORLDWH -- use world window height as range -- TODO change that later ?
-    local _offsets       =  math.tointeger(((((_rangewh - _size) // 2) - 1) * (_stat / Tic.STATSMAX)))
+    local _offsets       = Nums:roundint((((_rangewh - _size) // 2) - 1) * (_stat / Tic.STATSMAX))
+    -- _offsets             = math.tointeger(_offsets)
     -- local _offsets       = (_posturekneel) -- FIXME here the posture
     --     and ((((_rangewh - _size) // 2) - 1) * (_stat / Tic.STATSMAX)) // 2
     --     or  ((((_rangewh - _size) // 2) - 1) * (_stat / Tic.STATSMAX)) // 1
@@ -2455,7 +2463,7 @@ function CCharacter:regionMindOffsets() -- mind offsets region depending on dirx
     local _posturekneel  = _posture == Tic.POSTUREKNEEL
     local _size          = Tic.SPRITESIZE * self.scale
     local _rangewh       = Tic.WORLDWH -- use world window height as range -- TODO change that later ?
-    local _offsets       =  ((((_rangewh - _size) // 2) - 1) * (_stat / Tic.STATSMAX)) // 1
+    local _offsets       = Nums:roundint((((_rangewh - _size) // 2) - 1) * (_stat / Tic.STATSMAX))
 
     return CRegion{
         lf  = Nums:neg(_offsets),
@@ -2798,13 +2806,16 @@ function CCharacter:moveDirection(_direction) -- handle moving a character in a 
     self.offsety = _offsety
 
     Tic:logClearRecord()
+    Tic:logRecordActive(true)
     Tic:logRecord("self", self.worldx, self.worldy)
-    local _hitboxregion    = self:regionViewWorld() -- hitbox collisions
+    local _hitboxregion    = self:regionViewOffsets() -- hitbox collisions
     Tic:logRecord("hreg", _hitboxregion.lf..":".._hitboxregion.rg, _hitboxregion.up..":".._hitboxregion.dw)
+    Tic:logRecord()
     local _hitboxlocations = self:locationsAround()
     local _hitboxentities  = CLocations:entities(_hitboxlocations)
     Tic:logRecordEntities(_hitboxentities)
     local _hitboxlocations = self:locationsRegion(_hitboxregion)
+    Tic:logRecordActive(false)
 
     self:hitboxDetachAll()
     self:hitboxAttachTo(_hitboxentities)
@@ -4061,11 +4072,11 @@ for _, _cplace in pairs({
     -- CPlaceHouseAnim,
     CPlaceHouseIdle,
     -- CPlaceTowerAnim,
-    -- CPlaceTowerIdle,
+    CPlaceTowerIdle,
     -- CPlaceManorAnim,
-    -- CPlaceManorIdle,
+    CPlaceManorIdle,
     -- CPlaceAltarAnim,
-    -- CPlaceAltarIdle,
+    CPlaceAltarIdle,
     -- CPlaceWaterAnim,
     -- CPlaceWaterIdle,
     -- CPlaceStallAnim,

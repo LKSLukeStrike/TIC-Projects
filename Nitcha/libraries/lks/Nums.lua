@@ -51,6 +51,10 @@ function Nums:roundmin(_num) -- min rounded num
     return (_num >= 0) and math.floor(_num) or math.ceil(_num)
 end
 
+function Nums:roundint(_num) -- remove the floating part
+    return math.tointeger(_num // 1) -- avoid to return nil as math.tointeger does if floating is not .0
+end
+
 
 -- Random
 function Nums:random(_num1, _num2) -- solid random, ensure correct interval
