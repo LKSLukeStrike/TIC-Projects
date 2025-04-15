@@ -321,6 +321,7 @@ Tic.ACTIONSTATPSYACT    = "statPsyAct"
 Tic.ACTIONBIOMENEXT     = "biomeNext"
 Tic.ACTIONTOGGLEHITBOX  = "toggleHitbox"
 Tic.ACTIONTOGGLESPOTTED = "toggleSpotted"
+Tic.ACTIONTOGGLEBORDERS = "toggleBorders"
 Tic.ACTIONTOGGLEDIRS    = "toggleDirs"
 Tic.ACTIONTOGGLEVIEW    = "toggleView"
 Tic.ACTIONTOGGLEMIND    = "toggleMind"
@@ -351,6 +352,7 @@ Tic.KEYS2ACTIONS = {
     [Tic.KEY_M]            = Tic.ACTIONSTATMENACT,
     [Tic.KEY_O]            = Tic.ACTIONPLAYERONLY,
     [Tic.KEY_P]            = Tic.ACTIONSTATPHYACT,
+    [Tic.KEY_Q]            = Tic.ACTIONTOGGLEBORDERS,
     [Tic.KEY_R]            = Tic.ACTIONTOGGLEMIND,
     [Tic.KEY_S]            = Tic.ACTIONTOGGLESPOTTED,
     [Tic.KEY_V]            = Tic.ACTIONTOGGLEVIEW,
@@ -384,6 +386,7 @@ Tic.ACTIONS2FUNCTIONS = {
     [Tic.ACTIONBIOMENEXT]     = function() Tic:biomeNext() end,
     [Tic.ACTIONTOGGLEHITBOX]  = function() Tic:toggleHitbox() end,
     [Tic.ACTIONTOGGLESPOTTED] = function() Tic:toggleSpotted() end,
+    [Tic.ACTIONTOGGLEBORDERS] = function() Tic:toggleBorders() end,
     [Tic.ACTIONTOGGLEDIRS]    = function() Tic:toggleDirs() end,
     [Tic.ACTIONTOGGLEVIEW]    = function() Tic:toggleView() end,
     [Tic.ACTIONTOGGLEMIND]    = function() Tic:toggleMind() end,
@@ -434,7 +437,7 @@ end
 
 -- Players System -- handle a players stack
 Tic.PLAYERS    = CCyclerTable()
-Tic.PLAYERONLY = false -- to display view, move, etc only for actual player
+Tic.PLAYERONLY = true -- to display view, move, etc only for actual player
 function Tic:playerAppend(_player) -- stack a new player
     if Tables:findVal(Tic.PLAYERS, _player) then return end -- avoid doublons
     return Tic.PLAYERS:insert(_player)
@@ -654,6 +657,13 @@ end
 Tic.DRAWSPOTTED = false
 function Tic:toggleSpotted()
 	Tic.DRAWSPOTTED = Nums:toggleTF(Tic.DRAWSPOTTED)
+end
+
+
+-- Borders System -- toggle borders display
+Tic.DRAWBORDERS = false
+function Tic:toggleBorders()
+	Tic.DRAWBORDERS = Nums:toggleTF(Tic.DRAWBORDERS)
 end
 
 
@@ -923,9 +933,11 @@ end
 local CSpriteBG = CSprite:extend() -- bg sprites aka tic tiles
 CSpriteBG.SPRITEBANK  = 0
 CSpriteBG.SIGNALBANK  = 0  -- signals
-CSpriteBG.SIGNQUESTM  = CSpriteBG.SIGNALBANK + 0 -- question mark
-CSpriteBG.SIGNSPOTSQ  = CSpriteBG.SIGNALBANK + 1 -- spotted square
-CSpriteBG.SIGNINTBUB  = CSpriteBG.SIGNALBANK + 2 -- interact bubble
+CSpriteBG.SIGNQSTMRK  = CSpriteBG.SIGNALBANK + 0 -- question mark
+CSpriteBG.SIGNINTMRK  = CSpriteBG.SIGNALBANK + 1 -- interact mark
+CSpriteBG.SIGNBORSQR  = CSpriteBG.SIGNALBANK + 2 -- borders square
+CSpriteBG.SIGNSPOSQR  = CSpriteBG.SIGNALBANK + 3 -- spotted square
+CSpriteBG.SIGNCROSQR  = CSpriteBG.SIGNALBANK + 4 -- crossed square
 CSpriteBG.BUILDSBANK  = 16 -- buildings
 CSpriteBG.PLACEHOUSE  = CSpriteBG.BUILDSBANK + 0
 CSpriteBG.PLACETOWER  = CSpriteBG.BUILDSBANK + 1
@@ -1281,9 +1293,11 @@ function CLocations:locationsWorldXYRegion(_worldx, _worldy, _region) -- locatio
     Tic:logRecord("rang", _region:string())
 
     for _keyy, _valy in pairs(self.locations) do -- search for y in range
-        if Nums:isBW(_keyy, _region.up, _region.dw) then
+        if Nums:isBW(_keyy, _region.up, _region.dw)
+        or Nums:isBW(_keyy + Tic.SPRITESIZE, _region.up, _region.dw) then
             for _keyx, _valx in pairs(_valy) do -- search for x in range
-                if Nums:isBW(_keyx, _region.lf, _region.rg) then
+                if Nums:isBW(_keyx, _region.lf, _region.rg)
+                or Nums:isBW(_keyx + Tic.SPRITESIZE, _region.lf, _region.rg) then
                     for _entity, _ in pairs(_valx) do -- loop on entities
                         if not _result[_keyy] then -- new worldy entry
                             _result[_keyy] = {}
@@ -1585,6 +1599,7 @@ function CEntityDrawable:new(_argt)
     self.spotted     = false -- use spotted to draw a border
     self.hitbox      = nil -- hitbox region if any
     self.drawspotted = false -- draw behaviour
+    self.drawborders = false
     self.drawhitbox  = false
     self.drawfade    = false
    self:argt(_argt) -- override if any
@@ -1620,7 +1635,7 @@ function CEntityDrawable:draw() -- default draw for drawable entities -- overrid
     _musprite:draw()
 
     self:drawSpotted()
-
+    self:drawBorders()
     self:drawHitbox()
 end
 
@@ -1628,12 +1643,25 @@ function CEntityDrawable:drawSpotted() -- draw spotted if any
     self.drawspotted = Tic.DRAWSPOTTED -- use Tic as master
     if not self.drawspotted or not self.spotted then return end -- nothing to draw
     local _musprite = CSpriteBG() -- multi usage unique sprite
-    _musprite.sprite  = CSpriteBG.SIGNSPOTSQ
+    _musprite.sprite  = CSpriteBG.SIGNSPOSQR
     _musprite.screenx = self.screenx
     _musprite.screeny = self.screeny
     _musprite.flip    = self.dirx
     _musprite.scale   = self.scale
     _musprite.palette = {[Tic.COLORGREYM] = Tic.COLORWHITE,}
+    _musprite:draw()
+end
+
+function CEntityDrawable:drawBorders() -- draw borders if any
+    self.drawborders = Tic.DRAWBORDERS -- use Tic as master
+    if not self.drawborders then return end -- nothing to draw
+    local _musprite = CSpriteBG() -- multi usage unique sprite
+    _musprite.sprite  = CSpriteBG.SIGNBORSQR
+    _musprite.screenx = self.screenx
+    _musprite.screeny = self.screeny
+    _musprite.flip    = self.dirx
+    _musprite.scale   = self.scale
+    _musprite.palette = {[Tic.COLORGREYM] = Tic.COLORGREYL,}
     _musprite:draw()
 end
 
@@ -2555,6 +2583,7 @@ function CCharacter:draw() -- set animations and draw layers
     self:drawBody()
     self:drawHead()
     self:drawSpotted()
+    self:drawBorders()
     self:drawHitbox()
     self:drawView()
     self:drawMind()
@@ -2831,7 +2860,7 @@ function CCharacter:moveDirection(_direction) -- handle moving a character in a 
     self.offsety = _offsety
 
     Tic:logClearRecord()
-    Tic:logRecordActive(true)
+    Tic:logRecordActive(false)
     Tic:logRecord("self", self.worldx, self.worldy)
     local _hitboxregion    = self:regionViewOffsets() -- hitbox collisions
     Tic:logRecord("hreg", _hitboxregion.lf..":".._hitboxregion.rg, _hitboxregion.up..":".._hitboxregion.dw)
@@ -2844,11 +2873,8 @@ function CCharacter:moveDirection(_direction) -- handle moving a character in a 
     Tic:logRecord("size", Tables:size(_hitboxlocations))
     Tic:logRecordEntities(CLocations:entities(_hitboxlocations))
     Tic:logRecordActive(false)
-    local _hitboxentities  = CLocations:entities(_hitboxlocations)
 
     self:hitboxDetachAll()
-    self:hitboxAttachTo(_hitboxentities)
-    self:hitboxDetachSelf() -- not itself
 
     local _movebyx = Nums:sign(_offsetx) -- calculate the maximum move step by step
     local _movebyy = Nums:sign(_offsety)
@@ -2860,8 +2886,14 @@ function CCharacter:moveDirection(_direction) -- handle moving a character in a 
         if Nums:pos(_movetoy) < Nums:pos(_offsety) then _movetoy = _movetoy + _movebyy end
         if _movetox == _offsetx and _movetoy == _offsety then _move = false end
     end
-
     self:moveWorldXY(self.worldx + _movetox, self.worldy + _movetoy)
+
+    local _hitboxregion    = self:regionViewOffsets() -- hitbox collisions
+    local _hitboxlocations = self:locationsRegion(_hitboxregion)
+    local _hitboxentities  = CLocations:entities(_hitboxlocations)
+    self:hitboxAttachTo(_hitboxentities)
+    self:hitboxDetachSelf() -- not itself
+
     self.idlecycler:min() -- reset the idle cycler
 end
 
