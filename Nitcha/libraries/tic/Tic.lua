@@ -2410,8 +2410,9 @@ function CCharacter:new(_argt)
     self.frame        = CSprite.FRAME00 -- frame
     self.dirx         = Tic.DIRXLF -- directions
     self.diry         = Tic.DIRYMD
-    self.offsetx      = 0 -- move offsets
-    self.offsety      = 0
+    self.moveone      = false -- true for slowest move -1, 0, +1
+    -- self.movebyx      = 0 -- move offsets
+    -- self.movebyy      = 0
     self.hitbox       = CHitbox()
     self.state        = Tic.STATESTANDIDLE -- state
     self.idlecycler   = CCyclerInt{maxindex = 59,} -- cycler to get back to idle
@@ -2801,7 +2802,7 @@ function CCharacter:moveWorldXY(_worldx, _worldy) -- move character into world
     self.world:moveEntityWorldXY(self, _worldx, _worldy)
 end
 
-function CCharacter:moveDirection(_direction) -- handle moving a character in a direction
+function CCharacter:moveDirection(_direction, _moveone) -- handle moving a character in a direction
     if not _direction then return end -- mandatory
     local _state = self.state
     local _statesettings = Tic.STATESETTINGS[_state]
@@ -2816,9 +2817,7 @@ function CCharacter:moveDirection(_direction) -- handle moving a character in a 
 
     self.dirx = _dirx or self.dirx -- adjust dirx and diry
     self.diry = _diry or self.diry
-
-    self.offsetx = 0 -- reset move offsets
-    self.offsety = 0
+    self:hitboxRefresh() -- refresh the hitboxes
 
     if _posture == Tic.POSTUREFLOOR and _status ~= Tic.STATUSSLEEP then return end -- cannot move
 
@@ -2844,7 +2843,13 @@ function CCharacter:moveDirection(_direction) -- handle moving a character in a 
     self.state = _posture..Tic.STATUSMOVE
     self:toggleFrame() -- animate continuous move in the same dirx
 
-    if Tic.MODIFIERKEYS[Tic.KEY_CTRL] then -- slow move -1, 0, +1
+    self:save{"moveone"}
+    self.moveone = (_moveone == nil) and self.moveone or _moveone -- force to slowest move if any
+    self.moveone = (Tic.MODIFIERKEYS[Tic.KEY_CTRL]) and true or false -- force to slowest move if ctrl
+    -- self.movebyx = 0 -- reset move offsets
+    -- self.movebyy = 0
+
+    if self.moveone then -- slow move -1, 0, +1
         _offsetx = Nums:sign(_offsetx)
         _offsety = Nums:sign(_offsety)
     else -- normal move
@@ -2852,29 +2857,12 @@ function CCharacter:moveDirection(_direction) -- handle moving a character in a 
         _offsety = _offsety * (self.statphyact / Tic.STATSMAX)
         _offsetx = (_posture == Tic.POSTURESTAND) and _offsetx or _offsetx / 2 -- half if kneel
         _offsety = (_posture == Tic.POSTURESTAND) and _offsety or _offsety / 2 -- half if kneel
-        _offsetx = (_offsetx < 0) and math.ceil(_offsetx) or math.floor(_offsetx)
-        _offsety = (_offsety < 0) and math.ceil(_offsety) or math.floor(_offsety)
+        _offsetx = Nums:roundmax(_offsetx)
+        _offsety = Nums:roundmax(_offsety)
     end
 
-    self.offsetx = _offsetx -- set move offsets
-    self.offsety = _offsety
-
-    Tic:logClearRecord()
-    Tic:logRecordActive(false)
-    Tic:logRecord("self", self.worldx, self.worldy)
-    local _hitboxregion    = self:regionViewOffsets() -- hitbox collisions
-    Tic:logRecord("hreg", _hitboxregion.lf..":".._hitboxregion.rg, _hitboxregion.up..":".._hitboxregion.dw)
-    Tic:logRecord()
-    local _hitboxlocations = self:locationsAround()
-    local _hitboxentities  = CLocations:entities(_hitboxlocations)
-    Tic:logRecordEntities(_hitboxentities)
-    Tic:logRecord()
-    local _hitboxlocations = self:locationsRegion(_hitboxregion)
-    Tic:logRecord("size", Tables:size(_hitboxlocations))
-    Tic:logRecordEntities(CLocations:entities(_hitboxlocations))
-    Tic:logRecordActive(false)
-
-    self:hitboxDetachAll()
+    -- self.movebyx = _offsetx -- set move offsets
+    -- self.movebyy = _offsety
 
     local _movebyx = Nums:sign(_offsetx) -- calculate the maximum move step by step
     local _movebyy = Nums:sign(_offsety)
@@ -2888,13 +2876,19 @@ function CCharacter:moveDirection(_direction) -- handle moving a character in a 
     end
     self:moveWorldXY(self.worldx + _movetox, self.worldy + _movetoy)
 
-    local _hitboxregion    = self:regionViewOffsets() -- hitbox collisions
-    local _hitboxlocations = self:locationsRegion(_hitboxregion)
-    local _hitboxentities  = CLocations:entities(_hitboxlocations)
-    self:hitboxAttachTo(_hitboxentities)
-    self:hitboxDetachSelf() -- not itself
+    self:hitboxRefresh() -- refresh the hitboxes
 
     self.idlecycler:min() -- reset the idle cycler
+    self:load()
+end
+
+function CCharacter:hitboxRefresh() -- refresh the attached hitboxes
+    local _hitboxregion    = self:regionViewOffsets() -- hitbox collisions -- FIXME use another region (move)
+    local _hitboxlocations = self:locationsRegion(_hitboxregion)
+    local _hitboxentities  = CLocations:entities(_hitboxlocations)
+    self:hitboxDetachAll()
+    self:hitboxAttachTo(_hitboxentities)
+    self:hitboxDetachSelf() -- not itself
 end
 
 
@@ -4149,6 +4143,12 @@ for _, _cplace in pairs({
     }
 end
 end
+
+Tic.DRAWHITBOX  = true
+Tic.DRAWSPOTTED = true
+Tic.DRAWBORDERS = true
+Tic.DRAWVIEW    = true
+Tic:playerActual():hitboxRefresh() -- refresh the hitboxes
 
 
 --
