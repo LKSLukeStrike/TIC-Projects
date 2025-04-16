@@ -575,54 +575,30 @@ Tic.STATINC = "inc"
 Tic.STATMAX = "max"
 function Tic:statPhyAct(_character)
     local _stat = "statphyact"
-    if Tic.MODIFIERKEYS[Tic.KEY_SHIFT] then
-        Tic:statAct(Tic.STATINC, _stat, 1, _character)
-    elseif Tic.MODIFIERKEYS[Tic.KEY_CTRL] then
-        Tic:statAct(Tic.STATDEC, _stat, 1, _character)
-    else
-        Tic:statAct(Tic.STATMAX, _stat, nil, _character)
-    end
+    Tic:statAct(_stat, _character)
 end
 
 function Tic:statMenAct(_character)
     local _stat = "statmenact"
-    if Tic.MODIFIERKEYS[Tic.KEY_SHIFT] then
-        Tic:statAct(Tic.STATINC, _stat, 1, _character)
-    elseif Tic.MODIFIERKEYS[Tic.KEY_CTRL] then
-        Tic:statAct(Tic.STATDEC, _stat, 1, _character)
-    else
-        Tic:statAct(Tic.STATMAX, _stat, nil, _character)
-    end
+    Tic:statAct(_stat, _character)
 end
 
 function Tic:statPsyAct(_character)
     local _stat = "statpsyact"
-    if Tic.MODIFIERKEYS[Tic.KEY_SHIFT] then
-        Tic:statAct(Tic.STATINC, _stat, 1, _character)
-    elseif Tic.MODIFIERKEYS[Tic.KEY_CTRL] then
-        Tic:statAct(Tic.STATDEC, _stat, 1, _character)
-    else
-        Tic:statAct(Tic.STATMAX, _stat, nil, _character)
-    end
+    Tic:statAct(_stat, _character)
 end
 
-function Tic:statAct(_action, _stat, _value, _character) -- modify an act stat -- set/dec/inc/max
-    if not _action or not _stat then return end -- mandatory
-    _value     = _value or 0
+function Tic:statAct(_stat, _character) -- modify an act stat -- set/dec/inc/max
+    if not _stat then return end -- mandatory
     _character = _character or Tic:playerActual()
-    if not _character[_stat] then return end -- unknown stat
-    if _action == Tic.STATSET then
-        _character[_stat] = _value
-    elseif _action == Tic.STATDEC then
-        _character[_stat] = _character[_stat] - _value
-    elseif _action == Tic.STATINC then
-        _character[_stat] = _character[_stat] + _value
-    elseif _action == Tic.STATMAX then
-        _character[_stat] = _character[string.gsub(_stat, "act", "max")]
+
+    if Tic.MODIFIERKEYS[Tic.KEY_SHIFT] then
+        _character:statAct(Tic.STATINC, _stat, 1)
+    elseif Tic.MODIFIERKEYS[Tic.KEY_CTRL] then
+        _character:statAct(Tic.STATDEC, _stat, 1)
+    else
+        _character:statAct(Tic.STATMAX, _stat)
     end
-    _character[_stat] = math.max(_character[_stat], Tic.STATSMIN) -- stay in range
-    _character[_stat] = math.min(_character[_stat], Tic.STATSMAX)
-    _character[_stat] = math.floor(_character[_stat]) -- ensure an integer
 end
 
 
@@ -2762,6 +2738,7 @@ function CCharacter:toggleWork() -- toggle idle/move vs work
         and Tic.STATUSIDLE
         or  Tic.STATUSWORK
     self.state = _posture.._status
+    self:hitboxRefresh() -- refresh the hitboxes
 end
 
 function CCharacter:toggleKneel() -- toggle stand vs kneel
@@ -2779,6 +2756,7 @@ function CCharacter:toggleKneel() -- toggle stand vs kneel
         _status = Tic.STATUSIDLE
     end
     self.state = _posture.._status
+    self:hitboxRefresh() -- refresh the hitboxes
 end
 
 function CCharacter:toggleSleep() -- toggle stand vs sleep
@@ -2791,6 +2769,7 @@ function CCharacter:toggleSleep() -- toggle stand vs sleep
         and Tic.STATESTANDIDLE
         or  Tic.STATEFLOORSLEEP
     self.state = _state
+    self:hitboxRefresh() -- refresh the hitboxes
 end
 
 function CCharacter:toggleFrame() -- toggle frame 0-1
@@ -2889,6 +2868,28 @@ function CCharacter:hitboxRefresh() -- refresh the attached hitboxes
     self:hitboxDetachAll()
     self:hitboxAttachTo(_hitboxentities)
     self:hitboxDetachSelf() -- not itself
+end
+
+function CCharacter:statAct(_action, _stat, _value) -- modify a stat act -- set/dec/inc/max
+    if not _action or not _stat then return end -- mandatory
+    if not self[_stat] then return end -- unknown stat
+    _value = _value or 0
+
+    if _action == Tic.STATSET then
+        self[_stat] = _value
+    elseif _action == Tic.STATDEC then
+        self[_stat] = self[_stat] - _value
+    elseif _action == Tic.STATINC then
+        self[_stat] = self[_stat] + _value
+    elseif _action == Tic.STATMAX then
+        self[_stat] = self[string.gsub(_stat, "act", "max")]
+    end
+
+    self[_stat] = math.max(self[_stat], Tic.STATSMIN) -- stay in range
+    self[_stat] = math.min(self[_stat], Tic.STATSMAX)
+    self[_stat] = Nums:roundint(self[_stat]) -- ensure an integer
+
+    self:hitboxRefresh() -- refresh the hitboxes
 end
 
 
