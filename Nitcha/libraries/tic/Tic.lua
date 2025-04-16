@@ -1472,23 +1472,24 @@ function CEntity:locationsAround() -- locations around itself
 end
 
 function CEntity:nearestEntityAround() -- nearest entity around itself, except itself
-    local _nearestentity   = nil
+    local _result          = nil
     local _locationsaround = self:locationsAround()
+    local _entitiesaround  = CLocations:entities(_locationsaround)
+    Tic:logRecordActive(true)
+    Tic:logRecordEntities(CLocations:entities(_locationsaround), true)
 
-    for _, _keyy in pairs(Tables:keys(_locationsaround)) do -- sorted by y first
-        for _, _keyx in pairs(Tables:keys(_locationsaround[_keyy])) do -- sorted by x next
-            for _entity, _ in pairs(_locationsaround[_keyy][_keyx]) do
-				if not (_entity == self) then -- avoid to spot itself
-					if _nearestentity == nil then
-						_nearestentity = _entity -- first nearest entity
-					elseif self:distanceEntitySquared(_entity) < self:distanceEntitySquared(_nearestentity) then
-						_nearestentity = _entity -- new nearest entity
-					end
-                end
+    for _entity, _ in pairs(_entitiesaround) do
+        if not (_entity == self) then -- avoid to nearest itself
+            if _result == nil then
+                _result = _entity -- first nearest entity
+            elseif self:distanceEntityFake(_entity) < self:distanceEntityFake(_result) then
+                _result = _entity -- new nearest entity
             end
         end
     end
-	return _nearestentity
+
+    if _result then Tic:logRecord("near") ; Tic:logRecord(_result:string()) end
+    return _result
 end
 
 function CEntity:randomRegionWorld(_region) -- random worldx worldy in a region -- default min/max
@@ -1508,14 +1509,14 @@ function CEntity:randomWorldWindow() -- random worldx worldy into the world wind
     })
 end
 
-function CEntity:distanceEntityReal(_entity) -- real distance from itself to another entity
+function CEntity:distanceEntityReal(_entity) -- real distance from itself to another entity -- slower
     if not _entity then return 0 end -- mandatory
     return Nums:distancePointsReal(self.worldx, self.worldy, _entity.worldx, _entity.worldy)
 end
 
-function CEntity:distanceEntitySquared(_entity) -- squared distance from itself to another entity -- faster
+function CEntity:distanceEntityFake(_entity) -- fake distance from itself to another entity -- faster
     if not _entity then return 0 end -- mandatory
-    return Nums:distancePointsSquared(self.worldx, self.worldy, _entity.worldx, _entity.worldy)
+    return Nums:distancePointsFake(self.worldx, self.worldy, _entity.worldx, _entity.worldy)
 end
 
 

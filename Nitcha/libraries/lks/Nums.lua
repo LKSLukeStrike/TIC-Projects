@@ -97,11 +97,11 @@ end
 
 
 -- Distances
-function Nums:distancePointsReal(_pointx0, _pointy0, _pointx1, _pointy1) -- real distance between 2 points
-    return math.sqrt(Nums:distancePointsSquared(_pointx0, _pointy0, _pointx1, _pointy1))
+function Nums:distancePointsReal(_pointx0, _pointy0, _pointx1, _pointy1) -- real distance between 2 points -- slower
+    return math.sqrt(Nums:distancePointsFake(_pointx0, _pointy0, _pointx1, _pointy1))
 end
 
-function Nums:distancePointsSquared(_pointx0, _pointy0, _pointx1, _pointy1) -- squared distance between 2 points -- faster but not real
+function Nums:distancePointsFake(_pointx0, _pointy0, _pointx1, _pointy1) -- fake distance between 2 points -- faster
     _pointx0 = _pointx0 or 0
     _pointy0 = _pointy0 or 0
     _pointx1 = _pointx1 or 0
