@@ -910,25 +910,27 @@ end
 --
 local CSpriteBG = CSprite:extend() -- bg sprites aka tic tiles
 CSpriteBG.SPRITEBANK  = 0
-CSpriteBG.SIGNALBANK  = 0  -- signals
-CSpriteBG.SIGNQSTMRK  = CSpriteBG.SIGNALBANK + 0 -- question mark
-CSpriteBG.SIGNINTMRK  = CSpriteBG.SIGNALBANK + 1 -- interact mark
-CSpriteBG.SIGNBORSQU  = CSpriteBG.SIGNALBANK + 2 -- borders square
-CSpriteBG.SIGNSPOSQU  = CSpriteBG.SIGNALBANK + 3 -- spotted square
-CSpriteBG.SIGNCROSQU  = CSpriteBG.SIGNALBANK + 4 -- crossed square
-CSpriteBG.SIGNDOTSQU  = CSpriteBG.SIGNALBANK + 5 -- dot square
-CSpriteBG.SIGNSCROLL  = CSpriteBG.SIGNALBANK + 6 -- scroll arrow
-CSpriteBG.BUILDSBANK  = 16 -- buildings
-CSpriteBG.PLACEHOUSE  = CSpriteBG.BUILDSBANK + 0
-CSpriteBG.PLACETOWER  = CSpriteBG.BUILDSBANK + 1
-CSpriteBG.PLACEMANOR  = CSpriteBG.BUILDSBANK + 2
-CSpriteBG.PLACEALTAR  = CSpriteBG.BUILDSBANK + 3
-CSpriteBG.STANDSBANK  = 32 -- stands
-CSpriteBG.PLACEWATER  = CSpriteBG.STANDSBANK + 0
-CSpriteBG.PLACESTALL  = CSpriteBG.STANDSBANK + 1
-CSpriteBG.FORESTBANK  = 48 -- forests
-CSpriteBG.PLACETREE0  = CSpriteBG.FORESTBANK + 0
-CSpriteBG.PLACETREE1  = CSpriteBG.FORESTBANK + 1
+CSpriteBG.SIGNSBANK   = 0  -- signs
+CSpriteBG.SIGNQSTMRK  = CSpriteBG.SIGNSBANK + 0 -- question mark
+CSpriteBG.SIGNINTMRK  = CSpriteBG.SIGNSBANK + 1 -- interact mark
+CSpriteBG.SIGNBORSQU  = CSpriteBG.SIGNSBANK + 2 -- borders square
+CSpriteBG.SIGNSPOSQU  = CSpriteBG.SIGNSBANK + 3 -- spotted square
+CSpriteBG.SIGNCROSQU  = CSpriteBG.SIGNSBANK + 4 -- crossed square
+CSpriteBG.SIGNDOTSQU  = CSpriteBG.SIGNSBANK + 5 -- dot square
+CSpriteBG.SIGNSCROLL  = CSpriteBG.SIGNSBANK + 6 -- scroll arrow
+CSpriteBG.BUILDBANK   = 16 -- buildings
+CSpriteBG.PLACEHOUSE  = CSpriteBG.BUILDBANK + 0
+CSpriteBG.PLACETOWER  = CSpriteBG.BUILDBANK + 1
+CSpriteBG.PLACEMANOR  = CSpriteBG.BUILDBANK + 2
+CSpriteBG.PLACEALTAR  = CSpriteBG.BUILDBANK + 3
+CSpriteBG.STANDBANK   = 32 -- stands
+CSpriteBG.PLACEWATER  = CSpriteBG.STANDBANK + 0
+CSpriteBG.PLACESTALL  = CSpriteBG.STANDBANK + 1
+CSpriteBG.TREESBANK   = 48 -- trees
+CSpriteBG.PLACETREE0  = CSpriteBG.TREESBANK + 0
+CSpriteBG.PLACETREE1  = CSpriteBG.TREESBANK + 1
+CSpriteBG.ROADSBANK   = 128 -- roads
+CSpriteBG.PLACEPAVE0  = CSpriteBG.ROADSBANK + 0
 function CSpriteBG:new(_argt) -- FIXME can be removed ?
     CSpriteBG.super.new(self, _argt)
     self:argt(_argt) -- override if any
@@ -1380,62 +1382,9 @@ end
 
 
 --
--- CWorld
---
-local CWorld = Classic:extend() -- generic world that contains entities
-CWorld.KINDWORLD = "World" -- World kind
-CWorld.NAMEWORLD = "World" -- World name
-function CWorld:new(_argt)
-    CWorld.super.new(self, _argt)
-    self.kind = CWorld.KINDWORLD
-    self.name = CWorld.NAMEWORLD
-    self.entitieslocations = CEntitiesLocations{} -- record world entities and their locations
-    self:argt(_argt) -- override if any
-end
--- CWorld instance
-local World = CWorld{}
-
-function CWorld:appendEntity(_entity) -- append an entity in the world
-    if not _entity then return end -- mandatory
-    self.entitieslocations:appendEntity(_entity)
-end
-
-function CWorld:removeEntity(_entity) -- remove an entity from the world
-    if not _entity then return end -- mandatory
-    self.entitieslocations:removeEntity(_entity)
-end
-
-function CWorld:moveEntityWorldXY(_entity, _worldx, _worldy) -- move an entity into the world
-    if not _entity or not _worldx or not _worldy then return end -- mandatory
-    self.entitieslocations:moveEntityWorldXY(_entity, _worldx, _worldy)
-    _entity:focus() -- focus its camera on itself
-end
-
-function CWorld:locationsWorldXYRegion(_worldx, _worldy, _region) -- locations in region
-    if not _worldx or not _worldy or not _region then return end -- mandatory
-    return self.entitieslocations:locationsWorldXYRegion(_worldx, _worldy, _region)
-end
-
-function CWorld:locationsWorldXYRangeXY(_worldx, _worldy, _rangex, _rangey) -- locations in ranges
-    if not _worldx or not _worldy or not _rangex or not _rangey then return end -- mandatory
-    return self.entitieslocations:locationsWorldXYRangeXY(_worldx, _worldy, _rangex, _rangey)
-end
-
-function CWorld:locationsEntityRegion(_entity, _region) -- locations in region
-    if not _entity or not _region then return end -- mandatory
-    return self.entitieslocations:locationsEntityRegion(_entity, _region)
-end
-
-function CWorld:locationsEntityRangeXY(_entity, _rangex, _rangey) -- locations in ranges
-    if not _entity or not _rangex or not _rangey then return end -- mandatory
-    return self.entitieslocations:locationsEntityRangeXY(_entity, _rangex, _rangey)
-end
-
-
---
 -- CEntity
 --
-local CEntity = Classic:extend() -- generic entities like places, objects, characters, cameras ...
+local CEntity = Classic:extend() -- generic entities like worlds, places, objects, characters, cameras ...
 Classic.KINDENTITY = "Entity" -- Entity kind
 Classic.NAMEENTITY = "Entity" -- Entity name
 Classic.NAMEIDLE   = "Idle"   -- Idle name
@@ -1445,7 +1394,7 @@ function CEntity:new(_argt)
     CEntity.super.new(self, _argt)
     self.kind = Classic.KINDENTITY
     self.name = Classic.NAMEENTITY
-    self.world  = World -- world that contains the entity -- to override if any
+    self.world  = nil -- parent world if any
     self.worldx = CEntity.WORLDX -- world positions
     self.worldy = CEntity.WORLDY
     self.discovered = false -- discovered by the player ?
@@ -1525,6 +1474,61 @@ end
 
 
 --
+-- CWorld
+--
+local CWorld = CEntity:extend() -- generic world that contains entities
+CWorld.KINDWORLD = "World" -- World kind
+CWorld.NAMEWORLD = "World" -- World name
+function CWorld:new(_argt)
+    CWorld.super.new(self, _argt)
+    self.kind = CWorld.KINDWORLD
+    self.name = CWorld.NAMEWORLD
+    self.region = CRegion() -- world boundaries
+    self.entitieslocations = CEntitiesLocations{} -- record world entities and their locations
+    self:argt(_argt) -- override if any
+end
+-- CWorld instance
+local World = CWorld{}
+
+function CWorld:appendEntity(_entity) -- append an entity in the world
+    if not _entity then return end -- mandatory
+    _entity.world = self -- parent world
+    self.entitieslocations:appendEntity(_entity)
+end
+
+function CWorld:removeEntity(_entity) -- remove an entity from the world
+    if not _entity then return end -- mandatory
+    self.entitieslocations:removeEntity(_entity)
+end
+
+function CWorld:moveEntityWorldXY(_entity, _worldx, _worldy) -- move an entity into the world
+    if not _entity or not _worldx or not _worldy then return end -- mandatory
+    self.entitieslocations:moveEntityWorldXY(_entity, _worldx, _worldy)
+    _entity:focus() -- focus its camera on itself
+end
+
+function CWorld:locationsWorldXYRegion(_worldx, _worldy, _region) -- locations in region
+    if not _worldx or not _worldy or not _region then return end -- mandatory
+    return self.entitieslocations:locationsWorldXYRegion(_worldx, _worldy, _region)
+end
+
+function CWorld:locationsWorldXYRangeXY(_worldx, _worldy, _rangex, _rangey) -- locations in ranges
+    if not _worldx or not _worldy or not _rangex or not _rangey then return end -- mandatory
+    return self.entitieslocations:locationsWorldXYRangeXY(_worldx, _worldy, _rangex, _rangey)
+end
+
+function CWorld:locationsEntityRegion(_entity, _region) -- locations in region
+    if not _entity or not _region then return end -- mandatory
+    return self.entitieslocations:locationsEntityRegion(_entity, _region)
+end
+
+function CWorld:locationsEntityRangeXY(_entity, _rangex, _rangey) -- locations in ranges
+    if not _entity or not _rangex or not _rangey then return end -- mandatory
+    return self.entitieslocations:locationsEntityRangeXY(_entity, _rangex, _rangey)
+end
+
+
+--
 -- CCamera
 --
 local CCamera = CEntity:extend() -- camera
@@ -1536,6 +1540,7 @@ function CCamera:new(_argt)
     CCamera.super.new(self, _argt)
     self.kind = Classic.KINDCAMERA
     self.name = Classic.NAMECAMERA
+    self.world  = World
     self.rangex = CCamera.RANGEX
     self.rangey = CCamera.RANGEY
     self:argt(_argt) -- override if any
@@ -1571,6 +1576,7 @@ function CEntityDrawable:new(_argt)
     CEntityDrawable.super.new(self, _argt)
     self.kind = Classic.KINDDRAWABLE
     self.name = Classic.NAMEDRAWABLE
+    self.world       = World
     self.sprite      = CSpriteFG.SPRITEEMPTY
     self.screenx     = 0 -- screen positions -- used to draw the sprite
     self.screeny     = 0
