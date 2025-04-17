@@ -1476,7 +1476,7 @@ function CEntity:nearestEntityAround() -- nearest entity around itself, except i
     local _locationsaround = self:locationsAround()
     local _entitiesaround  = CLocations:entities(_locationsaround)
     Tic:logRecordActive(true)
-    Tic:logRecordEntities(CLocations:entities(_locationsaround), true)
+    Tic:logRecordEntities(_entitiesaround, true)
 
     for _entity, _ in pairs(_entitiesaround) do
         if not (_entity == self) then -- avoid to nearest itself
@@ -2825,7 +2825,7 @@ function CCharacter:moveDirection(_direction, _moveone) -- handle moving a chara
 
     self:save{"moveone"}
     self.moveone = (_moveone == nil) and self.moveone or _moveone -- force to slowest move if any
-    self.moveone = (Tic.MODIFIERKEYS[Tic.KEY_CTRL]) and true or false -- force to slowest move if ctrl
+    self.moveone = (Tic.MODIFIERKEYS[Tic.KEY_CAPSLOCK]) and true or false -- force to slowest move if ctrl
     -- self.movebyx = 0 -- reset move offsets
     -- self.movebyy = 0
 
@@ -2839,6 +2839,11 @@ function CCharacter:moveDirection(_direction, _moveone) -- handle moving a chara
         _offsety = (_posture == Tic.POSTURESTAND) and _offsety or _offsety / 2 -- half if kneel
         _offsetx = Nums:roundmax(_offsetx)
         _offsety = Nums:roundmax(_offsety)
+    end
+
+    if Tic.MODIFIERKEYS[Tic.KEY_CTRL] then
+        _offsetx = Nums:invert(_offsetx)
+        _offsety = Nums:invert(_offsety)
     end
 
     -- self.movebyx = _offsetx -- set move offsets

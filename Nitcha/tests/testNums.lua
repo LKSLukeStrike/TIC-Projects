@@ -89,3 +89,8 @@ print()
 print(Nums:sign(-10))
 print(Nums:sign(0))
 print(Nums:sign(10))
+
+print()
+print(Nums:invert(-10))
+print(Nums:invert(0))
+print(Nums:invert(10))

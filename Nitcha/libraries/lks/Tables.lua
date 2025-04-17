@@ -80,7 +80,7 @@ end
 
 function Tables:keyAppend(_table, _key, _val) -- add/replace a key val entry
     if not _table or not _key then return end -- mandatory
-    _val = (_val) and _val or true
+    _val = _val or true
     _table[_key] = _val
 end
 
@@ -89,7 +89,7 @@ function Tables:keyRemove(_table, _key) -- remove a key val entry
     _table[_key] = nil
 end
 
-function Tables:copy(_table) -- copy a table -- SORTED
+function Tables:copy(_table) -- copy a table -- SORTED -- only first level
     local _result = {}
     local _keys = Tables:keys(_table) -- sorted keys
     for _, _key in ipairs(_keys) do
