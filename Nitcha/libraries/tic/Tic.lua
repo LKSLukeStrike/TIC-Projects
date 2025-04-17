@@ -563,8 +563,10 @@ end
 function Tic:moveDirection(_direction, _character)
     if not _direction then return end -- mandatory
     _character = _character or Tic:playerActual()
-    if not _character then return end
-    _character:moveDirection(_direction)
+    if not _character then return end -- FIXME ensure another way that character exists ? (in world ?)
+    local _moveslow = (Tic.MODIFIERKEYS[Tic.KEY_CAPSLOCK]) and true or false -- force slow move if caps
+    local _moveback = (Tic.MODIFIERKEYS[Tic.KEY_CTRL]) and true or false -- force back move if ctrl
+    _character:moveDirection(_direction, _moveslow, _moveback)
 end
 
 
@@ -2387,9 +2389,6 @@ function CCharacter:new(_argt)
     self.frame        = CSprite.FRAME00 -- frame
     self.dirx         = Tic.DIRXLF -- directions
     self.diry         = Tic.DIRYMD
-    self.moveone      = false -- true for slowest move -1, 0, +1
-    -- self.movebyx      = 0 -- move offsets
-    -- self.movebyy      = 0
     self.hitbox       = CHitbox()
     self.state        = Tic.STATESTANDIDLE -- state
     self.idlecycler   = CCyclerInt{maxindex = 59,} -- cycler to get back to idle
@@ -2782,8 +2781,10 @@ function CCharacter:moveWorldXY(_worldx, _worldy) -- move character into world
     self.world:moveEntityWorldXY(self, _worldx, _worldy)
 end
 
-function CCharacter:moveDirection(_direction, _moveone) -- handle moving a character in a direction
+function CCharacter:moveDirection(_direction, _moveslow, _moveback) -- handle moving a character in a direction
     if not _direction then return end -- mandatory
+    _moveslow = _moveslow or false -- force slow move if any
+    _moveback = _moveback or false -- force back move if any
     local _state = self.state
     local _statesettings = Tic.STATESETTINGS[_state]
     local _posture = _statesettings.posture
@@ -2823,13 +2824,7 @@ function CCharacter:moveDirection(_direction, _moveone) -- handle moving a chara
     self.state = _posture..Tic.STATUSMOVE
     self:toggleFrame() -- animate continuous move in the same dirx
 
-    self:save{"moveone"}
-    self.moveone = (_moveone == nil) and self.moveone or _moveone -- force to slowest move if any
-    self.moveone = (Tic.MODIFIERKEYS[Tic.KEY_CAPSLOCK]) and true or false -- force to slowest move if ctrl
-    -- self.movebyx = 0 -- reset move offsets
-    -- self.movebyy = 0
-
-    if self.moveone then -- slow move -1, 0, +1
+    if _moveslow then -- slow move -1, 0, +1
         _offsetx = Nums:sign(_offsetx)
         _offsety = Nums:sign(_offsety)
     else -- normal move
@@ -2841,13 +2836,10 @@ function CCharacter:moveDirection(_direction, _moveone) -- handle moving a chara
         _offsety = Nums:roundmax(_offsety)
     end
 
-    if Tic.MODIFIERKEYS[Tic.KEY_CTRL] then
+    if _moveback then -- back move
         _offsetx = Nums:invert(_offsetx)
         _offsety = Nums:invert(_offsety)
     end
-
-    -- self.movebyx = _offsetx -- set move offsets
-    -- self.movebyy = _offsety
 
     local _movebyx = Nums:sign(_offsetx) -- calculate the maximum move step by step
     local _movebyy = Nums:sign(_offsety)
@@ -2864,7 +2856,6 @@ function CCharacter:moveDirection(_direction, _moveone) -- handle moving a chara
     self:hitboxRefresh() -- refresh the hitboxes
 
     self.idlecycler:min() -- reset the idle cycler
-    self:load()
 end
 
 function CCharacter:hitboxRefresh() -- refresh the attached hitboxes
