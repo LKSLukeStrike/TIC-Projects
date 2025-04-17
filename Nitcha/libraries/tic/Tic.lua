@@ -913,9 +913,11 @@ CSpriteBG.SPRITEBANK  = 0
 CSpriteBG.SIGNALBANK  = 0  -- signals
 CSpriteBG.SIGNQSTMRK  = CSpriteBG.SIGNALBANK + 0 -- question mark
 CSpriteBG.SIGNINTMRK  = CSpriteBG.SIGNALBANK + 1 -- interact mark
-CSpriteBG.SIGNBORSQR  = CSpriteBG.SIGNALBANK + 2 -- borders square
-CSpriteBG.SIGNSPOSQR  = CSpriteBG.SIGNALBANK + 3 -- spotted square
-CSpriteBG.SIGNCROSQR  = CSpriteBG.SIGNALBANK + 4 -- crossed square
+CSpriteBG.SIGNBORSQU  = CSpriteBG.SIGNALBANK + 2 -- borders square
+CSpriteBG.SIGNSPOSQU  = CSpriteBG.SIGNALBANK + 3 -- spotted square
+CSpriteBG.SIGNCROSQU  = CSpriteBG.SIGNALBANK + 4 -- crossed square
+CSpriteBG.SIGNDOTSQU  = CSpriteBG.SIGNALBANK + 5 -- dot square
+CSpriteBG.SIGNSCROLL  = CSpriteBG.SIGNALBANK + 6 -- scroll arrow
 CSpriteBG.BUILDSBANK  = 16 -- buildings
 CSpriteBG.PLACEHOUSE  = CSpriteBG.BUILDSBANK + 0
 CSpriteBG.PLACETOWER  = CSpriteBG.BUILDSBANK + 1
@@ -1031,7 +1033,7 @@ end
 -- CRegion
 --
 local CRegion = Classic:extend() -- generic region -- -lf +rg -up +dw around a point
-Classic.KINDREGION = "Region" -- Region kind -- FIXME really needed ?
+Classic.KINDREGION = "Region" -- Region kind
 Classic.NAMEREGION = "Region" -- Region name
 function CRegion:new(_argt)
     CRegion.super.new(self, _argt)
@@ -1398,7 +1400,7 @@ function CWorld:appendEntity(_entity) -- append an entity in the world
     self.entitieslocations:appendEntity(_entity)
 end
 
-function CWorld:entityRemove(_entity) -- remove an entity from the world
+function CWorld:removeEntity(_entity) -- remove an entity from the world
     if not _entity then return end -- mandatory
     self.entitieslocations:removeEntity(_entity)
 end
@@ -1496,7 +1498,7 @@ end
 
 function CEntity:randomRegionWorld(_region) -- random worldx worldy in a region -- default min/max
     _region = _region or CRegion{}
-    self.world:entityRemove(self) -- remove itself from its old position -- FIXME why remove/append here ?
+    self.world:removeEntity(self) -- remove itself from its old position -- FIXME why remove/append here ?
     self.worldx = Nums:random(_region.lf, _region.rg)
     self.worldy = Nums:random(_region.up, _region.dw)
     self.world:appendEntity(self) -- append itself from its new position
@@ -1622,7 +1624,7 @@ function CEntityDrawable:drawSpotted() -- draw spotted if any
     self.drawspotted = Tic.DRAWSPOTTED -- use Tic as master
     if not self.drawspotted or not self.spotted then return end -- nothing to draw
     local _musprite = CSpriteBG() -- multi usage unique sprite
-    _musprite.sprite  = CSpriteBG.SIGNSPOSQR
+    _musprite.sprite  = CSpriteBG.SIGNSPOSQU
     _musprite.screenx = self.screenx
     _musprite.screeny = self.screeny
     _musprite.flip    = self.dirx
@@ -1635,7 +1637,7 @@ function CEntityDrawable:drawBorders() -- draw borders if any
     self.drawborders = Tic.DRAWBORDERS -- use Tic as master
     if not self.drawborders then return end -- nothing to draw
     local _musprite = CSpriteBG() -- multi usage unique sprite
-    _musprite.sprite  = CSpriteBG.SIGNBORSQR
+    _musprite.sprite  = CSpriteBG.SIGNBORSQU
     _musprite.screenx = self.screenx
     _musprite.screeny = self.screeny
     _musprite.flip    = self.dirx
