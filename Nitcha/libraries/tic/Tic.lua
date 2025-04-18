@@ -43,9 +43,9 @@ Tic.WORLDWY2 = Tic.WORLDWY + Tic.WORLDWH2 -- half world window y position
 
 -- World Infos Window positions and sizes (hud)
 Tic.WORLDINFOSWW = Tic.WORLDWW -- world infos window width
-Tic.WORLDINFOSWH = 8 -- world infos window height
+Tic.WORLDINFOSWH = 10 -- world infos window height
 Tic.WORLDINFOSWX = Tic.WORLDWX -- world infos window x position
-Tic.WORLDINFOSWY = ((Tic.WORLDWY - Tic.WORLDINFOSWH) // 2) - 2 -- world infos window y position
+Tic.WORLDINFOSWY = ((Tic.WORLDWY - Tic.WORLDINFOSWH) // 2) - 4 -- world infos window y position
 
 -- Player Infos Window positions and sizes (hud)
 Tic.PLAYERINFOSWW = 26 -- player infos window width
@@ -1497,7 +1497,7 @@ function CWorld:new(_argt)
     self:argt(_argt) -- override if any
 end
 -- CWorld instance
-local World = CWorld{}
+local World = CWorld{name = "Underdark"}
 
 function CWorld:appendEntity(_entity) -- append an entity in the world
     if not _entity then return end -- mandatory
@@ -3568,6 +3568,29 @@ end
 -- CWindowInfosPlayer instance
 local WindowInfosPlayer = CWindowInfosPlayer{}
 
+function CWindowInfosPlayer:drawScrollArrows()
+    local _arrowscount  = 2
+    local _arrowsweight = _arrowscount * Tic.SPRITESIZE
+    local _paletteoff   = {[Tic.COLORWHITE] = Tic.COLORGREYM, [Tic.COLORGREYM] = Tic.COLORGREYD}
+    local _screenx      = Tic.PLAYERINFOSWX + ((Tic.PLAYERINFOSWW - _arrowsweight) / 2)
+    local _screeny      = Tic.PLAYERINFOSWY - Tic.SPRITESIZE
+    
+    local _musprite = CSpriteBG() -- multi usage unique sprite
+    _musprite.sprite  = CSpriteBG.SIGNSCROLL -- general arrows
+    _musprite.screeny = _screeny
+    _musprite.palette = nil
+
+    _musprite.screenx = _screenx + (0 * Tic.SPRITESIZE) -- lf arrow
+    _musprite.rotate  = CSprite.ROTATE270
+    _musprite.palette = nil
+    _musprite:draw()
+
+    _musprite.screenx = _screenx + (1 * Tic.SPRITESIZE) -- rg arrow
+    _musprite.rotate  = CSprite.ROTATE090
+    _musprite.palette = nil
+    _musprite:draw()
+end
+
 
 --
 -- CWindowPortrait
@@ -3895,11 +3918,11 @@ function CWindowWorld:drawScrollArrows()
     local _arrowsweight = _arrowscount * Tic.SPRITESIZE
     local _paletteoff   = {[Tic.COLORWHITE] = Tic.COLORGREYM, [Tic.COLORGREYM] = Tic.COLORGREYD}
     local _screenx      = Tic.WORLDWX + ((Tic.WORLDWW - _arrowsweight) / 2)
-    local _screeny      = Tic.WORLDWY - Tic.SPRITESIZE2 - 2
+    local _screeny      = Tic.WORLDWY - Tic.SPRITESIZE
     
     local _musprite = CSpriteBG() -- multi usage unique sprite
     _musprite.sprite  = CSpriteBG.SIGNSCROLL -- general arrows
-    _musprite.screeny = Tic.WORLDWY - Tic.SPRITESIZE2 - 2
+    _musprite.screeny = _screeny
     _musprite.palette = nil
 
     _musprite.screenx = _screenx + (0 * Tic.SPRITESIZE) -- lf arrow
@@ -3937,8 +3960,11 @@ function CWindowInfosWorld:new(_argt)
     CWindowInfosWorld.super.new(self, _argt)
     self.screenx = Tic.WORLDINFOSWX
     self.screeny = Tic.WORLDINFOSWY
-	self.small   = false
-	self.align   = CWindowInfos.ALIGNMD
+	self.small      = false
+    self.drawframes = false
+    self.drawborder = true
+	self.marginsv   = 1
+	self.align      = CWindowInfos.ALIGNMD
     self:argt(_argt) -- override if any
 	self.screenw = Tic.WORLDINFOSWW
 	self.screenh = Tic.WORLDINFOSWH
@@ -4251,8 +4277,8 @@ function Tic:draw()
     WindowPortraitPlayer:draw()
     WindowStatsPlayer:draw()
     WindowStatePlayer:draw()
-    -- WindowInfosSpotted:draw()
-    -- WindowPortraitSpotted:draw()
+    WindowInfosSpotted:draw()
+    WindowPortraitSpotted:draw()
 
     Tic:drawLog()
     Tic:logPrint()
