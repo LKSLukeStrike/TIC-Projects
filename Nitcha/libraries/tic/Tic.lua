@@ -32,8 +32,8 @@ Tic.SCREENX  = 0 -- screen x position
 Tic.SCREENY  = 0 -- screen y position
 
 -- World Window positions and sizes (hud)
-Tic.WORLDWW  = 120 --Tic.SCREENH -- world window width
-Tic.WORLDWH  = 100 --Tic.SCREENH -- world window height
+Tic.WORLDWW  = 120 -- world window width
+Tic.WORLDWH  = 100 -- world window height
 Tic.WORLDWW2 = Tic.WORLDWW // 2 -- half world window width
 Tic.WORLDWH2 = Tic.WORLDWH // 2 -- half world window height
 Tic.WORLDWX  = (Tic.SCREENW - Tic.WORLDWW) // 2 -- world window x position
@@ -41,43 +41,47 @@ Tic.WORLDWY  = (Tic.SCREENH - Tic.WORLDWH) // 2 -- world window y position
 Tic.WORLDWX2 = Tic.WORLDWX + Tic.WORLDWW2 -- half world window x position
 Tic.WORLDWY2 = Tic.WORLDWY + Tic.WORLDWH2 -- half world window y position
 
+-- World Infos Window positions and sizes (hud)
+Tic.WORLDINFOSWW = Tic.WORLDWW -- world infos window width
+Tic.WORLDINFOSWH = 8 -- world infos window height
+Tic.WORLDINFOSWX = Tic.WORLDWX -- world infos window x position
+Tic.WORLDINFOSWY = ((Tic.WORLDWY - Tic.WORLDINFOSWH) // 2) - 2 -- world infos window y position
+
 -- Player Infos Window positions and sizes (hud)
-Tic.PLAYERINFOSWW = 26 -- infos window width
-Tic.PLAYERINFOSWH = 16 -- infos window height
-Tic.PLAYERINFOSWX = Tic.SCREENW - Tic.PLAYERINFOSWW - ((Tic.WORLDWX - Tic.PLAYERINFOSWW) // 2) -- infos window x position
-Tic.PLAYERINFOSWY = Tic.WORLDWY -- infos window y position
+Tic.PLAYERINFOSWW = 26 -- player infos window width
+Tic.PLAYERINFOSWH = 16 -- player infos window height
+Tic.PLAYERINFOSWX = Tic.SCREENW - Tic.PLAYERINFOSWW - ((Tic.WORLDWX - Tic.PLAYERINFOSWW) // 2) -- player infos window x position
+Tic.PLAYERINFOSWY = Tic.WORLDWY -- player infos window y position
 
 -- Player Portrait Window positions and sizes (hud)
-Tic.PLAYERPORTRAITWW = 16 -- portrait window width
-Tic.PLAYERPORTRAITWH = 16 -- portrait window height
-Tic.PLAYERPORTRAITWX = Tic.SCREENW - Tic.PLAYERPORTRAITWW - ((Tic.WORLDWX - Tic.PLAYERPORTRAITWW) // 2) -- portrait window x position
-Tic.PLAYERPORTRAITWY = Tic.PLAYERINFOSWY + 25 -- portrait window y position
+Tic.PLAYERPORTRAITWW = 16 -- player portrait window width
+Tic.PLAYERPORTRAITWH = 16 -- player portrait window height
+Tic.PLAYERPORTRAITWX = Tic.SCREENW - Tic.PLAYERPORTRAITWW - ((Tic.WORLDWX - Tic.PLAYERPORTRAITWW) // 2) -- player portrait window x position
+Tic.PLAYERPORTRAITWY = Tic.PLAYERINFOSWY + 25 -- player portrait window y position
 
 -- Player Stats Window positions and sizes (hud)
-Tic.PLAYERSTATSWW = 16 -- stats window width
-Tic.PLAYERSTATSWH = 16 -- stats window height
-Tic.PLAYERSTATSWX = Tic.PLAYERPORTRAITWX -- stats window x position
-Tic.PLAYERSTATSWY = Tic.PLAYERPORTRAITWY + 25 -- stats window y position
+Tic.PLAYERSTATSWW = 16 -- player stats window width
+Tic.PLAYERSTATSWH = 16 -- player stats window height
+Tic.PLAYERSTATSWX = Tic.PLAYERPORTRAITWX -- player stats window x position
+Tic.PLAYERSTATSWY = Tic.PLAYERPORTRAITWY + 25 -- player stats window y position
 
 -- Player State Window positions and sizes (hud)
-Tic.PLAYERSTATEWW = 26 -- state window width
-Tic.PLAYERSTATEWH = 16 -- state window height
--- Tic.PLAYERSTATEWX = Tic.SCREENW - Tic.PLAYERSTATEWW - ((Tic.WORLDWX - Tic.PLAYERSTATEWW) // 2) -- state window x position
-Tic.PLAYERSTATEWX = Tic.PLAYERINFOSWX -- state window x position
-Tic.PLAYERSTATEWY = Tic.PLAYERSTATSWY + 25 -- state window y position
+Tic.PLAYERSTATEWW = 26 -- player state window width
+Tic.PLAYERSTATEWH = 16 -- player state window height
+Tic.PLAYERSTATEWX = Tic.PLAYERINFOSWX -- player state window x position
+Tic.PLAYERSTATEWY = Tic.PLAYERSTATSWY + 25 -- player state window y position
 
 -- Spotted Infos Window positions and sizes (hud)
-Tic.SPOTTEDINFOSWW = 26 -- infos window width
-Tic.SPOTTEDINFOSWH = 16 -- infos window height
-Tic.SPOTTEDINFOSWX = ((Tic.WORLDWX - Tic.SPOTTEDINFOSWW) // 2) -- infos window x position
-Tic.SPOTTEDINFOSWY = Tic.WORLDWY -- infos window y position
+Tic.SPOTTEDINFOSWW = 26 -- spotted infos window width
+Tic.SPOTTEDINFOSWH = 16 -- spotted infos window height
+Tic.SPOTTEDINFOSWX = ((Tic.WORLDWX - Tic.SPOTTEDINFOSWW) // 2) -- spotted infos window x position
+Tic.SPOTTEDINFOSWY = Tic.WORLDWY -- spotted infos window y position
 
 -- Spotted Portrait Window positions and sizes (hud)
-Tic.SPOTTEDPORTRAITWW = 16 -- portrait window width
-Tic.SPOTTEDPORTRAITWH = 16 -- portrait window height
-Tic.SPOTTEDPORTRAITWX = ((Tic.WORLDWX - Tic.SPOTTEDPORTRAITWW) // 2) -- portrait window x position
-Tic.SPOTTEDPORTRAITWY = Tic.SPOTTEDINFOSWY + 25 -- portrait window y position
-
+Tic.SPOTTEDPORTRAITWW = 16 -- spotted portrait window width
+Tic.SPOTTEDPORTRAITWH = 16 -- spotted portrait window height
+Tic.SPOTTEDPORTRAITWX = ((Tic.WORLDWX - Tic.SPOTTEDPORTRAITWW) // 2) -- spotted portrait window x position
+Tic.SPOTTEDPORTRAITWY = Tic.SPOTTEDINFOSWY + 25 -- spotted portrait window y position
 
 -- Palette map
 Tic.PALETTEMAP = 0x3FF0 * 2 -- vram bank 1
@@ -432,6 +436,14 @@ function Tic:keysDo(_hold, _period) -- execute functions depending on the presse
         if not Tic.ACTIONS2FUNCTIONS[Tic.KEYS2ACTIONS[_key]] then break end -- action not linked to a function -- do nothing
         Tic.ACTIONS2FUNCTIONS[Tic.KEYS2ACTIONS[_key]]() -- execute the associated function
     end
+end
+
+
+-- Cursor System
+Tic.CURSORADR = 0x3FFB
+Tic.CURSORNBR = 15
+function Tic:cursor()
+    poke(Tic.CURSORADR, Tic.CURSORNBR)
 end
 
 
@@ -918,6 +930,7 @@ CSpriteBG.SIGNSPOSQU  = CSpriteBG.SIGNSBANK + 3 -- spotted square
 CSpriteBG.SIGNCROSQU  = CSpriteBG.SIGNSBANK + 4 -- crossed square
 CSpriteBG.SIGNDOTSQU  = CSpriteBG.SIGNSBANK + 5 -- dot square
 CSpriteBG.SIGNSCROLL  = CSpriteBG.SIGNSBANK + 6 -- scroll arrow
+CSpriteBG.SIGNCENTER  = CSpriteBG.SIGNSBANK + 7 -- center arrow
 CSpriteBG.BUILDBANK   = 16 -- buildings
 CSpriteBG.PLACEHOUSE  = CSpriteBG.BUILDBANK + 0
 CSpriteBG.PLACETOWER  = CSpriteBG.BUILDBANK + 1
@@ -1272,8 +1285,6 @@ function CLocations:locationsWorldXYRegion(_worldx, _worldy, _region) -- locatio
     _region.dw = _worldy + _region.dw
     local _result  = {}
 
-    Tic:logRecord("rang", _region:string())
-
     for _keyy, _valy in pairs(self.locations) do -- search for y in range
         if Nums:isBW(_keyy, _region.up, _region.dw)
         or Nums:isBW(_keyy + Tic.SPRITESIZE, _region.up, _region.dw) then
@@ -1310,7 +1321,6 @@ function CLocations:locationsEntityRegion(_entity, _region) -- locations in regi
     if not _entity or not _region then return end -- mandatory
     local _worldx = _entity.worldx
     local _worldy = _entity.worldy
-    -- Tic:logRecord("loc", _entity:string()) ; Tic:logRecord("elo", _region:string())
 
     return self:locationsWorldXYRegion(_worldx, _worldy, _region)
 end
@@ -1371,7 +1381,6 @@ end
 
 function CEntitiesLocations:locationsEntityRegion(_entity, _region) -- locations in entity region
     if not _entity or not _region then return end -- mandatory
-    -- Tic:logRecord("elo", _entity:string()) ; Tic:logRecord("elo", _region:string())
     return self.locations:locationsEntityRegion(_entity, _region)
 end
 
@@ -1428,7 +1437,7 @@ function CEntity:nearestEntityAround() -- nearest entity around itself, except i
     local _result          = nil
     local _locationsaround = self:locationsAround()
     local _entitiesaround  = CLocations:entities(_locationsaround)
-    Tic:logRecordActive(true)
+    Tic:logRecordActive(false)
     Tic:logRecordEntities(_entitiesaround, true)
 
     for _entity, _ in pairs(_entitiesaround) do
@@ -3309,13 +3318,15 @@ function CWindow:new(_argt)
     self:argt(_argt) -- override if any
 end
 
-function CWindow:draw() -- window
+function CWindow:draw() -- window -- FIXME remove some attributes ? -- can be determined by the existence of the method
     if self.drawground then self:drawGround() end
     if self.drawguides then self:drawGuides() end
     if self.drawinside then self:drawInside() end
     if self.drawcaches then self:drawCaches() end
     if self.drawborder then self:drawBorder() end
     if self.drawframes then self:drawFrames() end
+    if self.drawScrollArrows then self:drawScrollArrows() end -- does window handles scroll arrows ?
+
 end
 
 function CWindow:drawGround() -- window ground
@@ -3804,6 +3815,10 @@ end
 local WindowPortraitSpotted = CWindowPortraitSpotted{}
 
 
+function Tic:worldActual() -- TEMP
+    return World
+end
+
 --
 -- CWindowWorld
 --
@@ -3874,6 +3889,70 @@ function CWindowWorld:drawPlayerActual()
         end
     end
 end
+
+function CWindowWorld:drawScrollArrows()
+    local _arrowscount  = 5
+    local _arrowsweight = _arrowscount * Tic.SPRITESIZE
+    local _paletteoff   = {[Tic.COLORWHITE] = Tic.COLORGREYM, [Tic.COLORGREYM] = Tic.COLORGREYD}
+    local _screenx      = Tic.WORLDWX + ((Tic.WORLDWW - _arrowsweight) / 2)
+    local _screeny      = Tic.WORLDWY - Tic.SPRITESIZE2 - 2
+    
+    local _musprite = CSpriteBG() -- multi usage unique sprite
+    _musprite.sprite  = CSpriteBG.SIGNSCROLL -- general arrows
+    _musprite.screeny = Tic.WORLDWY - Tic.SPRITESIZE2 - 2
+    _musprite.palette = nil
+
+    _musprite.screenx = _screenx + (0 * Tic.SPRITESIZE) -- lf arrow
+    _musprite.rotate  = CSprite.ROTATE270
+    _musprite.palette = nil
+    _musprite:draw()
+
+    _musprite.screenx = _screenx + (1 * Tic.SPRITESIZE) -- up arrow
+    _musprite.rotate  = CSprite.ROTATE000
+    _musprite.palette = nil
+    _musprite:draw()
+
+    _musprite.screenx = _screenx + (3 * Tic.SPRITESIZE) -- dw arrow
+    _musprite.rotate  = CSprite.ROTATE180
+    _musprite.palette = nil
+    _musprite:draw()
+
+    _musprite.screenx = _screenx + (4 * Tic.SPRITESIZE) -- rg arrow
+    _musprite.rotate  = CSprite.ROTATE090
+    _musprite.palette = nil
+    _musprite:draw()
+
+    _musprite.screenx = _screenx + (2 * Tic.SPRITESIZE) -- md arrow
+    _musprite.sprite  = CSpriteBG.SIGNCENTER
+    _musprite.palette = nil
+    _musprite:draw()
+end
+
+
+--
+-- CWindowInfosWorld
+--
+local CWindowInfosWorld = CWindowInfos:extend() -- window infos for world
+function CWindowInfosWorld:new(_argt)
+    CWindowInfosWorld.super.new(self, _argt)
+    self.screenx = Tic.WORLDINFOSWX
+    self.screeny = Tic.WORLDINFOSWY
+	self.small   = false
+	self.align   = CWindowInfos.ALIGNMD
+    self:argt(_argt) -- override if any
+	self.screenw = Tic.WORLDINFOSWW
+	self.screenh = Tic.WORLDINFOSWH
+	return self.screenw, self.screenh
+end
+
+function CWindowInfosWorld:drawInside() -- window infos content for world
+    local _entity = Tic:worldActual()
+    local _info   = _entity.kind.." : ".._entity.name
+    self.infos    = {_info}
+    CWindowInfosWorld.super.drawInside(self)
+end
+-- CWindowInfosWorld instance
+local WindowInfosWorld = CWindowInfosWorld{}
 
 
 
@@ -4153,7 +4232,7 @@ end
 Tic.DRAWHITBOX  = true
 Tic.DRAWSPOTTED = true
 Tic.DRAWBORDERS = true
-Tic.DRAWVIEW    = true
+-- Tic.DRAWVIEW    = true
 Tic:playerActual():hitboxRefresh() -- refresh the hitboxes
 
 
@@ -4161,10 +4240,13 @@ Tic:playerActual():hitboxRefresh() -- refresh the hitboxes
 -- Drawing
 --
 function Tic:draw()
+    Tic.cursor()
+
     Tic:keysDo(20, 10) -- handle keyboard
 
     WindowScreen:draw()
     WindowWorld:draw()
+    WindowInfosWorld:draw()
     WindowInfosPlayer:draw()
     WindowPortraitPlayer:draw()
     WindowStatsPlayer:draw()
