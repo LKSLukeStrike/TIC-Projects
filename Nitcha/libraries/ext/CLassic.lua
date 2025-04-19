@@ -154,8 +154,18 @@ function Classic:load() -- load (from stack) a table of argt {k = v, ...}
 end
 
 
+function Classic:string() -- classic as a string
+  return self:_kind(), self:_name()
+end
+
+
 function Classic:_kind() -- returns the kind of the classic if .kind exists else "Classic"
   return self.kind or "Classic"
+end
+
+
+function Classic:_name() -- returns the name of the classic if .name exists else "Classic"
+  return self.name or "Classic"
 end
 
 

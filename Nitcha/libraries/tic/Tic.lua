@@ -278,6 +278,7 @@ Tic.KEY_V              = 22
 Tic.KEY_X              = 24
 Tic.KEY_Y              = 25
 Tic.KEY_Z              = 26
+Tic.KEY_SPACE          = 48
 Tic.KEY_UP             = 58
 Tic.KEY_DOWN           = 59
 Tic.KEY_LEFT           = 60
@@ -331,6 +332,7 @@ Tic.ACTIONTOGGLEVIEW    = "toggleView"
 Tic.ACTIONTOGGLEMIND    = "toggleMind"
 Tic.ACTIONTOGGLEMOVE    = "toggleMove"
 Tic.ACTIONSCALENEXT     = "scaleNext"
+Tic.ACTIONSCREENNEXT    = "screenNext"
 
 -- Keys to Actions
 Tic.KEYS2ACTIONS = {
@@ -363,6 +365,7 @@ Tic.KEYS2ACTIONS = {
     [Tic.KEY_X]            = Tic.ACTIONTOGGLEMOVE,
     [Tic.KEY_Y]            = Tic.ACTIONSTATPSYACT,
     [Tic.KEY_Z]            = Tic.ACTIONSCALENEXT,
+    [Tic.KEY_SPACE]        = Tic.ACTIONSCREENNEXT,
 }
 
 -- Actions to Functions
@@ -396,6 +399,7 @@ Tic.ACTIONS2FUNCTIONS = {
     [Tic.ACTIONTOGGLEMIND]    = function() Tic:toggleMind() end,
     [Tic.ACTIONTOGGLEMOVE]    = function() Tic:toggleMove() end,
     [Tic.ACTIONSCALENEXT]     = function() Tic:scaleNext() end,
+    [Tic.ACTIONSCREENNEXT]    = function() Tic:screenNext() end,
 }
 
 
@@ -444,6 +448,22 @@ Tic.CURSORADR = 0x3FFB
 Tic.CURSORNBR = 15
 function Tic:cursor()
     poke(Tic.CURSORADR, Tic.CURSORNBR)
+end
+
+
+-- Screens System -- handle screen stack
+Tic.SCREENS = CCyclerTable()
+
+function Tic:screenActual() -- actual screen in the stack
+    return Tic.SCREENS.actvalue
+end
+
+function Tic:screenAppend(_screen) -- append a screen to the stack
+    return Tic.SCREENS:insert(_screen)
+end
+
+function Tic:screenNext() -- next screen in the stack
+    return Tic.SCREENS:next()
 end
 
 
@@ -1391,6 +1411,25 @@ end
 
 
 --
+-- CScreen
+--
+local CScreen = Classic:extend() -- generic screen
+Classic.KINDSCREEN = "Screen" -- Screen kind
+Classic.NAMESCREEN = "Screen" -- Screen name
+function CScreen:new(_argt)
+    CScreen.super.new(self, _argt)
+    self.kind = Classic.KINDSCREEN
+    self.name = Classic.NAMESCREEN
+    self.screen  = nil -- parent screen if any
+    self.screens = {} -- sub screens (layers) if any -- ordered
+    self.windows = {} -- screen windows if any -- ordered
+    self.buttons = {} -- screen buttons if any -- ordered
+    self.display = true -- display this screen ?
+    self:argt(_argt) -- override if any
+end
+
+
+--
 -- CEntity
 --
 local CEntity = Classic:extend() -- generic entities like worlds, places, objects, characters, cameras ...
@@ -1486,12 +1525,12 @@ end
 -- CWorld
 --
 local CWorld = CEntity:extend() -- generic world that contains entities
-CWorld.KINDWORLD = "World" -- World kind
-CWorld.NAMEWORLD = "World" -- World name
+Classic.KINDWORLD = "World" -- World kind
+Classic.NAMEWORLD = "World" -- World name
 function CWorld:new(_argt)
     CWorld.super.new(self, _argt)
-    self.kind = CWorld.KINDWORLD
-    self.name = CWorld.NAMEWORLD
+    self.kind = Classic.KINDWORLD
+    self.name = Classic.NAMEWORLD
     self.region = CRegion() -- world boundaries
     self.entitieslocations = CEntitiesLocations{} -- record world entities and their locations
     self:argt(_argt) -- override if any
@@ -3979,6 +4018,14 @@ function CWindowInfosWorld:drawInside() -- window infos content for world
 end
 -- CWindowInfosWorld instance
 local WindowInfosWorld = CWindowInfosWorld{}
+
+
+
+--
+-- INTERFACE
+--
+ScreenIntro = CScreen()
+Tic.screenAppend(ScreenIntro)
 
 
 

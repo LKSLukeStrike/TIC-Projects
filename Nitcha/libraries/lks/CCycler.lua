@@ -132,7 +132,7 @@ function CCyclerTable:argt(_argt) -- setup cycler
     return self.actvalue
 end
 
-function CCyclerTable:insert(_item, _at) -- insert an _item into table _at (end by default)
+function CCyclerTable:insert(_item, _at) -- insert an _item into table _at (end by default) -- TODO add unique ?
     if not _item then return self.actvalue end
     if not _at then
         table.insert(self.acttable, _item)
