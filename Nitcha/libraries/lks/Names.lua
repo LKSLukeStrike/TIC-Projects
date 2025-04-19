@@ -90,10 +90,10 @@ function Names:random(_minlen, _maxlen, _vowels, _consos, _prbvow) -- random nam
     local _result = ""
 
     if math.random() < _prbvow then
-        _result = Tables:randompickval(_vowels)
+        _result = Tables:valPickRandom(_vowels)
     end
     while #_result < _reslen do
-        _result = _result..Tables:randompickval(_consos)..Tables:randompickval(_vowels)
+        _result = _result..Tables:valPickRandom(_consos)..Tables:valPickRandom(_vowels)
     end
     return string.sub(_result, 1, _reslen)
 end

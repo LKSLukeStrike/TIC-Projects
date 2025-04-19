@@ -421,7 +421,7 @@ function Tic:keysPressed(_hold, _period) -- returns the pressed keys in a table
     for _i = 0, 3 do
         local _key = peek(Tic.KEYBOARDKEYS + _i)
         if _key > 0 then -- key pressed
-            local _modifier = Tables:findKey(Tic.MODIFIERKEYS, _key)
+            local _modifier = Tables:keyFind(Tic.MODIFIERKEYS, _key)
             if _modifier then -- modifier key
                 Tic.MODIFIERKEYS[_modifier] = true
             elseif keyp(_key, _hold, _period) then -- normal key holded
@@ -471,7 +471,7 @@ end
 Tic.PLAYERS    = CCyclerTable()
 Tic.PLAYERONLY = true -- to display view, move, etc only for actual player
 function Tic:playerAppend(_player) -- stack a new player
-    if Tables:findVal(Tic.PLAYERS, _player) then return end -- avoid doublons
+    if Tables:valFind(Tic.PLAYERS, _player) then return end -- avoid doublons
     return Tic.PLAYERS:insert(_player)
 end
 
@@ -1426,6 +1426,30 @@ function CScreen:new(_argt)
     self.buttons = {} -- screen buttons if any -- ordered
     self.display = true -- display this screen ?
     self:argt(_argt) -- override if any
+end
+
+function CScreen:draw()
+    if not self.display then return end -- nothing to display
+    self:drawWindows()
+    self:drawButtons()
+    for _, _screen in ipairs(self.screens or {}) do -- layer ordered
+        _screen:draw()
+    end
+end
+
+function CScreen:drawWindows() -- draw ordered
+    for _, _window in ipairs(self.windows or {}) do
+        _window:draw()
+    end
+end
+
+function CScreen:drawButtons() -- draw ordered
+end
+
+function CScreen:appendWindow(_window) -- append window -- unique
+    if not _window then return end -- mandarory
+    if Tables:valFind(self.windows, _window) then return end -- already exists
+    table.insert(self.windows, _window)
 end
 
 
@@ -4024,8 +4048,20 @@ local WindowInfosWorld = CWindowInfosWorld{}
 --
 -- INTERFACE
 --
-ScreenIntro = CScreen()
-Tic.screenAppend(ScreenIntro)
+ScreenIntro = CScreen{name = "Intro"}
+Tic:screenAppend(ScreenIntro)
+ScreenIntro:appendWindow(CWindowScreen())
+ScreenIntro:appendWindow(CWindowInfos{
+    drawground = false,
+    drawframes = false,
+    align = CWindowInfos.ALIGNMD,
+    scale = 2,
+    infos = {"Press", "SPACE",},
+})
+
+
+-- ScreenWorld = CScreen{name = "World"}
+-- Tic:screenAppend(ScreenWorld)
 
 
 
@@ -4058,7 +4094,7 @@ function CPlace:generateRandomWorldWindow(_count, _kinds) -- random count of pla
     _count = _count or CPlace.PLACECOUNT
     _kinds = _kinds or CPlace.PLACEKINDS
     for _ = 1, _count do
-        local _kind = Tables:randompickkey(_kinds) -- random kind
+        local _kind = Tables:keyPickRandom(_kinds) -- random kind
         _entity = _kind()
         _entity:randomWorldWindow() -- random position
     end
@@ -4076,9 +4112,9 @@ function CPlace:generateRandomRegionWorldCount(_count, _kinds, _worldregion) -- 
     }
 
     for _ = 1, _count do
-        local _kind = Tables:randompickkey(_kinds) -- random kind
+        local _kind = Tables:keyPickRandom(_kinds) -- random kind
         while _kinds[_kind].percent and math.random(0, 100) >_kinds[_kind].percent do
-            _kind = Tables:randompickkey(_kinds) -- choose another kind
+            _kind = Tables:keyPickRandom(_kinds) -- choose another kind
         end
         _entity = _kind()
         _entity:randomRegionWorld(_region) -- random position
@@ -4317,15 +4353,17 @@ function Tic:draw()
 
     Tic:keysDo(20, 10) -- handle keyboard
 
-    WindowScreen:draw()
-    WindowWorld:draw()
-    WindowInfosWorld:draw()
-    WindowInfosPlayer:draw()
-    WindowPortraitPlayer:draw()
-    WindowStatsPlayer:draw()
-    WindowStatePlayer:draw()
-    WindowInfosSpotted:draw()
-    WindowPortraitSpotted:draw()
+    Tic:screenActual():draw()
+
+    -- WindowScreen:draw()
+    -- WindowWorld:draw()
+    -- WindowInfosWorld:draw()
+    -- WindowInfosPlayer:draw()
+    -- WindowPortraitPlayer:draw()
+    -- WindowStatsPlayer:draw()
+    -- WindowStatePlayer:draw()
+    -- WindowInfosSpotted:draw()
+    -- WindowPortraitSpotted:draw()
 
     Tic:drawLog()
     Tic:logPrint()
@@ -4344,6 +4382,8 @@ function Tic:drawLog() -- [-] remove
     local _status  = Tic.STATESETTINGS[_state].status
     local _dirx    = _playeractual.dirx
     local _diry    = _playeractual.diry
+
+    Tic.logAppend(Tic:screenActual():string())
 
     
     -- for _key, _val in pairs(Tic.MODIFIERKEYS) do -- modifier keys state
