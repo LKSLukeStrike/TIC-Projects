@@ -11,7 +11,7 @@ end
 XHello.message = "My Message"
 
 CCharacter = Classic:extend()
-CCharacter:implementNew(XHello)
+-- CCharacter:implementNew(XHello)
 function CCharacter:new(_argt)
   CCharacter.super.new(self, _argt)
   self.x = 1
@@ -32,6 +32,7 @@ end
 CPlayer = CCharacter:extend()
 function CPlayer:new(_argt)
   CPlayer.super.new(self, _argt)
+  self.kind = "CPlayer"
   self:argt(_argt)
 end
 
@@ -67,8 +68,10 @@ print("CPlayer", Jeandu:is(CPlayer))
 print("CPlayer", Jeandu:is(CVoid))
 
 print()
-Jeandu:sayHello()
+-- Jeandu:sayHello()
 print("message:", Jeandu.message)
+print(Jeandu:string())
+print(Jeandu)
 
 -- print()
 -- print("XHello")

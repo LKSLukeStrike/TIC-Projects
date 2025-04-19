@@ -37,7 +37,7 @@ Tic.WORLDWH  = 100 -- world window height
 Tic.WORLDWW2 = Tic.WORLDWW // 2 -- half world window width
 Tic.WORLDWH2 = Tic.WORLDWH // 2 -- half world window height
 Tic.WORLDWX  = (Tic.SCREENW - Tic.WORLDWW) // 2 -- world window x position
-Tic.WORLDWY  = (Tic.SCREENH - Tic.WORLDWH) // 2 -- world window y position
+Tic.WORLDWY  = ((Tic.SCREENH - Tic.WORLDWH) // 2) + 2 -- world window y position
 Tic.WORLDWX2 = Tic.WORLDWX + Tic.WORLDWW2 -- half world window x position
 Tic.WORLDWY2 = Tic.WORLDWY + Tic.WORLDWH2 -- half world window y position
 
@@ -45,7 +45,7 @@ Tic.WORLDWY2 = Tic.WORLDWY + Tic.WORLDWH2 -- half world window y position
 Tic.WORLDINFOSWW = Tic.WORLDWW -- world infos window width
 Tic.WORLDINFOSWH = 10 -- world infos window height
 Tic.WORLDINFOSWX = Tic.WORLDWX -- world infos window x position
-Tic.WORLDINFOSWY = ((Tic.WORLDWY - Tic.WORLDINFOSWH) // 2) - 4 -- world infos window y position
+Tic.WORLDINFOSWY = 3 -- world infos window y position
 
 -- Player Infos Window positions and sizes (hud)
 Tic.PLAYERINFOSWW = 26 -- player infos window width
@@ -1449,7 +1449,15 @@ end
 function CScreen:appendWindow(_window) -- append window -- unique
     if not _window then return end -- mandarory
     if Tables:valFind(self.windows, _window) then return end -- already exists
+    _window.screen = self -- record parent
     table.insert(self.windows, _window)
+end
+
+function CScreen:appendScreen(_screen) -- append screen -- unique
+    if not _screen then return end -- mandarory
+    if Tables:valFind(self.screens, _screen) then return end -- already exists
+    _screen.screen = self -- record parent
+    table.insert(self.screens, _screen)
 end
 
 
@@ -2260,6 +2268,8 @@ local CObject = CEntityDrawable:extend() -- objects
 -- CCharacter
 --
 local CCharacter = CEntityDrawable:extend() -- characters
+Classic.KINDCHARACTER = "Character" -- Character kind
+Classic.NAMECHARACTER = "Character" -- Character name
 CCharacter.SIZEL = 0 -- character sizes -- for the head sprite y offset
 CCharacter.SIZEM = 1
 CCharacter.SIZES = 2
@@ -2458,8 +2468,6 @@ Tic.STATUSSETTINGS = { -- statuses settings
         palette1 = {[Tic.COLORRED] = Tic.COLORPURPLE, [Tic.COLORPURPLE] = Tic.COLORRED,},
      },
 }
-Classic.KINDCHARACTER = "Character" -- Character kind
-Classic.NAMECHARACTER = "Character" -- Character name
 function CCharacter:new(_argt)
     CCharacter.super.new(self, _argt)
     self.kind         = Classic.KINDCHARACTER
@@ -3359,13 +3367,18 @@ local CEnnemy = CCharacter:extend() -- ennemy characters
 -- CWindow
 --
 local CWindow = Classic:extend() -- generic window for displaying stuff
+Classic.KINDWINDOW = "Window" -- Window kind
+Classic.NAMEWINDOW = "Window" -- Window name
 function CWindow:new(_argt)
     CWindow.super.new(self, _argt)
+    self.kind = Classic.KINDWINDOW
+    self.name = Classic.NAMEWINDOW
+    self.screen      = nil -- parent screen if any
     self.screenx     = Tic.SCREENX -- positions
     self.screeny     = Tic.SCREENY
     self.screenw     = Tic.SCREENW -- sizes
     self.screenh     = Tic.SCREENH
-    self.cachest     = Tic.SCREENW -- caches thickness -- FIXME enlarge this to the whole screen
+    self.cachest     = Tic.SPRITESIZE -- caches thickness
     self.colorground = Tic.COLORHUDSCREEN
     self.colorguides = Tic.COLORGREYM
     self.colorcaches = Tic.COLORHUDSCREEN
@@ -3506,8 +3519,6 @@ function CWindowScreen:new(_argt)
     self.drawframes = false
     self:argt(_argt) -- override if any
 end
--- CWindowScreen instance
-local WindowScreen = CWindowScreen{}
 
 
 --
@@ -3628,8 +3639,6 @@ function CWindowInfosPlayer:drawInside() -- window infos content for player
 	self.entity = Tic:playerActual()
     CWindowInfosPlayer.super.drawInside(self)
 end
--- CWindowInfosPlayer instance
-local WindowInfosPlayer = CWindowInfosPlayer{}
 
 function CWindowInfosPlayer:drawScrollArrows()
     local _arrowscount  = 2
@@ -3722,8 +3731,6 @@ function CWindowPortraitPlayer:drawInside() -- window portrait content for playe
 	self.entity = Tic:playerActual()
     CWindowPortraitPlayer.super.drawInside(self)
 end
--- CWindowPortraitPlayer instance
-local WindowPortraitPlayer = CWindowPortraitPlayer{}
 
 
 --
@@ -3842,8 +3849,6 @@ function CWindowStatsPlayer:drawInside() -- window stats content for player
 	self.entity = Tic:playerActual()
     CWindowStatsPlayer.super.drawInside(self)
 end
--- CWindowStatsPlayer instance
-local WindowStatsPlayer = CWindowStatsPlayer{}
 
 
 --
@@ -3869,36 +3874,44 @@ function CWindowStatePlayer:drawInside() -- window state content for player
     self.infos = {_posture, _status}
     CWindowStatePlayer.super.drawInside(self)
 end
--- CWindowStatePlayer instance
-local WindowStatePlayer = CWindowStatePlayer{}
 
 
 --
 -- CWindowInfosSpotted
 --
 local CWindowInfosSpotted = CWindowInfosEntity:extend() -- window infos for spotted
+Classic.KINDWINDOWINFOSSPOTTED = "WindowInfosSpotted" -- WindowInfosSpotted kind
 function CWindowInfosSpotted:new(_argt)
     CWindowInfosSpotted.super.new(self, _argt)
+    self.kind = Classic.KINDWINDOWINFOSSPOTTED
     self.screenx = Tic.SPOTTEDINFOSWX
     self.screeny = Tic.SPOTTEDINFOSWY
     self:argt(_argt) -- override if any
 end
--- CWindowInfosSpotted instance
-local WindowInfosSpotted = CWindowInfosSpotted{}
+
+function CWindowInfosSpotted:draw()
+    if not self.entity then return end -- do not draw
+    CWindowInfosSpotted.super.draw(self)
+end
 
 
 --
 -- CWindowPortraitSpotted
 --
 local CWindowPortraitSpotted = CWindowPortraitDrawable:extend() -- window portrait for spotted
+Classic.KINDWINDOWPORTRAITSPOTTED = "WindowPortraitSpotted" -- WindowPortraitSpotted kind
 function CWindowPortraitSpotted:new(_argt)
     CWindowPortraitSpotted.super.new(self, _argt)
+    self.kind = Classic.KINDWINDOWPORTRAITSPOTTED
     self.screenx = Tic.SPOTTEDPORTRAITWX
     self.screeny = Tic.SPOTTEDPORTRAITWY
     self:argt(_argt) -- override if any
 end
--- CWindowPortraitSpotted instance
-local WindowPortraitSpotted = CWindowPortraitSpotted{}
+
+function CWindowPortraitSpotted:draw()
+    if not self.entity then return end -- do not draw
+    CWindowPortraitSpotted.super.draw(self)
+end
 
 
 function Tic:worldActual() -- TEMP
@@ -3911,16 +3924,15 @@ end
 local CWindowWorld = CWindow:extend() -- window world
 function CWindowWorld:new(_argt)
     CWindowWorld.super.new(self, _argt)
-    self.screenx     = Tic.WORLDWX -- positions
-    self.screeny     = Tic.WORLDWY
-    self.screenw     = Tic.WORLDWW -- sizes
-    self.screenh     = Tic.WORLDWH
-    self.colorground = Tic.COLORBIOMENIGHT
-    self.drawguides  = false
+    self.screenx         = Tic.WORLDWX -- positions
+    self.screeny         = Tic.WORLDWY
+    self.screenw         = Tic.WORLDWW -- sizes
+    self.screenh         = Tic.WORLDWH
+    self.spottedwindows  = nil -- spotted windows to inform if any
+    self.colorground     = Tic.COLORBIOMENIGHT
+    self.drawguides      = false
     self:argt(_argt) -- override if any
 end
--- CWindowWorld instance
-local WindowWorld = CWindowWorld{}
 
 function CWindowWorld:drawGround() -- window world ground
     self.colorground = Tic:biomeActual()
@@ -3928,7 +3940,7 @@ function CWindowWorld:drawGround() -- window world ground
 end
 
 function CWindowWorld:drawInside() -- window world content
-    CWindowWorld:drawPlayerActual()
+    self:drawPlayerActual()
 end
 
 function CWindowWorld:drawPlayerActual()
@@ -3942,15 +3954,11 @@ function CWindowWorld:drawPlayerActual()
         and _nearestentity
         or  nil
 
-    if _nearestentity then -- fill up the spotted windows if any
-        WindowInfosSpotted.entity    = _nearestentity
-        WindowPortraitSpotted.entity = _nearestentity
-    else
-        WindowInfosSpotted.entity    = nil
-        WindowPortraitSpotted.entity = nil
+    for _, _spottedwindow in pairs(self.spottedwindows or {}) do -- fill up the spotted windows if any
+        _spottedwindow.entity = _nearestentity
+        _spottedwindow.entity = _nearestentity
     end
     
-
     for _, _keyy in pairs(Tables:keys(_locationsaround)) do -- draw entities -- sorted by y first
         for _, _keyx in pairs(Tables:keys(_locationsaround[_keyy])) do -- sorted by x next
             for _entity, _ in pairs(_locationsaround[_keyy][_keyx]) do -- entities around actual player
@@ -4024,7 +4032,7 @@ function CWindowInfosWorld:new(_argt)
     self.screenx = Tic.WORLDINFOSWX
     self.screeny = Tic.WORLDINFOSWY
 	self.small      = false
-    self.drawframes = false
+    self.drawframes = true
     self.drawborder = true
 	self.marginsv   = 1
 	self.align      = CWindowInfos.ALIGNMD
@@ -4040,28 +4048,54 @@ function CWindowInfosWorld:drawInside() -- window infos content for world
     self.infos    = {_info}
     CWindowInfosWorld.super.drawInside(self)
 end
--- CWindowInfosWorld instance
+
+
+
+--
+-- INTERFACE -- order is important !
+--
+local ScreenWorld = CScreen{name = "World"}
+Tic:screenAppend(ScreenWorld)
+ScreenWorld:appendWindow(CWindowScreen())
+
+local ScreenWorldLF = CScreen{}
+ScreenWorld:appendScreen(ScreenWorldLF)
+local WindowInfosSpotted = CWindowInfosSpotted{}
+ScreenWorldLF:appendWindow(WindowInfosSpotted)
+local WindowPortraitSpotted = CWindowPortraitSpotted{}
+ScreenWorldLF:appendWindow(WindowPortraitSpotted)
+
+local ScreenWorldMD = CScreen{}
+ScreenWorld:appendScreen(ScreenWorldMD)
+local WindowWorld = CWindowWorld{spottedwindows = {WindowInfosSpotted, WindowPortraitSpotted}}
+ScreenWorldMD:appendWindow(WindowWorld)
 local WindowInfosWorld = CWindowInfosWorld{}
+ScreenWorldMD:appendWindow(WindowInfosWorld)
 
 
+local ScreenWorldRG = CScreen{}
+ScreenWorld:appendScreen(ScreenWorldRG)
+local WindowInfosPlayer = CWindowInfosPlayer{}
+ScreenWorldRG:appendWindow(WindowInfosPlayer)
+local WindowPortraitPlayer = CWindowPortraitPlayer{}
+ScreenWorldRG:appendWindow(WindowPortraitPlayer)
+local WindowStatsPlayer = CWindowStatsPlayer{}
+ScreenWorldRG:appendWindow(WindowStatsPlayer)
+local WindowStatePlayer = CWindowStatePlayer{}
+ScreenWorldRG:appendWindow(WindowStatePlayer)
 
---
--- INTERFACE
---
-ScreenIntro = CScreen{name = "Intro"}
+
+local ScreenIntro = CScreen{name = "Intro"}
 Tic:screenAppend(ScreenIntro)
 ScreenIntro:appendWindow(CWindowScreen())
 ScreenIntro:appendWindow(CWindowInfos{
+    screenx = 107,
+    screeny = 60,
     drawground = false,
     drawframes = false,
     align = CWindowInfos.ALIGNMD,
-    scale = 2,
-    infos = {"Press", "SPACE",},
+    infos = {"Press", "Key",},
 })
-
-
--- ScreenWorld = CScreen{name = "World"}
--- Tic:screenAppend(ScreenWorld)
 
 
 
@@ -4338,9 +4372,9 @@ for _, _cplace in pairs({
 end
 end
 
-Tic.DRAWHITBOX  = true
+-- Tic.DRAWHITBOX  = true
 Tic.DRAWSPOTTED = true
-Tic.DRAWBORDERS = true
+-- Tic.DRAWBORDERS = true
 -- Tic.DRAWVIEW    = true
 Tic:playerActual():hitboxRefresh() -- refresh the hitboxes
 
@@ -4349,11 +4383,14 @@ Tic:playerActual():hitboxRefresh() -- refresh the hitboxes
 -- Drawing
 --
 function Tic:draw()
+    if true then
     Tic.cursor()
 
     Tic:keysDo(20, 10) -- handle keyboard
 
     Tic:screenActual():draw()
+
+    if Tic:screenActual() == ScreenWorld then WindowWorld:drawScrollArrows() end
 
     -- WindowScreen:draw()
     -- WindowWorld:draw()
@@ -4368,7 +4405,8 @@ function Tic:draw()
     Tic:drawLog()
     Tic:logPrint()
 
-    Tic:tick() -- [!] required in the draw function 
+    Tic:tick() -- [!] required in the draw function
+    end
 end
 
 
@@ -4382,9 +4420,6 @@ function Tic:drawLog() -- [-] remove
     local _status  = Tic.STATESETTINGS[_state].status
     local _dirx    = _playeractual.dirx
     local _diry    = _playeractual.diry
-
-    Tic.logAppend(Tic:screenActual():string())
-
     
     -- for _key, _val in pairs(Tic.MODIFIERKEYS) do -- modifier keys state
     --     Tic:logAppend(_key, _val)

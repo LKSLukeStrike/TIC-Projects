@@ -15,6 +15,8 @@ Classic.__index = Classic
 
 function Classic:new(...)
   self._savestack = {} -- for saving/loading fields -- {{k = v, ...}, ...}
+  self.kind = "Classic"
+  self.name = "Classic"
 end
 
 
@@ -56,7 +58,7 @@ end
 
 
 function Classic:__tostring()
-  return self:_kind()..": "..string.format("%p", self)
+  return self.kind..": "..string.format("%p", self)
 end
 
 
@@ -155,17 +157,7 @@ end
 
 
 function Classic:string() -- classic as a string
-  return self:_kind(), self:_name()
-end
-
-
-function Classic:_kind() -- returns the kind of the classic if .kind exists else "Classic"
-  return self.kind or "Classic"
-end
-
-
-function Classic:_name() -- returns the name of the classic if .name exists else "Classic"
-  return self.name or "Classic"
+  return self.kind.." "..self.name
 end
 
 
