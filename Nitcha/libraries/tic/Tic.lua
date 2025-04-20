@@ -264,6 +264,7 @@ Tic.FREQUENCE0300 = 0300 -- each 5 second
 Tic.FREQUENCE0600 = 0600 -- each 10 second
 
 -- Keys values
+Tic.KEY_ANY            = -1
 Tic.KEY_A              = 01
 Tic.KEY_B              = 02
 Tic.KEY_D              = 04
@@ -302,40 +303,43 @@ Tic.KEY_NUMPADMINUS    = 90
 Tic.KEY_NUMPADMULTIPLY = 91
 Tic.KEY_NUMPADDIVIDE   = 92
 
--- Actions values
-Tic.ACTIONPLAYERPREV    = "playerPrev"
-Tic.ACTIONPLAYERNEXT    = "playerNext"
-Tic.ACTIONPLAYERQUIT    = "playerQuit"
-Tic.ACTIONPLAYERONLY    = "playerOnly"
-Tic.ACTIONSTATEPREV     = "statePrev"
-Tic.ACTIONSTATENEXT     = "stateNext"
-Tic.ACTIONTOGGLEWORK    = "toggleWork"
-Tic.ACTIONTOGGLEKNEEL   = "toggleKneel"
-Tic.ACTIONTOGGLESLEEP   = "toggleSleep"
-Tic.ACTIONMOVE000       = "move000"
-Tic.ACTIONMOVE045       = "move045"
-Tic.ACTIONMOVE090       = "move090"
-Tic.ACTIONMOVE135       = "move135"
-Tic.ACTIONMOVE180       = "move180"
-Tic.ACTIONMOVE225       = "move225"
-Tic.ACTIONMOVE270       = "move270"
-Tic.ACTIONMOVE315       = "move315"
-Tic.ACTIONSTATPHYACT    = "statPhyAct"
-Tic.ACTIONSTATMENACT    = "statMenAct"
-Tic.ACTIONSTATPSYACT    = "statPsyAct"
-Tic.ACTIONBIOMENEXT     = "biomeNext"
-Tic.ACTIONTOGGLEHITBOX  = "toggleHitbox"
-Tic.ACTIONTOGGLESPOTTED = "toggleSpotted"
-Tic.ACTIONTOGGLEBORDERS = "toggleBorders"
-Tic.ACTIONTOGGLEDIRS    = "toggleDirs"
-Tic.ACTIONTOGGLEVIEW    = "toggleView"
-Tic.ACTIONTOGGLEMIND    = "toggleMind"
-Tic.ACTIONTOGGLEMOVE    = "toggleMove"
-Tic.ACTIONSCALENEXT     = "scaleNext"
-Tic.ACTIONSCREENNEXT    = "screenNext"
+-- Actions values -- TODO and Tic functions
+Tic.ACTIONPLAYERPREV       = "playerPrev"
+Tic.ACTIONPLAYERNEXT       = "playerNext"
+Tic.ACTIONPLAYERQUIT       = "playerQuit"
+Tic.ACTIONPLAYERONLY       = "playerOnly"
+Tic.ACTIONSTATEPREV        = "statePrev"
+Tic.ACTIONSTATENEXT        = "stateNext"
+Tic.ACTIONTOGGLEWORK       = "toggleWork"
+Tic.ACTIONTOGGLEKNEEL      = "toggleKneel"
+Tic.ACTIONTOGGLESLEEP      = "toggleSleep"
+Tic.ACTIONMOVEDIRECTION000 = "moveDirection000"
+Tic.ACTIONMOVEDIRECTION045 = "moveDirection045"
+Tic.ACTIONMOVEDIRECTION090 = "moveDirection090"
+Tic.ACTIONMOVEDIRECTION135 = "moveDirection135"
+Tic.ACTIONMOVEDIRECTION180 = "moveDirection180"
+Tic.ACTIONMOVEDIRECTION225 = "moveDirection225"
+Tic.ACTIONMOVEDIRECTION270 = "moveDirection270"
+Tic.ACTIONMOVEDIRECTION315 = "moveDirection315"
+Tic.ACTIONSTATPHYACT       = "statPhyAct"
+Tic.ACTIONSTATMENACT       = "statMenAct"
+Tic.ACTIONSTATPSYACT       = "statPsyAct"
+Tic.ACTIONBIOMENEXT        = "biomeNext"
+Tic.ACTIONTOGGLEHITBOX     = "toggleHitbox"
+Tic.ACTIONTOGGLESPOTTED    = "toggleSpotted"
+Tic.ACTIONTOGGLEBORDERS    = "toggleBorders"
+Tic.ACTIONTOGGLEDIRS       = "toggleDirs"
+Tic.ACTIONTOGGLEVIEW       = "toggleView"
+Tic.ACTIONTOGGLEMIND       = "toggleMind"
+Tic.ACTIONTOGGLEMOVE       = "toggleMove"
+Tic.ACTIONSCALENEXT        = "scaleNext"
+Tic.ACTIONSCREENNEXT       = "screenNext"
 
--- Keys to Actions
-Tic.KEYS2ACTIONS = {
+-- Keys to Actions -- per screen
+Tic.KEYS2ACTIONSINTRO = {
+    [Tic.KEY_ANY]          = Tic.ACTIONSCREENNEXT,
+}
+Tic.KEYS2ACTIONSWORLD = {
     [Tic.KEY_LEFT]         = Tic.ACTIONPLAYERPREV, -- cycle actual player
     [Tic.KEY_RIGHT]        = Tic.ACTIONPLAYERNEXT,
     [Tic.KEY_UP]           = Tic.ACTIONSTATEPREV, -- cycle state
@@ -343,14 +347,14 @@ Tic.KEYS2ACTIONS = {
     [Tic.KEY_NUMPADDIVIDE] = Tic.ACTIONTOGGLEWORK, -- toggle posture/status
     [Tic.KEY_NUMPAD5]      = Tic.ACTIONTOGGLEKNEEL,
     [Tic.KEY_NUMPAD0]      = Tic.ACTIONTOGGLESLEEP,
-    [Tic.KEY_NUMPAD8]      = Tic.ACTIONMOVE000, -- move
-    [Tic.KEY_NUMPAD9]      = Tic.ACTIONMOVE045,
-    [Tic.KEY_NUMPAD6]      = Tic.ACTIONMOVE090,
-    [Tic.KEY_NUMPAD3]      = Tic.ACTIONMOVE135,
-    [Tic.KEY_NUMPAD2]      = Tic.ACTIONMOVE180,
-    [Tic.KEY_NUMPAD1]      = Tic.ACTIONMOVE225,
-    [Tic.KEY_NUMPAD4]      = Tic.ACTIONMOVE270,
-    [Tic.KEY_NUMPAD7]      = Tic.ACTIONMOVE315,
+    [Tic.KEY_NUMPAD8]      = Tic.ACTIONMOVEDIRECTION000, -- move
+    [Tic.KEY_NUMPAD9]      = Tic.ACTIONMOVEDIRECTION045,
+    [Tic.KEY_NUMPAD6]      = Tic.ACTIONMOVEDIRECTION090,
+    [Tic.KEY_NUMPAD3]      = Tic.ACTIONMOVEDIRECTION135,
+    [Tic.KEY_NUMPAD2]      = Tic.ACTIONMOVEDIRECTION180,
+    [Tic.KEY_NUMPAD1]      = Tic.ACTIONMOVEDIRECTION225,
+    [Tic.KEY_NUMPAD4]      = Tic.ACTIONMOVEDIRECTION270,
+    [Tic.KEY_NUMPAD7]      = Tic.ACTIONMOVEDIRECTION315,
     [Tic.KEY_A]            = Tic.ACTIONPLAYERQUIT,
     [Tic.KEY_B]            = Tic.ACTIONBIOMENEXT,
     [Tic.KEY_D]            = Tic.ACTIONTOGGLEDIRS,
@@ -379,14 +383,14 @@ Tic.ACTIONS2FUNCTIONS = {
     [Tic.ACTIONTOGGLEWORK]    = function() Tic:toggleWork() end,
     [Tic.ACTIONTOGGLEKNEEL]   = function() Tic:toggleKneel() end,
     [Tic.ACTIONTOGGLESLEEP]   = function() Tic:toggleSleep() end,
-    [Tic.ACTIONMOVE000]       = function() Tic:moveDirection(Tic.DIR000) end,
-    [Tic.ACTIONMOVE045]       = function() Tic:moveDirection(Tic.DIR045) end,
-    [Tic.ACTIONMOVE090]       = function() Tic:moveDirection(Tic.DIR090) end,
-    [Tic.ACTIONMOVE135]       = function() Tic:moveDirection(Tic.DIR135) end,
-    [Tic.ACTIONMOVE180]       = function() Tic:moveDirection(Tic.DIR180) end,
-    [Tic.ACTIONMOVE225]       = function() Tic:moveDirection(Tic.DIR225) end,
-    [Tic.ACTIONMOVE270]       = function() Tic:moveDirection(Tic.DIR270) end,
-    [Tic.ACTIONMOVE315]       = function() Tic:moveDirection(Tic.DIR315) end,
+    [Tic.ACTIONMOVEDIRECTION000]       = function() Tic:moveDirection000() end,
+    [Tic.ACTIONMOVEDIRECTION045]       = function() Tic:moveDirection045() end,
+    [Tic.ACTIONMOVEDIRECTION090]       = function() Tic:moveDirection090() end,
+    [Tic.ACTIONMOVEDIRECTION135]       = function() Tic:moveDirection135() end,
+    [Tic.ACTIONMOVEDIRECTION180]       = function() Tic:moveDirection180() end,
+    [Tic.ACTIONMOVEDIRECTION225]       = function() Tic:moveDirection225() end,
+    [Tic.ACTIONMOVEDIRECTION270]       = function() Tic:moveDirection270() end,
+    [Tic.ACTIONMOVEDIRECTION315]       = function() Tic:moveDirection315() end,
     [Tic.ACTIONSTATPHYACT]    = function() Tic:statPhyAct() end,
     [Tic.ACTIONSTATMENACT]    = function() Tic:statMenAct() end,
     [Tic.ACTIONSTATPSYACT]    = function() Tic:statPsyAct() end,
@@ -411,6 +415,7 @@ Tic.MODIFIERKEYS = { -- record modifier keys pressed
     [Tic.KEY_SHIFT]    = false,
     [Tic.KEY_ALT]      = false,
 }
+Tic.KEYS2ACTIONS = Tic.KEYS2ACTIONSINTRO
 function Tic:keysPressed(_hold, _period) -- returns the pressed keys in a table
     local _result = {}
 
@@ -430,15 +435,21 @@ function Tic:keysPressed(_hold, _period) -- returns the pressed keys in a table
         end
     end
 
+    if Tables:size(_result) > 0 then -- at least one key pressed
+        table.insert(_result, Tic.KEY_ANY)
+    end
+
     return _result
 end
 
 function Tic:keysDo(_hold, _period) -- execute functions depending on the pressed keys if any
     local _keyspressed = Tic:keysPressed(_hold, _period)
     for _, _key in ipairs(_keyspressed) do
-        if not Tic.KEYS2ACTIONS[_key] then break end -- key not linked to an action -- do nothing
-        if not Tic.ACTIONS2FUNCTIONS[Tic.KEYS2ACTIONS[_key]] then break end -- action not linked to a function -- do nothing
-        Tic.ACTIONS2FUNCTIONS[Tic.KEYS2ACTIONS[_key]]() -- execute the associated function
+        if Tic.KEYS2ACTIONS[_key] then -- key linked to an action
+            if Tic.ACTIONS2FUNCTIONS[Tic.KEYS2ACTIONS[_key]] then -- action linked to a function
+                Tic.ACTIONS2FUNCTIONS[Tic.KEYS2ACTIONS[_key]]() -- execute the associated function
+            end
+        end
     end
 end
 
@@ -458,12 +469,23 @@ function Tic:screenActual() -- actual screen in the stack
     return Tic.SCREENS.actvalue
 end
 
+function Tic:screenKeyboard() -- adjust the keyboard to the actual screen
+    local _screen = Tic:screenActual()
+    if not _screen.keys2actions then return end -- keep the old one
+    Tic.KEYS2ACTIONS = _screen.keys2actions
+end
+
 function Tic:screenAppend(_screen) -- append a screen to the stack
-    return Tic.SCREENS:insert(_screen)
+    if not _screen then return end -- mandatory
+    Tic.SCREENS:insert(_screen)
+    Tic:screenKeyboard()
+    return Tic:screenActual()
 end
 
 function Tic:screenNext() -- next screen in the stack
-    return Tic.SCREENS:next()
+    Tic.SCREENS:next()
+    Tic:screenKeyboard()
+    return Tic:screenActual()
 end
 
 
@@ -591,7 +613,39 @@ function Tic:toggleSleep(_character) -- toggle stand vs sleep
 end
 
 
--- Directions System -- move to 8 directions depending on status
+-- Directions System -- move to 8 directions depending on stattious
+function Tic:moveDirection000(_character)
+    Tic:moveDirection(Tic.DIR000, _character)
+end
+
+function Tic:moveDirection045(_character)
+    Tic:moveDirection(Tic.DIR045, _character)
+end
+
+function Tic:moveDirection090(_character)
+    Tic:moveDirection(Tic.DIR090, _character)
+end
+
+function Tic:moveDirection135(_character)
+    Tic:moveDirection(Tic.DIR135, _character)
+end
+
+function Tic:moveDirection180(_character)
+    Tic:moveDirection(Tic.DIR180, _character)
+end
+
+function Tic:moveDirection225(_character)
+    Tic:moveDirection(Tic.DIR225, _character)
+end
+
+function Tic:moveDirection270(_character)
+    Tic:moveDirection(Tic.DIR270, _character)
+end
+
+function Tic:moveDirection315(_character)
+    Tic:moveDirection(Tic.DIR315, _character)
+end
+
 function Tic:moveDirection(_direction, _character)
     if not _direction then return end -- mandatory
     _character = _character or Tic:playerActual()
@@ -1420,11 +1474,12 @@ function CScreen:new(_argt)
     CScreen.super.new(self, _argt)
     self.kind = Classic.KINDSCREEN
     self.name = Classic.NAMESCREEN
-    self.screen  = nil -- parent screen if any
-    self.screens = {} -- sub screens (layers) if any -- ordered
-    self.windows = {} -- screen windows if any -- ordered
-    self.buttons = {} -- screen buttons if any -- ordered
-    self.display = true -- display this screen ?
+    self.screen       = nil -- parent screen if any
+    self.screens      = {} -- sub screens (layers) if any -- ordered
+    self.windows      = {} -- screen windows if any -- ordered
+    self.buttons      = {} -- screen buttons if any -- ordered
+    self.display      = true -- display this screen ?
+    self.keys2actions = nil -- keys to actions mapping if any
     self:argt(_argt) -- override if any
 end
 
@@ -1467,7 +1522,9 @@ end
 local CEntity = Classic:extend() -- generic entities like worlds, places, objects, characters, cameras ...
 Classic.KINDENTITY = "Entity" -- Entity kind
 Classic.NAMEENTITY = "Entity" -- Entity name
-Classic.NAMEIDLE   = "Idle"   -- Idle name
+Classic.NAMEEMPTY  = "Empty"  -- Empty name
+Classic.NAMEDEAD   = "Dead"   -- Dead name
+Classic.NAMELIVING = "Living" -- Living name
 CEntity.WORLDX = 0
 CEntity.WORLDY = 0
 function CEntity:new(_argt)
@@ -1808,12 +1865,12 @@ end
 -- CPlace
 --
 local CPlace = CEntityDrawable:extend() -- places
+Classic.KINDPLACE = "Place" -- Place kind
+Classic.NAMEPLACE = "Place" -- Place name
 CPlace.EMPTY  = Tic.COLORKEY
 CPlace.ANIM01 = Tic.COLORWHITE
 CPlace.ANIM02 = Tic.COLORYELLOW
 CPlace.ANIM03 = Tic.COLORORANGE
-Classic.KINDPLACE = "Place" -- Place kind
-Classic.NAMEPLACE = "Place" -- Place name
 function CPlace:new(_argt)
     CPlace.super.new(self, _argt)
     self.kind = Classic.KINDPLACE
@@ -1827,6 +1884,8 @@ end
 -- CPlaceBuild
 --
 local CPlaceBuild = CPlace:extend() -- builds
+Classic.KINDBUILD = "Build" -- Build kind
+Classic.NAMEBUILD = "Build" -- Build name
 CPlaceBuild.SMOKE    = CPlace.ANIM01
 CPlaceBuild.WINDOW01 = CPlace.ANIM02
 CPlaceBuild.WINDOW02 = CPlace.ANIM03
@@ -1854,6 +1913,7 @@ CPlaceBuild.PALETTEIDLE  = {
     [CPlaceBuild.WINDOW01] = CPlaceBuild.WALLS,
     [CPlaceBuild.WINDOW02] = CPlaceBuild.WALLS,
     [CPlaceBuild.DOOR]     = CPlaceBuild.FACADE,    
+    [CPlaceBuild.ROOF]     = CPlaceBuild.FOAM,    
 }
 CPlaceBuild.PALETTEFADE  = {
     [CPlaceBuild.SMOKE]    = CPlace.EMPTY,
@@ -1863,12 +1923,10 @@ CPlaceBuild.PALETTEFADE  = {
     [CPlaceBuild.ROOF]     = CPlaceBuild.WALLS,
     [CPlaceBuild.FOAM]     = CPlaceBuild.WALLS,    
 }
-Classic.KINDBUILD = "Build" -- Build kind
-Classic.NAMEBUILD = "Build" -- Build name
 function CPlaceBuild:new(_argt)
     CPlaceBuild.super.new(self, _argt)
     self.kind = Classic.KINDBUILD
-    self.name = Classic.NAMEBUILD
+    self.name = Classic.NAMELIVING
     self.hitbox.region.lf = 2
     self.hitbox.region.rg = 4
     self.hitbox.region.up = 5
@@ -1883,11 +1941,9 @@ end
 --
 local CPlaceHouse = CPlaceBuild:extend() -- houses
 Classic.KINDHOUSE = "House" -- House kind
-Classic.NAMEHOUSE = "House" -- House name
 function CPlaceHouse:new(_argt)
     CPlaceHouse.super.new(self, _argt)
     self.kind = Classic.KINDHOUSE
-    self.name = Classic.NAMEHOUSE
     self.sprite      = CSpriteBG.PLACEHOUSE
     self:argt(_argt) -- override if any
 end
@@ -1915,7 +1971,7 @@ end
 local CPlaceHouseIdle = CPlaceHouse:extend() -- idle houses
 function CPlaceHouseIdle:new(_argt)
     CPlaceHouseIdle.super.new(self, _argt)
-    self.name = Classic.NAMEIDLE
+    self.name = Classic.NAMEEMPTY
     self.palette = CPlaceBuild.PALETTEIDLE
     self:argt(_argt) -- override if any
 end
@@ -1926,11 +1982,9 @@ end
 --
 local CPlaceTower = CPlaceBuild:extend() -- towers
 Classic.KINDTOWER = "Tower" -- Tower kind
-Classic.NAMETOWER = "Tower" -- Tower name
 function CPlaceTower:new(_argt)
     CPlaceTower.super.new(self, _argt)
     self.kind = Classic.KINDTOWER
-    self.name = Classic.NAMETOWER
     self.sprite  = CSpriteBG.PLACETOWER
     self:argt(_argt) -- override if any
 end
@@ -1958,7 +2012,7 @@ end
 local CPlaceTowerIdle = CPlaceTower:extend() -- idle towers
 function CPlaceTowerIdle:new(_argt)
     CPlaceTowerIdle.super.new(self, _argt)
-    self.name = Classic.NAMEIDLE
+    self.name = Classic.NAMEEMPTY
     self.palette = CPlaceBuild.PALETTEIDLE
     self:argt(_argt) -- override if any
 end
@@ -1969,11 +2023,9 @@ end
 --
 local CPlaceManor = CPlaceBuild:extend() -- manors
 Classic.KINDMANOR = "Manor" -- Manor kind
-Classic.NAMEMANOR = "Manor" -- Manor name
 function CPlaceManor:new(_argt)
     CPlaceManor.super.new(self, _argt)
     self.kind = Classic.KINDMANOR
-    self.name = Classic.NAMEMANOR
     self.sprite  = CSpriteBG.PLACEMANOR
     self.hitbox.region.lf = 1
     self:argt(_argt) -- override if any
@@ -2008,7 +2060,7 @@ end
 local CPlaceManorIdle = CPlaceManor:extend() -- idle manors
 function CPlaceManorIdle:new(_argt)
     CPlaceManorIdle.super.new(self, _argt)
-    self.name = Classic.NAMEIDLE
+    self.name = Classic.NAMEEMPTY
     self.palette = CPlaceBuild.PALETTEIDLE
     self:argt(_argt) -- override if any
 end
@@ -2019,11 +2071,9 @@ end
 --
 local CPlaceAltar = CPlaceBuild:extend() -- altars
 Classic.KINDALTAR = "Altar" -- Altar kind
-Classic.NAMEALTAR = "Altar" -- Altar name
 function CPlaceAltar:new(_argt)
     CPlaceAltar.super.new(self, _argt)
     self.kind = Classic.KINDALTAR
-    self.name = Classic.NAMEALTAR
     self.sprite  = CSpriteBG.PLACEALTAR
     self.hitbox.region.lf = 1
     self:argt(_argt) -- override if any
@@ -2052,7 +2102,7 @@ end
 local CPlaceAltarIdle = CPlaceAltar:extend() -- idle altars
 function CPlaceAltarIdle:new(_argt)
     CPlaceAltarIdle.super.new(self, _argt)
-    self.name = Classic.NAMEIDLE
+    self.name = Classic.NAMEEMPTY
     self.palette = CPlaceBuild.PALETTEIDLE
     self:argt(_argt) -- override if any
 end
@@ -2063,11 +2113,9 @@ end
 --
 local CPlaceWater = CPlaceBuild:extend() -- waters
 Classic.KINDWATER = "Water" -- Water kind
-Classic.NAMEWATER = "Water" -- Water name
 function CPlaceWater:new(_argt)
     CPlaceWater.super.new(self, _argt)
     self.kind = Classic.KINDWATER
-    self.name = Classic.NAMEWATER
     self.sprite  = CSpriteBG.PLACEWATER
     self.hitbox.region.lf = 1
     self.hitbox.region.rg = 4
@@ -2097,7 +2145,7 @@ end
 local CPlaceWaterIdle = CPlaceWater:extend() -- idle waters
 function CPlaceWaterIdle:new(_argt)
     CPlaceWaterIdle.super.new(self, _argt)
-    self.name = Classic.NAMEIDLE
+    self.name = Classic.NAMEEMPTY
     self.palette = CPlaceBuild.PALETTEIDLE
     self:argt(_argt) -- override if any
 end
@@ -2108,11 +2156,9 @@ end
 --
 local CPlaceStall = CPlaceBuild:extend() -- stalls
 Classic.KINDSTALL = "Stall" -- Stall kind
-Classic.NAMESTALL = "Stall" -- Stall name
 function CPlaceStall:new(_argt)
     CPlaceStall.super.new(self, _argt)
     self.kind = Classic.KINDSTALL
-    self.name = Classic.NAMESTALL
     self.sprite  = CSpriteBG.PLACESTALL
     self.hitbox.region.lf = 0
     self.hitbox.region.rg = 3
@@ -2148,7 +2194,7 @@ end
 local CPlaceStallIdle = CPlaceStall:extend() -- idle stalls
 function CPlaceStallIdle:new(_argt)
     CPlaceStallIdle.super.new(self, _argt)
-    self.name = Classic.NAMEIDLE
+    self.name = Classic.NAMEEMPTY
     self.palette = CPlaceBuild.PALETTEIDLE
     self:argt(_argt) -- override if any
 end
@@ -2158,6 +2204,7 @@ end
 -- CPlaceTrees
 --
 local CPlaceTrees = CPlace:extend() -- trees
+Classic.KINDTREES = "Trees" -- Trees kind
 CPlaceTrees.NEST    = CPlace.ANIM01
 CPlaceTrees.FLOOR01 = CPlace.ANIM02
 CPlaceTrees.FLOOR02 = CPlace.ANIM03
@@ -2169,9 +2216,11 @@ CPlaceTrees.COLORFLOOR01  = CPlaceTrees.LEAFSFG
 CPlaceTrees.COLORFLOOR02  = CPlaceTrees.LEAFSBG
 CPlaceTrees.COLORNEST     = Tic.COLORGREYL
 CPlaceTrees.PALETTEIDLE   = {
-    [CPlace.ANIM01]  = CPlace.EMPTY,
-    [CPlace.ANIM02]  = CPlaceTrees.BARK,
-    [CPlace.ANIM03]  = CPlaceTrees.BARK,
+    [CPlace.ANIM01]       = CPlace.EMPTY,
+    [CPlace.ANIM02]       = CPlaceTrees.BARK,
+    [CPlace.ANIM03]       = CPlaceTrees.BARK,
+    [CPlaceTrees.LEAFSFG] = CPlaceTrees.LEAFSBG,
+    [CPlaceTrees.LEAFSBG] = CPlaceTrees.BARK,
 }
 CPlaceTrees.PALETTEFADE   = {
     [CPlaceTrees.NEST]    = CPlace.EMPTY,
@@ -2180,12 +2229,10 @@ CPlaceTrees.PALETTEFADE   = {
     [CPlaceTrees.LEAFSFG] = CPlaceTrees.TRUNK,
     [CPlaceTrees.LEAFSBG] = CPlaceTrees.BARK,    
 }
-Classic.KINDTREES = "Trees" -- Trees kind
-Classic.NAMETREES = "Trees" -- Trees name
 function CPlaceTrees:new(_argt)
     CPlaceTrees.super.new(self, _argt)
     self.kind = Classic.KINDTREES
-    self.name = Classic.NAMETREES
+    self.name = Classic.NAMELIVING
     self.hitbox = CHitbox()
     self.hitbox.region.lf = 2
     self.hitbox.region.rg = 4
@@ -2224,7 +2271,7 @@ end
 local CPlaceTreesIdle = CPlaceTrees:extend() -- generic idle trees
 function CPlaceTreesIdle:new(_argt)
     CPlaceTreesIdle.super.new(self, _argt)
-    self.name = Classic.NAMEIDLE
+    self.name = Classic.NAMEDEAD
     self.palette = CPlaceTrees.PALETTEIDLE
     self:argt(_argt) -- override if any
 end
@@ -3910,7 +3957,10 @@ end
 
 function CWindowPortraitSpotted:draw()
     if not self.entity then return end -- do not draw
+    local _ticdrawspotted = Tic.DRAWSPOTTED -- override Tic
+    Tic.DRAWSPOTTED = false
     CWindowPortraitSpotted.super.draw(self)
+    Tic.DRAWSPOTTED = _ticdrawspotted -- restore Tic
 end
 
 
@@ -4054,7 +4104,7 @@ end
 --
 -- INTERFACE -- order is important !
 --
-local ScreenWorld = CScreen{name = "World"}
+local ScreenWorld = CScreen{name = "World", keys2actions = Tic.KEYS2ACTIONSWORLD}
 Tic:screenAppend(ScreenWorld)
 ScreenWorld:appendWindow(CWindowScreen())
 
@@ -4085,7 +4135,7 @@ local WindowStatePlayer = CWindowStatePlayer{}
 ScreenWorldRG:appendWindow(WindowStatePlayer)
 
 
-local ScreenIntro = CScreen{name = "Intro"}
+local ScreenIntro = CScreen{name = "Intro", keys2actions = Tic.KEYS2ACTIONSINTRO}
 Tic:screenAppend(ScreenIntro)
 ScreenIntro:appendWindow(CWindowScreen())
 ScreenIntro:appendWindow(CWindowInfos{
@@ -4350,24 +4400,24 @@ Tic.DRAWHITBOX = false
 for _, _cplace in pairs({
     -- CPlaceTree0Anim,
     CPlaceTree0Idle,
-    -- CPlaceTree1Anim,
+    CPlaceTree1Anim,
     -- CPlaceTree1Idle,
     -- CPlaceHouseAnim,
     CPlaceHouseIdle,
     -- CPlaceTowerAnim,
     CPlaceTowerIdle,
-    -- CPlaceManorAnim,
+    CPlaceManorAnim,
     -- CPlaceManorIdle,
     -- CPlaceAltarAnim,
-    -- CPlaceAltarIdle,
-    -- CPlaceWaterAnim,
+    CPlaceAltarIdle,
+    CPlaceWaterAnim,
     -- CPlaceWaterIdle,
-    -- CPlaceStallAnim,
+    CPlaceStallAnim,
     -- CPlaceStallIdle,
 }) do
     _cplace{
-        worldx = math.random(-20, 20),
-        worldy = math.random(-20, 20),
+        worldx = math.random(-50, 50),
+        worldy = math.random(-50, 50),
     }
 end
 end
