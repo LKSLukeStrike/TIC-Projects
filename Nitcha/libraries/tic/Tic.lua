@@ -338,6 +338,7 @@ Tic.ACTIONSCREENNEXT       = "screenNext"
 -- Keys to Actions -- per screen
 Tic.KEYS2ACTIONSINTRO = {
     [Tic.KEY_ANY]          = Tic.ACTIONSCREENNEXT,
+    -- [Tic.KEY_SPACE]          = Tic.ACTIONSCREENNEXT,
 }
 Tic.KEYS2ACTIONSWORLD = {
     [Tic.KEY_LEFT]         = Tic.ACTIONPLAYERPREV, -- cycle actual player
@@ -477,15 +478,11 @@ end
 
 function Tic:screenAppend(_screen) -- append a screen to the stack
     if not _screen then return end -- mandatory
-    Tic.SCREENS:insert(_screen)
-    Tic:screenKeyboard()
-    return Tic:screenActual()
+    return Tic.SCREENS:insert(_screen)
 end
 
 function Tic:screenNext() -- next screen in the stack
-    Tic.SCREENS:next()
-    Tic:screenKeyboard()
-    return Tic:screenActual()
+    return Tic.SCREENS:next()
 end
 
 
@@ -1485,6 +1482,7 @@ end
 
 function CScreen:draw()
     if not self.display then return end -- nothing to display
+    Tic:screenKeyboard() -- adjust keyboard mapping
     self:drawWindows()
     self:drawButtons()
     for _, _screen in ipairs(self.screens or {}) do -- layer ordered
