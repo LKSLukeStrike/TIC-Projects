@@ -1209,7 +1209,7 @@ end
 --
 -- CHitbox
 --
-local CHitbox = Classic:extend() -- generic hitbox region
+local CHitbox = Classic:extend() -- generic hitbox region -- FIXME could be a region ?
 CHitbox.REGIONLF = 0 -- hitbox region sizes
 CHitbox.REGIONRG = 7
 CHitbox.REGIONUP = 0
