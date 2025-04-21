@@ -336,11 +336,11 @@ Tic.ACTIONSCALENEXT        = "scaleNext"
 Tic.ACTIONSCREENNEXT       = "screenNext"
 
 -- Keys to Actions -- per screen
-Tic.KEYS2ACTIONSINTRO = {
+Tic.KEYSACTIONSINTRO = {
     [Tic.KEY_ANY]          = Tic.ACTIONSCREENNEXT,
     -- [Tic.KEY_SPACE]          = Tic.ACTIONSCREENNEXT,
 }
-Tic.KEYS2ACTIONSWORLD = {
+Tic.KEYSACTIONSWORLD = {
     [Tic.KEY_LEFT]         = Tic.ACTIONPLAYERPREV, -- cycle actual player
     [Tic.KEY_RIGHT]        = Tic.ACTIONPLAYERNEXT,
     [Tic.KEY_UP]           = Tic.ACTIONSTATEPREV, -- cycle state
@@ -374,7 +374,7 @@ Tic.KEYS2ACTIONSWORLD = {
 }
 
 -- Actions to Functions
-Tic.ACTIONS2FUNCTIONS = {
+Tic.ACTIONSFUNCTIONS = {
     [Tic.ACTIONPLAYERPREV]    = function() Tic:playerPrev() end,
     [Tic.ACTIONPLAYERNEXT]    = function() Tic:playerNext() end,
     [Tic.ACTIONPLAYERQUIT]    = function() Tic:playerQuit() end,
@@ -416,8 +416,8 @@ Tic.MODIFIERKEYS = { -- record modifier keys pressed
     [Tic.KEY_SHIFT]    = false,
     [Tic.KEY_ALT]      = false,
 }
-Tic.KEYS2ACTIONS = Tic.KEYS2ACTIONSINTRO
-function Tic:keysPressed(_hold, _period) -- returns the pressed keys in a table
+Tic.KEYSACTIONS = Tic.KEYSACTIONSINTRO
+function Tic:keysInput() -- returns the keys inputs in a table
     local _result = {}
 
     for _key, _ in pairs(Tic.MODIFIERKEYS) do -- reset modifier keys
@@ -430,7 +430,7 @@ function Tic:keysPressed(_hold, _period) -- returns the pressed keys in a table
             local _modifier = Tables:keyFind(Tic.MODIFIERKEYS, _key)
             if _modifier then -- modifier key
                 Tic.MODIFIERKEYS[_modifier] = true
-            elseif keyp(_key, _hold, _period) then -- normal key holded
+            elseif keyp(_key, 20, 10) then -- normal key holded
                  table.insert(_result, _key)
             end
         end
@@ -443,32 +443,79 @@ function Tic:keysPressed(_hold, _period) -- returns the pressed keys in a table
     return _result
 end
 
-function Tic:keysDo(_hold, _period) -- execute functions depending on the pressed keys if any
-    local _keyspressed = Tic:keysPressed(_hold, _period)
-    for _, _key in ipairs(_keyspressed) do
-        if Tic.KEYS2ACTIONS[_key] then -- key linked to an action
-            if Tic.ACTIONS2FUNCTIONS[Tic.KEYS2ACTIONS[_key]] then -- action linked to a function
-                Tic.ACTIONS2FUNCTIONS[Tic.KEYS2ACTIONS[_key]]() -- execute the associated function
+function Tic:keysDo() -- execute functions depending on the pressed keys if any
+    local _keysinput = Tic:keysInput()
+    for _, _key in ipairs(_keysinput) do
+        if Tic.KEYSACTIONS[_key] then -- key linked to an action
+            if Tic.ACTIONSFUNCTIONS[Tic.KEYSACTIONS[_key]] then -- action linked to a function
+                Tic.ACTIONSFUNCTIONS[Tic.KEYSACTIONS[_key]]() -- execute the associated function
             end
         end
     end
 end
 
-function Tic:keys2Actions(_keys2actions) -- adjust keyboard mapping
-    if not _keys2actions then return end -- mandatory
-    Tic.KEYS2ACTIONS = _keys2actions
+function Tic:keysActions(_keysactions) -- adjust keyboard mapping
+    if not _keysactions then return end -- mandatory
+    Tic.KEYSACTIONS = _keysactions
 end
 
 
--- Cursor System
-Tic.CURSORADR = 0x3FFB
-Tic.CURSORNBR = 15
-function Tic:cursor()
-    poke(Tic.CURSORADR, Tic.CURSORNBR)
+-- Mouse System
+Tic.MOUSECURSOR    = 0x3FFB
+Tic.MOUSESPRITE    = 14
+Tic.MOUSEOFFSETXLF = 2
+Tic.MOUSEOFFSETXRG = 5
+Tic.MOUSEOFFSETX   = Tic.MOUSEOFFSETXLF
+Tic.MOUSEOFFSETY   = 2
+Tic.MOUSEDIRX      = Tic.DIRXLF
+Tic.MOUSE          = {
+    screenx = 0,
+    screeny = 0,
+    clicklf = false,
+    clickmd = false,
+    clickrg = false,
+    scrollx = 0,
+    scrolly = 0,
+}
+function Tic:mouseCursor() -- set the mouse cursor sprite
+    poke(Tic.MOUSECURSOR, Tic.MOUSESPRITE + Tic.MOUSEDIRX)
+end
+
+function Tic:mouseInput() -- set the mouse inputs in a table
+    local _result = {}
+    _result.screenx, _result.screeny, _result.clicklf, _result.clickmd, _result.clickrg, _result.scrollx, _result.scrolly = mouse()
+    if _result.screenx < Tic.MOUSE.screenx then -- adjust mouse direction
+        Tic.MOUSEOFFSETX = Tic.MOUSEOFFSETXLF
+        Tic.MOUSEDIRX    = Tic.DIRXLF
+    elseif _result.screenx > Tic.MOUSE.screenx then
+        Tic.MOUSEOFFSETX = Tic.MOUSEOFFSETXRG
+        Tic.MOUSEDIRX    = Tic.DIRXRG
+    end
+    Tic.MOUSE = _result
+    return _result
+end
+
+function Tic:mouseDo() -- set the mouse cursor sprite
+    local _mouseinput = Tic:mouseInput()
+    Tic:mouseCursor()
 end
 
 
--- Screens System -- handle screen stack
+-- Buttons System -- handle buttons stack
+Tic.BUTTONS = {}
+
+function Tic:buttonsDo()
+end
+
+
+-- Inputs System -- handle mouse and keyboard inputs
+function Tic:inputsDo()
+    Tic:mouseDo() -- handle mouse
+    Tic:keysDo() -- handle keyboard
+end
+
+
+-- Screens System -- handle screens stack
 Tic.SCREENS = CCyclerTable()
 
 function Tic:screenActual() -- actual screen in the stack
@@ -485,7 +532,7 @@ function Tic:screenNext() -- next screen in the stack
 end
 
 function Tic:screenKeyboard() -- adjust the keyboard to the actual screen
-    Tic:keys2Actions(Tic:screenActual().keys2actions)
+    Tic:keysActions(Tic:screenActual().keysactions)
 end
 
 function Tic:screenButtons() -- adjust the buttons to the actual screen
@@ -1477,12 +1524,12 @@ function CScreen:new(_argt)
     CScreen.super.new(self, _argt)
     self.kind = Classic.KINDSCREEN
     self.name = Classic.NAMESCREEN
-    self.screen       = nil -- parent screen if any
-    self.windows      = {} -- screen windows if any -- ordered
-    self.buttons      = {} -- screen buttons if any -- ordered
-    self.screens      = {} -- sub screens (layers) if any -- ordered
-    self.display      = true -- display this screen ?
-    self.keys2actions = nil -- keys to actions mapping if any
+    self.screen      = nil -- parent screen if any
+    self.windows     = {} -- screen windows if any -- ordered
+    self.buttons     = {} -- screen buttons if any -- ordered
+    self.screens     = {} -- sub screens (layers) if any -- ordered
+    self.display     = true -- display this screen ?
+    self.keysactions = nil -- keys to actions mapping if any
     self:argt(_argt) -- override if any
 end
 
@@ -1540,6 +1587,7 @@ Classic.NAMEENTITY = "Entity" -- Entity name
 Classic.NAMEEMPTY  = "Empty"  -- Empty name
 Classic.NAMEDEAD   = "Dead"   -- Dead name
 Classic.NAMELIVING = "Living" -- Living name
+Classic.NAMEANIMED = "Animed" -- Animed name
 CEntity.WORLDX = 0
 CEntity.WORLDY = 0
 function CEntity:new(_argt)
@@ -1941,7 +1989,7 @@ CPlaceBuild.PALETTEFADE  = {
 function CPlaceBuild:new(_argt)
     CPlaceBuild.super.new(self, _argt)
     self.kind = Classic.KINDBUILD
-    self.name = Classic.NAMELIVING
+    self.name = Classic.NAMEANIMED
     self.hitbox.region.lf = 2
     self.hitbox.region.rg = 4
     self.hitbox.region.up = 5
@@ -4144,7 +4192,7 @@ end
 --
 -- INTERFACE -- order is important !
 --
-local ScreenWorld = CScreen{name = "World", keys2actions = Tic.KEYS2ACTIONSWORLD}
+local ScreenWorld = CScreen{name = "World", keysactions = Tic.KEYSACTIONSWORLD}
 Tic:screenAppend(ScreenWorld)
 ScreenWorld:appendWindow(CWindowScreen())
 
@@ -4175,7 +4223,7 @@ local WindowStatePlayer = CWindowStatePlayer{}
 ScreenWorldRG:appendWindow(WindowStatePlayer)
 
 
-local ScreenIntro = CScreen{name = "Intro", keys2actions = Tic.KEYS2ACTIONSINTRO}
+local ScreenIntro = CScreen{name = "Intro", keysactions = Tic.KEYSACTIONSINTRO}
 Tic:screenAppend(ScreenIntro)
 ScreenIntro:appendWindow(CWindowScreen())
 ScreenIntro:appendWindow(CWindowInfos{
@@ -4482,21 +4530,9 @@ Tic:playerActual():hitboxRefresh() -- refresh the hitboxes
 --
 function Tic:draw()
     if true then
-    Tic.cursor()
-
-    Tic:keysDo(20, 10) -- handle keyboard
+    Tic.inputsDo()
 
     Tic:screenActual():draw()
-
-    -- WindowScreen:draw()
-    -- WindowWorld:draw()
-    -- WindowInfosWorld:draw()
-    -- WindowInfosPlayer:draw()
-    -- WindowPortraitPlayer:draw()
-    -- WindowStatsPlayer:draw()
-    -- WindowStatePlayer:draw()
-    -- WindowInfosSpotted:draw()
-    -- WindowPortraitSpotted:draw()
 
     Tic:drawLog()
     Tic:logPrint()
