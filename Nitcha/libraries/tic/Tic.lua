@@ -417,7 +417,7 @@ Tic.MODIFIERKEYS = { -- record modifier keys pressed
     [Tic.KEY_ALT]      = false,
 }
 Tic.KEYSACTIONS = Tic.KEYSACTIONSINTRO
-function Tic:keysInput() -- returns the keys inputs in a table
+function Tic:keyboardInput() -- returns the keys inputs in a table
     local _result = {}
 
     for _key, _ in pairs(Tic.MODIFIERKEYS) do -- reset modifier keys
@@ -443,8 +443,8 @@ function Tic:keysInput() -- returns the keys inputs in a table
     return _result
 end
 
-function Tic:keysDo() -- execute functions depending on the pressed keys if any
-    local _keysinput = Tic:keysInput()
+function Tic:keyboardDo() -- execute functions depending on the pressed keys if any
+    local _keysinput = Tic:keyboardInput()
     for _, _key in ipairs(_keysinput) do
         if Tic.KEYSACTIONS[_key] then -- key linked to an action
             if Tic.ACTIONSFUNCTIONS[Tic.KEYSACTIONS[_key]] then -- action linked to a function
@@ -454,7 +454,7 @@ function Tic:keysDo() -- execute functions depending on the pressed keys if any
     end
 end
 
-function Tic:keysActions(_keysactions) -- adjust keyboard mapping
+function Tic:keyboardActions(_keysactions) -- adjust keyboard mapping
     if not _keysactions then return end -- mandatory
     Tic.KEYSACTIONS = _keysactions
 end
@@ -498,6 +498,7 @@ end
 function Tic:mouseDo() -- set the mouse cursor sprite
     local _mouseinput = Tic:mouseInput()
     Tic:mouseCursor()
+    Tic:buttonsDo()
 end
 
 
@@ -505,13 +506,22 @@ end
 Tic.BUTTONS = {}
 
 function Tic:buttonsDo()
+    for _, _button in ipairs(Tic.BUTTONS) do
+        if _button.display and _button.enabled then
+        end
+    end
+end
+
+function Tic:buttonsButtons(_buttons) -- adjust buttons mapping
+    if not _buttons then return end -- mandatory
+    Tic.BUTTONS = _buttons
 end
 
 
 -- Inputs System -- handle mouse and keyboard inputs
 function Tic:inputsDo()
     Tic:mouseDo() -- handle mouse
-    Tic:keysDo() -- handle keyboard
+    Tic:keyboardDo() -- handle keyboard
 end
 
 
@@ -532,10 +542,11 @@ function Tic:screenNext() -- next screen in the stack
 end
 
 function Tic:screenKeyboard() -- adjust the keyboard to the actual screen
-    Tic:keysActions(Tic:screenActual().keysactions)
+    Tic:keyboardActions(Tic:screenActual().keysactions)
 end
 
 function Tic:screenButtons() -- adjust the buttons to the actual screen
+    Tic:buttonsButtons(Tic:screenActual().buttons)
 end
 
 
@@ -1536,7 +1547,7 @@ end
 function CScreen:draw()
     if not self.display then return end -- nothing to display
     Tic:screenKeyboard() -- adjust keyboard mapping
-    Tic:screenButtons() -- adjust buttons mapping
+    Tic:screenButtons()  -- adjust buttons mapping
     self:drawWindows()
     self:drawButtons()
     for _, _screen in ipairs(self.screens or {}) do -- layer ordered
@@ -1688,7 +1699,7 @@ function CWorld:new(_argt)
     self:argt(_argt) -- override if any
 end
 -- CWorld instance
-local World = CWorld{name = "Underdark"}
+local World = CWorld{name = "Nuinmore"}
 
 function CWorld:appendEntity(_entity) -- append an entity in the world
     if not _entity then return end -- mandatory
@@ -3609,6 +3620,15 @@ end
 function CWindow:drawInside() -- window content
 end
 
+function CWindow:region() -- window region
+    return CRegion{
+        lf = self.screenx,
+        rg = self.screenw + self.screenx - 1,
+        up = self.screeny,
+        dw = self.screeny + self.screenh - 1,
+    }
+end
+
 
 --
 -- CWindowScreen
@@ -4160,12 +4180,23 @@ function CButton:new(_argt)
     self.enabled     = true  -- can be clicked ?
     self.hovered     = false -- hovered by the mouse ?
     self.actived     = false -- action triggered ?
-	self.action      = nil   -- action to trigger on click
-	self.rounded     = true -- rounded border and frames ?
+	self.clicklf     = nil   -- action to trigger on click lf
+	self.clickmd     = nil   -- action to trigger on click md
+	self.clickrg     = nil   -- action to trigger on click rg
+	self.scrollx     = nil   -- action to trigger on scroll x
+	self.scrolly     = nil   -- action to trigger on scroll y
+	self.rounded     = true  -- rounded border and frames ?
     self.drawframes  = false
+    self.drawcaches  = false
     self.colorground = Tic.COLORBIOMENIGHT
     self.colorhover  = Tic.COLORHUDSCREEN
+    self.coloraction = Tic.COLORBLUEM
     self:argt(_argt) -- override if any
+end
+
+function CButton:draw()
+    if not self.display then return end -- nothing to draw
+    CButton.super.draw(self)
 end
 
 function CButton:drawGround()
@@ -4178,13 +4209,14 @@ function CButton:drawGround()
 end
 
 function CButton:drawBorder()
+    local _drawcolor = (self.enabled) and self.colorborder or self.colorground
     if not self.rounded then -- standard drawing
         CButton.super.drawBorder(self)
     else
-        rect(self.screenx + 1, self.screeny, self.screenw - 2, 1, self.colorborder)
-        rect(self.screenx, self.screeny + 1, 1, self.screenh - 2, self.colorborder)
-        rect(self.screenx + 1, self.screeny + self.screenh - 1, self.screenw - 2, 1, self.colorborder)
-        rect(self.screenx + self.screenw - 1, self.screeny + 1, 1, self.screenh - 2, self.colorborder)
+        rect(self.screenx + 1, self.screeny, self.screenw - 2, 1, _drawcolor)
+        rect(self.screenx, self.screeny + 1, 1, self.screenh - 2, _drawcolor)
+        rect(self.screenx + 1, self.screeny + self.screenh - 1, self.screenw - 2, 1, _drawcolor)
+        rect(self.screenx + self.screenw - 1, self.screeny + 1, 1, self.screenh - 2, _drawcolor)
     end
 end
 
@@ -4235,13 +4267,21 @@ ScreenIntro:appendWindow(CWindowInfos{
     infos = {"Press", "Key",},
 })
 
-local Button = CButton{
+local Button1 = CButton{
     screenx = 10,
     screeny = 10,
     screenw = 16,
     screenh = 8,
 }
-ScreenIntro:appendWindow(Button)
+local Button2 = CButton{
+    screenx = 10,
+    screeny = 20,
+    screenw = 16,
+    screenh = 8,
+    enabled = false,
+}
+ScreenIntro:appendButton(Button1)
+ScreenIntro:appendButton(Button2)
 
 
 
