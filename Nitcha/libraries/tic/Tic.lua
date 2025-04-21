@@ -454,6 +454,11 @@ function Tic:keysDo(_hold, _period) -- execute functions depending on the presse
     end
 end
 
+function Tic:keys2Actions(_keys2actions) -- adjust keyboard mapping
+    if not _keys2actions then return end -- mandatory
+    Tic.KEYS2ACTIONS = _keys2actions
+end
+
 
 -- Cursor System
 Tic.CURSORADR = 0x3FFB
@@ -470,12 +475,6 @@ function Tic:screenActual() -- actual screen in the stack
     return Tic.SCREENS.actvalue
 end
 
-function Tic:screenKeyboard() -- adjust the keyboard to the actual screen
-    local _screen = Tic:screenActual()
-    if not _screen.keys2actions then return end -- keep the old one
-    Tic.KEYS2ACTIONS = _screen.keys2actions
-end
-
 function Tic:screenAppend(_screen) -- append a screen to the stack
     if not _screen then return end -- mandatory
     return Tic.SCREENS:insert(_screen)
@@ -483,6 +482,13 @@ end
 
 function Tic:screenNext() -- next screen in the stack
     return Tic.SCREENS:next()
+end
+
+function Tic:screenKeyboard() -- adjust the keyboard to the actual screen
+    Tic:keys2Actions(Tic:screenActual().keys2actions)
+end
+
+function Tic:screenButtons() -- adjust the buttons to the actual screen
 end
 
 
@@ -1472,9 +1478,9 @@ function CScreen:new(_argt)
     self.kind = Classic.KINDSCREEN
     self.name = Classic.NAMESCREEN
     self.screen       = nil -- parent screen if any
-    self.screens      = {} -- sub screens (layers) if any -- ordered
     self.windows      = {} -- screen windows if any -- ordered
     self.buttons      = {} -- screen buttons if any -- ordered
+    self.screens      = {} -- sub screens (layers) if any -- ordered
     self.display      = true -- display this screen ?
     self.keys2actions = nil -- keys to actions mapping if any
     self:argt(_argt) -- override if any
@@ -1483,6 +1489,7 @@ end
 function CScreen:draw()
     if not self.display then return end -- nothing to display
     Tic:screenKeyboard() -- adjust keyboard mapping
+    Tic:screenButtons() -- adjust buttons mapping
     self:drawWindows()
     self:drawButtons()
     for _, _screen in ipairs(self.screens or {}) do -- layer ordered
@@ -1497,6 +1504,9 @@ function CScreen:drawWindows() -- draw ordered
 end
 
 function CScreen:drawButtons() -- draw ordered
+    for _, _button in ipairs(self.buttons or {}) do
+        _button:draw()
+    end
 end
 
 function CScreen:appendWindow(_window) -- append window -- unique
@@ -1504,6 +1514,13 @@ function CScreen:appendWindow(_window) -- append window -- unique
     if Tables:valFind(self.windows, _window) then return end -- already exists
     _window.screen = self -- record parent
     table.insert(self.windows, _window)
+end
+
+function CScreen:appendButton(_button) -- append button -- unique
+    if not _button then return end -- mandarory
+    if Tables:valFind(self.buttons, _button) then return end -- already exists
+    _button.screen = self -- record parent
+    table.insert(self.buttons, _button)
 end
 
 function CScreen:appendScreen(_screen) -- append screen -- unique
@@ -3431,7 +3448,7 @@ function CWindow:new(_argt)
     self.colorframe1 = Tic.COLORWHITE -- frames colors
     self.colorframe2 = Tic.COLORGREYL
     self.drawground  = true -- draw behevior
-    self.drawguides  = true
+    self.drawguides  = false
     self.drawinside  = true
     self.drawcaches  = true
     self.drawborder  = true
@@ -3446,18 +3463,10 @@ function CWindow:draw() -- window -- FIXME remove some attributes ? -- can be de
     if self.drawcaches then self:drawCaches() end
     if self.drawborder then self:drawBorder() end
     if self.drawframes then self:drawFrames() end
-    if self.drawScrollArrows then self:drawScrollArrows() end -- does window handles scroll arrows ?
-
 end
 
 function CWindow:drawGround() -- window ground
-    rect(
-        self.screenx,
-        self.screeny,
-        self.screenw,
-        self.screenh,
-        self.colorground
-    )
+    rect(self.screenx, self.screeny, self.screenw, self.screenh, self.colorground)
 end
 
 function CWindow:drawGuides() -- window guides -- FIXME still not working -- use ratio w h ?
@@ -3559,7 +3568,6 @@ end
 local CWindowScreen = CWindow:extend() -- window screen
 function CWindowScreen:new(_argt)
     CWindowScreen.super.new(self, _argt)
-    self.drawguides = false
     self.drawcaches = false
     self.drawframes = false
     self:argt(_argt) -- override if any
@@ -3590,7 +3598,6 @@ function CWindowInfos:new(_argt)
     self.colorinfofg = Tic.COLORGREYL
     self.colorinfobg = Tic.COLORGREYD -- for shadow
     self.colorground = Tic.COLORBIOMENIGHT
-    self.drawguides  = false
     self.drawcaches  = false
     self.drawborder  = false
     self:argt(_argt) -- override if any
@@ -3719,7 +3726,6 @@ function CWindowPortrait:new(_argt)
     self.screenh     = Tic.PLAYERPORTRAITWH
     self.cachest     = 4 -- caches thickness
     self.colorground = Tic.COLORBIOMENIGHT
-    self.drawguides  = false
     self.drawborder  = false
     self:argt(_argt) -- override if any
 end
@@ -3792,7 +3798,6 @@ function CWindowStats:new(_argt)
     self.colormenact = Tic.COLORGREENM
     self.colorpsyact = Tic.COLORBLUEM
     self.colorlesser = Tic.COLORGREYL -- if the act stat is lesser than the max stat
-    self.drawguides  = false
     self.drawcaches  = false
     self.drawborder  = false
     self:argt(_argt) -- override if any
@@ -3978,7 +3983,6 @@ function CWindowWorld:new(_argt)
     self.screenh         = Tic.WORLDWH
     self.spottedwindows  = nil -- spotted windows to inform if any
     self.colorground     = Tic.COLORBIOMENIGHT
-    self.drawguides      = false
     self:argt(_argt) -- override if any
 end
 
@@ -4077,8 +4081,8 @@ end
 local CWindowInfosWorld = CWindowInfos:extend() -- window infos for world
 function CWindowInfosWorld:new(_argt)
     CWindowInfosWorld.super.new(self, _argt)
-    self.screenx = Tic.WORLDINFOSWX
-    self.screeny = Tic.WORLDINFOSWY
+    self.screenx    = Tic.WORLDINFOSWX
+    self.screeny    = Tic.WORLDINFOSWY
 	self.small      = false
     self.drawframes = true
     self.drawborder = true
@@ -4097,6 +4101,44 @@ function CWindowInfosWorld:drawInside() -- window infos content for world
     CWindowInfosWorld.super.drawInside(self)
 end
 
+
+--
+-- CButton
+--
+local CButton = CWindow:extend() -- generic button
+function CButton:new(_argt)
+    CButton.super.new(self, _argt)
+    self.display     = true  -- display or not ?
+    self.enabled     = true  -- can be clicked ?
+    self.hovered     = false -- hovered by the mouse ?
+    self.actived     = false -- action triggered ?
+	self.action      = nil   -- action to trigger on click
+	self.rounded     = true -- rounded border and frames ?
+    self.drawframes  = false
+    self.colorground = Tic.COLORBIOMENIGHT
+    self.colorhover  = Tic.COLORHUDSCREEN
+    self:argt(_argt) -- override if any
+end
+
+function CButton:drawGround()
+    local _drawcolor = (self.hovered) and self.colorhover or self.colorground
+    if not self.rounded then -- standard drawing
+        CButton.super.drawGround(self)
+    else
+        rect(self.screenx + 1, self.screeny + 1, self.screenw - 2, self.screenh - 2, _drawcolor)
+    end
+end
+
+function CButton:drawBorder()
+    if not self.rounded then -- standard drawing
+        CButton.super.drawBorder(self)
+    else
+        rect(self.screenx + 1, self.screeny, self.screenw - 2, 1, self.colorborder)
+        rect(self.screenx, self.screeny + 1, 1, self.screenh - 2, self.colorborder)
+        rect(self.screenx + 1, self.screeny + self.screenh - 1, self.screenw - 2, 1, self.colorborder)
+        rect(self.screenx + self.screenw - 1, self.screeny + 1, 1, self.screenh - 2, self.colorborder)
+    end
+end
 
 
 --
@@ -4144,6 +4186,14 @@ ScreenIntro:appendWindow(CWindowInfos{
     align = CWindowInfos.ALIGNMD,
     infos = {"Press", "Key",},
 })
+
+local Button = CButton{
+    screenx = 10,
+    screeny = 10,
+    screenw = 16,
+    screenh = 8,
+}
+ScreenIntro:appendWindow(Button)
 
 
 
@@ -4437,8 +4487,6 @@ function Tic:draw()
     Tic:keysDo(20, 10) -- handle keyboard
 
     Tic:screenActual():draw()
-
-    if Tic:screenActual() == ScreenWorld then WindowWorld:drawScrollArrows() end
 
     -- WindowScreen:draw()
     -- WindowWorld:draw()
