@@ -303,108 +303,73 @@ Tic.KEY_NUMPADMINUS    = 90
 Tic.KEY_NUMPADMULTIPLY = 91
 Tic.KEY_NUMPADDIVIDE   = 92
 
--- Actions values -- TODO and Tic functions
-Tic.ACTIONPLAYERPREV       = "playerPrev"
-Tic.ACTIONPLAYERNEXT       = "playerNext"
-Tic.ACTIONPLAYERQUIT       = "playerQuit"
-Tic.ACTIONPLAYERONLY       = "playerOnly"
-Tic.ACTIONSTATEPREV        = "statePrev"
-Tic.ACTIONSTATENEXT        = "stateNext"
-Tic.ACTIONTOGGLEWORK       = "toggleWork"
-Tic.ACTIONTOGGLEKNEEL      = "toggleKneel"
-Tic.ACTIONTOGGLESLEEP      = "toggleSleep"
-Tic.ACTIONMOVEDIRECTION000 = "moveDirection000"
-Tic.ACTIONMOVEDIRECTION045 = "moveDirection045"
-Tic.ACTIONMOVEDIRECTION090 = "moveDirection090"
-Tic.ACTIONMOVEDIRECTION135 = "moveDirection135"
-Tic.ACTIONMOVEDIRECTION180 = "moveDirection180"
-Tic.ACTIONMOVEDIRECTION225 = "moveDirection225"
-Tic.ACTIONMOVEDIRECTION270 = "moveDirection270"
-Tic.ACTIONMOVEDIRECTION315 = "moveDirection315"
-Tic.ACTIONSTATPHYACT       = "statPhyAct"
-Tic.ACTIONSTATMENACT       = "statMenAct"
-Tic.ACTIONSTATPSYACT       = "statPsyAct"
-Tic.ACTIONBIOMENEXT        = "biomeNext"
-Tic.ACTIONTOGGLEHITBOX     = "toggleHitbox"
-Tic.ACTIONTOGGLESPOTTED    = "toggleSpotted"
-Tic.ACTIONTOGGLEBORDERS    = "toggleBorders"
-Tic.ACTIONTOGGLEDIRS       = "toggleDirs"
-Tic.ACTIONTOGGLEVIEW       = "toggleView"
-Tic.ACTIONTOGGLEMIND       = "toggleMind"
-Tic.ACTIONTOGGLEMOVE       = "toggleMove"
-Tic.ACTIONSCALENEXT        = "scaleNext"
-Tic.ACTIONSCREENNEXT       = "screenNext"
+-- Functions values
+Tic.FUNCTIONPLAYERPREV       = function() Tic:playerPrev() end
+Tic.FUNCTIONPLAYERNEXT       = function() Tic:playerNext() end
+Tic.FUNCTIONPLAYERQUIT       = function() Tic:playerQuit() end
+Tic.FUNCTIONPLAYERONLY       = function() Tic:playerOnly() end
+Tic.FUNCTIONSTATEPREV        = function() Tic:statePrev() end
+Tic.FUNCTIONSTATENEXT        = function() Tic:stateNext() end
+Tic.FUNCTIONTOGGLEWORK       = function() Tic:toggleWork() end
+Tic.FUNCTIONTOGGLEKNEEL      = function() Tic:toggleKneel() end
+Tic.FUNCTIONTOGGLESLEEP      = function() Tic:toggleSleep() end
+Tic.FUNCTIONMOVEDIRECTION000 = function() Tic:moveDirection000() end
+Tic.FUNCTIONMOVEDIRECTION045 = function() Tic:moveDirection045() end
+Tic.FUNCTIONMOVEDIRECTION090 = function() Tic:moveDirection090() end
+Tic.FUNCTIONMOVEDIRECTION135 = function() Tic:moveDirection135() end
+Tic.FUNCTIONMOVEDIRECTION180 = function() Tic:moveDirection180() end
+Tic.FUNCTIONMOVEDIRECTION225 = function() Tic:moveDirection225() end
+Tic.FUNCTIONMOVEDIRECTION270 = function() Tic:moveDirection270() end
+Tic.FUNCTIONMOVEDIRECTION315 = function() Tic:moveDirection315() end
+Tic.FUNCTIONSTATPHYACT       = function() Tic:statPhyAct() end
+Tic.FUNCTIONSTATMENACT       = function() Tic:statMenAct() end
+Tic.FUNCTIONSTATPSYACT       = function() Tic:statPsyAct() end
+Tic.FUNCTIONBIOMENEXT        = function() Tic:biomeNext() end
+Tic.FUNCTIONTOGGLEHITBOX     = function() Tic:toggleHitbox() end
+Tic.FUNCTIONTOGGLESPOTTED    = function() Tic:toggleSpotted() end
+Tic.FUNCTIONTOGGLEBORDERS    = function() Tic:toggleBorders() end
+Tic.FUNCTIONTOGGLEDIRS       = function() Tic:toggleDirs() end
+Tic.FUNCTIONTOGGLEVIEW       = function() Tic:toggleView() end
+Tic.FUNCTIONTOGGLEMIND       = function() Tic:toggleMind() end
+Tic.FUNCTIONTOGGLEMOVE       = function() Tic:toggleMove() end
+Tic.FUNCTIONSCALENEXT        = function() Tic:scaleNext() end
+Tic.FUNCTIONSCREENNEXT       = function() Tic:screenNext() end
 
--- Keys to Actions -- per screen
-Tic.KEYSACTIONSINTRO = {
-    [Tic.KEY_ANY]          = Tic.ACTIONSCREENNEXT,
-    -- [Tic.KEY_SPACE]          = Tic.ACTIONSCREENNEXT,
+-- Keys to Functions -- per screen
+Tic.KEYSFUNCTIONSINTRO = {
+    [Tic.KEY_ANY]          = Tic.FUNCTIONSCREENNEXT,
 }
-Tic.KEYSACTIONSWORLD = {
-    [Tic.KEY_LEFT]         = Tic.ACTIONPLAYERPREV, -- cycle actual player
-    [Tic.KEY_RIGHT]        = Tic.ACTIONPLAYERNEXT,
-    [Tic.KEY_UP]           = Tic.ACTIONSTATEPREV, -- cycle state
-    [Tic.KEY_DOWN]         = Tic.ACTIONSTATENEXT,
-    [Tic.KEY_NUMPADDIVIDE] = Tic.ACTIONTOGGLEWORK, -- toggle posture/status
-    [Tic.KEY_NUMPAD5]      = Tic.ACTIONTOGGLEKNEEL,
-    [Tic.KEY_NUMPAD0]      = Tic.ACTIONTOGGLESLEEP,
-    [Tic.KEY_NUMPAD8]      = Tic.ACTIONMOVEDIRECTION000, -- move
-    [Tic.KEY_NUMPAD9]      = Tic.ACTIONMOVEDIRECTION045,
-    [Tic.KEY_NUMPAD6]      = Tic.ACTIONMOVEDIRECTION090,
-    [Tic.KEY_NUMPAD3]      = Tic.ACTIONMOVEDIRECTION135,
-    [Tic.KEY_NUMPAD2]      = Tic.ACTIONMOVEDIRECTION180,
-    [Tic.KEY_NUMPAD1]      = Tic.ACTIONMOVEDIRECTION225,
-    [Tic.KEY_NUMPAD4]      = Tic.ACTIONMOVEDIRECTION270,
-    [Tic.KEY_NUMPAD7]      = Tic.ACTIONMOVEDIRECTION315,
-    [Tic.KEY_A]            = Tic.ACTIONPLAYERQUIT,
-    [Tic.KEY_B]            = Tic.ACTIONBIOMENEXT,
-    [Tic.KEY_D]            = Tic.ACTIONTOGGLEDIRS,
-    [Tic.KEY_H]            = Tic.ACTIONTOGGLEHITBOX,
-    [Tic.KEY_M]            = Tic.ACTIONSTATMENACT,
-    [Tic.KEY_O]            = Tic.ACTIONPLAYERONLY,
-    [Tic.KEY_P]            = Tic.ACTIONSTATPHYACT,
-    [Tic.KEY_Q]            = Tic.ACTIONTOGGLEBORDERS,
-    [Tic.KEY_R]            = Tic.ACTIONTOGGLEMIND,
-    [Tic.KEY_S]            = Tic.ACTIONTOGGLESPOTTED,
-    [Tic.KEY_V]            = Tic.ACTIONTOGGLEVIEW,
-    [Tic.KEY_X]            = Tic.ACTIONTOGGLEMOVE,
-    [Tic.KEY_Y]            = Tic.ACTIONSTATPSYACT,
-    [Tic.KEY_Z]            = Tic.ACTIONSCALENEXT,
-    [Tic.KEY_SPACE]        = Tic.ACTIONSCREENNEXT,
-}
-
--- Actions to Functions
-Tic.ACTIONSFUNCTIONS = {
-    [Tic.ACTIONPLAYERPREV]    = function() Tic:playerPrev() end,
-    [Tic.ACTIONPLAYERNEXT]    = function() Tic:playerNext() end,
-    [Tic.ACTIONPLAYERQUIT]    = function() Tic:playerQuit() end,
-    [Tic.ACTIONPLAYERONLY]    = function() Tic:playerOnly() end,
-    [Tic.ACTIONSTATEPREV]     = function() Tic:statePrev() end,
-    [Tic.ACTIONSTATENEXT]     = function() Tic:stateNext() end,
-    [Tic.ACTIONTOGGLEWORK]    = function() Tic:toggleWork() end,
-    [Tic.ACTIONTOGGLEKNEEL]   = function() Tic:toggleKneel() end,
-    [Tic.ACTIONTOGGLESLEEP]   = function() Tic:toggleSleep() end,
-    [Tic.ACTIONMOVEDIRECTION000]       = function() Tic:moveDirection000() end,
-    [Tic.ACTIONMOVEDIRECTION045]       = function() Tic:moveDirection045() end,
-    [Tic.ACTIONMOVEDIRECTION090]       = function() Tic:moveDirection090() end,
-    [Tic.ACTIONMOVEDIRECTION135]       = function() Tic:moveDirection135() end,
-    [Tic.ACTIONMOVEDIRECTION180]       = function() Tic:moveDirection180() end,
-    [Tic.ACTIONMOVEDIRECTION225]       = function() Tic:moveDirection225() end,
-    [Tic.ACTIONMOVEDIRECTION270]       = function() Tic:moveDirection270() end,
-    [Tic.ACTIONMOVEDIRECTION315]       = function() Tic:moveDirection315() end,
-    [Tic.ACTIONSTATPHYACT]    = function() Tic:statPhyAct() end,
-    [Tic.ACTIONSTATMENACT]    = function() Tic:statMenAct() end,
-    [Tic.ACTIONSTATPSYACT]    = function() Tic:statPsyAct() end,
-    [Tic.ACTIONBIOMENEXT]     = function() Tic:biomeNext() end,
-    [Tic.ACTIONTOGGLEHITBOX]  = function() Tic:toggleHitbox() end,
-    [Tic.ACTIONTOGGLESPOTTED] = function() Tic:toggleSpotted() end,
-    [Tic.ACTIONTOGGLEBORDERS] = function() Tic:toggleBorders() end,
-    [Tic.ACTIONTOGGLEDIRS]    = function() Tic:toggleDirs() end,
-    [Tic.ACTIONTOGGLEVIEW]    = function() Tic:toggleView() end,
-    [Tic.ACTIONTOGGLEMIND]    = function() Tic:toggleMind() end,
-    [Tic.ACTIONTOGGLEMOVE]    = function() Tic:toggleMove() end,
-    [Tic.ACTIONSCALENEXT]     = function() Tic:scaleNext() end,
-    [Tic.ACTIONSCREENNEXT]    = function() Tic:screenNext() end,
+Tic.KEYSFUNCTIONSWORLD = {
+    [Tic.KEY_LEFT]         = Tic.FUNCTIONPLAYERPREV, -- cycle actual player
+    [Tic.KEY_RIGHT]        = Tic.FUNCTIONPLAYERNEXT,
+    [Tic.KEY_UP]           = Tic.FUNCTIONSTATEPREV, -- cycle state
+    [Tic.KEY_DOWN]         = Tic.FUNCTIONSTATENEXT,
+    [Tic.KEY_NUMPADDIVIDE] = Tic.FUNCTIONTOGGLEWORK, -- toggle posture/status
+    [Tic.KEY_NUMPAD5]      = Tic.FUNCTIONTOGGLEKNEEL,
+    [Tic.KEY_NUMPAD0]      = Tic.FUNCTIONTOGGLESLEEP,
+    [Tic.KEY_NUMPAD8]      = Tic.FUNCTIONMOVEDIRECTION000, -- move
+    [Tic.KEY_NUMPAD9]      = Tic.FUNCTIONMOVEDIRECTION045,
+    [Tic.KEY_NUMPAD6]      = Tic.FUNCTIONMOVEDIRECTION090,
+    [Tic.KEY_NUMPAD3]      = Tic.FUNCTIONMOVEDIRECTION135,
+    [Tic.KEY_NUMPAD2]      = Tic.FUNCTIONMOVEDIRECTION180,
+    [Tic.KEY_NUMPAD1]      = Tic.FUNCTIONMOVEDIRECTION225,
+    [Tic.KEY_NUMPAD4]      = Tic.FUNCTIONMOVEDIRECTION270,
+    [Tic.KEY_NUMPAD7]      = Tic.FUNCTIONMOVEDIRECTION315,
+    [Tic.KEY_A]            = Tic.FUNCTIONPLAYERQUIT,
+    [Tic.KEY_B]            = Tic.FUNCTIONBIOMENEXT,
+    [Tic.KEY_D]            = Tic.FUNCTIONTOGGLEDIRS,
+    [Tic.KEY_H]            = Tic.FUNCTIONTOGGLEHITBOX,
+    [Tic.KEY_M]            = Tic.FUNCTIONSTATMENACT,
+    [Tic.KEY_O]            = Tic.FUNCTIONPLAYERONLY,
+    [Tic.KEY_P]            = Tic.FUNCTIONSTATPHYACT,
+    [Tic.KEY_Q]            = Tic.FUNCTIONTOGGLEBORDERS,
+    [Tic.KEY_R]            = Tic.FUNCTIONTOGGLEMIND,
+    [Tic.KEY_S]            = Tic.FUNCTIONTOGGLESPOTTED,
+    [Tic.KEY_V]            = Tic.FUNCTIONTOGGLEVIEW,
+    [Tic.KEY_X]            = Tic.FUNCTIONTOGGLEMOVE,
+    [Tic.KEY_Y]            = Tic.FUNCTIONSTATPSYACT,
+    [Tic.KEY_Z]            = Tic.FUNCTIONSCALENEXT,
+    [Tic.KEY_SPACE]        = Tic.FUNCTIONSCREENNEXT,
 }
 
 
@@ -416,7 +381,7 @@ Tic.MODIFIERKEYS = { -- record modifier keys pressed
     [Tic.KEY_SHIFT]    = false,
     [Tic.KEY_ALT]      = false,
 }
-Tic.KEYSACTIONS = Tic.KEYSACTIONSINTRO
+Tic.KEYSFUNCTIONS = Tic.KEYSFUNCTIONSINTRO
 function Tic:keyboardInput() -- returns the keys inputs in a table
     local _result = {}
 
@@ -446,17 +411,16 @@ end
 function Tic:keyboardDo() -- execute functions depending on the pressed keys if any
     local _keysinput = Tic:keyboardInput()
     for _, _key in ipairs(_keysinput) do
-        if Tic.KEYSACTIONS[_key] then -- key linked to an action
-            if Tic.ACTIONSFUNCTIONS[Tic.KEYSACTIONS[_key]] then -- action linked to a function
-                Tic.ACTIONSFUNCTIONS[Tic.KEYSACTIONS[_key]]() -- execute the associated function
-            end
+        local _function = Tic.KEYSFUNCTIONS[_key]
+        if _function then -- key linked to a function
+            _function() -- execute the function
         end
     end
 end
 
-function Tic:keyboardActions(_keysactions) -- adjust keyboard mapping
-    if not _keysactions then return end -- mandatory
-    Tic.KEYSACTIONS = _keysactions
+function Tic:keyboardFunctions(_keysfunctions) -- adjust keyboard mapping
+    if not _keysfunctions then return end -- mandatory
+    Tic.KEYSFUNCTIONS = _keysfunctions
 end
 
 
@@ -544,7 +508,7 @@ function Tic:screenNext() -- next screen in the stack
 end
 
 function Tic:screenKeyboard() -- adjust the keyboard to the actual screen
-    Tic:keyboardActions(Tic:screenActual().keysactions)
+    Tic:keyboardFunctions(Tic:screenActual().keysfunctions)
 end
 
 function Tic:screenButtons() -- adjust the buttons to the actual screen
@@ -1537,12 +1501,12 @@ function CScreen:new(_argt)
     CScreen.super.new(self, _argt)
     self.kind = Classic.KINDSCREEN
     self.name = Classic.NAMESCREEN
-    self.screen      = nil -- parent screen if any
-    self.windows     = {} -- screen windows if any -- ordered
-    self.buttons     = {} -- screen buttons if any -- ordered
-    self.screens     = {} -- sub screens (layers) if any -- ordered
-    self.display     = true -- display this screen ?
-    self.keysactions = nil -- keys to actions mapping if any
+    self.screen        = nil -- parent screen if any
+    self.windows       = {} -- screen windows if any -- ordered
+    self.buttons       = {} -- screen buttons if any -- ordered
+    self.screens       = {} -- sub screens (layers) if any -- ordered
+    self.display       = true -- display this screen ?
+    self.keysfunctions = nil -- keys to functions mapping if any
     self:argt(_argt) -- override if any
 end
 
@@ -4222,7 +4186,7 @@ end
 --
 -- INTERFACE -- order is important !
 --
-local ScreenWorld = CScreen{name = "World", keysactions = Tic.KEYSACTIONSWORLD}
+local ScreenWorld = CScreen{name = "World", keysfunctions = Tic.KEYSFUNCTIONSWORLD}
 Tic:screenAppend(ScreenWorld)
 ScreenWorld:appendWindow(CWindowScreen())
 
@@ -4252,8 +4216,8 @@ ScreenWorldRG:appendWindow(WindowStatsPlayer)
 local WindowStatePlayer = CWindowStatePlayer{}
 ScreenWorldRG:appendWindow(WindowStatePlayer)
 
-
-local ScreenIntro = CScreen{name = "Intro", keysactions = Tic.KEYSACTIONSINTRO}
+if true then
+local ScreenIntro = CScreen{name = "Intro", keysfunctions = Tic.KEYSFUNCTIONSINTRO}
 Tic:screenAppend(ScreenIntro)
 ScreenIntro:appendWindow(CWindowScreen())
 ScreenIntro:appendWindow(CWindowInfos{
@@ -4295,7 +4259,7 @@ ScreenIntro:appendButton(Button1)
 ScreenIntro:appendButton(Button2)
 ScreenIntro:appendButton(Button3)
 ScreenIntro:appendButton(Button4)
-
+end
 
 
 --
