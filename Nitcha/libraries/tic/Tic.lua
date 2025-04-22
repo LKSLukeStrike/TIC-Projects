@@ -508,6 +508,8 @@ Tic.BUTTONS = {}
 function Tic:buttonsDo()
     for _, _button in ipairs(Tic.BUTTONS) do
         if _button.display and _button.enabled then
+            local _hovered = _button:region():hasInsidePoint(Tic.MOUSE.screenx + Tic.MOUSEOFFSETX, Tic.MOUSE.screeny + Tic.MOUSEOFFSETY)
+            _button.hovered = _hovered
         end
     end
 end
@@ -3506,6 +3508,7 @@ function CWindow:new(_argt)
     self.colorborder = Tic.COLORGREYM -- border color
     self.colorframe1 = Tic.COLORWHITE -- frames colors
     self.colorframe2 = Tic.COLORGREYL
+    self.display     = true -- display or not ?
     self.drawground  = true -- draw behevior
     self.drawguides  = false
     self.drawinside  = true
@@ -3515,7 +3518,8 @@ function CWindow:new(_argt)
     self:argt(_argt) -- override if any
 end
 
-function CWindow:draw() -- window -- FIXME remove some attributes ? -- can be determined by the existence of the method
+function CWindow:draw() -- window drawing
+    if not self.display then return end -- nothing to draw
     if self.drawground then self:drawGround() end
     if self.drawguides then self:drawGuides() end
     if self.drawinside then self:drawInside() end
@@ -4176,7 +4180,6 @@ end
 local CButton = CWindow:extend() -- generic button
 function CButton:new(_argt)
     CButton.super.new(self, _argt)
-    self.display     = true  -- display or not ?
     self.enabled     = true  -- can be clicked ?
     self.hovered     = false -- hovered by the mouse ?
     self.actived     = false -- action triggered ?
@@ -4192,11 +4195,6 @@ function CButton:new(_argt)
     self.colorhover  = Tic.COLORHUDSCREEN
     self.coloraction = Tic.COLORBLUEM
     self:argt(_argt) -- override if any
-end
-
-function CButton:draw()
-    if not self.display then return end -- nothing to draw
-    CButton.super.draw(self)
 end
 
 function CButton:drawGround()
@@ -4278,10 +4276,25 @@ local Button2 = CButton{
     screeny = 20,
     screenw = 16,
     screenh = 8,
+}
+local Button3 = CButton{
+    screenx = 10,
+    screeny = 30,
+    screenw = 16,
+    screenh = 8,
     enabled = false,
+}
+local Button4 = CButton{
+    screenx = 10,
+    screeny = 40,
+    screenw = 16,
+    screenh = 8,
+    display = false,
 }
 ScreenIntro:appendButton(Button1)
 ScreenIntro:appendButton(Button2)
+ScreenIntro:appendButton(Button3)
+ScreenIntro:appendButton(Button4)
 
 
 
