@@ -1408,20 +1408,16 @@ function CLocations:moveEntityWorldXY(_entity, _worldx, _worldy) -- move an exis
     self:appendEntity(_entity)
 end
 
-function CLocations:locationsWorldXYRegion(_worldx, _worldy, _region) -- locations in region around world xy
-    if not _worldx or not _worldy or not _region then return end -- mandatory
-    _region.lf = _worldx + _region.lf -- offset region by world xy
-    _region.rg = _worldx + _region.rg
-    _region.up = _worldy + _region.up
-    _region.dw = _worldy + _region.dw
+function CLocations:locationsRegion(_region) -- locations in region
+    if not _region then return end -- mandatory
     local _result  = {}
 
     for _keyy, _valy in pairs(self.locations) do -- search for y in range
         if Nums:isBW(_keyy, _region.up, _region.dw)
-        or Nums:isBW(_keyy + Tic.SPRITESIZE, _region.up, _region.dw) then
+        or Nums:isBW(_keyy + Tic.SPRITESIZE - 1, _region.up, _region.dw) then
             for _keyx, _valx in pairs(_valy) do -- search for x in range
                 if Nums:isBW(_keyx, _region.lf, _region.rg)
-                or Nums:isBW(_keyx + Tic.SPRITESIZE, _region.lf, _region.rg) then
+                or Nums:isBW(_keyx + Tic.SPRITESIZE - 1, _region.lf, _region.rg) then
                     for _entity, _ in pairs(_valx) do -- loop on entities
                         if not _result[_keyy] then -- new worldy entry
                             _result[_keyy] = {}
@@ -1435,7 +1431,13 @@ function CLocations:locationsWorldXYRegion(_worldx, _worldy, _region) -- locatio
             end
         end
     end
+	
     return _result -- locations
+end
+
+function CLocations:locationsWorldXYRegion(_worldx, _worldy, _region) -- locations in region around world xy
+    if not _worldx or not _worldy or not _region then return end -- mandatory
+    return self:locationsRegion(_region:offsetXY(_worldx, _worldy))
 end
 
 function CLocations:locationsWorldXYRangeXY(_worldx, _worldy, _rangex, _rangey) -- locations in ranges
@@ -1635,8 +1637,6 @@ function CEntity:nearestEntityAround() -- nearest entity around itself, except i
     local _result          = nil
     local _locationsaround = self:locationsAround()
     local _entitiesaround  = CLocations:entities(_locationsaround)
-    Tic:logRecordActive(false)
-    Tic:logRecordEntities(_entitiesaround, true)
 
     for _entity, _ in pairs(_entitiesaround) do
         if not (_entity == self) then -- avoid to nearest itself
@@ -1648,7 +1648,6 @@ function CEntity:nearestEntityAround() -- nearest entity around itself, except i
         end
     end
 
-    if _result then Tic:logRecord("near") ; Tic:logRecord(_result:string()) end
     return _result
 end
 
@@ -1695,7 +1694,7 @@ function CWorld:new(_argt)
     self:argt(_argt) -- override if any
 end
 -- CWorld instance
-local World = CWorld{name = "Nuinmore"}
+local World = CWorld{}
 
 function CWorld:appendEntity(_entity) -- append an entity in the world
     if not _entity then return end -- mandatory
