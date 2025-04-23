@@ -78,15 +78,43 @@ function Tables:valFind(_table, _find) -- return the key of val _find else nil i
     return -- nil
 end
 
-function Tables:keyAppend(_table, _key, _val) -- add/replace a key val entry
+function Tables:keyAppend(_table, _key, _val) -- append/replace a key val entry
     if not _table or not _key then return end -- mandatory
     _val = _val or true
     _table[_key] = _val
 end
 
-function Tables:keyRemove(_table, _key) -- remove a key val entry
+function Tables:keyDelete(_table, _key) -- delete a key val entry (paired tables)
     if not _table or not _key then return end -- mandatory
     _table[_key] = nil
+end
+
+function Tables:keyRemove(_table, _key) -- remove a key entry (ipaired tables)
+    if not _table or not _key then return end -- mandatory
+    table.remove(_table, _key)
+end
+
+function Tables:valInsert(_table, _val, _once, _key) -- insert a val entry (ipaired tables) -- once of any (avoid doublons)
+    if not _table or not _val then return end -- mandatory
+    if Tables:valFind(_table, _val) and _once then return end -- avoid doublons
+    if _key then
+        table.insert(_table, _key, _val) -- at _key
+    else
+        table.insert(_table, _val) -- _at end
+    end
+end
+
+function Tables:valRemove(_table, _val, _once) -- remove a val entry (ipaired tables) -- only once (first) if any, else all
+    if not _table or not _val then return end -- mandatory
+    local _key = Tables:valFind(_table, _val)
+    while _key do
+        Tables:keyRemove(_table, _key)
+        if _once then
+            _key = nil
+        else
+            _key = Tables:valFind(_table, _val)
+        end
+    end
 end
 
 function Tables:copy(_table) -- copy a table -- SORTED -- only first level

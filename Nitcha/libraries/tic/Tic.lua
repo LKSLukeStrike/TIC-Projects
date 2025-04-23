@@ -396,29 +396,33 @@ function Tic:keyboardInput() -- returns the keys inputs in a table
             if _modifier then -- modifier key
                 Tic.MODIFIERKEYS[_modifier] = true
             elseif keyp(_key, 20, 10) then -- normal key holded
-                 table.insert(_result, _key)
+                 Tables:valInsert(_result, _key, true)
             end
         end
     end
 
     if Tables:size(_result) > 0 then -- at least one key pressed
-        table.insert(_result, Tic.KEY_ANY)
+        Tables:valInsert(_result, Tic.KEY_ANY, true)
     end
 
     return _result
 end
 
-function Tic:keyboardDo() -- execute functions depending on the pressed keys if any
+function Tic:keyboardInputFunctions() -- return functions depending on the pressed keys if any
+    local _result = {}
+
     local _keysinput = Tic:keyboardInput()
     for _, _key in ipairs(_keysinput) do
         local _function = Tic.KEYSFUNCTIONS[_key]
         if _function then -- key linked to a function
-            _function() -- execute the function
+            Tables:valInsert(_result, _function, true)
         end
     end
+
+    return _result
 end
 
-function Tic:keyboardFunctions(_keysfunctions) -- adjust keyboard mapping
+function Tic:keyboardKeysFunctions(_keysfunctions) -- adjust keyboard mapping
     if not _keysfunctions then return end -- mandatory
     Tic.KEYSFUNCTIONS = _keysfunctions
 end
@@ -485,9 +489,35 @@ end
 
 
 -- Inputs System -- handle mouse and keyboard inputs
+Tic.FUNCTIONS = {}
+
 function Tic:inputsDo()
+    Tic:inputsClearFunctions() -- start recording functions
     Tic:mouseDo() -- handle mouse
-    Tic:keyboardDo() -- handle keyboard
+    Tic:inputsInsertFunctions(Tic:keyboardInputFunctions()) -- handle keyboard
+    Tic:inputsDoFunctions() -- execute functions
+end
+
+function Tic:inputsClearFunctions() -- clear the functions table
+    Tic.FUNCTIONS = {}
+end
+
+function Tic:inputsDoFunctions()
+    for _, _function in ipairs(Tic.FUNCTIONS) do
+        _function() -- execute each function
+    end
+end
+
+function Tic:inputsInsertFunctions(_functions)
+    for _, _function in ipairs(_functions or {}) do
+        Tables:valInsert(Tic.FUNCTIONS, _function, true) -- insert once
+    end
+end
+
+function Tic:inputsRemoveFunctions(_functions)
+    for _, _function in ipairs(_functions or {}) do
+        Tables:valRemove(Tic.FUNCTIONS, _function, false) -- FIXME remove all (?)
+    end
 end
 
 
@@ -508,7 +538,7 @@ function Tic:screenNext() -- next screen in the stack
 end
 
 function Tic:screenKeyboard() -- adjust the keyboard to the actual screen
-    Tic:keyboardFunctions(Tic:screenActual().keysfunctions)
+    Tic:keyboardKeysFunctions(Tic:screenActual().keysfunctions)
 end
 
 function Tic:screenButtons() -- adjust the buttons to the actual screen
@@ -834,7 +864,7 @@ function Tic:logAppend(...) -- add item to the log buffer
     for _, _val in ipairs(_args) do
         _item = _item..Tic:val2string(_val).." "
     end
-    table.insert(Tic.LOGBUFFER, _item)
+    Tables:valInsert(Tic.LOGBUFFER, _item, true)
 end
 
 function Tic:logRecordActive(_active) -- set log record active on/off
@@ -848,12 +878,12 @@ function Tic:logRecord(...) -- add item to the log record
     for _, _val in ipairs(_args) do
         _item = _item..Tic:val2string(_val).." "
     end
-    table.insert(Tic.LOGRECORD, _item)
+    Tables:valInsert(Tic.LOGRECORD, _item, true)
 end
 
 function Tic:logPrint() -- print the log buffer increased by the log record then clear it
     for _, _item in ipairs(Tic.LOGRECORD) do
-        table.insert(Tic.LOGBUFFER, _item)
+        Tables:valInsert(Tic.LOGBUFFER, _item, true)
     end
     for _line, _item in ipairs(Tic.LOGBUFFER) do
         _line = _line - 1 -- line start from 0
@@ -1266,9 +1296,9 @@ function CHitbox:hittoAppend(_entity) -- append an entity hitto
     Tables:keyAppend(self.hitto, _entity)
 end
 
-function CHitbox:hittoRemove(_entity) -- remove an entity hitto
+function CHitbox:hittoDelete(_entity) -- delete an entity hitto
     if not _entity then return end -- mandatory
-    Tables:keyRemove(self.hitto, _entity)
+    Tables:keyDelete(self.hitto, _entity)
 end
 
 function CHitbox:hitbyAppend(_entity) -- append an entity hitby
@@ -1276,9 +1306,9 @@ function CHitbox:hitbyAppend(_entity) -- append an entity hitby
     Tables:keyAppend(self.hitby, _entity)
 end
 
-function CHitbox:hitbyRemove(_entity) -- remove an entity hitby
+function CHitbox:hitbyDelete(_entity) -- delete an entity hitby
     if not _entity then return end -- mandatory
-    Tables:keyRemove(self.hitby, _entity)
+    Tables:keyDelete(self.hitby, _entity)
 end
 
 function CHitbox:draw()
@@ -1346,7 +1376,7 @@ function CLocations:entities(_locations) -- entities in locations
     return _result -- entities
 end
 
-function CLocations:appendEntity(_entity) -- add a new entity -- [!] allows doublons
+function CLocations:appendEntity(_entity) -- append a new entity -- [!] allows doublons
     if not _entity then return end -- mandatory
     local _worldx = _entity.worldx
     local _worldy = _entity.worldy
@@ -1359,7 +1389,7 @@ function CLocations:appendEntity(_entity) -- add a new entity -- [!] allows doub
     self.locations[_worldy][_worldx][_entity] = _entity
 end
 
-function CLocations:removeEntity(_entity) -- remove an existing entity
+function CLocations:deleteEntity(_entity) -- delete an existing entity
     if not _entity then return end -- mandatory
     local _worldx = _entity.worldx
     local _worldy = _entity.worldy
@@ -1372,7 +1402,7 @@ end
 function CLocations:moveEntityWorldXY(_entity, _worldx, _worldy) -- move an existing entity
     if not _entity or not _worldx or not _worldy then return end -- mandatory
     if not self.locations[_entity.worldy][_entity.worldx][_entity] then return end -- doesnt exist
-    self:removeEntity(_entity)
+    self:deleteEntity(_entity)
     _entity.worldx = _worldx
     _entity.worldy = _worldy
     self:appendEntity(_entity)
@@ -1457,11 +1487,11 @@ function CEntitiesLocations:appendEntity(_entity) -- add a new entity
     self.locations:appendEntity(_entity)
 end
 
-function CEntitiesLocations:removeEntity(_entity) -- remove an entity
+function CEntitiesLocations:deleteEntity(_entity) -- delete an entity
     if not _entity then return end -- mandatory
     if not self:exists(_entity) then return end -- doesnt exist
     self.entities[_entity] = nil
-    self.locations:removeEntity(_entity)
+    self.locations:deleteEntity(_entity)
 end
 
 function CEntitiesLocations:moveEntityWorldXY(_entity, _worldx, _worldy) -- move an existing entity
@@ -1537,21 +1567,21 @@ function CScreen:appendWindow(_window) -- append window -- unique
     if not _window then return end -- mandarory
     if Tables:valFind(self.windows, _window) then return end -- already exists
     _window.screen = self -- record parent
-    table.insert(self.windows, _window)
+    Tables:valInsert(self.windows, _window, true)
 end
 
 function CScreen:appendButton(_button) -- append button -- unique
     if not _button then return end -- mandarory
     if Tables:valFind(self.buttons, _button) then return end -- already exists
     _button.screen = self -- record parent
-    table.insert(self.buttons, _button)
+    Tables:valInsert(self.buttons, _button, true)
 end
 
 function CScreen:appendScreen(_screen) -- append screen -- unique
     if not _screen then return end -- mandarory
     if Tables:valFind(self.screens, _screen) then return end -- already exists
     _screen.screen = self -- record parent
-    table.insert(self.screens, _screen)
+    Tables:valInsert(self.screens, _screen, true)
 end
 
 
@@ -1624,7 +1654,7 @@ end
 
 function CEntity:randomRegionWorld(_region) -- random worldx worldy in a region -- default min/max
     _region = _region or CRegion{}
-    self.world:removeEntity(self) -- remove itself from its old position -- FIXME why remove/append here ?
+    self.world:deleteEntity(self) -- delete itself from its old position -- FIXME why remove/append here ?
     self.worldx = Nums:random(_region.lf, _region.rg)
     self.worldy = Nums:random(_region.up, _region.dw)
     self.world:appendEntity(self) -- append itself from its new position
@@ -1673,9 +1703,9 @@ function CWorld:appendEntity(_entity) -- append an entity in the world
     self.entitieslocations:appendEntity(_entity)
 end
 
-function CWorld:removeEntity(_entity) -- remove an entity from the world
+function CWorld:deleteEntity(_entity) -- delete an entity from the world
     if not _entity then return end -- mandatory
-    self.entitieslocations:removeEntity(_entity)
+    self.entitieslocations:deleteEntity(_entity)
 end
 
 function CWorld:moveEntityWorldXY(_entity, _worldx, _worldy) -- move an entity into the world
@@ -1869,15 +1899,15 @@ end
 
 function CEntityDrawable:hitboxDetachTo(_entities) -- detach hitto entities
     for _entity, _ in pairs(_entities or {}) do
-        if self.hitbox then self.hitbox:hittoRemove(_entity) end
-        if _entity.hitbox then _entity.hitbox:hitbyRemove(self) end
+        if self.hitbox then self.hitbox:hittoDelete(_entity) end
+        if _entity.hitbox then _entity.hitbox:hitbyDelete(self) end
     end
 end
 
 function CEntityDrawable:hitboxDetachBy(_entities) -- detach hitby entities
     for _entity, _ in pairs(_entities or {}) do
-        if self.hitbox then self.hitbox:hitbyRemove(_entity) end
-        if _entity.hitbox then _entity.hitbox:hittoRemove(self) end
+        if self.hitbox then self.hitbox:hitbyDelete(_entity) end
+        if _entity.hitbox then _entity.hitbox:hittoDelete(self) end
     end
 end
 
