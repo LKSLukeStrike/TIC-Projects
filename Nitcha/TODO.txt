@@ -15,3 +15,10 @@
 
 -- FIXME check all default args syntax
 
+-- remove camera
+
+-- remove certain locations functions
+
+-- make nearest unique function
+
+

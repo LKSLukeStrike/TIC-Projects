@@ -1497,6 +1497,11 @@ function CEntitiesLocations:moveEntityWorldXY(_entity, _worldx, _worldy) -- move
     self.locations:moveEntityWorldXY(_entity, _worldx, _worldy)
 end
 
+function CEntitiesLocations:locationsRegion(_region) -- locations in region
+    if not _region then return end -- mandatory
+    return self.locations:locationsRegion(_region)
+end
+
 function CEntitiesLocations:locationsWorldXYRegion(_worldx, _worldy, _region) -- locations in world xy region
     if not _worldx or not _worldy or not _region then return end -- mandatory
     return self.locations:locationsWorldXYRegion(_worldx, _worldy, _region)
@@ -1706,6 +1711,11 @@ function CWorld:moveEntityWorldXY(_entity, _worldx, _worldy) -- move an entity i
     if not _entity or not _worldx or not _worldy then return end -- mandatory
     self.entitieslocations:moveEntityWorldXY(_entity, _worldx, _worldy)
     _entity:focus() -- focus its camera on itself
+end
+
+function CWorld:locationsRegion(_region) -- locations in region
+    if not _region then return end -- mandatory
+    return self.entitieslocations:locationsRegion(_region)
 end
 
 function CWorld:locationsWorldXYRegion(_worldx, _worldy, _region) -- locations in region
@@ -2717,6 +2727,28 @@ end
 function CCharacter:regionMoveWorld() -- move world region depending on movex, movey
     local _regionmoveoffsets = self:regionMoveOffsets()
     return _regionmoveoffsets:offsetXY(self.worldx, self.worldy)
+end
+
+function CCharacter:locationsView() -- locations in itself view
+    return self.world:locationsRegion(self:regionViewWorld())
+end
+
+function CCharacter:nearestEntityView() -- nearest entity in itself view, except itself
+    local _result        = nil
+    local _locationsview = self:locationsView()
+    local _entitiesview  = CLocations:entities(_locationsview)
+
+    for _entity, _ in pairs(_entitiesview) do
+        if not (_entity == self) then -- avoid to nearest itself
+            if _result == nil then
+                _result = _entity -- first nearest entity
+            elseif self:distanceEntityFake(_entity) < self:distanceEntityFake(_result) then
+                _result = _entity -- new nearest entity
+            end
+        end
+    end
+
+    return _result
 end
 
 function CCharacter:draw() -- set animations and draw layers
@@ -4030,11 +4062,11 @@ function CWindowWorld:drawPlayerActual()
     local _locationsaround  = _playeractual:locationsAround()
     local _regionviewworld  = _playeractual:regionViewWorld()
     local _regionmindworld  = _playeractual:regionMindWorld()
-    local _nearestentity    = _playeractual:nearestEntityAround() -- nearest entity if any -- except itself
+    local _nearestentity    = _playeractual:nearestEntityView() -- nearest entity if any -- except itself
 
-    _nearestentity = (_nearestentity and _regionviewworld:hasInsideRegion(_nearestentity:worldRegion())) -- keep it only if in view
-        and _nearestentity
-        or  nil
+    -- _nearestentity = (_nearestentity and _regionviewworld:hasInsideRegion(_nearestentity:worldRegion())) -- keep it only if in view
+    --     and _nearestentity
+    --     or  nil
 
     for _, _spottedwindow in pairs(self.spottedwindows or {}) do -- fill up the spotted windows if any
         _spottedwindow.entity = _nearestentity
@@ -4149,31 +4181,42 @@ function CButton:new(_argt)
 	self.rounded     = true  -- rounded border and frames ?
     self.drawframes  = false
     self.drawcaches  = false
-    self.colorground = Tic.COLORBIOMENIGHT
+    self.colorground = Tic.COLORWHITE
+    self.colorborder = Tic.COLORGREYM
     self.colorhover  = Tic.COLORHUDSCREEN
     self.coloraction = Tic.COLORBLUEM
+    self.colorgrounddisabled = Tic.COLORGREYL
+    self.colorborderdisabled = Tic.COLORGREYM
     self:argt(_argt) -- override if any
 end
 
 function CButton:drawGround()
-    local _drawcolor = (self.hovered) and self.colorhover or self.colorground
+    self:save{"colorground", "colorborder"}
+    self.colorground = (self.hovered) and self.colorhover  or self.colorground
+    self.colorground = (self.enabled) and self.colorground or self.colorgrounddisabled
+    self.colorborder = (self.enabled) and self.colorborder or self.colorborderdisabled
     if not self.rounded then -- standard drawing
         CButton.super.drawGround(self)
     else
-        rect(self.screenx + 1, self.screeny + 1, self.screenw - 2, self.screenh - 2, _drawcolor)
+        rect(self.screenx + 1, self.screeny + 1, self.screenw - 2, self.screenh - 2, self.colorborder)
+        rect(self.screenx + 2, self.screeny + 1, self.screenw - 4, self.screenh - 2, self.colorground)
+        rect(self.screenx + 1, self.screeny + 2, self.screenw - 2, self.screenh - 4, self.colorground)
     end
+    self:load()
 end
 
 function CButton:drawBorder()
-    local _drawcolor = (self.enabled) and self.colorborder or self.colorground
+    self:save{"colorborder"}
+    self.colorborder = (self.enabled) and self.colorborder or self.colorborderdisabled
     if not self.rounded then -- standard drawing
         CButton.super.drawBorder(self)
     else
-        rect(self.screenx + 1, self.screeny, self.screenw - 2, 1, _drawcolor)
-        rect(self.screenx, self.screeny + 1, 1, self.screenh - 2, _drawcolor)
-        rect(self.screenx + 1, self.screeny + self.screenh - 1, self.screenw - 2, 1, _drawcolor)
-        rect(self.screenx + self.screenw - 1, self.screeny + 1, 1, self.screenh - 2, _drawcolor)
+        rect(self.screenx + 1, self.screeny, self.screenw - 2, 1, self.colorborder)
+        rect(self.screenx, self.screeny + 1, 1, self.screenh - 2, self.colorborder)
+        rect(self.screenx + 1, self.screeny + self.screenh - 1, self.screenw - 2, 1, self.colorborder)
+        rect(self.screenx + self.screenw - 1, self.screeny + 1, 1, self.screenh - 2, self.colorborder)
     end
+    self:load()
 end
 
 
@@ -4249,10 +4292,27 @@ local Button4 = CButton{
     screenh = 8,
     display = false,
 }
+local Button5 = CButton{
+    screenx = 10,
+    screeny = 50,
+    screenw = 16,
+    screenh = 8,
+    rounded = false,
+}
+local Button6 = CButton{
+    screenx = 10,
+    screeny = 60,
+    screenw = 16,
+    screenh = 8,
+    rounded = false,
+    enabled = false,
+}
 ScreenIntro:appendButton(Button1)
 ScreenIntro:appendButton(Button2)
 ScreenIntro:appendButton(Button3)
 ScreenIntro:appendButton(Button4)
+ScreenIntro:appendButton(Button5)
+ScreenIntro:appendButton(Button6)
 end
 
 
