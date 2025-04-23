@@ -1343,12 +1343,7 @@ end
 
 function CHitbox:regionScreen() -- screen coordinates of its region -- depends on dirx and scale
     local _regionoffsets = self:regionOffsets()
-    return CRegion{
-        lf = self.screenx + _regionoffsets.lf,
-        rg = self.screenx + _regionoffsets.rg,
-        up = self.screeny + _regionoffsets.up,
-        dw = self.screeny + _regionoffsets.dw,
-    }
+    return _regionoffsets:offsetXY(self.screenx, self.screeny)
 end
 
 
@@ -2668,22 +2663,12 @@ end
 
 function CCharacter:regionViewScreen() -- view screen region depending on dirx, diry
     local _regionviewoffsets = self:regionViewOffsets()
-    return CRegion{
-        lf = self.screenx + _regionviewoffsets.lf,
-        rg = self.screenx + _regionviewoffsets.rg,
-        up = self.screeny + _regionviewoffsets.up,
-        dw = self.screeny + _regionviewoffsets.dw,
-    }
+    return _regionviewoffsets:offsetXY(self.screenx, self.screeny)
 end
 
 function CCharacter:regionViewWorld() -- view world region depending on dirx, diry
     local _regionviewoffsets = self:regionViewOffsets()
-    return CRegion{
-        lf = self.worldx + _regionviewoffsets.lf,
-        rg = self.worldx + _regionviewoffsets.rg,
-        up = self.worldy + _regionviewoffsets.up,
-        dw = self.worldy + _regionviewoffsets.dw,
-    }
+    return _regionviewoffsets:offsetXY(self.worldx, self.worldy)
 end
 
 function CCharacter:regionMindOffsets() -- mind offsets region depending on dirx, diry, statmenact
@@ -2705,22 +2690,12 @@ end
 
 function CCharacter:regionMindScreen() -- mind screen region depending on dirx, diry
     local _regionmindoffsets = self:regionMindOffsets()
-    return CRegion{
-        lf = self.screenx + _regionmindoffsets.lf,
-        rg = self.screenx + _regionmindoffsets.rg,
-        up = self.screeny + _regionmindoffsets.up,
-        dw = self.screeny + _regionmindoffsets.dw,
-    }
+    return _regionmindoffsets:offsetXY(self.screenx, self.screeny)
 end
 
 function CCharacter:regionMindWorld() -- mind world region depending on dirx, diry
     local _regionmindoffsets = self:regionMindOffsets()
-    return CRegion{
-        lf = self.worldx + _regionmindoffsets.lf,
-        rg = self.worldx + _regionmindoffsets.rg,
-        up = self.worldy + _regionmindoffsets.up,
-        dw = self.worldy + _regionmindoffsets.dw,
-    }
+    return _regionmindoffsets:offsetXY(self.worldx, self.worldy)
 end
 
 function CCharacter:regionMoveOffsets() -- move offsets region depending on movex, movey
@@ -2736,22 +2711,12 @@ end
 
 function CCharacter:regionMoveScreen() -- move screen region depending on movex, movey
     local _regionmoveoffsets = self:regionMoveOffsets()
-    return CRegion{
-        lf = self.screenx + _regionmoveoffsets.lf,
-        rg = self.screenx + _regionmoveoffsets.rg,
-        up = self.screeny + _regionmoveoffsets.up,
-        dw = self.screeny + _regionmoveoffsets.dw,
-    }
+    return _regionmoveoffsets:offsetXY(self.screenx, self.screeny)
 end
 
 function CCharacter:regionMoveWorld() -- move world region depending on movex, movey
     local _regionmoveoffsets = self:regionMoveOffsets()
-    return CRegion{
-        lf = self.worldx + _regionmoveoffsets.lf,
-        rg = self.worldx + _regionmoveoffsets.rg,
-        up = self.worldy + _regionmoveoffsets.up,
-        dw = self.worldy + _regionmoveoffsets.dw,
-    }
+    return _regionmoveoffsets:offsetXY(self.worldx, self.worldy)
 end
 
 function CCharacter:draw() -- set animations and draw layers
