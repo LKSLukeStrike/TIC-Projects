@@ -4170,6 +4170,8 @@ end
 local CButton = CWindow:extend() -- generic button
 function CButton:new(_argt)
     CButton.super.new(self, _argt)
+    self.screenw     = Tic.SPRITESIZE -- sizes
+    self.screenh     = Tic.SPRITESIZE
     self.enabled     = true  -- can be clicked ?
     self.hovered     = false -- hovered by the mouse ?
     self.actived     = false -- action triggered ?
@@ -4184,15 +4186,16 @@ function CButton:new(_argt)
     self.colorground = Tic.COLORWHITE
     self.colorborder = Tic.COLORGREYM
     self.colorhover  = Tic.COLORHUDSCREEN
-    self.coloraction = Tic.COLORBLUEM
     self.colorgrounddisabled = Tic.COLORGREYL
     self.colorborderdisabled = Tic.COLORGREYM
+    self.colorgroundactived  = Tic.COLORBLUEL
     self:argt(_argt) -- override if any
 end
 
 function CButton:drawGround()
     self:save{"colorground", "colorborder"}
-    self.colorground = (self.hovered) and self.colorhover  or self.colorground
+    self.colorground = (self.hovered) and self.colorhover          or self.colorground
+    self.colorground = (self.actived) and self.colorgroundactived  or self.colorground
     self.colorground = (self.enabled) and self.colorground or self.colorgrounddisabled
     self.colorborder = (self.enabled) and self.colorborder or self.colorborderdisabled
     if not self.rounded then -- standard drawing
@@ -4217,6 +4220,103 @@ function CButton:drawBorder()
         rect(self.screenx + self.screenw - 1, self.screeny + 1, 1, self.screenh - 2, self.colorborder)
     end
     self:load()
+end
+
+
+--
+-- CButtonSprite
+--
+local CButtonSprite = CButton:extend() -- generic sprite button
+function CButtonSprite:new(_argt)
+    CButtonSprite.super.new(self, _argt)
+	self.sprite = CSpriteBG{}
+    self:argt(_argt) -- override if any
+end
+
+function CButtonSprite:drawGround()
+    local _palette = {[self.colorground] = self.colorground, [self.colorborder] = self.colorborder}
+    _palette = (self.hovered)
+        and {[self.colorground] = self.colorhover, [self.colorborder] = self.colorborder}
+        or  _palette
+    _palette = (self.actived)
+        and {[self.colorground] = self.colorgroundactived, [self.colorborder] = self.colorborder}
+        or  _palette
+    _palette = (self.enabled)
+        and _palette
+        or  {[self.colorground] = self.colorgrounddisabled, [self.colorborder] = self.colorborderdisabled}
+
+    self.sprite.screenx = self.screenx
+    self.sprite.screeny = self.screeny
+    self.sprite.palette = _palette
+    self.sprite:draw()
+end
+
+
+--
+-- CButtonScroll
+--
+local CButtonScroll = CButtonSprite:extend() -- generic scroll arrow sprite button
+function CButtonScroll:new(_argt)
+    CButtonScroll.super.new(self, _argt)
+    self.drawborder    = true
+	self.sprite.sprite = CSpriteBG.SIGNSCROLL
+    self:argt(_argt) -- override if any
+end
+
+
+--
+-- CButtonScrollLF
+--
+local CButtonScrollLF = CButtonScroll:extend() -- generic scroll LF arrow sprite button
+function CButtonScrollLF:new(_argt)
+    CButtonScrollLF.super.new(self, _argt)
+	self.sprite.rotate = CSprite.ROTATE270
+    self:argt(_argt) -- override if any
+end
+
+
+--
+-- CButtonScrollUP
+--
+local CButtonScrollUP = CButtonScroll:extend() -- generic scroll UP arrow sprite button
+function CButtonScrollUP:new(_argt)
+    CButtonScrollUP.super.new(self, _argt)
+	self.sprite.rotate = CSprite.ROTATE000
+    self:argt(_argt) -- override if any
+end
+
+
+--
+-- CButtonScrollDW
+--
+local CButtonScrollDW = CButtonScroll:extend() -- generic scroll DW arrow sprite button
+function CButtonScrollDW:new(_argt)
+    CButtonScrollDW.super.new(self, _argt)
+	self.sprite.rotate = CSprite.ROTATE180
+    self:argt(_argt) -- override if any
+end
+
+
+--
+-- CButtonScrollRG
+--
+local CButtonScrollRG = CButtonScroll:extend() -- generic scroll RG arrow sprite button
+function CButtonScrollRG:new(_argt)
+    CButtonScrollRG.super.new(self, _argt)
+	self.sprite.rotate = CSprite.ROTATE090
+    self:argt(_argt) -- override if any
+end
+
+
+--
+-- CButtonCenter
+--
+local CButtonCenter = CButtonSprite:extend() -- generic center arrow sprite button
+function CButtonCenter:new(_argt)
+    CButtonCenter.super.new(self, _argt)
+    self.drawborder    = true
+	self.sprite.sprite = CSpriteBG.SIGNCENTER
+    self:argt(_argt) -- override if any
 end
 
 
@@ -4275,8 +4375,9 @@ local Button1 = CButton{
 local Button2 = CButton{
     screenx = 10,
     screeny = 20,
-    screenw = 16,
-    screenh = 8,
+    -- screenw = 16,
+    -- screenh = 8,
+    actived = true,
 }
 local Button3 = CButton{
     screenx = 10,
@@ -4298,13 +4399,52 @@ local Button5 = CButton{
     screenw = 16,
     screenh = 8,
     rounded = false,
+    -- actived = true,
 }
 local Button6 = CButton{
     screenx = 10,
     screeny = 60,
+    rounded = false,
+    actived = true,
+}
+local Button7 = CButton{
+    screenx = 10,
+    screeny = 70,
     screenw = 16,
     screenh = 8,
     rounded = false,
+    enabled = false,
+}
+local Button11 = CButtonScrollLF{
+    screenx = 30,
+    screeny = 10,
+}
+local Button12 = CButtonScrollUP{
+    screenx = 30,
+    screeny = 20,
+    actived = true,
+}
+local Button13 = CButtonScrollDW{
+    screenx = 30,
+    screeny = 30,
+    enabled = false,
+}
+local Button14 = CButtonScrollRG{
+    screenx = 30,
+    screeny = 40,
+}
+local Button15 = CButtonCenter{
+    screenx = 30,
+    screeny = 50,
+}
+local Button16 = CButtonCenter{
+    screenx = 30,
+    screeny = 60,
+    actived = true,
+}
+local Button17 = CButtonCenter{
+    screenx = 30,
+    screeny = 70,
     enabled = false,
 }
 ScreenIntro:appendButton(Button1)
@@ -4313,7 +4453,16 @@ ScreenIntro:appendButton(Button3)
 ScreenIntro:appendButton(Button4)
 ScreenIntro:appendButton(Button5)
 ScreenIntro:appendButton(Button6)
+ScreenIntro:appendButton(Button7)
+ScreenIntro:appendButton(Button11)
+ScreenIntro:appendButton(Button12)
+ScreenIntro:appendButton(Button13)
+ScreenIntro:appendButton(Button14)
+ScreenIntro:appendButton(Button15)
+ScreenIntro:appendButton(Button16)
+ScreenIntro:appendButton(Button17)
 end
+-- exit()
 
 
 --
