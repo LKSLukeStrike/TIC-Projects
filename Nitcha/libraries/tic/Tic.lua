@@ -382,6 +382,7 @@ Tic.MODIFIERKEYS = { -- record modifier keys pressed
     [Tic.KEY_ALT]      = false,
 }
 Tic.KEYSFUNCTIONS = Tic.KEYSFUNCTIONSINTRO
+
 function Tic:keyboardInput() -- returns the keys inputs in a table
     local _result = {}
 
@@ -422,7 +423,11 @@ function Tic:keyboardInputFunctions() -- return functions depending on the press
     return _result
 end
 
-function Tic:keyboardKeysFunctions(_keysfunctions) -- adjust keyboard mapping
+function Tic:keyboardHandleInput() -- handle keyboard keys and functions
+    Tic:inputsInsertFunctions(Tic:keyboardInputFunctions())
+end
+
+function Tic:keyboardSetKeysFunctions(_keysfunctions) -- set keyboard mapping
     if not _keysfunctions then return end -- mandatory
     Tic.KEYSFUNCTIONS = _keysfunctions
 end
@@ -445,12 +450,10 @@ Tic.MOUSE          = {
     scrollx = 0,
     scrolly = 0,
 }
-function Tic:mouseCursor() -- set the mouse cursor sprite
-    poke(Tic.MOUSECURSOR, Tic.MOUSESPRITE + Tic.MOUSEDIRX)
-end
 
 function Tic:mouseInput() -- set the mouse inputs in a table
     local _result = {}
+
     _result.screenx, _result.screeny, _result.clicklf, _result.clickmd, _result.clickrg, _result.scrollx, _result.scrolly = mouse()
     if _result.screenx < Tic.MOUSE.screenx then -- adjust mouse direction
         Tic.MOUSEOFFSETX = Tic.MOUSEOFFSETXLF
@@ -459,30 +462,60 @@ function Tic:mouseInput() -- set the mouse inputs in a table
         Tic.MOUSEOFFSETX = Tic.MOUSEOFFSETXRG
         Tic.MOUSEDIRX    = Tic.DIRXRG
     end
+
     Tic.MOUSE = _result
-    return _result
+    return _result -- not useful
 end
 
-function Tic:mouseDo() -- set the mouse cursor sprite
-    local _mouseinput = Tic:mouseInput()
+function Tic:mouseCursor() -- set the mouse cursor sprite
+    poke(Tic.MOUSECURSOR, Tic.MOUSESPRITE + Tic.MOUSEDIRX)
+end
+
+function Tic:mouseHandleInput() -- set the mouse cursor sprite
+    Tic:mouseInput()
     Tic:mouseCursor()
-    Tic:buttonsDo()
 end
 
 
 -- Buttons System -- handle buttons stack
+Tic.BUTTONCLICKLF = "clicklf" -- buttons action keys
+Tic.BUTTONCLICKMD = "clickmd"
+Tic.BUTTONCLICKRG = "clickrg"
+Tic.BUTTONSCROLLX = "scrollx"
+Tic.BUTTONSCROLLY = "scrolly"
 Tic.BUTTONS = {}
 
-function Tic:buttonsDo()
-    for _, _button in ipairs(Tic.BUTTONS) do
-        if _button.display and _button.enabled then
-            local _hovered = _button:region():hasInsidePoint(Tic.MOUSE.screenx + Tic.MOUSEOFFSETX, Tic.MOUSE.screeny + Tic.MOUSEOFFSETY)
-            _button.hovered = _hovered
+function Tic:buttonsHandleInput()
+    for _, _button in ipairs(Tic.BUTTONS) do -- handle input functions
+        _button:deactivate()
+
+        if _button:activable() then -- check if a button is active and hovered
+            if _button:region():hasInsidePoint(Tic.MOUSE.screenx + Tic.MOUSEOFFSETX, Tic.MOUSE.screeny + Tic.MOUSEOFFSETY) then
+                local _functionsactived = _button:functionsActived()
+                if Tables:size(_functionsactived) == 0 then -- just hover
+                    _button.hovered = true
+                else -- or activate
+                    _button:activate()
+                    Tic:inputsInsertFunctions(_functionsactived)
+                end
+            end
+        else -- disable all functions related to hidden/disabled buttons
+            Tic:inputsRemoveFunctions(_button:functionsDefined())
+        end
+    end
+
+    for _, _function in ipairs(Tic.FUNCTIONS) do -- feedback functions to buttons
+        for _, _button in ipairs(Tic.BUTTONS) do
+            if _button:activable() then -- only activable buttons
+                if _button:functionsContains(_function) then
+                    _button:activate()
+                end
+            end
         end
     end
 end
 
-function Tic:buttonsButtons(_buttons) -- adjust buttons mapping
+function Tic:buttonsSetButtons(_buttons) -- set buttons mapping
     if not _buttons then return end -- mandatory
     Tic.BUTTONS = _buttons
 end
@@ -493,8 +526,9 @@ Tic.FUNCTIONS = {}
 
 function Tic:inputsDo()
     Tic:inputsClearFunctions() -- start recording functions
-    Tic:mouseDo() -- handle mouse
-    Tic:inputsInsertFunctions(Tic:keyboardInputFunctions()) -- handle keyboard
+    Tic:mouseHandleInput() -- handle mouse inputs and cursor
+    Tic:keyboardHandleInput() -- handle keyboard keys and functions
+    Tic:buttonsHandleInput() -- handle buttons action keys and functions
     Tic:inputsDoFunctions() -- execute functions
 end
 
@@ -516,7 +550,7 @@ end
 
 function Tic:inputsRemoveFunctions(_functions)
     for _, _function in ipairs(_functions or {}) do
-        Tables:valRemove(Tic.FUNCTIONS, _function, false) -- FIXME remove all (?)
+        Tables:valRemove(Tic.FUNCTIONS, _function, false) -- remove all
     end
 end
 
@@ -534,15 +568,15 @@ function Tic:screenAppend(_screen) -- append a screen to the stack
 end
 
 function Tic:screenNext() -- next screen in the stack
-    return Tic.SCREENS:next()
+    -- return Tic.SCREENS:next()
 end
 
 function Tic:screenKeyboard() -- adjust the keyboard to the actual screen
-    Tic:keyboardKeysFunctions(Tic:screenActual().keysfunctions)
+    Tic:keyboardSetKeysFunctions(Tic:screenActual().keysfunctions)
 end
 
 function Tic:screenButtons() -- adjust the buttons to the actual screen
-    Tic:buttonsButtons(Tic:screenActual().buttons)
+    Tic:buttonsSetButtons(Tic:screenActual().buttons)
 end
 
 
@@ -1066,7 +1100,7 @@ CSpriteBG.BUILDBANK   = 16 -- buildings
 CSpriteBG.PLACEHOUSE  = CSpriteBG.BUILDBANK + 0
 CSpriteBG.PLACETOWER  = CSpriteBG.BUILDBANK + 1
 CSpriteBG.PLACEMANOR  = CSpriteBG.BUILDBANK + 2
-CSpriteBG.PLACEALTAR  = CSpriteBG.BUILDBANK + 3
+CSpriteBG.PLACEKIRKE  = CSpriteBG.BUILDBANK + 3
 CSpriteBG.STANDBANK   = 32 -- stands
 CSpriteBG.PLACEWATER  = CSpriteBG.STANDBANK + 0
 CSpriteBG.PLACESTALL  = CSpriteBG.STANDBANK + 1
@@ -2141,21 +2175,21 @@ end
 
 
 --
--- CPlaceAltar
+-- CPlaceKirke
 --
-local CPlaceAltar = CPlaceBuild:extend() -- altars
-Classic.KINDALTAR = "Altar" -- Altar kind
-function CPlaceAltar:new(_argt)
-    CPlaceAltar.super.new(self, _argt)
-    self.kind = Classic.KINDALTAR
-    self.sprite  = CSpriteBG.PLACEALTAR
+local CPlaceKirke = CPlaceBuild:extend() -- kirkes
+Classic.KINDKIRKE = "Kirke" -- Kirke kind
+function CPlaceKirke:new(_argt)
+    CPlaceKirke.super.new(self, _argt)
+    self.kind = Classic.KINDKIRKE
+    self.sprite  = CSpriteBG.PLACEKIRKE
     self.hitbox.region.lf = 1
     self:argt(_argt) -- override if any
 end
 
-local CPlaceAltarAnim = CPlaceAltar:extend() -- anim altars
-function CPlaceAltarAnim:new(_argt)
-    CPlaceAltarAnim.super.new(self, _argt)
+local CPlaceKirkeAnim = CPlaceKirke:extend() -- anim kirkes
+function CPlaceKirkeAnim:new(_argt)
+    CPlaceKirkeAnim.super.new(self, _argt)
     self.animations = {
         CAnimation{ -- window 1
             frequence = Tic.FREQUENCE0600,
@@ -2173,9 +2207,9 @@ function CPlaceAltarAnim:new(_argt)
     self:argt(_argt) -- override if any
 end
 
-local CPlaceAltarIdle = CPlaceAltar:extend() -- idle altars
-function CPlaceAltarIdle:new(_argt)
-    CPlaceAltarIdle.super.new(self, _argt)
+local CPlaceKirkeIdle = CPlaceKirke:extend() -- idle kirkes
+function CPlaceKirkeIdle:new(_argt)
+    CPlaceKirkeIdle.super.new(self, _argt)
     self.name = Classic.NAMEEMPTY
     self.palette = CPlaceBuild.PALETTEIDLE
     self:argt(_argt) -- override if any
@@ -4170,22 +4204,23 @@ end
 local CButton = CWindow:extend() -- generic button
 function CButton:new(_argt)
     CButton.super.new(self, _argt)
-    self.screenw     = Tic.SPRITESIZE -- sizes
-    self.screenh     = Tic.SPRITESIZE
-    self.enabled     = true  -- can be clicked ?
-    self.hovered     = false -- hovered by the mouse ?
-    self.actived     = false -- action triggered ?
-	self.clicklf     = nil   -- action to trigger on click lf
-	self.clickmd     = nil   -- action to trigger on click md
-	self.clickrg     = nil   -- action to trigger on click rg
-	self.scrollx     = nil   -- action to trigger on scroll x
-	self.scrolly     = nil   -- action to trigger on scroll y
-	self.rounded     = true  -- rounded border and frames ?
-    self.drawframes  = false
-    self.drawcaches  = false
-    self.colorground = Tic.COLORWHITE
-    self.colorborder = Tic.COLORGREYM
-    self.colorhover  = Tic.COLORHUDSCREEN
+    self.screenw       = Tic.SPRITESIZE -- sizes
+    self.screenh       = Tic.SPRITESIZE
+    self.enabled       = true  -- can be clicked ?
+    self.hovered       = false -- hovered by the mouse ?
+    self.actived       = false -- action triggered ?
+    self.activedcycler = CCyclerInt{maxindex =  10, mode = CCycler.MODEBLOCK} -- cycler to maintain the activated effect a little bit 
+	self.clicklf       = nil   -- action to trigger on click lf
+	self.clickmd       = nil   -- action to trigger on click md
+	self.clickrg       = nil   -- action to trigger on click rg
+	self.scrollx       = nil   -- action to trigger on scroll x
+	self.scrolly       = nil   -- action to trigger on scroll y
+	self.rounded       = true  -- rounded border and frames ?
+    self.drawframes    = false
+    self.drawcaches    = false
+    self.colorground   = Tic.COLORWHITE
+    self.colorborder   = Tic.COLORGREYM
+    self.colorhover    = Tic.COLORHUDSCREEN
     self.colorgrounddisabled = Tic.COLORGREYL
     self.colorborderdisabled = Tic.COLORGREYM
     self.colorgroundactived  = Tic.COLORBLUEL
@@ -4220,6 +4255,49 @@ function CButton:drawBorder()
         rect(self.screenx + self.screenw - 1, self.screeny + 1, 1, self.screenh - 2, self.colorborder)
     end
     self:load()
+end
+
+function CButton:functionsDefined() -- defined functions of a button
+    local _result = {}
+
+    for _, _key in ipairs({Tic.BUTTONCLICKLF, Tic.BUTTONCLICKMD, Tic.BUTTONCLICKRG, Tic.BUTTONSCROLLX, Tic.BUTTONSCROLLY}) do
+        if type(self[_key]) == "function" then Tables:valInsert(_result, self[_key], true) end
+    end
+
+    return _result
+end
+
+function CButton:functionsActived() -- actived functions (in a key table) of a button
+    local _result = {}
+
+    if Tic.MOUSE.clicklf and type(self[Tic.BUTTONCLICKLF]) == "function" then Tables:valInsert(_result, self[Tic.BUTTONCLICKLF], true) end
+    if Tic.MOUSE.clickmd and type(self[Tic.BUTTONCLICKMD]) == "function" then Tables:valInsert(_result, self[Tic.BUTTONCLICKMD], true) end
+    if Tic.MOUSE.clickrg and type(self[Tic.BUTTONCLICKRG]) == "function" then Tables:valInsert(_result, self[Tic.BUTTONCLICKRG], true) end
+    if Tic.MOUSE.scrollx ~= 0 and type(self[Tic.BUTTONSCROLLX]) == "function" then Tables:valInsert(_result, self[Tic.BUTTONSCROLLX], true) end
+    if Tic.MOUSE.scrolly ~= 0 and type(self[Tic.BUTTONSCROLLY]) == "function" then Tables:valInsert(_result, self[Tic.BUTTONSCROLLY], true) end
+
+    return _result
+end
+
+function CButton:functionsContains(_function) -- does the button contains a function ?
+    return (Tables:valFind(self:functionsDefined(), _function)) and true or false
+end
+
+function CButton:activable() -- is the button activable ?
+    return self.display and self.enabled and Tables:size(self:functionsDefined()) > 0
+end
+
+function CButton:activate() -- activate the button and start the effect cycler
+    self.hovered = false
+    self.actived = true
+    self.activedcycler:max()
+end
+
+function CButton:deactivate() -- dehover the button and stop the activate effect if any
+    self.hovered = false
+    if self.activedcycler:prev() == 0 then
+        self.actived = false
+    end
 end
 
 
@@ -4354,6 +4432,7 @@ local WindowStatePlayer = CWindowStatePlayer{}
 ScreenWorldRG:appendWindow(WindowStatePlayer)
 
 if true then
+-- local ScreenIntro = CScreen{name = "Intro", keysfunctions = Tic.KEYSFUNCTIONSINTRO}
 local ScreenIntro = CScreen{name = "Intro", keysfunctions = Tic.KEYSFUNCTIONSINTRO}
 Tic:screenAppend(ScreenIntro)
 ScreenIntro:appendWindow(CWindowScreen())
@@ -4370,48 +4449,38 @@ local Button1 = CButton{
     screenx = 10,
     screeny = 10,
     screenw = 16,
-    screenh = 8,
 }
 local Button2 = CButton{
     screenx = 10,
     screeny = 20,
-    -- screenw = 16,
-    -- screenh = 8,
-    actived = true,
 }
 local Button3 = CButton{
     screenx = 10,
     screeny = 30,
     screenw = 16,
-    screenh = 8,
     enabled = false,
 }
 local Button4 = CButton{
     screenx = 10,
     screeny = 40,
     screenw = 16,
-    screenh = 8,
     display = false,
 }
 local Button5 = CButton{
     screenx = 10,
     screeny = 50,
     screenw = 16,
-    screenh = 8,
     rounded = false,
-    -- actived = true,
 }
 local Button6 = CButton{
     screenx = 10,
     screeny = 60,
     rounded = false,
-    actived = true,
 }
 local Button7 = CButton{
     screenx = 10,
     screeny = 70,
     screenw = 16,
-    screenh = 8,
     rounded = false,
     enabled = false,
 }
@@ -4461,6 +4530,13 @@ ScreenIntro:appendButton(Button14)
 ScreenIntro:appendButton(Button15)
 ScreenIntro:appendButton(Button16)
 ScreenIntro:appendButton(Button17)
+
+Button16.clicklf = Tic.FUNCTIONSCREENNEXT
+Button16.clicklf = Tic.FUNCTIONSCREENNEXT
+local _plopfct = function() Tic:logAppend("Plop") end
+Button1.clicklf = _plopfct
+Button2.clicklf = _plopfct
+-- Button7.clicklf = Tic.FUNCTIONSCREENNEXT
 end
 -- exit()
 
@@ -4478,8 +4554,8 @@ CPlace.PLACEKINDS = {  -- TODO val can contain parameters such as percent etc
     [CPlaceTowerIdle] = {},
     [CPlaceManorAnim] = {},
     [CPlaceManorIdle] = {},
-    [CPlaceAltarAnim] = {},
-    [CPlaceAltarIdle] = {},
+    [CPlaceKirkeAnim] = {},
+    [CPlaceKirkeIdle] = {},
     [CPlaceWaterAnim] = {},
     [CPlaceWaterIdle] = {},
     [CPlaceStallAnim] = {},
@@ -4587,8 +4663,8 @@ CPlace:generateRandomRegionWorldPercent(
 --     [CPlaceTowerIdle] = {},
 --     [CPlaceManorAnim] = {},
 --     [CPlaceManorIdle] = {},
---     [CPlaceAltarAnim] = {},
---     [CPlaceAltarIdle] = {},
+--     [CPlaceKirkeAnim] = {},
+--     [CPlaceKirkeIdle] = {},
 --     [CPlaceWaterAnim] = {},
 --     [CPlaceWaterIdle] = {},
 --     [CPlaceStallAnim] = {},
@@ -4724,8 +4800,8 @@ for _, _cplace in pairs({
     CPlaceTowerIdle,
     CPlaceManorAnim,
     -- CPlaceManorIdle,
-    -- CPlaceAltarAnim,
-    CPlaceAltarIdle,
+    -- CPlaceKirkeAnim,
+    CPlaceKirkeIdle,
     CPlaceWaterAnim,
     -- CPlaceWaterIdle,
     CPlaceStallAnim,

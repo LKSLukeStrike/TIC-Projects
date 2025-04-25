@@ -100,7 +100,7 @@ function Tables:valInsert(_table, _val, _once, _key) -- insert a val entry (ipai
     if _key then
         table.insert(_table, _key, _val) -- at _key
     else
-        table.insert(_table, _val) -- _at end
+        table.insert(_table, _val) -- at end
     end
 end
 
