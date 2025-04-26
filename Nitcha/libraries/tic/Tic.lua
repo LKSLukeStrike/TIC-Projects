@@ -3483,10 +3483,12 @@ function CWindow:new(_argt)
     self.drawcaches  = true
     self.drawborder  = true
     self.drawframes  = true
+    self.behaviour   = nil -- behaviour function if any
     self:argt(_argt) -- override if any
 end
 
 function CWindow:draw() -- window drawing
+    if type(self.behaviour) == "function" then self:behaviour() end -- execute behaviour function first if any
     if not self.display then return end -- nothing to draw
     if self.drawground then self:drawGround() end
     if self.drawguides then self:drawGuides() end
@@ -4146,8 +4148,17 @@ end
 -- CButton
 --
 local CButton = CWindow:extend() -- generic button
+Classic.KINDBUTTON = "Button" -- Button kind
+Classic.NAMEBUTTON = "Button" -- Button name
+CButton.BEHAVIOURAUTODISABLE = function(self)
+    if Tables:size(self:functionsDefined()) == 0 then
+        self.enabled = false
+    end
+end
 function CButton:new(_argt)
     CButton.super.new(self, _argt)
+    self.kind = Classic.KINDBUTTON
+    self.name = Classic.NAMEBUTTON
     self.screenw       = Tic.SPRITESIZE -- sizes
     self.screenh       = Tic.SPRITESIZE
     self.enabled       = true  -- can be clicked ?
@@ -4159,6 +4170,7 @@ function CButton:new(_argt)
 	self.clickrg       = nil   -- function to trigger on click rg
 	self.scrollx       = nil   -- function to trigger on scroll x
 	self.scrolly       = nil   -- function to trigger on scroll y
+	self.behaviour     = CButton.BEHAVIOURAUTODISABLE  -- function to trigger at first
 	self.rounded       = true  -- rounded border and frames ?
     self.drawframes    = false
     self.drawcaches    = false
@@ -4493,62 +4505,80 @@ end
 --
 local ScreenWorld = CScreen{name = "World", keysfunctions = Tic.KEYSFUNCTIONSWORLD}
 Tic:screenAppend(ScreenWorld)
-ScreenWorld:appendElement(CWindowScreen())
 
 local ScreenWorldLF = CScreen{}
-ScreenWorld:appendElement(ScreenWorldLF)
 local WindowInfosSpotted = CWindowInfosSpotted{}
-ScreenWorldLF:appendElement(WindowInfosSpotted)
 local WindowPortraitSpotted = CWindowPortraitSpotted{}
-ScreenWorldLF:appendElement(WindowPortraitSpotted)
+ScreenWorldLF:appendElements{
+    WindowInfosSpotted,
+    WindowPortraitSpotted,
+}
 
 local ScreenWorldMD = CScreen{}
-ScreenWorld:appendElement(ScreenWorldMD)
 local WindowWorld = CWindowWorld{spottedwindows = {WindowInfosSpotted, WindowPortraitSpotted}}
-ScreenWorldMD:appendElement(WindowWorld)
 local WindowInfosWorld = CWindowInfosWorld{}
-ScreenWorldMD:appendElement(WindowInfosWorld)
-
+ScreenWorldMD:appendElements{
+    WindowWorld,
+    WindowInfosWorld,
+}
 
 local ScreenWorldRG = CScreen{}
-ScreenWorld:appendElement(ScreenWorldRG)
 local WindowInfosPlayer = CWindowInfosPlayer{}
-ScreenWorldRG:appendElement(WindowInfosPlayer)
 local WindowPortraitPlayer = CWindowPortraitPlayer{}
-ScreenWorldRG:appendElement(WindowPortraitPlayer)
 local WindowStatsPlayer = CWindowStatsPlayer{}
-ScreenWorldRG:appendElement(WindowStatsPlayer)
 local WindowStatePlayer = CWindowStatePlayer{}
-ScreenWorldRG:appendElement(WindowStatePlayer)
+local ButtonPrevPlayer = CButtonScrollLF{
+    drawborder = false,
+    clicklf = Tic.FUNCTIONPLAYERPREV,
+}
+local ButtonNextPlayer = CButtonScrollRG{
+    drawborder = false,
+    clicklf = Tic.FUNCTIONPLAYERNEXT,
+}
+ScreenWorldRG:elementsDistributeH(
+    {ButtonPrevPlayer, ButtonNextPlayer}, -2,
+    -- WindowInfosPlayer.screenw - WindowInfosPlayer.screenx,
+    WindowInfosPlayer.screenx + ((WindowInfosPlayer.screenw - CScreen:elementsTotalH({ButtonPrevPlayer, ButtonNextPlayer}, -2)) // 2),
+    WindowInfosPlayer.screeny - Tic.SPRITESIZE
+)
+ScreenWorldRG:appendElements{
+    WindowInfosPlayer,
+    WindowPortraitPlayer,
+    WindowStatsPlayer,
+    WindowStatePlayer,
+    ButtonPrevPlayer,
+    ButtonNextPlayer,
+}
+
+ScreenWorld:appendElements{
+    CWindowScreen{},
+    ScreenWorldLF,
+    ScreenWorldMD,
+    ScreenWorldRG,
+}
 
 if true then
 -- local ScreenIntro = CScreen{name = "Intro", keysfunctions = Tic.KEYSFUNCTIONSINTRO}
 local ScreenIntro = CScreen{name = "Intro", keysfunctions = Tic.KEYSFUNCTIONSINTRO}
 Tic:screenAppend(ScreenIntro)
-ScreenIntro:appendElement(CWindowScreen())
-ScreenIntro:appendElement(CWindowInfos{
-    screenx = 107,
-    screeny = 60,
-    drawground = false,
-    drawframes = false,
-    align = CWindowInfos.ALIGNMD,
-    infos = {"Press", "Key",},
-})
 
 local Button1 = CButton{
     -- screenx = 10,
     -- screeny = 10,
     screenw = 16,
+    name = "plop 1",
 }
 local Button2 = CButton{
     -- screenx = 10,
     -- screeny = 20,
+    name = "plop 2",
 }
 local Button3 = CButton{
     -- screenx = 10,
     -- screeny = 30,
     screenw = 16,
     -- enabled = false,
+    name = "dummy",
 }
 local Button4 = CButton{
     screenx = 10,
@@ -4614,30 +4644,42 @@ local Button17 = CButtonCenter{
     screeny = 70,
     enabled = false,
 }
-ScreenIntro:appendElement(Button1)
-ScreenIntro:appendElement(Button2)
-ScreenIntro:appendElement(Button3)
-ScreenIntro:appendElement(Button4)
-ScreenIntro:appendElement(Button5)
-ScreenIntro:appendElement(Button6)
-ScreenIntro:appendElement(Button7)
-ScreenIntro:appendElement(Button11)
-ScreenIntro:appendElement(Button12)
-ScreenIntro:appendElement(Button13)
-ScreenIntro:appendElement(Button14)
-ScreenIntro:appendElement(Button15)
-ScreenIntro:appendElement(Button16)
-ScreenIntro:appendElement(Button17)
 
-Button16.clicklf = Tic.FUNCTIONSCREENNEXT
+ScreenIntro:appendElements{
+    CWindowScreen(),
+    CWindowInfos{
+        screenx = 107,
+        screeny = 60,
+        drawground = false,
+        drawframes = false,
+        align = CWindowInfos.ALIGNMD,
+        infos = {"Press", "Key",},
+    },
+    Button1,
+    Button2,
+    Button3,
+    Button4,
+    Button5,
+    Button6,
+    Button7,
+    Button11,
+    Button12,
+    Button13,
+    Button14,
+    Button15,
+    Button16,
+    Button17,
+}
+
 Button16.clicklf = Tic.FUNCTIONSCREENNEXT
 local _plopfct = function() Tic:logAppend("Plop") end
 Button1.clicklf = _plopfct
+Button1.clickrg = _plopfct
 Button2.clicklf = _plopfct
 Button7.clicklf = Tic.FUNCTIONSCREENNEXT
 
-CScreen:elementsDistributeH({Button11, Button12, Button16, Button13, Button14}, -2, 30, 10)
-CScreen:elementsDistributeV({Button1, Button2, Button3}, 2, 10, 10)
+ScreenIntro:elementsDistributeH({Button11, Button12, Button16, Button13, Button14}, -2, 30, 10)
+ScreenIntro:elementsDistributeV({Button1, Button2, Button3}, 2, 10, 10)
 end
 -- exit()
 
