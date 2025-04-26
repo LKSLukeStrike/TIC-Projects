@@ -568,7 +568,7 @@ function Tic:screenAppend(_screen) -- append a screen to the stack
 end
 
 function Tic:screenNext() -- next screen in the stack
-    -- return Tic.SCREENS:next()
+    return Tic.SCREENS:next()
 end
 
 function Tic:screenKeyboard() -- adjust the keyboard to the actual screen
@@ -1618,6 +1618,72 @@ function CScreen:appendScreen(_screen) -- append screen -- unique
     if Tables:valFind(self.screens, _screen) then return end -- already exists
     _screen.screen = self -- record parent
     Tables:valInsert(self.screens, _screen, true)
+end
+
+function CScreen:elementsTotalW(_elements, _separator) -- total w of elements with optional separator
+    _separator = _separator or 0
+    local _result = 0
+    for _, _element in ipairs(_elements or {}) do
+        _result = _result + _element.screenw + _separator
+    end
+    _result = (_result == 0) and _result or _result - _separator -- skip last separator
+    return _result
+end
+
+function CScreen:elementsTotalH(_elements, _separator) -- total h of elements with optional separator
+    _separator = _separator or 0
+    local _result = 0
+    for _, _element in ipairs(_elements or {}) do
+        _result = _result + _element.screenh + _separator
+    end
+    _result = (_result == 0) and _result or _result - _separator -- skip last separator
+    return _result
+end
+
+function CScreen:elementsDistributeH(_elements, _separator, _screenx, _screeny) -- distribute h elements with optional separator and xy
+    _separator = _separator or 0
+    for _, _element in ipairs(_elements or {}) do
+        if _screenx then
+            if _screenx >= 0 then -- gt 0 force x
+                _element.screenx = _screenx
+            else -- lt 0 keep its own x -- not useful here
+            end
+        else -- nil ajust x to the first element
+            _screenx = _element.screenx
+        end
+        if _screeny then
+            if _screeny >= 0 then -- gt 0 force y
+                _element.screeny = _screeny
+            else -- lt 0 keep its own y
+            end
+        else -- nil ajust y to the first element
+            _screeny = _element.screeny
+        end
+        _screenx = _screenx + _element.screenw + _separator
+    end
+end
+
+function CScreen:elementsDistributeV(_elements, _separator, _screenx, _screeny) -- distribute v elements with optional separator and xy
+    _separator = _separator or 0
+    for _, _element in ipairs(_elements or {}) do
+        if _screenx then
+            if _screenx >= 0 then -- gt 0 force x
+                _element.screenx = _screenx
+            else -- lt 0 keep its own x
+            end
+        else -- nil ajust x to the first element
+            _screenx = _element.screenx
+        end
+        if _screeny then
+            if _screeny >= 0 then -- gt 0 force y
+                _element.screeny = _screeny
+            else -- lt 0 keep its own y -- not useful here
+            end
+        else -- nil ajust y to the first element
+            _screeny = _element.screeny
+        end
+        _screeny = _screeny + _element.screenh + _separator
+    end
 end
 
 
@@ -4446,19 +4512,19 @@ ScreenIntro:appendWindow(CWindowInfos{
 })
 
 local Button1 = CButton{
-    screenx = 10,
-    screeny = 10,
+    -- screenx = 10,
+    -- screeny = 10,
     screenw = 16,
 }
 local Button2 = CButton{
-    screenx = 10,
-    screeny = 20,
+    -- screenx = 10,
+    -- screeny = 20,
 }
 local Button3 = CButton{
-    screenx = 10,
-    screeny = 30,
+    -- screenx = 10,
+    -- screeny = 30,
     screenw = 16,
-    enabled = false,
+    -- enabled = false,
 }
 local Button4 = CButton{
     screenx = 10,
@@ -4485,22 +4551,28 @@ local Button7 = CButton{
     enabled = false,
 }
 local Button11 = CButtonScrollLF{
-    screenx = 30,
-    screeny = 10,
+    -- screenx = 30,
+    -- screeny = 10,
+    drawborder = false,
 }
 local Button12 = CButtonScrollUP{
-    screenx = 30,
-    screeny = 20,
-    actived = true,
+    -- screenx = 30,
+    -- screeny = 20,
+    -- actived = true,
+    rounded = false,
+    drawborder = false,
 }
 local Button13 = CButtonScrollDW{
-    screenx = 30,
-    screeny = 30,
-    enabled = false,
+    -- screenx = 30,
+    -- screeny = 30,
+    -- enabled = false,
+    rounded = false,
+    drawborder = false,
 }
 local Button14 = CButtonScrollRG{
     screenx = 30,
     screeny = 40,
+    drawborder = false,
 }
 local Button15 = CButtonCenter{
     screenx = 30,
@@ -4510,6 +4582,8 @@ local Button16 = CButtonCenter{
     screenx = 30,
     screeny = 60,
     actived = true,
+    rounded = false,
+    drawborder = false,
 }
 local Button17 = CButtonCenter{
     screenx = 30,
@@ -4536,7 +4610,10 @@ Button16.clicklf = Tic.FUNCTIONSCREENNEXT
 local _plopfct = function() Tic:logAppend("Plop") end
 Button1.clicklf = _plopfct
 Button2.clicklf = _plopfct
--- Button7.clicklf = Tic.FUNCTIONSCREENNEXT
+Button7.clicklf = Tic.FUNCTIONSCREENNEXT
+
+CScreen:elementsDistributeH({Button11, Button12, Button16, Button13, Button14}, -2, 30, 10)
+CScreen:elementsDistributeV({Button1, Button2, Button3}, 2, 10, 10)
 end
 -- exit()
 
