@@ -373,7 +373,7 @@ Tic.KEYSFUNCTIONSWORLD = {
 }
 
 
--- Keyboard System -- handle keys pressed to actions to functions
+-- Keyboard System -- handle keys pressed to functions
 Tic.KEYBOARDKEYS = 0xFF88 -- keyboard state -- up to 4 pressed keys
 Tic.MODIFIERKEYS = { -- record modifier keys pressed
     [Tic.KEY_CAPSLOCK] = false,
@@ -478,7 +478,7 @@ end
 
 
 -- Buttons System -- handle buttons stack
-Tic.BUTTONCLICKLF = "clicklf" -- buttons action keys
+Tic.BUTTONCLICKLF = "clicklf" -- buttons function keys
 Tic.BUTTONCLICKMD = "clickmd"
 Tic.BUTTONCLICKRG = "clickrg"
 Tic.BUTTONSCROLLX = "scrollx"
@@ -528,7 +528,7 @@ function Tic:inputsDo()
     Tic:inputsClearFunctions() -- start recording functions
     Tic:mouseHandleInput() -- handle mouse inputs and cursor
     Tic:keyboardHandleInput() -- handle keyboard keys and functions
-    Tic:buttonsHandleInput() -- handle buttons action keys and functions
+    Tic:buttonsHandleInput() -- handle buttons function keys and functions
     Tic:inputsDoFunctions() -- execute functions
 end
 
@@ -1554,136 +1554,6 @@ end
 function CEntitiesLocations:locationsEntityRangeXY(_entity, _rangex, _rangey) -- locations in entity ranges
     if not _entity or not _rangex or not _rangey then return end -- mandatory
     return self.locations:locationsEntityRangeXY(_entity, _rangex, _rangey)
-end
-
-
---
--- CScreen
---
-local CScreen = Classic:extend() -- generic screen
-Classic.KINDSCREEN = "Screen" -- Screen kind
-Classic.NAMESCREEN = "Screen" -- Screen name
-function CScreen:new(_argt)
-    CScreen.super.new(self, _argt)
-    self.kind = Classic.KINDSCREEN
-    self.name = Classic.NAMESCREEN
-    self.screen        = nil -- parent screen if any
-    self.windows       = {} -- screen windows if any -- ordered
-    self.buttons       = {} -- screen buttons if any -- ordered
-    self.screens       = {} -- sub screens (layers) if any -- ordered
-    self.display       = true -- display this screen ?
-    self.keysfunctions = nil -- keys to functions mapping if any
-    self:argt(_argt) -- override if any
-end
-
-function CScreen:draw()
-    if not self.display then return end -- nothing to display
-    Tic:screenKeyboard() -- adjust keyboard mapping
-    Tic:screenButtons()  -- adjust buttons mapping
-    self:drawWindows()
-    self:drawButtons()
-    for _, _screen in ipairs(self.screens or {}) do -- layer ordered
-        _screen:draw()
-    end
-end
-
-function CScreen:drawWindows() -- draw ordered
-    for _, _window in ipairs(self.windows or {}) do
-        _window:draw()
-    end
-end
-
-function CScreen:drawButtons() -- draw ordered
-    for _, _button in ipairs(self.buttons or {}) do
-        _button:draw()
-    end
-end
-
-function CScreen:appendWindow(_window) -- append window -- unique
-    if not _window then return end -- mandarory
-    if Tables:valFind(self.windows, _window) then return end -- already exists
-    _window.screen = self -- record parent
-    Tables:valInsert(self.windows, _window, true)
-end
-
-function CScreen:appendButton(_button) -- append button -- unique
-    if not _button then return end -- mandarory
-    if Tables:valFind(self.buttons, _button) then return end -- already exists
-    _button.screen = self -- record parent
-    Tables:valInsert(self.buttons, _button, true)
-end
-
-function CScreen:appendScreen(_screen) -- append screen -- unique
-    if not _screen then return end -- mandarory
-    if Tables:valFind(self.screens, _screen) then return end -- already exists
-    _screen.screen = self -- record parent
-    Tables:valInsert(self.screens, _screen, true)
-end
-
-function CScreen:elementsTotalW(_elements, _separator) -- total w of elements with optional separator
-    _separator = _separator or 0
-    local _result = 0
-    for _, _element in ipairs(_elements or {}) do
-        _result = _result + _element.screenw + _separator
-    end
-    _result = (_result == 0) and _result or _result - _separator -- skip last separator
-    return _result
-end
-
-function CScreen:elementsTotalH(_elements, _separator) -- total h of elements with optional separator
-    _separator = _separator or 0
-    local _result = 0
-    for _, _element in ipairs(_elements or {}) do
-        _result = _result + _element.screenh + _separator
-    end
-    _result = (_result == 0) and _result or _result - _separator -- skip last separator
-    return _result
-end
-
-function CScreen:elementsDistributeH(_elements, _separator, _screenx, _screeny) -- distribute h elements with optional separator and xy
-    _separator = _separator or 0
-    for _, _element in ipairs(_elements or {}) do
-        if _screenx then
-            if _screenx >= 0 then -- gt 0 force x
-                _element.screenx = _screenx
-            else -- lt 0 keep its own x -- not useful here
-            end
-        else -- nil ajust x to the first element
-            _screenx = _element.screenx
-        end
-        if _screeny then
-            if _screeny >= 0 then -- gt 0 force y
-                _element.screeny = _screeny
-            else -- lt 0 keep its own y
-            end
-        else -- nil ajust y to the first element
-            _screeny = _element.screeny
-        end
-        _screenx = _screenx + _element.screenw + _separator
-    end
-end
-
-function CScreen:elementsDistributeV(_elements, _separator, _screenx, _screeny) -- distribute v elements with optional separator and xy
-    _separator = _separator or 0
-    for _, _element in ipairs(_elements or {}) do
-        if _screenx then
-            if _screenx >= 0 then -- gt 0 force x
-                _element.screenx = _screenx
-            else -- lt 0 keep its own x
-            end
-        else -- nil ajust x to the first element
-            _screenx = _element.screenx
-        end
-        if _screeny then
-            if _screeny >= 0 then -- gt 0 force y
-                _element.screeny = _screeny
-            else -- lt 0 keep its own y -- not useful here
-            end
-        else -- nil ajust y to the first element
-            _screeny = _element.screeny
-        end
-        _screeny = _screeny + _element.screenh + _separator
-    end
 end
 
 
@@ -3577,9 +3447,17 @@ local CEnnemy = CCharacter:extend() -- ennemy characters
 
 
 --
+-- CElement
+--
+local CElement = Classic:extend() -- generic screen element -- TODO build this class
+Classic.KINDELEMENT = "Element" -- Element kind
+Classic.NAMEELEMENT = "Element" -- Element name
+
+
+--
 -- CWindow
 --
-local CWindow = Classic:extend() -- generic window for displaying stuff
+local CWindow = CElement:extend() -- generic window element
 Classic.KINDWINDOW = "Window" -- Window kind
 Classic.NAMEWINDOW = "Window" -- Window name
 function CWindow:new(_argt)
@@ -4274,13 +4152,13 @@ function CButton:new(_argt)
     self.screenh       = Tic.SPRITESIZE
     self.enabled       = true  -- can be clicked ?
     self.hovered       = false -- hovered by the mouse ?
-    self.actived       = false -- action triggered ?
+    self.actived       = false -- function triggered ?
     self.activedcycler = CCyclerInt{maxindex =  10, mode = CCycler.MODEBLOCK} -- cycler to maintain the activated effect a little bit 
-	self.clicklf       = nil   -- action to trigger on click lf
-	self.clickmd       = nil   -- action to trigger on click md
-	self.clickrg       = nil   -- action to trigger on click rg
-	self.scrollx       = nil   -- action to trigger on scroll x
-	self.scrolly       = nil   -- action to trigger on scroll y
+	self.clicklf       = nil   -- function to trigger on click lf
+	self.clickmd       = nil   -- function to trigger on click md
+	self.clickrg       = nil   -- function to trigger on click rg
+	self.scrollx       = nil   -- function to trigger on scroll x
+	self.scrolly       = nil   -- function to trigger on scroll y
 	self.rounded       = true  -- rounded border and frames ?
     self.drawframes    = false
     self.drawcaches    = false
@@ -4465,44 +4343,190 @@ end
 
 
 --
+-- CScreen
+--
+local CScreen = CElement:extend() -- generic screen -- HAS TO BE AFTER WINDOWS AND BUTTONS
+Classic.KINDSCREEN = "Screen" -- Screen kind
+Classic.NAMESCREEN = "Screen" -- Screen name
+function CScreen:new(_argt)
+    CScreen.super.new(self, _argt)
+    self.kind = Classic.KINDSCREEN
+    self.name = Classic.NAMESCREEN
+    self.screen        = nil -- parent screen if any
+    self.windows       = {} -- screen windows if any -- ordered
+    self.buttons       = {} -- screen buttons if any -- ordered
+    self.screens       = {} -- sub screens (layers) if any -- ordered
+    self.display       = true -- display this screen ?
+    self.keysfunctions = nil -- keys to functions mapping if any
+    self:argt(_argt) -- override if any
+end
+
+function CScreen:draw()
+    if not self.display then return end -- nothing to display
+    Tic:screenKeyboard() -- adjust keyboard mapping
+    Tic:screenButtons()  -- adjust buttons mapping
+    self:drawWindows()
+    self:drawButtons()
+    for _, _screen in ipairs(self.screens or {}) do -- layer ordered
+        _screen:draw()
+    end
+end
+
+function CScreen:drawWindows() -- draw ordered
+    for _, _window in ipairs(self.windows or {}) do
+        _window:draw()
+    end
+end
+
+function CScreen:drawButtons() -- draw ordered
+    for _, _button in ipairs(self.buttons or {}) do
+        _button:draw()
+    end
+end
+
+function CScreen:appendWindow(_window) -- append window -- unique
+    if not _window then return end -- mandarory
+    if not _window:is(CWindow) then return end -- only windows
+    if Tables:valFind(self.windows, _window) then return end -- already exists
+    _window.screen = self -- record parent
+    Tables:valInsert(self.windows, _window, true)
+end
+
+function CScreen:appendButton(_button) -- append button -- unique
+    if not _button then return end -- mandarory
+    if not _button:is(CButton) then return end -- only buttons
+    if Tables:valFind(self.buttons, _button) then return end -- already exists
+    _button.screen = self -- record parent
+    Tables:valInsert(self.buttons, _button, true)
+end
+
+function CScreen:appendScreen(_screen) -- append screen -- unique
+    if not _screen then return end -- mandarory
+    if not _screen:is(CScreen) then return end -- only screens
+    if Tables:valFind(self.screens, _screen) then return end -- already exists
+    _screen.screen = self -- record parent
+    Tables:valInsert(self.screens, _screen, true)
+end
+
+function CScreen:appendElement(_element) -- append element -- unique
+    if not _element then return end -- mandarory
+    self:appendWindow(_element) -- try all kinds
+    self:appendButton(_element)
+    self:appendScreen(_element)
+end
+
+function CScreen:appendElements(_elements) -- append elements -- unique
+    for _, _element in ipairs(_elements or {}) do
+        self:appendElement(_element)
+    end
+end
+
+function CScreen:elementsTotalW(_elements, _separator) -- total w of elements with optional separator
+    _separator = _separator or 0
+    local _result = 0
+    for _, _element in ipairs(_elements or {}) do
+        _result = _result + _element.screenw + _separator
+    end
+    _result = (_result == 0) and _result or _result - _separator -- skip last separator
+    return _result
+end
+
+function CScreen:elementsTotalH(_elements, _separator) -- total h of elements with optional separator
+    _separator = _separator or 0
+    local _result = 0
+    for _, _element in ipairs(_elements or {}) do
+        _result = _result + _element.screenh + _separator
+    end
+    _result = (_result == 0) and _result or _result - _separator -- skip last separator
+    return _result
+end
+
+function CScreen:elementsDistributeH(_elements, _separator, _screenx, _screeny) -- distribute h elements with optional separator and xy
+    _separator = _separator or 0
+    for _, _element in ipairs(_elements or {}) do
+        if _screenx then
+            if _screenx >= 0 then -- gt 0 force x
+                _element.screenx = _screenx
+            else -- lt 0 keep its own x -- not useful here
+            end
+        else -- nil ajust x to the first element
+            _screenx = _element.screenx
+        end
+        if _screeny then
+            if _screeny >= 0 then -- gt 0 force y
+                _element.screeny = _screeny
+            else -- lt 0 keep its own y
+            end
+        else -- nil ajust y to the first element
+            _screeny = _element.screeny
+        end
+        _screenx = _screenx + _element.screenw + _separator
+    end
+end
+
+function CScreen:elementsDistributeV(_elements, _separator, _screenx, _screeny) -- distribute v elements with optional separator and xy
+    _separator = _separator or 0
+    for _, _element in ipairs(_elements or {}) do
+        if _screenx then
+            if _screenx >= 0 then -- gt 0 force x
+                _element.screenx = _screenx
+            else -- lt 0 keep its own x
+            end
+        else -- nil ajust x to the first element
+            _screenx = _element.screenx
+        end
+        if _screeny then
+            if _screeny >= 0 then -- gt 0 force y
+                _element.screeny = _screeny
+            else -- lt 0 keep its own y -- not useful here
+            end
+        else -- nil ajust y to the first element
+            _screeny = _element.screeny
+        end
+        _screeny = _screeny + _element.screenh + _separator
+    end
+end
+
+
+--
 -- INTERFACE -- order is important !
 --
 local ScreenWorld = CScreen{name = "World", keysfunctions = Tic.KEYSFUNCTIONSWORLD}
 Tic:screenAppend(ScreenWorld)
-ScreenWorld:appendWindow(CWindowScreen())
+ScreenWorld:appendElement(CWindowScreen())
 
 local ScreenWorldLF = CScreen{}
-ScreenWorld:appendScreen(ScreenWorldLF)
+ScreenWorld:appendElement(ScreenWorldLF)
 local WindowInfosSpotted = CWindowInfosSpotted{}
-ScreenWorldLF:appendWindow(WindowInfosSpotted)
+ScreenWorldLF:appendElement(WindowInfosSpotted)
 local WindowPortraitSpotted = CWindowPortraitSpotted{}
-ScreenWorldLF:appendWindow(WindowPortraitSpotted)
+ScreenWorldLF:appendElement(WindowPortraitSpotted)
 
 local ScreenWorldMD = CScreen{}
-ScreenWorld:appendScreen(ScreenWorldMD)
+ScreenWorld:appendElement(ScreenWorldMD)
 local WindowWorld = CWindowWorld{spottedwindows = {WindowInfosSpotted, WindowPortraitSpotted}}
-ScreenWorldMD:appendWindow(WindowWorld)
+ScreenWorldMD:appendElement(WindowWorld)
 local WindowInfosWorld = CWindowInfosWorld{}
-ScreenWorldMD:appendWindow(WindowInfosWorld)
+ScreenWorldMD:appendElement(WindowInfosWorld)
 
 
 local ScreenWorldRG = CScreen{}
-ScreenWorld:appendScreen(ScreenWorldRG)
+ScreenWorld:appendElement(ScreenWorldRG)
 local WindowInfosPlayer = CWindowInfosPlayer{}
-ScreenWorldRG:appendWindow(WindowInfosPlayer)
+ScreenWorldRG:appendElement(WindowInfosPlayer)
 local WindowPortraitPlayer = CWindowPortraitPlayer{}
-ScreenWorldRG:appendWindow(WindowPortraitPlayer)
+ScreenWorldRG:appendElement(WindowPortraitPlayer)
 local WindowStatsPlayer = CWindowStatsPlayer{}
-ScreenWorldRG:appendWindow(WindowStatsPlayer)
+ScreenWorldRG:appendElement(WindowStatsPlayer)
 local WindowStatePlayer = CWindowStatePlayer{}
-ScreenWorldRG:appendWindow(WindowStatePlayer)
+ScreenWorldRG:appendElement(WindowStatePlayer)
 
 if true then
 -- local ScreenIntro = CScreen{name = "Intro", keysfunctions = Tic.KEYSFUNCTIONSINTRO}
 local ScreenIntro = CScreen{name = "Intro", keysfunctions = Tic.KEYSFUNCTIONSINTRO}
 Tic:screenAppend(ScreenIntro)
-ScreenIntro:appendWindow(CWindowScreen())
-ScreenIntro:appendWindow(CWindowInfos{
+ScreenIntro:appendElement(CWindowScreen())
+ScreenIntro:appendElement(CWindowInfos{
     screenx = 107,
     screeny = 60,
     drawground = false,
@@ -4590,20 +4614,20 @@ local Button17 = CButtonCenter{
     screeny = 70,
     enabled = false,
 }
-ScreenIntro:appendButton(Button1)
-ScreenIntro:appendButton(Button2)
-ScreenIntro:appendButton(Button3)
-ScreenIntro:appendButton(Button4)
-ScreenIntro:appendButton(Button5)
-ScreenIntro:appendButton(Button6)
-ScreenIntro:appendButton(Button7)
-ScreenIntro:appendButton(Button11)
-ScreenIntro:appendButton(Button12)
-ScreenIntro:appendButton(Button13)
-ScreenIntro:appendButton(Button14)
-ScreenIntro:appendButton(Button15)
-ScreenIntro:appendButton(Button16)
-ScreenIntro:appendButton(Button17)
+ScreenIntro:appendElement(Button1)
+ScreenIntro:appendElement(Button2)
+ScreenIntro:appendElement(Button3)
+ScreenIntro:appendElement(Button4)
+ScreenIntro:appendElement(Button5)
+ScreenIntro:appendElement(Button6)
+ScreenIntro:appendElement(Button7)
+ScreenIntro:appendElement(Button11)
+ScreenIntro:appendElement(Button12)
+ScreenIntro:appendElement(Button13)
+ScreenIntro:appendElement(Button14)
+ScreenIntro:appendElement(Button15)
+ScreenIntro:appendElement(Button16)
+ScreenIntro:appendElement(Button17)
 
 Button16.clicklf = Tic.FUNCTIONSCREENNEXT
 Button16.clicklf = Tic.FUNCTIONSCREENNEXT
