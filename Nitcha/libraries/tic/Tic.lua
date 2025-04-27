@@ -790,7 +790,7 @@ end
 function Tic:statAct(_stat, _character) -- modify an act stat -- set/dec/inc/max
     if not _stat then return end -- mandatory
     _character = _character or Tic:playerActual()
-
+    if not _character then return end
     if Tic.MODIFIERKEYS[Tic.KEY_SHIFT] then
         _character:statAct(Tic.STATINC, _stat, 1)
     elseif Tic.MODIFIERKEYS[Tic.KEY_CTRL] then
@@ -878,6 +878,7 @@ Tic.SCALES = CCyclerInt{ -- scales cycler from 1-4
 
 function Tic:scaleNext() -- next scale in the stack
     Tic.SCALES:next()
+    if not Tic:playerActual() then return end
     Tic:playerActual().scale = Tic:scaleActual()
     return Tic:scaleActual()
 end
@@ -2841,7 +2842,7 @@ function CCharacter:drawView() -- draw the view of a character
     if Tic.PLAYERONLY and not (self == Tic:playerActual()) then return end -- only actual player
     self.drawview = Tic.DRAWVIEW -- use Tic as master
     if not self.drawview then return end -- nothing to draw
-    -- if not (self == Tic:playerActual()) then return end -- only actual player
+
     local _drawcolor = Tic.COLORGREENL
     local _regionviewscreen = self:regionViewScreen()
     local _screenlf  = _regionviewscreen.lf
@@ -2856,7 +2857,7 @@ function CCharacter:drawMind() -- draw the mind of a character
     if Tic.PLAYERONLY and not (self == Tic:playerActual()) then return end -- only actual player
     self.drawmind = Tic.DRAWMIND -- use Tic as master
     if not self.drawmind then return end -- nothing to draw
-    -- if not (self == Tic:playerActual()) then return end -- only actual player
+
     local _drawcolor = Tic.COLORGREENM
     local _regionmindscreen = self:regionMindScreen()
     local _screenlf  = _regionmindscreen.lf
@@ -2871,7 +2872,7 @@ function CCharacter:drawMove() -- draw the move of a character
     if Tic.PLAYERONLY and not (self == Tic:playerActual()) then return end -- only actual player
     self.drawmove = Tic.DRAWMOVE -- use Tic as master
     if not self.drawmove then return end -- nothing to draw
-    -- if not (self == Tic:playerActual()) then return end -- only actual player
+
     local _drawcolor = Tic.COLORGREEND
     local _regionmovescreen = self:regionMoveScreen()
     local _screenlf  = _regionmovescreen.lf
@@ -3979,6 +3980,7 @@ function CWindowStatePlayer:new(_argt)
 end
 
 function CWindowStatePlayer:drawInside() -- window state content for player
+    if not Tic:playerActual() then return end
 	self.entity          = Tic:playerActual()
     local _state         = self.entity.state
     local _statesettings = Tic.STATESETTINGS[_state]
@@ -4060,6 +4062,7 @@ end
 
 function CWindowWorld:drawPlayerActual()
     local _playeractual     = Tic:playerActual()
+    if not _playeractual then return end
     local _locationsaround  = _playeractual:locationsAround()
     local _regionviewworld  = _playeractual:regionViewWorld()
     local _regionmindworld  = _playeractual:regionMindWorld()
@@ -4311,10 +4314,15 @@ end
 -- CButtonPlayer
 --
 local CButtonPlayer = CButtonSprite:extend() -- generic player sprite button
+CButtonPlayer.BEHAVIOURAUTODISABLE = function(self)
+    self.enabled = Tables:size(Tic:playerPlayers()) > 1
+    CButton.BEHAVIOURAUTODISABLE(self)
+end
 function CButtonPlayer:new(_argt)
     CButtonPlayer.super.new(self, _argt)
     self.drawborder    = false
 	self.sprite.sprite = CSpriteBG.SIGNPLAYER
+	self.behaviour     = CButtonPlayer.BEHAVIOURAUTODISABLE  -- function to trigger at first
     self:argt(_argt) -- override if any
 end
 
@@ -4562,12 +4570,14 @@ local WindowStatsPlayer = CWindowStatsPlayer{}
 local WindowStatePlayer = CWindowStatePlayer{}
 local ButtonPrevPlayer = CButtonScrollLF{
     clicklf = Tic.FUNCTIONPLAYERPREV,
+	behaviour = CButtonPlayer.BEHAVIOURAUTODISABLE  -- function to trigger at first
 }
 local ButtonPickPlayer = CButtonPlayer{
     clicklf = function() Tic:logAppend("Player") end,
 }
 local ButtonNextPlayer = CButtonScrollRG{
     clicklf = Tic.FUNCTIONPLAYERNEXT,
+    behaviour = CButtonPlayer.BEHAVIOURAUTODISABLE  -- function to trigger at first
 }
 ScreenWorldRG:elementsDistributeH(
     {ButtonPrevPlayer, ButtonPickPlayer, ButtonNextPlayer}, -2,
@@ -4991,7 +5001,6 @@ end
 Tic.DRAWSPOTTED = true
 -- Tic.DRAWBORDERS = true
 -- Tic.DRAWVIEW    = true
-Tic:playerActual():hitboxRefresh() -- refresh the hitboxes
 
 
 --
@@ -5016,6 +5025,7 @@ function Tic:drawLog() -- [-] remove
     local _tick00 = Tic.TICK00.actvalue
     local _tick60 = Tic.TICK60.actvalue
     local _playeractual = Tic:playerActual()
+    if not _playeractual then return end
     local _state   = _playeractual.state
     local _posture = Tic.STATESETTINGS[_state].posture
     local _status  = Tic.STATESETTINGS[_state].status
