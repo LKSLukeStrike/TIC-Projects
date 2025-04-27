@@ -1129,8 +1129,18 @@ CSpriteBG.PLACESTALL  = CSpriteBG.STANDBANK + 1
 CSpriteBG.TREESBANK   = 48 -- trees
 CSpriteBG.PLACETREE0  = CSpriteBG.TREESBANK + 0
 CSpriteBG.PLACETREE1  = CSpriteBG.TREESBANK + 1
-CSpriteBG.ROADSBANK   = 128 -- roads
+CSpriteBG.MENHRBANK   = 64 -- menhirs
+CSpriteBG.PLACEMENH0  = CSpriteBG.MENHRBANK + 0
+CSpriteBG.PLACEMENH1  = CSpriteBG.MENHRBANK + 1
+CSpriteBG.DOLMNBANK   = 80 -- dolmens
+CSpriteBG.PLACEDOLM0  = CSpriteBG.DOLMNBANK + 0
+CSpriteBG.PLACEDOLM1  = CSpriteBG.DOLMNBANK + 1
+CSpriteBG.CIRCLBANK   = 96 -- circles
+CSpriteBG.PLACECIRC0  = CSpriteBG.CIRCLBANK + 0
+CSpriteBG.PLACECIRC1  = CSpriteBG.CIRCLBANK + 1
+CSpriteBG.ROADSBANK   = 112 -- roads
 CSpriteBG.PLACEPAVE0  = CSpriteBG.ROADSBANK + 0
+CSpriteBG.PLACEPAVE1  = CSpriteBG.ROADSBANK + 1
 function CSpriteBG:new(_argt) -- FIXME can be removed ?
     CSpriteBG.super.new(self, _argt)
     self:argt(_argt) -- override if any
