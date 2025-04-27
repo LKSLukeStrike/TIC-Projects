@@ -381,7 +381,7 @@ Tic.MODIFIERKEYS = { -- record modifier keys pressed
     [Tic.KEY_SHIFT]    = false,
     [Tic.KEY_ALT]      = false,
 }
-Tic.KEYSFUNCTIONS = Tic.KEYSFUNCTIONSINTRO
+Tic.KEYSFUNCTIONS = {}
 
 function Tic:keyboardInput() -- returns the keys inputs in a table
     local _result = {}
@@ -423,13 +423,18 @@ function Tic:keyboardInputFunctions() -- return functions depending on the press
     return _result
 end
 
-function Tic:keyboardHandleInput() -- handle keyboard keys and functions
+function Tic:keyboardHandleInput() -- handle keyboard keysfunctions
     Tic:inputsInsertFunctions(Tic:keyboardInputFunctions())
 end
 
-function Tic:keyboardSetKeysFunctions(_keysfunctions) -- set keyboard mapping
-    if not _keysfunctions then return end -- mandatory
-    Tic.KEYSFUNCTIONS = _keysfunctions
+function Tic:keyboardClearKeysFunctions() -- clear keyboard keysfunctions
+    Tic.KEYSFUNCTIONS = {}
+end
+
+function Tic:keyboardAppendKeysFunctions(_keysfunctions) -- append keyboard keysfunctions
+    for _key, _function in pairs(_keysfunctions or {}) do
+        Tables:keyAppend(Tic.KEYSFUNCTIONS, _key, _function)
+    end
 end
 
 
@@ -515,9 +520,14 @@ function Tic:buttonsHandleInput()
     end
 end
 
-function Tic:buttonsSetButtons(_buttons) -- set buttons mapping
-    if not _buttons then return end -- mandatory
-    Tic.BUTTONS = _buttons
+function Tic:buttonsClearButtons() -- clear buttons stack
+    Tic.BUTTONS = {}
+end
+
+function Tic:buttonsInsertButtons(_buttons) -- insert buttons (once)
+    for _, _button in ipairs(_buttons or {}) do
+        Tables:valInsert(Tic.BUTTONS, _button, true)
+    end
 end
 
 
@@ -567,16 +577,26 @@ function Tic:screenAppend(_screen) -- append a screen to the stack
     return Tic.SCREENS:insert(_screen)
 end
 
+function Tic:screenPrev() -- prev screen in the stack
+    Tic:keyboardClearKeysFunctions() -- clear keyboard stack
+    Tic:buttonsClearButtons() -- clear buttons stack
+    return Tic.SCREENS:prev()
+end
+
 function Tic:screenNext() -- next screen in the stack
+    Tic:keyboardClearKeysFunctions() -- clear keyboard stack
+    Tic:buttonsClearButtons() -- clear buttons stack
     return Tic.SCREENS:next()
 end
 
-function Tic:screenKeyboard() -- adjust the keyboard to the actual screen
-    Tic:keyboardSetKeysFunctions(Tic:screenActual().keysfunctions)
+function Tic:screenKeyboard(_screen) -- append screen keysfunctions to the keyboard stack
+    _screen = _screen or Tic:screenActual()
+    Tic:keyboardAppendKeysFunctions(_screen.keysfunctions)
 end
 
-function Tic:screenButtons() -- adjust the buttons to the actual screen
-    Tic:buttonsSetButtons(Tic:screenActual().buttons)
+function Tic:screenButtons(_screen) -- adjust the buttons to the actual screen
+    _screen = _screen or Tic:screenActual()
+    Tic:buttonsInsertButtons(_screen.buttons)
 end
 
 
@@ -1096,6 +1116,7 @@ CSpriteBG.SIGNCROSQU  = CSpriteBG.SIGNSBANK + 4 -- crossed square
 CSpriteBG.SIGNDOTSQU  = CSpriteBG.SIGNSBANK + 5 -- dot square
 CSpriteBG.SIGNSCROLL  = CSpriteBG.SIGNSBANK + 6 -- scroll arrow
 CSpriteBG.SIGNCENTER  = CSpriteBG.SIGNSBANK + 7 -- center arrow
+CSpriteBG.SIGNPLAYER  = CSpriteBG.SIGNSBANK + 8 -- player sprite
 CSpriteBG.BUILDBANK   = 16 -- buildings
 CSpriteBG.PLACEHOUSE  = CSpriteBG.BUILDBANK + 0
 CSpriteBG.PLACETOWER  = CSpriteBG.BUILDBANK + 1
@@ -4240,7 +4261,7 @@ function CButton:functionsContains(_function) -- does the button contains a func
 end
 
 function CButton:activable() -- is the button activable ?
-    return self.display and self.enabled and Tables:size(self:functionsDefined()) > 0
+    return self.display and self.enabled and Tables:size(self:functionsDefined()) > 0 and not self.actived
 end
 
 function CButton:activate() -- activate the button and start the effect cycler
@@ -4287,12 +4308,24 @@ end
 
 
 --
+-- CButtonPlayer
+--
+local CButtonPlayer = CButtonSprite:extend() -- generic player sprite button
+function CButtonPlayer:new(_argt)
+    CButtonPlayer.super.new(self, _argt)
+    self.drawborder    = false
+	self.sprite.sprite = CSpriteBG.SIGNPLAYER
+    self:argt(_argt) -- override if any
+end
+
+
+--
 -- CButtonScroll
 --
 local CButtonScroll = CButtonSprite:extend() -- generic scroll arrow sprite button
 function CButtonScroll:new(_argt)
     CButtonScroll.super.new(self, _argt)
-    self.drawborder    = true
+    self.drawborder    = false
 	self.sprite.sprite = CSpriteBG.SIGNSCROLL
     self:argt(_argt) -- override if any
 end
@@ -4348,7 +4381,7 @@ end
 local CButtonCenter = CButtonSprite:extend() -- generic center arrow sprite button
 function CButtonCenter:new(_argt)
     CButtonCenter.super.new(self, _argt)
-    self.drawborder    = true
+    self.drawborder    = false
 	self.sprite.sprite = CSpriteBG.SIGNCENTER
     self:argt(_argt) -- override if any
 end
@@ -4375,8 +4408,8 @@ end
 
 function CScreen:draw()
     if not self.display then return end -- nothing to display
-    Tic:screenKeyboard() -- adjust keyboard mapping
-    Tic:screenButtons()  -- adjust buttons mapping
+    Tic:screenKeyboard(self) -- adjust keyboard mapping
+    Tic:screenButtons(self)  -- adjust buttons mapping
     self:drawWindows()
     self:drawButtons()
     for _, _screen in ipairs(self.screens or {}) do -- layer ordered
@@ -4528,17 +4561,18 @@ local WindowPortraitPlayer = CWindowPortraitPlayer{}
 local WindowStatsPlayer = CWindowStatsPlayer{}
 local WindowStatePlayer = CWindowStatePlayer{}
 local ButtonPrevPlayer = CButtonScrollLF{
-    drawborder = false,
     clicklf = Tic.FUNCTIONPLAYERPREV,
 }
+local ButtonPickPlayer = CButtonPlayer{
+    clicklf = function() Tic:logAppend("Player") end,
+}
 local ButtonNextPlayer = CButtonScrollRG{
-    drawborder = false,
     clicklf = Tic.FUNCTIONPLAYERNEXT,
 }
 ScreenWorldRG:elementsDistributeH(
-    {ButtonPrevPlayer, ButtonNextPlayer}, -2,
-    -- WindowInfosPlayer.screenw - WindowInfosPlayer.screenx,
-    WindowInfosPlayer.screenx + ((WindowInfosPlayer.screenw - CScreen:elementsTotalH({ButtonPrevPlayer, ButtonNextPlayer}, -2)) // 2),
+    {ButtonPrevPlayer, ButtonPickPlayer, ButtonNextPlayer}, -2,
+    WindowInfosPlayer.screenx + (
+        (WindowInfosPlayer.screenw - CScreen:elementsTotalH({ButtonPrevPlayer, ButtonPickPlayer, ButtonNextPlayer}, -2)) // 2),
     WindowInfosPlayer.screeny - Tic.SPRITESIZE
 )
 ScreenWorldRG:appendElements{
@@ -4547,6 +4581,7 @@ ScreenWorldRG:appendElements{
     WindowStatsPlayer,
     WindowStatePlayer,
     ButtonPrevPlayer,
+    ButtonPickPlayer,
     ButtonNextPlayer,
 }
 
@@ -4607,26 +4642,22 @@ local Button7 = CButton{
 local Button11 = CButtonScrollLF{
     -- screenx = 30,
     -- screeny = 10,
-    drawborder = false,
 }
 local Button12 = CButtonScrollUP{
     -- screenx = 30,
     -- screeny = 20,
     -- actived = true,
     rounded = false,
-    drawborder = false,
 }
 local Button13 = CButtonScrollDW{
     -- screenx = 30,
     -- screeny = 30,
     -- enabled = false,
     rounded = false,
-    drawborder = false,
 }
 local Button14 = CButtonScrollRG{
     screenx = 30,
     screeny = 40,
-    drawborder = false,
 }
 local Button15 = CButtonCenter{
     screenx = 30,
@@ -4635,9 +4666,6 @@ local Button15 = CButtonCenter{
 local Button16 = CButtonCenter{
     screenx = 30,
     screeny = 60,
-    actived = true,
-    rounded = false,
-    drawborder = false,
 }
 local Button17 = CButtonCenter{
     screenx = 30,
@@ -4669,13 +4697,15 @@ ScreenIntro:appendElements{
     Button15,
     Button16,
     Button17,
+    ButtonPrevPlayer,
+    ButtonNextPlayer,
 }
 
 Button16.clicklf = Tic.FUNCTIONSCREENNEXT
-local _plopfct = function() Tic:logAppend("Plop") end
-Button1.clicklf = _plopfct
-Button1.clickrg = _plopfct
-Button2.clicklf = _plopfct
+local _function = function() Tic:logAppend("Plop") end
+Button1.clicklf = _function
+Button1.clickrg = _function
+Button2.clicklf = _function
 Button7.clicklf = Tic.FUNCTIONSCREENNEXT
 
 ScreenIntro:elementsDistributeH({Button11, Button12, Button16, Button13, Button14}, -2, 30, 10)

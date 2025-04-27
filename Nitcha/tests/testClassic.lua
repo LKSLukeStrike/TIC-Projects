@@ -14,6 +14,7 @@ CCharacter = Classic:extend()
 -- CCharacter:implementNew(XHello)
 function CCharacter:new(_argt)
   CCharacter.super.new(self, _argt)
+  self.kind = "CCharacter"
   self.x = 1
   self.y = 2
   self.z = 3
@@ -82,3 +83,7 @@ print(Jeandu)
 -- Tables:print(CPlayer)
 -- print("Jeandu")
 -- Tables:print(Jeandu)
+
+print()
+print(CCharacter.kind)
+print(type(CCharacter))
