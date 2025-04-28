@@ -1943,10 +1943,23 @@ end
 local CPlace = CEntityDrawable:extend() -- places
 Classic.KINDPLACE = "Place" -- Place kind
 Classic.NAMEPLACE = "Place" -- Place name
-CPlace.EMPTY  = Tic.COLORKEY
-CPlace.ANIM01 = Tic.COLORWHITE
-CPlace.ANIM02 = Tic.COLORYELLOW
-CPlace.ANIM03 = Tic.COLORORANGE
+CPlace.EMPTY    = Tic.COLORKEY
+CPlace.ANIM01   = Tic.COLORWHITE
+CPlace.ANIM02   = Tic.COLORYELLOW
+CPlace.ANIM03   = Tic.COLORORANGE
+CPlace.SMOKE    = CPlace.ANIM01
+CPlace.WINDOW01 = CPlace.ANIM02
+CPlace.WINDOW02 = CPlace.ANIM03
+CPlace.ROOF     = Tic.COLORRED
+CPlace.DOOR     = Tic.COLORGREYL
+CPlace.FACADE   = Tic.COLORGREYM
+CPlace.WALLS    = Tic.COLORGREYD
+CPlace.FOAM     = Tic.COLORGREEND
+CPlace.OWNER    = CPlace.ANIM01
+CPlace.WATER01  = CPlace.ANIM02
+CPlace.WATER02  = CPlace.ANIM03
+CPlace.GOODS01  = CPlace.ANIM02
+CPlace.GOODS02  = CPlace.ANIM03
 function CPlace:new(_argt)
     CPlace.super.new(self, _argt)
     self.kind = Classic.KINDPLACE
@@ -1962,19 +1975,6 @@ end
 local CPlaceBuild = CPlace:extend() -- builds
 Classic.KINDBUILD = "Build" -- Build kind
 Classic.NAMEBUILD = "Build" -- Build name
-CPlaceBuild.SMOKE    = CPlace.ANIM01
-CPlaceBuild.WINDOW01 = CPlace.ANIM02
-CPlaceBuild.WINDOW02 = CPlace.ANIM03
-CPlaceBuild.ROOF     = Tic.COLORRED
-CPlaceBuild.DOOR     = Tic.COLORGREYL
-CPlaceBuild.FACADE   = Tic.COLORGREYM
-CPlaceBuild.WALLS    = Tic.COLORGREYD
-CPlaceBuild.FOAM     = Tic.COLORGREEND
-CPlaceBuild.WATER01  = CPlace.ANIM02
-CPlaceBuild.WATER02  = CPlace.ANIM03
-CPlaceBuild.OWNER    = CPlace.ANIM01
-CPlaceBuild.GOODS01  = CPlace.ANIM02
-CPlaceBuild.GOODS02  = CPlace.ANIM03
 CPlaceBuild.COLORLIGHT   = Tic.COLORORANGE
 CPlaceBuild.COLORGLASS01 = Tic.COLORCYAN
 CPlaceBuild.COLORGLASS02 = Tic.COLORBLUEL
@@ -1984,20 +1984,20 @@ CPlaceBuild.COLORGOODS01 = Tic.COLORGREENM
 CPlaceBuild.COLORGOODS02 = Tic.COLORGREEND
 CPlaceBuild.PALETTEIDLE  = {
     [CPlace.ANIM01] = CPlace.EMPTY,
-    [CPlace.ANIM02] = CPlaceBuild.WALLS,
-    [CPlace.ANIM03] = CPlaceBuild.WALLS,
-    [CPlaceBuild.WINDOW01] = CPlaceBuild.WALLS,
-    [CPlaceBuild.WINDOW02] = CPlaceBuild.WALLS,
-    [CPlaceBuild.DOOR]     = CPlaceBuild.FACADE,    
-    [CPlaceBuild.ROOF]     = CPlaceBuild.FOAM,    
+    [CPlace.ANIM02] = CPlace.WALLS,
+    [CPlace.ANIM03] = CPlace.WALLS,
+    [CPlace.WINDOW01] = CPlace.WALLS,
+    [CPlace.WINDOW02] = CPlace.WALLS,
+    [CPlace.DOOR]     = CPlace.FACADE,    
+    [CPlace.ROOF]     = CPlace.FOAM,    
 }
 CPlaceBuild.PALETTEFADE  = {
-    [CPlaceBuild.SMOKE]    = CPlace.EMPTY,
-    [CPlaceBuild.WINDOW01] = CPlaceBuild.WALLS,
-    [CPlaceBuild.WINDOW02] = CPlaceBuild.WALLS,
-    [CPlaceBuild.DOOR]     = CPlaceBuild.FACADE,    
-    [CPlaceBuild.ROOF]     = CPlaceBuild.WALLS,
-    [CPlaceBuild.FOAM]     = CPlaceBuild.WALLS,    
+    [CPlace.SMOKE]    = CPlace.EMPTY,
+    [CPlace.WINDOW01] = CPlace.WALLS,
+    [CPlace.WINDOW02] = CPlace.WALLS,
+    [CPlace.DOOR]     = CPlace.FACADE,    
+    [CPlace.ROOF]     = CPlace.WALLS,
+    [CPlace.FOAM]     = CPlace.WALLS,    
 }
 function CPlaceBuild:new(_argt)
     CPlaceBuild.super.new(self, _argt)
@@ -2031,14 +2031,14 @@ function CPlaceHouseAnim:new(_argt)
         CAnimation{ -- smoke
             frequence = Tic.FREQUENCE0300,
             percent0  = 0.9,
-            palette0  = {[CPlaceBuild.SMOKE] = CPlaceBuild.SMOKE,},
-            palette1  = {[CPlaceBuild.SMOKE] = CPlaceBuild.COLORLIGHT,},
+            palette0  = {[CPlace.SMOKE] = CPlace.SMOKE,},
+            palette1  = {[CPlace.SMOKE] = CPlaceBuild.COLORLIGHT,},
         },
         CAnimation{ -- window
             frequence = Tic.FREQUENCE0600,
             percent0  = 0.1,
-            palette0  = {[CPlaceBuild.WINDOW02] = CPlaceBuild.WALLS},
-            palette1  = {[CPlaceBuild.WINDOW02] = CPlaceBuild.COLORLIGHT,},
+            palette0  = {[CPlace.WINDOW02] = CPlace.WALLS},
+            palette1  = {[CPlace.WINDOW02] = CPlaceBuild.COLORLIGHT,},
         },
     }
     self:argt(_argt) -- override if any
@@ -2072,14 +2072,14 @@ function CPlaceTowerAnim:new(_argt)
         CAnimation{ -- window 1
             frequence = Tic.FREQUENCE0240,
             percent0  = 0.6,
-            palette0  = {[CPlaceBuild.WINDOW01] = CPlaceBuild.WALLS},
-            palette1  = {[CPlaceBuild.WINDOW01] = CPlaceBuild.COLORLIGHT,},
+            palette0  = {[CPlace.WINDOW01] = CPlace.WALLS},
+            palette1  = {[CPlace.WINDOW01] = CPlaceBuild.COLORLIGHT,},
         },
         CAnimation{ -- window 2
             frequence = Tic.FREQUENCE0120,
             percent0  = 0.1,
-            palette0  = {[CPlaceBuild.WINDOW02] = CPlaceBuild.WALLS},
-            palette1  = {[CPlaceBuild.WINDOW02] = CPlaceBuild.COLORLIGHT,},
+            palette0  = {[CPlace.WINDOW02] = CPlace.WALLS},
+            palette1  = {[CPlace.WINDOW02] = CPlaceBuild.COLORLIGHT,},
         },
     }
     self:argt(_argt) -- override if any
@@ -2114,20 +2114,20 @@ function CPlaceManorAnim:new(_argt)
         CAnimation{ -- smoke
             frequence = Tic.FREQUENCE0300,
             percent0  = 0.9,
-            palette0  = {[CPlaceBuild.SMOKE] = CPlaceBuild.SMOKE,},
-            palette1  = {[CPlaceBuild.SMOKE] = CPlaceBuild.COLORLIGHT,},
+            palette0  = {[CPlace.SMOKE] = CPlace.SMOKE,},
+            palette1  = {[CPlace.SMOKE] = CPlaceBuild.COLORLIGHT,},
         },
         CAnimation{ -- window 1
             frequence = Tic.FREQUENCE0240,
             percent0  = 0.9,
-            palette0  = {[CPlaceBuild.WINDOW01] = CPlaceBuild.WALLS},
-            palette1  = {[CPlaceBuild.WINDOW01] = CPlaceBuild.COLORLIGHT,},
+            palette0  = {[CPlace.WINDOW01] = CPlace.WALLS},
+            palette1  = {[CPlace.WINDOW01] = CPlaceBuild.COLORLIGHT,},
         },
         CAnimation{ -- window 2
             frequence = Tic.FREQUENCE0120,
             percent0  = 0.5,
-            palette0  = {[CPlaceBuild.WINDOW02] = CPlaceBuild.WALLS},
-            palette1  = {[CPlaceBuild.WINDOW02] = CPlaceBuild.COLORLIGHT,},
+            palette0  = {[CPlace.WINDOW02] = CPlace.WALLS},
+            palette1  = {[CPlace.WINDOW02] = CPlaceBuild.COLORLIGHT,},
         },
     }
     self:argt(_argt) -- override if any
@@ -2162,14 +2162,14 @@ function CPlaceKirkeAnim:new(_argt)
         CAnimation{ -- window 1
             frequence = Tic.FREQUENCE0600,
             percent0  = 0.9,
-            palette0  = {[CPlaceBuild.WINDOW01] = CPlaceBuild.WALLS,},
-            palette1  = {[CPlaceBuild.WINDOW01] = CPlaceBuild.COLORGLASS01,},
+            palette0  = {[CPlace.WINDOW01] = CPlace.WALLS,},
+            palette1  = {[CPlace.WINDOW01] = CPlaceBuild.COLORGLASS01,},
         },
         CAnimation{ -- window 2
             frequence = Tic.FREQUENCE0600,
             percent0  = 0.1,
-            palette0  = {[CPlaceBuild.WINDOW02] = CPlaceBuild.WALLS,},
-            palette1  = {[CPlaceBuild.WINDOW02] = CPlaceBuild.COLORGLASS02,},
+            palette0  = {[CPlace.WINDOW02] = CPlace.WALLS,},
+            palette1  = {[CPlace.WINDOW02] = CPlaceBuild.COLORGLASS02,},
         },
     }
     self:argt(_argt) -- override if any
@@ -2205,14 +2205,14 @@ function CPlaceWaterAnim:new(_argt)
         CAnimation{ -- water 1
             frequence = Tic.FREQUENCE0240,
             percent0  = 0.6,
-            palette0  = {[CPlaceBuild.WATER01] = CPlaceBuild.COLORWATER01,},
-            palette1  = {[CPlaceBuild.WATER01] = CPlaceBuild.COLORWATER02,},
+            palette0  = {[CPlace.WATER01] = CPlaceBuild.COLORWATER01,},
+            palette1  = {[CPlace.WATER01] = CPlaceBuild.COLORWATER02,},
         },
         CAnimation{ -- water 2
             frequence = Tic.FREQUENCE0120,
             percent0  = 0.1,
-            palette0  = {[CPlaceBuild.WATER02] = CPlaceBuild.COLORWATER01,},
-            palette1  = {[CPlaceBuild.WATER02] = CPlaceBuild.COLORWATER02,},
+            palette0  = {[CPlace.WATER02] = CPlaceBuild.COLORWATER01,},
+            palette1  = {[CPlace.WATER02] = CPlaceBuild.COLORWATER02,},
         },
     }
     self:argt(_argt) -- override if any
@@ -2248,20 +2248,20 @@ function CPlaceStallAnim:new(_argt)
         CAnimation{ -- owner
             frequence = Tic.FREQUENCE0240,
             percent0  = 0.6,
-            palette0  = {[CPlaceBuild.OWNER] = Tic.COLORWHITE,},
-            palette1  = {[CPlaceBuild.OWNER] = Tic.COLORKEY,},
+            palette0  = {[CPlace.OWNER] = Tic.COLORWHITE,},
+            palette1  = {[CPlace.OWNER] = Tic.COLORKEY,},
         },
         CAnimation{ -- goods 1
             frequence = Tic.FREQUENCE0120,
             percent0  = 0.1,
-            palette0  = {[CPlaceBuild.GOODS01] = CPlaceBuild.COLORGOODS01,},
-            palette1  = {[CPlaceBuild.GOODS01] = CPlaceBuild.COLORGOODS02,},
+            palette0  = {[CPlace.GOODS01] = CPlaceBuild.COLORGOODS01,},
+            palette1  = {[CPlace.GOODS01] = CPlaceBuild.COLORGOODS02,},
         },
         CAnimation{ -- goods 2
             frequence = Tic.FREQUENCE0120,
             percent0  = 0.1,
-            palette0  = {[CPlaceBuild.GOODS02] = CPlaceBuild.COLORGOODS01,},
-            palette1  = {[CPlaceBuild.GOODS02] = CPlaceBuild.COLORGOODS02,},
+            palette0  = {[CPlace.GOODS02] = CPlaceBuild.COLORGOODS01,},
+            palette1  = {[CPlace.GOODS02] = CPlaceBuild.COLORGOODS02,},
         },
     }
     self:argt(_argt) -- override if any
@@ -2292,9 +2292,9 @@ CPlaceTrees.COLORFLOOR01  = CPlaceTrees.LEAFSFG
 CPlaceTrees.COLORFLOOR02  = CPlaceTrees.LEAFSBG
 CPlaceTrees.COLORNEST     = Tic.COLORGREYL
 CPlaceTrees.PALETTEIDLE   = {
-    [CPlace.ANIM01]       = CPlace.EMPTY,
-    [CPlace.ANIM02]       = CPlaceTrees.BARK,
-    [CPlace.ANIM03]       = CPlaceTrees.BARK,
+    [CPlaceTrees.NEST]    = CPlace.EMPTY,
+    [CPlaceTrees.FLOOR01] = CPlaceTrees.BARK,
+    [CPlaceTrees.FLOOR02] = CPlaceTrees.BARK,
     [CPlaceTrees.LEAFSFG] = CPlaceTrees.LEAFSBG,
     [CPlaceTrees.LEAFSBG] = CPlaceTrees.BARK,
 }
