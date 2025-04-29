@@ -1990,6 +1990,7 @@ CPlace.COLORGOODS02 = Tic.COLORGREEND
 CPlace.COLORNEST    = Tic.COLORGREYL
 CPlace.COLORFLOOR01 = CPlace.LEAFSFG
 CPlace.COLORFLOOR02 = CPlace.LEAFSBG
+CPlace.COLORMOON    = Tic.COLORGREYL
 function CPlace:new(_argt)
     CPlace.super.new(self, _argt)
     self.kind = Classic.KINDPLACE
@@ -2396,8 +2397,11 @@ end
 --
 -- CPlaceStone
 --
-local CPlaceStone = CPlace:extend() -- stones
+local CPlaceStone = CPlace:extend() -- stone
 Classic.KINDSTONE = "Stone" -- Stone kind
+Classic.NAMEMENHR = "Menhr" -- Menhr name
+Classic.NAMEDOLMN = "Dolmn" -- Dolmn name
+Classic.NAMECIRKL = "Cirkl" -- Cirkl name
 CPlaceStone.PALETTEIDLE   = {
     [CPlace.MOON]    = CPlace.EMPTY,
     [CPlace.FLOOR01] = CPlace.STONEBG,
@@ -2422,6 +2426,40 @@ function CPlaceStone:new(_argt)
     self.hitbox.region.up = 6
     self.hitbox.region.dw = 7
     self.palettefade = CPlaceStone.PALETTEFADE
+    self:argt(_argt) -- override if any
+end
+
+local CPlaceStoneAnim = CPlaceStone:extend() -- generic anim stone
+function CPlaceStoneAnim:new(_argt)
+    CPlaceStoneAnim.super.new(self, _argt)
+    self.animations = {
+        CAnimation{ -- moon
+            frequence = Tic.FREQUENCE0600,
+            percent0  = 0.9,
+            palette0  = {[CPlace.MOON] = CPlace.STONEFG,},
+            palette1  = {[CPlace.MOON] = CPlace.COLORMOON,},
+        },
+        CAnimation{ -- floor 1
+            frequence = Tic.FREQUENCE0600,
+            percent0  = 0.5,
+            palette0  = {[CPlace.FLOOR01] = CPlace.STONEFG,},
+            palette1  = {[CPlace.FLOOR01] = CPlace.COLORFLOOR01,},
+        },
+        CAnimation{ -- floor 2
+            frequence = Tic.FREQUENCE0600,
+            percent0  = 0.3,
+            palette0  = {[CPlace.FLOOR02] = CPlace.STONEBG,},
+            palette1  = {[CPlace.FLOOR02] = CPlace.COLORFLOOR02,},
+        },
+    }
+    self:argt(_argt) -- override if any
+end
+
+local CPlaceStoneIdle = CPlaceStone:extend() -- generic idle stone
+function CPlaceStoneIdle:new(_argt)
+    CPlaceStoneIdle.super.new(self, _argt)
+    self.name = Classic.NAMESILENT
+    self.palette = CPlaceStone.PALETTEIDLE
     self:argt(_argt) -- override if any
 end
 
@@ -3261,14 +3299,14 @@ function CCharacterHumanoid:drawHead()
 end
 
 
-local IPlayer = CCharacter:extend() -- players characters interface -- FIXME really needed ?
+local IPlayer = CCharacter:extend() -- players characters implementation
 function IPlayer:playerAppend()
     Tic:playerAppend(self) -- record the new player on tic
 end
 
 
 local CPlayerHumanoid = CCharacterHumanoid:extend() -- humanoid player characters
-CPlayerHumanoid:implement(IPlayer) -- FIXME really needed ?
+CPlayerHumanoid:implementall(IPlayer)
 function CPlayerHumanoid:new(_argt)
     CPlayerHumanoid.super.new(self, _argt)
     self.discovered = true

@@ -4,14 +4,14 @@ local Classic = require("libraries/ext/Classic")
 local Tables  = require("libraries/lks/Tables")
 
 
-XHello = Classic:extend()
-function XHello:sayHello()
-  print"Hello"
+IHello = Classic:extend()
+function IHello:sayHello()
+  print("Hello", self.prenom)
 end
-XHello.message = "My Message"
+IHello.message = "My Message"
 
 CCharacter = Classic:extend()
--- CCharacter:implementNew(XHello)
+CCharacter:implementnew(IHello)
 function CCharacter:new(_argt)
   CCharacter.super.new(self, _argt)
   self.kind = "CCharacter"
@@ -69,21 +69,17 @@ print("CPlayer", Jeandu:is(CPlayer))
 print("CPlayer", Jeandu:is(CVoid))
 
 print()
--- Jeandu:sayHello()
+Jeandu:sayHello()
 print("message:", Jeandu.message)
 print(Jeandu:string())
 print(Jeandu)
 
 -- print()
--- print("XHello")
--- Tables:print(XHello)
+-- print("IHello")
+-- Tables:print(IHello)
 -- print("CCharacter")
 -- Tables:print(CCharacter)
 -- print("CPlayer")
 -- Tables:print(CPlayer)
 -- print("Jeandu")
 -- Tables:print(Jeandu)
-
-print()
-print(CCharacter.kind)
-print(type(CCharacter))

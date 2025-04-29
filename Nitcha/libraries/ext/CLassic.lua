@@ -72,24 +72,25 @@ end
 --
 -- LKS additions
 --
-function Classic:defaultArg(_arg, _default, ...) -- return _arg if _arg in allowed ... else _default
-  for _, _allowed in pairs({...}) do
-    if _arg == _allowed then return _arg end
+function Classic:implementnew(...) -- implement new functions and variables -- modified version
+  for _, _classic in pairs({...}) do
+    for _key, _val in pairs(_classic) do
+      if self[_key] == nil and not (_key:find("__") == 1) then
+        print(_key, type(_val))
+        self[_key] = _val
+      end
+    end
   end
-  return _default
 end
 
 
--- FIXME still doesnt work -- seems to destroy stuff
-function Classic:expand(_new, _type, ...) -- implement vars or fcts or both (depending of _type) if they exist or not (depending of _new)
-  _new  = Classic:defaultArg(_new, "all", "new", "all") -- new = only if not existing, all = even existing
-  _type = Classic:defaultArg(_type, "all", "var", "fct", "all") -- only var, fct or all
+function Classic:implementall(...) -- implement all functions and variables -- modified version
   for _, _classic in pairs({...}) do
     for _key, _val in pairs(_classic) do
-      local _expand = true
-      if self[_key] ~= nil and _new == "new" then _expand = false end
-      if type(_val) == "function" and _type == "var" then _expand = false end
-      if _expand then self[_key] = _val end
+      if not (_key:find("__") == 1) then
+        print(_key, type(_val))
+        self[_key] = _val
+      end
     end
   end
 end
