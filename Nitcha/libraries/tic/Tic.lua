@@ -1597,8 +1597,10 @@ Classic.KINDENTITY = "Entity" -- Entity kind
 Classic.NAMEENTITY = "Entity" -- Entity name
 Classic.NAMEEMPTY  = "Empty"  -- Empty name
 Classic.NAMEDEAD   = "Dead"   -- Dead name
+Classic.NAMESILENT = "Silent" -- Silent name
 Classic.NAMELIVING = "Living" -- Living name
 Classic.NAMEANIMED = "Animed" -- Animed name
+Classic.NAMEFITFUL = "Fitful" -- Fitful name
 CEntity.WORLDX = 0
 CEntity.WORLDY = 0
 function CEntity:new(_argt)
@@ -1943,11 +1945,15 @@ end
 local CPlace = CEntityDrawable:extend() -- places
 Classic.KINDPLACE = "Place" -- Place kind
 Classic.NAMEPLACE = "Place" -- Place name
-CPlace.EMPTY    = Tic.COLORKEY
+CPlace.EMPTY    = Tic.COLORKEY -- anims
 CPlace.ANIM01   = Tic.COLORWHITE
 CPlace.ANIM02   = Tic.COLORYELLOW
 CPlace.ANIM03   = Tic.COLORORANGE
-CPlace.SMOKE    = CPlace.ANIM01
+CPlace.ANIM04   = Tic.COLORCYAN
+CPlace.ANIM05   = Tic.COLORBLUEL
+CPlace.ANIM06   = Tic.COLORBLUEM
+CPlace.ANIM07   = Tic.COLORBLUED
+CPlace.SMOKE    = CPlace.ANIM01 -- builds
 CPlace.WINDOW01 = CPlace.ANIM02
 CPlace.WINDOW02 = CPlace.ANIM03
 CPlace.ROOF     = Tic.COLORRED
@@ -1955,11 +1961,35 @@ CPlace.DOOR     = Tic.COLORGREYL
 CPlace.FACADE   = Tic.COLORGREYM
 CPlace.WALLS    = Tic.COLORGREYD
 CPlace.FOAM     = Tic.COLORGREEND
-CPlace.OWNER    = CPlace.ANIM01
+CPlace.OWNER    = CPlace.ANIM01 -- stalls
 CPlace.WATER01  = CPlace.ANIM02
 CPlace.WATER02  = CPlace.ANIM03
 CPlace.GOODS01  = CPlace.ANIM02
 CPlace.GOODS02  = CPlace.ANIM03
+CPlace.NEST     = CPlace.ANIM01 -- trees
+CPlace.FLOOR01  = CPlace.ANIM02
+CPlace.FLOOR02  = CPlace.ANIM03
+CPlace.LEAFSFG  = Tic.COLORGREENM
+CPlace.LEAFSBG  = Tic.COLORGREEND
+CPlace.TRUNK    = Tic.COLORGREYM
+CPlace.BARK     = Tic.COLORGREYD
+CPlace.MOON     = CPlace.ANIM01 -- stones
+CPlace.STONEFG  = Tic.COLORGREYM
+CPlace.STONEBG  = Tic.COLORGREYD
+CPlace.MAGIC01  = CPlace.ANIM04 -- magic
+CPlace.MAGIC02  = CPlace.ANIM05
+CPlace.MAGIC03  = CPlace.ANIM06
+CPlace.MAGIC04  = CPlace.ANIM07
+CPlace.COLORLIGHT   = Tic.COLORORANGE -- colors
+CPlace.COLORGLASS01 = Tic.COLORCYAN
+CPlace.COLORGLASS02 = Tic.COLORBLUEL
+CPlace.COLORWATER01 = Tic.COLORBLUEL
+CPlace.COLORWATER02 = Tic.COLORBLUEM
+CPlace.COLORGOODS01 = Tic.COLORGREENM
+CPlace.COLORGOODS02 = Tic.COLORGREEND
+CPlace.COLORNEST    = Tic.COLORGREYL
+CPlace.COLORFLOOR01 = CPlace.LEAFSFG
+CPlace.COLORFLOOR02 = CPlace.LEAFSBG
 function CPlace:new(_argt)
     CPlace.super.new(self, _argt)
     self.kind = Classic.KINDPLACE
@@ -1975,21 +2005,13 @@ end
 local CPlaceBuild = CPlace:extend() -- builds
 Classic.KINDBUILD = "Build" -- Build kind
 Classic.NAMEBUILD = "Build" -- Build name
-CPlaceBuild.COLORLIGHT   = Tic.COLORORANGE
-CPlaceBuild.COLORGLASS01 = Tic.COLORCYAN
-CPlaceBuild.COLORGLASS02 = Tic.COLORBLUEL
-CPlaceBuild.COLORWATER01 = Tic.COLORBLUEL
-CPlaceBuild.COLORWATER02 = Tic.COLORBLUEM
-CPlaceBuild.COLORGOODS01 = Tic.COLORGREENM
-CPlaceBuild.COLORGOODS02 = Tic.COLORGREEND
 CPlaceBuild.PALETTEIDLE  = {
-    [CPlace.ANIM01] = CPlace.EMPTY,
-    [CPlace.ANIM02] = CPlace.WALLS,
-    [CPlace.ANIM03] = CPlace.WALLS,
+    [CPlace.SMOKE]    = CPlace.EMPTY,
     [CPlace.WINDOW01] = CPlace.WALLS,
     [CPlace.WINDOW02] = CPlace.WALLS,
     [CPlace.DOOR]     = CPlace.FACADE,    
     [CPlace.ROOF]     = CPlace.FOAM,    
+    [CPlace.FOAM]     = CPlace.FOAM,    
 }
 CPlaceBuild.PALETTEFADE  = {
     [CPlace.SMOKE]    = CPlace.EMPTY,
@@ -2032,13 +2054,13 @@ function CPlaceHouseAnim:new(_argt)
             frequence = Tic.FREQUENCE0300,
             percent0  = 0.9,
             palette0  = {[CPlace.SMOKE] = CPlace.SMOKE,},
-            palette1  = {[CPlace.SMOKE] = CPlaceBuild.COLORLIGHT,},
+            palette1  = {[CPlace.SMOKE] = CPlace.COLORLIGHT,},
         },
         CAnimation{ -- window
             frequence = Tic.FREQUENCE0600,
             percent0  = 0.1,
             palette0  = {[CPlace.WINDOW02] = CPlace.WALLS},
-            palette1  = {[CPlace.WINDOW02] = CPlaceBuild.COLORLIGHT,},
+            palette1  = {[CPlace.WINDOW02] = CPlace.COLORLIGHT,},
         },
     }
     self:argt(_argt) -- override if any
@@ -2073,13 +2095,13 @@ function CPlaceTowerAnim:new(_argt)
             frequence = Tic.FREQUENCE0240,
             percent0  = 0.6,
             palette0  = {[CPlace.WINDOW01] = CPlace.WALLS},
-            palette1  = {[CPlace.WINDOW01] = CPlaceBuild.COLORLIGHT,},
+            palette1  = {[CPlace.WINDOW01] = CPlace.COLORLIGHT,},
         },
         CAnimation{ -- window 2
             frequence = Tic.FREQUENCE0120,
             percent0  = 0.1,
             palette0  = {[CPlace.WINDOW02] = CPlace.WALLS},
-            palette1  = {[CPlace.WINDOW02] = CPlaceBuild.COLORLIGHT,},
+            palette1  = {[CPlace.WINDOW02] = CPlace.COLORLIGHT,},
         },
     }
     self:argt(_argt) -- override if any
@@ -2115,19 +2137,19 @@ function CPlaceManorAnim:new(_argt)
             frequence = Tic.FREQUENCE0300,
             percent0  = 0.9,
             palette0  = {[CPlace.SMOKE] = CPlace.SMOKE,},
-            palette1  = {[CPlace.SMOKE] = CPlaceBuild.COLORLIGHT,},
+            palette1  = {[CPlace.SMOKE] = CPlace.COLORLIGHT,},
         },
         CAnimation{ -- window 1
             frequence = Tic.FREQUENCE0240,
             percent0  = 0.9,
             palette0  = {[CPlace.WINDOW01] = CPlace.WALLS},
-            palette1  = {[CPlace.WINDOW01] = CPlaceBuild.COLORLIGHT,},
+            palette1  = {[CPlace.WINDOW01] = CPlace.COLORLIGHT,},
         },
         CAnimation{ -- window 2
             frequence = Tic.FREQUENCE0120,
             percent0  = 0.5,
             palette0  = {[CPlace.WINDOW02] = CPlace.WALLS},
-            palette1  = {[CPlace.WINDOW02] = CPlaceBuild.COLORLIGHT,},
+            palette1  = {[CPlace.WINDOW02] = CPlace.COLORLIGHT,},
         },
     }
     self:argt(_argt) -- override if any
@@ -2163,13 +2185,13 @@ function CPlaceKirkeAnim:new(_argt)
             frequence = Tic.FREQUENCE0600,
             percent0  = 0.9,
             palette0  = {[CPlace.WINDOW01] = CPlace.WALLS,},
-            palette1  = {[CPlace.WINDOW01] = CPlaceBuild.COLORGLASS01,},
+            palette1  = {[CPlace.WINDOW01] = CPlace.COLORGLASS01,},
         },
         CAnimation{ -- window 2
             frequence = Tic.FREQUENCE0600,
             percent0  = 0.1,
             palette0  = {[CPlace.WINDOW02] = CPlace.WALLS,},
-            palette1  = {[CPlace.WINDOW02] = CPlaceBuild.COLORGLASS02,},
+            palette1  = {[CPlace.WINDOW02] = CPlace.COLORGLASS02,},
         },
     }
     self:argt(_argt) -- override if any
@@ -2205,14 +2227,14 @@ function CPlaceWaterAnim:new(_argt)
         CAnimation{ -- water 1
             frequence = Tic.FREQUENCE0240,
             percent0  = 0.6,
-            palette0  = {[CPlace.WATER01] = CPlaceBuild.COLORWATER01,},
-            palette1  = {[CPlace.WATER01] = CPlaceBuild.COLORWATER02,},
+            palette0  = {[CPlace.WATER01] = CPlace.COLORWATER01,},
+            palette1  = {[CPlace.WATER01] = CPlace.COLORWATER02,},
         },
         CAnimation{ -- water 2
             frequence = Tic.FREQUENCE0120,
             percent0  = 0.1,
-            palette0  = {[CPlace.WATER02] = CPlaceBuild.COLORWATER01,},
-            palette1  = {[CPlace.WATER02] = CPlaceBuild.COLORWATER02,},
+            palette0  = {[CPlace.WATER02] = CPlace.COLORWATER01,},
+            palette1  = {[CPlace.WATER02] = CPlace.COLORWATER02,},
         },
     }
     self:argt(_argt) -- override if any
@@ -2254,14 +2276,14 @@ function CPlaceStallAnim:new(_argt)
         CAnimation{ -- goods 1
             frequence = Tic.FREQUENCE0120,
             percent0  = 0.1,
-            palette0  = {[CPlace.GOODS01] = CPlaceBuild.COLORGOODS01,},
-            palette1  = {[CPlace.GOODS01] = CPlaceBuild.COLORGOODS02,},
+            palette0  = {[CPlace.GOODS01] = CPlace.COLORGOODS01,},
+            palette1  = {[CPlace.GOODS01] = CPlace.COLORGOODS02,},
         },
         CAnimation{ -- goods 2
             frequence = Tic.FREQUENCE0120,
             percent0  = 0.1,
-            palette0  = {[CPlace.GOODS02] = CPlaceBuild.COLORGOODS01,},
-            palette1  = {[CPlace.GOODS02] = CPlaceBuild.COLORGOODS02,},
+            palette0  = {[CPlace.GOODS02] = CPlace.COLORGOODS01,},
+            palette1  = {[CPlace.GOODS02] = CPlace.COLORGOODS02,},
         },
     }
     self:argt(_argt) -- override if any
@@ -2281,29 +2303,19 @@ end
 --
 local CPlaceTrees = CPlace:extend() -- trees
 Classic.KINDTREES = "Trees" -- Trees kind
-CPlaceTrees.NEST    = CPlace.ANIM01
-CPlaceTrees.FLOOR01 = CPlace.ANIM02
-CPlaceTrees.FLOOR02 = CPlace.ANIM03
-CPlaceTrees.LEAFSFG = Tic.COLORGREENM
-CPlaceTrees.LEAFSBG = Tic.COLORGREEND
-CPlaceTrees.TRUNK   = Tic.COLORGREYM
-CPlaceTrees.BARK    = Tic.COLORGREYD
-CPlaceTrees.COLORFLOOR01  = CPlaceTrees.LEAFSFG
-CPlaceTrees.COLORFLOOR02  = CPlaceTrees.LEAFSBG
-CPlaceTrees.COLORNEST     = Tic.COLORGREYL
 CPlaceTrees.PALETTEIDLE   = {
-    [CPlaceTrees.NEST]    = CPlace.EMPTY,
-    [CPlaceTrees.FLOOR01] = CPlaceTrees.BARK,
-    [CPlaceTrees.FLOOR02] = CPlaceTrees.BARK,
-    [CPlaceTrees.LEAFSFG] = CPlaceTrees.LEAFSBG,
-    [CPlaceTrees.LEAFSBG] = CPlaceTrees.BARK,
+    [CPlace.NEST]    = CPlace.EMPTY,
+    [CPlace.FLOOR01] = CPlace.BARK,
+    [CPlace.FLOOR02] = CPlace.BARK,
+    [CPlace.LEAFSFG] = CPlace.LEAFSBG,
+    [CPlace.LEAFSBG] = CPlace.BARK,
 }
 CPlaceTrees.PALETTEFADE   = {
-    [CPlaceTrees.NEST]    = CPlace.EMPTY,
-    [CPlaceTrees.FLOOR01] = CPlaceTrees.BARK,
-    [CPlaceTrees.FLOOR02] = CPlaceTrees.BARK,
-    [CPlaceTrees.LEAFSFG] = CPlaceTrees.TRUNK,
-    [CPlaceTrees.LEAFSBG] = CPlaceTrees.BARK,    
+    [CPlace.NEST]    = CPlace.EMPTY,
+    [CPlace.FLOOR01] = CPlace.BARK,
+    [CPlace.FLOOR02] = CPlace.BARK,
+    [CPlace.LEAFSFG] = CPlace.TRUNK,
+    [CPlace.LEAFSBG] = CPlace.BARK,    
 }
 function CPlaceTrees:new(_argt)
     CPlaceTrees.super.new(self, _argt)
@@ -2325,20 +2337,20 @@ function CPlaceTreesAnim:new(_argt)
         CAnimation{ -- nest
             frequence = Tic.FREQUENCE0600,
             percent0  = 0.9,
-            palette0  = {[CPlaceTrees.NEST] = CPlaceTrees.TRUNK,},
-            palette1  = {[CPlaceTrees.NEST] = CPlaceTrees.COLORNEST,},
+            palette0  = {[CPlace.NEST] = CPlace.TRUNK,},
+            palette1  = {[CPlace.NEST] = CPlace.COLORNEST,},
         },
         CAnimation{ -- floor 1
             frequence = Tic.FREQUENCE0600,
             percent0  = 0.5,
-            palette0  = {[CPlaceTrees.FLOOR01] = CPlaceTrees.TRUNK,},
-            palette1  = {[CPlaceTrees.FLOOR01] = CPlaceTrees.COLORFLOOR01,},
+            palette0  = {[CPlace.FLOOR01] = CPlace.TRUNK,},
+            palette1  = {[CPlace.FLOOR01] = CPlace.COLORFLOOR01,},
         },
         CAnimation{ -- floor 2
             frequence = Tic.FREQUENCE0600,
             percent0  = 0.3,
-            palette0  = {[CPlaceTrees.FLOOR02] = CPlaceTrees.BARK,},
-            palette1  = {[CPlaceTrees.FLOOR02] = CPlaceTrees.COLORFLOOR02,},
+            palette0  = {[CPlace.FLOOR02] = CPlace.BARK,},
+            palette1  = {[CPlace.FLOOR02] = CPlace.COLORFLOOR02,},
         },
     }
     self:argt(_argt) -- override if any
@@ -2377,6 +2389,39 @@ local CPlaceTree1Idle = CPlaceTreesIdle:extend() -- idle tree1
 function CPlaceTree1Idle:new(_argt)
     CPlaceTree1Idle.super.new(self, _argt)
     self.sprite  = CSpriteBG.PLACETREE1
+    self:argt(_argt) -- override if any
+end
+
+
+--
+-- CPlaceStone
+--
+local CPlaceStone = CPlace:extend() -- stones
+Classic.KINDSTONE = "Stone" -- Stone kind
+CPlaceStone.PALETTEIDLE   = {
+    [CPlace.MOON]    = CPlace.EMPTY,
+    [CPlace.FLOOR01] = CPlace.STONEBG,
+    [CPlace.FLOOR02] = CPlace.STONEBG,
+    [CPlace.DOOR]    = CPlace.STONEFG,    
+    [CPlace.FOAM]    = CPlace.FOAM,    
+}
+CPlaceStone.PALETTEFADE   = {
+    [CPlace.MOON]    = CPlace.EMPTY,
+    [CPlace.FLOOR01] = CPlace.STONEBG,
+    [CPlace.FLOOR02] = CPlace.STONEBG,
+    [CPlace.DOOR]    = CPlace.STONEFG,    
+    [CPlace.FOAM]    = CPlace.STONEBG,    
+}
+function CPlaceStone:new(_argt)
+    CPlaceStone.super.new(self, _argt)
+    self.kind = Classic.KINDSTONE
+    self.name = Classic.NAMEFITFUL
+    self.hitbox = CHitbox()
+    self.hitbox.region.lf = 2
+    self.hitbox.region.rg = 4
+    self.hitbox.region.up = 6
+    self.hitbox.region.dw = 7
+    self.palettefade = CPlaceStone.PALETTEFADE
     self:argt(_argt) -- override if any
 end
 
@@ -3324,9 +3369,9 @@ function CPlayerAngel:new(_argt)
     self.headsprite   = CSpriteFG.HEADANGEL -- head
     self.statphymax   = 4
     self.statphyact   = self.statphymax
-    self.statmenmax   = 6
+    self.statmenmax   = 5
     self.statmenact   = self.statmenmax
-    self.statpsymax   = 5
+    self.statpsymax   = 6
     self.statpsyact   = self.statpsymax
     self:argt(_argt) -- override if any
 end
@@ -4892,8 +4937,8 @@ end -- generate places
 -- }
 -- local Nitcha = CPlayerDrowe{name = "Nitcha",
 -- }
--- local Zariel = CPlayerAngel{name = "Zariel",
--- }
+local Zariel = CPlayerAngel{name = "Zariel",
+}
 -- local Zikkow = CPlayerTifel{name = "Zikkow",
 --     colorhairsbg = Tic.COLORGREENM,
 --     colorhairsfg = Tic.COLORGREEND,
@@ -4912,9 +4957,8 @@ end -- generate places
 -- }
 -- local Daemok = CPlayerDemon{name = "Daemok",
 -- }
-
--- local Golith = CPlayerGogol{name = "Golith", drawdirs = false, scale = 2,
--- }
+local Golith = CPlayerGogol{name = "Golith"
+}
 -- Golith:randomWorldWindow()
 
 local Wulfie = CPlayerWolfe{name = "Wulfie",
