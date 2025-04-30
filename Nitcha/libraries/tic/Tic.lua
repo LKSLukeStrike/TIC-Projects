@@ -2322,11 +2322,14 @@ function CPlaceTrees:new(_argt)
     CPlaceTrees.super.new(self, _argt)
     self.kind = Classic.KINDTREES
     self.name = Classic.NAMELIVING
-    self.hitbox = CHitbox()
-    self.hitbox.region.lf = 2
-    self.hitbox.region.rg = 4
-    self.hitbox.region.up = 6
-    self.hitbox.region.dw = 7
+    self.hitbox = CHitbox{
+        region = {
+            lf = 2,
+            rg = 4,
+            up = 6,
+            dw = 7,
+        }
+    }
     self.palettefade = CPlaceTrees.PALETTEFADE
     self:argt(_argt) -- override if any
 end
@@ -2399,13 +2402,13 @@ end
 --
 local CPlaceStone = CPlace:extend() -- stone
 Classic.KINDSTONE = "Stone" -- Stone kind
-Classic.NAMEMENHR = "Menhr" -- Menhr name
-Classic.NAMEDOLMN = "Dolmn" -- Dolmn name
-Classic.NAMECIRKL = "Cirkl" -- Cirkl name
+Classic.KINDMENHR = "Menhr" -- Menhr kind
+Classic.KINDDOLMN = "Dolmn" -- Dolmn kind
+Classic.KINDCIRKL = "Cirkl" -- Cirkl kind
 CPlaceStone.PALETTEIDLE   = {
     [CPlace.MOON]    = CPlace.EMPTY,
     [CPlace.FLOOR01] = CPlace.STONEBG,
-    [CPlace.FLOOR02] = CPlace.STONEBG,
+    [CPlace.FLOOR02] = CPlace.FOAM,
     [CPlace.DOOR]    = CPlace.STONEFG,    
     [CPlace.FOAM]    = CPlace.FOAM,    
 }
@@ -2420,36 +2423,32 @@ function CPlaceStone:new(_argt)
     CPlaceStone.super.new(self, _argt)
     self.kind = Classic.KINDSTONE
     self.name = Classic.NAMEFITFUL
-    self.hitbox = CHitbox()
-    self.hitbox.region.lf = 2
-    self.hitbox.region.rg = 4
-    self.hitbox.region.up = 6
-    self.hitbox.region.dw = 7
+    self.hitbox = nil -- override if any
     self.palettefade = CPlaceStone.PALETTEFADE
     self:argt(_argt) -- override if any
 end
 
-local CPlaceStoneAnim = CPlaceStone:extend() -- generic anim stone
+local CPlaceStoneAnim = CPlaceStone:extend() -- generic anim stone -- TODO add magic
 function CPlaceStoneAnim:new(_argt)
     CPlaceStoneAnim.super.new(self, _argt)
     self.animations = {
         CAnimation{ -- moon
             frequence = Tic.FREQUENCE0600,
             percent0  = 0.9,
-            palette0  = {[CPlace.MOON] = CPlace.STONEFG,},
+            palette0  = {[CPlace.MOON] = CPlace.EMPTY,},
             palette1  = {[CPlace.MOON] = CPlace.COLORMOON,},
         },
         CAnimation{ -- floor 1
             frequence = Tic.FREQUENCE0600,
-            percent0  = 0.5,
+            percent0  = 0.1,
             palette0  = {[CPlace.FLOOR01] = CPlace.STONEFG,},
-            palette1  = {[CPlace.FLOOR01] = CPlace.COLORFLOOR01,},
+            palette1  = {[CPlace.FLOOR01] = CPlace.LEAFSFG,},
         },
         CAnimation{ -- floor 2
             frequence = Tic.FREQUENCE0600,
             percent0  = 0.3,
-            palette0  = {[CPlace.FLOOR02] = CPlace.STONEBG,},
-            palette1  = {[CPlace.FLOOR02] = CPlace.COLORFLOOR02,},
+            palette0  = {[CPlace.FLOOR02] = CPlace.FOAM,},
+            palette1  = {[CPlace.FLOOR02] = CPlace.LEAFSFG,},
         },
     }
     self:argt(_argt) -- override if any
@@ -2461,6 +2460,100 @@ function CPlaceStoneIdle:new(_argt)
     self.name = Classic.NAMESILENT
     self.palette = CPlaceStone.PALETTEIDLE
     self:argt(_argt) -- override if any
+end
+
+
+--
+-- IStoneMenhr
+--
+local IStoneMenhr = CPlaceStone:extend() -- menhr implementation
+IStoneMenhr.kind   = Classic.KINDMENHR
+IStoneMenhr.hitbox = CHitbox{
+    region = {
+        lf = 2,
+        rg = 4,
+        up = 6,
+        dw = 7,
+    }
+}
+
+local CPlaceMenh0Anim = CPlaceStoneAnim:extend() -- anim menh0
+function CPlaceMenh0Anim:new(_argt)
+    CPlaceMenh0Anim.super.new(self, _argt)
+    self.sprite  = CSpriteBG.PLACEMENH0
+    self:argt(_argt) -- override if any
+    self:implementall(IStoneMenhr)
+end
+
+local CPlaceMenh0Idle = CPlaceStoneIdle:extend() -- idle menh0
+function CPlaceMenh0Idle:new(_argt)
+    CPlaceMenh0Idle.super.new(self, _argt)
+    self.sprite  = CSpriteBG.PLACEMENH0
+    self:argt(_argt) -- override if any
+    self:implementall(IStoneMenhr)
+end
+
+local CPlaceMenh1Anim = CPlaceStoneAnim:extend() -- anim menh1
+function CPlaceMenh1Anim:new(_argt)
+    CPlaceMenh1Anim.super.new(self, _argt)
+    self.sprite  = CSpriteBG.PLACEMENH1
+    self:argt(_argt) -- override if any
+    self:implementall(IStoneMenhr)
+end
+
+local CPlaceMenh1Idle = CPlaceStoneIdle:extend() -- idle menh1
+function CPlaceMenh1Idle:new(_argt)
+    CPlaceMenh1Idle.super.new(self, _argt)
+    self.sprite  = CSpriteBG.PLACEMENH1
+    self:argt(_argt) -- override if any
+    self:implementall(IStoneMenhr)
+end
+
+
+--
+-- IStoneDolmn
+--
+local IStoneDolmn = CPlaceStone:extend() -- dolmn implementation
+IStoneDolmn.kind   = Classic.KINDDOLMN
+IStoneDolmn.hitbox = CHitbox{
+    region = {
+        lf = 1,
+        rg = 4,
+        up = 6,
+        dw = 7,
+    }
+}
+
+local CPlaceDolm0Anim = CPlaceStoneAnim:extend() -- anim dolm0
+function CPlaceDolm0Anim:new(_argt)
+    CPlaceDolm0Anim.super.new(self, _argt)
+    self.sprite  = CSpriteBG.PLACEDOLM0
+    self:argt(_argt) -- override if any
+    self:implementall(IStoneDolmn)
+end
+
+local CPlaceDolm0Idle = CPlaceStoneIdle:extend() -- idle dolm0
+function CPlaceDolm0Idle:new(_argt)
+    CPlaceDolm0Idle.super.new(self, _argt)
+    self.sprite  = CSpriteBG.PLACEDOLM0
+    self:argt(_argt) -- override if any
+    self:implementall(IStoneDolmn)
+end
+
+local CPlaceDolm1Anim = CPlaceStoneAnim:extend() -- anim dolm1
+function CPlaceDolm1Anim:new(_argt)
+    CPlaceDolm1Anim.super.new(self, _argt)
+    self.sprite  = CSpriteBG.PLACEDOLM1
+    self:argt(_argt) -- override if any
+    self:implementall(IStoneDolmn)
+end
+
+local CPlaceDolm1Idle = CPlaceStoneIdle:extend() -- idle dolm1
+function CPlaceDolm1Idle:new(_argt)
+    CPlaceDolm1Idle.super.new(self, _argt)
+    self.sprite  = CSpriteBG.PLACEDOLM1
+    self:argt(_argt) -- override if any
+    self:implementall(IStoneDolmn)
 end
 
 
@@ -2710,12 +2803,14 @@ function CCharacter:new(_argt)
     self.drawview     = false
     self.drawmind     = false
     self.drawmove     = false
-    -- self.drawhitbox   = false
-    self.hitbox       = CHitbox()
-    self.hitbox.region.lf = 2
-    self.hitbox.region.rg = 4
-    self.hitbox.region.up = 5
-    self.hitbox.region.dw = 7
+    self.hitbox       = CHitbox{
+        region = {
+            lf = 2,
+            rg = 4,
+            up = 5,
+            dw = 7,
+        }
+    }
     self:argt(_argt) -- override if any
     self.camera       = CCamera{name = self.name.." "..Classic.NAMECAMERA} -- one camera per character
     self:focus() -- focus its camera on itself
@@ -3306,12 +3401,12 @@ end
 
 
 local CPlayerHumanoid = CCharacterHumanoid:extend() -- humanoid player characters
-CPlayerHumanoid:implementall(IPlayer)
 function CPlayerHumanoid:new(_argt)
     CPlayerHumanoid.super.new(self, _argt)
     self.discovered = true
-    self:playerAppend()
     self:argt(_argt) -- override if any
+    self:implementall(IPlayer)
+    self:playerAppend()
 end
 
 
@@ -4975,8 +5070,8 @@ end -- generate places
 -- }
 -- local Nitcha = CPlayerDrowe{name = "Nitcha",
 -- }
-local Zariel = CPlayerAngel{name = "Zariel",
-}
+-- local Zariel = CPlayerAngel{name = "Zariel",
+-- }
 -- local Zikkow = CPlayerTifel{name = "Zikkow",
 --     colorhairsbg = Tic.COLORGREENM,
 --     colorhairsfg = Tic.COLORGREEND,
@@ -4995,14 +5090,14 @@ local Zariel = CPlayerAngel{name = "Zariel",
 -- }
 -- local Daemok = CPlayerDemon{name = "Daemok",
 -- }
-local Golith = CPlayerGogol{name = "Golith"
-}
+-- local Golith = CPlayerGogol{name = "Golith"
+-- }
 -- Golith:randomWorldWindow()
 
-local Wulfie = CPlayerWolfe{name = "Wulfie",
-    colorextra = Tic.COLORRED,
-    worldx = 10,
-}
+-- local Wulfie = CPlayerWolfe{name = "Wulfie",
+--     colorextra = Tic.COLORRED,
+--     worldx = 10,
+-- }
 -- Wulfie:randomWorldWindow()
 
 local Oxboow = CPlayerGhost{name = "Oxboow",
@@ -5070,17 +5165,25 @@ for _, _cplace in pairs({
     CPlaceTree1Anim,
     -- CPlaceTree1Idle,
     -- CPlaceHouseAnim,
-    CPlaceHouseIdle,
+    -- CPlaceHouseIdle,
     -- CPlaceTowerAnim,
-    CPlaceTowerIdle,
-    CPlaceManorAnim,
+    -- CPlaceTowerIdle,
+    -- CPlaceManorAnim,
     -- CPlaceManorIdle,
     -- CPlaceKirkeAnim,
-    CPlaceKirkeIdle,
-    CPlaceWaterAnim,
+    -- CPlaceKirkeIdle,
+    -- CPlaceWaterAnim,
     -- CPlaceWaterIdle,
-    CPlaceStallAnim,
+    -- CPlaceStallAnim,
     -- CPlaceStallIdle,
+    CPlaceMenh0Anim,
+    CPlaceMenh0Idle,
+    CPlaceMenh1Anim,
+    CPlaceMenh1Idle,
+    CPlaceDolm0Anim,
+    CPlaceDolm0Idle,
+    CPlaceDolm1Anim,
+    CPlaceDolm1Idle,
 }) do
     _cplace{
         worldx = math.random(-50, 50),

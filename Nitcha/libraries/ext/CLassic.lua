@@ -75,8 +75,7 @@ end
 function Classic:implementnew(...) -- implement new functions and variables -- modified version
   for _, _classic in pairs({...}) do
     for _key, _val in pairs(_classic) do
-      if self[_key] == nil and not (_key:find("__") == 1) then
-        print(_key, type(_val))
+      if  not (_key:find("__") == 1) and not (_key == "super") and self[_key] == nil then
         self[_key] = _val
       end
     end
@@ -87,8 +86,7 @@ end
 function Classic:implementall(...) -- implement all functions and variables -- modified version
   for _, _classic in pairs({...}) do
     for _key, _val in pairs(_classic) do
-      if not (_key:find("__") == 1) then
-        print(_key, type(_val))
+      if not (_key:find("__") == 1) and not (_key == "super") then
         self[_key] = _val
       end
     end
