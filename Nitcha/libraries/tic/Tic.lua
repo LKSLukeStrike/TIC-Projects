@@ -1135,12 +1135,12 @@ CSpriteBG.PLACEMENH1  = CSpriteBG.MENHRBANK + 1
 CSpriteBG.DOLMNBANK   = 80 -- dolmens
 CSpriteBG.PLACEDOLM0  = CSpriteBG.DOLMNBANK + 0
 CSpriteBG.PLACEDOLM1  = CSpriteBG.DOLMNBANK + 1
-CSpriteBG.CIRCLBANK   = 96 -- circles
-CSpriteBG.PLACECIRC0  = CSpriteBG.CIRCLBANK + 0
-CSpriteBG.PLACECIRC1  = CSpriteBG.CIRCLBANK + 1
+CSpriteBG.CIRKLBANK   = 96 -- circles
+CSpriteBG.PLACECIRK0  = CSpriteBG.CIRKLBANK + 0
+CSpriteBG.PLACECIRK1  = CSpriteBG.CIRKLBANK + 1
 CSpriteBG.ROADSBANK   = 112 -- roads
-CSpriteBG.PLACEPAVE0  = CSpriteBG.ROADSBANK + 0
-CSpriteBG.PLACEPAVE1  = CSpriteBG.ROADSBANK + 1
+CSpriteBG.PLACEROAD0  = CSpriteBG.ROADSBANK + 0
+CSpriteBG.PLACEROAD1  = CSpriteBG.ROADSBANK + 1
 function CSpriteBG:new(_argt) -- FIXME can be removed ?
     CSpriteBG.super.new(self, _argt)
     self:argt(_argt) -- override if any
@@ -2405,6 +2405,7 @@ Classic.KINDSTONE = "Stone" -- Stone kind
 Classic.KINDMENHR = "Menhr" -- Menhr kind
 Classic.KINDDOLMN = "Dolmn" -- Dolmn kind
 Classic.KINDCIRKL = "Cirkl" -- Cirkl kind
+Classic.KINDROADS = "Roads" -- Roads kind
 CPlaceStone.PALETTEIDLE   = {
     [CPlace.MOON]    = CPlace.EMPTY,
     [CPlace.FLOOR01] = CPlace.STONEBG,
@@ -2554,6 +2555,100 @@ function CPlaceDolm1Idle:new(_argt)
     self.sprite  = CSpriteBG.PLACEDOLM1
     self:argt(_argt) -- override if any
     self:implementall(IStoneDolmn)
+end
+
+
+--
+-- IStoneCirkl
+--
+local IStoneCirkl = CPlaceStone:extend() -- cirkl implementation
+IStoneCirkl.kind   = Classic.KINDCIRKL
+IStoneCirkl.hitbox = CHitbox{
+    region = {
+        lf = 3,
+        rg = 4,
+        up = 6,
+        dw = 7,
+    }
+}
+
+local CPlaceCirk0Anim = CPlaceStoneAnim:extend() -- anim cirk0
+function CPlaceCirk0Anim:new(_argt)
+    CPlaceCirk0Anim.super.new(self, _argt)
+    self.sprite  = CSpriteBG.PLACECIRK0
+    self:argt(_argt) -- override if any
+    self:implementall(IStoneCirkl)
+end
+
+local CPlaceCirk0Idle = CPlaceStoneIdle:extend() -- idle cirk0
+function CPlaceCirk0Idle:new(_argt)
+    CPlaceCirk0Idle.super.new(self, _argt)
+    self.sprite  = CSpriteBG.PLACECIRK0
+    self:argt(_argt) -- override if any
+    self:implementall(IStoneCirkl)
+end
+
+local CPlaceCirk1Anim = CPlaceStoneAnim:extend() -- anim cirk1
+function CPlaceCirk1Anim:new(_argt)
+    CPlaceCirk1Anim.super.new(self, _argt)
+    self.sprite  = CSpriteBG.PLACECIRK1
+    self:argt(_argt) -- override if any
+    self:implementall(IStoneCirkl)
+end
+
+local CPlaceCirk1Idle = CPlaceStoneIdle:extend() -- idle cirk1
+function CPlaceCirk1Idle:new(_argt)
+    CPlaceCirk1Idle.super.new(self, _argt)
+    self.sprite  = CSpriteBG.PLACECIRK1
+    self:argt(_argt) -- override if any
+    self:implementall(IStoneCirkl)
+end
+
+
+--
+-- IStoneRoads
+--
+local IStoneRoads = CPlaceStone:extend() -- roads implementation
+IStoneRoads.kind   = Classic.KINDROADS
+-- IStoneRoads.hitbox = CHitbox{
+--     region = {
+--         lf = 1,
+--         rg = 4,
+--         up = 6,
+--         dw = 7,
+--     }
+-- }
+
+local CPlaceRoad0Anim = CPlaceStoneAnim:extend() -- anim road0
+function CPlaceRoad0Anim:new(_argt)
+    CPlaceRoad0Anim.super.new(self, _argt)
+    self.sprite  = CSpriteBG.PLACEROAD0
+    self:argt(_argt) -- override if any
+    self:implementall(IStoneRoads)
+end
+
+local CPlaceRoad0Idle = CPlaceStoneIdle:extend() -- idle road0
+function CPlaceRoad0Idle:new(_argt)
+    CPlaceRoad0Idle.super.new(self, _argt)
+    self.sprite  = CSpriteBG.PLACEROAD0
+    self:argt(_argt) -- override if any
+    self:implementall(IStoneRoads)
+end
+
+local CPlaceRoad1Anim = CPlaceStoneAnim:extend() -- anim road1
+function CPlaceRoad1Anim:new(_argt)
+    CPlaceRoad1Anim.super.new(self, _argt)
+    self.sprite  = CSpriteBG.PLACEROAD1
+    self:argt(_argt) -- override if any
+    self:implementall(IStoneRoads)
+end
+
+local CPlaceRoad1Idle = CPlaceStoneIdle:extend() -- idle road1
+function CPlaceRoad1Idle:new(_argt)
+    CPlaceRoad1Idle.super.new(self, _argt)
+    self.sprite  = CSpriteBG.PLACEROAD1
+    self:argt(_argt) -- override if any
+    self:implementall(IStoneRoads)
 end
 
 
@@ -5184,6 +5279,14 @@ for _, _cplace in pairs({
     CPlaceDolm0Idle,
     CPlaceDolm1Anim,
     CPlaceDolm1Idle,
+    CPlaceCirk0Anim,
+    CPlaceCirk0Idle,
+    CPlaceCirk1Anim,
+    CPlaceCirk1Idle,
+    CPlaceRoad0Anim,
+    CPlaceRoad0Idle,
+    CPlaceRoad1Anim,
+    CPlaceRoad1Idle,
 }) do
     _cplace{
         worldx = math.random(-50, 50),
