@@ -100,6 +100,20 @@ function Nums:isEven(_num) -- if num is even
 end
 
 
+-- Limits
+function Nums:min(_num, _val) -- min value
+    return (_num < _val) and _num or _val
+end
+
+function Nums:max(_num, _val) -- max value
+    return (_num > _val) and _num or _val
+end
+
+function Nums:btw(_num, _min, _max) -- btw value
+    return Nums:min(Nums:max(_num, _min), _max)
+end
+
+
 -- Distances
 function Nums:distancePointsReal(_pointx0, _pointy0, _pointx1, _pointy1) -- real distance between 2 points -- slower
     return math.sqrt(Nums:distancePointsFake(_pointx0, _pointy0, _pointx1, _pointy1))
@@ -111,6 +125,55 @@ function Nums:distancePointsFake(_pointx0, _pointy0, _pointx1, _pointy1) -- fake
     _pointx1 = _pointx1 or 0
     _pointy1 = _pointy1 or 0
     return ((_pointx0 - _pointx1) ^ 2) + ((_pointy0 - _pointy1) ^ 2)
+end
+
+
+-- Points
+function Nums:pointsLine(_pointx0, _pointy0, _pointx1, _pointy1, _nobounds) -- list of points between 2 points -- exclude start and end if any
+    _nobounds = _nobounds or false
+    local _distance = Nums:distancePointsReal(_pointx0, _pointy0, _pointx1, _pointy1)
+    local _offsetx  = (_pointx1 - _pointx0) / _distance
+    local _offsety  = (_pointy1 - _pointy0) / _distance
+    local _result   = {}
+    local _pointx   = nil
+    local _pointy   = nil
+    local _roundx   = nil
+    local _roundy   = nil
+    for _ = 0, _distance do
+        _roundx = Nums:roundint(Nums:roundmin(_pointx0 + (Nums:sign(_pointx0) * 0.5)))
+        _roundy = Nums:roundint(Nums:roundmin(_pointy0 + (Nums:sign(_pointy0) * 0.5)))
+        if not (_roundx == _pointx) or not (_roundy == _pointy) then
+            table.insert(_result, {x = _roundx, y = _roundy})
+            _pointx = _roundx
+            _pointy = _roundy
+        end
+        _pointx0 = _pointx0 + _offsetx
+        _pointy0 = _pointy0 + _offsety
+    end
+    if _nobounds then -- remove beg and end bounds
+        table.remove(_result, 1)
+        table.remove(_result)
+    end
+    return _result
+end
+
+function Nums:pointsPickCount(_points, _count, _finish) -- pick count points -- distributed
+    _finish = _finish or false
+    print("count", _count)
+    _count = _count or #_points
+    _count = (_count < 1 or _count > #_points) and #_points or _count -- all by default
+    local _result = {}
+    if _count == 0 then return _result end -- empty
+    print("count", _count)
+    local _step = Nums:roundint(#_points / _count) + 1
+    print("step", _step)
+    for _key = 1, #_points, _step do
+        table.insert(_result, _points[_key])
+    end
+    if _finish and #_result < _count then
+        table.insert(_result, _points[#_points])
+    end
+    return _result
 end
 
 

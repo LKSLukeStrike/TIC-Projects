@@ -3,6 +3,7 @@ package.path = package.path..";G:/TIC80 1.1/TICProjects/Nitcha/?.lua"
 local Nums   = require("libraries/lks/Nums")
 
 
+if false then
 --
 print("---")
 local _num = 10
@@ -94,3 +95,26 @@ print()
 print(Nums:invert(-10))
 print(Nums:invert(0))
 print(Nums:invert(10))
+
+print()
+print(Nums:btw(10, 10, 20))
+print(Nums:btw(20, 10, 20))
+print(Nums:btw(15, 10, 20))
+print(Nums:btw(9, 10, 20))
+print(Nums:btw(21, 10, 20))
+end
+
+function printPoints(_points)
+    print(#_points)
+    for _, _point in ipairs(_points) do
+        print(_, _point.x, _point.y)
+    end
+end
+
+print()
+printPoints(Nums:pointsLine(0, 0, -10, -10))
+printPoints(Nums:pointsLine(0, 0, -10, -10, true))
+
+print()
+printPoints(Nums:pointsPickCount(Nums:pointsLine(0, 0, -10, -10, true), 3, true))
+printPoints(Nums:pointsPickCount(Nums:pointsLine(0, 0, -10, -10, true), 4, true))

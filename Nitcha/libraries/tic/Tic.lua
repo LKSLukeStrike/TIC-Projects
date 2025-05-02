@@ -5301,6 +5301,7 @@ Tic.DRAWSPOTTED = true
 -- Tic.DRAWVIEW    = true
 
 
+
 --
 -- Drawing
 --
@@ -5313,10 +5314,16 @@ function Tic:draw()
     Tic:drawLog()
     Tic:logPrint()
 
+    -- line(10, 9, 25, 9, Tic.COLORCYAN)
+    line(10, 10, 25, 17, Tic.COLORCYAN)
+    Tic:drawLine(10, 10, 25, 17)
+    line(10, 30, 25, 37, Tic.COLORCYAN)
+    Tic:drawLine(10, 30, 25, 37, true)
+    -- Tic:drawLine(10, 29, 26, 29, true)
+
     Tic:tick() -- [!] required in the draw function
     end
 end
-
 
 
 function Tic:drawLog() -- [-] remove
@@ -5338,6 +5345,14 @@ function Tic:drawLog() -- [-] remove
     -- Tic:logAppend("wy", _playeractual.worldy)
 
     -- Tic:logAppend(Nums:frequence01(_tick00, Tic.FREQUENCE0240))
+end
+
+
+function Tic:drawLine(_pointx0, _pointy0, _pointx1, _pointy1, _nobounds) -- TESTING
+    local _points = Nums:pointsLine(_pointx0, _pointy0, _pointx1, _pointy1, _nobounds)
+    for _, _point in ipairs(_points) do
+        rect(_point.x, _point.y, 1, 1, Tic.COLORRED)
+    end
 end
 
 
