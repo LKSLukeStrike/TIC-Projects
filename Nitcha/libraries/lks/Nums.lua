@@ -159,14 +159,11 @@ end
 
 function Nums:pointsPickCount(_points, _count, _finish) -- pick count points -- distributed
     _finish = _finish or false
-    print("count", _count)
     _count = _count or #_points
     _count = (_count < 1 or _count > #_points) and #_points or _count -- all by default
     local _result = {}
     if _count == 0 then return _result end -- empty
-    print("count", _count)
     local _step = Nums:roundint(#_points / _count) + 1
-    print("step", _step)
     for _key = 1, #_points, _step do
         table.insert(_result, _points[_key])
     end

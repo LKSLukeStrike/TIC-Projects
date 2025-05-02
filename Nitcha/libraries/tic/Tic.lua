@@ -1159,7 +1159,7 @@ CSpriteFG.HEADBANK    = 272 -- characters heads
 CSpriteFG.HEADDWARF   = CSpriteFG.HEADBANK + 0
 CSpriteFG.HEADGNOME   = CSpriteFG.HEADBANK + 1
 CSpriteFG.HEADELVWE   = CSpriteFG.HEADBANK + 2
-CSpriteFG.HEADGOGOL   = CSpriteFG.HEADBANK + 3
+CSpriteFG.HEADGOLTH   = CSpriteFG.HEADBANK + 3
 CSpriteFG.HEADANGEL   = CSpriteFG.HEADBANK + 4
 CSpriteFG.HEADHORNE   = CSpriteFG.HEADBANK + 5
 CSpriteFG.HEADMEDUZ   = CSpriteFG.HEADBANK + 6
@@ -3605,18 +3605,18 @@ function CPlayerAngel:new(_argt)
 end
 
 
-local CPlayerGogol = CPlayerHumanoid:extend() -- Gogol player characters
-Classic.KINDGOGOL = "Gogol" -- Gogol kind
-function CPlayerGogol:new(_argt)
-    CPlayerGogol.super.new(self, _argt)
-    self.kind         = Classic.KINDGOGOL
+local CPlayerGolth = CPlayerHumanoid:extend() -- Golth player characters
+Classic.KINDGOLTH = "Golth" -- Golth kind
+function CPlayerGolth:new(_argt)
+    CPlayerGolth.super.new(self, _argt)
+    self.kind         = Classic.KINDGOLTH
     self.size         = CCharacter.SIZEL -- size
     self.colorhairsfg = Tic.COLORWHITE -- colors
     self.colorhairsbg = Tic.COLORWHITE
     self.colorextra   = self.colorshirt
     self.coloreyesfg  = Tic.COLORBLUEL
     self.coloreyesbg  = Tic.COLORBLUEM
-    self.headsprite   = CSpriteFG.HEADGOGOL -- head
+    self.headsprite   = CSpriteFG.HEADGOLTH -- head
     self.statphymax   = 8
     self.statphyact   = self.statphymax
     self.statmenmax   = 6
@@ -3735,9 +3735,9 @@ function CPlayerGhost:new(_argt)
     self.coloreyesbg  = Tic.COLORPURPLE
     self.colorhands   = Tic.COLORPURPLE
     self.headsprite   = CSpriteFG.HEADGHOST -- head
-    self.statphymax   = 4
+    self.statphymax   = 3
     self.statphyact   = self.statphymax
-    self.statmenmax   = 5
+    self.statmenmax   = 6
     self.statmenact   = self.statmenmax
     self.statpsymax   = 6
     self.statpsyact   = self.statpsymax
@@ -5165,7 +5165,7 @@ end -- generate places
 -- }
 -- local Nitcha = CPlayerDrowe{name = "Nitcha",
 -- }
--- local Zariel = CPlayerAngel{name = "Zariel",
+-- local Azarel = CPlayerAngel{name = "Azarel",
 -- }
 -- local Zikkow = CPlayerTifel{name = "Zikkow",
 --     colorhairsbg = Tic.COLORGREENM,
@@ -5185,9 +5185,9 @@ end -- generate places
 -- }
 -- local Daemok = CPlayerDemon{name = "Daemok",
 -- }
--- local Golith = CPlayerGogol{name = "Golith"
+-- local Globth = CPlayerGolth{name = "Globth"
 -- }
--- Golith:randomWorldWindow()
+-- Globth:randomWorldWindow()
 
 -- local Wulfie = CPlayerWolfe{name = "Wulfie",
 --     colorextra = Tic.COLORRED,
@@ -5319,7 +5319,8 @@ function Tic:draw()
     Tic:drawLine(10, 10, 25, 17)
     line(10, 30, 25, 37, Tic.COLORCYAN)
     Tic:drawLine(10, 30, 25, 37, true)
-    -- Tic:drawLine(10, 29, 26, 29, true)
+    rect(10, 50, 16, 1, Tic.COLORCYAN)
+    Tic:drawPoints(Nums:pointsPickCount(Nums:pointsLine(10, 50, 25, 50), 4))
 
     Tic:tick() -- [!] required in the draw function
     end
@@ -5350,6 +5351,10 @@ end
 
 function Tic:drawLine(_pointx0, _pointy0, _pointx1, _pointy1, _nobounds) -- TESTING
     local _points = Nums:pointsLine(_pointx0, _pointy0, _pointx1, _pointy1, _nobounds)
+    Tic:drawPoints(_points)
+end
+
+function Tic:drawPoints(_points) -- TESTING
     for _, _point in ipairs(_points) do
         rect(_point.x, _point.y, 1, 1, Tic.COLORRED)
     end
