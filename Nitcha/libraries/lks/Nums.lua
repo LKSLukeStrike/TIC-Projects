@@ -163,14 +163,20 @@ function Nums:pointsPickCount(_points, _count, _finish) -- pick count points -- 
     _count = (_count < 1 or _count > #_points) and #_points or _count -- all by default
     local _result = {}
     if _count == 0 then return _result end -- empty
-    local _step = Nums:roundint(#_points / _count) + 1
+    local _step = Nums:roundint(#_points / _count) --+ 1
+    local _finished = false
     for _key = 1, #_points, _step do
         table.insert(_result, _points[_key])
+        if _key == #_points then _finished = true end
     end
-    if _finish and #_result < _count then
+    if _finish and not _finished then
         table.insert(_result, _points[#_points])
     end
     return _result
+end
+
+function Nums:pointsPickPercent(_points, _percent, _finish) -- pick percent points -- distributed
+    return Nums:pointsPickCount(_points, Nums:roundint(#_points * _percent / 100), _finish)
 end
 
 

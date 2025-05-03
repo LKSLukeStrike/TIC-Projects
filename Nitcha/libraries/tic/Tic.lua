@@ -5320,7 +5320,14 @@ function Tic:draw()
     line(10, 30, 25, 37, Tic.COLORCYAN)
     Tic:drawLine(10, 30, 25, 37, true)
     rect(10, 50, 16, 1, Tic.COLORCYAN)
-    Tic:drawPoints(Nums:pointsPickCount(Nums:pointsLine(10, 50, 25, 50), 4))
+    Tic:drawPoints(Nums:pointsPickCount(Nums:pointsLine(10, 50, 25, 50), 3, true))
+    Tic:drawPoints(Nums:pointsPickCount(Nums:pointsLine(10, 52, 25, 52), 4, true))
+    Tic:drawPoints(Nums:pointsPickCount(Nums:pointsLine(10, 54, 25, 54), 6, true))
+    Tic:drawPoints(Nums:pointsPickCount(Nums:pointsLine(10, 60, 25, 60), 3, false))
+    Tic:drawPoints(Nums:pointsPickCount(Nums:pointsLine(10, 62, 25, 62), 4, false))
+    Tic:drawPoints(Nums:pointsPickCount(Nums:pointsLine(10, 64, 25, 64), 6, false))
+    Tic:drawPoints(Nums:pointsPickPercent(Nums:pointsLine(10, 66, 25, 66), 20, true))
+    Tic:drawPoints(Nums:pointsPickPercent(Nums:pointsLine(10, 68, 25, 68), 25, true))
 
     Tic:tick() -- [!] required in the draw function
     end
