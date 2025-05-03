@@ -1118,6 +1118,7 @@ CSpriteBG.SIGNDOTSQU  = CSpriteBG.SIGNSBANK + 5 -- dot square
 CSpriteBG.SIGNSCROLL  = CSpriteBG.SIGNSBANK + 6 -- scroll arrow
 CSpriteBG.SIGNCENTER  = CSpriteBG.SIGNSBANK + 7 -- center arrow
 CSpriteBG.SIGNPLAYER  = CSpriteBG.SIGNSBANK + 8 -- player sprite
+CSpriteBG.SIGNSPOTIT  = CSpriteBG.SIGNSBANK + 9 -- spotit sprite
 CSpriteBG.BUILDBANK   = 16 -- buildings
 CSpriteBG.PLACEHOUSE  = CSpriteBG.BUILDBANK + 0
 CSpriteBG.PLACETOWER  = CSpriteBG.BUILDBANK + 1
@@ -4611,6 +4612,23 @@ end
 
 
 --
+-- CButtonSpotIt
+--
+local CButtonSpotIt = CButtonSprite:extend() -- generic spotit sprite button
+CButtonSpotIt.BEHAVIOURAUTODISABLE = function(self)
+    self.enabled = Tic.DRAWSPOTTED
+    CButton.BEHAVIOURAUTODISABLE(self)
+end
+function CButtonSpotIt:new(_argt)
+    CButtonSpotIt.super.new(self, _argt)
+    self.drawborder    = false
+	self.sprite.sprite = CSpriteBG.SIGNSPOTIT
+	self.behaviour     = CButtonSpotIt.BEHAVIOURAUTODISABLE  -- function to trigger at first
+    self:argt(_argt) -- override if any
+end
+
+
+--
 -- CButtonScroll
 --
 local CButtonScroll = CButtonSprite:extend() -- generic scroll arrow sprite button
@@ -4831,14 +4849,26 @@ if true then
 local ScreenWorld = CScreen{name = "World", keysfunctions = Tic.KEYSFUNCTIONSWORLD}
 Tic:screenAppend(ScreenWorld)
 
+-- lf panel
 local ScreenWorldLF = CScreen{}
 local WindowInfosSpotted = CWindowInfosSpotted{}
 local WindowPortraitSpotted = CWindowPortraitSpotted{}
+local ButtonSpotIt = CButtonSpotIt{
+    clicklf = function() Tic:toggleSpotted() end,
+}
+ScreenWorldLF:elementsDistributeH(
+    {ButtonSpotIt}, -2,
+    WindowInfosSpotted.screenx + (
+        (WindowInfosSpotted.screenw - CScreen:elementsTotalH({ButtonSpotIt}, -2)) // 2),
+        WindowInfosSpotted.screeny - Tic.SPRITESIZE
+)
 ScreenWorldLF:appendElements{
     WindowInfosSpotted,
     WindowPortraitSpotted,
+    ButtonSpotIt,
 }
 
+-- md panel
 local ScreenWorldMD = CScreen{}
 local WindowWorld = CWindowWorld{spottedwindows = {WindowInfosSpotted, WindowPortraitSpotted}}
 local WindowInfosWorld = CWindowInfosWorld{}
@@ -4847,6 +4877,7 @@ ScreenWorldMD:appendElements{
     WindowInfosWorld,
 }
 
+-- rg panel
 local ScreenWorldRG = CScreen{}
 local WindowInfosPlayer = CWindowInfosPlayer{}
 local WindowPortraitPlayer = CWindowPortraitPlayer{}
