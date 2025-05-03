@@ -14,6 +14,7 @@ local Nums    = require("libraries/lks/Nums")
 local Tables = {}
 
 
+-- Size
 function Tables:size(_table) -- size of a table
     local _result = 0
     for _, _ in pairs(_table or {}) do
@@ -22,6 +23,8 @@ function Tables:size(_table) -- size of a table
     return _result
 end
 
+
+-- Keys and Vals
 function Tables:keys(_table) -- keys of a table -- SORTED
     local _result = {}
     for _key, _ in pairs(_table) do
@@ -47,6 +50,20 @@ function Tables:vals(_table) -- vals of a table -- SORTED
     return _result
 end
 
+
+-- Generate
+function Tables:generate(_that) -- generate a table from [key] = count ... to count x [key] ...
+    local _result = {}
+    for _key, _count in pairs(_that or {}) do
+        for _ = 1, _count do
+            table.insert(_result, _key)
+        end
+    end
+    return _result
+end
+
+
+-- Pick
 function Tables:keyPick(_table, _keyn) -- return the nth key of a table
     local _keys = Tables:keys(_table)
     return _keys[_keyn] -- nil if not found
@@ -64,6 +81,8 @@ function Tables:valPickRandom(_table) -- return a random val in a table
     return _table[Tables:keyPickRandom(_table)] -- nil if no items
 end
 
+ 
+-- Find
 function Tables:keyFind(_table, _find) -- return the key of key _find else nil if not found
     for _key, _val in pairs(_table or {}) do
         if _key == _find then return _key end
@@ -78,6 +97,8 @@ function Tables:valFind(_table, _find) -- return the key of val _find else nil i
     return -- nil
 end
 
+
+-- Append, Delete, Insert, Remove
 function Tables:keyAppend(_table, _key, _val) -- append/replace a key val entry
     if not _table or not _key then return end -- mandatory
     _val = _val or true
@@ -90,8 +111,14 @@ function Tables:keyDelete(_table, _key) -- delete a key val entry (paired tables
 end
 
 function Tables:keyRemove(_table, _key) -- remove a key entry (ipaired tables)
-    if not _table or not _key then return end -- mandatory
+    if not _table then return end -- mandatory
     table.remove(_table, _key)
+end
+
+function Tables:keyRemoveNAt(_table, _n, _at) -- remove N elements at key position
+    for _ = 1, _n or 0 do
+        Tables:keyRemove(_table, _at)
+    end
 end
 
 function Tables:valInsert(_table, _val, _once, _key) -- insert a val entry (ipaired tables) -- once of any (avoid doublons)
@@ -117,6 +144,8 @@ function Tables:valRemove(_table, _val, _once) -- remove a val entry (ipaired ta
     end
 end
 
+
+-- Copy and Merge
 function Tables:copy(_table) -- copy a table -- SORTED -- only first level
     local _result = {}
     local _keys = Tables:keys(_table) -- sorted keys
@@ -134,6 +163,7 @@ function Tables:merge(_tablea, _tableb) -- merge two tables -- do not alter init
 end
 
 
+-- Dump and Print
 function Tables:dump(_table, _argt) -- dump a table -- SORTED -- RECURSIVE -- INDENT -- DEPTH
     _argt = _argt or {}
     local _indent  = _argt.indent or ""

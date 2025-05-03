@@ -4827,6 +4827,7 @@ end
 --
 -- INTERFACE -- order is important !
 --
+if true then
 local ScreenWorld = CScreen{name = "World", keysfunctions = Tic.KEYSFUNCTIONSWORLD}
 Tic:screenAppend(ScreenWorld)
 
@@ -4884,8 +4885,9 @@ ScreenWorld:appendElements{
     ScreenWorldMD,
     ScreenWorldRG,
 }
+end
 
-if true then
+if false then
 -- local ScreenIntro = CScreen{name = "Intro", keysfunctions = Tic.KEYSFUNCTIONSINTRO}
 local ScreenIntro = CScreen{name = "Intro", keysfunctions = Tic.KEYSFUNCTIONSINTRO}
 Tic:screenAppend(ScreenIntro)
@@ -5055,7 +5057,7 @@ function CPlace:generateRandomRegionWorldCount(_count, _kinds, _worldregion) -- 
 
     for _ = 1, _count do
         local _kind = Tables:keyPickRandom(_kinds) -- random kind
-        while _kinds[_kind].percent and math.random(0, 100) >_kinds[_kind].percent do
+        while _kinds[_kind].percent and Nums:random(0, 100) >_kinds[_kind].percent do
             _kind = Tables:keyPickRandom(_kinds) -- choose another kind
         end
         _entity = _kind()
@@ -5252,7 +5254,7 @@ local Region = CRegion{
 --
 -- Places -- TESTING
 --
-if true then
+if false then
 Tic.DRAWHITBOX = false
 for _, _cplace in pairs({
     -- CPlaceTree0Anim,
@@ -5289,10 +5291,57 @@ for _, _cplace in pairs({
     CPlaceRoad1Idle,
 }) do
     _cplace{
-        worldx = math.random(-50, 50),
-        worldy = math.random(-50, 50),
+        worldx = Nums:random(-50, 50),
+        worldy = Nums:random(-50, 50),
     }
 end
+end
+
+function CPlace:generateRoad(_worldx0, _worldy0, _worldx1, _worldy1, _percent, _devx, _devy, _cplaces)
+    _percent = _percent or 10
+    _devx    = _devx or 0 -- apply random xy deviations if any
+    _devy    = _devy or 0
+    _cplaces = _cplaces or Tables:generate{ -- places classes to random pick
+        [CPlaceRoad0Anim] = 1,
+        [CPlaceRoad1Anim] = 1,
+        [CPlaceRoad0Idle] = 4,
+        [CPlaceRoad1Idle] = 4,
+    }
+    local _points = Nums:pointsPickPercent(Nums:pointsLine(_worldx0, _worldy0, _worldx1, _worldy1, true), _percent)
+    Tables:keyRemoveNAt(_points, 1, 1) -- skip starting and ending positions
+    Tables:keyRemoveNAt(_points, 1)
+    for _, _point in ipairs(_points) do
+        local _cplace = Tables:valPickRandom(_cplaces)
+        _cplace{
+            worldx = _point.x + Nums:random(Nums:neg(_devx), Nums:pos(_devx)),
+            worldy = _point.y + Nums:random(Nums:neg(_devy), Nums:pos(_devy)),
+        }
+    end
+end
+
+if true then
+local House1 = CPlaceHouseAnim{
+    name = "House1",
+    worldx = -20,
+    worldy = 10,
+}
+local House2 = CPlaceHouseAnim{
+    name = "House2",
+    worldx = 30,
+    worldy = 40,
+}
+local Kirke1 = CPlaceKirkeAnim{
+    name = "Kirke1",
+    worldx = -20,
+    worldy = 40,
+}
+CPlace:generateRoad(House1.worldx, House1.worldy, House2.worldx, House2.worldy, 15)
+CPlace:generateRoad(House1.worldx, House1.worldy, Kirke1.worldx, Kirke1.worldy, 20)
+CPlace:generateRoad(House2.worldx, House2.worldy, Kirke1.worldx, Kirke1.worldy, 10)
+CPlace:generateRoad(House1.worldx, House1.worldy, House2.worldx, House2.worldy, 10, 5, 5, Tables:generate{
+    [CPlaceTree0Anim] = 4,
+    -- [CPlaceTree0Idle] = 1,
+})
 end
 
 -- Tic.DRAWHITBOX  = true
@@ -5315,19 +5364,19 @@ function Tic:draw()
     Tic:logPrint()
 
     -- line(10, 9, 25, 9, Tic.COLORCYAN)
-    line(10, 10, 25, 17, Tic.COLORCYAN)
-    Tic:drawLine(10, 10, 25, 17)
-    line(10, 30, 25, 37, Tic.COLORCYAN)
-    Tic:drawLine(10, 30, 25, 37, true)
-    rect(10, 50, 16, 1, Tic.COLORCYAN)
-    Tic:drawPoints(Nums:pointsPickCount(Nums:pointsLine(10, 50, 25, 50), 3, true))
-    Tic:drawPoints(Nums:pointsPickCount(Nums:pointsLine(10, 52, 25, 52), 4, true))
-    Tic:drawPoints(Nums:pointsPickCount(Nums:pointsLine(10, 54, 25, 54), 6, true))
-    Tic:drawPoints(Nums:pointsPickCount(Nums:pointsLine(10, 60, 25, 60), 3, false))
-    Tic:drawPoints(Nums:pointsPickCount(Nums:pointsLine(10, 62, 25, 62), 4, false))
-    Tic:drawPoints(Nums:pointsPickCount(Nums:pointsLine(10, 64, 25, 64), 6, false))
-    Tic:drawPoints(Nums:pointsPickPercent(Nums:pointsLine(10, 66, 25, 66), 20, true))
-    Tic:drawPoints(Nums:pointsPickPercent(Nums:pointsLine(10, 68, 25, 68), 25, true))
+    -- line(10, 10, 25, 17, Tic.COLORCYAN)
+    -- Tic:drawLine(10, 10, 25, 17)
+    -- line(10, 30, 25, 37, Tic.COLORCYAN)
+    -- Tic:drawLine(10, 30, 25, 37, true)
+    -- rect(10, 50, 16, 1, Tic.COLORCYAN)
+    -- Tic:drawPoints(Nums:pointsPickCount(Nums:pointsLine(10, 50, 25, 50), 3, true))
+    -- Tic:drawPoints(Nums:pointsPickCount(Nums:pointsLine(10, 52, 25, 52), 4, true))
+    -- Tic:drawPoints(Nums:pointsPickCount(Nums:pointsLine(10, 54, 25, 54), 6, true))
+    -- Tic:drawPoints(Nums:pointsPickCount(Nums:pointsLine(10, 60, 25, 60), 3, false))
+    -- Tic:drawPoints(Nums:pointsPickCount(Nums:pointsLine(10, 62, 25, 62), 4, false))
+    -- Tic:drawPoints(Nums:pointsPickCount(Nums:pointsLine(10, 64, 25, 64), 6, false))
+    -- Tic:drawPoints(Nums:pointsPickPercent(Nums:pointsLine(10, 66, 25, 66), 20, true))
+    -- Tic:drawPoints(Nums:pointsPickPercent(Nums:pointsLine(10, 68, 25, 68), 25, true))
 
     Tic:tick() -- [!] required in the draw function
     end

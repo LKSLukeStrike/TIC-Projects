@@ -59,3 +59,13 @@ Tables:print(t)
 print()
 Tables:valRemove(t, "velo", true)
 Tables:print(t)
+print()
+Tables:keyRemoveNAt(t, 1)
+Tables:print(t)
+
+print()
+Tables:print(Tables:generate{
+    ["a"] = 10,
+    ["b"] = 5,
+    ["c"] = 1,
+})
