@@ -823,6 +823,7 @@ end
 
 -- Hitbox System -- toggle hitbox display
 Tic.DRAWHITBOX = false
+
 function Tic:toggleHitbox()
 	Tic.DRAWHITBOX = Nums:toggleTF(Tic.DRAWHITBOX)
 end
@@ -830,13 +831,28 @@ end
 
 -- Spotted System -- toggle spotted display
 Tic.DRAWSPOTTED = false
+Tic.LOCKSPOTTED = false
+
 function Tic:toggleSpotted()
+    if Tic.MODIFIERKEYS[Tic.KEY_SHIFT] then
+        Tic:toggleLockSpotted()
+    else
+        Tic:toggleDrawSpotted()
+    end
+end
+
+function Tic:toggleDrawSpotted()
 	Tic.DRAWSPOTTED = Nums:toggleTF(Tic.DRAWSPOTTED)
+end
+
+function Tic:toggleLockSpotted()
+	Tic.LOCKSPOTTED = Nums:toggleTF(Tic.LOCKSPOTTED)
 end
 
 
 -- Borders System -- toggle borders display
 Tic.DRAWBORDERS = false
+
 function Tic:toggleBorders()
 	Tic.DRAWBORDERS = Nums:toggleTF(Tic.DRAWBORDERS)
 end
@@ -844,6 +860,7 @@ end
 
 -- Dirs System -- toggle dirs display
 Tic.DRAWDIRS = false
+
 function Tic:toggleDirs()
 	Tic.DRAWDIRS = Nums:toggleTF(Tic.DRAWDIRS)
 end
@@ -851,6 +868,7 @@ end
 
 -- View System -- toggle view display
 Tic.DRAWVIEW = false
+
 function Tic:toggleView()
 	Tic.DRAWVIEW = Nums:toggleTF(Tic.DRAWVIEW)
 end
@@ -858,6 +876,7 @@ end
 
 -- Mind System -- toggle mind display
 Tic.DRAWMIND = false
+
 function Tic:toggleMind()
 	Tic.DRAWMIND = Nums:toggleTF(Tic.DRAWMIND)
 end
@@ -865,16 +884,14 @@ end
 
 -- Move System -- toggle move display
 Tic.DRAWMOVE = false
+
 function Tic:toggleMove()
 	Tic.DRAWMOVE = Nums:toggleTF(Tic.DRAWMOVE)
 end
 
 
 -- Scales System -- handle scales
-Tic.SCALES = CCyclerInt{ -- scales cycler from 1-4
-    minindex = 1,
-    maxindex = 4,
-}
+Tic.SCALES = CCyclerInt{minindex = 1, maxindex = 4} -- scales cycler from 1-4
 
 function Tic:scaleNext() -- next scale in the stack
     Tic.SCALES:next()
@@ -895,6 +912,7 @@ Tic.TICK00 = CCyclerInt{ -- tick cycler from 0-maxinteger
 Tic.TICK60 = CCyclerInt{ -- tick cycler from 0-59
     maxindex = 59,
 }
+
 function Tic:tick() -- increment the timers
     Tic.TICK00:next()
     Tic.TICK60:next()
@@ -905,6 +923,7 @@ end
 Tic.LOGBUFFER       = {} -- cleared at print
 Tic.LOGRECORD       = {} -- cleared manually
 Tic.LOGRECORDACTIVE = false -- to switch on/off
+
 function Tic:logClearBuffer() -- clear the log buffer
     Tic.LOGBUFFER = {}
 end
@@ -1109,16 +1128,17 @@ end
 local CSpriteBG = CSprite:extend() -- bg sprites aka tic tiles
 CSpriteBG.SPRITEBANK  = 0
 CSpriteBG.SIGNSBANK   = 0  -- signs
-CSpriteBG.SIGNQSTMRK  = CSpriteBG.SIGNSBANK + 0 -- question mark
-CSpriteBG.SIGNINTMRK  = CSpriteBG.SIGNSBANK + 1 -- interact mark
-CSpriteBG.SIGNBORSQU  = CSpriteBG.SIGNSBANK + 2 -- borders square
-CSpriteBG.SIGNSPOSQU  = CSpriteBG.SIGNSBANK + 3 -- spotted square
-CSpriteBG.SIGNCROSQU  = CSpriteBG.SIGNSBANK + 4 -- crossed square
-CSpriteBG.SIGNDOTSQU  = CSpriteBG.SIGNSBANK + 5 -- dot square
-CSpriteBG.SIGNSCROLL  = CSpriteBG.SIGNSBANK + 6 -- scroll arrow
-CSpriteBG.SIGNCENTER  = CSpriteBG.SIGNSBANK + 7 -- center arrow
-CSpriteBG.SIGNPLAYER  = CSpriteBG.SIGNSBANK + 8 -- player sprite
-CSpriteBG.SIGNSPOTIT  = CSpriteBG.SIGNSBANK + 9 -- spotit sprite
+CSpriteBG.SIGNQSTMRK  = CSpriteBG.SIGNSBANK + 00 -- question mark
+CSpriteBG.SIGNINTMRK  = CSpriteBG.SIGNSBANK + 01 -- interact mark
+CSpriteBG.SIGNBORSQU  = CSpriteBG.SIGNSBANK + 02 -- borders square
+CSpriteBG.SIGNSPOSQU  = CSpriteBG.SIGNSBANK + 03 -- spotted square
+CSpriteBG.SIGNCROSQU  = CSpriteBG.SIGNSBANK + 04 -- crossed square
+CSpriteBG.SIGNDOTSQU  = CSpriteBG.SIGNSBANK + 05 -- dot square
+CSpriteBG.SIGNSCROLL  = CSpriteBG.SIGNSBANK + 06 -- scroll arrow
+CSpriteBG.SIGNCENTER  = CSpriteBG.SIGNSBANK + 07 -- center arrow
+CSpriteBG.SIGNPLAYER  = CSpriteBG.SIGNSBANK + 08 -- player sprite
+CSpriteBG.SIGNSPOTIT  = CSpriteBG.SIGNSBANK + 09 -- spotit sprite
+CSpriteBG.SIGNLOCKIT  = CSpriteBG.SIGNSBANK + 10 -- lockit sprite
 CSpriteBG.BUILDBANK   = 16 -- buildings
 CSpriteBG.PLACEHOUSE  = CSpriteBG.BUILDBANK + 0
 CSpriteBG.PLACETOWER  = CSpriteBG.BUILDBANK + 1
@@ -4682,6 +4702,23 @@ end
 
 
 --
+-- CButtonLockIt
+--
+local CButtonLockIt = CButtonCheck:extend() -- generic lockit check button
+CButtonLockIt.BEHAVIOURAUTODISABLE = function(self)
+    self.checked = Tic.LOCKSPOTTED
+    CButton.BEHAVIOURAUTODISABLE(self)
+end
+function CButtonLockIt:new(_argt)
+    CButtonLockIt.super.new(self, _argt)
+    self.drawborder    = false
+	self.sprite.sprite = CSpriteBG.SIGNLOCKIT
+	self.behaviour     = CButtonLockIt.BEHAVIOURAUTODISABLE  -- function to trigger at first
+    self:argt(_argt) -- override if any
+end
+
+
+--
 -- CButtonScroll
 --
 local CButtonScroll = CButtonClick:extend() -- generic scroll click button
@@ -4907,19 +4944,24 @@ local ScreenWorldLF = CScreen{}
 local WindowInfosSpotted = CWindowInfosSpotted{}
 local WindowPortraitSpotted = CWindowPortraitSpotted{}
 local ButtonSpotIt = CButtonSpotIt{
-    clicklf = function() Tic:toggleSpotted() end,
+    clicklf = function() Tic:toggleDrawSpotted() end,
     hovertext = "Spot",
 }
+local ButtonLockIt = CButtonLockIt{
+    clicklf = function() Tic:toggleLockSpotted() end,
+    hovertext = "Lock",
+}
 ScreenWorldLF:elementsDistributeH(
-    {ButtonSpotIt},
+    {ButtonSpotIt, ButtonLockIt},
     WindowInfosSpotted.screenx + (
-        (WindowInfosSpotted.screenw - CScreen:elementsTotalH({ButtonSpotIt})) // 2),
+        (WindowInfosSpotted.screenw - CScreen:elementsTotalH({ButtonSpotIt, ButtonLockIt})) // 2),
         WindowInfosSpotted.screeny - Tic.SPRITESIZE
 )
 ScreenWorldLF:appendElements{
     WindowInfosSpotted,
     WindowPortraitSpotted,
     ButtonSpotIt,
+    ButtonLockIt,
 }
 
 -- md panel
