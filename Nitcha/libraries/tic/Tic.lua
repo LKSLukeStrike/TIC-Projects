@@ -4472,7 +4472,7 @@ function CButton:new(_argt)
     self.enabled       = true  -- can be clicked ?
     self.hovered       = false -- hovered by the mouse ?
     self.actived       = false -- function triggered ?
-    self.activedcycler = CCyclerInt{maxindex =  10, mode = CCycler.MODEBLOCK} -- cycler to maintain the activated effect a little bit 
+    self.activedcycler = CCyclerInt{maxindex =  10, mode = CCycler.MODEBLOCK} -- cycler to maintain the actived effect a little bit 
 	self.clicklf       = nil   -- function to trigger on click lf
 	self.clickmd       = nil   -- function to trigger on click md
 	self.clickrg       = nil   -- function to trigger on click rg
@@ -4595,9 +4595,48 @@ end
 
 
 --
+-- CButtonClick
+--
+local CButtonClick = CButtonSprite:extend() -- generic click button
+
+
+--
+-- CButtonCheck
+--
+local CButtonCheck = CButtonSprite:extend() -- generic check button
+function CButtonCheck:new(_argt)
+    CButtonCheck.super.new(self, _argt)
+    self.activedcycler = CCyclerInt{minindex =  1, maxindex =  1} -- cycler to maintain the actived effect
+    self:argt(_argt) -- override if any
+end
+
+function CButtonCheck:drawGround()
+    local _palette = {[self.colorground] = self.colorground, [self.colorborder] = self.colorborder}
+    _palette = (self.actived)
+        and {[self.colorground] = self.colorground, [self.colorborder] = self.colorgroundactived}
+        or  _palette
+    _palette = (self.hovered)
+        and {[self.colorground] = self.colorground, [self.colorborder] = self.colorhover}
+        or  _palette
+    _palette = (self.enabled)
+        and _palette
+        or  {[self.colorground] = self.colorgrounddisabled, [self.colorborder] = self.colorborderdisabled}
+
+    self.sprite.screenx = self.screenx
+    self.sprite.screeny = self.screeny
+    self.sprite.palette = _palette
+    self.sprite:draw()
+end
+
+function CButtonCheck:activable() -- always activable
+    return true
+end
+
+
+--
 -- CButtonPlayer
 --
-local CButtonPlayer = CButtonSprite:extend() -- generic player sprite button
+local CButtonPlayer = CButtonClick:extend() -- generic player click button
 CButtonPlayer.BEHAVIOURAUTODISABLE = function(self)
     self.enabled = Tables:size(Tic:playerPlayers()) > 1
     CButton.BEHAVIOURAUTODISABLE(self)
@@ -4614,9 +4653,9 @@ end
 --
 -- CButtonSpotIt
 --
-local CButtonSpotIt = CButtonSprite:extend() -- generic spotit sprite button
+local CButtonSpotIt = CButtonCheck:extend() -- generic spotit check button
 CButtonSpotIt.BEHAVIOURAUTODISABLE = function(self)
-    self.enabled = Tic.DRAWSPOTTED
+    self.actived = Tic.DRAWSPOTTED
     CButton.BEHAVIOURAUTODISABLE(self)
 end
 function CButtonSpotIt:new(_argt)
@@ -4631,7 +4670,7 @@ end
 --
 -- CButtonScroll
 --
-local CButtonScroll = CButtonSprite:extend() -- generic scroll arrow sprite button
+local CButtonScroll = CButtonClick:extend() -- generic scroll click button
 function CButtonScroll:new(_argt)
     CButtonScroll.super.new(self, _argt)
     self.drawborder    = false
@@ -4643,7 +4682,7 @@ end
 --
 -- CButtonScrollLF
 --
-local CButtonScrollLF = CButtonScroll:extend() -- generic scroll LF arrow sprite button
+local CButtonScrollLF = CButtonScroll:extend() -- generic scroll LF click button
 function CButtonScrollLF:new(_argt)
     CButtonScrollLF.super.new(self, _argt)
 	self.sprite.rotate = CSprite.ROTATE270
@@ -4654,7 +4693,7 @@ end
 --
 -- CButtonScrollUP
 --
-local CButtonScrollUP = CButtonScroll:extend() -- generic scroll UP arrow sprite button
+local CButtonScrollUP = CButtonScroll:extend() -- generic scroll UP click button
 function CButtonScrollUP:new(_argt)
     CButtonScrollUP.super.new(self, _argt)
 	self.sprite.rotate = CSprite.ROTATE000
@@ -4665,7 +4704,7 @@ end
 --
 -- CButtonScrollDW
 --
-local CButtonScrollDW = CButtonScroll:extend() -- generic scroll DW arrow sprite button
+local CButtonScrollDW = CButtonScroll:extend() -- generic scroll DW click button
 function CButtonScrollDW:new(_argt)
     CButtonScrollDW.super.new(self, _argt)
 	self.sprite.rotate = CSprite.ROTATE180
@@ -4676,7 +4715,7 @@ end
 --
 -- CButtonScrollRG
 --
-local CButtonScrollRG = CButtonScroll:extend() -- generic scroll RG arrow sprite button
+local CButtonScrollRG = CButtonScroll:extend() -- generic scroll RG click button
 function CButtonScrollRG:new(_argt)
     CButtonScrollRG.super.new(self, _argt)
 	self.sprite.rotate = CSprite.ROTATE090
@@ -4687,7 +4726,7 @@ end
 --
 -- CButtonCenter
 --
-local CButtonCenter = CButtonSprite:extend() -- generic center arrow sprite button
+local CButtonCenter = CButtonClick:extend() -- generic center click button
 function CButtonCenter:new(_argt)
     CButtonCenter.super.new(self, _argt)
     self.drawborder    = false
@@ -5222,10 +5261,10 @@ end -- generate places
 -- }
 -- Globth:randomWorldWindow()
 
--- local Wulfie = CPlayerWolfe{name = "Wulfie",
---     colorextra = Tic.COLORRED,
---     worldx = 10,
--- }
+local Wulfie = CPlayerWolfe{name = "Wulfie",
+    colorextra = Tic.COLORRED,
+    worldx = 10,
+}
 -- Wulfie:randomWorldWindow()
 
 local Oxboow = CPlayerGhost{name = "Oxboow",
