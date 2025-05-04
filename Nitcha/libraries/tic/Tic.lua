@@ -21,7 +21,7 @@ local Tic = {}
 -- Fonts sizes
 Tic.FONTWL = 6 -- large font width
 Tic.FONTWS = 4 -- small font width
-Tic.FONTH  = 6 -- both font height
+Tic.FONTH  = 6 -- both fonts height
 
 -- Screen positions and sizes
 Tic.SCREENW  = 240 -- screen width
@@ -4479,6 +4479,7 @@ function CButton:new(_argt)
 	self.scrollx       = nil   -- function to trigger on scroll x
 	self.scrolly       = nil   -- function to trigger on scroll y
 	self.behaviour     = CButton.BEHAVIOURAUTODISABLE  -- function to trigger at first
+    self.hovertext     = nil -- hover text if any
 	self.rounded       = true  -- rounded border and frames ?
     self.drawframes    = false
     self.drawcaches    = false
@@ -4489,6 +4490,11 @@ function CButton:new(_argt)
     self.colorborderdisabled = Tic.COLORGREYM
     self.colorgroundactived  = Tic.COLORBLUEL
     self:argt(_argt) -- override if any
+end
+
+function CButton:draw() -- button drawing
+    CButton.super.draw(self)
+    if self.hovered and self.hovertext then self:drawFHoverText() end
 end
 
 function CButton:drawGround()
@@ -4519,6 +4525,15 @@ function CButton:drawBorder()
         rect(self.screenx + self.screenw - 1, self.screeny + 1, 1, self.screenh - 2, self.colorborder)
     end
     self:load()
+end
+
+function CButton:drawFHoverText()
+    local _textw = #self.hovertext * Tic.FONTWS
+    local _screenx = self.screenx - ((_textw - self.screenw) // 2) + 1
+    local _screeny = self.screeny - (Tic.FONTH)
+    rect(_screenx -1, _screeny, _textw + 1, Tic.FONTH, self.colorhover)
+    rect(_screenx, _screeny - 1, _textw - 1, Tic.FONTH + 2, self.colorhover)
+    print(self.hovertext, _screenx, _screeny, self.colorground, true, 1, true)
 end
 
 function CButton:functionsDefined() -- defined functions of a button
@@ -4893,6 +4908,7 @@ local WindowInfosSpotted = CWindowInfosSpotted{}
 local WindowPortraitSpotted = CWindowPortraitSpotted{}
 local ButtonSpotIt = CButtonSpotIt{
     clicklf = function() Tic:toggleSpotted() end,
+    hovertext = "Spot",
 }
 ScreenWorldLF:elementsDistributeH(
     {ButtonSpotIt}, -2,
@@ -4923,14 +4939,17 @@ local WindowStatsPlayer = CWindowStatsPlayer{}
 local WindowStatePlayer = CWindowStatePlayer{}
 local ButtonPrevPlayer = CButtonScrollLF{
     clicklf = Tic.FUNCTIONPLAYERPREV,
-	behaviour = CButtonPlayer.BEHAVIOURAUTODISABLE  -- function to trigger at first
+	behaviour = CButtonPlayer.BEHAVIOURAUTODISABLE,  -- function to trigger at first
+    hovertext = "Prev",
 }
 local ButtonPickPlayer = CButtonPlayer{
     clicklf = function() Tic:logAppend("Player") end,
+    hovertext = "Pick",
 }
 local ButtonNextPlayer = CButtonScrollRG{
     clicklf = Tic.FUNCTIONPLAYERNEXT,
-    behaviour = CButtonPlayer.BEHAVIOURAUTODISABLE  -- function to trigger at first
+    behaviour = CButtonPlayer.BEHAVIOURAUTODISABLE,  -- function to trigger at first
+    hovertext = "Next",
 }
 ScreenWorldRG:elementsDistributeH(
     {ButtonPrevPlayer, ButtonPickPlayer, ButtonNextPlayer}, -2,
@@ -4956,7 +4975,7 @@ ScreenWorld:appendElements{
 }
 end
 
-if false then
+if true then
 -- local ScreenIntro = CScreen{name = "Intro", keysfunctions = Tic.KEYSFUNCTIONSINTRO}
 local ScreenIntro = CScreen{name = "Intro", keysfunctions = Tic.KEYSFUNCTIONSINTRO}
 Tic:screenAppend(ScreenIntro)
@@ -4966,11 +4985,13 @@ local Button1 = CButton{
     -- screeny = 10,
     screenw = 16,
     name = "plop 1",
+    hovertext = "PY",
 }
 local Button2 = CButton{
     -- screenx = 10,
     -- screeny = 20,
     name = "plop 2",
+    hovertext = "PyLYP",
 }
 local Button3 = CButton{
     -- screenx = 10,
