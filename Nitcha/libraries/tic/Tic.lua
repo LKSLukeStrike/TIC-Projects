@@ -4848,7 +4848,7 @@ function CScreen:elementsTotalH(_elements, _separator) -- total h of elements wi
     return _result
 end
 
-function CScreen:elementsDistributeH(_elements, _separator, _screenx, _screeny) -- distribute h elements with optional separator and xy
+function CScreen:elementsDistributeH(_elements, _screenx, _screeny, _separator) -- distribute h elements with optional separator and xy
     _separator = _separator or 0
     for _, _element in ipairs(_elements or {}) do
         if _screenx then
@@ -4871,7 +4871,7 @@ function CScreen:elementsDistributeH(_elements, _separator, _screenx, _screeny) 
     end
 end
 
-function CScreen:elementsDistributeV(_elements, _separator, _screenx, _screeny) -- distribute v elements with optional separator and xy
+function CScreen:elementsDistributeV(_elements, _screenx, _screeny, _separator) -- distribute v elements with optional separator and xy
     _separator = _separator or 0
     for _, _element in ipairs(_elements or {}) do
         if _screenx then
@@ -4911,9 +4911,9 @@ local ButtonSpotIt = CButtonSpotIt{
     hovertext = "Spot",
 }
 ScreenWorldLF:elementsDistributeH(
-    {ButtonSpotIt}, -2,
+    {ButtonSpotIt},
     WindowInfosSpotted.screenx + (
-        (WindowInfosSpotted.screenw - CScreen:elementsTotalH({ButtonSpotIt}, -2)) // 2),
+        (WindowInfosSpotted.screenw - CScreen:elementsTotalH({ButtonSpotIt})) // 2),
         WindowInfosSpotted.screeny - Tic.SPRITESIZE
 )
 ScreenWorldLF:appendElements{
@@ -4952,9 +4952,9 @@ local ButtonNextPlayer = CButtonScrollRG{
     hovertext = "Next",
 }
 ScreenWorldRG:elementsDistributeH(
-    {ButtonPrevPlayer, ButtonPickPlayer, ButtonNextPlayer}, -2,
+    {ButtonPrevPlayer, ButtonPickPlayer, ButtonNextPlayer},
     WindowInfosPlayer.screenx + (
-        (WindowInfosPlayer.screenw - CScreen:elementsTotalH({ButtonPrevPlayer, ButtonPickPlayer, ButtonNextPlayer}, -2)) // 2),
+        (WindowInfosPlayer.screenw - CScreen:elementsTotalH({ButtonPrevPlayer, ButtonPickPlayer, ButtonNextPlayer})) // 2),
     WindowInfosPlayer.screeny - Tic.SPRITESIZE
 )
 ScreenWorldRG:appendElements{
@@ -5093,8 +5093,8 @@ Button1.clickrg = _function
 Button2.clicklf = _function
 Button7.clicklf = Tic.FUNCTIONSCREENNEXT
 
-ScreenIntro:elementsDistributeH({Button11, Button12, Button16, Button13, Button14}, -2, 30, 10)
-ScreenIntro:elementsDistributeV({Button1, Button2, Button3}, 2, 10, 10)
+ScreenIntro:elementsDistributeH({Button11, Button12, Button16, Button13, Button14}, 30, 10, -2)
+ScreenIntro:elementsDistributeV({Button1, Button2, Button3}, 10, 10, 2)
 end
 -- exit()
 
