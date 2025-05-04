@@ -4606,12 +4606,15 @@ local CButtonClick = CButtonSprite:extend() -- generic click button
 local CButtonCheck = CButtonSprite:extend() -- generic check button
 function CButtonCheck:new(_argt)
     CButtonCheck.super.new(self, _argt)
-    self.activedcycler = CCyclerInt{minindex =  1, maxindex =  1} -- cycler to maintain the actived effect
+	self.checked = false
     self:argt(_argt) -- override if any
 end
 
 function CButtonCheck:drawGround()
     local _palette = {[self.colorground] = self.colorground, [self.colorborder] = self.colorborder}
+    _palette = (self.checked)
+        and {[self.colorground] = self.colorground, [self.colorborder] = self.colorgroundactived}
+        or  _palette
     _palette = (self.actived)
         and {[self.colorground] = self.colorground, [self.colorborder] = self.colorgroundactived}
         or  _palette
@@ -4626,10 +4629,6 @@ function CButtonCheck:drawGround()
     self.sprite.screeny = self.screeny
     self.sprite.palette = _palette
     self.sprite:draw()
-end
-
-function CButtonCheck:activable() -- always activable
-    return true
 end
 
 
@@ -4655,7 +4654,7 @@ end
 --
 local CButtonSpotIt = CButtonCheck:extend() -- generic spotit check button
 CButtonSpotIt.BEHAVIOURAUTODISABLE = function(self)
-    self.actived = Tic.DRAWSPOTTED
+    self.checked = Tic.DRAWSPOTTED
     CButton.BEHAVIOURAUTODISABLE(self)
 end
 function CButtonSpotIt:new(_argt)
