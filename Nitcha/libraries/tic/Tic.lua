@@ -2896,6 +2896,7 @@ function CCharacter:new(_argt)
     self.state        = Tic.STATESTANDIDLE -- state
     self.idlecycler   = CCyclerInt{maxindex = 59,} -- cycler to get back to idle
     self.workcycler   = CCyclerInt{maxindex = 179,} -- cycler to animate work
+    self.spotting     = nil -- spotting an entity if any
     self.colorhairsfg = Tic.COLORHAIRSFG -- colors
     self.colorhairsbg = Tic.COLORHAIRSBG
     self.colorextra   = Tic.COLOREXTRA
@@ -3802,6 +3803,7 @@ function CWindow:new(_argt)
     self.colorborder = Tic.COLORGREYM -- border color
     self.colorframe1 = Tic.COLORWHITE -- frames colors
     self.colorframe2 = Tic.COLORGREYL
+    self.behaviour   = nil  -- behaviour function if any
     self.display     = true -- display or not ?
     self.drawground  = true -- draw behevior
     self.drawguides  = false
@@ -3809,7 +3811,6 @@ function CWindow:new(_argt)
     self.drawcaches  = true
     self.drawborder  = true
     self.drawframes  = true
-    self.behaviour   = nil -- behaviour function if any
     self:argt(_argt) -- override if any
 end
 
@@ -4058,29 +4059,6 @@ end
 function CWindowInfosPlayer:drawInside() -- window infos content for player
 	self.entity = Tic:playerActual()
     CWindowInfosPlayer.super.drawInside(self)
-end
-
-function CWindowInfosPlayer:drawScrollArrows()
-    local _arrowscount  = 2
-    local _arrowsweight = _arrowscount * Tic.SPRITESIZE
-    local _paletteoff   = {[Tic.COLORWHITE] = Tic.COLORGREYM, [Tic.COLORGREYM] = Tic.COLORGREYD}
-    local _screenx      = Tic.PLAYERINFOSWX + ((Tic.PLAYERINFOSWW - _arrowsweight) / 2)
-    local _screeny      = Tic.PLAYERINFOSWY - Tic.SPRITESIZE
-    
-    local _musprite = CSpriteBG() -- multi usage unique sprite
-    _musprite.sprite  = CSpriteBG.SIGNSCROLL -- general arrows
-    _musprite.screeny = _screeny
-    _musprite.palette = nil
-
-    _musprite.screenx = _screenx + (0 * Tic.SPRITESIZE) -- lf arrow
-    _musprite.rotate  = CSprite.ROTATE270
-    _musprite.palette = nil
-    _musprite:draw()
-
-    _musprite.screenx = _screenx + (1 * Tic.SPRITESIZE) -- rg arrow
-    _musprite.rotate  = CSprite.ROTATE090
-    _musprite.palette = nil
-    _musprite:draw()
 end
 
 
@@ -4372,10 +4350,6 @@ function CWindowWorld:drawPlayerActual()
     local _regionmindworld  = _playeractual:regionMindWorld()
     local _nearestentity    = _playeractual:nearestEntityView() -- nearest entity if any -- except itself
 
-    -- _nearestentity = (_nearestentity and _regionviewworld:hasInsideRegion(_nearestentity:worldRegion())) -- keep it only if in view
-    --     and _nearestentity
-    --     or  nil
-
     for _, _spottedwindow in pairs(self.spottedwindows or {}) do -- fill up the spotted windows if any
         _spottedwindow.entity = _nearestentity
         _spottedwindow.entity = _nearestentity
@@ -4404,44 +4378,6 @@ function CWindowWorld:drawPlayerActual()
             end
         end
     end
-end
-
-function CWindowWorld:drawScrollArrows()
-    local _arrowscount  = 5
-    local _arrowsweight = _arrowscount * Tic.SPRITESIZE
-    local _paletteoff   = {[Tic.COLORWHITE] = Tic.COLORGREYM, [Tic.COLORGREYM] = Tic.COLORGREYD}
-    local _screenx      = Tic.WORLDWX + ((Tic.WORLDWW - _arrowsweight) / 2)
-    local _screeny      = Tic.WORLDWY - Tic.SPRITESIZE
-    
-    local _musprite = CSpriteBG() -- multi usage unique sprite
-    _musprite.sprite  = CSpriteBG.SIGNSCROLL -- general arrows
-    _musprite.screeny = _screeny
-    _musprite.palette = nil
-
-    _musprite.screenx = _screenx + (0 * Tic.SPRITESIZE) -- lf arrow
-    _musprite.rotate  = CSprite.ROTATE270
-    _musprite.palette = nil
-    _musprite:draw()
-
-    _musprite.screenx = _screenx + (1 * Tic.SPRITESIZE) -- up arrow
-    _musprite.rotate  = CSprite.ROTATE000
-    _musprite.palette = nil
-    _musprite:draw()
-
-    _musprite.screenx = _screenx + (3 * Tic.SPRITESIZE) -- dw arrow
-    _musprite.rotate  = CSprite.ROTATE180
-    _musprite.palette = nil
-    _musprite:draw()
-
-    _musprite.screenx = _screenx + (4 * Tic.SPRITESIZE) -- rg arrow
-    _musprite.rotate  = CSprite.ROTATE090
-    _musprite.palette = nil
-    _musprite:draw()
-
-    _musprite.screenx = _screenx + (2 * Tic.SPRITESIZE) -- md arrow
-    _musprite.sprite  = CSpriteBG.SIGNCENTER
-    _musprite.palette = nil
-    _musprite:draw()
 end
 
 
