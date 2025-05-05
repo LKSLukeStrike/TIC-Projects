@@ -4414,7 +4414,7 @@ end
 local CButton = CWindow:extend() -- generic button
 Classic.KINDBUTTON = "Button" -- Button kind
 Classic.NAMEBUTTON = "Button" -- Button name
-CButton.BEHAVIOURAUTODISABLE = function(self)
+CButton.BEHAVIOUR = function(self)
     if Tables:size(self:functionsDefined()) == 0 then
         self.enabled = false
     end
@@ -4434,7 +4434,7 @@ function CButton:new(_argt)
 	self.clickrg       = nil   -- function to trigger on click rg
 	self.scrollx       = nil   -- function to trigger on scroll x
 	self.scrolly       = nil   -- function to trigger on scroll y
-	self.behaviour     = CButton.BEHAVIOURAUTODISABLE  -- function to trigger at first
+	self.behaviour     = CButton.BEHAVIOUR  -- function to trigger at first
     self.hovertext     = nil -- hover text if any
 	self.rounded       = true  -- rounded border and frames ?
     self.drawframes    = false
@@ -4572,89 +4572,6 @@ local CButtonClick = CButtonSprite:extend() -- generic click button
 
 
 --
--- CButtonCheck
---
-local CButtonCheck = CButtonSprite:extend() -- generic check button
-function CButtonCheck:new(_argt)
-    CButtonCheck.super.new(self, _argt)
-	self.checked = false
-    self:argt(_argt) -- override if any
-end
-
-function CButtonCheck:drawGround()
-    local _palette = {[self.colorground] = self.colorground, [self.colorborder] = self.colorborder}
-    _palette = (self.checked)
-        and {[self.colorground] = self.colorground, [self.colorborder] = self.colorgroundactived}
-        or  _palette
-    _palette = (self.actived)
-        and {[self.colorground] = self.colorground, [self.colorborder] = self.colorgroundactived}
-        or  _palette
-    _palette = (self.hovered)
-        and {[self.colorground] = self.colorground, [self.colorborder] = self.colorhover}
-        or  _palette
-    _palette = (self.enabled)
-        and _palette
-        or  {[self.colorground] = self.colorgrounddisabled, [self.colorborder] = self.colorborderdisabled}
-
-    self.sprite.screenx = self.screenx
-    self.sprite.screeny = self.screeny
-    self.sprite.palette = _palette
-    self.sprite:draw()
-end
-
-
---
--- CButtonPlayer
---
-local CButtonPlayer = CButtonClick:extend() -- generic player click button
-CButtonPlayer.BEHAVIOURAUTODISABLE = function(self)
-    self.enabled = Tables:size(Tic:playerPlayers()) > 1
-    CButton.BEHAVIOURAUTODISABLE(self)
-end
-function CButtonPlayer:new(_argt)
-    CButtonPlayer.super.new(self, _argt)
-    self.drawborder    = false
-	self.sprite.sprite = CSpriteBG.SIGNPLAYER
-	self.behaviour     = CButtonPlayer.BEHAVIOURAUTODISABLE  -- function to trigger at first
-    self:argt(_argt) -- override if any
-end
-
-
---
--- CButtonSpotIt
---
-local CButtonSpotIt = CButtonCheck:extend() -- generic spotit check button
-CButtonSpotIt.BEHAVIOURAUTODISABLE = function(self)
-    self.checked = Tic.DRAWSPOTTED
-    CButton.BEHAVIOURAUTODISABLE(self)
-end
-function CButtonSpotIt:new(_argt)
-    CButtonSpotIt.super.new(self, _argt)
-    self.drawborder    = false
-	self.sprite.sprite = CSpriteBG.SIGNSPOTIT
-	self.behaviour     = CButtonSpotIt.BEHAVIOURAUTODISABLE  -- function to trigger at first
-    self:argt(_argt) -- override if any
-end
-
-
---
--- CButtonLockIt
---
-local CButtonLockIt = CButtonCheck:extend() -- generic lockit check button
-CButtonLockIt.BEHAVIOURAUTODISABLE = function(self)
-    self.checked = Tic.LOCKSPOTTED
-    CButton.BEHAVIOURAUTODISABLE(self)
-end
-function CButtonLockIt:new(_argt)
-    CButtonLockIt.super.new(self, _argt)
-    self.drawborder    = false
-	self.sprite.sprite = CSpriteBG.SIGNLOCKIT
-	self.behaviour     = CButtonLockIt.BEHAVIOURAUTODISABLE  -- function to trigger at first
-    self:argt(_argt) -- override if any
-end
-
-
---
 -- CButtonScroll
 --
 local CButtonScroll = CButtonClick:extend() -- generic scroll click button
@@ -4718,6 +4635,125 @@ function CButtonCenter:new(_argt)
     CButtonCenter.super.new(self, _argt)
     self.drawborder    = false
 	self.sprite.sprite = CSpriteBG.SIGNCENTER
+    self:argt(_argt) -- override if any
+end
+
+
+--
+-- CButtonCheck
+--
+local CButtonCheck = CButtonSprite:extend() -- generic check button
+function CButtonCheck:new(_argt)
+    CButtonCheck.super.new(self, _argt)
+	self.checked = false
+    self:argt(_argt) -- override if any
+end
+
+function CButtonCheck:drawGround()
+    local _palette = {[self.colorground] = self.colorground, [self.colorborder] = self.colorborder}
+    _palette = (self.checked)
+        and {[self.colorground] = self.colorground, [self.colorborder] = self.colorgroundactived}
+        or  _palette
+    _palette = (self.actived)
+        and {[self.colorground] = self.colorground, [self.colorborder] = self.colorgroundactived}
+        or  _palette
+    _palette = (self.hovered)
+        and {[self.colorground] = self.colorground, [self.colorborder] = self.colorhover}
+        or  _palette
+    _palette = (self.enabled)
+        and _palette
+        or  {[self.colorground] = self.colorgrounddisabled, [self.colorborder] = self.colorborderdisabled}
+
+    self.sprite.screenx = self.screenx
+    self.sprite.screeny = self.screeny
+    self.sprite.palette = _palette
+    self.sprite:draw()
+end
+
+
+--
+-- IButtonPlayer -- players buttons implementation
+--
+local IButtonPlayer = CButton:extend() -- generic player button
+IButtonPlayer.BEHAVIOUR = function(self)
+    self.enabled = Tables:size(Tic:playerPlayers()) > 1
+    CButton.BEHAVIOUR(self)
+end
+
+
+--
+-- CButtonPrevPlayer
+--
+local CButtonPrevPlayer = CButtonScrollLF:extend() -- generic player prev button
+function CButtonPrevPlayer:new(_argt)
+    CButtonPrevPlayer.super.new(self, _argt)
+    self.drawborder    = false
+	self.behaviour     = IButtonPlayer.BEHAVIOUR  -- function to trigger at first
+    self.clicklf       = Tic.FUNCTIONPLAYERPREV
+    self.hovertext     = "Prev"
+    self:argt(_argt) -- override if any
+end
+
+
+--
+-- CButtonNextPlayer
+--
+local CButtonNextPlayer = CButtonScrollRG:extend() -- generic player next button
+function CButtonNextPlayer:new(_argt)
+    CButtonNextPlayer.super.new(self, _argt)
+    self.drawborder    = false
+	self.behaviour     = IButtonPlayer.BEHAVIOUR  -- function to trigger at first
+    self.clicklf       = Tic.FUNCTIONPLAYERNEXT
+    self.hovertext     = "Next"
+    self:argt(_argt) -- override if any
+end
+
+
+--
+-- CButtonPickPlayer
+--
+local CButtonPickPlayer = CButtonClick:extend() -- generic player pick button
+function CButtonPickPlayer:new(_argt)
+    CButtonPickPlayer.super.new(self, _argt)
+    self.drawborder    = false
+	self.sprite.sprite = CSpriteBG.SIGNPLAYER
+	self.behaviour     = IButtonPlayer.BEHAVIOUR  -- function to trigger at first
+    self.clicklf       = function() Tic:logAppend("Player") end
+    self.hovertext     = "Pick"
+    self:argt(_argt) -- override if any
+end
+
+
+--
+-- CButtonSpotIt
+--
+local CButtonSpotIt = CButtonCheck:extend() -- generic spotit check button
+CButtonSpotIt.BEHAVIOUR = function(self)
+    self.checked = Tic.DRAWSPOTTED
+    CButton.BEHAVIOUR(self)
+end
+function CButtonSpotIt:new(_argt)
+    CButtonSpotIt.super.new(self, _argt)
+    self.drawborder    = false
+	self.sprite.sprite = CSpriteBG.SIGNSPOTIT
+	self.behaviour     = CButtonSpotIt.BEHAVIOUR  -- function to trigger at first
+    self:argt(_argt) -- override if any
+end
+
+
+--
+-- CButtonLockIt
+--
+local CButtonLockIt = CButtonCheck:extend() -- generic lockit check button
+CButtonLockIt.BEHAVIOUR = function(self)
+    self.checked = Tic.LOCKSPOTTED
+    CButton.BEHAVIOUR(self)
+end
+function CButtonLockIt:new(_argt)
+    CButtonLockIt.super.new(self, _argt)
+    self.drawborder    = false
+	self.sprite.sprite = CSpriteBG.SIGNLOCKIT
+	self.behaviour     = CButtonLockIt.BEHAVIOUR  -- function to trigger at first
     self:argt(_argt) -- override if any
 end
 
@@ -4915,20 +4951,9 @@ local WindowInfosPlayer = CWindowInfosPlayer{}
 local WindowPortraitPlayer = CWindowPortraitPlayer{}
 local WindowStatsPlayer = CWindowStatsPlayer{}
 local WindowStatePlayer = CWindowStatePlayer{}
-local ButtonPrevPlayer = CButtonScrollLF{
-    clicklf = Tic.FUNCTIONPLAYERPREV,
-	behaviour = CButtonPlayer.BEHAVIOURAUTODISABLE,  -- function to trigger at first
-    hovertext = "Prev",
-}
-local ButtonPickPlayer = CButtonPlayer{
-    clicklf = function() Tic:logAppend("Player") end,
-    hovertext = "Pick",
-}
-local ButtonNextPlayer = CButtonScrollRG{
-    clicklf = Tic.FUNCTIONPLAYERNEXT,
-    behaviour = CButtonPlayer.BEHAVIOURAUTODISABLE,  -- function to trigger at first
-    hovertext = "Next",
-}
+local ButtonPrevPlayer = CButtonPrevPlayer{}
+local ButtonPickPlayer = CButtonPickPlayer{}
+local ButtonNextPlayer = CButtonScrollRG{}
 ScreenWorldRG:elementsDistributeH(
     {ButtonPrevPlayer, ButtonPickPlayer, ButtonNextPlayer},
     WindowInfosPlayer.screenx + (
@@ -4953,7 +4978,7 @@ ScreenWorld:appendElements{
 }
 end
 
-if true then
+if false then
 -- local ScreenIntro = CScreen{name = "Intro", keysfunctions = Tic.KEYSFUNCTIONSINTRO}
 local ScreenIntro = CScreen{name = "Intro", keysfunctions = Tic.KEYSFUNCTIONSINTRO}
 Tic:screenAppend(ScreenIntro)
@@ -5259,17 +5284,17 @@ end -- generate places
 -- }
 -- Globth:randomWorldWindow()
 
-local Wulfie = CPlayerWolfe{name = "Wulfie",
-    colorextra = Tic.COLORRED,
-    worldx = 10,
-}
+-- local Wulfie = CPlayerWolfe{name = "Wulfie",
+--     colorextra = Tic.COLORRED,
+--     worldx = 10,
+-- }
 -- Wulfie:randomWorldWindow()
 
-local Oxboow = CPlayerGhost{name = "Oxboow",
-    statphyact = 10,
-    statmenact = 10,
-    statpsyact = 10,
-}
+-- local Oxboow = CPlayerGhost{name = "Oxboow",
+--     statphyact = 10,
+--     statmenact = 10,
+--     statpsyact = 10,
+-- }
 -- Oxboow:randomWorldWindow()
 
 
