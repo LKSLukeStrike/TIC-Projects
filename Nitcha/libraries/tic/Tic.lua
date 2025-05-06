@@ -4020,6 +4020,15 @@ end
 
 
 --
+-- IWindowEntity -- entities windows implementation
+--
+local IWindowEntity = CWindow:extend() -- generic entity window
+IWindowEntity.BEHAVIOUR = function(self)
+    self.drawinside = (self.entity) and true or false
+end
+
+
+--
 -- CWindowInfosEntity
 --
 local CWindowInfosEntity = CWindowInfos:extend() -- window infos for entities
@@ -4045,20 +4054,26 @@ end
 
 
 --
+-- IWindowPlayer -- players windows implementation
+--
+local IWindowPlayer = CWindow:extend() -- generic player window
+IWindowPlayer.BEHAVIOUR = function(self)
+    self.entity = Tic:playerActual()
+    IWindowEntity.BEHAVIOUR(self)
+end
+
+
+--
 -- CWindowInfosPlayer
 --
 local CWindowInfosPlayer = CWindowInfosEntity:extend() -- window infos for player
 function CWindowInfosPlayer:new(_argt)
     CWindowInfosPlayer.super.new(self, _argt)
-    self.screenx = Tic.PLAYERINFOSWX
-    self.screeny = Tic.PLAYERINFOSWY
-	self.entity  = Tic:playerActual()
+    self.screenx   = Tic.PLAYERINFOSWX
+    self.screeny   = Tic.PLAYERINFOSWY
+	self.entity    = Tic:playerActual()
+	self.behaviour = IWindowPlayer.BEHAVIOUR
     self:argt(_argt) -- override if any
-end
-
-function CWindowInfosPlayer:drawInside() -- window infos content for player
-	self.entity = Tic:playerActual()
-    CWindowInfosPlayer.super.drawInside(self)
 end
 
 
@@ -4094,8 +4109,6 @@ function CWindowPortraitDrawable:new(_argt)
 end
 
 function CWindowPortraitDrawable:drawInside() -- window portrait content for -- [!] drawable entities
-    if not self.entity then return end -- mandatory
-    if not self.entity:is(CEntityDrawable) then return end -- mandatory
     self.entity:save{"screenx", "screeny", "scale", "drawdirs", "drawview","dirx", "frame", "animations",}
     self.entity.screenx  = self.screenx -- force character attributes
     self.entity.screeny  = self.screeny
@@ -4118,15 +4131,11 @@ end
 local CWindowPortraitPlayer = CWindowPortraitDrawable:extend() -- window portrait for player
 function CWindowPortraitPlayer:new(_argt)
     CWindowPortraitPlayer.super.new(self, _argt)
-    self.screenx = Tic.PLAYERPORTRAITWX
-    self.screeny = Tic.PLAYERPORTRAITWY
-	self.entity  = Tic:playerActual()
+    self.screenx   = Tic.PLAYERPORTRAITWX
+    self.screeny   = Tic.PLAYERPORTRAITWY
+	self.entity    = Tic:playerActual()
+	self.behaviour = IWindowPlayer.BEHAVIOUR
     self:argt(_argt) -- override if any
-end
-
-function CWindowPortraitPlayer:drawInside() -- window portrait content for player
-	self.entity = Tic:playerActual()
-    CWindowPortraitPlayer.super.drawInside(self)
 end
 
 
@@ -4161,8 +4170,6 @@ function CWindowStatsCharacter:new(_argt)
 end
 
 function CWindowStatsCharacter:drawInside() -- window portrait content for -- [!] characters
-    if not self.entity then return end -- mandatory
-    if not self.entity:is(CCharacter) then return end -- mandatory
     rectb( -- phy bar border
         self.screenx + 01,
         self.screeny + 02,
@@ -4235,15 +4242,11 @@ end
 local CWindowStatsPlayer = CWindowStatsCharacter:extend() -- window stats for player
 function CWindowStatsPlayer:new(_argt)
     CWindowStatsPlayer.super.new(self, _argt)
-    self.screenx = Tic.PLAYERSTATSWX
-    self.screeny = Tic.PLAYERSTATSWY
-	self.entity  = Tic:playerActual()
+    self.screenx   = Tic.PLAYERSTATSWX
+    self.screeny   = Tic.PLAYERSTATSWY
+	self.entity    = Tic:playerActual()
+	self.behaviour = IWindowPlayer.BEHAVIOUR
     self:argt(_argt) -- override if any
-end
-
-function CWindowStatsPlayer:drawInside() -- window stats content for player
-	self.entity = Tic:playerActual()
-    CWindowStatsPlayer.super.drawInside(self)
 end
 
 
@@ -4253,17 +4256,16 @@ end
 local CWindowStatePlayer = CWindowInfos:extend() -- window state for player
 function CWindowStatePlayer:new(_argt)
     CWindowStatePlayer.super.new(self, _argt)
-    self.screenx = Tic.PLAYERSTATEWX
-    self.screeny = Tic.PLAYERSTATEWY
-    self.align   = CWindowInfos.ALIGNMD
-    self.fupper  = true
-	self.entity  = Tic:playerActual()
+    self.screenx   = Tic.PLAYERSTATEWX
+    self.screeny   = Tic.PLAYERSTATEWY
+    self.align     = CWindowInfos.ALIGNMD
+    self.fupper    = true
+	self.entity    = Tic:playerActual()
+	self.behaviour = IWindowPlayer.BEHAVIOUR
     self:argt(_argt) -- override if any
 end
 
 function CWindowStatePlayer:drawInside() -- window state content for player
-    if not Tic:playerActual() then return end
-	self.entity          = Tic:playerActual()
     local _state         = self.entity.state
     local _statesettings = Tic.STATESETTINGS[_state]
     local _posture       = _statesettings.posture
@@ -4281,14 +4283,10 @@ Classic.KINDWINDOWINFOSSPOTTED = "WindowInfosSpotted" -- WindowInfosSpotted kind
 function CWindowInfosSpotted:new(_argt)
     CWindowInfosSpotted.super.new(self, _argt)
     self.kind = Classic.KINDWINDOWINFOSSPOTTED
-    self.screenx = Tic.SPOTTEDINFOSWX
-    self.screeny = Tic.SPOTTEDINFOSWY
+    self.screenx   = Tic.SPOTTEDINFOSWX
+    self.screeny   = Tic.SPOTTEDINFOSWY
+    self.behaviour = IWindowEntity.BEHAVIOUR
     self:argt(_argt) -- override if any
-end
-
-function CWindowInfosSpotted:draw()
-    if not self.entity then return end -- do not draw
-    CWindowInfosSpotted.super.draw(self)
 end
 
 
@@ -4300,15 +4298,15 @@ Classic.KINDWINDOWPORTRAITSPOTTED = "WindowPortraitSpotted" -- WindowPortraitSpo
 function CWindowPortraitSpotted:new(_argt)
     CWindowPortraitSpotted.super.new(self, _argt)
     self.kind = Classic.KINDWINDOWPORTRAITSPOTTED
-    self.screenx = Tic.SPOTTEDPORTRAITWX
-    self.screeny = Tic.SPOTTEDPORTRAITWY
+    self.screenx   = Tic.SPOTTEDPORTRAITWX
+    self.screeny   = Tic.SPOTTEDPORTRAITWY
+    self.behaviour = IWindowEntity.BEHAVIOUR
     self:argt(_argt) -- override if any
 end
 
 function CWindowPortraitSpotted:draw()
-    if not self.entity then return end -- do not draw
-    local _ticdrawspotted = Tic.DRAWSPOTTED -- override Tic
-    Tic.DRAWSPOTTED = false
+    local _ticdrawspotted = Tic.DRAWSPOTTED -- save Tic
+    Tic.DRAWSPOTTED = false -- override Tic
     CWindowPortraitSpotted.super.draw(self)
     Tic.DRAWSPOTTED = _ticdrawspotted -- restore Tic
 end
@@ -4737,6 +4735,8 @@ function CButtonSpotIt:new(_argt)
     self.drawborder    = false
 	self.sprite.sprite = CSpriteBG.SIGNSPOTIT
 	self.behaviour     = CButtonSpotIt.BEHAVIOUR  -- function to trigger at first
+    self.clicklf       = function() Tic:toggleDrawSpotted() end
+    self.hovertext     = "Spot"
     self:argt(_argt) -- override if any
 end
 
@@ -4754,6 +4754,8 @@ function CButtonLockIt:new(_argt)
     self.drawborder    = false
 	self.sprite.sprite = CSpriteBG.SIGNLOCKIT
 	self.behaviour     = CButtonLockIt.BEHAVIOUR  -- function to trigger at first
+    self.clicklf       = function() Tic:toggleLockSpotted() end
+    self.hovertext     = "Lock"
     self:argt(_argt) -- override if any
 end
 
@@ -4913,16 +4915,10 @@ Tic:screenAppend(ScreenWorld)
 
 -- lf panel
 local ScreenWorldLF = CScreen{}
-local WindowInfosSpotted = CWindowInfosSpotted{}
+local WindowInfosSpotted    = CWindowInfosSpotted{}
 local WindowPortraitSpotted = CWindowPortraitSpotted{}
-local ButtonSpotIt = CButtonSpotIt{
-    clicklf = function() Tic:toggleDrawSpotted() end,
-    hovertext = "Spot",
-}
-local ButtonLockIt = CButtonLockIt{
-    clicklf = function() Tic:toggleLockSpotted() end,
-    hovertext = "Lock",
-}
+local ButtonSpotIt          = CButtonSpotIt{}
+local ButtonLockIt          = CButtonLockIt{}
 ScreenWorldLF:elementsDistributeH(
     {ButtonSpotIt, ButtonLockIt},
     WindowInfosSpotted.screenx + (
@@ -4938,7 +4934,7 @@ ScreenWorldLF:appendElements{
 
 -- md panel
 local ScreenWorldMD = CScreen{}
-local WindowWorld = CWindowWorld{spottedwindows = {WindowInfosSpotted, WindowPortraitSpotted}}
+local WindowWorld      = CWindowWorld{spottedwindows = {WindowInfosSpotted, WindowPortraitSpotted}}
 local WindowInfosWorld = CWindowInfosWorld{}
 ScreenWorldMD:appendElements{
     WindowWorld,
@@ -4947,13 +4943,13 @@ ScreenWorldMD:appendElements{
 
 -- rg panel
 local ScreenWorldRG = CScreen{}
-local WindowInfosPlayer = CWindowInfosPlayer{}
+local WindowInfosPlayer    = CWindowInfosPlayer{}
 local WindowPortraitPlayer = CWindowPortraitPlayer{}
-local WindowStatsPlayer = CWindowStatsPlayer{}
-local WindowStatePlayer = CWindowStatePlayer{}
-local ButtonPrevPlayer = CButtonPrevPlayer{}
-local ButtonPickPlayer = CButtonPickPlayer{}
-local ButtonNextPlayer = CButtonScrollRG{}
+local WindowStatsPlayer    = CWindowStatsPlayer{}
+local WindowStatePlayer    = CWindowStatePlayer{}
+local ButtonPrevPlayer     = CButtonPrevPlayer{}
+local ButtonPickPlayer     = CButtonPickPlayer{}
+local ButtonNextPlayer     = CButtonNextPlayer{}
 ScreenWorldRG:elementsDistributeH(
     {ButtonPrevPlayer, ButtonPickPlayer, ButtonNextPlayer},
     WindowInfosPlayer.screenx + (
@@ -5284,17 +5280,17 @@ end -- generate places
 -- }
 -- Globth:randomWorldWindow()
 
--- local Wulfie = CPlayerWolfe{name = "Wulfie",
---     colorextra = Tic.COLORRED,
---     worldx = 10,
--- }
+local Wulfie = CPlayerWolfe{name = "Wulfie",
+    colorextra = Tic.COLORRED,
+    worldx = 10,
+}
 -- Wulfie:randomWorldWindow()
 
--- local Oxboow = CPlayerGhost{name = "Oxboow",
---     statphyact = 10,
---     statmenact = 10,
---     statpsyact = 10,
--- }
+local Oxboow = CPlayerGhost{name = "Oxboow",
+    statphyact = 10,
+    statmenact = 10,
+    statpsyact = 10,
+}
 -- Oxboow:randomWorldWindow()
 
 
