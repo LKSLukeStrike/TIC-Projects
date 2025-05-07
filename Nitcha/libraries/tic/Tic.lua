@@ -1155,11 +1155,12 @@ CSpriteBG.SIGNBORSQU  = CSpriteBG.SIGNSBANK + 02 -- borders square
 CSpriteBG.SIGNSPOSQU  = CSpriteBG.SIGNSBANK + 03 -- spotted square
 CSpriteBG.SIGNCROSQU  = CSpriteBG.SIGNSBANK + 04 -- crossed square
 CSpriteBG.SIGNDOTSQU  = CSpriteBG.SIGNSBANK + 05 -- dot square
-CSpriteBG.SIGNSCROLL  = CSpriteBG.SIGNSBANK + 06 -- scroll arrow
-CSpriteBG.SIGNCENTER  = CSpriteBG.SIGNSBANK + 07 -- center arrow
-CSpriteBG.SIGNPLAYER  = CSpriteBG.SIGNSBANK + 08 -- player sprite
-CSpriteBG.SIGNSPOTIT  = CSpriteBG.SIGNSBANK + 09 -- spotit sprite
-CSpriteBG.SIGNLOCKIT  = CSpriteBG.SIGNSBANK + 10 -- lockit sprite
+CSpriteBG.SIGNARROWD  = CSpriteBG.SIGNSBANK + 06 -- diag arrow
+CSpriteBG.SIGNARROWL  = CSpriteBG.SIGNSBANK + 07 -- line arrow
+CSpriteBG.SIGNCENTER  = CSpriteBG.SIGNSBANK + 08 -- center dot
+CSpriteBG.SIGNPLAYER  = CSpriteBG.SIGNSBANK + 09 -- player sprite
+CSpriteBG.SIGNSPOTIT  = CSpriteBG.SIGNSBANK + 10 -- spotit sprite
+CSpriteBG.SIGNLOCKIT  = CSpriteBG.SIGNSBANK + 11 -- lockit sprite
 CSpriteBG.BUILDBANK   = 16 -- buildings
 CSpriteBG.PLACEHOUSE  = CSpriteBG.BUILDBANK + 0
 CSpriteBG.PLACETOWER  = CSpriteBG.BUILDBANK + 1
@@ -4640,57 +4641,122 @@ local CButtonClick = CButtonSprite:extend() -- generic click button
 
 
 --
--- CButtonScroll
+-- CButtonArrow
 --
-local CButtonScroll = CButtonClick:extend() -- generic scroll click button
-function CButtonScroll:new(_argt)
-    CButtonScroll.super.new(self, _argt)
+local CButtonArrow = CButtonClick:extend() -- generic arrow click button
+function CButtonArrow:new(_argt)
+    CButtonArrow.super.new(self, _argt)
     self.drawborder    = false
-	self.sprite.sprite = CSpriteBG.SIGNSCROLL
     self:argt(_argt) -- override if any
 end
 
 
 --
--- CButtonScrollLF
+-- CButtonArrowLine
 --
-local CButtonScrollLF = CButtonScroll:extend() -- generic scroll LF click button
-function CButtonScrollLF:new(_argt)
-    CButtonScrollLF.super.new(self, _argt)
+local CButtonArrowLine = CButtonArrow:extend() -- generic line arrow click button
+function CButtonArrowLine:new(_argt)
+    CButtonArrowLine.super.new(self, _argt)
+	self.sprite.sprite = CSpriteBG.SIGNARROWL
+    self:argt(_argt) -- override if any
+end
+
+
+--
+-- CButtonArrowDiag
+--
+local CButtonArrowDiag = CButtonArrow:extend() -- generic diag arrow click button
+function CButtonArrowDiag:new(_argt)
+    CButtonArrowDiag.super.new(self, _argt)
+	self.sprite.sprite = CSpriteBG.SIGNARROWD
+    self:argt(_argt) -- override if any
+end
+
+
+--
+-- CButtonArrowLF
+--
+local CButtonArrowLF = CButtonArrowLine:extend() -- generic arrow LF click button
+function CButtonArrowLF:new(_argt)
+    CButtonArrowLF.super.new(self, _argt)
 	self.sprite.rotate = CSprite.ROTATE270
     self:argt(_argt) -- override if any
 end
 
 
 --
--- CButtonScrollUP
+-- CButtonArrowUP
 --
-local CButtonScrollUP = CButtonScroll:extend() -- generic scroll UP click button
-function CButtonScrollUP:new(_argt)
-    CButtonScrollUP.super.new(self, _argt)
+local CButtonArrowUP = CButtonArrowLine:extend() -- generic arrow UP click button
+function CButtonArrowUP:new(_argt)
+    CButtonArrowUP.super.new(self, _argt)
 	self.sprite.rotate = CSprite.ROTATE000
     self:argt(_argt) -- override if any
 end
 
 
 --
--- CButtonScrollDW
+-- CButtonArrowDW
 --
-local CButtonScrollDW = CButtonScroll:extend() -- generic scroll DW click button
-function CButtonScrollDW:new(_argt)
-    CButtonScrollDW.super.new(self, _argt)
+local CButtonArrowDW = CButtonArrowLine:extend() -- generic arrow DW click button
+function CButtonArrowDW:new(_argt)
+    CButtonArrowDW.super.new(self, _argt)
 	self.sprite.rotate = CSprite.ROTATE180
     self:argt(_argt) -- override if any
 end
 
 
 --
--- CButtonScrollRG
+-- CButtonArrowRG
 --
-local CButtonScrollRG = CButtonScroll:extend() -- generic scroll RG click button
-function CButtonScrollRG:new(_argt)
-    CButtonScrollRG.super.new(self, _argt)
+local CButtonArrowRG = CButtonArrowLine:extend() -- generic arrow RG click button
+function CButtonArrowRG:new(_argt)
+    CButtonArrowRG.super.new(self, _argt)
 	self.sprite.rotate = CSprite.ROTATE090
+    self:argt(_argt) -- override if any
+end
+
+
+--
+-- CButtonArrowUL
+--
+local CButtonArrowUL = CButtonArrowDiag:extend() -- generic arrow UL click button
+function CButtonArrowUL:new(_argt)
+    CButtonArrowUL.super.new(self, _argt)
+	self.sprite.rotate = CSprite.ROTATE000
+    self:argt(_argt) -- override if any
+end
+
+
+--
+-- CButtonArrowUR
+--
+local CButtonArrowUR = CButtonArrowDiag:extend() -- generic arrow UR click button
+function CButtonArrowUR:new(_argt)
+    CButtonArrowUR.super.new(self, _argt)
+	self.sprite.rotate = CSprite.ROTATE090
+    self:argt(_argt) -- override if any
+end
+
+
+--
+-- CButtonArrowDL
+--
+local CButtonArrowDL = CButtonArrowDiag:extend() -- generic arrow DL click button
+function CButtonArrowDL:new(_argt)
+    CButtonArrowDL.super.new(self, _argt)
+	self.sprite.rotate = CSprite.ROTATE270
+    self:argt(_argt) -- override if any
+end
+
+
+--
+-- CButtonArrowDR
+--
+local CButtonArrowDR = CButtonArrowDiag:extend() -- generic arrow DR click button
+function CButtonArrowDR:new(_argt)
+    CButtonArrowDR.super.new(self, _argt)
+	self.sprite.rotate = CSprite.ROTATE180
     self:argt(_argt) -- override if any
 end
 
@@ -4752,10 +4818,9 @@ end
 --
 -- CButtonPrevPlayer
 --
-local CButtonPrevPlayer = CButtonScrollLF:extend() -- generic player prev button
+local CButtonPrevPlayer = CButtonArrowLF:extend() -- generic player prev button
 function CButtonPrevPlayer:new(_argt)
     CButtonPrevPlayer.super.new(self, _argt)
-    self.drawborder    = false
 	self.behaviour     = IButtonPlayer.BEHAVIOUR  -- function to trigger at first
     self.clicklf       = Tic.FUNCTIONPLAYERPREV
     self.hovertext     = "Prev"
@@ -4766,10 +4831,9 @@ end
 --
 -- CButtonNextPlayer
 --
-local CButtonNextPlayer = CButtonScrollRG:extend() -- generic player next button
+local CButtonNextPlayer = CButtonArrowRG:extend() -- generic player next button
 function CButtonNextPlayer:new(_argt)
     CButtonNextPlayer.super.new(self, _argt)
-    self.drawborder    = false
 	self.behaviour     = IButtonPlayer.BEHAVIOUR  -- function to trigger at first
     self.clicklf       = Tic.FUNCTIONPLAYERNEXT
     self.hovertext     = "Next"
@@ -5054,13 +5118,13 @@ local Button1 = CButton{
     -- screeny = 10,
     screenw = 16,
     name = "plop 1",
-    hovertext = "PY",
+    hovertext = "ksca",
 }
 local Button2 = CButton{
     -- screenx = 10,
     -- screeny = 20,
     name = "plop 2",
-    hovertext = "PyLYP",
+    hovertext = "LSCA",
 }
 local Button3 = CButton{
     -- screenx = 10,
@@ -5093,30 +5157,12 @@ local Button7 = CButton{
     rounded = false,
     enabled = false,
 }
-local Button11 = CButtonScrollLF{
-    -- screenx = 30,
-    -- screeny = 10,
-}
-local Button12 = CButtonScrollUP{
-    -- screenx = 30,
-    -- screeny = 20,
-    -- actived = true,
-    rounded = false,
-}
-local Button13 = CButtonScrollDW{
-    -- screenx = 30,
-    -- screeny = 30,
-    -- enabled = false,
-    rounded = false,
-}
-local Button14 = CButtonScrollRG{
-    screenx = 30,
-    screeny = 40,
-}
-local Button15 = CButtonCenter{
-    screenx = 30,
-    screeny = 50,
-}
+local Button11 = CButtonArrowUL{}
+local Button12 = CButtonArrowDL{}
+local Button13 = CButtonArrowDR{}
+local Button14 = CButtonArrowUR{}
+local Button15 = CButtonCenter{}
+
 local Button16 = CButtonCenter{
     screenx = 30,
     screeny = 60,
@@ -5144,25 +5190,27 @@ ScreenIntro:appendElements{
     Button5,
     Button6,
     Button7,
+
     Button11,
     Button12,
     Button13,
     Button14,
     Button15,
+
     Button16,
     Button17,
     ButtonPrevPlayer,
     ButtonNextPlayer,
 }
 
-Button16.clicklf = Tic.FUNCTIONSCREENNEXT
+Button15.clicklf = Tic.FUNCTIONSCREENNEXT
 local _function = function() Tic:logAppend("Plop") end
 Button1.clicklf = _function
 Button1.clickrg = _function
 Button2.clicklf = _function
 Button7.clicklf = Tic.FUNCTIONSCREENNEXT
 
-ScreenIntro:elementsDistributeH({Button11, Button12, Button16, Button13, Button14}, 30, 10, -2)
+ScreenIntro:elementsDistributeH({Button11, Button12, Button15, Button13, Button14}, 30, 10)
 ScreenIntro:elementsDistributeV({Button1, Button2, Button3}, 10, 10, 2)
 end
 -- exit()
