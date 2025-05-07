@@ -25,4 +25,6 @@
 
 -- TODO derive windows, buttons, screen from elements
 
+-- FIXME problem with back move (only reacts in move)
+
 
