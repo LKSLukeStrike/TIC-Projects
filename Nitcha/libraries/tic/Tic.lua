@@ -1085,12 +1085,16 @@ function Tic:boardPaint(_sprite, _directives, _clean) -- paint a board sprite
     end
 end
 
-function Tic:boardDirectives(_sprite) -- returns the directive of a sprite
+function Tic:boardDirectives(_sprite, _palette) -- returns the directive of a sprite -- optional palette modification
     if not _sprite then return end -- mandatory
+    _palette = _palette or {}
     local _result = {}
     for _y = 0, 7 do
         for _x = 0, 7 do
             local _color = peek4(((Tic.SPRITEBANK + (32 * _sprite)) * 2) + ((_y * Tic.SPRITESIZE) + _x))
+            if _palette[_color] then
+                _color = _palette[_color]
+            end
             if not (_color == Tic.COLORKEY) then -- avoid empty pixels
                 table.insert(_result, {
                     x = _x,
@@ -1121,6 +1125,7 @@ CSprite.ROTATE000  = 0 -- sprite rotations
 CSprite.ROTATE090  = 1
 CSprite.ROTATE180  = 2
 CSprite.ROTATE270  = 3
+CSprite.SPRITEBOARD = 256
 function CSprite:new(_argt)
     CSprite.super.new(self, _argt)
     self.spritebank = CSprite.SPRITEBANK
@@ -1139,9 +1144,13 @@ function CSprite:new(_argt)
 end
 
 function CSprite:draw() -- draw a sprite -- SCREEN -- DEFAULT
-    Tic:paletteChange(self.palette) -- change palette colors if any
+    local _sprite = self.sprite + (self.frame *  CSprite.FRAMEOF)
+    local _directives = Tic:boardDirectives(_sprite, self.palette)
+    Tic:boardPaint(CSprite.SPRITEBOARD, _directives)
+    -- Tic:paletteChange(self.palette) -- change palette colors if any
     spr(
-        self.sprite + (self.frame *  CSprite.FRAMEOF),
+        CSprite.SPRITEBOARD,
+        -- self.sprite + (self.frame *  CSprite.FRAMEOF),
         self.screenx,
         self.screeny,
         self.colorkey,
@@ -1151,7 +1160,7 @@ function CSprite:draw() -- draw a sprite -- SCREEN -- DEFAULT
         self.width,
         self.height
     )
-    Tic:paletteReset() -- restore palette colors
+    -- Tic:paletteReset() -- restore palette colors
 end
 
 
@@ -1160,7 +1169,8 @@ end
 --
 local CSpriteBG = CSprite:extend() -- bg sprites aka tic tiles
 CSpriteBG.SPRITEBANK  = 0
-CSpriteBG.SIGNSBANK   = 0  -- signs
+CSpriteBG.SPRITEEMPTY = CSpriteBG.SPRITEBANK + 0 -- empty sprite
+CSpriteBG.SIGNSBANK   = 1  -- signs
 CSpriteBG.SIGNQSTMRK  = CSpriteBG.SIGNSBANK + 00 -- question mark
 CSpriteBG.SIGNINTMRK  = CSpriteBG.SIGNSBANK + 01 -- interact mark
 CSpriteBG.SIGNBORSQU  = CSpriteBG.SIGNSBANK + 02 -- borders square
@@ -1207,9 +1217,8 @@ end
 --
 local CSpriteFG = CSprite:extend() -- fg sprites aka tic sprites
 CSpriteFG.SPRITEBANK  = 256
-CSpriteFG.SPRITEEMPTY = CSpriteFG.SPRITEBANK + 0 -- empty sprite
+CSpriteFG.SPRITEBOARD = CSpriteFG.SPRITEBANK + 0 -- board sprite -- for creating a sprite by code
 CSpriteFG.SPRITEPIXEL = CSpriteFG.SPRITEBANK + 1 -- pixel sprite
-CSpriteFG.SPRITEBOARD = CSpriteFG.SPRITEBANK + 2 -- board sprite -- for creating a sprite by code
 CSpriteFG.HEADBANK    = 272 -- characters heads
 CSpriteFG.HEADDWARF   = CSpriteFG.HEADBANK + 0
 CSpriteFG.HEADGNOME   = CSpriteFG.HEADBANK + 1
@@ -1231,7 +1240,7 @@ CSpriteFG.BODYHUMANKNEELMOVE = CSpriteFG.BODYHUMAN + 6
 CSpriteFG.EYESBANK    = 320 -- characters eyes
 CSpriteFG.EYESHUMAN   = CSpriteFG.EYESBANK + 0 -- humanoid eyes
 CSpriteFG.STATUSBANK  = 336 -- status types
-CSpriteFG.STATUSEMPTY = CSpriteFG.SPRITEEMPTY
+CSpriteFG.STATUSEMPTY = CSpriteBG.SPRITEEMPTY
 CSpriteFG.STATUSSLEEP = CSpriteFG.STATUSBANK + 0
 CSpriteFG.STATUSWOUND = CSpriteFG.STATUSBANK + 1
 CSpriteFG.STATUSDEATH = CSpriteFG.STATUSBANK + 2
@@ -1249,7 +1258,7 @@ end
 local CSpriteFGEmpty = CSpriteFG:extend() -- empty sprites
 function CSpriteFGEmpty:new(_argt)
     CSpriteFGEmpty.super.new(self, _argt)
-    self.sprite = CSpriteFG.SPRITEEMPTY
+    self.sprite = CSpriteBG.SPRITEEMPTY
     self:argt(_argt) -- override if any
 end
 
@@ -1847,7 +1856,7 @@ function CEntityDrawable:new(_argt)
     self.kind = Classic.KINDDRAWABLE
     self.name = Classic.NAMEDRAWABLE
     self.world       = World
-    self.sprite      = CSpriteFG.SPRITEEMPTY
+    self.sprite      = CSpriteBG.SPRITEEMPTY
     self.screenx     = 0 -- screen positions -- used to draw the sprite
     self.screeny     = 0
     self.dirx        = Nums:random01() -- random flip lf/rg
@@ -5581,7 +5590,9 @@ local SpriteHTG = CSpriteFG{
 local SpriteBIS = CSpriteFGBoard{
     screenx = 30,
     screeny = 120,
-    directives = Tic:boardDirectives(458),
+    directives = Tic:boardDirectives(458, {
+        [Tic.COLORBLUEL] = Tic.COLORKEY,
+    }),
 }
 
 
