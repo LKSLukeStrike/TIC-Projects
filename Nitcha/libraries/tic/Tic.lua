@@ -834,9 +834,9 @@ end
 -- Spotting System -- toggle spotting draw/lock
 function Tic:toggleSpotting(_character)
     if Tic.MODIFIERKEYS[Tic.KEY_SHIFT] then
-        Tic:toggleLockSpotting(_character)
-    else
         Tic:toggleDrawSpotting(_character)
+    else
+        Tic:toggleLockSpotting(_character)
     end
 end
 
@@ -4931,6 +4931,7 @@ IButtonSpotting.PALETTE = {[Tic.COLORGREYD] = Tic.COLORKEY}
 local CButtonSpottingLF = CButtonArrowLF:extend() -- generic spotting LF button
 function CButtonSpottingLF:new(_argt)
     CButtonSpottingLF.super.new(self, _argt)
+    self.sprite.palette = IButtonSpotting.PALETTE
     self:argt(_argt) -- override if any
 end
 
@@ -4952,6 +4953,7 @@ end
 local CButtonSpottingDW = CButtonArrowDW:extend() -- generic spotting DW button
 function CButtonSpottingDW:new(_argt)
     CButtonSpottingDW.super.new(self, _argt)
+    self.sprite.palette = IButtonSpotting.PALETTE
     self:argt(_argt) -- override if any
 end
 
@@ -4962,6 +4964,7 @@ end
 local CButtonSpottingRG = CButtonArrowRG:extend() -- generic spotting RG button
 function CButtonSpottingRG:new(_argt)
     CButtonSpottingRG.super.new(self, _argt)
+    self.sprite.palette = IButtonSpotting.PALETTE
     self:argt(_argt) -- override if any
 end
 
@@ -4972,6 +4975,7 @@ end
 local CButtonSpottingUL = CButtonArrowUL:extend() -- generic spotting UL button
 function CButtonSpottingUL:new(_argt)
     CButtonSpottingUL.super.new(self, _argt)
+    self.sprite.palette = IButtonSpotting.PALETTE
     self:argt(_argt) -- override if any
 end
 
@@ -4982,6 +4986,7 @@ end
 local CButtonSpottingUR = CButtonArrowUR:extend() -- generic spotting UR button
 function CButtonSpottingUR:new(_argt)
     CButtonSpottingUR.super.new(self, _argt)
+    self.sprite.palette = IButtonSpotting.PALETTE
     self:argt(_argt) -- override if any
 end
 
@@ -4992,6 +4997,7 @@ end
 local CButtonSpottingDL = CButtonArrowDL:extend() -- generic spotting DL button
 function CButtonSpottingDL:new(_argt)
     CButtonSpottingDL.super.new(self, _argt)
+    self.sprite.palette = IButtonSpotting.PALETTE
     self:argt(_argt) -- override if any
 end
 
@@ -5002,6 +5008,7 @@ end
 local CButtonSpottingDR = CButtonArrowDR:extend() -- generic spotting DR button
 function CButtonSpottingDR:new(_argt)
     CButtonSpottingDR.super.new(self, _argt)
+    self.sprite.palette = IButtonSpotting.PALETTE
     self:argt(_argt) -- override if any
 end
 
@@ -5166,7 +5173,12 @@ local WindowSpottingPortrait = CWindowSpottingPortrait{}
 local ButtonSpottingDraw     = CButtonSpottingDraw{}
 local ButtonSpottingLock     = CButtonSpottingLock{}
 local ButtonSpottingLF       = CButtonSpottingLF{}
-local ButtonSpottingUP       = CButtonSpottingUP{}
+local ButtonSpottingUP       = CButtonSpottingUP{behaviour = function(self)
+    Tic:logAppend("UP")
+    local _entity = Tic:entitySpotting()
+    self.enabled = (_entity) and true or false
+    self.actived = (_entity) and true or false
+end}
 local ButtonSpottingDW       = CButtonSpottingDW{}
 local ButtonSpottingRG       = CButtonSpottingRG{}
 local ButtonSpottingUL       = CButtonSpottingUL{}
@@ -5180,16 +5192,28 @@ ScreenWorldLF:elementsDistributeH(
     WindowSpottingInfos.screeny - Tic.SPRITESIZE
 )
 ScreenWorldLF:elementsDistributeH(
-    {ButtonSpottingUL, ButtonSpottingUP, ButtonSpottingUR},
-    WindowSpottingPortrait.screenx + (
-        (WindowSpottingPortrait.screenw - CScreen:elementsTotalH({ButtonSpottingUL, ButtonSpottingUP, ButtonSpottingUR})) // 2),
-    WindowSpottingPortrait.screeny - Tic.SPRITESIZE
+    {ButtonSpottingUL, ButtonSpottingUR},
+    WindowSpottingPortrait.screenx - 6,
+    WindowSpottingPortrait.screeny - Tic.SPRITESIZE + 2,
+    12
 )
 ScreenWorldLF:elementsDistributeH(
-    {ButtonSpottingDL, ButtonSpottingDW, ButtonSpottingDR},
-    WindowSpottingPortrait.screenx + (
-        (WindowSpottingPortrait.screenw - CScreen:elementsTotalH({ButtonSpottingDL, ButtonSpottingDW, ButtonSpottingDR})) // 2),
-    WindowSpottingPortrait.screeny + WindowSpottingPortrait.screenh
+    {ButtonSpottingLF, ButtonSpottingRG},
+    WindowSpottingPortrait.screenx - 7,
+    WindowSpottingPortrait.screeny + 4,
+    14
+)
+ScreenWorldLF:elementsDistributeV(
+    {ButtonSpottingUP, ButtonSpottingDW},
+    WindowSpottingPortrait.screenx + 4,
+    WindowSpottingPortrait.screeny - 7,
+    14
+)
+ScreenWorldLF:elementsDistributeH(
+    {ButtonSpottingDL, ButtonSpottingDR},
+    WindowSpottingPortrait.screenx - 6,
+    WindowSpottingPortrait.screeny + WindowSpottingPortrait.screenh - 2,
+    12
 )
 ScreenWorldLF:appendElements{
     WindowSpottingInfos,
