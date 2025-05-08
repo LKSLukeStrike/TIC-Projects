@@ -1085,6 +1085,24 @@ function Tic:boardPaint(_sprite, _directives, _clean) -- paint a board sprite
     end
 end
 
+function Tic:boardDirectives(_sprite) -- returns the directive of a sprite
+    if not _sprite then return end -- mandatory
+    local _result = {}
+    for _y = 0, 7 do
+        for _x = 0, 7 do
+            local _color = peek4(((Tic.SPRITEBANK + (32 * _sprite)) * 2) + ((_y * Tic.SPRITESIZE) + _x))
+            if not (_color == Tic.COLORKEY) then -- avoid empty pixels
+                table.insert(_result, {
+                    x = _x,
+                    y = _y,
+                    color = _color,
+                })
+            end
+        end
+    end
+    return _result
+end
+
 
 
 --
@@ -1134,12 +1152,6 @@ function CSprite:draw() -- draw a sprite -- SCREEN -- DEFAULT
         self.height
     )
     Tic:paletteReset() -- restore palette colors
-end
-
-function CSprite:palettize(_palette) -- change palette colors if any
-    for _key, _val in pairs(_palette or {}) do
-        self.palette[_key] = _val
-    end
 end
 
 
@@ -3230,7 +3242,7 @@ function CCharacter:drawStatus()
     _musprite.screeny = self.screeny
     _musprite.flip    = self.dirx
     _musprite.scale   = self.scale
-    _musprite:palettize(_palette)
+    _musprite.palette = _palette
     _musprite:draw()
 end
 
@@ -3489,7 +3501,7 @@ function CCharacterHumanoid:drawBody()
     _musprite.frame   = _bodyframe
     _musprite.scale   = self.scale
     _musprite.flip    = self.dirx
-    _musprite:palettize{ -- apply body palette
+    _musprite.palette = { -- apply body palette
         [Tic.COLORARMOR] = self.colorarmor,
         [Tic.COLORSHIRT] = self.colorshirt,
         [Tic.COLORPANTS] = self.colorpants,
@@ -3521,7 +3533,7 @@ function CCharacterHumanoid:drawHead()
     _musprite.frame   = _headframe
     _musprite.scale   = self.scale
     _musprite.flip    = self.dirx
-    _musprite:palettize{ -- apply head palette
+    _musprite.palette = { -- apply head palette
         [Tic.COLORHAIRSFG] = self.colorhairsfg,
         [Tic.COLORHAIRSBG] = self.colorhairsbg,
         [Tic.COLOREXTRA]   = self.colorextra,
@@ -3549,8 +3561,7 @@ function CCharacterHumanoid:drawHead()
     end
 
     _musprite.sprite  = self.eyessprite -- apply the corresponding attributes
-    _musprite.palette = {} -- fresh palette
-    _musprite:palettize{ -- apply eyes palette
+    _musprite.palette = { -- apply eyes palette
         [Tic.COLOREYESFG]   = _coloreyesfg,
         [Tic.COLOREYESBGUP] = _coloreyesbgup,
         [Tic.COLOREYESBGMD] = _coloreyesbgmd,
@@ -4113,11 +4124,11 @@ end
 
 
 --
--- CWindowInfosPlayer
+-- CWindowPlayerInfos
 --
-local CWindowInfosPlayer = CWindowInfosEntity:extend() -- window infos for player
-function CWindowInfosPlayer:new(_argt)
-    CWindowInfosPlayer.super.new(self, _argt)
+local CWindowPlayerInfos = CWindowInfosEntity:extend() -- window infos for player
+function CWindowPlayerInfos:new(_argt)
+    CWindowPlayerInfos.super.new(self, _argt)
     self.screenx   = Tic.PLAYERINFOSWX
     self.screeny   = Tic.PLAYERINFOSWY
 	self.entity    = Tic:playerActual()
@@ -4175,11 +4186,11 @@ end
 
 
 --
--- CWindowPortraitPlayer
+-- CWindowPlayerPortrait
 --
-local CWindowPortraitPlayer = CWindowPortraitDrawable:extend() -- window portrait for player
-function CWindowPortraitPlayer:new(_argt)
-    CWindowPortraitPlayer.super.new(self, _argt)
+local CWindowPlayerPortrait = CWindowPortraitDrawable:extend() -- window portrait for player
+function CWindowPlayerPortrait:new(_argt)
+    CWindowPlayerPortrait.super.new(self, _argt)
     self.screenx   = Tic.PLAYERPORTRAITWX
     self.screeny   = Tic.PLAYERPORTRAITWY
 	self.entity    = Tic:playerActual()
@@ -4286,11 +4297,11 @@ end
 
 
 --
--- CWindowStatsPlayer
+-- CWindowPlayerStats
 --
-local CWindowStatsPlayer = CWindowStatsCharacter:extend() -- window stats for player
-function CWindowStatsPlayer:new(_argt)
-    CWindowStatsPlayer.super.new(self, _argt)
+local CWindowPlayerStats = CWindowStatsCharacter:extend() -- window stats for player
+function CWindowPlayerStats:new(_argt)
+    CWindowPlayerStats.super.new(self, _argt)
     self.screenx   = Tic.PLAYERSTATSWX
     self.screeny   = Tic.PLAYERSTATSWY
 	self.entity    = Tic:playerActual()
@@ -4300,11 +4311,11 @@ end
 
 
 --
--- CWindowStatePlayer
+-- CWindowPlayerState
 --
-local CWindowStatePlayer = CWindowInfos:extend() -- window state for player
-function CWindowStatePlayer:new(_argt)
-    CWindowStatePlayer.super.new(self, _argt)
+local CWindowPlayerState = CWindowInfos:extend() -- window state for player
+function CWindowPlayerState:new(_argt)
+    CWindowPlayerState.super.new(self, _argt)
     self.screenx   = Tic.PLAYERSTATEWX
     self.screeny   = Tic.PLAYERSTATEWY
     self.align     = CWindowInfos.ALIGNMD
@@ -4314,13 +4325,13 @@ function CWindowStatePlayer:new(_argt)
     self:argt(_argt) -- override if any
 end
 
-function CWindowStatePlayer:drawInside() -- window state content for player
+function CWindowPlayerState:drawInside() -- window state content for player
     local _state         = self.entity.state
     local _statesettings = Tic.STATESETTINGS[_state]
     local _posture       = _statesettings.posture
     local _status        = _statesettings.status
     self.infos = {_posture, _status}
-    CWindowStatePlayer.super.drawInside(self)
+    CWindowPlayerState.super.drawInside(self)
 end
 
 
@@ -4345,12 +4356,12 @@ end
 
 
 --
--- CWindowInfosSpotted
+-- CWindowSpottingInfos
 --
-local CWindowInfosSpotted = CWindowInfosEntity:extend() -- window infos for spotted
-Classic.KINDWINDOWINFOSSPOTTED = "WindowInfosSpotted" -- WindowInfosSpotted kind
-function CWindowInfosSpotted:new(_argt)
-    CWindowInfosSpotted.super.new(self, _argt)
+local CWindowSpottingInfos = CWindowInfosEntity:extend() -- window infos for spotted
+Classic.KINDWINDOWINFOSSPOTTED = "WindowSpottingInfos" -- WindowSpottingInfos kind
+function CWindowSpottingInfos:new(_argt)
+    CWindowSpottingInfos.super.new(self, _argt)
     self.kind = Classic.KINDWINDOWINFOSSPOTTED
     self.screenx   = Tic.SPOTTEDINFOSWX
     self.screeny   = Tic.SPOTTEDINFOSWY
@@ -4360,12 +4371,12 @@ end
 
 
 --
--- CWindowPortraitSpotted
+-- CWindowSpottingPortrait
 --
-local CWindowPortraitSpotted = CWindowPortraitDrawable:extend() -- window portrait for spotted
-Classic.KINDWINDOWPORTRAITSPOTTED = "WindowPortraitSpotted" -- WindowPortraitSpotted kind
-function CWindowPortraitSpotted:new(_argt)
-    CWindowPortraitSpotted.super.new(self, _argt)
+local CWindowSpottingPortrait = CWindowPortraitDrawable:extend() -- window portrait for spotted
+Classic.KINDWINDOWPORTRAITSPOTTED = "WindowSpottingPortrait" -- WindowSpottingPortrait kind
+function CWindowSpottingPortrait:new(_argt)
+    CWindowSpottingPortrait.super.new(self, _argt)
     self.kind = Classic.KINDWINDOWPORTRAITSPOTTED
     self.screenx   = Tic.SPOTTEDPORTRAITWX
     self.screeny   = Tic.SPOTTEDPORTRAITWY
@@ -4373,12 +4384,12 @@ function CWindowPortraitSpotted:new(_argt)
     self:argt(_argt) -- override if any
 end
 
-function CWindowPortraitSpotted:draw()
+function CWindowSpottingPortrait:draw()
     if self.entity then
         self.entity:save{"spotted"}
         self.entity.spotted = false -- dont draw spotted frame in window
     end
-    CWindowPortraitSpotted.super.draw(self)
+    CWindowSpottingPortrait.super.draw(self)
     if self.entity then
         self.entity:load()
     end
@@ -4626,6 +4637,7 @@ function CButtonSprite:drawGround()
     _palette = (self.enabled)
         and _palette
         or  {[self.colorground] = self.colorgrounddisabled, [self.colorborder] = self.colorborderdisabled}
+    _palette = Tables:merge(self.sprite.palette, _palette)
 
     self.sprite.screenx = self.screenx
     self.sprite.screeny = self.screeny
@@ -4764,10 +4776,9 @@ end
 --
 -- CButtonCenter
 --
-local CButtonCenter = CButtonClick:extend() -- generic center click button
+local CButtonCenter = CButtonArrow:extend() -- generic center click button
 function CButtonCenter:new(_argt)
     CButtonCenter.super.new(self, _argt)
-    self.drawborder    = false
 	self.sprite.sprite = CSpriteBG.SIGNCENTER
     self:argt(_argt) -- override if any
 end
@@ -4816,11 +4827,11 @@ end
 
 
 --
--- CButtonPrevPlayer
+-- CButtonPlayerPrev
 --
-local CButtonPrevPlayer = CButtonArrowLF:extend() -- generic player prev button
-function CButtonPrevPlayer:new(_argt)
-    CButtonPrevPlayer.super.new(self, _argt)
+local CButtonPlayerPrev = CButtonArrowLF:extend() -- generic player prev button
+function CButtonPlayerPrev:new(_argt)
+    CButtonPlayerPrev.super.new(self, _argt)
 	self.behaviour     = IButtonPlayer.BEHAVIOUR  -- function to trigger at first
     self.clicklf       = Tic.FUNCTIONPLAYERPREV
     self.hovertext     = "Prev"
@@ -4829,11 +4840,11 @@ end
 
 
 --
--- CButtonNextPlayer
+-- CButtonPlayerNext
 --
-local CButtonNextPlayer = CButtonArrowRG:extend() -- generic player next button
-function CButtonNextPlayer:new(_argt)
-    CButtonNextPlayer.super.new(self, _argt)
+local CButtonPlayerNext = CButtonArrowRG:extend() -- generic player next button
+function CButtonPlayerNext:new(_argt)
+    CButtonPlayerNext.super.new(self, _argt)
 	self.behaviour     = IButtonPlayer.BEHAVIOUR  -- function to trigger at first
     self.clicklf       = Tic.FUNCTIONPLAYERNEXT
     self.hovertext     = "Next"
@@ -4842,33 +4853,33 @@ end
 
 
 --
--- CButtonPickPlayer
+-- CButtonPlayerPick
 --
-local CButtonPickPlayer = CButtonClick:extend() -- generic player pick button
-function CButtonPickPlayer:new(_argt)
-    CButtonPickPlayer.super.new(self, _argt)
+local CButtonPlayerPick = CButtonClick:extend() -- generic player pick button
+function CButtonPlayerPick:new(_argt)
+    CButtonPlayerPick.super.new(self, _argt)
     self.drawborder    = false
 	self.sprite.sprite = CSpriteBG.SIGNPLAYER
 	self.behaviour     = IButtonPlayer.BEHAVIOUR  -- function to trigger at first
-    self.clicklf       = function() Tic:logAppend("Player") end
+    self.clicklf       = function(self) Tic:logAppend("Player") end
     self.hovertext     = "Pick"
     self:argt(_argt) -- override if any
 end
 
 
 --
--- CButtonDrawSpotting
+-- CButtonSpottingDraw
 --
-local CButtonDrawSpotting = CButtonCheck:extend() -- generic drawspotting check button
-CButtonDrawSpotting.BEHAVIOUR = function(self)
+local CButtonSpottingDraw = CButtonCheck:extend() -- generic drawspotting check button
+CButtonSpottingDraw.BEHAVIOUR = function(self)
     self.checked = Tic:isDrawSpotting()
     CButton.BEHAVIOUR(self)
 end
-function CButtonDrawSpotting:new(_argt)
-    CButtonDrawSpotting.super.new(self, _argt)
+function CButtonSpottingDraw:new(_argt)
+    CButtonSpottingDraw.super.new(self, _argt)
     self.drawborder    = false
 	self.sprite.sprite = CSpriteBG.SIGNSPOTIT
-	self.behaviour     = CButtonDrawSpotting.BEHAVIOUR  -- function to trigger at first
+	self.behaviour     = CButtonSpottingDraw.BEHAVIOUR  -- function to trigger at first
     self.clicklf       = function() Tic:toggleDrawSpotting() end
     self.hovertext     = "Spot"
     self:argt(_argt) -- override if any
@@ -4876,20 +4887,112 @@ end
 
 
 --
--- CButtonLockSpotting
+-- CButtonSpottingLock
 --
-local CButtonLockSpotting = CButtonCheck:extend() -- generic lockspotting check button
-CButtonLockSpotting.BEHAVIOUR = function(self)
+local CButtonSpottingLock = CButtonCheck:extend() -- generic lockspotting check button
+CButtonSpottingLock.BEHAVIOUR = function(self)
     self.checked = Tic:isLockSpotting()
     CButton.BEHAVIOUR(self)
 end
-function CButtonLockSpotting:new(_argt)
-    CButtonLockSpotting.super.new(self, _argt)
+function CButtonSpottingLock:new(_argt)
+    CButtonSpottingLock.super.new(self, _argt)
     self.drawborder    = false
 	self.sprite.sprite = CSpriteBG.SIGNLOCKIT
-	self.behaviour     = CButtonLockSpotting.BEHAVIOUR  -- function to trigger at first
+	self.behaviour     = CButtonSpottingLock.BEHAVIOUR  -- function to trigger at first
     self.clicklf       = function() Tic:toggleLockSpotting() end
     self.hovertext     = "Lock"
+    self:argt(_argt) -- override if any
+end
+
+
+--
+-- IButtonSpotting -- spotting buttons implementation
+--
+local IButtonSpotting = CButton:extend() -- generic player button
+IButtonSpotting.PALETTE = {[Tic.COLORGREYD] = Tic.COLORKEY}
+-- IButtonSpotting.BEHAVIOUR = function(self)
+--     self.enabled = Tables:size(Tic:playerPlayers()) > 1
+--     CButton.BEHAVIOUR(self)
+-- end
+
+
+--
+-- CButtonSpottingLF
+--
+local CButtonSpottingLF = CButtonArrowLF:extend() -- generic spotting LF button
+function CButtonSpottingLF:new(_argt)
+    CButtonSpottingLF.super.new(self, _argt)
+    self:argt(_argt) -- override if any
+end
+
+
+--
+-- CButtonSpottingUP
+--
+local CButtonSpottingUP = CButtonArrowUP:extend() -- generic spotting UP button
+function CButtonSpottingUP:new(_argt)
+    CButtonSpottingUP.super.new(self, _argt)
+    self.sprite.palette = IButtonSpotting.PALETTE
+    self:argt(_argt) -- override if any
+end
+
+
+--
+-- CButtonSpottingDW
+--
+local CButtonSpottingDW = CButtonArrowDW:extend() -- generic spotting DW button
+function CButtonSpottingDW:new(_argt)
+    CButtonSpottingDW.super.new(self, _argt)
+    self:argt(_argt) -- override if any
+end
+
+
+--
+-- CButtonSpottingRG
+--
+local CButtonSpottingRG = CButtonArrowRG:extend() -- generic spotting RG button
+function CButtonSpottingRG:new(_argt)
+    CButtonSpottingRG.super.new(self, _argt)
+    self:argt(_argt) -- override if any
+end
+
+
+--
+-- CButtonSpottingUL
+--
+local CButtonSpottingUL = CButtonArrowUL:extend() -- generic spotting UL button
+function CButtonSpottingUL:new(_argt)
+    CButtonSpottingUL.super.new(self, _argt)
+    self:argt(_argt) -- override if any
+end
+
+
+--
+-- CButtonSpottingUR
+--
+local CButtonSpottingUR = CButtonArrowUR:extend() -- generic spotting UR button
+function CButtonSpottingUR:new(_argt)
+    CButtonSpottingUR.super.new(self, _argt)
+    self:argt(_argt) -- override if any
+end
+
+
+--
+-- CButtonSpottingDL
+--
+local CButtonSpottingDL = CButtonArrowDL:extend() -- generic spotting DL button
+function CButtonSpottingDL:new(_argt)
+    CButtonSpottingDL.super.new(self, _argt)
+    self:argt(_argt) -- override if any
+end
+
+
+--
+-- CButtonSpottingDR
+--
+local CButtonSpottingDR = CButtonArrowDR:extend() -- generic spotting DR button
+function CButtonSpottingDR:new(_argt)
+    CButtonSpottingDR.super.new(self, _argt)
     self:argt(_argt) -- override if any
 end
 
@@ -5049,26 +5152,54 @@ Tic:screenAppend(ScreenWorld)
 
 -- lf panel
 local ScreenWorldLF = CScreen{}
-local WindowInfosSpotted    = CWindowInfosSpotted{}
-local WindowPortraitSpotted = CWindowPortraitSpotted{}
-local ButtonDrawSpotting    = CButtonDrawSpotting{}
-local ButtonLockSpotting    = CButtonLockSpotting{}
+local WindowSpottingInfos    = CWindowSpottingInfos{}
+local WindowSpottingPortrait = CWindowSpottingPortrait{}
+local ButtonSpottingDraw     = CButtonSpottingDraw{}
+local ButtonSpottingLock     = CButtonSpottingLock{}
+local ButtonSpottingLF       = CButtonSpottingLF{}
+local ButtonSpottingUP       = CButtonSpottingUP{}
+local ButtonSpottingDW       = CButtonSpottingDW{}
+local ButtonSpottingRG       = CButtonSpottingRG{}
+local ButtonSpottingUL       = CButtonSpottingUL{}
+local ButtonSpottingUR       = CButtonSpottingUR{}
+local ButtonSpottingDL       = CButtonSpottingDL{}
+local ButtonSpottingDR       = CButtonSpottingDR{}
 ScreenWorldLF:elementsDistributeH(
-    {ButtonDrawSpotting, ButtonLockSpotting},
-    WindowInfosSpotted.screenx + (
-        (WindowInfosSpotted.screenw - CScreen:elementsTotalH({ButtonDrawSpotting, ButtonLockSpotting})) // 2),
-        WindowInfosSpotted.screeny - Tic.SPRITESIZE
+    {ButtonSpottingDraw, ButtonSpottingLock},
+    WindowSpottingInfos.screenx + (
+        (WindowSpottingInfos.screenw - CScreen:elementsTotalH({ButtonSpottingDraw, ButtonSpottingLock})) // 2),
+    WindowSpottingInfos.screeny - Tic.SPRITESIZE
+)
+ScreenWorldLF:elementsDistributeH(
+    {ButtonSpottingUL, ButtonSpottingUP, ButtonSpottingUR},
+    WindowSpottingPortrait.screenx + (
+        (WindowSpottingPortrait.screenw - CScreen:elementsTotalH({ButtonSpottingUL, ButtonSpottingUP, ButtonSpottingUR})) // 2),
+    WindowSpottingPortrait.screeny - Tic.SPRITESIZE
+)
+ScreenWorldLF:elementsDistributeH(
+    {ButtonSpottingDL, ButtonSpottingDW, ButtonSpottingDR},
+    WindowSpottingPortrait.screenx + (
+        (WindowSpottingPortrait.screenw - CScreen:elementsTotalH({ButtonSpottingDL, ButtonSpottingDW, ButtonSpottingDR})) // 2),
+    WindowSpottingPortrait.screeny + WindowSpottingPortrait.screenh
 )
 ScreenWorldLF:appendElements{
-    WindowInfosSpotted,
-    WindowPortraitSpotted,
-    ButtonDrawSpotting,
-    ButtonLockSpotting,
+    WindowSpottingInfos,
+    WindowSpottingPortrait,
+    ButtonSpottingDraw,
+    ButtonSpottingLock,
+    ButtonSpottingLF,
+    ButtonSpottingUP,
+    ButtonSpottingDW,
+    ButtonSpottingRG,
+    ButtonSpottingUL,
+    ButtonSpottingUR,
+    ButtonSpottingDL,
+    ButtonSpottingDR,
 }
 
 -- md panel
 local ScreenWorldMD = CScreen{}
-local WindowWorld      = CWindowWorld{spottedwindows = {WindowInfosSpotted, WindowPortraitSpotted}}
+local WindowWorld      = CWindowWorld{spottedwindows = {WindowSpottingInfos, WindowSpottingPortrait}}
 local WindowInfosWorld = CWindowInfosWorld{}
 ScreenWorldMD:appendElements{
     WindowWorld,
@@ -5077,27 +5208,27 @@ ScreenWorldMD:appendElements{
 
 -- rg panel
 local ScreenWorldRG = CScreen{}
-local WindowInfosPlayer    = CWindowInfosPlayer{}
-local WindowPortraitPlayer = CWindowPortraitPlayer{}
-local WindowStatsPlayer    = CWindowStatsPlayer{}
-local WindowStatePlayer    = CWindowStatePlayer{}
-local ButtonPrevPlayer     = CButtonPrevPlayer{}
-local ButtonPickPlayer     = CButtonPickPlayer{}
-local ButtonNextPlayer     = CButtonNextPlayer{}
+local WindowPlayerInfos    = CWindowPlayerInfos{}
+local WindowPlayerPortrait = CWindowPlayerPortrait{}
+local WindowPlayerStats    = CWindowPlayerStats{}
+local WindowPlayerState    = CWindowPlayerState{}
+local ButtonPlayerPrev     = CButtonPlayerPrev{}
+local ButtonPlayerPick     = CButtonPlayerPick{}
+local ButtonPlayerNext     = CButtonPlayerNext{}
 ScreenWorldRG:elementsDistributeH(
-    {ButtonPrevPlayer, ButtonPickPlayer, ButtonNextPlayer},
-    WindowInfosPlayer.screenx + (
-        (WindowInfosPlayer.screenw - CScreen:elementsTotalH({ButtonPrevPlayer, ButtonPickPlayer, ButtonNextPlayer})) // 2),
-    WindowInfosPlayer.screeny - Tic.SPRITESIZE
+    {ButtonPlayerPrev, ButtonPlayerPick, ButtonPlayerNext},
+    WindowPlayerInfos.screenx + (
+        (WindowPlayerInfos.screenw - CScreen:elementsTotalH({ButtonPlayerPrev, ButtonPlayerPick, ButtonPlayerNext})) // 2),
+    WindowPlayerInfos.screeny - Tic.SPRITESIZE
 )
 ScreenWorldRG:appendElements{
-    WindowInfosPlayer,
-    WindowPortraitPlayer,
-    WindowStatsPlayer,
-    WindowStatePlayer,
-    ButtonPrevPlayer,
-    ButtonPickPlayer,
-    ButtonNextPlayer,
+    WindowPlayerInfos,
+    WindowPlayerPortrait,
+    WindowPlayerStats,
+    WindowPlayerState,
+    ButtonPlayerPrev,
+    ButtonPlayerPick,
+    ButtonPlayerNext,
 }
 
 ScreenWorld:appendElements{
@@ -5199,8 +5330,8 @@ ScreenIntro:appendElements{
 
     Button16,
     Button17,
-    ButtonPrevPlayer,
-    ButtonNextPlayer,
+    ButtonPlayerPrev,
+    ButtonPlayerNext,
 }
 
 Button15.clicklf = Tic.FUNCTIONSCREENNEXT
@@ -5420,9 +5551,9 @@ goto runit
 --
 -- Sprites -- TESTING
 --
-local SpriteSFB = CSpriteFGBoard{
-    screenx = Tic.SCREENW2,
-    screeny = Tic.SCREENH2,
+local SpriteSFX = CSpriteFGBoard{
+    screenx = 30,
+    screeny = 110,
     directives = {
         {x = 2, y = 1, color = Tic.COLORORANGE,},
         {x = 1, y = 2, color = Tic.COLORORANGE,},
@@ -5442,12 +5573,17 @@ local SpriteSFB = CSpriteFGBoard{
         {x = 3, y = 5, color = Tic.COLORPURPLE,},
     },
 }
-local SpriteFG = CSpriteFG{
-    sprite = 477,
-    screenx = 0,
-    screeny = 0,
-    scale = CSprite.SCALE04,
+local SpriteHTG = CSpriteFG{
+    sprite = 458,
+    screenx = 30,
+    screeny = 100,
 }
+local SpriteBIS = CSpriteFGBoard{
+    screenx = 30,
+    screeny = 120,
+    directives = Tic:boardDirectives(458),
+}
+
 
 --
 -- Regions -- TESTING
@@ -5570,20 +5706,9 @@ function Tic:draw()
     Tic:drawLog()
     Tic:logPrint()
 
-    -- line(10, 9, 25, 9, Tic.COLORCYAN)
-    -- line(10, 10, 25, 17, Tic.COLORCYAN)
-    -- Tic:drawLine(10, 10, 25, 17)
-    -- line(10, 30, 25, 37, Tic.COLORCYAN)
-    -- Tic:drawLine(10, 30, 25, 37, true)
-    -- rect(10, 50, 16, 1, Tic.COLORCYAN)
-    -- Tic:drawPoints(Nums:pointsPickCount(Nums:pointsLine(10, 50, 25, 50), 3, true))
-    -- Tic:drawPoints(Nums:pointsPickCount(Nums:pointsLine(10, 52, 25, 52), 4, true))
-    -- Tic:drawPoints(Nums:pointsPickCount(Nums:pointsLine(10, 54, 25, 54), 6, true))
-    -- Tic:drawPoints(Nums:pointsPickCount(Nums:pointsLine(10, 60, 25, 60), 3, false))
-    -- Tic:drawPoints(Nums:pointsPickCount(Nums:pointsLine(10, 62, 25, 62), 4, false))
-    -- Tic:drawPoints(Nums:pointsPickCount(Nums:pointsLine(10, 64, 25, 64), 6, false))
-    -- Tic:drawPoints(Nums:pointsPickPercent(Nums:pointsLine(10, 66, 25, 66), 20, true))
-    -- Tic:drawPoints(Nums:pointsPickPercent(Nums:pointsLine(10, 68, 25, 68), 25, true))
+    SpriteSFX:draw()
+    SpriteHTG:draw()
+    SpriteBIS:draw()
 
     Tic:tick() -- [!] required in the draw function
     end
