@@ -4932,35 +4932,35 @@ local IButtonSpotting = CButton:extend() -- generic player button
 IButtonSpotting.PALETTE = {[Tic.COLORGREYD] = Tic.COLORKEY}
 IButtonSpotting.BEHAVIOUR = function(self)
     CButton.BEHAVIOUR(self)
-    self.enabled = (Tic:entitySpotting()) and true or false
     self.display = (Tic:entitySpotting()) and true or false
+    if not self.display then return end -- no spotting
     local _playerworldregion = Tic:playerActual():worldRegion()
-    Tic:logAppend("p", _playerworldregion.lf, _playerworldregion.rg, _playerworldregion.up, _playerworldregion.dw)
-    if not self.enabled then return end -- no spotting
     local _entityworldregion = Tic:entitySpotting():worldRegion()
-    Tic:logAppend("e", _entityworldregion.lf, _entityworldregion.rg, _entityworldregion.up, _entityworldregion.dw)
+    self.enabled = true
     self.actived = false
-    if _playerworldregion.up > _entityworldregion.dw then
+    if _playerworldregion.up > _entityworldregion.dw then -- lower than entity
         if _playerworldregion.lf > _entityworldregion.rg and self.direction == Tic.DIR315 then
             self.actived = true
         elseif _playerworldregion.rg < _entityworldregion.lf and self.direction == Tic.DIR045 then
             self.actived = true
-        elseif self.direction == Tic.DIR000 then
+        elseif _playerworldregion.lf <= _entityworldregion.rg and  _playerworldregion.rg >= _entityworldregion.lf and self.direction == Tic.DIR000 then
             self.actived = true
         end
-    elseif _playerworldregion.dw < _entityworldregion.up then
+    elseif _playerworldregion.dw < _entityworldregion.up then -- upper than entity
         if _playerworldregion.lf > _entityworldregion.rg and self.direction == Tic.DIR225 then
             self.actived = true
         elseif _playerworldregion.rg < _entityworldregion.lf and self.direction == Tic.DIR135 then
             self.actived = true
-        elseif self.direction == Tic.DIR180 then
+        elseif _playerworldregion.lf <= _entityworldregion.rg and _playerworldregion.rg >= _entityworldregion.lf and self.direction == Tic.DIR180 then
             self.actived = true
         end
-    else
+    else -- same level than entity
         if _playerworldregion.rg < _entityworldregion.lf and self.direction == Tic.DIR090 then
             self.actived = true
         elseif _playerworldregion.lf > _entityworldregion.rg and self.direction == Tic.DIR270 then
             self.actived = true
+        elseif _playerworldregion.rg >= _entityworldregion.lf and _playerworldregion.lf <= _entityworldregion.rg then
+            self.hovered = true
         end
     end
 end
@@ -5218,9 +5218,15 @@ Tic:screenAppend(ScreenWorld)
 -- lf panel
 local ScreenWorldLF = CScreen{}
 local WindowSpottingInfos    = CWindowSpottingInfos{}
-local WindowSpottingPortrait = CWindowSpottingPortrait{}
 local ButtonSpottingDraw     = CButtonSpottingDraw{}
 local ButtonSpottingLock     = CButtonSpottingLock{}
+ScreenWorldLF:elementsDistributeH(
+    {ButtonSpottingDraw, ButtonSpottingLock},
+    WindowSpottingInfos.screenx + (
+        (WindowSpottingInfos.screenw - CScreen:elementsTotalH({ButtonSpottingDraw, ButtonSpottingLock})) // 2),
+    WindowSpottingInfos.screeny - Tic.SPRITESIZE
+)
+local WindowSpottingPortrait = CWindowSpottingPortrait{}
 local ButtonSpottingLF       = CButtonSpottingLF{}
 local ButtonSpottingUP       = CButtonSpottingUP{}
 local ButtonSpottingDW       = CButtonSpottingDW{}
@@ -5230,31 +5236,25 @@ local ButtonSpottingUR       = CButtonSpottingUR{}
 local ButtonSpottingDL       = CButtonSpottingDL{}
 local ButtonSpottingDR       = CButtonSpottingDR{}
 ScreenWorldLF:elementsDistributeH(
-    {ButtonSpottingDraw, ButtonSpottingLock},
-    WindowSpottingInfos.screenx + (
-        (WindowSpottingInfos.screenw - CScreen:elementsTotalH({ButtonSpottingDraw, ButtonSpottingLock})) // 2),
-    WindowSpottingInfos.screeny - Tic.SPRITESIZE
-)
-ScreenWorldLF:elementsDistributeH(
-    {ButtonSpottingUL, ButtonSpottingUR},
+    {ButtonSpottingDR, ButtonSpottingDL},
     WindowSpottingPortrait.screenx - 6,
     WindowSpottingPortrait.screeny - Tic.SPRITESIZE + 2,
     12
 )
 ScreenWorldLF:elementsDistributeH(
-    {ButtonSpottingLF, ButtonSpottingRG},
+    {ButtonSpottingRG, ButtonSpottingLF},
     WindowSpottingPortrait.screenx - 7,
     WindowSpottingPortrait.screeny + 4,
     14
 )
 ScreenWorldLF:elementsDistributeV(
-    {ButtonSpottingUP, ButtonSpottingDW},
+    {ButtonSpottingDW, ButtonSpottingUP},
     WindowSpottingPortrait.screenx + 4,
     WindowSpottingPortrait.screeny - 7,
     14
 )
 ScreenWorldLF:elementsDistributeH(
-    {ButtonSpottingDL, ButtonSpottingDR},
+    {ButtonSpottingUR, ButtonSpottingUL},
     WindowSpottingPortrait.screenx - 6,
     WindowSpottingPortrait.screeny + WindowSpottingPortrait.screenh - 2,
     12
@@ -5788,9 +5788,9 @@ function Tic:draw()
     Tic:drawLog()
     Tic:logPrint()
 
-    SpriteSFX:draw()
-    SpriteHTG:draw()
-    SpriteBIS:draw()
+    -- SpriteSFX:draw()
+    -- SpriteHTG:draw()
+    -- SpriteBIS:draw()
 
     Tic:tick() -- [!] required in the draw function
     end
