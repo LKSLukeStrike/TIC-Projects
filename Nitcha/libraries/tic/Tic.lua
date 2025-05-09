@@ -150,9 +150,9 @@ Tic.COLORHAIRSBG  = Tic.COLORGREYM
 Tic.COLOREXTRA    = Tic.COLORGREYL
 Tic.COLORSKIN     = Tic.COLORWHITE
 Tic.COLOREYESFG   = Tic.COLORGREYD -- 4 colors for the eyes
-Tic.COLOREYESBGUP = Tic.COLORGREYM
-Tic.COLOREYESBGMD = Tic.COLORGREYL
-Tic.COLOREYESBGDW = Tic.COLORWHITE
+Tic.COLOREYESBU   = Tic.COLORGREYM
+Tic.COLOREYESBM   = Tic.COLORGREYL
+Tic.COLOREYESBD   = Tic.COLORWHITE
 -- TODO weapons fg/bg + status
 
 -- Directions
@@ -1085,9 +1085,10 @@ function Tic:boardPaint(_sprite, _directives, _clean) -- paint a board sprite
     end
 end
 
-function Tic:boardDirectives(_sprite, _palette) -- returns the directive of a sprite -- optional palette modification
+function Tic:boardDirectives(_sprite, _palette, _colorkey) -- returns the directive of a sprite -- optional palette modification
     if not _sprite then return end -- mandatory
-    _palette = _palette or {}
+    _palette  = _palette or {}
+    _colorkey = _colorkey or Tic.COLORKEY
     local _result = {}
     for _y = 0, 7 do
         for _x = 0, 7 do
@@ -1095,7 +1096,7 @@ function Tic:boardDirectives(_sprite, _palette) -- returns the directive of a sp
             if _palette[_color] then
                 _color = _palette[_color]
             end
-            if not (_color == Tic.COLORKEY) then -- avoid empty pixels
+            if not (_color == _colorkey) then -- skip empty pixels
                 table.insert(_result, {
                     x = _x,
                     y = _y,
@@ -1145,11 +1146,10 @@ end
 
 function CSprite:draw() -- draw a sprite -- SCREEN -- DEFAULT
     local _sprite = self.sprite + (self.frame *  CSprite.FRAMEOF)
-    local _directives = Tic:boardDirectives(_sprite, self.palette)
+    local _directives = Tic:boardDirectives(_sprite, self.palette, self.colorkey)
     Tic:boardPaint(CSprite.SPRITEBOARD, _directives)
     spr(
         CSprite.SPRITEBOARD,
-        -- self.sprite + (self.frame *  CSprite.FRAMEOF),
         self.screenx,
         self.screeny,
         self.colorkey,
@@ -3523,6 +3523,9 @@ function CCharacterHumanoid:drawHead()
     local _posture          = _statesettings.posture
     local _posturesettings  = Tic.POSTURESETTINGS[_posture]
 
+    local _musprite = CSpriteFG() -- multi usage unique sprite
+
+    -- draw head
     local _headxoffset = _posturesettings.headxoffset
     local _headyoffset = _posturesettings.headyoffset
     _headyoffset = (_posturesettings.headusesize)
@@ -3531,8 +3534,6 @@ function CCharacterHumanoid:drawHead()
     local _headrotate  = _posturesettings.rotate
     local _headframe   = CSprite.FRAME00 -- heads have only one frame
 
-    local _musprite = CSpriteFG() -- multi usage unique sprite
-    -- draw head
     _musprite.sprite  = self.headsprite -- apply the corresponding attributes
     _musprite.screenx = self.screenx + (_headxoffset * self.scale)
     _musprite.screeny = self.screeny + (_headyoffset * self.scale)
@@ -3549,30 +3550,33 @@ function CCharacterHumanoid:drawHead()
     _musprite:draw()
 
     -- draw eyes
-    local _coloreyesfg   = self.coloreyesfg
-    local _coloreyesbgup = self.coloreyesbg
-    local _coloreyesbgmd = self.coloreyesbg
-    local _coloreyesbgdw = self.coloreyesbg
-
+    local _coloreyesfg = Tic.COLORKEY
+    local _coloreyesbu = Tic.COLORKEY
+    local _coloreyesbm = Tic.COLORKEY
+    local _coloreyesbd = Tic.COLORKEY
+    
     if self.posture == Tic.POSTUREFLOOR then
-        _musprite.colorkey = {Tic.COLORKEY, Tic.COLOREYESFG, Tic.COLOREYESBGUP, Tic.COLOREYESBGDW,}
+        _coloreyesbm = self.coloreyesbg
     end
-    if self.posture ~= Tic.POSTUREFLOOR and self.diry == Tic.DIRYUP then
-        _musprite.colorkey = {Tic.COLORKEY, Tic.COLOREYESBGMD, Tic.COLOREYESBGDW,}
+    if not (self.posture == Tic.POSTUREFLOOR) and self.diry == Tic.DIRYUP then
+        _coloreyesfg = self.coloreyesfg
+        _coloreyesbu = self.coloreyesbg
     end
-    if self.posture ~= Tic.POSTUREFLOOR and self.diry == Tic.DIRYMD then
-        _musprite.colorkey = {Tic.COLORKEY, Tic.COLOREYESBGUP, Tic.COLOREYESBGDW,}
+    if not (self.posture == Tic.POSTUREFLOOR) and self.diry == Tic.DIRYMD then
+        _coloreyesfg = self.coloreyesfg
+        _coloreyesbm = self.coloreyesbg
     end
-    if self.posture ~= Tic.POSTUREFLOOR and self.diry == Tic.DIRYDW then
-        _musprite.colorkey = {Tic.COLORKEY, Tic.COLOREYESBGUP, Tic.COLOREYESBGMD,}
+    if not (self.posture == Tic.POSTUREFLOOR) and self.diry == Tic.DIRYDW then
+        _coloreyesfg = self.coloreyesfg
+        _coloreyesbd = self.coloreyesbg
     end
 
     _musprite.sprite  = self.eyessprite -- apply the corresponding attributes
     _musprite.palette = { -- apply eyes palette
-        [Tic.COLOREYESFG]   = _coloreyesfg,
-        [Tic.COLOREYESBGUP] = _coloreyesbgup,
-        [Tic.COLOREYESBGMD] = _coloreyesbgmd,
-        [Tic.COLOREYESBGDW] = _coloreyesbgdw,
+        [Tic.COLOREYESFG] = _coloreyesfg,
+        [Tic.COLOREYESBU] = _coloreyesbu,
+        [Tic.COLOREYESBM] = _coloreyesbm,
+        [Tic.COLOREYESBD] = _coloreyesbd,
     }
     _musprite:draw()
 end
@@ -4929,6 +4933,7 @@ IButtonSpotting.PALETTE = {[Tic.COLORGREYD] = Tic.COLORKEY}
 IButtonSpotting.BEHAVIOUR = function(self)
     CButton.BEHAVIOUR(self)
     self.enabled = (Tic:entitySpotting()) and true or false
+    self.display = (Tic:entitySpotting()) and true or false
     local _playerworldregion = Tic:playerActual():worldRegion()
     Tic:logAppend("p", _playerworldregion.lf, _playerworldregion.rg, _playerworldregion.up, _playerworldregion.dw)
     if not self.enabled then return end -- no spotting
