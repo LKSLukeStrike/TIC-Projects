@@ -725,7 +725,7 @@ function Tic:toggleSleep(_character) -- toggle stand vs sleep
 end
 
 
--- Directions System -- move to 8 directions depending on stattious
+-- Move System -- move to 8 directions depending on stattious
 function Tic:moveDirection000(_character)
     Tic:moveDirection(Tic.DIR000, _character)
 end
@@ -2931,6 +2931,7 @@ function CCharacter:new(_argt)
     self.frame        = CSprite.FRAME00 -- frame
     self.dirx         = Tic.DIRXLF -- directions
     self.diry         = Tic.DIRYMD
+    self.direction    = Tic.DIR270
     self.hitbox       = CHitbox()
     self.state        = Tic.STATESTANDIDLE -- state
     self.idlecycler   = CCyclerInt{maxindex = 59,} -- cycler to get back to idle
@@ -3019,7 +3020,7 @@ function CCharacter:regionMindOffsets() -- mind offsets region depending on dirx
     local _posture       = _statesettings.posture
     local _posturekneel  = _posture == Tic.POSTUREKNEEL
     local _size          = Tic.SPRITESIZE * self.scale
-    local _range       = Tic.WORLDWH -- use world window height as range -- TODO change that later ?
+    local _range         = Tic.WORLDWH -- use world window height as range -- TODO change that later ?
     local _offsets       = Nums:roundint((((_range - _size) // 2) - 1) * (_stat / Tic.STATSMAX))
 
     return CRegion{
@@ -3041,13 +3042,31 @@ function CCharacter:regionMindWorld() -- mind world region depending on dirx, di
 end
 
 function CCharacter:regionMoveOffsets() -- move offsets region depending on movex, movey
+    local _stat          = self.statphyact
+    local _statesettings = Tic.STATESETTINGS[self.state]
+    local _posture       = _statesettings.posture
+    local _posturekneel  = _posture == Tic.POSTUREKNEEL
     local _size          = Tic.SPRITESIZE * self.scale
+    local _range         = (_posturekneel) and Tic.WORLDWH // 2 or Tic.WORLDWH -- use world window height as range -- TODO change that later ?
+    local _offsets       = Nums:roundint((((_range - _size) // 2) - 1) * (_stat / Tic.STATSMAX))
 
     return CRegion{
-        lf  = self.offsetx,
-        rg  = self.offsetx + _size,
-        up  = self.offsety,
-        dw  = self.offsety + _size,
+        lf  = (self.dirx == Tic.DIRXLF)
+            and Nums:neg(_offsets)
+            or  0,
+        rg  = (self.dirx == Tic.DIRXLF)
+            and _size
+            or  _size + _offsets,
+        up  = (self.diry == Tic.DIRYUP)
+            and Nums:neg(_offsets)
+            or  (self.diry == Tic.DIRYMD)
+                and Nums:neg(_offsets // 2)
+                or  0,
+        dw  = (self.diry == Tic.DIRYUP)
+            and _size
+            or  (self.diry == Tic.DIRYMD)
+                and _size + (_offsets // 2)
+                or  _size + _offsets,
     }
 end
 
@@ -3339,16 +3358,16 @@ function CCharacter:moveDirection(_direction, _movenone,  _moveslow, _moveback) 
     _movenone = _movenone or false -- force none move if any
     _moveslow = _moveslow or false -- force slow move if any
     _moveback = _moveback or false -- force back move if any
-    local _state = self.state
+    local _state         = self.state
     local _statesettings = Tic.STATESETTINGS[_state]
-    local _posture = _statesettings.posture
-    local _status  = _statesettings.status
-    local _offsets = Tic.DIRS2OFFSETS[_direction]
-    local _offsetx = _offsets.offsetx
-    local _offsety = _offsets.offsety
-    local _dirx    = _offsets.dirx
-    local _diry    = _offsets.diry
-    local _oldx    = self.dirx -- save actual character dirx
+    local _posture       = _statesettings.posture
+    local _status        = _statesettings.status
+    local _offsets       = Tic.DIRS2OFFSETS[_direction]
+    local _offsetx       = _offsets.offsetx
+    local _offsety       = _offsets.offsety
+    local _dirx          = _offsets.dirx
+    local _diry          = _offsets.diry
+    local _oldx          = self.dirx -- save actual character dirx
 
     self.dirx = _dirx or self.dirx -- adjust dirx and diry
     self.diry = _diry or self.diry
