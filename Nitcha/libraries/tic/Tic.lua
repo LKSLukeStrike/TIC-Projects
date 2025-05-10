@@ -172,70 +172,70 @@ Tic.DIR315 = 315
 Tic.OFFSETZERO = 00 -- offsets for moving in line or diagonal
 Tic.OFFSETDIAG = 07
 Tic.OFFSETLINE = 10
-Tic.DIRS2OFFSETS = { -- directions to x y offsets and dirs
+Tic.DIRSOFFSETS = { -- directions to x y offsets and dirs
     [Tic.DIR000] = {
         offsetx = Nums:pos(Tic.OFFSETZERO),
         offsety = Nums:neg(Tic.OFFSETLINE),
         screenx = nil, -- double line
         screeny = 0,
-        dirx = nil,
-        diry = Tic.DIRYUP,
+        dirx    = nil,
+        diry    = Tic.DIRYUP,
     },
     [Tic.DIR045] = {
         offsetx = Nums:pos(Tic.OFFSETDIAG),
         offsety = Nums:neg(Tic.OFFSETDIAG),
         screenx = 1,
         screeny = 0,
-        dirx = Tic.DIRXRG,
-        diry = Tic.DIRYUP,
+        dirx    = Tic.DIRXRG,
+        diry    = Tic.DIRYUP,
     },
     [Tic.DIR090] = {
         offsetx = Nums:pos(Tic.OFFSETLINE),
         offsety = Nums:pos(Tic.OFFSETZERO),
         screenx = 1,
         screeny = nil, -- double line
-        dirx = Tic.DIRXRG,
-        diry = Tic.DIRYMD,
+        dirx    = Tic.DIRXRG,
+        diry    = Tic.DIRYMD,
     },
     [Tic.DIR135] = {
         offsetx = Nums:pos(Tic.OFFSETDIAG),
         offsety = Nums:pos(Tic.OFFSETDIAG),
         screenx = 1,
         screeny = 1,
-        dirx = Tic.DIRXRG,
-        diry = Tic.DIRYDW,
+        dirx    = Tic.DIRXRG,
+        diry    = Tic.DIRYDW,
     },
     [Tic.DIR180] = {
         offsetx = Nums:pos(Tic.OFFSETZERO),
         offsety = Nums:pos(Tic.OFFSETLINE),
         screenx = nil, -- double line
         screeny = 0,
-        dirx = nil,
-        diry = Tic.DIRYDW,
+        dirx    = nil,
+        diry    = Tic.DIRYDW,
     },
     [Tic.DIR225] = {
         offsetx = Nums:neg(Tic.OFFSETDIAG),
         offsety = Nums:pos(Tic.OFFSETDIAG),
         screenx = 0,
         screeny = 1,
-        dirx = Tic.DIRXLF,
-        diry = Tic.DIRYDW,
+        dirx    = Tic.DIRXLF,
+        diry    = Tic.DIRYDW,
     },
     [Tic.DIR270] = {
         offsetx = Nums:neg(Tic.OFFSETLINE),
         offsety = Nums:pos(Tic.OFFSETZERO),
         screenx = 0,
         screeny = nil, -- double line
-        dirx = Tic.DIRXLF,
-        diry = Tic.DIRYMD,
+        dirx    = Tic.DIRXLF,
+        diry    = Tic.DIRYMD,
     },
     [Tic.DIR315] = {
         offsetx = Nums:neg(Tic.OFFSETDIAG),
         offsety = Nums:neg(Tic.OFFSETDIAG),
         screenx = 0,
         screeny = 0,
-        dirx = Tic.DIRXLF,
-        diry = Tic.DIRYUP,
+        dirx    = Tic.DIRXLF,
+        diry    = Tic.DIRYUP,
     },
 }
 
@@ -3162,8 +3162,8 @@ function CCharacter:drawDirs() -- draw the directions and ranges around the char
 
     circb(_screenx, _screeny, _range, _drawcolor)
     circb(_screenx + 1, _screeny, _range, _drawcolor)
-    for _, _dir in pairs(Tables:keys(Tic.DIRS2OFFSETS)) do
-        local _offsets  = Tic.DIRS2OFFSETS[_dir]
+    for _, _direction in pairs(Tables:keys(Tic.DIRSOFFSETS)) do
+        local _offsets  = Tic.DIRSOFFSETS[_direction]
         local _oscreenx = _offsets.screenx or 0
         local _oscreeny = _offsets.screeny or 0
         local _ooffsetx = Nums:roundmax(_offsets.offsetx * _range / Tic.OFFSETLINE)
@@ -3353,24 +3353,60 @@ function CCharacter:moveWorldXY(_worldx, _worldy) -- move character into world
     self.world:moveEntityWorldXY(self, _worldx, _worldy)
 end
 
+function CCharacter:offsetsDirection(_direction, _movenone,  _moveslow, _moveback) -- return offsets corresponding to direction, posture etc
+    if not _direction then return end -- mandatory
+    _movenone = _movenone or false -- force none move if any
+    _moveslow = _moveslow or false -- force slow move if any
+    _moveback = _moveback or false -- force back move if any
+    local _posture = Tic.STATESETTINGS[self.state].posture
+    local _offsets = Tic.DIRSOFFSETS[_direction]
+
+    local _result = {
+        offsetx = _offsets.offsetx,
+        offsety = _offsets.offsety,
+        screenx = _offsets.screenx,
+        screeny = _offsets.screeny,
+        dirx    = _offsets.dirx,
+        diry    = _offsets.diry,
+    }
+
+    if _movenone then -- none move
+        _result.offsetx = 0
+        _result.offsety = 0
+    elseif _moveslow then -- slow move -1, 0, +1
+        _result.offsetx = Nums:sign(_result.offsetx)
+        _result.offsety = Nums:sign(_result.offsety)
+    else -- normal move
+        _result.offsetx = _result.offsetx * (self.statphyact / Tic.STATSMAX) -- depends of phy act
+        _result.offsety = _result.offsety * (self.statphyact / Tic.STATSMAX)
+        _result.offsetx = (_posture == Tic.POSTURESTAND) and _result.offsetx or _result.offsetx / 2 -- half if not stand
+        _result.offsety = (_posture == Tic.POSTURESTAND) and _result.offsety or _result.offsety / 2 -- half if not stand
+        _result.offsetx = Nums:roundmax(_result.offsetx) -- ensure solid values
+        _result.offsety = Nums:roundmax(_result.offsety)
+    end
+
+    if _moveback then -- back move
+        _result.offsetx = Nums:invert(_result.offsetx)
+        _result.offsety = Nums:invert(_result.offsety)
+    end
+
+    return _result
+end
+
 function CCharacter:moveDirection(_direction, _movenone,  _moveslow, _moveback) -- handle moving a character in a direction
     if not _direction then return end -- mandatory
     _movenone = _movenone or false -- force none move if any
     _moveslow = _moveslow or false -- force slow move if any
     _moveback = _moveback or false -- force back move if any
-    local _state         = self.state
-    local _statesettings = Tic.STATESETTINGS[_state]
-    local _posture       = _statesettings.posture
-    local _status        = _statesettings.status
-    local _offsets       = Tic.DIRS2OFFSETS[_direction]
-    local _offsetx       = _offsets.offsetx
-    local _offsety       = _offsets.offsety
-    local _dirx          = _offsets.dirx
-    local _diry          = _offsets.diry
-    local _oldx          = self.dirx -- save actual character dirx
+    local _posture = Tic.STATESETTINGS[self.state].posture
+    local _status  = Tic.STATESETTINGS[self.state].status
+    local _offsets = Tic.DIRSOFFSETS[_direction]
+    local _offsets = self:offsetsDirection(_direction, _movenone,  _moveslow, _moveback)
+    local _dirx    = self.dirx -- save actual character dirx
 
-    self.dirx = _dirx or self.dirx -- adjust dirx and diry
-    self.diry = _diry or self.diry
+    self.dirx      = _offsets.dirx -- adjust dirx, diry and direction
+    self.diry      = _offsets.diry
+    self.direction = _direction
     self:hitboxRefresh() -- refresh the hitboxes
 
     if _movenone then -- none move
@@ -3391,11 +3427,11 @@ function CCharacter:moveDirection(_direction, _movenone,  _moveslow, _moveback) 
         return
     end
 
-    if _status == Tic.STATUSIDLE and self.dirx ~= _oldx then -- simply change dirx
+    if _status == Tic.STATUSIDLE and not (self.dirx == _dirx) then -- simply change dirx
         return
     end
 
-    if _status == Tic.STATUSMOVE and self.dirx ~= _oldx then -- change dirx and goes to idle
+    if _status == Tic.STATUSMOVE and not (self.dirx == _dirx) then -- change dirx and goes to idle
         self.state = _posture..Tic.STATUSIDLE
         return
     end
@@ -3403,32 +3439,15 @@ function CCharacter:moveDirection(_direction, _movenone,  _moveslow, _moveback) 
     self.state = _posture..Tic.STATUSMOVE
     self:toggleFrame() -- animate continuous move in the same dirx
 
-    if _moveslow then -- slow move -1, 0, +1
-        _offsetx = Nums:sign(_offsetx)
-        _offsety = Nums:sign(_offsety)
-    else -- normal move
-        _offsetx = _offsetx * (self.statphyact / Tic.STATSMAX) -- depends of phy act
-        _offsety = _offsety * (self.statphyact / Tic.STATSMAX)
-        _offsetx = (_posture == Tic.POSTURESTAND) and _offsetx or _offsetx / 2 -- half if kneel
-        _offsety = (_posture == Tic.POSTURESTAND) and _offsety or _offsety / 2 -- half if kneel
-        _offsetx = Nums:roundmax(_offsetx)
-        _offsety = Nums:roundmax(_offsety)
-    end
-
-    if _moveback then -- back move
-        _offsetx = Nums:invert(_offsetx)
-        _offsety = Nums:invert(_offsety)
-    end
-
-    local _movebyx = Nums:sign(_offsetx) -- calculate the maximum move step by step
-    local _movebyy = Nums:sign(_offsety)
+    local _movebyx = Nums:sign(_offsets.offsetx) -- calculate the maximum move step by step
+    local _movebyy = Nums:sign(_offsets.offsety)
     local _movetox = 0
     local _movetoy = 0
     local _move    = true
     while _move do
-        if Nums:pos(_movetox) < Nums:pos(_offsetx) then _movetox = _movetox + _movebyx end
-        if Nums:pos(_movetoy) < Nums:pos(_offsety) then _movetoy = _movetoy + _movebyy end
-        if _movetox == _offsetx and _movetoy == _offsety then _move = false end
+        if Nums:pos(_movetox) < Nums:pos(_offsets.offsetx) then _movetox = _movetox + _movebyx end
+        if Nums:pos(_movetoy) < Nums:pos(_offsets.offsety) then _movetoy = _movetoy + _movebyy end
+        if _movetox == _offsets.offsetx and _movetoy == _offsets.offsety then _move = false end
     end
     self:moveWorldXY(self.worldx + _movetox, self.worldy + _movetoy)
 
