@@ -1960,22 +1960,28 @@ end
 
 function CEntityDrawable:hitboxAttachTo(_entities) -- attach hitto entities
     for _entity, _ in pairs(_entities or {}) do
-        if self.hitbox then self.hitbox:hittoAppend(_entity) end
-        if _entity.hitbox then _entity.hitbox:hitbyAppend(self) end
+        if self.hitbox and _entity.hitbox then
+            self.hitbox:hittoAppend(_entity)
+            _entity.hitbox:hitbyAppend(self)
+        end
     end
 end
 
 function CEntityDrawable:hitboxDetachTo(_entities) -- detach hitto entities
     for _entity, _ in pairs(_entities or {}) do
-        if self.hitbox then self.hitbox:hittoDelete(_entity) end
-        if _entity.hitbox then _entity.hitbox:hitbyDelete(self) end
+        if self.hitbox and _entity.hitbox then
+            self.hitbox:hittoDelete(_entity)
+            _entity.hitbox:hitbyDelete(self)
+        end
     end
 end
 
 function CEntityDrawable:hitboxDetachBy(_entities) -- detach hitby entities
     for _entity, _ in pairs(_entities or {}) do
-        if self.hitbox then self.hitbox:hitbyDelete(_entity) end
-        if _entity.hitbox then _entity.hitbox:hittoDelete(self) end
+        if self.hitbox and _entity.hitbox then
+            self.hitbox:hitbyDelete(_entity)
+            _entity.hitbox:hittoDelete(self)
+        end
     end
 end
 
@@ -3041,42 +3047,29 @@ function CCharacter:regionMindWorld() -- mind world region depending on dirx, di
     return _regionmindoffsets:offsetXY(self.worldx, self.worldy)
 end
 
-function CCharacter:regionMoveOffsets() -- move offsets region depending on movex, movey
-    local _stat          = self.statphyact
-    local _statesettings = Tic.STATESETTINGS[self.state]
-    local _posture       = _statesettings.posture
-    local _posturekneel  = _posture == Tic.POSTUREKNEEL
-    local _size          = Tic.SPRITESIZE * self.scale
-    local _range         = (_posturekneel) and Tic.WORLDWH // 2 or Tic.WORLDWH -- use world window height as range -- TODO change that later ?
-    local _offsets       = Nums:roundint((((_range - _size) // 2) - 1) * (_stat / Tic.STATSMAX))
+function CCharacter:regionMoveOffsets(_direction, _movenone,  _moveslow, _moveback) -- move offsets region HERE
+    _direction     = _direction or self.direction
+    local _offsets = self:offsetsDirection(_direction, _movenone,  _moveslow, _moveback)
+    local _lf = 0
+    local _rg = Tic.SPRITESIZE * self.scale
+    local _up = 0
+    local _dw = Tic.SPRITESIZE * self.scale
 
     return CRegion{
-        lf  = (self.dirx == Tic.DIRXLF)
-            and Nums:neg(_offsets)
-            or  0,
-        rg  = (self.dirx == Tic.DIRXLF)
-            and _size
-            or  _size + _offsets,
-        up  = (self.diry == Tic.DIRYUP)
-            and Nums:neg(_offsets)
-            or  (self.diry == Tic.DIRYMD)
-                and Nums:neg(_offsets // 2)
-                or  0,
-        dw  = (self.diry == Tic.DIRYUP)
-            and _size
-            or  (self.diry == Tic.DIRYMD)
-                and _size + (_offsets // 2)
-                or  _size + _offsets,
+        lf  = _lf,
+        rg  = _rg,
+        up  = _up,
+        dw  = _dw,
     }
 end
 
-function CCharacter:regionMoveScreen() -- move screen region depending on movex, movey
-    local _regionmoveoffsets = self:regionMoveOffsets()
+function CCharacter:regionMoveScreen(_direction, _movenone,  _moveslow, _moveback) -- move screen region depending on movex, movey
+    local _regionmoveoffsets = self:regionMoveOffsets(_direction, _movenone,  _moveslow, _moveback)
     return _regionmoveoffsets:offsetXY(self.screenx, self.screeny)
 end
 
-function CCharacter:regionMoveWorld() -- move world region depending on movex, movey
-    local _regionmoveoffsets = self:regionMoveOffsets()
+function CCharacter:regionMoveWorld(_direction, _movenone,  _moveslow, _moveback) -- move world region depending on movex, movey
+    local _regionmoveoffsets = self:regionMoveOffsets(_direction, _movenone,  _moveslow, _moveback)
     return _regionmoveoffsets:offsetXY(self.worldx, self.worldy)
 end
 
@@ -3366,8 +3359,8 @@ function CCharacter:offsetsDirection(_direction, _movenone,  _moveslow, _movebac
         offsety = _offsets.offsety,
         screenx = _offsets.screenx,
         screeny = _offsets.screeny,
-        dirx    = _offsets.dirx,
-        diry    = _offsets.diry,
+        dirx    = _offsets.dirx or self.dirx,
+        diry    = _offsets.diry or self.diry,
     }
 
     if _movenone then -- none move
@@ -3457,7 +3450,7 @@ function CCharacter:moveDirection(_direction, _movenone,  _moveslow, _moveback) 
 end
 
 function CCharacter:hitboxRefresh() -- refresh the attached hitboxes
-    local _hitboxregion    = self:regionViewOffsets() -- hitbox collisions -- FIXME use another region (move)
+    local _hitboxregion    = self:regionMoveOffsets() -- hitbox collisions -- FIXME use another region (move)
     local _hitboxlocations = self:locationsRegion(_hitboxregion)
     local _hitboxentities  = CLocations:entities(_hitboxlocations)
     self:hitboxDetachAll()
@@ -3509,7 +3502,7 @@ function CCharacterHumanoid:new(_argt)
     self:argt(_argt) -- override if any
 end
 
-function CCharacterHumanoid:drawBody()
+function CCharacterHumanoid:drawBody() -- FIXME to rewrite from scratch
     local _state            = self.state
     local _statesettings    = Tic.STATESETTINGS[_state]
     local _posture          = _statesettings.posture
