@@ -325,13 +325,13 @@ Tic.FUNCTIONSTATPHYACT       = function() Tic:statPhyAct() end
 Tic.FUNCTIONSTATMENACT       = function() Tic:statMenAct() end
 Tic.FUNCTIONSTATPSYACT       = function() Tic:statPsyAct() end
 Tic.FUNCTIONBIOMENEXT        = function() Tic:biomeNext() end
-Tic.FUNCTIONTOGGLEHITBOX     = function() Tic:toggleHitbox() end
-Tic.FUNCTIONTOGGLESPOTTED    = function() Tic:toggleSpotting() end
-Tic.FUNCTIONTOGGLEBORDERS    = function() Tic:toggleBorders() end
-Tic.FUNCTIONTOGGLEDIRS       = function() Tic:toggleDirs() end
-Tic.FUNCTIONTOGGLEVIEW       = function() Tic:toggleView() end
-Tic.FUNCTIONTOGGLEMIND       = function() Tic:toggleMind() end
-Tic.FUNCTIONTOGGLEMOVE       = function() Tic:toggleMove() end
+Tic.FUNCTIONTOGGLEHITBOX     = function() Tic:hitboxToggleDraw() end
+Tic.FUNCTIONTOGGLESPOTTED    = function() Tic:spottingToggle() end
+Tic.FUNCTIONTOGGLEBORDERS    = function() Tic:bordersToggleDraw() end
+Tic.FUNCTIONTOGGLEDIRS       = function() Tic:dirsToggleDraw() end
+Tic.FUNCTIONTOGGLEVIEW       = function() Tic:viewToggleDraw() end
+Tic.FUNCTIONTOGGLEMIND       = function() Tic:mindToggleDraw() end
+Tic.FUNCTIONTOGGLEMOVE       = function() Tic:moveToggleDraw() end
 Tic.FUNCTIONSCALENEXT        = function() Tic:scaleNext() end
 Tic.FUNCTIONSCREENNEXT       = function() Tic:screenNext() end
 
@@ -826,42 +826,42 @@ end
 -- Hitbox System -- toggle hitbox display
 Tic.DRAWHITBOX = false
 
-function Tic:toggleHitbox()
+function Tic:hitboxToggleDraw()
 	Tic.DRAWHITBOX = Nums:toggleTF(Tic.DRAWHITBOX)
 end
 
 
 -- Spotting System -- toggle spotting draw/lock
-function Tic:toggleSpotting(_character)
+function Tic:spottingToggle(_character)
     if Tic.MODIFIERKEYS[Tic.KEY_SHIFT] then
-        Tic:toggleDrawSpotting(_character)
+        Tic:spottingToggleDraw(_character)
     else
-        Tic:toggleLockSpotting(_character)
+        Tic:spottingToggleLock(_character)
     end
 end
 
-function Tic:toggleDrawSpotting(_character)
+function Tic:spottingToggleDraw(_character)
     _character = _character or Tic:playerActual()
     if not _character then return end
-	_character:toggleDrawSpotting()
+	_character:spottingToggleDraw()
 end
 
-function Tic:toggleLockSpotting(_character)
+function Tic:spottingToggleLock(_character)
     _character = _character or Tic:playerActual()
     if not _character then return end
-	_character:toggleLockSpotting()
+	_character:spottingToggleLock()
 end
 
-function Tic:isDrawSpotting(_character)
+function Tic:isSpottingDraw(_character)
     _character = _character or Tic:playerActual()
     if not _character then return false end
-	return _character:isDrawSpotting()
+	return _character:isSpottingDraw()
 end
 
-function Tic:isLockSpotting(_character)
+function Tic:isSpottingLock(_character)
     _character = _character or Tic:playerActual()
     if not _character then return false end
-	return _character:isLockSpotting()
+	return _character:isSpottingLock()
 end
 
 function Tic:entitySpotting(_character)
@@ -874,7 +874,7 @@ end
 -- Borders System -- toggle borders display
 Tic.DRAWBORDERS = false
 
-function Tic:toggleBorders()
+function Tic:bordersToggleDraw()
 	Tic.DRAWBORDERS = Nums:toggleTF(Tic.DRAWBORDERS)
 end
 
@@ -882,7 +882,7 @@ end
 -- Dirs System -- toggle dirs display
 Tic.DRAWDIRS = false
 
-function Tic:toggleDirs()
+function Tic:dirsToggleDraw()
 	Tic.DRAWDIRS = Nums:toggleTF(Tic.DRAWDIRS)
 end
 
@@ -890,7 +890,7 @@ end
 -- View System -- toggle view display
 Tic.DRAWVIEW = false
 
-function Tic:toggleView()
+function Tic:viewToggleDraw()
 	Tic.DRAWVIEW = Nums:toggleTF(Tic.DRAWVIEW)
 end
 
@@ -898,7 +898,7 @@ end
 -- Mind System -- toggle mind display
 Tic.DRAWMIND = false
 
-function Tic:toggleMind()
+function Tic:mindToggleDraw()
 	Tic.DRAWMIND = Nums:toggleTF(Tic.DRAWMIND)
 end
 
@@ -906,7 +906,7 @@ end
 -- Move System -- toggle move display
 Tic.DRAWMOVE = false
 
-function Tic:toggleMove()
+function Tic:moveToggleDraw()
 	Tic.DRAWMOVE = Nums:toggleTF(Tic.DRAWMOVE)
 end
 
@@ -2974,20 +2974,14 @@ function CCharacter:new(_argt)
     self:focus() -- focus its camera on itself
 end
 
-function CCharacter:regionViewOffsets() -- view offsets region depending on dirx, diry, statphyact and -- TODO posture
+function CCharacter:regionViewOffsets() -- view offsets region depending on dirx, diry, statphyact and posture
     local _stat          = self.statphyact
     local _statesettings = Tic.STATESETTINGS[self.state]
     local _posture       = _statesettings.posture
     local _posturekneel  = _posture == Tic.POSTUREKNEEL
     local _size          = Tic.SPRITESIZE * self.scale
-    local _rangewh       = Tic.WORLDWH -- use world window height as range -- TODO change that later ?
-    local _offsets       = Nums:roundint((((_rangewh - _size) // 2) - 1) * (_stat / Tic.STATSMAX))
-    -- _offsets             = Nums:roundint(_offsets)
-    -- local _offsets       = (_posturekneel) -- FIXME here the posture
-    --     and ((((_rangewh - _size) // 2) - 1) * (_stat / Tic.STATSMAX)) // 2
-    --     or  ((((_rangewh - _size) // 2) - 1) * (_stat / Tic.STATSMAX)) // 1
-    -- Tic:logAppend("pa:", _stat)
-    -- Tic:logAppend("of:", _offsets)
+    local _range         = (_posturekneel) and Tic.WORLDWH // 2 or Tic.WORLDWH -- use world window height as range -- TODO change that later ?
+    local _offsets       = Nums:roundint((((_range - _size) // 2) - 1) * (_stat / Tic.STATSMAX))
 
     return CRegion{
         lf  = (self.dirx == Tic.DIRXLF)
@@ -3025,8 +3019,8 @@ function CCharacter:regionMindOffsets() -- mind offsets region depending on dirx
     local _posture       = _statesettings.posture
     local _posturekneel  = _posture == Tic.POSTUREKNEEL
     local _size          = Tic.SPRITESIZE * self.scale
-    local _rangewh       = Tic.WORLDWH -- use world window height as range -- TODO change that later ?
-    local _offsets       = Nums:roundint((((_rangewh - _size) // 2) - 1) * (_stat / Tic.STATSMAX))
+    local _range       = Tic.WORLDWH -- use world window height as range -- TODO change that later ?
+    local _offsets       = Nums:roundint((((_range - _size) // 2) - 1) * (_stat / Tic.STATSMAX))
 
     return CRegion{
         lf  = Nums:neg(_offsets),
@@ -3315,19 +3309,19 @@ function CCharacter:toggleFrame() -- toggle frame 0-1
     self.frame = Nums:toggle01(self.frame) -- animate continuous move in the same dirx
 end
 
-function CCharacter:toggleDrawSpotting()
+function CCharacter:spottingToggleDraw()
 	self.drawspotting = Nums:toggleTF(self.drawspotting)
 end
 
-function CCharacter:toggleLockSpotting()
+function CCharacter:spottingToggleLock()
 	self.lockspotting = Nums:toggleTF(self.lockspotting)
 end
 
-function CCharacter:isDrawSpotting()
+function CCharacter:isSpottingDraw()
 	return self.drawspotting
 end
 
-function CCharacter:isLockSpotting()
+function CCharacter:isSpottingLock()
 	return self.lockspotting
 end
 
@@ -4442,7 +4436,7 @@ function CWindowWorld:drawPlayerActual()
     local _regionmindworld  = _playeractual:regionMindWorld()
     local _nearestentity    = _playeractual:nearestEntityView() -- nearest entity if any -- except itself
 
-    if not _playeractual:isLockSpotting() then
+    if not _playeractual:isSpottingLock() then
         _playeractual.spotting  = _nearestentity
     end
     
@@ -4451,7 +4445,7 @@ function CWindowWorld:drawPlayerActual()
             for _entity, _ in pairs(_locationsaround[_keyy][_keyx]) do -- entities around actual player
                 local _entityworldregion = _entity:worldRegion()
 
-                _entity.spotted = (_entity == _playeractual:entitySpotting() and _playeractual:isDrawSpotting()) -- unspot all entities except spotted one if any
+                _entity.spotted = (_entity == _playeractual:entitySpotting() and _playeractual:isSpottingDraw()) -- unspot all entities except spotted one if any
                     and true
                     or  false
 
@@ -4892,7 +4886,7 @@ end
 --
 local CButtonSpottingDraw = CButtonCheck:extend() -- generic drawspotting check button
 CButtonSpottingDraw.BEHAVIOUR = function(self)
-    self.checked = Tic:isDrawSpotting()
+    self.checked = Tic:isSpottingDraw()
     CButton.BEHAVIOUR(self)
 end
 function CButtonSpottingDraw:new(_argt)
@@ -4900,7 +4894,7 @@ function CButtonSpottingDraw:new(_argt)
     self.drawborder    = false
 	self.sprite.sprite = CSpriteBG.SIGNSPOTIT
 	self.behaviour     = CButtonSpottingDraw.BEHAVIOUR  -- function to trigger at first
-    self.clicklf       = function() Tic:toggleDrawSpotting() end
+    self.clicklf       = function() Tic:spottingToggleDraw() end
     self.hovertext     = "Spot"
     self:argt(_argt) -- override if any
 end
@@ -4911,7 +4905,7 @@ end
 --
 local CButtonSpottingLock = CButtonCheck:extend() -- generic lockspotting check button
 CButtonSpottingLock.BEHAVIOUR = function(self)
-    self.checked = Tic:isLockSpotting()
+    self.checked = Tic:isSpottingLock()
     CButton.BEHAVIOUR(self)
 end
 function CButtonSpottingLock:new(_argt)
@@ -4919,7 +4913,7 @@ function CButtonSpottingLock:new(_argt)
     self.drawborder    = false
 	self.sprite.sprite = CSpriteBG.SIGNLOCKIT
 	self.behaviour     = CButtonSpottingLock.BEHAVIOUR  -- function to trigger at first
-    self.clicklf       = function() Tic:toggleLockSpotting() end
+    self.clicklf       = function() Tic:spottingToggleLock() end
     self.hovertext     = "Lock"
     self:argt(_argt) -- override if any
 end
@@ -5770,9 +5764,9 @@ CPlace:generateRoad(House1.worldx, House1.worldy, House2.worldx, House2.worldy, 
 })
 end
 
--- Tic.DRAWHITBOX  = true
+Tic.DRAWHITBOX  = true
 -- Tic.DRAWBORDERS = true
--- Tic.DRAWVIEW    = true
+Tic.DRAWVIEW    = true
 
 
 
