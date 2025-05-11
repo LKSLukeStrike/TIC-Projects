@@ -3050,16 +3050,38 @@ end
 function CCharacter:regionMoveOffsets(_direction, _movenone,  _moveslow, _moveback) -- move offsets region HERE
     _direction     = _direction or self.direction
     local _offsets = self:offsetsDirection(_direction, _movenone,  _moveslow, _moveback)
-    local _lf = 0
-    local _rg = Tic.SPRITESIZE * self.scale
-    local _up = 0
-    local _dw = Tic.SPRITESIZE * self.scale
+    local _up      = 0
+    local _dw      = Tic.SPRITESIZE * self.scale
+    local _lf      = 0
+    local _rg      = Tic.SPRITESIZE * self.scale
+
+    if _direction == Tic.DIR000 then
+        _up = _up + _offsets.offsety
+    elseif _direction == Tic.DIR045 then
+        _up = _up + _offsets.offsety
+        _rg = _rg + _offsets.offsetx
+    elseif _direction == Tic.DIR090 then
+        _rg = _rg + _offsets.offsetx
+    elseif _direction == Tic.DIR135 then
+        _dw = _dw + _offsets.offsety
+        _rg = _rg + _offsets.offsetx
+    elseif _direction == Tic.DIR180 then
+        _dw = _dw + _offsets.offsety
+    elseif _direction == Tic.DIR225 then
+        _dw = _dw + _offsets.offsety
+        _lf = _lf + _offsets.offsetx
+    elseif _direction == Tic.DIR270 then
+        _lf = _lf + _offsets.offsetx
+    elseif _direction == Tic.DIR315 then
+        _up = _up + _offsets.offsety
+        _lf = _lf + _offsets.offsetx
+    end
 
     return CRegion{
-        lf  = _lf,
-        rg  = _rg,
         up  = _up,
         dw  = _dw,
+        lf  = _lf,
+        rg  = _rg,
     }
 end
 
@@ -4989,7 +5011,7 @@ IButtonSpotting.BEHAVIOUR = function(self)
         end
     end
 end
--- HERE
+
 
 --
 -- CButtonSpottingLF
