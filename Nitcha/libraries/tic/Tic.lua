@@ -1090,6 +1090,7 @@ function Tic:boardDirectives(_sprite, _palette, _colorkey) -- returns the direct
     _palette  = _palette or {}
     _colorkey = _colorkey or Tic.COLORKEY
     local _result = {}
+
     for _y = 0, 7 do
         for _x = 0, 7 do
             local _color = peek4(((Tic.SPRITEBANK + (32 * _sprite)) * 2) + ((_y * Tic.SPRITESIZE) + _x))
@@ -1097,7 +1098,7 @@ function Tic:boardDirectives(_sprite, _palette, _colorkey) -- returns the direct
                 _color = _palette[_color]
             end
             if not (_color == _colorkey) then -- skip empty pixels
-                table.insert(_result, {
+                Tables:valInsert(_result, {
                     x = _x,
                     y = _y,
                     color = _color,
@@ -1105,6 +1106,7 @@ function Tic:boardDirectives(_sprite, _palette, _colorkey) -- returns the direct
             end
         end
     end
+
     return _result
 end
 
@@ -1306,17 +1308,17 @@ end
 --
 -- CRegion
 --
-local CRegion = Classic:extend() -- generic region -- -lf +rg -up +dw around a point
+local CRegion = Classic:extend() -- generic region -- lf rg up dw around a point
 Classic.KINDREGION = "Region" -- Region kind
 Classic.NAMEREGION = "Region" -- Region name
 function CRegion:new(_argt)
     CRegion.super.new(self, _argt)
     self.kind = Classic.KINDREGION
     self.name = Classic.NAMEREGION
-    self.lf = Nums.MININTEGER -- negative
-    self.rg = Nums.MAXINTEGER -- positive
-    self.up = Nums.MININTEGER -- negative
-    self.dw = Nums.MAXINTEGER -- positive
+    self.lf = Nums.MININTEGER
+    self.rg = Nums.MAXINTEGER
+    self.up = Nums.MININTEGER
+    self.dw = Nums.MAXINTEGER
     self:argt(_argt) -- override if any
 end
 
@@ -1338,7 +1340,7 @@ function CRegion:surface() -- region surface
     return self:borderW() * self:borderH()
 end
 
-function CRegion:offsetXY(_offsetx, _offsety) -- offset a region by x y -- TODO modify the region inplace ?
+function CRegion:offsetXY(_offsetx, _offsety) -- offset a region by x y
     _offsetx = _offsetx or 0
     _offsety = _offsety or 0
     return CRegion{
@@ -1399,9 +1401,9 @@ end
 --
 local CHitbox = Classic:extend() -- generic hitbox region -- FIXME could be a region ?
 CHitbox.REGIONLF = 0 -- hitbox region sizes
-CHitbox.REGIONRG = 7
+CHitbox.REGIONRG = Tic.SPRITESIZE - 1
 CHitbox.REGIONUP = 0
-CHitbox.REGIONDW = 7
+CHitbox.REGIONDW = Tic.SPRITESIZE - 1
 function CHitbox:new(_argt)
     CHitbox.super.new(self, _argt)
     self.screenx  = 0 -- positions
@@ -1454,7 +1456,7 @@ function CHitbox:draw()
 	)
 end
 
-function CHitbox:regionOffsets() -- screen coordinates of its region -- depends on dirx and scale
+function CHitbox:regionOffsets() -- hitbox offsets -- depends on dirx and scale
     local _result  = CRegion()
     local _widthlf = (self.region.lf - CHitbox.REGIONLF) -- |lf|md|rg| widths
     local _widthmd = (self.region.rg - self.region.lf )
@@ -1466,10 +1468,11 @@ function CHitbox:regionOffsets() -- screen coordinates of its region -- depends 
     _result.rg = _result.lf + (_widthmd * self.scale)
     _result.up = self.region.up * self.scale
     _result.dw = self.region.dw * self.scale
+
     return _result
 end
 
-function CHitbox:regionScreen() -- screen coordinates of its region -- depends on dirx and scale
+function CHitbox:regionScreen() -- hitbox screen coordinates of its region -- depends on dirx and scale
     local _regionoffsets = self:regionOffsets()
     return _regionoffsets:offsetXY(self.screenx, self.screeny)
 end
@@ -1486,7 +1489,6 @@ function CLocations:new(_argt)
 end
 
 function CLocations:entities(_locations) -- entities in locations
-    if not _locations then return end -- mandatory
     local _result = {}
 
     for _keyy, _valy in pairs(_locations or {}) do -- loop on y
@@ -1496,6 +1498,7 @@ function CLocations:entities(_locations) -- entities in locations
 			end
 		end
     end
+
     return _result -- entities
 end
 
@@ -2002,6 +2005,11 @@ end
 function CEntityDrawable:hitboxDetachAll() -- detach all hitto/hitby entities
 	self:hitboxDetachAllTo()
 	self:hitboxDetachAllBy()
+end
+
+function CEntityDrawable:hitboxWorld() -- hitbox in world -- depends on dirx
+	if not self.hitbox then return end -- mandatory
+	return self.hitbox:regionOffsets():offsetXY(self.worldx, self.worldy)
 end
 
 
@@ -3047,7 +3055,7 @@ function CCharacter:regionMindWorld() -- mind world region depending on dirx, di
     return _regionmindoffsets:offsetXY(self.worldx, self.worldy)
 end
 
-function CCharacter:regionMoveOffsets(_direction, _movenone,  _moveslow, _moveback) -- move offsets region HERE
+function CCharacter:regionMoveOffsets(_direction, _movenone,  _moveslow, _moveback) -- move offsets region
     _direction     = _direction or self.direction
     local _offsets = self:offsetsDirection(_direction, _movenone,  _moveslow, _moveback)
     local _up      = 0
@@ -3409,13 +3417,12 @@ function CCharacter:offsetsDirection(_direction, _movenone,  _moveslow, _movebac
 end
 
 function CCharacter:moveDirection(_direction, _movenone,  _moveslow, _moveback) -- handle moving a character in a direction
-    if not _direction then return end -- mandatory
-    _movenone = _movenone or false -- force none move if any
-    _moveslow = _moveslow or false -- force slow move if any
-    _moveback = _moveback or false -- force back move if any
+    _direction = _direction or self.direction
+    _movenone  = _movenone or false -- force none move if any
+    _moveslow  = _moveslow or false -- force slow move if any
+    _moveback  = _moveback or false -- force back move if any
     local _posture = Tic.STATESETTINGS[self.state].posture
     local _status  = Tic.STATESETTINGS[self.state].status
-    local _offsets = Tic.DIRSOFFSETS[_direction]
     local _offsets = self:offsetsDirection(_direction, _movenone,  _moveslow, _moveback)
     local _dirx    = self.dirx -- save actual character dirx
 
@@ -3454,19 +3461,46 @@ function CCharacter:moveDirection(_direction, _movenone,  _moveslow, _moveback) 
     self.state = _posture..Tic.STATUSMOVE
     self:toggleFrame() -- animate continuous move in the same dirx
 
+    local _moveregion     = self:regionMoveOffsets(_direction, _movenone,  _moveslow, _moveback) -- possible hitbox collisions
+    local _movelocations  = self:locationsRegion(_moveregion)
+    local _moveentities   = CLocations:entities(_movelocations)
+    local _hitboxentities = {}
+    self:hitboxDetachAll()
+-- HH
     local _movebyx = Nums:sign(_offsets.offsetx) -- calculate the maximum move step by step
     local _movebyy = Nums:sign(_offsets.offsety)
     local _movetox = 0
     local _movetoy = 0
     local _move    = true
     while _move do
-        if Nums:pos(_movetox) < Nums:pos(_offsets.offsetx) then _movetox = _movetox + _movebyx end
-        if Nums:pos(_movetoy) < Nums:pos(_offsets.offsety) then _movetoy = _movetoy + _movebyy end
-        if _movetox == _offsets.offsetx and _movetoy == _offsets.offsety then _move = false end
-    end
-    self:moveWorldXY(self.worldx + _movetox, self.worldy + _movetoy)
+        local _hitboxworld = self:hitboxWorld() -- take direction in account
+        if _hitboxworld then -- only consider collisions if charater has an hitbox
+            for _entity, _ in pairs(_moveentities) do
+                local _entityhitboxworld = _entity:hitboxWorld() -- take direction in account
+                if _entityhitboxworld then -- only consider collisions if entity has an hitbox
+                    if _hitboxworld:hasInsideRegion(_entityhitboxworld) then -- collision
+                        Tables:keyAppend(_hitboxentities, _entity, _entity)
+                    end
+                end
+            end
+        end
 
-    self:hitboxRefresh() -- refresh the hitboxes
+        if Tables:size(_hitboxentities) > 0 then
+            Tic:logAppend("bump")
+            self:hitboxAttachTo(_hitboxentities)
+            _move = false
+        else
+            if Nums:pos(_movetox) < Nums:pos(_offsets.offsetx) then _movetox = _movetox + _movebyx end
+            if Nums:pos(_movetoy) < Nums:pos(_offsets.offsety) then _movetoy = _movetoy + _movebyy end
+            if _movetox == _offsets.offsetx and _movetoy == _offsets.offsety then
+                _move = false
+            end
+        end
+
+        if _move then
+            self:moveWorldXY(self.worldx + _movetox, self.worldy + _movetoy)
+        end
+    end
 
     self.idlecycler:min() -- reset the idle cycler
 end
@@ -5819,7 +5853,8 @@ end
 
 Tic.DRAWHITBOX  = true
 -- Tic.DRAWBORDERS = true
-Tic.DRAWVIEW    = true
+-- Tic.DRAWVIEW    = true
+Tic.DRAWMOVE    = true
 
 
 
