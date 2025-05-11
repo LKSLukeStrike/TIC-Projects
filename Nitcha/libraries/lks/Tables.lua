@@ -165,7 +165,8 @@ end
 
 -- Dump and Print
 function Tables:dump(_table, _argt) -- dump a table -- SORTED -- RECURSIVE -- INDENT -- DEPTH
-    _argt = _argt or {}
+    _table = _table or {}
+    _argt  = _argt  or {}
     local _indent  = _argt.indent or ""
     local _depth   = _argt.depth  or Nums.MAXINTEGER
     local _verbose = (_argt.verbose == true) or false

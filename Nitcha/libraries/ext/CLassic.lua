@@ -58,7 +58,12 @@ end
 
 
 function Classic:__tostring()
-  return self.kind..": "..string.format("%p", self)
+  local _mt = getmetatable(self) -- temporary disable metatable
+  setmetatable(self, nil)
+  local _address = tostring(self)
+  _address = string.sub(_address, string.find(_address, " ") + 1)
+  setmetatable(self, _mt)
+  return self.kind..": ".._address
 end
 
 

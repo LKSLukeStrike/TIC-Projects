@@ -3103,16 +3103,35 @@ function CCharacter:regionMoveWorld(_direction, _movenone,  _moveslow, _moveback
     return _regionmoveoffsets:offsetXY(self.worldx, self.worldy)
 end
 
-function CCharacter:locationsView() -- locations in itself view
+function CCharacter:locationsViewWorld() -- locations in itself view world
     return self.world:locationsRegion(self:regionViewWorld())
 end
 
-function CCharacter:nearestEntityView() -- nearest entity in itself view, except itself
-    local _result        = nil
-    local _locationsview = self:locationsView()
-    local _entitiesview  = CLocations:entities(_locationsview)
+function CCharacter:entitiesViewWorld() -- entities in itself view world
+    return CLocations:entities(self:locationsViewWorld())
+end
 
-    for _entity, _ in pairs(_entitiesview) do
+function CCharacter:locationsMindWorld() -- locations in itself mind world
+    return self.world:locationsRegion(self:regionMindWorld())
+end
+
+function CCharacter:entitiesMindWorld() -- entities in itself mind world
+    return CLocations:entities(self:locationsMindWorld())
+end
+
+function CCharacter:locationsMoveWorld(_direction, _movenone,  _moveslow, _moveback) -- locations in itself move world
+    return self.world:locationsRegion(self:regionMoveWorld(_direction, _movenone,  _moveslow, _moveback))
+end
+
+function CCharacter:entitiesMoveWorld(_direction, _movenone,  _moveslow, _moveback) -- entities in itself move world
+    return CLocations:entities(self:locationsMoveWorld(_direction, _movenone,  _moveslow, _moveback))
+end
+
+function CCharacter:nearestEntityViewWorld() -- nearest entity in itself view world, except itself
+    local _result            = nil
+    local _entitiesviewworld = self:entitiesViewWorld()
+
+    for _entity, _ in pairs(_entitiesviewworld) do
         if not (_entity == self) then -- avoid to nearest itself
             if _result == nil then
                 _result = _entity -- first nearest entity
@@ -3461,9 +3480,13 @@ function CCharacter:moveDirection(_direction, _movenone,  _moveslow, _moveback) 
     self.state = _posture..Tic.STATUSMOVE
     self:toggleFrame() -- animate continuous move in the same dirx
 
-    local _moveregion     = self:regionMoveOffsets(_direction, _movenone,  _moveslow, _moveback) -- possible hitbox collisions
-    local _movelocations  = self:locationsRegion(_moveregion)
-    local _moveentities   = CLocations:entities(_movelocations)
+    local _entitiesmoveworld = self:entitiesMoveWorld(_direction, _movenone,  _moveslow, _moveback)
+    local _entitieshitboxes  = {}
+    for _entity, _ in pairs(_entitiesmoveworld) do
+        Tic:traceTable(nil, _entity)
+    end
+    exit()
+    if false then
     local _hitboxentities = {}
     self:hitboxDetachAll()
 -- HH
@@ -3488,7 +3511,7 @@ function CCharacter:moveDirection(_direction, _movenone,  _moveslow, _moveback) 
         if Tables:size(_hitboxentities) > 0 then
             Tic:logAppend("bump")
             self:hitboxAttachTo(_hitboxentities)
-            _move = false
+            -- _move = false
         else
             if Nums:pos(_movetox) < Nums:pos(_offsets.offsetx) then _movetox = _movetox + _movebyx end
             if Nums:pos(_movetoy) < Nums:pos(_offsets.offsety) then _movetoy = _movetoy + _movebyy end
@@ -3503,6 +3526,7 @@ function CCharacter:moveDirection(_direction, _movenone,  _moveslow, _moveback) 
     end
 
     self.idlecycler:min() -- reset the idle cycler
+end -- test
 end
 
 function CCharacter:hitboxRefresh() -- refresh the attached hitboxes
@@ -4521,7 +4545,7 @@ function CWindowWorld:drawPlayerActual()
     local _locationsaround  = _playeractual:locationsAround()
     local _regionviewworld  = _playeractual:regionViewWorld()
     local _regionmindworld  = _playeractual:regionMindWorld()
-    local _nearestentity    = _playeractual:nearestEntityView() -- nearest entity if any -- except itself
+    local _nearestentity    = _playeractual:nearestEntityViewWorld() -- nearest entity if any -- except itself
 
     if not _playeractual:isSpottingLock() then
         _playeractual.spotting  = _nearestentity
