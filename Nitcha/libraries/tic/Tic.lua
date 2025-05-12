@@ -2668,6 +2668,7 @@ local CPlaceRoad0Anim = CPlaceStoneAnim:extend() -- anim road0
 function CPlaceRoad0Anim:new(_argt)
     CPlaceRoad0Anim.super.new(self, _argt)
     self.sprite  = CSpriteBG.PLACEROAD0
+    self.hitbox  = nil
     self:argt(_argt) -- override if any
     self:implementall(IStoneRoads)
 end
@@ -2676,6 +2677,7 @@ local CPlaceRoad0Idle = CPlaceStoneIdle:extend() -- idle road0
 function CPlaceRoad0Idle:new(_argt)
     CPlaceRoad0Idle.super.new(self, _argt)
     self.sprite  = CSpriteBG.PLACEROAD0
+    self.hitbox  = nil
     self:argt(_argt) -- override if any
     self:implementall(IStoneRoads)
 end
@@ -2684,6 +2686,7 @@ local CPlaceRoad1Anim = CPlaceStoneAnim:extend() -- anim road1
 function CPlaceRoad1Anim:new(_argt)
     CPlaceRoad1Anim.super.new(self, _argt)
     self.sprite  = CSpriteBG.PLACEROAD1
+    self.hitbox  = nil
     self:argt(_argt) -- override if any
     self:implementall(IStoneRoads)
 end
@@ -2692,6 +2695,7 @@ local CPlaceRoad1Idle = CPlaceStoneIdle:extend() -- idle road1
 function CPlaceRoad1Idle:new(_argt)
     CPlaceRoad1Idle.super.new(self, _argt)
     self.sprite  = CSpriteBG.PLACEROAD1
+    self.hitbox  = nil
     self:argt(_argt) -- override if any
     self:implementall(IStoneRoads)
 end
@@ -3446,9 +3450,9 @@ function CCharacter:moveDirection(_direction, _movenone,  _moveslow, _moveback) 
     self.state = _posture..Tic.STATUSMOVE
     self:toggleFrame() -- animate continuous move in the same dirx
 
-    local _characterhbrw      = self:hitboxRegionWorld() -- collisions system
-    local _entitiesmoveworldv = self:entitiesMoveWorld(_direction, _movenone,  _moveslow, _moveback)
-    local _entitieshbrw       = {}
+    local _characterhbrw     = self:hitboxRegionWorld() -- collisions system
+    local _entitiesmoveworld = self:entitiesMoveWorld(_direction, _movenone,  _moveslow, _moveback)
+    local _entitieshbrw      = {}
     for _entity, _ in pairs(_entitiesmoveworld or {}) do -- record the possible hitboxes
         if not (_entity == self) and _entity.hitbox then -- only with hitbox -- except itself
             Tables:keyAppend(_entitieshbrw, _entity, _entity:hitboxRegionWorld())
@@ -3465,6 +3469,7 @@ function CCharacter:moveDirection(_direction, _movenone,  _moveslow, _moveback) 
     local _entitiescollided = {}
     while _move do
         if _characterhbrw then -- only consider collisions if charater has an hitbox
+            _characterhbrw = _characterhbrw:offsetXY(_movebyx, _movebyy) -- compute the future position
             for _entity, _entityhbrw in pairs(_entitieshbrw) do
                 if _characterhbrw:hasInsideRegion(_entityhbrw) then -- collision
                     Tables:keyAppend(_entitiescollided, _entity, _entity)
@@ -3473,7 +3478,6 @@ function CCharacter:moveDirection(_direction, _movenone,  _moveslow, _moveback) 
         end
 
         if Tables:size(_entitiescollided) > 0 then
-            Tic:logAppend("bump")
             self:hitboxAttachTo(_entitiescollided)
             _move = false
         else
@@ -3481,8 +3485,6 @@ function CCharacter:moveDirection(_direction, _movenone,  _moveslow, _moveback) 
             if Nums:pos(_movetoy) < Nums:pos(_offsets.offsety) then _movetoy = _movetoy + _movebyy end
             if _movetox == _offsets.offsetx and _movetoy == _offsets.offsety then
                 _move = false
-            else
-                _characterhbrw:offsetXY(_movebyx, _movebyy)
             end
         end
     end
@@ -5813,7 +5815,7 @@ function CPlace:generateRoad(_worldx0, _worldy0, _worldx1, _worldy1, _percent, _
 end
 
 
-if false then
+if true then
 local House1 = CPlaceHouseAnim{
     name = "House1",
     worldx = -20,
@@ -5834,17 +5836,17 @@ CPlace:generateRoad(House1.worldx, House1.worldy, Kirke1.worldx, Kirke1.worldy, 
 CPlace:generateRoad(House2.worldx, House2.worldy, Kirke1.worldx, Kirke1.worldy, 10)
 CPlace:generateRoad(House1.worldx, House1.worldy, House2.worldx, House2.worldy, 10, 5, 5, Tables:generate{
     [CPlaceTree0Anim] = 4,
-    -- [CPlaceTree0Idle] = 1,
+    [CPlaceTree0Idle] = 1,
 })
+
+CPlaceTree0Idle{worldx = 0, worldy = -10}
+CPlaceTree0Idle{worldx = -4, worldy = -10}
 end
 
 Tic.DRAWHITBOX  = true
 -- Tic.DRAWBORDERS = true
 -- Tic.DRAWVIEW    = true
-Tic.DRAWMOVE    = true
--- local _menhr = CPlaceMenh0Idle{worldx = 0, worldy = -10}
--- Tic:traceTable("men", _menhr.hitbox, {indent = " ", depth = 1})
--- exit()
+-- Tic.DRAWMOVE    = true
 
 
 --
@@ -5879,15 +5881,16 @@ function Tic:drawLog() -- [-] remove
     local _diry    = _playeractual.diry
 
     -- Oxboow.hitbox.scale = 1
-    local _ho = Oxboow:hitboxRegionWorld()
-    local _hw = Wulfie:hitboxRegionWorld()
-    Tic:logAppend("ox0", Oxboow.hitbox.entity)
-    Tic:logAppend("ox1", Oxboow.worldx, Oxboow.worldy)
-    Tic:logRegion("ox2", Oxboow.hitbox)
-    Tic:logRegion("ox3", _ho)
-    Tic:logAppend("wu1", Wulfie.worldx, Wulfie.worldy)
-    Tic:logRegion("wu2", Wulfie.hitbox)
-    Tic:logRegion("wu3", _hw)
+    -- local _ho = Oxboow:hitboxRegionWorld()
+    -- local _hw = Wulfie:hitboxRegionWorld()
+    -- Tic:logAppend("oxE", Oxboow.hitbox.entity)
+    -- Tic:logAppend("oxW", Oxboow.worldx, Oxboow.worldy)
+    -- Tic:logRegion("oxH", Oxboow.hitbox)
+    -- Tic:logRegion("oxR", _ho)
+    -- Tic:logAppend("wuW", Wulfie.worldx, Wulfie.worldy)
+    -- Tic:logRegion("wuH", Wulfie.hitbox)
+    -- Tic:logRegion("wuR", _hw)
+    -- Tic:logAppend("HIT", _ho:hasInsideRegion(_hw))
     
     -- for _key, _val in pairs(Tic.MODIFIERKEYS) do -- modifier keys state
     --     Tic:logAppend(_key, _val)
