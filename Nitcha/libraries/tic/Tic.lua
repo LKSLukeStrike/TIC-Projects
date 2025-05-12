@@ -1023,7 +1023,7 @@ function Tic:print(_screenx, _screeny, ...) -- print with multiple args
         _val = Tic:val2string(_val)
         _output = _output.._val.." "
     end
-    print( _output, _screenx, _screeny, Tic.COLORGREYM, true)
+    print( _output, _screenx, _screeny, Tic.COLORCYAN, true)
 end
 
 
@@ -1364,20 +1364,6 @@ function CRegion:randomWH(_width, _height) -- returns a region of random width a
     }
 end
 
-function CRegion:drawBorderScreenXY(_screenx, _screeny, _drawcolor) -- draw border of a region around screen xy
-    _screenx   = _screenx or Tic.SCREENX
-    _screeny   = _screeny or Tic.SCREENY
-    _drawcolor = _drawcolor or Tic.COLORGREYL
-    local _borderx = _screenx + self.lf -- dont forget they are negatives
-    local _bordery = _screeny + self.up
-    local _borderw = self:borderW()
-    local _borderh = self:borderH()
-    rectb(_borderx, _bordery,
-        _borderw, _borderh,
-        _drawcolor
-    )
-end
-
 function CRegion:hasInsidePoint(_pointx, _pointy) -- is a point inside a region ?
     _pointx = _pointx or 0
     _pointy = _pointy or 0
@@ -1399,25 +1385,24 @@ end
 --
 -- CHitbox
 --
-local CHitbox = Classic:extend() -- generic hitbox region -- FIXME could be a region ?
-CHitbox.REGIONLF = 0 -- hitbox region sizes
-CHitbox.REGIONRG = Tic.SPRITESIZE - 1
-CHitbox.REGIONUP = 0
-CHitbox.REGIONDW = Tic.SPRITESIZE - 1
+local CHitbox = CRegion:extend() -- generic hitbox region
+Classic.KINDHITBOX = "Hitbox" -- Hitbox kind
+Classic.NAMEHITBOX = "Hitbox" -- Hitbox name
+CHitbox.LF = 0 -- hitbox region sizes
+CHitbox.RG = Tic.SPRITESIZE - 1
+CHitbox.UP = 0
+CHitbox.DW = Tic.SPRITESIZE - 1
 function CHitbox:new(_argt)
     CHitbox.super.new(self, _argt)
-    self.screenx  = 0 -- positions
-    self.screeny  = 0
-	self.dirx     = Tic.DIRXLF
-    self.scale    = CSprite.SCALE01
-    self.hitto    = {} -- entities hit to -- table
-    self.hitby    = {} -- entities hit by -- table
-    self.region   = CRegion{
-        lf = CHitbox.REGIONLF,
-        rg = CHitbox.REGIONRG,
-        up = CHitbox.REGIONUP,
-        dw = CHitbox.REGIONDW,
-    }
+    self.kind = Classic.KINDHITBOX
+    self.name = Classic.NAMEHITBOX
+    self.lf     = CHitbox.LF
+    self.rg     = CHitbox.RG
+    self.up     = CHitbox.UP
+    self.dw     = CHitbox.DW
+    self.entity = nil -- parent entity -- override if any
+    self.hitto  = {}  -- entities hit to -- table
+    self.hitby  = {}  -- entities hit by -- table
     self:argt(_argt) -- override if any
 end
 
@@ -1442,39 +1427,38 @@ function CHitbox:hitbyDelete(_entity) -- delete an entity hitby
 end
 
 function CHitbox:draw()
+    if not self.entity then return end -- no entity no draw
 	local _drawcolor = Tic.COLORYELLOW
     _drawcolor = (Tables:size(self.hitto) > 0) and Tic.COLORORANGE or _drawcolor
     _drawcolor = (Tables:size(self.hitby) > 0) and Tic.COLORRED    or _drawcolor
-	local _regionscreen = self:regionScreen()
+
+    local _regionadjusted = self:regionAdjusted():offsetXY(self.entity.screenx, self.entity.screeny)
 
     rectb(
-		_regionscreen.lf,
-		_regionscreen.up,
-		_regionscreen:borderW(self.scale),
-		_regionscreen:borderH(self.scale),
+		_regionadjusted.lf,
+		_regionadjusted.up,
+		_regionadjusted:borderW(self.entity.scale),
+		_regionadjusted:borderH(self.entity.scale),
 		_drawcolor
 	)
 end
 
-function CHitbox:regionOffsets() -- hitbox offsets -- depends on dirx and scale
-    local _result  = CRegion()
-    local _widthlf = (self.region.lf - CHitbox.REGIONLF) -- |lf|md|rg| widths
-    local _widthmd = (self.region.rg - self.region.lf )
-    local _widthrg = (CHitbox.REGIONRG - self.region.rg)
+function CHitbox:regionAdjusted() -- hitbox offsets adjusted to its entity -- depends on dirx and scale
+    local _result  = CRegion{lf = self.lf, rg = self.rg, up = self.up, dw = self.dw}
+    if not self.entity then return _result end -- has no entity to adjust with
 
-    _result.lf = (self.dirx == Tic.DIRXLF)
-        and _widthlf * self.scale
-        or  _widthrg * self.scale
-    _result.rg = _result.lf + (_widthmd * self.scale)
-    _result.up = self.region.up * self.scale
-    _result.dw = self.region.dw * self.scale
+    local _widthlf = (self.lf - CHitbox.LF) -- |lf|md|rg| areas widths
+    local _widthmd = (self.rg - self.lf )
+    local _widthrg = (CHitbox.RG - self.rg)
+
+    _result.lf = (self.entity.dirx == Tic.DIRXLF)
+        and _widthlf * self.entity.scale
+        or  _widthrg * self.entity.scale
+    _result.rg = _result.lf + (_widthmd * self.entity.scale)
+    _result.up = self.up * self.entity.scale
+    _result.dw = self.dw * self.entity.scale
 
     return _result
-end
-
-function CHitbox:regionScreen() -- hitbox screen coordinates of its region -- depends on dirx and scale
-    local _regionoffsets = self:regionOffsets()
-    return _regionoffsets:offsetXY(self.screenx, self.screeny)
 end
 
 
@@ -1758,7 +1742,7 @@ function CWorld:new(_argt)
     CWorld.super.new(self, _argt)
     self.kind = Classic.KINDWORLD
     self.name = Classic.NAMEWORLD
-    self.region = CRegion() -- world boundaries
+    self.region = CRegion{} -- world boundaries
     self.entitieslocations = CEntitiesLocations{} -- record world entities and their locations
     self:argt(_argt) -- override if any
 end
@@ -1864,11 +1848,11 @@ function CEntityDrawable:new(_argt)
     self.scale       = CSprite.SCALE01
     self.animations  = nil -- override if any
     self.spotted     = false -- use spotted to draw a border
-    self.hitbox      = nil -- hitbox region if any
+    self.hitbox      = CHitbox{entity = self} -- hitbox if any
     self.drawborders = false -- draw behaviour
     self.drawhitbox  = false
     self.drawfade    = false
-   self:argt(_argt) -- override if any
+    self:argt(_argt) -- override if any
     self.world:appendEntity(self) -- append itself to the world
 end
 
@@ -1933,10 +1917,6 @@ end
 function CEntityDrawable:drawHitbox() -- draw hitbox if any
     self.drawhitbox = Tic.DRAWHITBOX -- use Tic as master
     if not self.drawhitbox or not self.hitbox then return end -- nothing to draw
-    self.hitbox.screenx  = self.screenx
-    self.hitbox.screeny  = self.screeny
-    self.hitbox.dirx     = self.dirx
-    self.hitbox.scale    = self.scale
     self.hitbox:draw()
 end
 
@@ -2007,9 +1987,9 @@ function CEntityDrawable:hitboxDetachAll() -- detach all hitto/hitby entities
 	self:hitboxDetachAllBy()
 end
 
-function CEntityDrawable:hitboxWorld() -- hitbox in world -- depends on dirx
+function CEntityDrawable:hitboxRegionWorld() -- hitbox in world -- depends on dirx
 	if not self.hitbox then return end -- mandatory
-	return self.hitbox:regionOffsets():offsetXY(self.worldx, self.worldy)
+	return self.hitbox:regionAdjusted():offsetXY(self.worldx, self.worldy)
 end
 
 
@@ -2069,7 +2049,6 @@ function CPlace:new(_argt)
     CPlace.super.new(self, _argt)
     self.kind = Classic.KINDPLACE
     self.name = Classic.NAMEPLACE
-    self.hitbox = CHitbox()
     self:argt(_argt) -- override if any
 end
 
@@ -2100,10 +2079,10 @@ function CPlaceBuild:new(_argt)
     CPlaceBuild.super.new(self, _argt)
     self.kind = Classic.KINDBUILD
     self.name = Classic.NAMEANIMED
-    self.hitbox.region.lf = 2
-    self.hitbox.region.rg = 4
-    self.hitbox.region.up = 5
-    self.hitbox.region.dw = 7
+    self.hitbox.lf = 2
+    self.hitbox.rg = 4
+    self.hitbox.up = 5
+    self.hitbox.dw = 7
     self.palettefade = CPlaceBuild.PALETTEFADE
     self:argt(_argt) -- override if any
 end
@@ -2200,7 +2179,7 @@ function CPlaceManor:new(_argt)
     CPlaceManor.super.new(self, _argt)
     self.kind = Classic.KINDMANOR
     self.sprite  = CSpriteBG.PLACEMANOR
-    self.hitbox.region.lf = 1
+    self.hitbox.lf = 1
     self:argt(_argt) -- override if any
 end
 
@@ -2248,7 +2227,7 @@ function CPlaceKirke:new(_argt)
     CPlaceKirke.super.new(self, _argt)
     self.kind = Classic.KINDKIRKE
     self.sprite  = CSpriteBG.PLACEKIRKE
-    self.hitbox.region.lf = 1
+    self.hitbox.lf = 1
     self:argt(_argt) -- override if any
 end
 
@@ -2290,8 +2269,8 @@ function CPlaceWater:new(_argt)
     CPlaceWater.super.new(self, _argt)
     self.kind = Classic.KINDWATER
     self.sprite  = CSpriteBG.PLACEWATER
-    self.hitbox.region.lf = 1
-    self.hitbox.region.rg = 4
+    self.hitbox.lf = 1
+    self.hitbox.rg = 4
     self:argt(_argt) -- override if any
 end
 
@@ -2333,8 +2312,8 @@ function CPlaceStall:new(_argt)
     CPlaceStall.super.new(self, _argt)
     self.kind = Classic.KINDSTALL
     self.sprite  = CSpriteBG.PLACESTALL
-    self.hitbox.region.lf = 0
-    self.hitbox.region.rg = 3
+    self.hitbox.lf = 0
+    self.hitbox.rg = 3
     self:argt(_argt) -- override if any
 end
 
@@ -2396,14 +2375,10 @@ function CPlaceTrees:new(_argt)
     CPlaceTrees.super.new(self, _argt)
     self.kind = Classic.KINDTREES
     self.name = Classic.NAMELIVING
-    self.hitbox = CHitbox{
-        region = {
-            lf = 2,
-            rg = 4,
-            up = 6,
-            dw = 7,
-        }
-    }
+    self.hitbox.lf = 2
+    self.hitbox.rg = 4
+    self.hitbox.up = 6
+    self.hitbox.dw = 7
     self.palettefade = CPlaceTrees.PALETTEFADE
     self:argt(_argt) -- override if any
 end
@@ -2498,7 +2473,6 @@ function CPlaceStone:new(_argt)
     CPlaceStone.super.new(self, _argt)
     self.kind = Classic.KINDSTONE
     self.name = Classic.NAMEFITFUL
-    self.hitbox = nil -- override if any
     self.palettefade = CPlaceStone.PALETTEFADE
     self:argt(_argt) -- override if any
 end
@@ -2543,19 +2517,20 @@ end
 --
 local IStoneMenhr = CPlaceStone:extend() -- menhr implementation
 IStoneMenhr.kind   = Classic.KINDMENHR
-IStoneMenhr.hitbox = CHitbox{
-    region = {
-        lf = 2,
-        rg = 4,
-        up = 6,
-        dw = 7,
-    }
-}
+IStoneMenhr.hitbox = {}
+IStoneMenhr.hitbox.lf = 2
+IStoneMenhr.hitbox.rg = 4
+IStoneMenhr.hitbox.up = 6
+IStoneMenhr.hitbox.dw = 7
 
 local CPlaceMenh0Anim = CPlaceStoneAnim:extend() -- anim menh0
 function CPlaceMenh0Anim:new(_argt)
     CPlaceMenh0Anim.super.new(self, _argt)
     self.sprite  = CSpriteBG.PLACEMENH0
+    self.hitbox.lf = IStoneMenhr.hitbox.lf
+    self.hitbox.rg = IStoneMenhr.hitbox.rg
+    self.hitbox.up = IStoneMenhr.hitbox.up
+    self.hitbox.dw = IStoneMenhr.hitbox.dw
     self:argt(_argt) -- override if any
     self:implementall(IStoneMenhr)
 end
@@ -2564,6 +2539,10 @@ local CPlaceMenh0Idle = CPlaceStoneIdle:extend() -- idle menh0
 function CPlaceMenh0Idle:new(_argt)
     CPlaceMenh0Idle.super.new(self, _argt)
     self.sprite  = CSpriteBG.PLACEMENH0
+    self.hitbox.lf = IStoneMenhr.hitbox.lf
+    self.hitbox.rg = IStoneMenhr.hitbox.rg
+    self.hitbox.up = IStoneMenhr.hitbox.up
+    self.hitbox.dw = IStoneMenhr.hitbox.dw
     self:argt(_argt) -- override if any
     self:implementall(IStoneMenhr)
 end
@@ -2684,14 +2663,6 @@ end
 --
 local IStoneRoads = CPlaceStone:extend() -- roads implementation
 IStoneRoads.kind   = Classic.KINDROADS
--- IStoneRoads.hitbox = CHitbox{
---     region = {
---         lf = 1,
---         rg = 4,
---         up = 6,
---         dw = 7,
---     }
--- }
 
 local CPlaceRoad0Anim = CPlaceStoneAnim:extend() -- anim road0
 function CPlaceRoad0Anim:new(_argt)
@@ -2946,7 +2917,10 @@ function CCharacter:new(_argt)
     self.dirx         = Tic.DIRXLF -- directions
     self.diry         = Tic.DIRYMD
     self.direction    = Tic.DIR270
-    self.hitbox       = CHitbox()
+    self.hitbox.lf    = 2
+    self.hitbox.rg    = 4
+    self.hitbox.up    = 5
+    self.hitbox.dw    = 7
     self.state        = Tic.STATESTANDIDLE -- state
     self.idlecycler   = CCyclerInt{maxindex = 59,} -- cycler to get back to idle
     self.workcycler   = CCyclerInt{maxindex = 179,} -- cycler to animate work
@@ -2976,14 +2950,6 @@ function CCharacter:new(_argt)
     self.drawview     = false
     self.drawmind     = false
     self.drawmove     = false
-    self.hitbox       = CHitbox{
-        region = {
-            lf = 2,
-            rg = 4,
-            up = 5,
-            dw = 7,
-        }
-    }
     self:argt(_argt) -- override if any
     self.camera       = CCamera{name = self.name.." "..Classic.NAMECAMERA} -- one camera per character
     self:focus() -- focus its camera on itself
@@ -3480,62 +3446,59 @@ function CCharacter:moveDirection(_direction, _movenone,  _moveslow, _moveback) 
     self.state = _posture..Tic.STATUSMOVE
     self:toggleFrame() -- animate continuous move in the same dirx
 
-    local _entitiesmoveworld = self:entitiesMoveWorld(_direction, _movenone,  _moveslow, _moveback)
-    local _entitieshitboxes  = {}
-    for _entity, _ in pairs(_entitiesmoveworld) do
-        Tic:traceTable(nil, _entity)
+    local _characterhbrw      = self:hitboxRegionWorld() -- collisions system
+    local _entitiesmoveworldv = self:entitiesMoveWorld(_direction, _movenone,  _moveslow, _moveback)
+    local _entitieshbrw       = {}
+    for _entity, _ in pairs(_entitiesmoveworld or {}) do -- record the possible hitboxes
+        if not (_entity == self) and _entity.hitbox then -- only with hitbox -- except itself
+            Tables:keyAppend(_entitieshbrw, _entity, _entity:hitboxRegionWorld())
+        end
     end
-    exit()
-    if false then
-    local _hitboxentities = {}
-    self:hitboxDetachAll()
 -- HH
-    local _movebyx = Nums:sign(_offsets.offsetx) -- calculate the maximum move step by step
-    local _movebyy = Nums:sign(_offsets.offsety)
-    local _movetox = 0
-    local _movetoy = 0
-    local _move    = true
+    if true then
+    self:hitboxDetachAll()
+    local _movebyx          = Nums:sign(_offsets.offsetx) -- calculate the maximum move step by step
+    local _movebyy          = Nums:sign(_offsets.offsety)
+    local _movetox          = 0
+    local _movetoy          = 0
+    local _move             = true
+    local _entitiescollided = {}
     while _move do
-        local _hitboxworld = self:hitboxWorld() -- take direction in account
-        if _hitboxworld then -- only consider collisions if charater has an hitbox
-            for _entity, _ in pairs(_moveentities) do
-                local _entityhitboxworld = _entity:hitboxWorld() -- take direction in account
-                if _entityhitboxworld then -- only consider collisions if entity has an hitbox
-                    if _hitboxworld:hasInsideRegion(_entityhitboxworld) then -- collision
-                        Tables:keyAppend(_hitboxentities, _entity, _entity)
-                    end
+        if _characterhbrw then -- only consider collisions if charater has an hitbox
+            for _entity, _entityhbrw in pairs(_entitieshbrw) do
+                if _characterhbrw:hasInsideRegion(_entityhbrw) then -- collision
+                    Tables:keyAppend(_entitiescollided, _entity, _entity)
                 end
             end
         end
 
-        if Tables:size(_hitboxentities) > 0 then
+        if Tables:size(_entitiescollided) > 0 then
             Tic:logAppend("bump")
-            self:hitboxAttachTo(_hitboxentities)
-            -- _move = false
+            self:hitboxAttachTo(_entitiescollided)
+            _move = false
         else
             if Nums:pos(_movetox) < Nums:pos(_offsets.offsetx) then _movetox = _movetox + _movebyx end
             if Nums:pos(_movetoy) < Nums:pos(_offsets.offsety) then _movetoy = _movetoy + _movebyy end
             if _movetox == _offsets.offsetx and _movetoy == _offsets.offsety then
                 _move = false
+            else
+                _characterhbrw:offsetXY(_movebyx, _movebyy)
             end
         end
-
-        if _move then
-            self:moveWorldXY(self.worldx + _movetox, self.worldy + _movetoy)
-        end
     end
+    self:moveWorldXY(self.worldx + _movetox, self.worldy + _movetoy)
 
     self.idlecycler:min() -- reset the idle cycler
 end -- test
 end
 
 function CCharacter:hitboxRefresh() -- refresh the attached hitboxes
-    local _hitboxregion    = self:regionMoveOffsets() -- hitbox collisions -- FIXME use another region (move)
-    local _hitboxlocations = self:locationsRegion(_hitboxregion)
-    local _hitboxentities  = CLocations:entities(_hitboxlocations)
-    self:hitboxDetachAll()
-    self:hitboxAttachTo(_hitboxentities)
-    self:hitboxDetachSelf() -- not itself
+    -- local _hitboxregion    = self:regionMoveOffsets() -- hitbox collisions -- FIXME use another region (move)
+    -- local _hitboxlocations = self:locationsRegion(_hitboxregion)
+    -- local _hitboxentities  = CLocations:entities(_hitboxlocations)
+    -- self:hitboxDetachAll()
+    -- self:hitboxAttachTo(_hitboxentities)
+    -- self:hitboxDetachSelf() -- not itself
 end
 
 function CCharacter:statAct(_action, _stat, _value) -- modify a stat act -- set/dec/inc/max
@@ -5713,7 +5676,7 @@ end -- generate places
 
 local Wulfie = CPlayerWolfe{name = "Wulfie",
     colorextra = Tic.COLORRED,
-    worldx = 10,
+    worldx = -10,
 }
 -- Wulfie:randomWorldWindow()
 
@@ -5724,11 +5687,10 @@ local Oxboow = CPlayerGhost{name = "Oxboow",
     drawspotted = true,
 }
 -- Oxboow:randomWorldWindow()
+-- Tic:traceTable("ox", Oxboow.hitbox, {indent = " ", depth = 1})
+-- exit()
 
 
-goto runit
-::debug::
-::runit::
 
 --
 -- Sprites -- TESTING
@@ -5850,7 +5812,8 @@ function CPlace:generateRoad(_worldx0, _worldy0, _worldx1, _worldy1, _percent, _
     end
 end
 
-if true then
+
+if false then
 local House1 = CPlaceHouseAnim{
     name = "House1",
     worldx = -20,
@@ -5879,7 +5842,9 @@ Tic.DRAWHITBOX  = true
 -- Tic.DRAWBORDERS = true
 -- Tic.DRAWVIEW    = true
 Tic.DRAWMOVE    = true
-
+-- local _menhr = CPlaceMenh0Idle{worldx = 0, worldy = -10}
+-- Tic:traceTable("men", _menhr.hitbox, {indent = " ", depth = 1})
+-- exit()
 
 
 --
@@ -5902,7 +5867,6 @@ function Tic:draw()
     end
 end
 
-
 function Tic:drawLog() -- [-] remove
     local _tick00 = Tic.TICK00.actvalue
     local _tick60 = Tic.TICK60.actvalue
@@ -5913,6 +5877,17 @@ function Tic:drawLog() -- [-] remove
     local _status  = Tic.STATESETTINGS[_state].status
     local _dirx    = _playeractual.dirx
     local _diry    = _playeractual.diry
+
+    -- Oxboow.hitbox.scale = 1
+    local _ho = Oxboow:hitboxRegionWorld()
+    local _hw = Wulfie:hitboxRegionWorld()
+    Tic:logAppend("ox0", Oxboow.hitbox.entity)
+    Tic:logAppend("ox1", Oxboow.worldx, Oxboow.worldy)
+    Tic:logRegion("ox2", Oxboow.hitbox)
+    Tic:logRegion("ox3", _ho)
+    Tic:logAppend("wu1", Wulfie.worldx, Wulfie.worldy)
+    Tic:logRegion("wu2", Wulfie.hitbox)
+    Tic:logRegion("wu3", _hw)
     
     -- for _key, _val in pairs(Tic.MODIFIERKEYS) do -- modifier keys state
     --     Tic:logAppend(_key, _val)
@@ -5922,6 +5897,10 @@ function Tic:drawLog() -- [-] remove
     -- Tic:logAppend("wy", _playeractual.worldy)
 
     -- Tic:logAppend(Nums:frequence01(_tick00, Tic.FREQUENCE0240))
+end
+
+function Tic:logRegion(_pfx, _region)
+    Tic:logAppend(_pfx, _region.up, _region.dw, _region.lf, _region.rg)
 end
 
 
