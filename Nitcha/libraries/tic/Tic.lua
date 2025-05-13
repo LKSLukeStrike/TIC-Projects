@@ -2449,12 +2449,9 @@ end
 --
 -- CPlaceStone
 --
-local CPlaceStone = CPlace:extend() -- stone
+local CPlaceStone = CPlace:extend() -- stones
 Classic.KINDSTONE = "Stone" -- Stone kind
-Classic.KINDMENHR = "Menhr" -- Menhr kind
-Classic.KINDDOLMN = "Dolmn" -- Dolmn kind
-Classic.KINDCIRKL = "Cirkl" -- Cirkl kind
-Classic.KINDROADS = "Roads" -- Roads kind
+Classic.NAMESTONE = "Stone" -- Stone name
 CPlaceStone.PALETTEIDLE   = {
     [CPlace.MOON]    = CPlace.EMPTY,
     [CPlace.FLOOR01] = CPlace.STONEBG,
@@ -2473,13 +2470,30 @@ function CPlaceStone:new(_argt)
     CPlaceStone.super.new(self, _argt)
     self.kind = Classic.KINDSTONE
     self.name = Classic.NAMEFITFUL
+    self.hitbox.lf = 2
+    self.hitbox.rg = 4
+    self.hitbox.up = 6
+    self.hitbox.dw = 7
     self.palettefade = CPlaceStone.PALETTEFADE
     self:argt(_argt) -- override if any
 end
 
-local CPlaceStoneAnim = CPlaceStone:extend() -- generic anim stone -- TODO add magic
-function CPlaceStoneAnim:new(_argt)
-    CPlaceStoneAnim.super.new(self, _argt)
+
+--
+-- CPlaceMenhr
+--
+local CPlaceMenhr = CPlaceStone:extend() -- menhrs
+Classic.KINDMENHR = "Menhr" -- Menhr kind
+function CPlaceMenhr:new(_argt)
+    CPlaceMenhr.super.new(self, _argt)
+    self.kind = Classic.KINDMENHR
+    self.sprite      = CSpriteBG.PLACEMENHR
+    self:argt(_argt) -- override if any
+end
+
+local CPlaceMenhrAnim = CPlaceMenhr:extend() -- anim menhrs
+function CPlaceMenhrAnim:new(_argt)
+    CPlaceMenhrAnim.super.new(self, _argt)
     self.animations = {
         CAnimation{ -- moon
             frequence = Tic.FREQUENCE0600,
@@ -2503,201 +2517,274 @@ function CPlaceStoneAnim:new(_argt)
     self:argt(_argt) -- override if any
 end
 
-local CPlaceStoneIdle = CPlaceStone:extend() -- generic idle stone
-function CPlaceStoneIdle:new(_argt)
-    CPlaceStoneIdle.super.new(self, _argt)
+local CPlaceMenhrIdle = CPlaceMenhr:extend() -- idle menhrs
+function CPlaceMenhrIdle:new(_argt)
+    CPlaceMenhrIdle.super.new(self, _argt)
     self.name = Classic.NAMESILENT
     self.palette = CPlaceStone.PALETTEIDLE
     self:argt(_argt) -- override if any
 end
 
-
---
--- IStoneMenhr
---
-local IStoneMenhr = CPlaceStone:extend() -- menhr implementation
-IStoneMenhr.kind   = Classic.KINDMENHR
-IStoneMenhr.hitbox = {}
-IStoneMenhr.hitbox.lf = 2
-IStoneMenhr.hitbox.rg = 4
-IStoneMenhr.hitbox.up = 6
-IStoneMenhr.hitbox.dw = 7
-
-local CPlaceMenh0Anim = CPlaceStoneAnim:extend() -- anim menh0
+local CPlaceMenh0Anim = CPlaceMenhrAnim:extend() -- anim menh0
 function CPlaceMenh0Anim:new(_argt)
     CPlaceMenh0Anim.super.new(self, _argt)
     self.sprite  = CSpriteBG.PLACEMENH0
-    self.hitbox.lf = IStoneMenhr.hitbox.lf
-    self.hitbox.rg = IStoneMenhr.hitbox.rg
-    self.hitbox.up = IStoneMenhr.hitbox.up
-    self.hitbox.dw = IStoneMenhr.hitbox.dw
     self:argt(_argt) -- override if any
-    self:implementall(IStoneMenhr)
 end
 
-local CPlaceMenh0Idle = CPlaceStoneIdle:extend() -- idle menh0
+local CPlaceMenh0Idle = CPlaceMenhrIdle:extend() -- idle menh0
 function CPlaceMenh0Idle:new(_argt)
     CPlaceMenh0Idle.super.new(self, _argt)
     self.sprite  = CSpriteBG.PLACEMENH0
-    self.hitbox.lf = IStoneMenhr.hitbox.lf
-    self.hitbox.rg = IStoneMenhr.hitbox.rg
-    self.hitbox.up = IStoneMenhr.hitbox.up
-    self.hitbox.dw = IStoneMenhr.hitbox.dw
     self:argt(_argt) -- override if any
-    self:implementall(IStoneMenhr)
 end
 
-local CPlaceMenh1Anim = CPlaceStoneAnim:extend() -- anim menh1
+local CPlaceMenh1Anim = CPlaceMenhrAnim:extend() -- anim menh1
 function CPlaceMenh1Anim:new(_argt)
     CPlaceMenh1Anim.super.new(self, _argt)
     self.sprite  = CSpriteBG.PLACEMENH1
     self:argt(_argt) -- override if any
-    self:implementall(IStoneMenhr)
 end
 
-local CPlaceMenh1Idle = CPlaceStoneIdle:extend() -- idle menh1
+local CPlaceMenh1Idle = CPlaceMenhrIdle:extend() -- idle menh1
 function CPlaceMenh1Idle:new(_argt)
     CPlaceMenh1Idle.super.new(self, _argt)
     self.sprite  = CSpriteBG.PLACEMENH1
     self:argt(_argt) -- override if any
-    self:implementall(IStoneMenhr)
 end
 
 
 --
--- IStoneDolmn
+-- CPlaceDolmn
 --
-local IStoneDolmn = CPlaceStone:extend() -- dolmn implementation
-IStoneDolmn.kind   = Classic.KINDDOLMN
-IStoneDolmn.hitbox = CHitbox{
-    region = {
-        lf = 1,
-        rg = 4,
-        up = 6,
-        dw = 7,
-    }
-}
+local CPlaceDolmn = CPlaceStone:extend() -- dolmns
+Classic.KINDDOLMN = "Dolmn" -- Dolmn kind
+function CPlaceDolmn:new(_argt)
+    CPlaceDolmn.super.new(self, _argt)
+    self.kind = Classic.KINDDOLMN
+    self.sprite      = CSpriteBG.PLACEDOLMN
+    self.hitbox.lf = 1
+    self.hitbox.rg = 4
+    self.hitbox.up = 6
+    self.hitbox.dw = 7
+     self:argt(_argt) -- override if any
+end
 
-local CPlaceDolm0Anim = CPlaceStoneAnim:extend() -- anim dolm0
+local CPlaceDolmnAnim = CPlaceDolmn:extend() -- anim dolmns
+function CPlaceDolmnAnim:new(_argt)
+    CPlaceDolmnAnim.super.new(self, _argt)
+    self.animations = {
+        CAnimation{ -- moon
+            frequence = Tic.FREQUENCE0600,
+            percent0  = 0.9,
+            palette0  = {[CPlace.MOON] = CPlace.EMPTY,},
+            palette1  = {[CPlace.MOON] = CPlace.COLORMOON,},
+        },
+        CAnimation{ -- floor 1
+            frequence = Tic.FREQUENCE0600,
+            percent0  = 0.1,
+            palette0  = {[CPlace.FLOOR01] = CPlace.STONEFG,},
+            palette1  = {[CPlace.FLOOR01] = CPlace.LEAFSFG,},
+        },
+        CAnimation{ -- floor 2
+            frequence = Tic.FREQUENCE0600,
+            percent0  = 0.3,
+            palette0  = {[CPlace.FLOOR02] = CPlace.FOAM,},
+            palette1  = {[CPlace.FLOOR02] = CPlace.LEAFSFG,},
+        },
+    }
+    self:argt(_argt) -- override if any
+end
+
+local CPlaceDolmnIdle = CPlaceDolmn:extend() -- idle dolmns
+function CPlaceDolmnIdle:new(_argt)
+    CPlaceDolmnIdle.super.new(self, _argt)
+    self.name = Classic.NAMESILENT
+    self.palette = CPlaceStone.PALETTEIDLE
+    self:argt(_argt) -- override if any
+end
+
+local CPlaceDolm0Anim = CPlaceDolmnAnim:extend() -- anim dolm0
 function CPlaceDolm0Anim:new(_argt)
     CPlaceDolm0Anim.super.new(self, _argt)
     self.sprite  = CSpriteBG.PLACEDOLM0
     self:argt(_argt) -- override if any
-    self:implementall(IStoneDolmn)
 end
 
-local CPlaceDolm0Idle = CPlaceStoneIdle:extend() -- idle dolm0
+local CPlaceDolm0Idle = CPlaceDolmnIdle:extend() -- idle dolm0
 function CPlaceDolm0Idle:new(_argt)
     CPlaceDolm0Idle.super.new(self, _argt)
     self.sprite  = CSpriteBG.PLACEDOLM0
     self:argt(_argt) -- override if any
-    self:implementall(IStoneDolmn)
 end
 
-local CPlaceDolm1Anim = CPlaceStoneAnim:extend() -- anim dolm1
+local CPlaceDolm1Anim = CPlaceDolmnAnim:extend() -- anim dolm1
 function CPlaceDolm1Anim:new(_argt)
     CPlaceDolm1Anim.super.new(self, _argt)
     self.sprite  = CSpriteBG.PLACEDOLM1
     self:argt(_argt) -- override if any
-    self:implementall(IStoneDolmn)
 end
 
-local CPlaceDolm1Idle = CPlaceStoneIdle:extend() -- idle dolm1
+local CPlaceDolm1Idle = CPlaceDolmnIdle:extend() -- idle dolm1
 function CPlaceDolm1Idle:new(_argt)
     CPlaceDolm1Idle.super.new(self, _argt)
     self.sprite  = CSpriteBG.PLACEDOLM1
     self:argt(_argt) -- override if any
-    self:implementall(IStoneDolmn)
 end
 
 
 --
--- IStoneCirkl
+-- CPlaceCirkl
 --
-local IStoneCirkl = CPlaceStone:extend() -- cirkl implementation
-IStoneCirkl.kind   = Classic.KINDCIRKL
-IStoneCirkl.hitbox = CHitbox{
-    region = {
-        lf = 3,
-        rg = 4,
-        up = 6,
-        dw = 7,
-    }
-}
+local CPlaceCirkl = CPlaceStone:extend() -- cirkls
+Classic.KINDCIRKL = "Cirkl" -- Cirkl kind
+function CPlaceCirkl:new(_argt)
+    CPlaceCirkl.super.new(self, _argt)
+    self.kind = Classic.KINDCIRKL
+    self.sprite      = CSpriteBG.PLACECIRKL
+    self.hitbox.lf = 3
+    self.hitbox.rg = 4
+    self.hitbox.up = 6
+    self.hitbox.dw = 7
+    self:argt(_argt) -- override if any
+end
 
-local CPlaceCirk0Anim = CPlaceStoneAnim:extend() -- anim cirk0
+local CPlaceCirklAnim = CPlaceCirkl:extend() -- anim cirkls
+function CPlaceCirklAnim:new(_argt)
+    CPlaceCirklAnim.super.new(self, _argt)
+    self.animations = {
+        CAnimation{ -- moon
+            frequence = Tic.FREQUENCE0600,
+            percent0  = 0.9,
+            palette0  = {[CPlace.MOON] = CPlace.EMPTY,},
+            palette1  = {[CPlace.MOON] = CPlace.COLORMOON,},
+        },
+        CAnimation{ -- floor 1
+            frequence = Tic.FREQUENCE0600,
+            percent0  = 0.1,
+            palette0  = {[CPlace.FLOOR01] = CPlace.STONEFG,},
+            palette1  = {[CPlace.FLOOR01] = CPlace.LEAFSFG,},
+        },
+        CAnimation{ -- floor 2
+            frequence = Tic.FREQUENCE0600,
+            percent0  = 0.3,
+            palette0  = {[CPlace.FLOOR02] = CPlace.FOAM,},
+            palette1  = {[CPlace.FLOOR02] = CPlace.LEAFSFG,},
+        },
+    }
+    self:argt(_argt) -- override if any
+end
+
+local CPlaceCirklIdle = CPlaceCirkl:extend() -- idle cirkls
+function CPlaceCirklIdle:new(_argt)
+    CPlaceCirklIdle.super.new(self, _argt)
+    self.name = Classic.NAMESILENT
+    self.palette = CPlaceStone.PALETTEIDLE
+    self:argt(_argt) -- override if any
+end
+
+local CPlaceCirk0Anim = CPlaceCirklAnim:extend() -- anim cirk0
 function CPlaceCirk0Anim:new(_argt)
     CPlaceCirk0Anim.super.new(self, _argt)
     self.sprite  = CSpriteBG.PLACECIRK0
     self:argt(_argt) -- override if any
-    self:implementall(IStoneCirkl)
 end
 
-local CPlaceCirk0Idle = CPlaceStoneIdle:extend() -- idle cirk0
+local CPlaceCirk0Idle = CPlaceCirklIdle:extend() -- idle cirk0
 function CPlaceCirk0Idle:new(_argt)
     CPlaceCirk0Idle.super.new(self, _argt)
     self.sprite  = CSpriteBG.PLACECIRK0
     self:argt(_argt) -- override if any
-    self:implementall(IStoneCirkl)
 end
 
-local CPlaceCirk1Anim = CPlaceStoneAnim:extend() -- anim cirk1
+local CPlaceCirk1Anim = CPlaceCirklAnim:extend() -- anim cirk1
 function CPlaceCirk1Anim:new(_argt)
     CPlaceCirk1Anim.super.new(self, _argt)
     self.sprite  = CSpriteBG.PLACECIRK1
     self:argt(_argt) -- override if any
-    self:implementall(IStoneCirkl)
 end
 
-local CPlaceCirk1Idle = CPlaceStoneIdle:extend() -- idle cirk1
+local CPlaceCirk1Idle = CPlaceCirklIdle:extend() -- idle cirk1
 function CPlaceCirk1Idle:new(_argt)
     CPlaceCirk1Idle.super.new(self, _argt)
     self.sprite  = CSpriteBG.PLACECIRK1
     self:argt(_argt) -- override if any
-    self:implementall(IStoneCirkl)
 end
 
 
 --
--- IStoneRoads
+-- CPlaceRoads
 --
-local IStoneRoads = CPlaceStone:extend() -- roads implementation
-IStoneRoads.kind   = Classic.KINDROADS
+local CPlaceRoads = CPlaceStone:extend() -- roads
+Classic.KINDROADS = "Roads" -- Roads kind
+function CPlaceRoads:new(_argt)
+    CPlaceRoads.super.new(self, _argt)
+    self.kind = Classic.KINDROADS
+    self.sprite      = CSpriteBG.PLACEROADS
+    self.hitbox = nil
+    self:argt(_argt) -- override if any
+end
 
-local CPlaceRoad0Anim = CPlaceStoneAnim:extend() -- anim road0
+local CPlaceRoadsAnim = CPlaceRoads:extend() -- anim roads
+function CPlaceRoadsAnim:new(_argt)
+    CPlaceRoadsAnim.super.new(self, _argt)
+    self.animations = {
+        CAnimation{ -- moon
+            frequence = Tic.FREQUENCE0600,
+            percent0  = 0.9,
+            palette0  = {[CPlace.MOON] = CPlace.EMPTY,},
+            palette1  = {[CPlace.MOON] = CPlace.COLORMOON,},
+        },
+        CAnimation{ -- floor 1
+            frequence = Tic.FREQUENCE0600,
+            percent0  = 0.1,
+            palette0  = {[CPlace.FLOOR01] = CPlace.STONEFG,},
+            palette1  = {[CPlace.FLOOR01] = CPlace.LEAFSFG,},
+        },
+        CAnimation{ -- floor 2
+            frequence = Tic.FREQUENCE0600,
+            percent0  = 0.3,
+            palette0  = {[CPlace.FLOOR02] = CPlace.FOAM,},
+            palette1  = {[CPlace.FLOOR02] = CPlace.LEAFSFG,},
+        },
+    }
+    self:argt(_argt) -- override if any
+end
+
+local CPlaceRoadsIdle = CPlaceRoads:extend() -- idle roads
+function CPlaceRoadsIdle:new(_argt)
+    CPlaceRoadsIdle.super.new(self, _argt)
+    self.name = Classic.NAMESILENT
+    self.palette = CPlaceStone.PALETTEIDLE
+    self:argt(_argt) -- override if any
+end
+
+local CPlaceRoad0Anim = CPlaceRoadsAnim:extend() -- anim road0
 function CPlaceRoad0Anim:new(_argt)
     CPlaceRoad0Anim.super.new(self, _argt)
     self.sprite  = CSpriteBG.PLACEROAD0
-    self.hitbox  = nil
     self:argt(_argt) -- override if any
-    self:implementall(IStoneRoads)
 end
 
-local CPlaceRoad0Idle = CPlaceStoneIdle:extend() -- idle road0
+local CPlaceRoad0Idle = CPlaceRoadsIdle:extend() -- idle road0
 function CPlaceRoad0Idle:new(_argt)
     CPlaceRoad0Idle.super.new(self, _argt)
     self.sprite  = CSpriteBG.PLACEROAD0
-    self.hitbox  = nil
     self:argt(_argt) -- override if any
-    self:implementall(IStoneRoads)
 end
 
-local CPlaceRoad1Anim = CPlaceStoneAnim:extend() -- anim road1
+local CPlaceRoad1Anim = CPlaceRoadsAnim:extend() -- anim road1
 function CPlaceRoad1Anim:new(_argt)
     CPlaceRoad1Anim.super.new(self, _argt)
     self.sprite  = CSpriteBG.PLACEROAD1
-    self.hitbox  = nil
     self:argt(_argt) -- override if any
-    self:implementall(IStoneRoads)
 end
 
-local CPlaceRoad1Idle = CPlaceStoneIdle:extend() -- idle road1
+local CPlaceRoad1Idle = CPlaceRoadsIdle:extend() -- idle road1
 function CPlaceRoad1Idle:new(_argt)
     CPlaceRoad1Idle.super.new(self, _argt)
     self.sprite  = CSpriteBG.PLACEROAD1
-    self.hitbox  = nil
     self:argt(_argt) -- override if any
-    self:implementall(IStoneRoads)
 end
 
 
@@ -5838,10 +5925,27 @@ CPlace:generateRoad(House1.worldx, House1.worldy, House2.worldx, House2.worldy, 
     [CPlaceTree0Anim] = 4,
     [CPlaceTree0Idle] = 1,
 })
-
-CPlaceTree0Idle{worldx = 0, worldy = -10}
-CPlaceTree0Idle{worldx = -4, worldy = -10}
 end
+
+CPlaceMenh0Anim{worldx = -4, worldy = -10}
+CPlaceMenh1Anim{worldx = 0 , worldy = -10}
+CPlaceMenh0Idle{worldx = 10, worldy = -10}
+CPlaceMenh1Idle{worldx = 14, worldy = -10}
+
+CPlaceDolm0Anim{worldx = -4, worldy = 20}
+CPlaceDolm1Anim{worldx = 0 , worldy = 20}
+CPlaceDolm0Idle{worldx = 10, worldy = 20}
+CPlaceDolm1Idle{worldx = 14, worldy = 20}
+
+CPlaceCirk0Anim{worldx = -4, worldy = 30}
+CPlaceCirk1Anim{worldx = 0 , worldy = 30}
+CPlaceCirk0Idle{worldx = 10, worldy = 30}
+CPlaceCirk1Idle{worldx = 14, worldy = 30}
+
+CPlaceRoad0Anim{worldx = -4, worldy = -20}
+CPlaceRoad1Anim{worldx = 0 , worldy = -20}
+CPlaceRoad0Idle{worldx = 10, worldy = -20}
+CPlaceRoad1Idle{worldx = 14, worldy = -20}
 
 Tic.DRAWHITBOX  = true
 -- Tic.DRAWBORDERS = true
