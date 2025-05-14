@@ -3046,10 +3046,22 @@ function CCharacter:new(_argt)
     self:focus() -- focus its camera on itself
 end
 
+function CCharacter:postureGet() -- state posture
+    return Tic.STATESETTINGS[self.state].posture
+end
+
+function CCharacter:statusGet() -- state status
+    return Tic.STATESETTINGS[self.state].status
+end
+
+function CCharacter:stateSet(_posture, _status) -- set state from posture and status
+    if not _posture or not _status then return end -- mandatory
+    self.state = _posture.._status -- simple concatenation
+end
+
 function CCharacter:regionViewOffsets() -- view offsets region depending on dirx, diry, statphyact and posture
     local _stat          = self.statphyact
-    local _statesettings = Tic.STATESETTINGS[self.state]
-    local _posture       = _statesettings.posture
+    local _posture       = self:postureGet()
     local _posturekneel  = _posture == Tic.POSTUREKNEEL
     local _size          = Tic.SPRITESIZE * self.scale
     local _range         = (_posturekneel) and Tic.WORLDWH // 2 or Tic.WORLDWH -- use world window height as range -- TODO change that later ?
@@ -3087,8 +3099,7 @@ end
 
 function CCharacter:regionMindOffsets() -- mind offsets region depending on dirx, diry, statmenact
     local _stat          = self.statmenact
-    local _statesettings = Tic.STATESETTINGS[self.state]
-    local _posture       = _statesettings.posture
+    local _posture       = self:postureGet()
     local _posturekneel  = _posture == Tic.POSTUREKNEEL
     local _size          = Tic.SPRITESIZE * self.scale
     local _range         = Tic.WORLDWH -- use world window height as range -- TODO change that later ?
@@ -3202,7 +3213,6 @@ function CCharacter:nearestEntityViewWorld() -- nearest entity in itself view wo
 end
 
 function CCharacter:draw() -- set animations and draw layers
-    self.posture = Tic.STATESETTINGS[self.state].posture -- force the posture
     self:cycle() -- cycle the cyclers
     self:drawDirs()
     self:drawStatus()
@@ -3224,22 +3234,22 @@ function CCharacter:cycle()
 end
 
 function CCharacter:cycleIdle() -- reset to idle after a delay
-    local _posture = Tic.STATESETTINGS[self.state].posture
-    local _status  = Tic.STATESETTINGS[self.state].status
+    local _posture = self:postureGet()
+    local _status  = self:statusGet()
     if _posture == Tic.POSTUREFLOOR then return end -- mandatory stand or kneel
     if _status  == Tic.STATUSWORK then return end -- is at work
 
     self.idlecycler:next()
 	if self.idlecycler:isMAX() then -- trigger idlecycler
-		self.state = _posture..Tic.STATUSIDLE
+		self:stateSet(_posture, Tic.STATUSIDLE)
 	end
 end
 
 function CCharacter:cycleWork() -- animate work after a delay
-    local _posture = Tic.STATESETTINGS[self.state].posture
-    local _status  = Tic.STATESETTINGS[self.state].status
-    if _posture == Tic.POSTUREFLOOR then return end -- mandatory stand or kneel
-    if _status  ~= Tic.STATUSWORK then return end -- not at work
+    local _posture = self:postureGet()
+    local _status  = self:statusGet()
+    if _posture == Tic.POSTUREFLOOR then return end -- not stand or kneel
+    if not (_status == Tic.STATUSWORK) then return end -- not at work
 
     self.workcycler:next()
 	if self.workcycler:isGEH() then -- trigger workcycler
@@ -3251,13 +3261,12 @@ function CCharacter:drawDirs() -- draw the directions and ranges around the char
     if Tic.PLAYERONLY and not (self == Tic:playerActual()) then return end -- only actual player
     self.drawdirs = Tic.DRAWDIRS -- use Tic as master
     if not self.drawdirs then return end -- nothing to draw
-    local _drawcolor     = Tic.COLORWHITE
-    local _screenx       = Tic.WORLDWX + Tic.WORLDWW2 - (Tic:playerActual().worldx - self.worldx) - 1 --relative to actual player -- feet
-    local _screeny       = Tic.WORLDWY + Tic.WORLDWH2 - (Tic:playerActual().worldy - self.worldy) + 2
-    local _statesettings = Tic.STATESETTINGS[self.state]
-    local _posture       = _statesettings.posture
-    local _range         = self.statphyact * self.scale
-    _range               = (_posture == Tic.POSTUREKNEEL) and Nums:roundmax(_range / 2) or _range
+    local _drawcolor = Tic.COLORWHITE
+    local _screenx   = Tic.WORLDWX + Tic.WORLDWW2 - (Tic:playerActual().worldx - self.worldx) - 1 --relative to actual player -- feet
+    local _screeny   = Tic.WORLDWY + Tic.WORLDWH2 - (Tic:playerActual().worldy - self.worldy) + 2
+    local _posture   = self:postureGet()
+    local _range     = self.statphyact * self.scale
+    _range           = (_posture == Tic.POSTUREKNEEL) and Nums:roundmax(_range / 2) or _range
 
     circb(_screenx, _screeny, _range, _drawcolor)
     circb(_screenx + 1, _screeny, _range, _drawcolor)
@@ -3342,16 +3351,12 @@ function CCharacter:drawMove() -- draw the move of a character
 end
 
 function CCharacter:drawStatus()
-    local _state            = self.state
-    local _statesettings    = Tic.STATESETTINGS[_state]
-    local _posture          = _statesettings.posture
-    local _status           = _statesettings.status
-    local _frequence        = _statesettings.frequence
-    local _statussettings   = Tic.STATUSSETTINGS[_status]
-
-    local _statussprite = _statussettings.statussprite -- status sprite
-    local _tick00       = Tic.TICK00.actvalue
-    local _palette      = (Nums:frequence01(_tick00, _frequence) == 0)
+    local _status         = self:statusGet()
+    local _statussettings = Tic.STATUSSETTINGS[_status]
+    local _frequence      = Tic.STATESETTINGS[self.state].frequence
+    local _statussprite   = _statussettings.statussprite -- status sprite
+    local _tick00         = Tic.TICK00.actvalue
+    local _palette        = (Nums:frequence01(_tick00, _frequence) == 0)
         and _statussettings.palette0
         or  _statussettings.palette1
 
@@ -3380,24 +3385,20 @@ function CCharacter:stateNext() -- next state in the stack
 end
 
 function CCharacter:toggleWork() -- toggle idle/move vs work
-    local _state = self.state
-    local _statesettings = Tic.STATESETTINGS[_state]
-    local _posture = _statesettings.posture
-    local _status  = _statesettings.status
+    local _posture = self:postureGet()
+    local _status  = self:statusGet()
     if _posture == Tic.POSTUREFLOOR then return end -- cannot toggle work
     _status = (_status == Tic.STATUSWORK)
         and Tic.STATUSIDLE
         or  Tic.STATUSWORK
-    self.state = _posture.._status
+	self:stateSet(_posture, _status)
     self:hitboxRefresh() -- refresh the hitboxes
 end
 
 function CCharacter:toggleKneel() -- toggle stand vs kneel
-    local _state = self.state
-    local _statesettings = Tic.STATESETTINGS[_state]
-    local _posture = _statesettings.posture
-    local _status  = _statesettings.status
-    if _posture == Tic.POSTUREFLOOR and _status ~= Tic.STATUSSLEEP then return end -- cannot toggle sleep
+    local _posture = self:postureGet()
+    local _status  = self:statusGet()
+    if _posture == Tic.POSTUREFLOOR and not (_status == Tic.STATUSSLEEP) then return end -- cannot toggle sleep
     if _posture == Tic.POSTURESTAND then
         _posture = Tic.POSTUREKNEEL
     elseif _posture == Tic.POSTUREKNEEL then
@@ -3406,20 +3407,21 @@ function CCharacter:toggleKneel() -- toggle stand vs kneel
         _posture = Tic.POSTUREKNEEL
         _status = Tic.STATUSIDLE
     end
-    self.state = _posture.._status
+	self:stateSet(_posture, _status)
     self:hitboxRefresh() -- refresh the hitboxes
 end
 
 function CCharacter:toggleSleep() -- toggle stand vs sleep
-    local _state = self.state
-    local _statesettings = Tic.STATESETTINGS[_state]
-    local _posture = _statesettings.posture
-    local _status  = _statesettings.status
-    if _posture == Tic.POSTUREFLOOR and _status ~= Tic.STATUSSLEEP then return end -- cannot toggle sleep
-    _state = (_state == Tic.STATEFLOORSLEEP)
-        and Tic.STATESTANDIDLE
-        or  Tic.STATEFLOORSLEEP
-    self.state = _state
+    local _posture = self:postureGet()
+    local _status  = self:statusGet()
+    if _posture == Tic.POSTUREFLOOR and not (_status == Tic.STATUSSLEEP) then return end -- cannot toggle sleep
+    _posture = (_posture == Tic.POSTUREFLOOR)
+        and Tic.POSTURESTAND
+        or  Tic.POSTUREFLOOR
+    _status = (_status == Tic.STATUSSLEEP)
+        and Tic.STATUSIDLE
+        or  Tic.STATUSSLEEP
+    self:stateSet(_posture, _status)
     self:hitboxRefresh() -- refresh the hitboxes
 end
 
@@ -3457,7 +3459,7 @@ function CCharacter:offsetsDirection(_direction, _movenone,  _moveslow, _movebac
     _movenone = _movenone or false -- force none move if any
     _moveslow = _moveslow or false -- force slow move if any
     _moveback = _moveback or false -- force back move if any
-    local _posture = Tic.STATESETTINGS[self.state].posture
+    local _posture = self:postureGet()
     local _offsets = Tic.DIRSOFFSETS[_direction]
 
     local _result = {
@@ -3497,32 +3499,29 @@ function CCharacter:moveDirection(_direction, _movenone,  _moveslow, _moveback) 
     _movenone  = _movenone or false -- force none move if any
     _moveslow  = _moveslow or false -- force slow move if any
     _moveback  = _moveback or false -- force back move if any
-    local _posture = Tic.STATESETTINGS[self.state].posture
-    local _status  = Tic.STATESETTINGS[self.state].status
+    local _posture = self:postureGet()
+    local _status  = self:statusGet()
     local _offsets = self:offsetsDirection(_direction, _movenone,  _moveslow, _moveback)
     local _dirx    = self.dirx -- save actual character dirx
+
+    if _posture == Tic.POSTUREFLOOR and not (_status == Tic.STATUSSLEEP) then -- cannot move -- nor change dir
+        return
+    end
+
+    if _posture == Tic.POSTUREFLOOR and _status == Tic.STATUSSLEEP then -- sleep to stand
+        return self:stateSet(Tic.POSTURESTAND, Tic.STATUSIDLE)
+    end
 
     self.dirx      = _offsets.dirx -- adjust dirx, diry and direction
     self.diry      = _offsets.diry
     self.direction = _direction
-    self:hitboxRefresh() -- refresh the hitboxes
 
     if _movenone then -- none move
         return
     end
 
-    if _posture == Tic.POSTUREFLOOR and not (_status == Tic.STATUSSLEEP) then -- cannot move
-        return
-    end
-
-    if _state == Tic.STATEFLOORSLEEP then -- sleep to stand
-        self.state = Tic.STATESTANDIDLE
-        return
-    end
-
     if _status == Tic.STATUSWORK then -- interrupt work and goes to idle
-        self.state = _posture..Tic.STATUSIDLE
-        return
+        return self:stateSet(_posture, Tic.STATUSIDLE)
     end
 
     if _status == Tic.STATUSIDLE and not (self.dirx == _dirx) then -- simply change dirx
@@ -3530,11 +3529,10 @@ function CCharacter:moveDirection(_direction, _movenone,  _moveslow, _moveback) 
     end
 
     if _status == Tic.STATUSMOVE and not (self.dirx == _dirx) then -- change dirx and goes to idle
-        self.state = _posture..Tic.STATUSIDLE
-        return
+        return self:stateSet(_posture, Tic.STATUSIDLE)
     end
 
-    self.state = _posture..Tic.STATUSMOVE
+    self:stateSet(_posture, Tic.STATUSMOVE)
     self:toggleFrame() -- animate continuous move in the same dirx
 
     local _characterhbrw     = self:hitboxRegionWorld() -- collisions system
@@ -3635,12 +3633,10 @@ function CCharacterHumanoid:new(_argt)
 end
 
 function CCharacterHumanoid:drawBody() -- FIXME to rewrite from scratch
-    local _state            = self.state
-    local _statesettings    = Tic.STATESETTINGS[_state]
-    local _posture          = _statesettings.posture
-    local _status           = _statesettings.status
-    local _posturesettings  = Tic.POSTURESETTINGS[_posture]
-    local _statussettings   = Tic.STATUSSETTINGS[_status]
+    local _posture         = self:postureGet()
+    local _status          = self:statusGet()
+    local _posturesettings = Tic.POSTURESETTINGS[_posture]
+    local _statussettings  = Tic.STATUSSETTINGS[_status]
 
     local _bodyspriteoffset = _posturesettings.bodyspriteoffset + _statussettings.bodyspriteoffset
     local _bodyxoffset      = _posturesettings.bodyxoffset
@@ -3675,21 +3671,20 @@ function CCharacterHumanoid:drawBody() -- FIXME to rewrite from scratch
 end
 
 function CCharacterHumanoid:drawHead()
-    local _state            = self.state
-    local _statesettings    = Tic.STATESETTINGS[_state]
-    local _posture          = _statesettings.posture
-    local _posturesettings  = Tic.POSTURESETTINGS[_posture]
+    local _posture         = self:postureGet()
+    local _posturesettings = Tic.POSTURESETTINGS[_posture]
+    local _headxoffset     = _posturesettings.headxoffset
+    local _headyoffset     = _posturesettings.headyoffset
+    _headyoffset           = (_posturesettings.headusesize)
+        and _headyoffset + self.size
+        or  _headyoffset
+    local _headrotate      = _posturesettings.rotate
+    local _headframe       = CSprite.FRAME00 -- heads have only one frame
+
 
     local _musprite = CSpriteFG() -- multi usage unique sprite
 
     -- draw head
-    local _headxoffset = _posturesettings.headxoffset
-    local _headyoffset = _posturesettings.headyoffset
-    _headyoffset = (_posturesettings.headusesize)
-        and _headyoffset + self.size
-        or  _headyoffset
-    local _headrotate  = _posturesettings.rotate
-    local _headframe   = CSprite.FRAME00 -- heads have only one frame
 
     _musprite.sprite  = self.headsprite -- apply the corresponding attributes
     _musprite.screenx = self.screenx + (_headxoffset * self.scale)
@@ -3712,18 +3707,18 @@ function CCharacterHumanoid:drawHead()
     local _coloreyesbm = Tic.COLORKEY
     local _coloreyesbd = Tic.COLORKEY
     
-    if self.posture == Tic.POSTUREFLOOR then
+    if _posture == Tic.POSTUREFLOOR then
         _coloreyesbm = self.coloreyesbg
     end
-    if not (self.posture == Tic.POSTUREFLOOR) and self.diry == Tic.DIRYUP then
+    if not (_posture == Tic.POSTUREFLOOR) and self.diry == Tic.DIRYUP then
         _coloreyesfg = self.coloreyesfg
         _coloreyesbu = self.coloreyesbg
     end
-    if not (self.posture == Tic.POSTUREFLOOR) and self.diry == Tic.DIRYMD then
+    if not (_posture == Tic.POSTUREFLOOR) and self.diry == Tic.DIRYMD then
         _coloreyesfg = self.coloreyesfg
         _coloreyesbm = self.coloreyesbg
     end
-    if not (self.posture == Tic.POSTUREFLOOR) and self.diry == Tic.DIRYDW then
+    if not (_posture == Tic.POSTUREFLOOR) and self.diry == Tic.DIRYDW then
         _coloreyesfg = self.coloreyesfg
         _coloreyesbd = self.coloreyesbg
     end
@@ -4494,10 +4489,9 @@ function CWindowPlayerState:new(_argt)
 end
 
 function CWindowPlayerState:drawInside() -- window state content for player
-    local _state         = self.entity.state
-    local _statesettings = Tic.STATESETTINGS[_state]
-    local _posture       = _statesettings.posture
-    local _status        = _statesettings.status
+    if not self.entity then return end -- nothing to draw
+    local _posture = self.entity:postureGet()
+    local _status  = self.entity:statusGet()
     self.infos = {_posture, _status}
     CWindowPlayerState.super.drawInside(self)
 end
@@ -4756,8 +4750,8 @@ function CButton:functionsActived() -- actived functions (in a key table) of a b
     if Tic.MOUSE.clicklf and type(self[Tic.BUTTONCLICKLF]) == "function" then Tables:valInsert(_result, self[Tic.BUTTONCLICKLF], true) end
     if Tic.MOUSE.clickmd and type(self[Tic.BUTTONCLICKMD]) == "function" then Tables:valInsert(_result, self[Tic.BUTTONCLICKMD], true) end
     if Tic.MOUSE.clickrg and type(self[Tic.BUTTONCLICKRG]) == "function" then Tables:valInsert(_result, self[Tic.BUTTONCLICKRG], true) end
-    if Tic.MOUSE.scrollx ~= 0 and type(self[Tic.BUTTONSCROLLX]) == "function" then Tables:valInsert(_result, self[Tic.BUTTONSCROLLX], true) end
-    if Tic.MOUSE.scrolly ~= 0 and type(self[Tic.BUTTONSCROLLY]) == "function" then Tables:valInsert(_result, self[Tic.BUTTONSCROLLY], true) end
+    if not (Tic.MOUSE.scrollx == 0) and type(self[Tic.BUTTONSCROLLX]) == "function" then Tables:valInsert(_result, self[Tic.BUTTONSCROLLX], true) end
+    if not (Tic.MOUSE.scrolly == 0) and type(self[Tic.BUTTONSCROLLY]) == "function" then Tables:valInsert(_result, self[Tic.BUTTONSCROLLY], true) end
 
     return _result
 end
@@ -5978,9 +5972,8 @@ function Tic:drawLog() -- [-] remove
     local _tick60 = Tic.TICK60.actvalue
     local _playeractual = Tic:playerActual()
     if not _playeractual then return end
-    local _state   = _playeractual.state
-    local _posture = Tic.STATESETTINGS[_state].posture
-    local _status  = Tic.STATESETTINGS[_state].status
+    local _posture = _playeractual:postureGet()
+    local _status  = _playeractual:statusGet()
     local _dirx    = _playeractual.dirx
     local _diry    = _playeractual.diry
 
