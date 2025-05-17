@@ -1436,11 +1436,19 @@ function CHitbox:hitbyDelete(_entity) -- delete an entity hitby
     Tables:keyDelete(self.hitby, _entity)
 end
 
+function CHitbox:hasHitTo() -- has hitto ?
+    return Tables:size(self.hitto) > 0
+end
+
+function CHitbox:hasHitBy() -- has hitby ?
+    return Tables:size(self.hitby) > 0
+end
+
 function CHitbox:draw()
     if not self.entity then return end -- no entity no draw
 	local _drawcolor = Tic.COLORYELLOW
-    _drawcolor = (Tables:size(self.hitto) > 0) and Tic.COLORORANGE or _drawcolor
-    _drawcolor = (Tables:size(self.hitby) > 0) and Tic.COLORRED    or _drawcolor
+    _drawcolor = (self:hasHitTo()) and Tic.COLORORANGE or _drawcolor
+    _drawcolor = (self:hasHitBy()) and Tic.COLORRED    or _drawcolor
 
     local _regionadjusted = self:regionAdjusted():offsetXY(self.entity.screenx, self.entity.screeny)
 
@@ -3391,7 +3399,9 @@ function CCharacter:drawShield()
 end
 
 function CCharacter:drawInteract()
+    if not (self == Tic:playerActual()) then return end -- dont draw
     local _posture         = self:postureGet()
+    if _posture == Tic.POSTUREFLOOR then return end -- dont draw
     local _posturesettings = Tic.POSTURESETTINGS[_posture]
     local _xoffset         = _posturesettings.headxoffset
     _xoffset               = (self.dirx == Tic.DIRXLF)
@@ -3409,6 +3419,7 @@ function CCharacter:drawInteract()
     _musprite.screeny = self.screeny + (_yoffset * self.scale)
     _musprite.scale   = self.scale
     _musprite.flip    = self.dirx
+    _musprite.palette = {[Tic.COLORGREYD] = Tic.COLORKEY}
     _musprite:draw()
 end
 
@@ -5977,7 +5988,7 @@ CPlaceRoad1Anim{worldx = 0 , worldy = -40}
 CPlaceRoad0Idle{worldx = 10, worldy = -40}
 CPlaceRoad1Idle{worldx = 14, worldy = -40}
 
-Tic.DRAWHITBOX  = true
+-- Tic.DRAWHITBOX  = true
 -- Tic.DRAWBORDERS = true
 -- Tic.DRAWVIEW    = true
 -- Tic.DRAWMOVE    = true
