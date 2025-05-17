@@ -1306,6 +1306,16 @@ end
 
 
 --
+-- CInteraction
+--
+local CInteraction = Classic:extend() -- generic interaction for entities
+function CInteraction:new(_argt)
+    CInteraction.super.new(self, _argt)
+    self:argt(_argt) -- override if any
+end
+
+
+--
 -- CRegion
 --
 local CRegion = Classic:extend() -- generic region -- lf rg up dw around a point
@@ -1656,10 +1666,13 @@ function CEntity:new(_argt)
     CEntity.super.new(self, _argt)
     self.kind = Classic.KINDENTITY
     self.name = Classic.NAMEENTITY
-    self.world  = nil -- parent world if any
-    self.worldx = CEntity.WORLDX -- world positions
-    self.worldy = CEntity.WORLDY
-    self.discovered = false -- discovered by the player ?
+    self.world        = nil -- parent world if any
+    self.worldx       = CEntity.WORLDX -- world positions
+    self.worldy       = CEntity.WORLDY
+    self.discovered   = false -- discovered by the player ?
+    self.interactions = nil -- possible interactions if any
+    self.interactedto = {}  -- entities interacted to -- table
+    self.interactedby = {}  -- entities interacted by -- table
     self.camera = nil -- optional camera that follows the entity -- to override if any
     self:argt(_argt) -- override if any
 end
@@ -1862,7 +1875,7 @@ function CEntityDrawable:draw() -- default draw for drawable entities -- overrid
         and Tables:merge(self.palette, self.palettefade)
         or  Tables:merge(self.palette, {})
 
-    for _, _animation in pairs(self.animations or {}) do -- animate -- FIXME something wrong in frequences
+    for _, _animation in pairs(self.animations or {}) do -- animate
         local _frequence   = _animation.frequence
         local _percent0    = _animation.percent0
         local _palette0    = _animation.palette0
@@ -3226,6 +3239,7 @@ function CCharacter:draw() -- set animations and draw layers
     self:drawView()
     self:drawMind()
     self:drawMove()
+    self:drawInteract()
 end
 
 function CCharacter:cycle()
@@ -3374,6 +3388,28 @@ function CCharacter:drawWeapon()
 end
 
 function CCharacter:drawShield()
+end
+
+function CCharacter:drawInteract()
+    local _posture         = self:postureGet()
+    local _posturesettings = Tic.POSTURESETTINGS[_posture]
+    local _xoffset         = _posturesettings.headxoffset
+    _xoffset               = (self.dirx == Tic.DIRXLF)
+        and _xoffset - 3
+        or  _xoffset + 3
+    local _yoffset         = _posturesettings.headyoffset - Tic.SPRITESIZE + 1
+    _yoffset               = (_posturesettings.headusesize)
+        and _yoffset + self.size
+        or  _yoffset
+
+
+    local _musprite = CSpriteFG() -- multi usage unique sprite
+    _musprite.sprite  = CSpriteBG.SIGNINTMRK -- apply the corresponding attributes
+    _musprite.screenx = self.screenx + (_xoffset * self.scale)
+    _musprite.screeny = self.screeny + (_yoffset * self.scale)
+    _musprite.scale   = self.scale
+    _musprite.flip    = self.dirx
+    _musprite:draw()
 end
 
 function CCharacter:statePrev() -- prev state in the stack
@@ -5926,20 +5962,20 @@ CPlaceMenh1Anim{worldx = 0 , worldy = -10}
 CPlaceMenh0Idle{worldx = 10, worldy = -10}
 CPlaceMenh1Idle{worldx = 14, worldy = -10}
 
-CPlaceDolm0Anim{worldx = -4, worldy = 20}
-CPlaceDolm1Anim{worldx = 0 , worldy = 20}
-CPlaceDolm0Idle{worldx = 10, worldy = 20}
-CPlaceDolm1Idle{worldx = 14, worldy = 20}
+CPlaceDolm0Anim{worldx = -4, worldy = -20}
+CPlaceDolm1Anim{worldx = 0 , worldy = -20}
+CPlaceDolm0Idle{worldx = 10, worldy = -20}
+CPlaceDolm1Idle{worldx = 14, worldy = -20}
 
-CPlaceCirk0Anim{worldx = -4, worldy = 30}
-CPlaceCirk1Anim{worldx = 0 , worldy = 30}
-CPlaceCirk0Idle{worldx = 10, worldy = 30}
-CPlaceCirk1Idle{worldx = 14, worldy = 30}
+CPlaceCirk0Anim{worldx = -4, worldy = -30}
+CPlaceCirk1Anim{worldx = 0 , worldy = -30}
+CPlaceCirk0Idle{worldx = 10, worldy = -30}
+CPlaceCirk1Idle{worldx = 14, worldy = -30}
 
-CPlaceRoad0Anim{worldx = -4, worldy = -20}
-CPlaceRoad1Anim{worldx = 0 , worldy = -20}
-CPlaceRoad0Idle{worldx = 10, worldy = -20}
-CPlaceRoad1Idle{worldx = 14, worldy = -20}
+CPlaceRoad0Anim{worldx = -4, worldy = -40}
+CPlaceRoad1Anim{worldx = 0 , worldy = -40}
+CPlaceRoad0Idle{worldx = 10, worldy = -40}
+CPlaceRoad1Idle{worldx = 14, worldy = -40}
 
 Tic.DRAWHITBOX  = true
 -- Tic.DRAWBORDERS = true
