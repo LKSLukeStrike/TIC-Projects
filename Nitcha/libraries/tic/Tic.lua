@@ -1917,7 +1917,7 @@ function CEntityDrawable:new(_argt)
     self.dirx        = Nums:random01() -- random flip lf/rg
     self.scale       = CSprite.SCALE01
     self.animations  = nil -- override if any
-    self.spotting     = false -- use spotting to draw a border
+    self.spotted     = false -- use spotted to draw a border
     self.hitbox      = CHitbox{entity = self} -- hitbox if any
     self.drawborders = false -- draw behaviour
     self.drawhitbox  = false
@@ -1954,13 +1954,13 @@ function CEntityDrawable:draw() -- default draw for drawable entities -- overrid
     _musprite.palette = _palette
     _musprite:draw()
 
-    self:drawSpotting()
+    self:drawSpotted()
     self:drawBorders()
     self:drawHitbox()
 end
 
-function CEntityDrawable:drawSpotting() -- draw spotting if any
-    if not self.spotting then return end -- nothing to draw
+function CEntityDrawable:drawSpotted() -- draw spotted if any
+    if not self.spotted then return end -- nothing to draw
     local _musprite = CSpriteBG() -- multi usage unique sprite
     _musprite.sprite  = CSpriteBG.SIGNSPOSQU
     _musprite.screenx = self.screenx
@@ -3291,7 +3291,7 @@ function CCharacter:draw() -- set animations and draw layers
     self:drawShield()
     self:drawBody()
     self:drawHead()
-    self:drawSpotting()
+    self:drawSpotted()
     self:drawBorders()
     self:drawHitbox()
     self:drawView()
@@ -4654,8 +4654,8 @@ end
 
 function CWindowSpottingPortrait:draw()
     if self.entity then
-        self.entity:save{"spotting"}
-        self.entity.spotting = false -- dont draw spotting frame in window
+        self.entity:save{"spotted"}
+        self.entity.spotted = false -- dont draw spotted frame in window
     end
     CWindowSpottingPortrait.super.draw(self)
     if self.entity then
@@ -4708,7 +4708,7 @@ function CWindowWorld:drawPlayerActual()
             for _entity, _ in pairs(_locationsaround[_keyy][_keyx]) do -- entities around actual player
                 local _entityworldregion = _entity:worldRegion()
 
-                _entity.spotting = (_entity == _playeractual:entitySpotting() and _playeractual:isSpottingDraw()) -- unspot all entities except spotting one if any
+                _entity.spotted = (_entity == _playeractual:entitySpotting() and _playeractual:isSpottingDraw()) -- unspot all entities except spotting one if any
                     and true
                     or  false
 
@@ -5204,7 +5204,7 @@ end
 --
 -- IButtonSpotting -- spotting buttons implementation
 --
-local IButtonSpotting = CButton:extend() -- generic player button
+local IButtonSpotting = CButton:extend() -- generic spotting button
 IButtonSpotting.PALETTE = {[Tic.COLORGREYD] = Tic.COLORKEY}
 IButtonSpotting.BEHAVIOUR = function(self)
     CButton.BEHAVIOUR(self)
