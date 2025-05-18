@@ -69,3 +69,6 @@ Tables:print(Tables:generate{
     ["b"] = 5,
     ["c"] = 1,
 })
+
+print()
+print(Tables:size(nil))

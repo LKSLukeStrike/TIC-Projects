@@ -71,17 +71,17 @@ Tic.PLAYERSTATEWH = 16 -- player state window height
 Tic.PLAYERSTATEWX = Tic.PLAYERINFOSWX -- player state window x position
 Tic.PLAYERSTATEWY = Tic.PLAYERSTATSWY + 25 -- player state window y position
 
--- Spotted Infos Window positions and sizes (hud)
-Tic.SPOTTEDINFOSWW = 26 -- spotted infos window width
-Tic.SPOTTEDINFOSWH = 16 -- spotted infos window height
-Tic.SPOTTEDINFOSWX = ((Tic.WORLDWX - Tic.SPOTTEDINFOSWW) // 2) -- spotted infos window x position
-Tic.SPOTTEDINFOSWY = Tic.WORLDWY -- spotted infos window y position
+-- Spotting Infos Window positions and sizes (hud)
+Tic.SPOTTINGINFOSWW = 26 -- spotting infos window width
+Tic.SPOTTINGINFOSWH = 16 -- spotting infos window height
+Tic.SPOTTINGINFOSWX = ((Tic.WORLDWX - Tic.SPOTTINGINFOSWW) // 2) -- spotting infos window x position
+Tic.SPOTTINGINFOSWY = Tic.WORLDWY -- spotting infos window y position
 
--- Spotted Portrait Window positions and sizes (hud)
-Tic.SPOTTEDPORTRAITWW = 16 -- spotted portrait window width
-Tic.SPOTTEDPORTRAITWH = 16 -- spotted portrait window height
-Tic.SPOTTEDPORTRAITWX = ((Tic.WORLDWX - Tic.SPOTTEDPORTRAITWW) // 2) -- spotted portrait window x position
-Tic.SPOTTEDPORTRAITWY = Tic.SPOTTEDINFOSWY + 25 -- spotted portrait window y position
+-- Spotting Portrait Window positions and sizes (hud)
+Tic.SPOTTINGPORTRAITWW = 16 -- spotting portrait window width
+Tic.SPOTTINGPORTRAITWH = 16 -- spotting portrait window height
+Tic.SPOTTINGPORTRAITWX = ((Tic.WORLDWX - Tic.SPOTTINGPORTRAITWW) // 2) -- spotting portrait window x position
+Tic.SPOTTINGPORTRAITWY = Tic.SPOTTINGINFOSWY + 25 -- spotting portrait window y position
 
 -- Palette map
 Tic.PALETTEMAP = 0x3FF0 * 2 -- vram bank 1
@@ -326,7 +326,7 @@ Tic.FUNCTIONSTATMENACT       = function() Tic:statMenAct() end
 Tic.FUNCTIONSTATPSYACT       = function() Tic:statPsyAct() end
 Tic.FUNCTIONBIOMENEXT        = function() Tic:biomeNext() end
 Tic.FUNCTIONTOGGLEHITBOX     = function() Tic:hitboxToggleDraw() end
-Tic.FUNCTIONTOGGLESPOTTED    = function() Tic:spottingToggle() end
+Tic.FUNCTIONTOGGLESPOTTING    = function() Tic:spottingToggle() end
 Tic.FUNCTIONTOGGLEBORDERS    = function() Tic:bordersToggleDraw() end
 Tic.FUNCTIONTOGGLEDIRS       = function() Tic:dirsToggleDraw() end
 Tic.FUNCTIONTOGGLEVIEW       = function() Tic:viewToggleDraw() end
@@ -364,7 +364,7 @@ Tic.KEYSFUNCTIONSWORLD = {
     [Tic.KEY_P]            = Tic.FUNCTIONSTATPHYACT,
     [Tic.KEY_Q]            = Tic.FUNCTIONTOGGLEBORDERS,
     [Tic.KEY_R]            = Tic.FUNCTIONTOGGLEMIND,
-    [Tic.KEY_S]            = Tic.FUNCTIONTOGGLESPOTTED,
+    [Tic.KEY_S]            = Tic.FUNCTIONTOGGLESPOTTING,
     [Tic.KEY_V]            = Tic.FUNCTIONTOGGLEVIEW,
     [Tic.KEY_X]            = Tic.FUNCTIONTOGGLEMOVE,
     [Tic.KEY_Y]            = Tic.FUNCTIONSTATPSYACT,
@@ -835,6 +835,8 @@ end
 function Tic:spottingToggle(_character)
     if Tic.MODIFIERKEYS[Tic.KEY_SHIFT] then
         Tic:spottingToggleDraw(_character)
+    elseif Tic.MODIFIERKEYS[Tic.KEY_CTRL] then
+        Tic:spottingTogglePick(_character)
     else
         Tic:spottingToggleLock(_character)
     end
@@ -844,6 +846,12 @@ function Tic:spottingToggleDraw(_character)
     _character = _character or Tic:playerActual()
     if not _character then return end
 	_character:spottingToggleDraw()
+end
+
+function Tic:spottingTogglePick(_character)
+    _character = _character or Tic:playerActual()
+    if not _character then return end
+	_character:spottingTogglePick()
 end
 
 function Tic:spottingToggleLock(_character)
@@ -856,6 +864,12 @@ function Tic:isSpottingDraw(_character)
     _character = _character or Tic:playerActual()
     if not _character then return false end
 	return _character:isSpottingDraw()
+end
+
+function Tic:isSpottingPick(_character)
+    _character = _character or Tic:playerActual()
+    if not _character then return false end
+	return _character:isSpottingPick()
 end
 
 function Tic:isSpottingLock(_character)
@@ -1174,7 +1188,7 @@ CSpriteBG.SIGNSBANK   = 1  -- signs
 CSpriteBG.SIGNQSTMRK  = CSpriteBG.SIGNSBANK + 00 -- question mark
 CSpriteBG.SIGNINTMRK  = CSpriteBG.SIGNSBANK + 01 -- interact mark
 CSpriteBG.SIGNBORSQU  = CSpriteBG.SIGNSBANK + 02 -- borders square
-CSpriteBG.SIGNSPOSQU  = CSpriteBG.SIGNSBANK + 03 -- spotted square
+CSpriteBG.SIGNSPOSQU  = CSpriteBG.SIGNSBANK + 03 -- spotting square
 CSpriteBG.SIGNCROSQU  = CSpriteBG.SIGNSBANK + 04 -- crossed square
 CSpriteBG.SIGNDOTSQU  = CSpriteBG.SIGNSBANK + 05 -- dot square
 CSpriteBG.SIGNARROWD  = CSpriteBG.SIGNSBANK + 06 -- diag arrow
@@ -1183,6 +1197,7 @@ CSpriteBG.SIGNCENTER  = CSpriteBG.SIGNSBANK + 08 -- center dot
 CSpriteBG.SIGNPLAYER  = CSpriteBG.SIGNSBANK + 09 -- player sprite
 CSpriteBG.SIGNSPOTIT  = CSpriteBG.SIGNSBANK + 10 -- spotit sprite
 CSpriteBG.SIGNLOCKIT  = CSpriteBG.SIGNSBANK + 11 -- lockit sprite
+CSpriteBG.SIGNPICKIT  = CSpriteBG.SIGNSBANK + 12 -- pickit sprite
 CSpriteBG.BUILDBANK   = 16 -- buildings
 CSpriteBG.PLACEHOUSE  = CSpriteBG.BUILDBANK + 0
 CSpriteBG.PLACETOWER  = CSpriteBG.BUILDBANK + 1
@@ -1411,8 +1426,8 @@ function CHitbox:new(_argt)
     self.up     = CHitbox.UP
     self.dw     = CHitbox.DW
     self.entity = nil -- parent entity -- override if any
-    self.hitto  = {}  -- entities hit to -- table
-    self.hitby  = {}  -- entities hit by -- table
+    self.hitto  = {}  -- entities hitto -- table
+    self.hitby  = {}  -- entities hitby -- table
     self:argt(_argt) -- override if any
 end
 
@@ -1679,8 +1694,8 @@ function CEntity:new(_argt)
     self.worldy       = CEntity.WORLDY
     self.discovered   = false -- discovered by the player ?
     self.interactions = nil -- possible interactions if any
-    self.interactedto = {}  -- entities interacted to -- table
-    self.interactedby = {}  -- entities interacted by -- table
+    self.interactedto = {}  -- entities interactedto -- table
+    self.interactedby = {}  -- entities interactedby -- table
     self.camera = nil -- optional camera that follows the entity -- to override if any
     self:argt(_argt) -- override if any
 end
@@ -1750,6 +1765,40 @@ end
 function CEntity:distanceEntityFake(_entity) -- fake distance from itself to another entity -- faster
     if not _entity then return 0 end -- mandatory
     return Nums:distancePointsFake(self.worldx, self.worldy, _entity.worldx, _entity.worldy)
+end
+
+function CEntity:interactedtoAppend(_entity) -- append an entity interactedto
+    if not _entity then return end -- mandatory
+    if not _entity:hasInteractions() then return end -- no interaction possible
+    Tables:keyAppend(self.interactedto, _entity)
+end
+
+function CEntity:interactedtoDelete(_entity) -- delete an entity interactedto
+    if not _entity then return end -- mandatory
+    Tables:keyDelete(self.interactedto, _entity)
+end
+
+function CEntity:interactedbyAppend(_entity) -- append an entity interactedby
+    if not _entity then return end -- mandatory
+    if not self:hasInteractions() then return end -- no interaction possible
+    Tables:keyAppend(self.interactedby, _entity)
+end
+
+function CEntity:interactedbyDelete(_entity) -- delete an entity interactedby
+    if not _entity then return end -- mandatory
+    Tables:keyDelete(self.interactedby, _entity)
+end
+
+function CEntity:hasInteractedTo() -- has interactedto ?
+    return Tables:size(self.interactedto) > 0
+end
+
+function CEntity:hasInteractedBy() -- has interactedby ?
+    return Tables:size(self.interactedby) > 0
+end
+
+function CEntity:hasInteractions() -- has interactions ?
+    return Tables:size(self.interactions) > 0
 end
 
 
@@ -1868,7 +1917,7 @@ function CEntityDrawable:new(_argt)
     self.dirx        = Nums:random01() -- random flip lf/rg
     self.scale       = CSprite.SCALE01
     self.animations  = nil -- override if any
-    self.spotted     = false -- use spotted to draw a border
+    self.spotting     = false -- use spotting to draw a border
     self.hitbox      = CHitbox{entity = self} -- hitbox if any
     self.drawborders = false -- draw behaviour
     self.drawhitbox  = false
@@ -1905,13 +1954,13 @@ function CEntityDrawable:draw() -- default draw for drawable entities -- overrid
     _musprite.palette = _palette
     _musprite:draw()
 
-    self:drawSpotted()
+    self:drawSpotting()
     self:drawBorders()
     self:drawHitbox()
 end
 
-function CEntityDrawable:drawSpotted() -- draw spotted if any
-    if not self.spotted then return end -- nothing to draw
+function CEntityDrawable:drawSpotting() -- draw spotting if any
+    if not self.spotting then return end -- nothing to draw
     local _musprite = CSpriteBG() -- multi usage unique sprite
     _musprite.sprite  = CSpriteBG.SIGNSPOSQU
     _musprite.screenx = self.screenx
@@ -3036,9 +3085,10 @@ function CCharacter:new(_argt)
     self.state        = Tic.STATESTANDIDLE -- state
     self.idlecycler   = CCyclerInt{maxindex = 59,} -- cycler to get back to idle
     self.workcycler   = CCyclerInt{maxindex = 179,} -- cycler to animate work
-    self.spotting     = nil -- spotted entity if any
-    self.drawspotting = false -- lock its spotted
-    self.lockspotting = false -- lock its spotted
+    self.spotting     = nil -- spotting entity if any
+    self.spottingdraw = false -- draw its spotting
+    self.spottinglock = false -- lock its spotting
+    self.spottingpick = false -- pick its spotting
     self.colorhairsfg = Tic.COLORHAIRSFG -- colors
     self.colorhairsbg = Tic.COLORHAIRSBG
     self.colorextra   = Tic.COLOREXTRA
@@ -3241,7 +3291,7 @@ function CCharacter:draw() -- set animations and draw layers
     self:drawShield()
     self:drawBody()
     self:drawHead()
-    self:drawSpotted()
+    self:drawSpotting()
     self:drawBorders()
     self:drawHitbox()
     self:drawView()
@@ -3402,6 +3452,7 @@ function CCharacter:drawInteract()
     if not (self == Tic:playerActual()) then return end -- dont draw
     local _posture         = self:postureGet()
     if _posture == Tic.POSTUREFLOOR then return end -- dont draw
+    if not self:hasInteractedTo() then return end -- dont draw
     local _posturesettings = Tic.POSTURESETTINGS[_posture]
     local _xoffset         = _posturesettings.headxoffset
     _xoffset               = (self.dirx == Tic.DIRXLF)
@@ -3477,19 +3528,27 @@ function CCharacter:toggleFrame() -- toggle frame 0-1
 end
 
 function CCharacter:spottingToggleDraw()
-	self.drawspotting = Nums:toggleTF(self.drawspotting)
+	self.spottingdraw = Nums:toggleTF(self.spottingdraw)
 end
 
 function CCharacter:spottingToggleLock()
-	self.lockspotting = Nums:toggleTF(self.lockspotting)
+	self.spottinglock = Nums:toggleTF(self.spottinglock)
+end
+
+function CCharacter:spottingTogglePick()
+	self.spottingpick = Nums:toggleTF(self.spottingpick)
 end
 
 function CCharacter:isSpottingDraw()
-	return self.drawspotting
+	return self.spottingdraw
 end
 
 function CCharacter:isSpottingLock()
-	return self.lockspotting
+	return self.spottinglock
+end
+
+function CCharacter:isSpottingPick()
+	return self.spottingpick
 end
 
 function CCharacter:entitySpotting()
@@ -4555,10 +4614,10 @@ end
 
 
 --
--- IWindowSpotted -- spotted windows implementation
+-- IWindowSpotting -- spotting windows implementation
 --
-local IWindowSpotted = CWindow:extend() -- generic spotted window
-IWindowSpotted.BEHAVIOUR = function(self)
+local IWindowSpotting = CWindow:extend() -- generic spotting window
+IWindowSpotting.BEHAVIOUR = function(self)
     self.entity = Tic:entitySpotting()
     IWindowEntity.BEHAVIOUR(self)
 end
@@ -4567,14 +4626,14 @@ end
 --
 -- CWindowSpottingInfos
 --
-local CWindowSpottingInfos = CWindowInfosEntity:extend() -- window infos for spotted
-Classic.KINDWINDOWINFOSSPOTTED = "WindowSpottingInfos" -- WindowSpottingInfos kind
+local CWindowSpottingInfos = CWindowInfosEntity:extend() -- window infos for spotting
+Classic.KINDWINDOWSPOTTINGINFOS = "WindowSpottingInfos" -- WindowSpottingInfos kind
 function CWindowSpottingInfos:new(_argt)
     CWindowSpottingInfos.super.new(self, _argt)
-    self.kind = Classic.KINDWINDOWINFOSSPOTTED
-    self.screenx   = Tic.SPOTTEDINFOSWX
-    self.screeny   = Tic.SPOTTEDINFOSWY
-    self.behaviour = IWindowSpotted.BEHAVIOUR
+    self.kind = Classic.KINDWINDOWSPOTTINGINFOS
+    self.screenx   = Tic.SPOTTINGINFOSWX
+    self.screeny   = Tic.SPOTTINGINFOSWY
+    self.behaviour = IWindowSpotting.BEHAVIOUR
     self:argt(_argt) -- override if any
 end
 
@@ -4582,21 +4641,21 @@ end
 --
 -- CWindowSpottingPortrait
 --
-local CWindowSpottingPortrait = CWindowPortraitDrawable:extend() -- window portrait for spotted
-Classic.KINDWINDOWPORTRAITSPOTTED = "WindowSpottingPortrait" -- WindowSpottingPortrait kind
+local CWindowSpottingPortrait = CWindowPortraitDrawable:extend() -- window portrait for spotting
+Classic.KINDWINDOWSPOTTINGPORTRAIT = "WindowSpottingPortrait" -- WindowSpottingPortrait kind
 function CWindowSpottingPortrait:new(_argt)
     CWindowSpottingPortrait.super.new(self, _argt)
-    self.kind = Classic.KINDWINDOWPORTRAITSPOTTED
-    self.screenx   = Tic.SPOTTEDPORTRAITWX
-    self.screeny   = Tic.SPOTTEDPORTRAITWY
-    self.behaviour = IWindowSpotted.BEHAVIOUR
+    self.kind = Classic.KINDWINDOWSPOTTINGPORTRAIT
+    self.screenx   = Tic.SPOTTINGPORTRAITWX
+    self.screeny   = Tic.SPOTTINGPORTRAITWY
+    self.behaviour = IWindowSpotting.BEHAVIOUR
     self:argt(_argt) -- override if any
 end
 
 function CWindowSpottingPortrait:draw()
     if self.entity then
-        self.entity:save{"spotted"}
-        self.entity.spotted = false -- dont draw spotted frame in window
+        self.entity:save{"spotting"}
+        self.entity.spotting = false -- dont draw spotting frame in window
     end
     CWindowSpottingPortrait.super.draw(self)
     if self.entity then
@@ -4649,7 +4708,7 @@ function CWindowWorld:drawPlayerActual()
             for _entity, _ in pairs(_locationsaround[_keyy][_keyx]) do -- entities around actual player
                 local _entityworldregion = _entity:worldRegion()
 
-                _entity.spotted = (_entity == _playeractual:entitySpotting() and _playeractual:isSpottingDraw()) -- unspot all entities except spotted one if any
+                _entity.spotting = (_entity == _playeractual:entitySpotting() and _playeractual:isSpottingDraw()) -- unspot all entities except spotting one if any
                     and true
                     or  false
 
@@ -5088,7 +5147,7 @@ end
 --
 -- CButtonSpottingDraw
 --
-local CButtonSpottingDraw = CButtonCheck:extend() -- generic drawspotting check button
+local CButtonSpottingDraw = CButtonCheck:extend() -- generic spottingdraw check button
 CButtonSpottingDraw.BEHAVIOUR = function(self)
     self.checked = Tic:isSpottingDraw()
     CButton.BEHAVIOUR(self)
@@ -5107,7 +5166,7 @@ end
 --
 -- CButtonSpottingLock
 --
-local CButtonSpottingLock = CButtonCheck:extend() -- generic lockspotting check button
+local CButtonSpottingLock = CButtonCheck:extend() -- generic spottinglock check button
 CButtonSpottingLock.BEHAVIOUR = function(self)
     self.checked = Tic:isSpottingLock()
     CButton.BEHAVIOUR(self)
@@ -5119,6 +5178,25 @@ function CButtonSpottingLock:new(_argt)
 	self.behaviour     = CButtonSpottingLock.BEHAVIOUR  -- function to trigger at first
     self.clicklf       = function() Tic:spottingToggleLock() end
     self.hovertext     = "Lock"
+    self:argt(_argt) -- override if any
+end
+
+
+--
+-- CButtonSpottingPick
+--
+local CButtonSpottingPick = CButtonCheck:extend() -- generic spottingpick check button
+CButtonSpottingPick.BEHAVIOUR = function(self)
+    self.checked = Tic:isSpottingPick()
+    CButton.BEHAVIOUR(self)
+end
+function CButtonSpottingPick:new(_argt)
+    CButtonSpottingPick.super.new(self, _argt)
+    self.drawborder    = false
+	self.sprite.sprite = CSpriteBG.SIGNPICKIT
+	self.behaviour     = CButtonSpottingPick.BEHAVIOUR  -- function to trigger at first
+    self.clicklf       = function() Tic:spottingTogglePick() end
+    self.hovertext     = "Pick"
     self:argt(_argt) -- override if any
 end
 
@@ -5418,10 +5496,11 @@ local ScreenWorldLF = CScreen{}
 local WindowSpottingInfos    = CWindowSpottingInfos{}
 local ButtonSpottingDraw     = CButtonSpottingDraw{}
 local ButtonSpottingLock     = CButtonSpottingLock{}
+local ButtonSpottingPick     = CButtonSpottingPick{}
 ScreenWorldLF:elementsDistributeH(
-    {ButtonSpottingDraw, ButtonSpottingLock},
+    {ButtonSpottingDraw, ButtonSpottingLock, ButtonSpottingPick},
     WindowSpottingInfos.screenx + (
-        (WindowSpottingInfos.screenw - CScreen:elementsTotalH({ButtonSpottingDraw, ButtonSpottingLock})) // 2),
+        (WindowSpottingInfos.screenw - CScreen:elementsTotalH({ButtonSpottingDraw, ButtonSpottingLock, ButtonSpottingPick})) // 2),
     WindowSpottingInfos.screeny - Tic.SPRITESIZE
 )
 local WindowSpottingPortrait = CWindowSpottingPortrait{}
@@ -5462,6 +5541,7 @@ ScreenWorldLF:appendElements{
     WindowSpottingPortrait,
     ButtonSpottingDraw,
     ButtonSpottingLock,
+    ButtonSpottingPick,
     ButtonSpottingLF,
     ButtonSpottingUP,
     ButtonSpottingDW,
@@ -5474,7 +5554,7 @@ ScreenWorldLF:appendElements{
 
 -- md panel
 local ScreenWorldMD = CScreen{}
-local WindowWorld      = CWindowWorld{spottedwindows = {WindowSpottingInfos, WindowSpottingPortrait}}
+local WindowWorld      = CWindowWorld{spottingwindows = {WindowSpottingInfos, WindowSpottingPortrait}}
 local WindowInfosWorld = CWindowInfosWorld{}
 ScreenWorldMD:appendElements{
     WindowWorld,
@@ -5814,7 +5894,8 @@ local Oxboow = CPlayerGhost{name = "Oxboow",
     statphyact = 10,
     statmenact = 10,
     statpsyact = 10,
-    drawspotted = true,
+    spottingdraw = true,
+    interactedto = {10}
 }
 -- Oxboow:randomWorldWindow()
 -- Tic:traceTable("ox", Oxboow.hitbox, {indent = " ", depth = 1})
