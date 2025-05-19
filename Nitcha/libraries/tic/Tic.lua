@@ -1936,12 +1936,11 @@ function CEntityDrawable:new(_argt)
     self.scale       = CSprite.SCALE01
     self.animations  = nil -- override if any
     self.spotted     = false -- use spotted to draw a border
-    -- self.hitbox      = CHitbox{entity = self} -- hitbox if any
+    self.hitbox       = CHitbox{entity = self, lf = 0, rg = 7, up = 0, dw = 7}
     self.drawborders = false -- draw behaviour
     self.drawhitbox  = false
     self.drawfade    = false
     self:argt(_argt) -- override if any
-    self.hitbox       = CHitbox{entity = self, lf = 0, rg = 7, up = 0, dw = 7}
     self.world:appendEntity(self) -- append itself to the world
 end
 
@@ -2168,10 +2167,7 @@ function CPlaceBuild:new(_argt)
     CPlaceBuild.super.new(self, _argt)
     self.kind = Classic.KINDBUILD
     self.name = Classic.NAMEANIMED
-    self.hitbox.lf = 2
-    self.hitbox.rg = 4
-    self.hitbox.up = 5
-    self.hitbox.dw = 7
+    self.hitbox      = CHitbox{entity = self, lf = 2, rg = 4, up = 5, dw = 7}
     self.palettefade = CPlaceBuild.PALETTEFADE
     self:argt(_argt) -- override if any
 end
@@ -2268,7 +2264,7 @@ function CPlaceManor:new(_argt)
     CPlaceManor.super.new(self, _argt)
     self.kind = Classic.KINDMANOR
     self.sprite  = CSpriteBG.PLACEMANOR
-    self.hitbox.lf = 1
+    self.hitbox  = CHitbox{entity = self, lf = 1, rg = 4, up = 5, dw = 7}
     self:argt(_argt) -- override if any
 end
 
@@ -2316,7 +2312,7 @@ function CPlaceKirke:new(_argt)
     CPlaceKirke.super.new(self, _argt)
     self.kind = Classic.KINDKIRKE
     self.sprite  = CSpriteBG.PLACEKIRKE
-    self.hitbox.lf = 1
+    self.hitbox  = CHitbox{entity = self, lf = 1, rg = 4, up = 5, dw = 7}
     self:argt(_argt) -- override if any
 end
 
@@ -2358,8 +2354,7 @@ function CPlaceWater:new(_argt)
     CPlaceWater.super.new(self, _argt)
     self.kind = Classic.KINDWATER
     self.sprite  = CSpriteBG.PLACEWATER
-    self.hitbox.lf = 1
-    self.hitbox.rg = 4
+    self.hitbox  = CHitbox{entity = self, lf = 1, rg = 4, up = 5, dw = 7}
     self:argt(_argt) -- override if any
 end
 
@@ -2401,8 +2396,7 @@ function CPlaceStall:new(_argt)
     CPlaceStall.super.new(self, _argt)
     self.kind = Classic.KINDSTALL
     self.sprite  = CSpriteBG.PLACESTALL
-    self.hitbox.lf = 0
-    self.hitbox.rg = 3
+    self.hitbox  = CHitbox{entity = self, lf = 0, rg = 3, up = 5, dw = 7}
     self:argt(_argt) -- override if any
 end
 
@@ -2464,10 +2458,7 @@ function CPlaceTrees:new(_argt)
     CPlaceTrees.super.new(self, _argt)
     self.kind = Classic.KINDTREES
     self.name = Classic.NAMELIVING
-    self.hitbox.lf = 2
-    self.hitbox.rg = 4
-    self.hitbox.up = 6
-    self.hitbox.dw = 7
+    self.hitbox       = CHitbox{entity = self, lf = 2, rg = 4, up = 6, dw = 7}
     self.palettefade = CPlaceTrees.PALETTEFADE
     self:argt(_argt) -- override if any
 end
@@ -2559,10 +2550,7 @@ function CPlaceStone:new(_argt)
     CPlaceStone.super.new(self, _argt)
     self.kind = Classic.KINDSTONE
     self.name = Classic.NAMEFITFUL
-    self.hitbox.lf = 2
-    self.hitbox.rg = 4
-    self.hitbox.up = 6
-    self.hitbox.dw = 7
+    self.hitbox      = CHitbox{entity = self, lf = 2, rg = 4, up = 6, dw = 7}
     self.palettefade = CPlaceStone.PALETTEFADE
     self:argt(_argt) -- override if any
 end
@@ -2651,11 +2639,8 @@ Classic.KINDDOLMN = "Dolmn" -- Dolmn kind
 function CPlaceDolmn:new(_argt)
     CPlaceDolmn.super.new(self, _argt)
     self.kind = Classic.KINDDOLMN
-    self.sprite      = CSpriteBG.PLACEDOLMN
-    self.hitbox.lf = 1
-    self.hitbox.rg = 4
-    self.hitbox.up = 6
-    self.hitbox.dw = 7
+    self.sprite = CSpriteBG.PLACEDOLMN
+    self.hitbox = CHitbox{entity = self, lf = 1, rg = 4, up = 6, dw = 7}
      self:argt(_argt) -- override if any
 end
 
@@ -2730,11 +2715,8 @@ Classic.KINDCIRKL = "Cirkl" -- Cirkl kind
 function CPlaceCirkl:new(_argt)
     CPlaceCirkl.super.new(self, _argt)
     self.kind = Classic.KINDCIRKL
-    self.sprite      = CSpriteBG.PLACECIRKL
-    self.hitbox.lf = 3
-    self.hitbox.rg = 4
-    self.hitbox.up = 6
-    self.hitbox.dw = 7
+    self.sprite = CSpriteBG.PLACECIRKL
+    self.hitbox = CHitbox{entity = self, lf = 3, rg = 4, up = 6, dw = 7}
     self:argt(_argt) -- override if any
 end
 
@@ -3100,6 +3082,7 @@ function CCharacter:new(_argt)
     self.state        = Tic.STATESTANDIDLE -- state
     self.idlecycler   = CCyclerInt{maxindex = 59} -- cycler to get back to idle
     self.workcycler   = CCyclerInt{maxindex = 179} -- cycler to animate work
+    self.hitbox       = CHitbox{entity = self, lf = 2, rg = 4, up = 5, dw = 7}
     self.spotting     = nil -- spotting entity if any
     self.spottingdraw = false -- draw its spotting
     self.spottinglock = false -- lock its spotting
@@ -3128,7 +3111,6 @@ function CCharacter:new(_argt)
     self.drawmind     = false
     self.drawmove     = false
     self:argt(_argt) -- override if any
-    self.hitbox       = CHitbox{entity = self, lf = 2, rg = 4, up = 5, dw = 7}
     self.camera       = CCamera{name = self.name.." "..Classic.NAMECAMERA} -- one camera per character
     self:focus() -- focus its camera on itself
 end
