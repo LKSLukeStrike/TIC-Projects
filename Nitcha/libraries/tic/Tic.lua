@@ -1936,11 +1936,12 @@ function CEntityDrawable:new(_argt)
     self.scale       = CSprite.SCALE01
     self.animations  = nil -- override if any
     self.spotted     = false -- use spotted to draw a border
-    self.hitbox      = CHitbox{entity = self} -- hitbox if any
+    -- self.hitbox      = CHitbox{entity = self} -- hitbox if any
     self.drawborders = false -- draw behaviour
     self.drawhitbox  = false
     self.drawfade    = false
     self:argt(_argt) -- override if any
+    self.hitbox       = CHitbox{entity = self, lf = 0, rg = 7, up = 0, dw = 7}
     self.world:appendEntity(self) -- append itself to the world
 end
 
@@ -3096,13 +3097,9 @@ function CCharacter:new(_argt)
     self.dirx         = Tic.DIRXLF -- directions
     self.diry         = Tic.DIRYMD
     self.direction    = Tic.DIR270
-    self.hitbox.lf    = 2
-    self.hitbox.rg    = 4
-    self.hitbox.up    = 5
-    self.hitbox.dw    = 7
     self.state        = Tic.STATESTANDIDLE -- state
-    self.idlecycler   = CCyclerInt{maxindex = 59,} -- cycler to get back to idle
-    self.workcycler   = CCyclerInt{maxindex = 179,} -- cycler to animate work
+    self.idlecycler   = CCyclerInt{maxindex = 59} -- cycler to get back to idle
+    self.workcycler   = CCyclerInt{maxindex = 179} -- cycler to animate work
     self.spotting     = nil -- spotting entity if any
     self.spottingdraw = false -- draw its spotting
     self.spottinglock = false -- lock its spotting
@@ -3131,6 +3128,7 @@ function CCharacter:new(_argt)
     self.drawmind     = false
     self.drawmove     = false
     self:argt(_argt) -- override if any
+    self.hitbox       = CHitbox{entity = self, lf = 2, rg = 4, up = 5, dw = 7}
     self.camera       = CCamera{name = self.name.." "..Classic.NAMECAMERA} -- one camera per character
     self:focus() -- focus its camera on itself
 end
@@ -5906,7 +5904,7 @@ local Oxboow = CPlayerGhost{name = "Oxboow",
     statpsyact = 10,
     spottingdraw = true,
     spottinglock = true,
-    hitbox = nil,
+    hitbox = Classic.NIL,
     -- interactedto = {10}
 }
 -- Oxboow:randomWorldWindow()

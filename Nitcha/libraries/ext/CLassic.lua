@@ -12,6 +12,8 @@
 local Classic = {}
 Classic.__index = Classic
 
+Classic.NIL = "~~NiL~~" --used to remove fields
+
 
 function Classic:new(...)
   self._savestack = {} -- for saving/loading fields -- {{k = v, ...}, ...}
@@ -140,7 +142,11 @@ end
 
 function Classic:argt(_argt) -- set a classic tables key/val from a _argt table {k = v, ...}
   for _key, _val in pairs(_argt or {}) do
-    self[_key] = _val
+    if _val == Classic.NIL then
+      self[_key] = nil -- remove a key
+    else
+      self[_key] = _val
+    end
   end
 end
 
