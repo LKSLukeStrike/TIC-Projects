@@ -169,6 +169,7 @@ Tic.DIR180 = 180
 Tic.DIR225 = 225
 Tic.DIR270 = 270
 Tic.DIR315 = 315
+Tic.DIRHIT = -1  -- no direction (in case of matching positions)
 Tic.OFFSETZERO = 00 -- offsets for moving in line or diagonal
 Tic.OFFSETDIAG = 07
 Tic.OFFSETLINE = 10
@@ -1404,6 +1405,23 @@ function CRegion:hasInsideRegion(_region) -- is a region inside a region ?
 	if self:hasInsidePoint(_region.lf, _region.dw) then return true end
 	if self:hasInsidePoint(_region.rg, _region.dw) then return true end
 	return false
+end
+
+function CRegion:directionRegion(_region) -- returns the direction from a region to a region
+    if not _region then return end -- mandatory
+    if self.up > _region.dw then -- lower than entity
+        if self.lf > _region.rg then return Tic.DIR315 end
+        if self.rg < _region.lf then return Tic.DIR045 end
+        return Tic.DIR000
+    elseif self.dw < _region.up then -- upper than entity
+        if self.lf > _region.rg then return Tic.DIR225 end
+        if self.rg < _region.lf then return Tic.DIR135 end
+        return Tic.DIR180
+    else -- same level than entity
+        if self.rg < _region.lf then return Tic.DIR090 end
+        if self.lf > _region.rg then return Tic.DIR270 end
+        return Tic.DIRHIT
+    end
 end
 
 
@@ -4467,6 +4485,17 @@ function CWindowPlayerPortrait:new(_argt)
     self:argt(_argt) -- override if any
 end
 
+function CWindowPlayerPortrait:draw()
+    if self.entity then
+        self.entity:save{"interactedto"}
+        self.entity.interactedto = {} -- dont draw interact in window
+    end
+    CWindowPlayerPortrait.super.draw(self)
+    if self.entity then
+        self.entity:load()
+    end
+end
+
 
 --
 -- CWindowStats
@@ -4699,7 +4728,7 @@ function CWindowWorld:drawPlayerActual()
     local _regionmindworld  = _playeractual:regionMindWorld()
     local _nearestentity    = _playeractual:nearestEntityViewWorld() -- nearest entity if any -- except itself
 
-    if not _playeractual:isSpottingLock() then
+    if not _playeractual.spotting or not _playeractual:isSpottingLock() then
         _playeractual.spotting  = _nearestentity
     end
     
@@ -4954,11 +4983,11 @@ end
 
 
 --
--- CButtonArrowLF
+-- CButtonArrow270
 --
-local CButtonArrowLF = CButtonArrowLine:extend() -- generic arrow LF click button
-function CButtonArrowLF:new(_argt)
-    CButtonArrowLF.super.new(self, _argt)
+local CButtonArrow270 = CButtonArrowLine:extend() -- generic arrow 270 click button
+function CButtonArrow270:new(_argt)
+    CButtonArrow270.super.new(self, _argt)
     self.direction     = Tic.DIR270
 	self.sprite.rotate = CSprite.ROTATE270
     self:argt(_argt) -- override if any
@@ -4966,11 +4995,11 @@ end
 
 
 --
--- CButtonArrowRG
+-- CButtonArrow090
 --
-local CButtonArrowRG = CButtonArrowLine:extend() -- generic arrow RG click button
-function CButtonArrowRG:new(_argt)
-    CButtonArrowRG.super.new(self, _argt)
+local CButtonArrow090 = CButtonArrowLine:extend() -- generic arrow 090 click button
+function CButtonArrow090:new(_argt)
+    CButtonArrow090.super.new(self, _argt)
     self.direction     = Tic.DIR090
 	self.sprite.rotate = CSprite.ROTATE090
     self:argt(_argt) -- override if any
@@ -4978,11 +5007,11 @@ end
 
 
 --
--- CButtonArrowUP
+-- CButtonArrow000
 --
-local CButtonArrowUP = CButtonArrowLine:extend() -- generic arrow UP click button
-function CButtonArrowUP:new(_argt)
-    CButtonArrowUP.super.new(self, _argt)
+local CButtonArrow000 = CButtonArrowLine:extend() -- generic arrow 000 click button
+function CButtonArrow000:new(_argt)
+    CButtonArrow000.super.new(self, _argt)
     self.direction     = Tic.DIR000
 	self.sprite.rotate = CSprite.ROTATE000
     self:argt(_argt) -- override if any
@@ -4990,11 +5019,11 @@ end
 
 
 --
--- CButtonArrowDW
+-- CButtonArrow180
 --
-local CButtonArrowDW = CButtonArrowLine:extend() -- generic arrow DW click button
-function CButtonArrowDW:new(_argt)
-    CButtonArrowDW.super.new(self, _argt)
+local CButtonArrow180 = CButtonArrowLine:extend() -- generic arrow 180 click button
+function CButtonArrow180:new(_argt)
+    CButtonArrow180.super.new(self, _argt)
     self.direction     = Tic.DIR180
 	self.sprite.rotate = CSprite.ROTATE180
     self:argt(_argt) -- override if any
@@ -5002,11 +5031,11 @@ end
 
 
 --
--- CButtonArrowUL
+-- CButtonArrow315
 --
-local CButtonArrowUL = CButtonArrowDiag:extend() -- generic arrow UL click button
-function CButtonArrowUL:new(_argt)
-    CButtonArrowUL.super.new(self, _argt)
+local CButtonArrow315 = CButtonArrowDiag:extend() -- generic arrow 315 click button
+function CButtonArrow315:new(_argt)
+    CButtonArrow315.super.new(self, _argt)
     self.direction     = Tic.DIR315
 	self.sprite.rotate = CSprite.ROTATE000
     self:argt(_argt) -- override if any
@@ -5014,11 +5043,11 @@ end
 
 
 --
--- CButtonArrowUR
+-- CButtonArrow045
 --
-local CButtonArrowUR = CButtonArrowDiag:extend() -- generic arrow UR click button
-function CButtonArrowUR:new(_argt)
-    CButtonArrowUR.super.new(self, _argt)
+local CButtonArrow045 = CButtonArrowDiag:extend() -- generic arrow 045 click button
+function CButtonArrow045:new(_argt)
+    CButtonArrow045.super.new(self, _argt)
     self.direction     = Tic.DIR045
 	self.sprite.rotate = CSprite.ROTATE090
     self:argt(_argt) -- override if any
@@ -5026,11 +5055,11 @@ end
 
 
 --
--- CButtonArrowDR
+-- CButtonArrow135
 --
-local CButtonArrowDR = CButtonArrowDiag:extend() -- generic arrow DR click button
-function CButtonArrowDR:new(_argt)
-    CButtonArrowDR.super.new(self, _argt)
+local CButtonArrow135 = CButtonArrowDiag:extend() -- generic arrow 135 click button
+function CButtonArrow135:new(_argt)
+    CButtonArrow135.super.new(self, _argt)
     self.direction     = Tic.DIR135
 	self.sprite.rotate = CSprite.ROTATE180
     self:argt(_argt) -- override if any
@@ -5038,11 +5067,11 @@ end
 
 
 --
--- CButtonArrowDL
+-- CButtonArrow225
 --
-local CButtonArrowDL = CButtonArrowDiag:extend() -- generic arrow DL click button
-function CButtonArrowDL:new(_argt)
-    CButtonArrowDL.super.new(self, _argt)
+local CButtonArrow225 = CButtonArrowDiag:extend() -- generic arrow 225 click button
+function CButtonArrow225:new(_argt)
+    CButtonArrow225.super.new(self, _argt)
     self.direction     = Tic.DIR225
 	self.sprite.rotate = CSprite.ROTATE270
     self:argt(_argt) -- override if any
@@ -5106,7 +5135,7 @@ end
 --
 -- CButtonPlayerPrev
 --
-local CButtonPlayerPrev = CButtonArrowLF:extend() -- generic player prev button
+local CButtonPlayerPrev = CButtonArrow270:extend() -- generic player prev button
 function CButtonPlayerPrev:new(_argt)
     CButtonPlayerPrev.super.new(self, _argt)
 	self.behaviour     = IButtonPlayer.BEHAVIOUR  -- function to trigger at first
@@ -5119,7 +5148,7 @@ end
 --
 -- CButtonPlayerNext
 --
-local CButtonPlayerNext = CButtonArrowRG:extend() -- generic player next button
+local CButtonPlayerNext = CButtonArrow090:extend() -- generic player next button
 function CButtonPlayerNext:new(_argt)
     CButtonPlayerNext.super.new(self, _argt)
 	self.behaviour     = IButtonPlayer.BEHAVIOUR  -- function to trigger at first
@@ -5212,42 +5241,23 @@ IButtonSpotting.BEHAVIOUR = function(self)
     if not self.display then return end -- no spotting
     local _playerworldregion = Tic:playerActual():worldRegion()
     local _entityworldregion = Tic:entitySpotting():worldRegion()
+    local _direction         = _playerworldregion:directionRegion(_entityworldregion)
     self.enabled = true
     self.actived = false
-    if _playerworldregion.up > _entityworldregion.dw then -- lower than entity
-        if _playerworldregion.lf > _entityworldregion.rg and self.direction == Tic.DIR315 then
-            self.actived = true
-        elseif _playerworldregion.rg < _entityworldregion.lf and self.direction == Tic.DIR045 then
-            self.actived = true
-        elseif _playerworldregion.lf <= _entityworldregion.rg and  _playerworldregion.rg >= _entityworldregion.lf and self.direction == Tic.DIR000 then
-            self.actived = true
-        end
-    elseif _playerworldregion.dw < _entityworldregion.up then -- upper than entity
-        if _playerworldregion.lf > _entityworldregion.rg and self.direction == Tic.DIR225 then
-            self.actived = true
-        elseif _playerworldregion.rg < _entityworldregion.lf and self.direction == Tic.DIR135 then
-            self.actived = true
-        elseif _playerworldregion.lf <= _entityworldregion.rg and _playerworldregion.rg >= _entityworldregion.lf and self.direction == Tic.DIR180 then
-            self.actived = true
-        end
-    else -- same level than entity
-        if _playerworldregion.rg < _entityworldregion.lf and self.direction == Tic.DIR090 then
-            self.actived = true
-        elseif _playerworldregion.lf > _entityworldregion.rg and self.direction == Tic.DIR270 then
-            self.actived = true
-        elseif _playerworldregion.rg >= _entityworldregion.lf and _playerworldregion.lf <= _entityworldregion.rg then
-            self.hovered = true
-        end
+    if _direction == self.direction then
+        self.actived = true
+    else
+        self.hovered = true
     end
 end
 
 
 --
--- CButtonSpottingLF
+-- CButtonSpotting000
 --
-local CButtonSpottingLF = CButtonArrowLF:extend() -- generic spotting LF button
-function CButtonSpottingLF:new(_argt)
-    CButtonSpottingLF.super.new(self, _argt)
+local CButtonSpotting000 = CButtonArrow000:extend() -- generic spotting 000 button
+function CButtonSpotting000:new(_argt)
+    CButtonSpotting000.super.new(self, _argt)
     self.sprite.palette = IButtonSpotting.PALETTE
     self.behaviour      = IButtonSpotting.BEHAVIOUR
     self:argt(_argt) -- override if any
@@ -5255,11 +5265,11 @@ end
 
 
 --
--- CButtonSpottingUP
+-- CButtonSpotting045
 --
-local CButtonSpottingUP = CButtonArrowUP:extend() -- generic spotting UP button
-function CButtonSpottingUP:new(_argt)
-    CButtonSpottingUP.super.new(self, _argt)
+local CButtonSpotting045 = CButtonArrow045:extend() -- generic spotting 045 button
+function CButtonSpotting045:new(_argt)
+    CButtonSpotting045.super.new(self, _argt)
     self.sprite.palette = IButtonSpotting.PALETTE
     self.behaviour      = IButtonSpotting.BEHAVIOUR
     self:argt(_argt) -- override if any
@@ -5267,11 +5277,11 @@ end
 
 
 --
--- CButtonSpottingDW
+-- CButtonSpotting090
 --
-local CButtonSpottingDW = CButtonArrowDW:extend() -- generic spotting DW button
-function CButtonSpottingDW:new(_argt)
-    CButtonSpottingDW.super.new(self, _argt)
+local CButtonSpotting090 = CButtonArrow090:extend() -- generic spotting 090 button
+function CButtonSpotting090:new(_argt)
+    CButtonSpotting090.super.new(self, _argt)
     self.sprite.palette = IButtonSpotting.PALETTE
     self.behaviour      = IButtonSpotting.BEHAVIOUR
     self:argt(_argt) -- override if any
@@ -5279,11 +5289,11 @@ end
 
 
 --
--- CButtonSpottingRG
+-- CButtonSpotting135
 --
-local CButtonSpottingRG = CButtonArrowRG:extend() -- generic spotting RG button
-function CButtonSpottingRG:new(_argt)
-    CButtonSpottingRG.super.new(self, _argt)
+local CButtonSpotting135 = CButtonArrow135:extend() -- generic spotting 135 button
+function CButtonSpotting135:new(_argt)
+    CButtonSpotting135.super.new(self, _argt)
     self.sprite.palette = IButtonSpotting.PALETTE
     self.behaviour      = IButtonSpotting.BEHAVIOUR
     self:argt(_argt) -- override if any
@@ -5291,11 +5301,11 @@ end
 
 
 --
--- CButtonSpottingUL
+-- CButtonSpotting180
 --
-local CButtonSpottingUL = CButtonArrowUL:extend() -- generic spotting UL button
-function CButtonSpottingUL:new(_argt)
-    CButtonSpottingUL.super.new(self, _argt)
+local CButtonSpotting180 = CButtonArrow180:extend() -- generic spotting 180 button
+function CButtonSpotting180:new(_argt)
+    CButtonSpotting180.super.new(self, _argt)
     self.sprite.palette = IButtonSpotting.PALETTE
     self.behaviour      = IButtonSpotting.BEHAVIOUR
     self:argt(_argt) -- override if any
@@ -5303,11 +5313,11 @@ end
 
 
 --
--- CButtonSpottingUR
+-- CButtonSpotting225
 --
-local CButtonSpottingUR = CButtonArrowUR:extend() -- generic spotting UR button
-function CButtonSpottingUR:new(_argt)
-    CButtonSpottingUR.super.new(self, _argt)
+local CButtonSpotting225 = CButtonArrow225:extend() -- generic spotting 225 button
+function CButtonSpotting225:new(_argt)
+    CButtonSpotting225.super.new(self, _argt)
     self.sprite.palette = IButtonSpotting.PALETTE
     self.behaviour      = IButtonSpotting.BEHAVIOUR
     self:argt(_argt) -- override if any
@@ -5315,11 +5325,11 @@ end
 
 
 --
--- CButtonSpottingDL
+-- CButtonSpotting270
 --
-local CButtonSpottingDL = CButtonArrowDL:extend() -- generic spotting DL button
-function CButtonSpottingDL:new(_argt)
-    CButtonSpottingDL.super.new(self, _argt)
+local CButtonSpotting270 = CButtonArrow270:extend() -- generic spotting 270 button
+function CButtonSpotting270:new(_argt)
+    CButtonSpotting270.super.new(self, _argt)
     self.sprite.palette = IButtonSpotting.PALETTE
     self.behaviour      = IButtonSpotting.BEHAVIOUR
     self:argt(_argt) -- override if any
@@ -5327,11 +5337,11 @@ end
 
 
 --
--- CButtonSpottingDR
+-- CButtonSpotting315
 --
-local CButtonSpottingDR = CButtonArrowDR:extend() -- generic spotting DR button
-function CButtonSpottingDR:new(_argt)
-    CButtonSpottingDR.super.new(self, _argt)
+local CButtonSpotting315 = CButtonArrow315:extend() -- generic spotting 315 button
+function CButtonSpotting315:new(_argt)
+    CButtonSpotting315.super.new(self, _argt)
     self.sprite.palette = IButtonSpotting.PALETTE
     self.behaviour      = IButtonSpotting.BEHAVIOUR
     self:argt(_argt) -- override if any
@@ -5504,34 +5514,34 @@ ScreenWorldLF:elementsDistributeH(
     WindowSpottingInfos.screeny - Tic.SPRITESIZE
 )
 local WindowSpottingPortrait = CWindowSpottingPortrait{}
-local ButtonSpottingLF       = CButtonSpottingLF{}
-local ButtonSpottingUP       = CButtonSpottingUP{}
-local ButtonSpottingDW       = CButtonSpottingDW{}
-local ButtonSpottingRG       = CButtonSpottingRG{}
-local ButtonSpottingUL       = CButtonSpottingUL{}
-local ButtonSpottingUR       = CButtonSpottingUR{}
-local ButtonSpottingDL       = CButtonSpottingDL{}
-local ButtonSpottingDR       = CButtonSpottingDR{}
+local ButtonSpotting270      = CButtonSpotting270{}
+local ButtonSpotting000      = CButtonSpotting000{}
+local ButtonSpotting180      = CButtonSpotting180{}
+local ButtonSpotting090      = CButtonSpotting090{}
+local ButtonSpotting315      = CButtonSpotting315{}
+local ButtonSpotting045      = CButtonSpotting045{}
+local ButtonSpotting225      = CButtonSpotting225{}
+local ButtonSpotting135      = CButtonSpotting135{}
 ScreenWorldLF:elementsDistributeH(
-    {ButtonSpottingDR, ButtonSpottingDL},
+    {ButtonSpotting135, ButtonSpotting225},
     WindowSpottingPortrait.screenx - 6,
     WindowSpottingPortrait.screeny - Tic.SPRITESIZE + 2,
     12
 )
 ScreenWorldLF:elementsDistributeH(
-    {ButtonSpottingRG, ButtonSpottingLF},
+    {ButtonSpotting090, ButtonSpotting270},
     WindowSpottingPortrait.screenx - 7,
     WindowSpottingPortrait.screeny + 4,
     14
 )
 ScreenWorldLF:elementsDistributeV(
-    {ButtonSpottingDW, ButtonSpottingUP},
+    {ButtonSpotting180, ButtonSpotting000},
     WindowSpottingPortrait.screenx + 4,
     WindowSpottingPortrait.screeny - 7,
     14
 )
 ScreenWorldLF:elementsDistributeH(
-    {ButtonSpottingUR, ButtonSpottingUL},
+    {ButtonSpotting045, ButtonSpotting315},
     WindowSpottingPortrait.screenx - 6,
     WindowSpottingPortrait.screeny + WindowSpottingPortrait.screenh - 2,
     12
@@ -5542,14 +5552,14 @@ ScreenWorldLF:appendElements{
     ButtonSpottingDraw,
     ButtonSpottingLock,
     ButtonSpottingPick,
-    ButtonSpottingLF,
-    ButtonSpottingUP,
-    ButtonSpottingDW,
-    ButtonSpottingRG,
-    ButtonSpottingUL,
-    ButtonSpottingUR,
-    ButtonSpottingDL,
-    ButtonSpottingDR,
+    ButtonSpotting270,
+    ButtonSpotting000,
+    ButtonSpotting180,
+    ButtonSpotting090,
+    ButtonSpotting315,
+    ButtonSpotting045,
+    ButtonSpotting225,
+    ButtonSpotting135,
 }
 
 -- md panel
@@ -5643,10 +5653,10 @@ local Button7 = CButton{
     rounded = false,
     enabled = false,
 }
-local Button11 = CButtonArrowUL{}
-local Button12 = CButtonArrowDL{}
-local Button13 = CButtonArrowDR{}
-local Button14 = CButtonArrowUR{}
+local Button11 = CButtonArrow315{}
+local Button12 = CButtonArrow225{}
+local Button13 = CButtonArrow135{}
+local Button14 = CButtonArrow045{}
 local Button15 = CButtonCenter{}
 
 local Button16 = CButtonCenter{
@@ -5895,7 +5905,9 @@ local Oxboow = CPlayerGhost{name = "Oxboow",
     statmenact = 10,
     statpsyact = 10,
     spottingdraw = true,
-    interactedto = {10}
+    spottinglock = true,
+    hitbox = nil,
+    -- interactedto = {10}
 }
 -- Oxboow:randomWorldWindow()
 -- Tic:traceTable("ox", Oxboow.hitbox, {indent = " ", depth = 1})
@@ -6049,6 +6061,7 @@ CPlace:generateRoad(House1.worldx, House1.worldy, House2.worldx, House2.worldy, 
 })
 end
 
+if false then
 CPlaceMenh0Anim{worldx = -4, worldy = -10}
 CPlaceMenh1Anim{worldx = 0 , worldy = -10}
 CPlaceMenh0Idle{worldx = 10, worldy = -10}
@@ -6068,6 +6081,7 @@ CPlaceRoad0Anim{worldx = -4, worldy = -40}
 CPlaceRoad1Anim{worldx = 0 , worldy = -40}
 CPlaceRoad0Idle{worldx = 10, worldy = -40}
 CPlaceRoad1Idle{worldx = 14, worldy = -40}
+end
 
 -- Tic.DRAWHITBOX  = true
 -- Tic.DRAWBORDERS = true
@@ -6128,7 +6142,7 @@ function Tic:drawLog() -- [-] remove
 end
 
 function Tic:logRegion(_pfx, _region)
-    Tic:logAppend(_pfx, _region.up, _region.dw, _region.lf, _region.rg)
+    Tic:logAppend(_pfx, "u:".._region.up, "d:".._region.dw, "l:".._region.lf, "r:".._region.rg)
 end
 
 
