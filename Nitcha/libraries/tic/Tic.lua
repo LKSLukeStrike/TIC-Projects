@@ -2020,7 +2020,7 @@ function CEntityDrawable:drawRelativeToEntity(_entity) -- draw an entity relativ
 	self:load()
 end
 
-function CEntityDrawable:worldRegion() -- return its own region in world
+function CEntityDrawable:regionWorld() -- return its own region in world
     return CRegion{
         lf = self.worldx,
         rg = self.worldx + (Tic.SPRITESIZE * self.scale) - 1,
@@ -3641,10 +3641,10 @@ function CCharacter:moveDirection(_direction, _movenone,  _moveslow, _moveback) 
 
     local _characterhitbox   = self:hitboxRegionWorld() -- collisions system
     local _entitiesmoveworld = self:entitiesMoveWorld(_direction, _movenone,  _moveslow, _moveback)
-    local _entitieshitbox    = {}
+    local _entitieshitboxes  = {}
     for _entity, _ in pairs(_entitiesmoveworld or {}) do -- record the possible hitboxes
         if not (_entity == self) and _entity.hitbox then -- only with hitbox -- except itself
-            Tables:keyAppend(_entitieshitbox, _entity, _entity:hitboxRegionWorld())
+            Tables:keyAppend(_entitieshitboxes, _entity, _entity:hitboxRegionWorld())
         end
     end
 
@@ -3658,7 +3658,7 @@ function CCharacter:moveDirection(_direction, _movenone,  _moveslow, _moveback) 
     while _move do
         if _characterhitbox then -- only consider collisions if charater has an hitbox
             _characterhitbox = _characterhitbox:offsetXY(_movebyx, _movebyy) -- compute the future position
-            for _entity, _entityhitbox in pairs(_entitieshitbox) do
+            for _entity, _entityhitbox in pairs(_entitieshitboxes) do
                 if _characterhitbox:hasInsideRegion(_entityhitbox) then -- collision
                     Tables:keyAppend(_entitiescollided, _entity, _entity)
                 end
@@ -4706,27 +4706,36 @@ function CWindowWorld:drawPlayerActual()
     local _regionmindworld  = _playeractual:regionMindWorld()
     local _nearestentity    = _playeractual:nearestEntityViewWorld() -- nearest entity if any -- except itself
 
-    if not _playeractual.spotting or not _playeractual:isSpottingLock() then
+    if not _playeractual:entitySpotting() or not _playeractual:isSpottingLock() then
         _playeractual.spotting  = _nearestentity
+    end
+
+    if  _playeractual:entitySpotting()
+    and _playeractual:entitySpotting():hasInteractions() -- HH
+    and _playeractual:regionWorld():directionRegion(_playeractual:entitySpotting():regionWorld()) == Tic.DIRHIT
+    then
+        _playeractual.interactedto = {_playeractual:entitySpotting()}
+    else
+        _playeractual.interactedto = {}
     end
     
     for _, _keyy in pairs(Tables:keys(_locationsaround)) do -- draw entities -- sorted by y first
         for _, _keyx in pairs(Tables:keys(_locationsaround[_keyy])) do -- sorted by x next
             for _entity, _ in pairs(_locationsaround[_keyy][_keyx]) do -- entities around actual player
-                local _entityworldregion = _entity:worldRegion()
+                local _entityregionworld = _entity:regionWorld()
 
                 _entity.spotted = (_entity == _playeractual:entitySpotting() and _playeractual:isSpottingDraw()) -- unspot all entities except spotting one if any
                     and true
                     or  false
 
-                if _regionviewworld:hasInsideRegion(_entityworldregion) then -- if in view
+                if _regionviewworld:hasInsideRegion(_entityregionworld) then -- if in view
                     _entity.drawfade = false
                     _entity.discovered = true
                 else -- not in view
                     _entity.drawfade = true
                 end
 
-                if (_entity.drawfade == false) or (_regionmindworld:hasInsideRegion(_entityworldregion)) then -- draw entity ?
+                if (_entity.drawfade == false) or (_regionmindworld:hasInsideRegion(_entityregionworld)) then -- draw entity ?
                     _entity:drawRelativeToEntity(_playeractual)
                 end
 
@@ -5217,9 +5226,9 @@ IButtonSpotting.BEHAVIOUR = function(self)
     CButton.BEHAVIOUR(self)
     self.display = (Tic:entitySpotting()) and true or false
     if not self.display then return end -- no spotting
-    local _playerworldregion = Tic:playerActual():worldRegion()
-    local _entityworldregion = Tic:entitySpotting():worldRegion()
-    local _direction         = _playerworldregion:directionRegion(_entityworldregion)
+    local _playerregionworld = Tic:playerActual():regionWorld()
+    local _entityregionworld = Tic:entitySpotting():regionWorld()
+    local _direction         = _playerregionworld:directionRegion(_entityregionworld)
     self.enabled = true
     self.actived = false
     if _direction == self.direction then
@@ -5725,15 +5734,15 @@ function CPlace:generateRandomWorldWindow(_count, _kinds) -- random count of pla
     end
 end
 
-function CPlace:generateRandomRegionWorldCount(_count, _kinds, _worldregion) -- random number of places of kinds in region world
+function CPlace:generateRandomRegionWorldCount(_count, _kinds, _regionworld) -- random number of places of kinds in region world
     _count        = _count       or CPlace.PLACECOUNT
     _kinds        = _kinds       or CPlace.PLACEKINDS
-    _worldregion  = _worldregion or CRegionWorld{}
+    _regionworld  = _regionworld or CRegionWorld{}
     local _region = CRegion{
-        lf = _worldregion.worldx + _worldregion.region.lf,
-        rg = _worldregion.worldx + _worldregion.region.rg,
-        up = _worldregion.worldy + _worldregion.region.up,
-        dw = _worldregion.worldy + _worldregion.region.dw,
+        lf = _regionworld.worldx + _regionworld.region.lf,
+        rg = _regionworld.worldx + _regionworld.region.rg,
+        up = _regionworld.worldy + _regionworld.region.up,
+        dw = _regionworld.worldy + _regionworld.region.dw,
     }
 
     for _ = 1, _count do
@@ -5746,12 +5755,12 @@ function CPlace:generateRandomRegionWorldCount(_count, _kinds, _worldregion) -- 
     end
 end
 
-function CPlace:generateRandomRegionWorldPercent(_percent, _kinds, _worldregion) -- random percent of places of kinds in region world
+function CPlace:generateRandomRegionWorldPercent(_percent, _kinds, _regionworld) -- random percent of places of kinds in region world
     _percent      = _percent     or 100
     _kinds        = _kinds       or CPlace.PLACEKINDS
-    _worldregion  = _worldregion or CRegionWorld{}
-    local _count  = math.sqrt(_worldregion.region:surface()) * _percent // 100
-    CPlace:generateRandomRegionWorldCount(_count, _kinds, _worldregion)
+    _regionworld  = _regionworld or CRegionWorld{}
+    local _count  = math.sqrt(_regionworld.region:surface()) * _percent // 100
+    CPlace:generateRandomRegionWorldCount(_count, _kinds, _regionworld)
 end
 
 RegionWorldTree0 = CRegionWorld{
@@ -5875,6 +5884,7 @@ end -- generate places
 local Wulfie = CPlayerWolfe{name = "Wulfie",
     colorextra = Tic.COLORRED,
     worldx = -10,
+    interactions = {10},
 }
 -- Wulfie:randomWorldWindow()
 
