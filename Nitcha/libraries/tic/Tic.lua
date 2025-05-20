@@ -3639,16 +3639,15 @@ function CCharacter:moveDirection(_direction, _movenone,  _moveslow, _moveback) 
     self:stateSet(_posture, Tic.STATUSMOVE)
     self:toggleFrame() -- animate continuous move in the same dirx
 
-    local _characterhbrw     = self:hitboxRegionWorld() -- collisions system
+    local _characterhitbox   = self:hitboxRegionWorld() -- collisions system
     local _entitiesmoveworld = self:entitiesMoveWorld(_direction, _movenone,  _moveslow, _moveback)
-    local _entitieshbrw      = {}
+    local _entitieshitbox    = {}
     for _entity, _ in pairs(_entitiesmoveworld or {}) do -- record the possible hitboxes
         if not (_entity == self) and _entity.hitbox then -- only with hitbox -- except itself
-            Tables:keyAppend(_entitieshbrw, _entity, _entity:hitboxRegionWorld())
+            Tables:keyAppend(_entitieshitbox, _entity, _entity:hitboxRegionWorld())
         end
     end
--- HH
-    if true then
+
     self:hitboxDetachAll()
     local _movebyx          = Nums:sign(_offsets.offsetx) -- calculate the maximum move step by step
     local _movebyy          = Nums:sign(_offsets.offsety)
@@ -3657,10 +3656,10 @@ function CCharacter:moveDirection(_direction, _movenone,  _moveslow, _moveback) 
     local _move             = true
     local _entitiescollided = {}
     while _move do
-        if _characterhbrw then -- only consider collisions if charater has an hitbox
-            _characterhbrw = _characterhbrw:offsetXY(_movebyx, _movebyy) -- compute the future position
-            for _entity, _entityhbrw in pairs(_entitieshbrw) do
-                if _characterhbrw:hasInsideRegion(_entityhbrw) then -- collision
+        if _characterhitbox then -- only consider collisions if charater has an hitbox
+            _characterhitbox = _characterhitbox:offsetXY(_movebyx, _movebyy) -- compute the future position
+            for _entity, _entityhitbox in pairs(_entitieshitbox) do
+                if _characterhitbox:hasInsideRegion(_entityhitbox) then -- collision
                     Tables:keyAppend(_entitiescollided, _entity, _entity)
                 end
             end
@@ -3680,7 +3679,6 @@ function CCharacter:moveDirection(_direction, _movenone,  _moveslow, _moveback) 
     self:moveWorldXY(self.worldx + _movetox, self.worldy + _movetoy)
 
     self.idlecycler:min() -- reset the idle cycler
-end -- test
 end
 
 function CCharacter:hitboxRefresh() -- refresh the attached hitboxes
