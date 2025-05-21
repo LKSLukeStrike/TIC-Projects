@@ -1712,8 +1712,8 @@ function CEntity:new(_argt)
     self.worldy       = CEntity.WORLDY
     self.discovered   = false -- discovered by the player ?
     self.interactions = nil -- possible interactions if any
-    self.interactedto = {}  -- entities interactedto -- table
-    self.interactedby = {}  -- entities interactedby -- table
+    self.interactto   = {}  -- entities interactto -- table
+    self.interactby   = {}  -- entities interactby -- table
     self.camera = nil -- optional camera that follows the entity -- to override if any
     self:argt(_argt) -- override if any
 end
@@ -1785,34 +1785,42 @@ function CEntity:distanceEntityFake(_entity) -- fake distance from itself to ano
     return Nums:distancePointsFake(self.worldx, self.worldy, _entity.worldx, _entity.worldy)
 end
 
-function CEntity:interactedtoAppend(_entity) -- append an entity interactedto
+function CEntity:interacttoAppend(_entity) -- append an entity interactto
     if not _entity then return end -- mandatory
     if not _entity:hasInteractions() then return end -- no interaction possible
-    Tables:keyAppend(self.interactedto, _entity)
+    Tables:keyAppend(self.interactto, _entity)
 end
 
-function CEntity:interactedtoDelete(_entity) -- delete an entity interactedto
+function CEntity:interacttoDelete(_entity) -- delete an entity interactto
     if not _entity then return end -- mandatory
-    Tables:keyDelete(self.interactedto, _entity)
+    Tables:keyDelete(self.interactto, _entity)
 end
 
-function CEntity:interactedbyAppend(_entity) -- append an entity interactedby
+function CEntity:interacttoDeleteAll() -- delete all entities interactto
+    self.interactto = {}
+end
+
+function CEntity:interactbyAppend(_entity) -- append an entity interactby
     if not _entity then return end -- mandatory
     if not self:hasInteractions() then return end -- no interaction possible
-    Tables:keyAppend(self.interactedby, _entity)
+    Tables:keyAppend(self.interactby, _entity)
 end
 
-function CEntity:interactedbyDelete(_entity) -- delete an entity interactedby
+function CEntity:interactbyDelete(_entity) -- delete an entity interactby
     if not _entity then return end -- mandatory
-    Tables:keyDelete(self.interactedby, _entity)
+    Tables:keyDelete(self.interactby, _entity)
 end
 
-function CEntity:hasInteractedTo() -- has interactedto ?
-    return Tables:size(self.interactedto) > 0
+function CEntity:interactbyDeleteAll() -- delete all entities interactby
+    self.interactby = {}
 end
 
-function CEntity:hasInteractedBy() -- has interactedby ?
-    return Tables:size(self.interactedby) > 0
+function CEntity:hasInteractTo() -- has interactto ?
+    return Tables:size(self.interactto) > 0
+end
+
+function CEntity:hasInteractBy() -- has interactby ?
+    return Tables:size(self.interactby) > 0
 end
 
 function CEntity:hasInteractions() -- has interactions ?
@@ -3450,7 +3458,7 @@ function CCharacter:drawInteract()
     if not (self == Tic:playerActual()) then return end -- dont draw
     local _posture         = self:postureGet()
     if _posture == Tic.POSTUREFLOOR then return end -- dont draw
-    if not self:hasInteractedTo() then return end -- dont draw
+    if not self:hasInteractTo() then return end -- dont draw
     local _posturesettings = Tic.POSTURESETTINGS[_posture]
     local _xoffset         = _posturesettings.headxoffset
     _xoffset               = (self.dirx == Tic.DIRXLF)
@@ -4465,8 +4473,8 @@ end
 
 function CWindowPlayerPortrait:draw()
     if self.entity then
-        self.entity:save{"interactedto"}
-        self.entity.interactedto = {} -- dont draw interact in window
+        self.entity:save{"interactto"}
+        self.entity.interactto = {} -- dont draw interact in window
     end
     CWindowPlayerPortrait.super.draw(self)
     if self.entity then
@@ -4714,9 +4722,9 @@ function CWindowWorld:drawPlayerActual()
     and _playeractual:entitySpotting():hasInteractions() -- HH
     and _playeractual:regionWorld():directionRegion(_playeractual:entitySpotting():regionWorld()) == Tic.DIRHIT
     then
-        _playeractual.interactedto = {_playeractual:entitySpotting()}
+        _playeractual:interacttoAppend(_playeractual:entitySpotting())
     else
-        _playeractual.interactedto = {}
+        _playeractual:interacttoDeleteAll()
     end
     
     for _, _keyy in pairs(Tables:keys(_locationsaround)) do -- draw entities -- sorted by y first
@@ -5895,7 +5903,7 @@ local Oxboow = CPlayerGhost{name = "Oxboow",
     spottingdraw = true,
     spottinglock = true,
     hitbox = Classic.NIL,
-    -- interactedto = {10}
+    -- interactto = {10}
 }
 -- Oxboow:randomWorldWindow()
 -- Tic:traceTable("ox", Oxboow.hitbox, {indent = " ", depth = 1})
