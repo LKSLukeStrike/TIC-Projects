@@ -4112,42 +4112,35 @@ local CEnnemy = CCharacter:extend() -- ennemy characters
 local CElement = Classic:extend() -- generic screen element -- TODO build this class
 Classic.KINDELEMENT = "Element" -- Element kind
 Classic.NAMEELEMENT = "Element" -- Element name
-
-
---
--- CWindow
---
-local CWindow = CElement:extend() -- generic window element
-Classic.KINDWINDOW = "Window" -- Window kind
-Classic.NAMEWINDOW = "Window" -- Window name
-function CWindow:new(_argt)
-    CWindow.super.new(self, _argt)
-    self.kind = Classic.KINDWINDOW
-    self.name = Classic.NAMEWINDOW
-    self.screen      = nil -- parent screen if any
+function CElement:new(_argt)
+    CElement.super.new(self, _argt)
+    self.kind = Classic.KINDELEMENT
+    self.name = Classic.NAMEELEMENT
+    self.parent      = nil -- parent element if any
+    self.elements    = {}  -- children elements if any
     self.screenx     = Tic.SCREENX -- positions
     self.screeny     = Tic.SCREENY
     self.screenw     = Tic.SCREENW -- sizes
     self.screenh     = Tic.SCREENH
-    self.cachest     = Tic.SPRITESIZE -- caches thickness
-    self.colorground = Tic.COLORHUDSCREEN
-    self.colorguides = Tic.COLORGREYM
-    self.colorcaches = Tic.COLORHUDSCREEN
-    self.colorborder = Tic.COLORGREYM -- border color
-    self.colorframe1 = Tic.COLORWHITE -- frames colors
-    self.colorframe2 = Tic.COLORGREYL
     self.behaviour   = nil  -- behaviour function if any
     self.display     = true -- display or not ?
-    self.drawground  = true -- draw behevior
-    self.drawguides  = false
+    self.drawground  = true -- draw beheviors
+    self.drawguides  = true
     self.drawinside  = true
     self.drawcaches  = true
     self.drawborder  = true
     self.drawframes  = true
+    self.cachestick  = Tic.SPRITESIZE -- caches thickness
+    self.colorground = Tic.COLORHUDSCREEN -- colors
+    self.colorguides = Tic.COLORGREYM
+    self.colorcaches = Tic.COLORHUDSCREEN
+    self.colorborder = Tic.COLORGREYM
+    self.colorframe1 = Tic.COLORWHITE
+    self.colorframe2 = Tic.COLORGREYL
     self:argt(_argt) -- override if any
 end
 
-function CWindow:draw() -- window drawing
+function CElement:draw() -- element drawing
     if type(self.behaviour) == "function" then self:behaviour() end -- execute behaviour function first if any
     if not self.display then return end -- nothing to draw
     if self.drawground then self:drawGround() end
@@ -4158,11 +4151,11 @@ function CWindow:draw() -- window drawing
     if self.drawframes then self:drawFrames() end
 end
 
-function CWindow:drawGround() -- window ground
+function CElement:drawGround() -- element ground
     rect(self.screenx, self.screeny, self.screenw, self.screenh, self.colorground)
 end
 
-function CWindow:drawGuides() -- window guides -- FIXME still not working -- use ratio w h ?
+function CElement:drawGuides() -- element guides -- FIXME still not working -- use ratio w h ?
     rect( -- hline md
 		self.screenx,
 		self.screeny + ((Nums:isEven(self.screenh)) and (self.screenh // 2) - 1 or (self.screenh // 2)),
@@ -4193,38 +4186,42 @@ function CWindow:drawGuides() -- window guides -- FIXME still not working -- use
     )
 end
 
-function CWindow:drawCaches() -- window caches
+function CElement:drawInside() -- element inside
+    -- override
+end
+
+function CElement:drawCaches() -- element caches
     rect( -- lf cache
-		self.screenx - self.cachest,
+		self.screenx - self.cachestick,
 		self.screeny,
-        self.cachest,
+        self.cachestick,
 		self.screenh,
         self.colorcaches
     )
     rect( -- rg cache
 		self.screenx + self.screenw,
 		self.screeny,
-        self.cachest,
+        self.cachestick,
 		self.screenh,
         self.colorcaches
     )
     rect( -- up cache
-		self.screenx - self.cachest,
-		self.screeny - self.cachest,
-        self.screenw + (self.cachest * 2),
-		self.cachest,
+		self.screenx - self.cachestick,
+		self.screeny - self.cachestick,
+        self.screenw + (self.cachestick * 2),
+		self.cachestick,
         self.colorcaches
     )
     rect( -- dw cache
-		self.screenx - self.cachest,
+		self.screenx - self.cachestick,
 		self.screeny + self.screenh,
-        self.screenw + (self.cachest * 2),
-		self.cachest,
+        self.screenw + (self.cachestick * 2),
+		self.cachestick,
         self.colorcaches
     )
 end
 
-function CWindow:drawBorder() -- window single border
+function CElement:drawBorder() -- element single border
     rectb(
         self.screenx,
         self.screeny,
@@ -4234,7 +4231,7 @@ function CWindow:drawBorder() -- window single border
     )
 end
 
-function CWindow:drawFrames() -- window double frames
+function CElement:drawFrames() -- element double frames
     rectb( -- bg frame
         self.screenx - 2,
         self.screeny - 2,
@@ -4251,16 +4248,28 @@ function CWindow:drawFrames() -- window double frames
     )
 end
 
-function CWindow:drawInside() -- window content
-end
-
-function CWindow:region() -- window region
+function CElement:region() -- element region
     return CRegion{
         lf = self.screenx,
         rg = self.screenx + self.screenw - 1,
         up = self.screeny,
         dw = self.screeny + self.screenh - 1,
     }
+end
+
+
+--
+-- CWindow
+--
+local CWindow = CElement:extend() -- generic window element
+Classic.KINDWINDOW = "Window" -- Window kind
+Classic.NAMEWINDOW = "Window" -- Window name
+function CWindow:new(_argt)
+    CWindow.super.new(self, _argt)
+    self.kind = Classic.KINDWINDOW
+    self.name = Classic.NAMEWINDOW
+    self.drawguides = false
+    self:argt(_argt) -- override if any
 end
 
 
@@ -4418,7 +4427,7 @@ function CWindowPortrait:new(_argt)
     CWindowPortrait.super.new(self, _argt)
     self.screenw     = Tic.PLAYERPORTRAITWW -- sizes
     self.screenh     = Tic.PLAYERPORTRAITWH
-    self.cachest     = 4 -- caches thickness
+    self.cachestick  = 4 -- caches thickness
     self.colorground = Tic.COLORBIOMENIGHT
     self.drawborder  = false
     self:argt(_argt) -- override if any
@@ -5380,7 +5389,6 @@ function CScreen:new(_argt)
     CScreen.super.new(self, _argt)
     self.kind = Classic.KINDSCREEN
     self.name = Classic.NAMESCREEN
-    self.screen        = nil -- parent screen if any
     self.windows       = {} -- screen windows if any -- ordered
     self.buttons       = {} -- screen buttons if any -- ordered
     self.screens       = {} -- sub screens (layers) if any -- ordered
@@ -5654,20 +5662,23 @@ local Button3 = CButton{
     -- enabled = false,
     name = "dummy",
 }
-local Button4 = CButton{
+local Button4 = CButtonText{
     screenx = 10,
-    screeny = 40,
-    screenw = 16,
-    display = false,
+    screeny = 42,
+    screenw = 26,
+    screenh = 9,
+    rounded = false,
+    text = "Open",
+    clicklf = function() end,
 }
 local Button5 = CButtonText{
     screenx = 10,
     screeny = 50,
-    screenw = 32,
+    screenw = 26,
     screenh = 9,
     rounded = false,
     text = "Close",
-    colortext = Tic.COLORKEY
+    -- colortext = Tic.COLORKEY
 }
 local Button6 = CButton{
     screenx = 10,
