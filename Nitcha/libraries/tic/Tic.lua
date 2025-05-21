@@ -4817,6 +4817,7 @@ function CButton:new(_argt)
     self.colorgrounddisabled = Tic.COLORGREYL
     self.colorborderdisabled = Tic.COLORGREYM
     self.colorgroundactived  = Tic.COLORBLUEL
+    self.colorhoverground    = nil
     self:argt(_argt) -- override if any
 end
 
@@ -4856,11 +4857,13 @@ function CButton:drawBorder()
 end
 
 function CButton:drawFHoverText()
-    local _textw = #self.hovertext * Tic.FONTWS
+    local _textw   = #self.hovertext * Tic.FONTWS
     local _screenx = self.screenx - ((_textw - self.screenw) // 2) + 1
     local _screeny = self.screeny - (Tic.FONTH)
-    rect(_screenx -1, _screeny, _textw + 1, Tic.FONTH, self.colorhover)
-    rect(_screenx, _screeny - 1, _textw - 1, Tic.FONTH + 2, self.colorhover)
+    if self.colorhoverground then
+        rect(_screenx -1, _screeny, _textw + 1, Tic.FONTH, self.colorhoverground)
+        rect(_screenx, _screeny - 1, _textw - 1, Tic.FONTH + 2, self.colorhoverground)
+    end
     print(self.hovertext, _screenx, _screeny, self.colorground, true, 1, true)
 end
 
@@ -4905,6 +4908,30 @@ function CButton:deactivate() -- dehover the button and stop the activate effect
     if self.activedcycler:prev() == 0 then
         self.actived = false
     end
+end
+
+
+--
+-- CButtonText
+--
+local CButtonText = CButton:extend() -- generic text button
+function CButtonText:new(_argt)
+    CButtonText.super.new(self, _argt)
+	self.text = nil -- override if any
+    self.colortext = self.colorborder
+    self:argt(_argt) -- override if any
+end
+
+function CButtonText:draw() -- button drawing
+    CButtonText.super.draw(self)
+    if self.text and #self.text > 0 then self:drawText() end
+end
+
+function CButtonText:drawText()
+    local _textw   = #self.text * Tic.FONTWS
+    local _screenx = self.screenx - ((_textw - self.screenw) // 2)
+    local _screeny = self.screeny - ((Tic.FONTH - self.screenh) // 2)
+    print(self.text, _screenx, _screeny, self.colortext, true, 1, true)
 end
 
 
@@ -5508,6 +5535,7 @@ ScreenWorldLF:elementsDistributeH(
         (WindowSpottingInfos.screenw - CScreen:elementsTotalH({ButtonSpottingDraw, ButtonSpottingLock, ButtonSpottingPick})) // 2),
     WindowSpottingInfos.screeny - Tic.SPRITESIZE
 )
+ButtonSpottingLock.screeny = ButtonSpottingLock.screeny + 20
 local WindowSpottingPortrait = CWindowSpottingPortrait{}
 local ButtonSpotting270      = CButtonSpotting270{}
 local ButtonSpotting000      = CButtonSpotting000{}
@@ -5599,17 +5627,19 @@ ScreenWorld:appendElements{
 }
 end
 
-if false then
+if true then
 -- local ScreenIntro = CScreen{name = "Intro", keysfunctions = Tic.KEYSFUNCTIONSINTRO}
 local ScreenIntro = CScreen{name = "Intro", keysfunctions = Tic.KEYSFUNCTIONSINTRO}
 Tic:screenAppend(ScreenIntro)
 
-local Button1 = CButton{
+local Button1 = CButtonText{
     -- screenx = 10,
     -- screeny = 10,
     screenw = 16,
+    screenh = 7,
     name = "plop 1",
     hovertext = "ksca",
+    text = "Ok",
 }
 local Button2 = CButton{
     -- screenx = 10,
@@ -5630,11 +5660,14 @@ local Button4 = CButton{
     screenw = 16,
     display = false,
 }
-local Button5 = CButton{
+local Button5 = CButtonText{
     screenx = 10,
     screeny = 50,
-    screenw = 16,
+    screenw = 32,
+    screenh = 9,
     rounded = false,
+    text = "Close",
+    colortext = Tic.COLORKEY
 }
 local Button6 = CButton{
     screenx = 10,
@@ -5699,7 +5732,8 @@ local _function = function() Tic:logAppend("Plop") end
 Button1.clicklf = _function
 Button1.clickrg = _function
 Button2.clicklf = _function
-Button7.clicklf = Tic.FUNCTIONSCREENNEXT
+Button5.clicklf = _function
+-- Button7.clicklf = Tic.FUNCTIONSCREENNEXT
 
 ScreenIntro:elementsDistributeH({Button11, Button12, Button15, Button13, Button14}, 30, 10)
 ScreenIntro:elementsDistributeV({Button1, Button2, Button3}, 10, 10, 2)
