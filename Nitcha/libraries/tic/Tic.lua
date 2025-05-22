@@ -4117,7 +4117,7 @@ function CElement:new(_argt)
     self.kind = Classic.KINDELEMENT
     self.name = Classic.NAMEELEMENT
     self.parent      = nil -- parent element if any
-    self.elements    = {}  -- children elements if any
+    self.elements    = {}  -- children elements if any -- ordered
     self.screenx     = Tic.SCREENX -- positions
     self.screeny     = Tic.SCREENY
     self.screenw     = Tic.SCREENW -- sizes
@@ -4133,6 +4133,7 @@ function CElement:new(_argt)
     self.cachestick  = Tic.SPRITESIZE -- caches thickness
     self.colorground = Tic.COLORHUDSCREEN -- colors
     self.colorguides = Tic.COLORGREYM
+    self.colorinside = Tic.COLORGREYM
     self.colorcaches = Tic.COLORHUDSCREEN
     self.colorborder = Tic.COLORGREYM
     self.colorframe1 = Tic.COLORWHITE
@@ -4255,6 +4256,28 @@ function CElement:region() -- element region
         up = self.screeny,
         dw = self.screeny + self.screenh - 1,
     }
+end
+
+function CElement:appendElement(_element) -- append element -- unique -- ordered
+    if not _element then return end -- mandarory
+    if not _element:is(CElement) then return end -- only elements
+    _element.parent = self -- record parent
+    Tables:valInsert(self.elements, _element, true)
+end
+
+
+--
+-- CText
+--
+local CText = CElement:extend() -- generic text element
+Classic.KINDTEXT = "Text" -- Text kind
+Classic.NAMETEXT = "Text" -- Text name
+function CText:new(_argt)
+    CText.super.new(self, _argt)
+    self.kind = Classic.KINDTEXT
+    self.name = Classic.NAMETEXT
+    self.drawguides = false
+    self:argt(_argt) -- override if any
 end
 
 
