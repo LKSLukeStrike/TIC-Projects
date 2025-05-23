@@ -23,6 +23,12 @@ Tic.FONTWL = 6 -- large font width
 Tic.FONTWS = 4 -- small font width
 Tic.FONTH  = 6 -- both fonts height
 
+-- Scales
+Tic.SCALE01 = 01
+Tic.SCALE02 = 02
+Tic.SCALE03 = 03
+Tic.SCALE04 = 04
+
 -- Screen positions and sizes
 Tic.SCREENW  = 240 -- screen width
 Tic.SCREENH  = 136 -- screen height
@@ -1132,10 +1138,6 @@ end
 --
 local CSprite = Classic:extend() -- generic sprites
 CSprite.SPRITEBANK = 0
-CSprite.SCALE01    = 01 -- sprites scales
-CSprite.SCALE02    = 02
-CSprite.SCALE03    = 03
-CSprite.SCALE04    = 04
 CSprite.FRAMEOF    = 16 -- sprites frames offset multiplier
 CSprite.FRAME00    = 00 -- sprites frames -- [!] start at 0, used to compute the offset
 CSprite.FRAME01    = 01
@@ -1152,7 +1154,7 @@ function CSprite:new(_argt)
     self.screeny   = 0
     self.frame     = CSprite.FRAME00
     self.colorkey  = Tic.COLORKEY -- default colorkey
-    self.scale     = CSprite.SCALE01 -- default scale
+    self.scale     = Tic.SCALE01 -- default scale
     self.flip      = Tic.DIRXLF -- all sprites are dir x left by default
     self.rotate    = CSprite.ROTATE000 -- no rotation by default
     self.width     = 1 -- sprite 1x1 by default
@@ -1353,12 +1355,12 @@ function CRegion:string() -- region as a string
 end
 
 function CRegion:borderW(_scale) -- border width
-    _scale = _scale or CSprite.SCALE01
+    _scale = _scale or Tic.SCALE01
     return self.rg - self.lf + (1 * _scale)
 end
 
 function CRegion:borderH(_scale) -- border height
-    _scale = _scale or CSprite.SCALE01
+    _scale = _scale or Tic.SCALE01
     return self.dw - self.up + (1 * _scale)
 end
 
@@ -1941,7 +1943,7 @@ function CEntityDrawable:new(_argt)
     self.screenx     = 0 -- screen positions -- used to draw the sprite
     self.screeny     = 0
     self.dirx        = Nums:random01() -- random flip lf/rg
-    self.scale       = CSprite.SCALE01
+    self.scale       = Tic.SCALE01
     self.animations  = nil -- override if any
     self.spotted     = false -- use spotted to draw a border
     self.hitbox       = CHitbox{entity = self, lf = 0, rg = 7, up = 0, dw = 7}
@@ -3082,7 +3084,7 @@ function CCharacter:new(_argt)
     self.kind         = Classic.KINDCHARACTER
     self.name         = Classic.NAMECHARACTER
     self.size         = CCharacter.SIZEM -- size
-    self.scale        = CSprite.SCALE01 -- scale
+    self.scale        = Tic.SCALE01 -- scale
     self.frame        = CSprite.FRAME00 -- frame
     self.dirx         = Tic.DIRXLF -- directions
     self.diry         = Tic.DIRYMD
@@ -4276,18 +4278,51 @@ function CText:new(_argt)
     CText.super.new(self, _argt)
     self.kind = Classic.KINDTEXT
     self.name = Classic.NAMETEXT
-    self.drawguides = false
-    self.text    = nil
-    self.screenh = Tic.FONTH
-    self.fixed   = true
-    self.scale   = CSprite.SCALE01
-    self.small   = true
+    self.drawground  = false -- draw beheviors
+    self.drawguides  = false
+    self.drawinside  = true
+    self.drawcaches  = false
+    self.drawborder  = false
+    self.drawframes  = false
+    self.text        = nil
+    self.screenh     = Tic.FONTH
+    self.fixed       = true
+    self.scale       = Tic.SCALE01
+    self.small       = true
+    self.shadow      = false -- add a shadow ?
+    self.colorinside = Tic.COLORGREYL
+    self.colorshadow = Tic.COLORGREYD
     self:argt(_argt) -- override if any
 end
 function CText:argt(_argt)
     CText.super.argt(self, _argt)
-    self.screenw = print((self.text or ""), nil, nil, self.colorinside, self.fixed, self.scale, self.small)
+    self.screenw = print((self.text or ""), Nums.MININTEGER, Nums.MININTEGER, self.colorinside, self.fixed, self.scale, self.small)
+    self.screenw = (self.shadow) and self.screenw + (self.scale or Tic.SCALE01) or self.screenw
+    self.screenh = (self.shadow) and self.screenh + (self.scale or Tic.SCALE01) or self.screenh
   end
+
+function CText:drawInside()
+    if self.shadow then
+        print(
+            self.text,
+            self.screenx + 1,
+            self.screeny + 1,
+            self.colorshadow,
+            self.fixed,
+            self.scale,
+            self.small
+        )
+    end
+    print(
+        self.text,
+        self.screenx,
+        self.screeny,
+        self.colorinside,
+        self.fixed,
+        self.scale,
+        self.small
+    )
+end
   
 
 --
@@ -4329,7 +4364,7 @@ function CWindowInfos:new(_argt)
 	self.lines       = 2 -- number of lines
 	self.chars       = 6 -- number of chars per lines
 	self.fixed       = true -- TODO accept also not fixed fonts ?
-	self.scale       = CSprite.SCALE01 -- TODO accept also other scales ?
+	self.scale       = Tic.SCALE01 -- TODO accept also other scales ?
 	self.small       = true -- small fonts or large fonts
 	self.infos       = {} -- lines content -- {info1, infoN,...}
 	self.align       = CWindowInfos.ALIGNLF -- h alignment
@@ -4486,7 +4521,7 @@ function CWindowPortraitDrawable:drawInside() -- window portrait content for -- 
     self.entity:save{"screenx", "screeny", "scale", "drawdirs", "drawview","dirx", "frame", "animations",}
     self.entity.screenx  = self.screenx -- force character attributes
     self.entity.screeny  = self.screeny
-    self.entity.scale    = CSprite.SCALE02
+    self.entity.scale    = Tic.SCALE02
     self.entity.drawdirs = false
     self.entity.drawview = false
     if self.idle then
@@ -5781,9 +5816,13 @@ ScreenIntro:elementsDistributeH({Button11, Button12, Button15, Button13, Button1
 ScreenIntro:elementsDistributeV({Button1, Button2, Button3}, 10, 10, 2)
 end
 
-trace(print("hello"))
-trace(CText{text = "hello", fixed = false, small = false}.screenw)
-exit()
+-- trace(print("hello"))
+Text01 = CText{screenx = 65, screeny = 30, text = "Cozy", fixed = false, small = false, shadow = true}
+-- trace(CText{text = "hello", fixed = false, small = false}.screenh)
+Text02 = CText{screenx = 65, screeny = 50, text = "Cozy", fixed = false, small = true}
+Text03 = CText{screenx = 65, screeny = 70, text = "Cozy", fixed = true, small = true, shadow = true}
+-- trace(CText{text = "hello", fixed = false, small = false, shadow = true}.screenh)
+-- exit()
 
 
 --
@@ -6168,13 +6207,17 @@ end
 -- Drawing
 --
 function Tic:draw()
-    if false then
+    if true then
     Tic.inputsDo()
 
     Tic:screenActual():draw()
 
     Tic:drawLog()
     Tic:logPrint()
+
+    Text01:draw()
+    Text02:draw()
+    Text03:draw()
 
     -- SpriteSFX:draw()
     -- SpriteHTG:draw()
