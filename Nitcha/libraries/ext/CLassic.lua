@@ -151,9 +151,9 @@ function Classic:argt(_argt) -- set a classic tables key/val from a _argt table 
 end
 
 
-function Classic:save(_keyt) -- save (into stack) a table of keys {"k", ...}
+function Classic:save(_keys) -- save (into stack) a table of argt from a list of keys {"k", ...}
   local _argt = {}
-  for _, _key in pairs(_keyt or {}) do
+  for _, _key in pairs(_keys or {}) do
     _argt[_key] = self[_key]
   end
   table.insert(self._savestack, _argt)

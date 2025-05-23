@@ -4277,9 +4277,18 @@ function CText:new(_argt)
     self.kind = Classic.KINDTEXT
     self.name = Classic.NAMETEXT
     self.drawguides = false
+    self.text    = nil
+    self.screenh = Tic.FONTH
+    self.fixed   = true
+    self.scale   = CSprite.SCALE01
+    self.small   = true
     self:argt(_argt) -- override if any
 end
-
+function CText:argt(_argt)
+    CText.super.argt(self, _argt)
+    self.screenw = print((self.text or ""), nil, nil, self.colorinside, self.fixed, self.scale, self.small)
+  end
+  
 
 --
 -- CWindow
@@ -5566,7 +5575,6 @@ ScreenWorldLF:elementsDistributeH(
         (WindowSpottingInfos.screenw - CScreen:elementsTotalH({ButtonSpottingDraw, ButtonSpottingLock, ButtonSpottingPick})) // 2),
     WindowSpottingInfos.screeny - Tic.SPRITESIZE
 )
-ButtonSpottingLock.screeny = ButtonSpottingLock.screeny + 20
 local WindowSpottingPortrait = CWindowSpottingPortrait{}
 local ButtonSpotting270      = CButtonSpotting270{}
 local ButtonSpotting000      = CButtonSpotting000{}
@@ -5772,7 +5780,10 @@ Button5.clicklf = _function
 ScreenIntro:elementsDistributeH({Button11, Button12, Button15, Button13, Button14}, 30, 10)
 ScreenIntro:elementsDistributeV({Button1, Button2, Button3}, 10, 10, 2)
 end
--- exit()
+
+trace(print("hello"))
+trace(CText{text = "hello", fixed = false, small = false}.screenw)
+exit()
 
 
 --
@@ -6157,7 +6168,7 @@ end
 -- Drawing
 --
 function Tic:draw()
-    if true then
+    if false then
     Tic.inputsDo()
 
     Tic:screenActual():draw()

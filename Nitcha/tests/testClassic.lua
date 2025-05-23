@@ -6,7 +6,7 @@ local Tables  = require("libraries/lks/Tables")
 
 IHello = Classic:extend()
 function IHello:sayHello()
-  print("Hello", self.prenom)
+  print("Hello", self.firstname)
 end
 IHello.message = "My Message"
 
@@ -38,10 +38,23 @@ function CPlayer:new(_argt)
 end
 
 
+CPlayerExtra = CPlayer:extend()
+function CPlayerExtra:new(_argt)
+  CPlayerExtra.super.new(self, _argt)
+  self.kind = "CPlayerExtra"
+  self:argt(_argt)
+end
+function CPlayerExtra:argt(_argt)
+  CPlayerExtra.super.argt(self, _argt)
+  self.fullname = (self.firstname or "")..":"..(self.lastname or "")
+end
+
+
+if false then
 Jeandu = CPlayer{
   age = 42,
-  prenom = "jean",
-  nom = "du",
+  firstname = "jean",
+  lastname = "du",
 }
 
 Jeandu:argt{
@@ -73,13 +86,13 @@ Jeandu:sayHello()
 print("message:", Jeandu.message)
 print(Jeandu:string())
 print(Jeandu)
+end
 
--- print()
--- print("IHello")
--- Tables:print(IHello)
--- print("CCharacter")
--- Tables:print(CCharacter)
--- print("CPlayer")
--- Tables:print(CPlayer)
--- print("Jeandu")
--- Tables:print(Jeandu)
+print()
+AlainDucon = CPlayerExtra{
+  x = 1000,
+  firstname = "Alain",
+  lastname = "Ducon",
+}
+
+AlainDucon:printMe()
