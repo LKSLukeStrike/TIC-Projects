@@ -4862,7 +4862,7 @@ end
 --
 -- CButton
 --
-local CButton = CWindow:extend() -- generic button
+local CButton = CElement:extend() -- generic button
 Classic.KINDBUTTON = "Button" -- Button kind
 Classic.NAMEBUTTON = "Button" -- Button name
 CButton.BEHAVIOUR = function(self)
@@ -4886,28 +4886,27 @@ function CButton:new(_argt)
 	self.scrollx       = nil   -- function to trigger on scroll x
 	self.scrolly       = nil   -- function to trigger on scroll y
 	self.behaviour     = CButton.BEHAVIOUR  -- function to trigger at first
-    self.hovertext     = nil -- hover CText if any
-	self.rounded       = true  -- rounded border and frames ?
-    self.drawframes    = false
+    self.hovertext     = nil   -- hover CText if any
+	self.rounded       = false -- rounded border and frames ?
+    self.drawground    = true  -- draw beheviors
+    self.drawguides    = false
+    self.drawinside    = true
     self.drawcaches    = false
-    self.colorground   = Tic.COLORWHITE
-    self.colorborder   = Tic.COLORGREYM
-    self.colorhover    = Tic.COLORHUDSCREEN
+    self.drawborder    = true
+    self.drawframes    = false
+    self.colorground         = Tic.COLORWHITE -- colors
+    self.colorborder         = Tic.COLORGREYM
+    self.colorhover          = Tic.COLORHUDSCREEN
     self.colorgrounddisabled = Tic.COLORGREYL
     self.colorborderdisabled = Tic.COLORGREYM
     self.colorgroundactived  = Tic.COLORBLUEL
     self.colorhoverground    = nil
     self:argt(_argt) -- override if any
-    if self.hovertext then
-        self.hovertext.colorinside = Tic.COLORRED --self.colorground
-        self.hovertext.screenx = self.screenx - ((self.hovertext.screenw - self.screenw) // 2) + 1
-        self.hovertext.screeny = self.screeny - self.hovertext.screenh
-    end
 end
 
 function CButton:draw() -- button drawing
     CButton.super.draw(self)
-    if self.hovered and self.hovertext then self:drawFHoverText() end
+    if self.hovered and (self.hovertext and self.hovertext:is(CText)) then self:drawHovertext() end
 end
 
 function CButton:drawGround()
@@ -4940,13 +4939,8 @@ function CButton:drawBorder()
     self:load()
 end
 
-function CButton:drawFHoverText()
-    -- local _textw   = #self.hovertext * Tic.FONTWS
-    -- local _screenx = self.screenx - ((_textw - self.screenw) // 2) + 1
-    -- local _screeny = self.screeny - (Tic.FONTH)
+function CButton:drawHovertext()
     if self.colorhoverground then
-        -- rect(_screenx -1, _screeny, _textw + 1, Tic.FONTH, self.colorhoverground)
-        -- rect(_screenx, _screeny - 1, _textw - 1, Tic.FONTH + 2, self.colorhoverground)
         rect(
             self.hovertext.screenx -1,
             self.hovertext.screeny,
@@ -4962,7 +4956,9 @@ function CButton:drawFHoverText()
             self.colorhoverground
         )
     end
-    -- print(self.hovertext, _screenx, _screeny, self.colorground, true, 1, true)
+    self.hovertext.colorinside = self.colorground
+    self.hovertext.screenx = self.screenx - ((self.hovertext.screenw - self.screenw) // 2) + 1
+    self.hovertext.screeny = self.screeny - self.hovertext.screenh
     self.hovertext:draw()
 end
 
@@ -5016,21 +5012,40 @@ end
 local CButtonText = CButton:extend() -- generic text button
 function CButtonText:new(_argt)
     CButtonText.super.new(self, _argt)
-	self.text = nil -- override if any
-    self.colortext = self.colorborder
+	self.text = nil -- override with CText if any
+    self.rounded = true
+    self.colorinside = self.colorborder
     self:argt(_argt) -- override if any
 end
 
 function CButtonText:draw() -- button drawing
+    self.drawinside = (self.text and self.text:is(CText)) and true or false
     CButtonText.super.draw(self)
-    if self.text and #self.text > 0 then self:drawText() end
 end
 
-function CButtonText:drawText()
-    local _textw   = #self.text * Tic.FONTWS
-    local _screenx = self.screenx - ((_textw - self.screenw) // 2)
-    local _screeny = self.screeny - ((Tic.FONTH - self.screenh) // 2)
-    print(self.text, _screenx, _screeny, self.colortext, true, 1, true)
+function CButtonText:drawInside()
+    self.text.colorinside = self.colorinside
+    self.text.screenx = self.screenx - ((self.text.screenw - self.screenw) // 2)
+    self.text.screeny = self.screeny - ((self.text.screenh - self.screenh) // 2)
+    self.text:draw()
+end
+
+
+--
+-- CButtonMenu
+--
+local CButtonMenu = CButtonText:extend() -- generic menu button
+function CButtonMenu:new(_argt)
+    CButtonMenu.super.new(self, _argt)
+    self.rounded = false
+    self:argt(_argt) -- override if any
+end
+
+function CButtonMenu:drawInside()
+    self.text.colorinside = self.colorinside
+    self.text.screenx = self.screenx + 3
+    self.text.screeny = self.screeny - ((self.text.screenh - self.screenh) // 2)
+    self.text:draw()
 end
 
 
@@ -5725,6 +5740,11 @@ ScreenWorld:appendElements{
 end
 
 if true then
+local _function = function(self) -- FIXME axecute functions with self
+    -- Tic:logAppend((self.name or "None"))
+    Tic:logAppend("Plop")
+end
+
 -- local ScreenIntro = CScreen{name = "Intro", keysfunctions = Tic.KEYSFUNCTIONSINTRO}
 local ScreenIntro = CScreen{name = "Intro", keysfunctions = Tic.KEYSFUNCTIONSINTRO}
 Tic:screenAppend(ScreenIntro)
@@ -5736,38 +5756,46 @@ local Button1 = CButtonText{
     screenh = 7,
     name = "plop 1",
     hovertext = CText{text = "One"},
-    text = "Ok",
+    text = CText{text = "Ok"},
+    clicklf = _function,
+    clickrg = _function,
 }
-local Button2 = CButton{
+local Button2 = CButtonText{
     -- screenx = 10,
     -- screeny = 20,
+    screenw = 9,
+    screenh = 9,
     name = "plop 2",
     hovertext = CText{text = "TWO"},
+    colorinside = Tic.COLORRED,
+    text = CText{text = "C"},
+    clicklf = _function,
 }
-local Button3 = CButton{
+local Button3 = CButtonText{
     -- screenx = 10,
     -- screeny = 30,
     screenw = 16,
     -- enabled = false,
     name = "dummy",
 }
-local Button4 = CButtonText{
+local Button4 = CButtonMenu{
     screenx = 10,
     screeny = 42,
     screenw = 26,
     screenh = 9,
     rounded = false,
-    text = "Open",
+    text = CText{text = "Open"},
     clicklf = function() end,
 }
-local Button5 = CButtonText{
+local Button5 = CButtonMenu{
     screenx = 10,
     screeny = 50,
     screenw = 26,
     screenh = 9,
     rounded = false,
-    text = "Close",
-    -- colortext = Tic.COLORKEY
+    text = CText{text = "Close"},
+    clicklf = _function,
+    -- colorinside = Tic.COLORKEY
 }
 local Button6 = CButton{
     screenx = 10,
@@ -5828,11 +5856,6 @@ ScreenIntro:appendElements{
 }
 
 Button15.clicklf = Tic.FUNCTIONSCREENNEXT
-local _function = function() Tic:logAppend("Plop") end
-Button1.clicklf = _function
-Button1.clickrg = _function
-Button2.clicklf = _function
-Button5.clicklf = _function
 -- Button7.clicklf = Tic.FUNCTIONSCREENNEXT
 
 ScreenIntro:elementsDistributeH({Button11, Button12, Button15, Button13, Button14}, 30, 10)
