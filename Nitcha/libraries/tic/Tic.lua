@@ -4293,13 +4293,16 @@ function CText:new(_argt)
     self.colorinside = Tic.COLORGREYL
     self.colorshadow = Tic.COLORGREYD
     self:argt(_argt) -- override if any
-end
-function CText:argt(_argt)
-    CText.super.argt(self, _argt)
     self.screenw = print((self.text or ""), Nums.MININTEGER, Nums.MININTEGER, self.colorinside, self.fixed, self.scale, self.small)
-    self.screenw = (self.shadow) and self.screenw + (self.scale or Tic.SCALE01) or self.screenw
-    self.screenh = (self.shadow) and self.screenh + (self.scale or Tic.SCALE01) or self.screenh
-  end
+    self.screenw = (self.shadow) and self.screenw + self.scale or self.screenw
+    self.screenh = (self.shadow) and self.screenh + self.scale or self.screenh
+end
+-- function CText:argt(_argt)
+--     CText.super.argt(self, _argt)
+--     self.screenw = print((self.text or ""), Nums.MININTEGER, Nums.MININTEGER, self.colorinside, self.fixed, self.scale, self.small)
+--     self.screenw = (self.shadow) and self.screenw + (self.scale or Tic.SCALE01) or self.screenw
+--     self.screenh = (self.shadow) and self.screenh + (self.scale or Tic.SCALE01) or self.screenh
+-- end
 
 function CText:drawInside()
     if self.shadow then
@@ -4883,7 +4886,7 @@ function CButton:new(_argt)
 	self.scrollx       = nil   -- function to trigger on scroll x
 	self.scrolly       = nil   -- function to trigger on scroll y
 	self.behaviour     = CButton.BEHAVIOUR  -- function to trigger at first
-    self.hovertext     = nil -- hover text if any
+    self.hovertext     = nil -- hover CText if any
 	self.rounded       = true  -- rounded border and frames ?
     self.drawframes    = false
     self.drawcaches    = false
@@ -4895,6 +4898,11 @@ function CButton:new(_argt)
     self.colorgroundactived  = Tic.COLORBLUEL
     self.colorhoverground    = nil
     self:argt(_argt) -- override if any
+    if self.hovertext then
+        self.hovertext.colorinside = Tic.COLORRED --self.colorground
+        self.hovertext.screenx = self.screenx - ((self.hovertext.screenw - self.screenw) // 2) + 1
+        self.hovertext.screeny = self.screeny - self.hovertext.screenh
+    end
 end
 
 function CButton:draw() -- button drawing
@@ -4933,14 +4941,29 @@ function CButton:drawBorder()
 end
 
 function CButton:drawFHoverText()
-    local _textw   = #self.hovertext * Tic.FONTWS
-    local _screenx = self.screenx - ((_textw - self.screenw) // 2) + 1
-    local _screeny = self.screeny - (Tic.FONTH)
+    -- local _textw   = #self.hovertext * Tic.FONTWS
+    -- local _screenx = self.screenx - ((_textw - self.screenw) // 2) + 1
+    -- local _screeny = self.screeny - (Tic.FONTH)
     if self.colorhoverground then
-        rect(_screenx -1, _screeny, _textw + 1, Tic.FONTH, self.colorhoverground)
-        rect(_screenx, _screeny - 1, _textw - 1, Tic.FONTH + 2, self.colorhoverground)
+        -- rect(_screenx -1, _screeny, _textw + 1, Tic.FONTH, self.colorhoverground)
+        -- rect(_screenx, _screeny - 1, _textw - 1, Tic.FONTH + 2, self.colorhoverground)
+        rect(
+            self.hovertext.screenx -1,
+            self.hovertext.screeny,
+            self.hovertext.screenw + 1,
+            self.hovertext.screenh,
+            self.colorhoverground
+        )
+        rect(
+            self.hovertext.screenx,
+            self.hovertext.screeny - 1,
+            self.hovertext.screenw - 1,
+            self.hovertext.screenh + 2,
+            self.colorhoverground
+        )
     end
-    print(self.hovertext, _screenx, _screeny, self.colorground, true, 1, true)
+    -- print(self.hovertext, _screenx, _screeny, self.colorground, true, 1, true)
+    self.hovertext:draw()
 end
 
 function CButton:functionsDefined() -- defined functions of a button
@@ -5236,9 +5259,9 @@ end
 local CButtonPlayerPrev = CButtonArrow270:extend() -- generic player prev button
 function CButtonPlayerPrev:new(_argt)
     CButtonPlayerPrev.super.new(self, _argt)
-	self.behaviour     = IButtonPlayer.BEHAVIOUR  -- function to trigger at first
-    self.clicklf       = Tic.FUNCTIONPLAYERPREV
-    self.hovertext     = "Prev"
+	self.behaviour = IButtonPlayer.BEHAVIOUR  -- function to trigger at first
+    self.clicklf   = Tic.FUNCTIONPLAYERPREV
+    self.hovertext = CText{text = "Prev"}
     self:argt(_argt) -- override if any
 end
 
@@ -5249,9 +5272,9 @@ end
 local CButtonPlayerNext = CButtonArrow090:extend() -- generic player next button
 function CButtonPlayerNext:new(_argt)
     CButtonPlayerNext.super.new(self, _argt)
-	self.behaviour     = IButtonPlayer.BEHAVIOUR  -- function to trigger at first
-    self.clicklf       = Tic.FUNCTIONPLAYERNEXT
-    self.hovertext     = "Next"
+	self.behaviour = IButtonPlayer.BEHAVIOUR  -- function to trigger at first
+    self.clicklf   = Tic.FUNCTIONPLAYERNEXT
+    self.hovertext = CText{text = "Next"}
     self:argt(_argt) -- override if any
 end
 
@@ -5266,7 +5289,7 @@ function CButtonPlayerPick:new(_argt)
 	self.sprite.sprite = CSpriteBG.SIGNPLAYER
 	self.behaviour     = IButtonPlayer.BEHAVIOUR  -- function to trigger at first
     self.clicklf       = function(self) Tic:logAppend("Player") end
-    self.hovertext     = "Pick"
+    self.hovertext     = CText{text = "Pick"}
     self:argt(_argt) -- override if any
 end
 
@@ -5285,7 +5308,7 @@ function CButtonSpottingDraw:new(_argt)
 	self.sprite.sprite = CSpriteBG.SIGNSPOTIT
 	self.behaviour     = CButtonSpottingDraw.BEHAVIOUR  -- function to trigger at first
     self.clicklf       = function() Tic:spottingToggleDraw() end
-    self.hovertext     = "Spot"
+    self.hovertext     = CText{text = "Spot"}
     self:argt(_argt) -- override if any
 end
 
@@ -5304,7 +5327,7 @@ function CButtonSpottingLock:new(_argt)
 	self.sprite.sprite = CSpriteBG.SIGNLOCKIT
 	self.behaviour     = CButtonSpottingLock.BEHAVIOUR  -- function to trigger at first
     self.clicklf       = function() Tic:spottingToggleLock() end
-    self.hovertext     = "Lock"
+    self.hovertext     = CText{text = "Lock"}
     self:argt(_argt) -- override if any
 end
 
@@ -5323,7 +5346,7 @@ function CButtonSpottingPick:new(_argt)
 	self.sprite.sprite = CSpriteBG.SIGNPICKIT
 	self.behaviour     = CButtonSpottingPick.BEHAVIOUR  -- function to trigger at first
     self.clicklf       = function() Tic:spottingTogglePick() end
-    self.hovertext     = "Pick"
+    self.hovertext     = CText{text = "Pick"}
     self:argt(_argt) -- override if any
 end
 
@@ -5712,14 +5735,14 @@ local Button1 = CButtonText{
     screenw = 16,
     screenh = 7,
     name = "plop 1",
-    hovertext = "ksca",
+    hovertext = CText{text = "One"},
     text = "Ok",
 }
 local Button2 = CButton{
     -- screenx = 10,
     -- screeny = 20,
     name = "plop 2",
-    hovertext = "LSCA",
+    hovertext = CText{text = "TWO"},
 }
 local Button3 = CButton{
     -- screenx = 10,
@@ -5819,7 +5842,7 @@ end
 -- trace(print("hello"))
 Text01 = CText{screenx = 65, screeny = 30, text = "Cozy", fixed = false, small = false, shadow = true}
 -- trace(CText{text = "hello", fixed = false, small = false}.screenh)
-Text02 = CText{screenx = 65, screeny = 50, text = "Cozy", fixed = false, small = true}
+Text02 = CText{screenx = 65, screeny = 50, text = "Cozy", fixed = false, small = true, colorinside = 5}
 Text03 = CText{screenx = 65, screeny = 70, text = "Cozy", fixed = true, small = true, shadow = true}
 -- trace(CText{text = "hello", fixed = false, small = false, shadow = true}.screenh)
 -- exit()
