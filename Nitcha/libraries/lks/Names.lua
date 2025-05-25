@@ -74,9 +74,21 @@ Names.CONSOS = {
 	Names.LETTER_Z,
 }
 
+Names.CASEUPPER = "upper"
+Names.CASELOWER = "lower"
+Names.CASECAMEL = "camel"
+Names.CASEFIRST = "first"
+function Names:case(_string, _case) -- return a casified string
+	if not _string then return end -- mandatory
+	if _case == Names.CASEUPPER then _string = _string:upper() end
+	if _case == Names.CASELOWER then _string = _string:lower() end
+	if _case == Names.CASECAMEL then _string = _string:lower():gsub("(%a)([%w_']*)", function(_f, _r) return _f:upper().._r:lower() end) end
+	if _case == Names.CASEFIRST then _string = _string:lower():gsub("^.", string.upper) end
+	return _string
+end
+
 function Names:fupper(_string) -- uppercase first letter, lowercase the rest
-    _string = _string or ""
-    return _string:lower():gsub("^.", string.upper)
+    return Names:case(_string, Names.CASEFIRST)
 end
 
 

@@ -7,6 +7,7 @@ local Names  = require("libraries/lks/Names")
 --     print(Names:random())
 -- end
 
+if false then
 for _ = 1, 20 do
     print(Names:random(3, 10,
     {
@@ -32,3 +33,9 @@ for _ = 1, 20 do
     1
 ))
 end
+end
+
+print(Names:case("life's Beautiful  yes", Names.CASEUPPER))
+print(Names:case("life's Beautiful  yes", Names.CASELOWER))
+print(Names:case("life's Beautiful  yes", Names.CASECAMEL))
+print(Names:case("life's Beautiful  yes", Names.CASEFIRST))
