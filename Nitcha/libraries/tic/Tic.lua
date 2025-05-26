@@ -498,17 +498,22 @@ Tic.BUTTONSCROLLY = "scrolly"
 Tic.BUTTONS = {}
 
 function Tic:buttonsHandleInput()
+    local _buttontreated = false -- avoid overlaping buttons, just keep the first one
+
     for _, _button in ipairs(Tic.BUTTONS) do -- handle input functions
         _button:deactivate()
 
         if _button:activable() then -- check if a button is active and hovered
             if _button:region():hasInsidePoint(Tic.MOUSE.screenx + Tic.MOUSEOFFSETX, Tic.MOUSE.screeny + Tic.MOUSEOFFSETY) then
-                local _functionsactived = _button:functionsActived()
-                if Tables:size(_functionsactived) == 0 then -- just hover
-                    _button.hovered = true
-                else -- or activate
-                    _button:activate()
-                    Tic:inputsInsertFunctions(_functionsactived)
+                if not _buttontreated then
+                    local _functionsactived = _button:functionsActived()
+                    if Tables:size(_functionsactived) > 0 then -- activate
+                        _button:activate()
+                        Tic:inputsInsertFunctions(_functionsactived)
+                    else -- or just hover
+                        _button.hovered = true
+                    end
+                    _buttontreated = true
                 end
             end
         else -- disable all functions related to hidden/disabled buttons
@@ -516,7 +521,7 @@ function Tic:buttonsHandleInput()
         end
     end
 
-    for _, _function in ipairs(Tic.FUNCTIONS) do -- feedback functions to buttons
+    for _, _function in ipairs(Tic.FUNCTIONS) do -- feedback functions to other buttons with same function if any
         for _, _button in ipairs(Tic.BUTTONS) do
             if _button:activable() then -- only activable buttons
                 if _button:functionsContains(_function) then
