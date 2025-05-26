@@ -4129,6 +4129,7 @@ function CElement:new(_argt)
     self.screeny     = Tic.SCREENY
     self.screenw     = Tic.SCREENW -- sizes
     self.screenh     = Tic.SCREENH
+    self.align       = Tic.DIRHIT -- sub elements alignment
     self.behaviour   = nil  -- behaviour function if any
     self.display     = true -- display or not ?
     self.drawground  = true -- draw beheviors
@@ -4270,6 +4271,25 @@ function CElement:appendElement(_element) -- append element -- unique -- ordered
     if not _element:is(CElement) then return end -- only elements
     _element.parent = self -- record parent
     Tables:valInsert(self.elements, _element, true)
+end
+
+function CElement:alignElementDirection(_element, _direction) -- align a sub element from itself -- use direction
+    if not _element then return end -- mandatory
+    _direction = _direction or Tic.DIRHIT -- center by default
+    if Tables:valFind({Tic.DIR315, Tic.DIR270, Tic.DIR225}, _direction) then -- LF
+        _element.screenx = self.screenx
+    elseif Tables:valFind({Tic.DIR000, Tic.DIRHIT, Tic.DIR180}, _direction) then -- MD
+        _element.screenx = self.screenx + ((self.screenw - _element.screenw) // 2)
+    else -- RG
+        _element.screenx = self.screenx + (self.screenw - _element.screenw)
+    end
+    if Tables:valFind({Tic.DIR315, Tic.DIR000, Tic.DIR045}, _direction) then -- UP
+        _element.screeny = self.screeny
+    elseif Tables:valFind({Tic.DIR270, Tic.DIRHIT, Tic.DIR090}, _direction) then -- MD
+        _element.screeny = self.screeny + ((self.screenh - _element.screenh) // 2)
+    else -- DW
+        _element.screeny = self.screeny + (self.screenh - _element.screenh)
+    end
 end
 
 
@@ -4810,7 +4830,7 @@ function CWindowWorld:drawPlayerActual()
     end
 
     if  _playeractual:entitySpotting()
-    and _playeractual:entitySpotting():hasInteractions() -- HH
+    and _playeractual:entitySpotting():hasInteractions()
     and _playeractual:regionWorld():directionRegion(_playeractual:entitySpotting():regionWorld()) == Tic.DIRHIT
     then
         _playeractual:interacttoAppend(_playeractual:entitySpotting())
@@ -5036,9 +5056,10 @@ function CButtonText:draw() -- button drawing
 end
 
 function CButtonText:drawInside()
+    self:alignElementDirection(self.text, self.align)
     self.text.colorinside = self.colorinside
-    self.text.screenx = self.screenx - ((self.text.screenw - self.screenw) // 2)
-    self.text.screeny = self.screeny - ((self.text.screenh - self.screenh) // 2)
+    -- self.text.screenx = self.screenx - ((self.text.screenw - self.screenw) // 2)
+    -- self.text.screeny = self.screeny - ((self.text.screenh - self.screenh) // 2)
     self.text:draw()
 end
 
