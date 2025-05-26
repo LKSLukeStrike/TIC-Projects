@@ -4278,6 +4278,7 @@ function CText:new(_argt)
     CText.super.new(self, _argt)
     self.kind = Classic.KINDTEXT
     self.name = Classic.NAMETEXT
+    self.screenh     = Tic.FONTH
     self.drawground  = false -- draw beheviors
     self.drawguides  = false
     self.drawinside  = true
@@ -4285,31 +4286,37 @@ function CText:new(_argt)
     self.drawborder  = false
     self.drawframes  = false
     self.text        = nil
-    self.screenh     = Tic.FONTH
     self.fixed       = true
     self.scale       = Tic.SCALE01
     self.small       = true
     self.shadow      = false -- add a shadow ?
+    self.case        = nil
+    self.marginlf    = 0
+    self.marginrg    = 0
+    self.marginup    = 0
+    self.margindw    = 0
     self.colorinside = Tic.COLORGREYL
     self.colorshadow = Tic.COLORGREYD
     self:argt(_argt) -- override if any
+    self:adjustWH()
+end
+
+function CText:adjustWH() -- adjust screenw, screenh
     self.screenw = print((self.text or ""), Nums.MININTEGER, Nums.MININTEGER, self.colorinside, self.fixed, self.scale, self.small)
     self.screenw = (self.shadow) and self.screenw + self.scale or self.screenw
+    self.screenw = self.screenw + (self.marginlf * self.scale) + (self.marginrg * self.scale)
+    self.screenh = Tic.FONTH
     self.screenh = (self.shadow) and self.screenh + self.scale or self.screenh
+    self.screenh = self.screenh + (self.marginup * self.scale) + (self.margindw * self.scale)
 end
--- function CText:argt(_argt)
---     CText.super.argt(self, _argt)
---     self.screenw = print((self.text or ""), Nums.MININTEGER, Nums.MININTEGER, self.colorinside, self.fixed, self.scale, self.small)
---     self.screenw = (self.shadow) and self.screenw + (self.scale or Tic.SCALE01) or self.screenw
---     self.screenh = (self.shadow) and self.screenh + (self.scale or Tic.SCALE01) or self.screenh
--- end
 
 function CText:drawInside()
+    self.text = Names:case(self.text, self.case)
     if self.shadow then
         print(
             self.text,
-            self.screenx + 1,
-            self.screeny + 1,
+            self.screenx + (self.marginlf * self.scale) + self.scale,
+            self.screeny + (self.marginup * self.scale) + self.scale,
             self.colorshadow,
             self.fixed,
             self.scale,
@@ -4318,8 +4325,8 @@ function CText:drawInside()
     end
     print(
         self.text,
-        self.screenx,
-        self.screeny,
+        self.screenx + (self.marginlf * self.scale),
+        self.screeny + (self.marginup * self.scale),
         self.colorinside,
         self.fixed,
         self.scale,
@@ -5863,10 +5870,10 @@ ScreenIntro:elementsDistributeV({Button1, Button2, Button3}, 10, 10, 2)
 end
 
 -- trace(print("hello"))
-Text01 = CText{screenx = 65, screeny = 30, text = "Cozy", fixed = false, small = false, shadow = true}
+Text01 = CText{screenx = 65, screeny = 30, text = "cozy world", fixed = false, small = false, shadow = true, case = Names.CASECAMEL, marginlf = 2}
 -- trace(CText{text = "hello", fixed = false, small = false}.screenh)
-Text02 = CText{screenx = 65, screeny = 50, text = "Cozy", fixed = false, small = true, colorinside = 5}
-Text03 = CText{screenx = 65, screeny = 70, text = "Cozy", fixed = true, small = true, shadow = true}
+Text02 = CText{screenx = 65, screeny = 38, text = "Cozy", fixed = false, small = true, colorinside = 5}
+Text03 = CText{screenx = 65, screeny = 50, text = "Cozy", fixed = true, small = true, shadow = true}
 -- trace(CText{text = "hello", fixed = false, small = false, shadow = true}.screenh)
 -- exit()
 
