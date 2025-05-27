@@ -4950,7 +4950,6 @@ function CButton:drawGround()
     if not self.rounded then -- standard drawing
         CButton.super.drawGround(self)
     else
-        rect(self.screenx + 1, self.screeny + 1, self.screenw - 2, self.screenh - 2, self.colorborder)
         rect(self.screenx + 2, self.screeny + 1, self.screenw - 4, self.screenh - 2, self.colorground)
         rect(self.screenx + 1, self.screeny + 2, self.screenw - 2, self.screenh - 4, self.colorground)
     end
@@ -4964,8 +4963,12 @@ function CButton:drawBorder()
         CButton.super.drawBorder(self)
     else
         rect(self.screenx + 1, self.screeny, self.screenw - 2, 1, self.colorborder)
+        rect(self.screenx + 1, self.screeny + 1, 1, 1, self.colorborder)
+        rect(self.screenx +  self.screenw - 2, self.screeny + 1, 1, 1, self.colorborder)
         rect(self.screenx, self.screeny + 1, 1, self.screenh - 2, self.colorborder)
         rect(self.screenx + 1, self.screeny + self.screenh - 1, self.screenw - 2, 1, self.colorborder)
+        rect(self.screenx + 1, self.screeny + self.screenh - 2, 1, 1, self.colorborder)
+        rect(self.screenx +  self.screenw - 2, self.screeny + self.screenh - 2, 1, 1, self.colorborder)
         rect(self.screenx + self.screenw - 1, self.screeny + 1, 1, self.screenh - 2, self.colorborder)
     end
     self:load()
@@ -5057,9 +5060,7 @@ end
 
 function CButtonText:drawInside()
     self:alignElementDirection(self.text, self.align)
-    self.text.colorinside = self.colorinside
-    -- self.text.screenx = self.screenx - ((self.text.screenw - self.screenw) // 2)
-    -- self.text.screeny = self.screeny - ((self.text.screenh - self.screenh) // 2)
+    self.text.colorinside = (self.colorinside) and self.colorinside or self.text.colorinside
     self.text:draw()
 end
 
@@ -5071,15 +5072,16 @@ local CButtonMenu = CButtonText:extend() -- generic menu button
 function CButtonMenu:new(_argt)
     CButtonMenu.super.new(self, _argt)
     self.rounded = false
+    self.align   = Tic.DIR270
     self:argt(_argt) -- override if any
 end
 
-function CButtonMenu:drawInside()
-    self.text.colorinside = self.colorinside
-    self.text.screenx = self.screenx + 3
-    self.text.screeny = self.screeny - ((self.text.screenh - self.screenh) // 2)
-    self.text:draw()
-end
+-- function CButtonMenu:drawInside()
+--     self.text.colorinside = self.colorinside
+--     self.text.screenx = self.screenx + 3
+--     self.text.screeny = self.screeny - ((self.text.screenh - self.screenh) // 2)
+--     self.text:draw()
+-- end
 
 
 --
@@ -5786,22 +5788,25 @@ local Button1 = CButtonText{
     -- screenx = 10,
     -- screeny = 10,
     screenw = 16,
-    screenh = 7,
+    screenh = 8,
     name = "plop 1",
     hovertext = CText{text = "One"},
-    text = CText{text = "Ok"},
+    text = CText{text = "Op"},
     clicklf = _function,
     clickrg = _function,
 }
 local Button2 = CButtonText{
     -- screenx = 10,
     -- screeny = 20,
-    screenw = 9,
-    screenh = 9,
+    screenw = 8,
+    screenh = 8,
     name = "plop 2",
     hovertext = CText{text = "TWO"},
-    colorinside = Tic.COLORRED,
-    text = CText{text = "C"},
+    colorinside = Classic.NIL,
+    text = CText{text = "C", colorinside = Tic.COLORBLUEL},
+    -- drawborder = false,
+    -- drawground = false,
+    -- align = Tic.DIR270,
     clicklf = _function,
 }
 local Button3 = CButtonText{
@@ -5813,20 +5818,20 @@ local Button3 = CButtonText{
 }
 local Button4 = CButtonMenu{
     screenx = 10,
-    screeny = 42,
-    screenw = 26,
-    screenh = 9,
+    screeny = 40,
+    screenw = 28,
+    screenh = 10,
     rounded = false,
-    text = CText{text = "Open"},
+    text = CText{text = "Open", marginlf = 2},
     clicklf = function() end,
 }
 local Button5 = CButtonMenu{
     screenx = 10,
-    screeny = 50,
-    screenw = 26,
-    screenh = 9,
+    screeny = 49,
+    screenw = 28,
+    screenh = 10,
     rounded = false,
-    text = CText{text = "Close"},
+    text = CText{text = "Close", marginlf = 2},
     clicklf = _function,
     -- colorinside = Tic.COLORKEY
 }
