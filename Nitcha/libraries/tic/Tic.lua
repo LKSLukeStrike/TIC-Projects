@@ -4123,13 +4123,15 @@ function CElement:new(_argt)
     CElement.super.new(self, _argt)
     self.kind = Classic.KINDELEMENT
     self.name = Classic.NAMEELEMENT
-    self.parent      = nil -- parent element if any
-    self.elements    = {}  -- children elements if any -- ordered
     self.screenx     = Tic.SCREENX -- positions
     self.screeny     = Tic.SCREENY
     self.screenw     = Tic.SCREENW -- sizes
     self.screenh     = Tic.SCREENH
     self.align       = Tic.DIRHIT -- sub elements alignment
+    self.marginlf    = 0
+    self.marginrg    = 0
+    self.marginup    = 0
+    self.margindw    = 0
     self.behaviour   = nil  -- behaviour function if any
     self.display     = true -- display or not ?
     self.drawground  = true -- draw beheviors
@@ -4266,13 +4268,6 @@ function CElement:region() -- element region
     }
 end
 
-function CElement:appendElement(_element) -- append element -- unique -- ordered
-    if not _element then return end -- mandarory
-    if not _element:is(CElement) then return end -- only elements
-    _element.parent = self -- record parent
-    Tables:valInsert(self.elements, _element, true)
-end
-
 function CElement:alignElementDirection(_element, _direction) -- align a sub element from itself -- use direction
     if not _element then return end -- mandatory
     _direction = _direction or Tic.DIRHIT -- center by default
@@ -4316,10 +4311,6 @@ function CText:new(_argt)
     self.small       = true
     self.shadow      = false -- add a shadow ?
     self.case        = nil
-    self.marginlf    = 0
-    self.marginrg    = 0
-    self.marginup    = 0
-    self.margindw    = 0
     self.colorinside = Tic.COLORGREYL
     self.colorshadow = Tic.COLORGREYD
     self:argt(_argt) -- override if any
@@ -4390,6 +4381,28 @@ end
 --
 -- CWindowInfos
 --
+local CWindowInfos2 = CWindow:extend() -- window infos
+function CWindowInfos2:new(_argt)
+    CWindowInfos2.super.new(self, _argt)
+    self.drawcaches  = false
+    self.drawborder  = false
+    self.colorground = Tic.COLORBIOMENIGHT
+	self.infos       = {} -- lines content -- {CText, ...}
+    self:argt(_argt) -- override if any
+end
+
+function CWindowInfos2:drawInside()
+    -- local _screenx = self.screenx
+    -- local _screeny = self.screeny
+    -- local _screenw = 0
+    -- local _screenh = 0
+    for _, _text in pairs(self.infos) do
+        Tic:logAppend(_text.text)
+        -- _text:draw()
+        -- self:alignElementDirection(_text, self.align)
+    end
+end
+
 local CWindowInfos = CWindow:extend() -- window infos
 CWindowInfos.ALIGNLF = "alignlf"
 CWindowInfos.ALIGNMD = "alignmd"
@@ -4867,26 +4880,24 @@ end
 --
 -- CWindowInfosWorld
 --
-local CWindowInfosWorld = CWindowInfos:extend() -- window infos for world
+local CWindowInfosWorld = CWindowInfos2:extend() -- window infos for world
 function CWindowInfosWorld:new(_argt)
     CWindowInfosWorld.super.new(self, _argt)
     self.screenx    = Tic.WORLDINFOSWX
     self.screeny    = Tic.WORLDINFOSWY
-	self.small      = false
+	self.screenw    = Tic.WORLDINFOSWW
+	self.screenh    = Tic.WORLDINFOSWH
     self.drawframes = true
     self.drawborder = true
-	self.marginsv   = 1
-	self.align      = CWindowInfos.ALIGNMD
+	self.small      = false
+	self.align      = Tic.DIRHIT
     self:argt(_argt) -- override if any
-	self.screenw = Tic.WORLDINFOSWW
-	self.screenh = Tic.WORLDINFOSWH
-	return self.screenw, self.screenh
 end
 
 function CWindowInfosWorld:drawInside() -- window infos content for world
     local _entity = Tic:worldActual()
-    local _info   = _entity.kind.." : ".._entity.name
-    self.infos    = {_info}
+    local _text   = {text = _entity.kind.." : ".._entity.name, small = false}
+    self.infos    = {_text}
     CWindowInfosWorld.super.drawInside(self)
 end
 
