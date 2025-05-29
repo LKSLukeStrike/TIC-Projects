@@ -4132,6 +4132,7 @@ function CElement:new(_argt)
     self.marginrg    = 0
     self.marginup    = 0
     self.margindw    = 0
+    self.elements    = {} -- sub elements if any
     self.behaviour   = nil  -- behaviour function if any
     self.display     = true -- display or not ?
     self.drawground  = true -- draw beheviors
@@ -4319,10 +4320,8 @@ end
 
 function CText:adjustWH() -- adjust screenw, screenh
     self.screenw = print((self.text or ""), Nums.MININTEGER, Nums.MININTEGER, self.colorinside, self.fixed, self.scale, self.small)
-    self.screenw = (self.shadow) and self.screenw + self.scale or self.screenw
     self.screenw = self.screenw + (self.marginlf * self.scale) + (self.marginrg * self.scale)
     self.screenh = Tic.FONTH
-    self.screenh = (self.shadow) and self.screenh + self.scale or self.screenh
     self.screenh = self.screenh + (self.marginup * self.scale) + (self.margindw * self.scale)
 end
 
@@ -4381,98 +4380,23 @@ end
 --
 -- CWindowInfos
 --
-local CWindowInfos2 = CWindow:extend() -- window infos
-function CWindowInfos2:new(_argt)
-    CWindowInfos2.super.new(self, _argt)
-    self.drawcaches  = false
-    self.drawborder  = false
-    self.colorground = Tic.COLORBIOMENIGHT
-	self.infos       = {} -- lines content -- {CText, ...}
-    self:argt(_argt) -- override if any
-end
-
-function CWindowInfos2:drawInside()
-    -- local _screenx = self.screenx
-    -- local _screeny = self.screeny
-    -- local _screenw = 0
-    -- local _screenh = 0
-    for _, _text in pairs(self.infos) do
-        Tic:logAppend(_text.text)
-        -- _text:draw()
-        -- self:alignElementDirection(_text, self.align)
-    end
-end
-
 local CWindowInfos = CWindow:extend() -- window infos
-CWindowInfos.ALIGNLF = "alignlf"
-CWindowInfos.ALIGNMD = "alignmd"
-CWindowInfos.ALIGNRG = "alignrg"
 function CWindowInfos:new(_argt)
     CWindowInfos.super.new(self, _argt)
-	self.lines       = 2 -- number of lines
-	self.chars       = 6 -- number of chars per lines
-	self.fixed       = true -- TODO accept also not fixed fonts ?
-	self.scale       = Tic.SCALE01 -- TODO accept also other scales ?
-	self.small       = true -- small fonts or large fonts
-	self.infos       = {} -- lines content -- {info1, infoN,...}
-	self.align       = CWindowInfos.ALIGNLF -- h alignment
-	self.marginsh    = 1 -- h margins in px
-	self.marginsv    = 0 -- v margins in px
-	self.linessep    = 0 -- separator in px
-    self.shadow      = true -- add a shadow
-    self.fupper      = false -- uppercase the first char
-    self.colorinfofg = Tic.COLORGREYL
-    self.colorinfobg = Tic.COLORGREYD -- for shadow
-    self.colorground = Tic.COLORBIOMENIGHT
     self.drawcaches  = false
     self.drawborder  = false
+    self.colorground = Tic.COLORBIOMENIGHT
     self:argt(_argt) -- override if any
-	local _fontw = (self.small) and Tic.FONTWS or Tic.FONTWL
-	local _fonth = Tic.FONTH + 2
-	local _seppx = math.min(0, self.lines - 1) * self.linessep
-	self.screenw = (self.chars * _fontw) + (self.marginsh * 2)
-	self.screenh = (self.lines * _fonth) + (self.marginsv * 2) + _seppx
-	return self.screenw, self.screenh
 end
 
-function CWindowInfos:drawInside() -- window info content
-	local _fontw   = (self.small) and Tic.FONTWS or Tic.FONTWL
-    local _offsetx = self.marginsh
-    local _offsety = self.marginsv
-	for _line = 1, self.lines do -- draw each line
-        local _info = self.infos[_line] or ""
-        local _size = string.len(_info) * _fontw
-        _offsetx = (self.align == CWindowInfos.ALIGNMD)
-            and (self.screenw - _size) // 2
-            or  _offsetx
-        _offsetx = (self.align == CWindowInfos.ALIGNRG)
-            and self.screenw - self.marginsh - _size + 1
-            or  _offsetx
-        _info = (self.fupper) -- uppercase first char if any
-            and Names:fupper(_info)
-            or  _info
-		if self.shadow then
-			print(
-				_info,
-				self.screenx + _offsetx + 1,
-				self.screeny + _offsety + 2, -- y offset font in each line
-				self.colorinfobg,
-				self.fixed,
-				self.scale,
-				self.small
-			)
-		end
-		print(
-			_info,
-			self.screenx + _offsetx,
-			self.screeny + _offsety + 1, -- y offset font in each line
-			self.colorinfofg,
-			self.fixed,
-			self.scale,
-			self.small
-		)
-		_offsety = _offsety + Tic.FONTH + 2 + self.linessep
-	end
+function CWindowInfos:drawInside()
+    local _offsety = 0
+    for _, _text in pairs(self.elements) do
+        self:alignElementDirection(_text, self.align)
+        _text.screeny = _text.screeny + _offsety
+        _text:draw()
+        _offsety = _offsety + _text.screenh
+    end
 end
 
 
@@ -4491,21 +4415,16 @@ end
 local CWindowInfosEntity = CWindowInfos:extend() -- window infos for entities
 function CWindowInfosEntity:new(_argt)
     CWindowInfosEntity.super.new(self, _argt)
-    self.lines  = 2
-    self.chars  = 6
-    self.small  = true
-    self.align  = CWindowInfos.ALIGNMD
-    self.shadow = true
+    self.align  = Tic.DIR000
 	self.entity = nil -- override
     self:argt(_argt) -- override if any
 end
 
 function CWindowInfosEntity:drawInside() -- window infos content for entities
-    if not self.entity then return end -- mandatory
-    if not self.entity:is(CEntity) then return end -- mandatory
-    local _info1 = self.entity.name
-    local _info2 = self.entity.kind
-	self.infos = {_info1, _info2}
+    if not self.entity then return end -- nothing to draw
+    local _name = CText{text = self.entity.name, case = Names.CASEFIRST, shadow = true, marginup = 1}
+    local _kind = CText{text = self.entity.kind, case = Names.CASEFIRST, shadow = true, marginup = 2}
+    self.elements = {_name, _kind}
     CWindowInfosEntity.super.drawInside(self)
 end
 
@@ -4528,6 +4447,8 @@ function CWindowPlayerInfos:new(_argt)
     CWindowPlayerInfos.super.new(self, _argt)
     self.screenx   = Tic.PLAYERINFOSWX
     self.screeny   = Tic.PLAYERINFOSWY
+    self.screenw   = Tic.PLAYERINFOSWW
+    self.screenh   = Tic.PLAYERINFOSWH
 	self.entity    = Tic:playerActual()
 	self.behaviour = IWindowPlayer.BEHAVIOUR
     self:argt(_argt) -- override if any
@@ -4726,8 +4647,9 @@ function CWindowPlayerState:new(_argt)
     CWindowPlayerState.super.new(self, _argt)
     self.screenx   = Tic.PLAYERSTATEWX
     self.screeny   = Tic.PLAYERSTATEWY
-    self.align     = CWindowInfos.ALIGNMD
-    self.fupper    = true
+    self.screenw   = Tic.PLAYERSTATEWW
+    self.screenh   = Tic.PLAYERSTATEWH
+    self.align     = Tic.DIR000
 	self.entity    = Tic:playerActual()
 	self.behaviour = IWindowPlayer.BEHAVIOUR
     self:argt(_argt) -- override if any
@@ -4735,9 +4657,9 @@ end
 
 function CWindowPlayerState:drawInside() -- window state content for player
     if not self.entity then return end -- nothing to draw
-    local _posture = self.entity:postureGet()
-    local _status  = self.entity:statusGet()
-    self.infos = {_posture, _status}
+    local _posture = CText{text = self.entity:postureGet(), case = Names.CASEFIRST, shadow = true, marginup = 1}
+    local _status  = CText{text = self.entity:statusGet(), case = Names.CASEFIRST, shadow = true, marginup = 2}
+    self.elements = {_posture, _status}
     CWindowPlayerState.super.drawInside(self)
 end
 
@@ -4772,6 +4694,8 @@ function CWindowSpottingInfos:new(_argt)
     self.kind = Classic.KINDWINDOWSPOTTINGINFOS
     self.screenx   = Tic.SPOTTINGINFOSWX
     self.screeny   = Tic.SPOTTINGINFOSWY
+    self.screenw   = Tic.SPOTTINGINFOSWW
+    self.screenh   = Tic.SPOTTINGINFOSWH
     self.behaviour = IWindowSpotting.BEHAVIOUR
     self:argt(_argt) -- override if any
 end
@@ -4787,6 +4711,8 @@ function CWindowSpottingPortrait:new(_argt)
     self.kind = Classic.KINDWINDOWSPOTTINGPORTRAIT
     self.screenx   = Tic.SPOTTINGPORTRAITWX
     self.screeny   = Tic.SPOTTINGPORTRAITWY
+    self.screenw   = Tic.SPOTTINGPORTRAITWW
+    self.screenh   = Tic.SPOTTINGPORTRAITWH
     self.behaviour = IWindowSpotting.BEHAVIOUR
     self:argt(_argt) -- override if any
 end
@@ -4880,24 +4806,22 @@ end
 --
 -- CWindowInfosWorld
 --
-local CWindowInfosWorld = CWindowInfos2:extend() -- window infos for world
+local CWindowInfosWorld = CWindowInfos:extend() -- window infos for world
 function CWindowInfosWorld:new(_argt)
     CWindowInfosWorld.super.new(self, _argt)
     self.screenx    = Tic.WORLDINFOSWX
     self.screeny    = Tic.WORLDINFOSWY
 	self.screenw    = Tic.WORLDINFOSWW
 	self.screenh    = Tic.WORLDINFOSWH
-    self.drawframes = true
     self.drawborder = true
-	self.small      = false
 	self.align      = Tic.DIRHIT
     self:argt(_argt) -- override if any
 end
 
 function CWindowInfosWorld:drawInside() -- window infos content for world
     local _entity = Tic:worldActual()
-    local _text   = {text = _entity.kind.." : ".._entity.name, small = false}
-    self.infos    = {_text}
+    local _text   = CText{text = _entity.kind.." : ".._entity.name, small = false}
+    self.elements = {_text}
     CWindowInfosWorld.super.drawInside(self)
 end
 
@@ -6310,9 +6234,9 @@ function Tic:draw()
     Tic:drawLog()
     Tic:logPrint()
 
-    Text01:draw()
-    Text02:draw()
-    Text03:draw()
+    -- Text01:draw()
+    -- Text02:draw()
+    -- Text03:draw()
 
     -- SpriteSFX:draw()
     -- SpriteHTG:draw()
