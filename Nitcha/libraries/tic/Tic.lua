@@ -1951,6 +1951,7 @@ function CEntityDrawable:new(_argt)
     self.scale       = Tic.SCALE01
     self.animations  = nil -- override if any
     self.spotted     = false -- use spotted to draw a border
+    self.hovered     = false -- use hovered to draw a border
     self.hitbox       = CHitbox{entity = self, lf = 0, rg = 7, up = 0, dw = 7}
     self.drawborders = false -- draw behaviour
     self.drawhitbox  = false
@@ -1988,6 +1989,7 @@ function CEntityDrawable:draw() -- default draw for drawable entities -- overrid
     _musprite:draw()
 
     self:drawSpotted()
+    self:drawHovered()
     self:drawBorders()
     self:drawHitbox()
 end
@@ -2001,6 +2003,18 @@ function CEntityDrawable:drawSpotted() -- draw spotted if any
     _musprite.flip    = self.dirx
     _musprite.scale   = self.scale
     _musprite.palette = {[Tic.COLORGREYM] = Tic.COLORWHITE,}
+    _musprite:draw()
+end
+
+function CEntityDrawable:drawHovered() -- draw hovered if any
+    if not self.hovered then return end -- nothing to draw
+    local _musprite = CSpriteBG() -- multi usage unique sprite
+    _musprite.sprite  = CSpriteBG.SIGNBORSQU
+    _musprite.screenx = self.screenx
+    _musprite.screeny = self.screeny
+    _musprite.flip    = self.dirx
+    _musprite.scale   = self.scale
+    _musprite.palette = {[Tic.COLORGREYM] = Tic.COLORGREYL,}
     _musprite:draw()
 end
 
@@ -3305,6 +3319,7 @@ function CCharacter:draw() -- set animations and draw layers
     self:drawBody()
     self:drawHead()
     self:drawSpotted()
+    self:drawHovered()
     self:drawBorders()
     self:drawHitbox()
     self:drawView()
@@ -4487,18 +4502,27 @@ function CWindowPortraitDrawable:new(_argt)
 end
 
 function CWindowPortraitDrawable:drawInside() -- window portrait content for -- [!] drawable entities
-    self.entity:save{"screenx", "screeny", "scale", "drawdirs", "drawview","dirx", "frame", "animations",}
-    self.entity.screenx  = self.screenx -- force character attributes
-    self.entity.screeny  = self.screeny
-    self.entity.scale    = Tic.SCALE02
-    self.entity.drawdirs = false
-    self.entity.drawview = false
+    if not self.entity then return end -- nothing to draw
+    self.entity:save{"screenx", "screeny", "scale", "drawdirs", "drawview","dirx", "frame", "animations",
+        "interactto", "interactby", "spotted", "hovered"}
+    self.entity.screenx    = self.screenx -- force entity attributes
+    self.entity.screeny    = self.screeny
+    self.entity.scale      = Tic.SCALE02
+    self.entity.drawdirs   = false
+    self.entity.drawview   = false
+    self.entity.interactto = {} -- dont draw interactto in window
+    self.entity.interactby = {} -- dont draw interactby in window
+    self.entity.spotted    = false -- dont draw spotted frame in window
+    self.entity.hovered    = false -- dont draw hovered frame in window
+    local _ticdrawhitbox   = Tic.DRAWHITBOX
+    Tic.DRAWHITBOX         = false -- FIXME remove tic master at one point
     if self.idle then
         self.entity.dirx       = Tic.DIRXLF
         self.entity.frame      = CSprite.FRAME00
         self.entity.animations = {}
     end
     self.entity:draw()
+    Tic.DRAWHITBOX = _ticdrawhitbox
     self.entity:load()
 end
 
@@ -4514,17 +4538,6 @@ function CWindowPlayerPortrait:new(_argt)
 	self.entity    = Tic:playerActual()
 	self.behaviour = IWindowPlayer.BEHAVIOUR
     self:argt(_argt) -- override if any
-end
-
-function CWindowPlayerPortrait:draw()
-    if self.entity then
-        self.entity:save{"interactto"}
-        self.entity.interactto = {} -- dont draw interact in window
-    end
-    CWindowPlayerPortrait.super.draw(self)
-    if self.entity then
-        self.entity:load()
-    end
 end
 
 
@@ -4715,17 +4728,6 @@ function CWindowSpottingPortrait:new(_argt)
     self.screenh   = Tic.SPOTTINGPORTRAITWH
     self.behaviour = IWindowSpotting.BEHAVIOUR
     self:argt(_argt) -- override if any
-end
-
-function CWindowSpottingPortrait:draw()
-    if self.entity then
-        self.entity:save{"spotted"}
-        self.entity.spotted = false -- dont draw spotted frame in window
-    end
-    CWindowSpottingPortrait.super.draw(self)
-    if self.entity then
-        self.entity:load()
-    end
 end
 
 
@@ -5709,7 +5711,7 @@ ScreenWorld:appendElements{
 }
 end
 
-if true then
+if false then
 local _function = function(self) -- FIXME axecute functions with self
     -- Tic:logAppend((self.name or "None"))
     Tic:logAppend("Plop")
@@ -6040,6 +6042,7 @@ local Oxboow = CPlayerGhost{name = "Oxboow",
     spottingdraw = true,
     spottinglock = true,
     hitbox = Classic.NIL,
+    hovered = true,
     -- interactto = {10}
 }
 -- Oxboow:randomWorldWindow()
@@ -6174,6 +6177,7 @@ local House1 = CPlaceHouseAnim{
     name = "House1",
     worldx = -20,
     worldy = 10,
+    hovered = true,
 }
 local House2 = CPlaceHouseAnim{
     name = "House2",
