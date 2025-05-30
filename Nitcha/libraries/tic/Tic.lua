@@ -475,6 +475,9 @@ function Tic:mouseInput() -- set the mouse inputs in a table
         Tic.MOUSEDIRX    = Tic.DIRXRG
     end
 
+    -- _result.screenx = _result.screenx + Tic.MOUSEOFFSETX
+    -- _result.screeny = _result.screeny + Tic.MOUSEOFFSETY
+
     Tic.MOUSE = _result
     return _result -- not useful
 end
@@ -486,6 +489,14 @@ end
 function Tic:mouseHandleInput() -- set the mouse cursor sprite
     Tic:mouseInput()
     Tic:mouseCursor()
+end
+
+function Tic:mousePointX() -- real mouse x point
+    return Tic.MOUSE.screenx + Tic.MOUSEOFFSETX
+end
+
+function Tic:mousePointY() -- real mouse y point
+    return Tic.MOUSE.screeny + Tic.MOUSEOFFSETY
 end
 
 
@@ -504,7 +515,7 @@ function Tic:buttonsHandleInput()
         _button:deactivate()
 
         if _button:activable() then -- check if a button is active and hovered
-            if _button:region():hasInsidePoint(Tic.MOUSE.screenx + Tic.MOUSEOFFSETX, Tic.MOUSE.screeny + Tic.MOUSEOFFSETY) then
+            if _button:region():hasInsidePoint(Tic:mousePointX(), Tic:mousePointY()) then
                 if not _buttontreated then
                     local _functionsactived = _button:functionsActived()
                     if Tables:size(_functionsactived) > 0 then -- activate
@@ -3113,6 +3124,7 @@ function CCharacter:new(_argt)
     self.workcycler   = CCyclerInt{maxindex = 179} -- cycler to animate work
     self.hitbox       = CHitbox{entity = self, lf = 2, rg = 4, up = 5, dw = 7}
     self.spotting     = nil -- spotting entity if any
+    self.hovering     = nil -- hovering entity if any
     self.spottingdraw = false -- draw its spotting
     self.spottinglock = false -- lock its spotting
     self.spottingpick = false -- pick its spotting
@@ -4766,11 +4778,13 @@ function CWindowWorld:drawPlayerActual()
     local _regionmindworld  = _playeractual:regionMindWorld()
     local _nearestentity    = _playeractual:nearestEntityViewWorld() -- nearest entity if any -- except itself
 
-    if not _playeractual:entitySpotting() or not _playeractual:isSpottingLock() then
+    if not _playeractual:entitySpotting() or not _playeractual:isSpottingLock() then -- spotting
         _playeractual.spotting  = _nearestentity
     end
 
-    if  _playeractual:entitySpotting()
+    _playeractual.hovering = nil -- hovering
+
+    if  _playeractual:entitySpotting() -- interact
     and _playeractual:entitySpotting():hasInteractions()
     and _playeractual:regionWorld():directionRegion(_playeractual:entitySpotting():regionWorld()) == Tic.DIRHIT
     then
@@ -4788,6 +4802,8 @@ function CWindowWorld:drawPlayerActual()
                     and true
                     or  false
 
+                _entity.hovered = false
+
                 if _regionviewworld:hasInsideRegion(_entityregionworld) then -- if in view
                     _entity.drawfade = false
                     _entity.discovered = true
@@ -4796,6 +4812,11 @@ function CWindowWorld:drawPlayerActual()
                 end
 
                 if (_entity.drawfade == false) or (_regionmindworld:hasInsideRegion(_entityregionworld)) then -- draw entity ?
+                    if  _playeractual.spottingpick
+                    and not _playeractual.hovering then
+                    -- and _entity:regionScreen() HH
+                        _entity.hovered = true
+                    end
                     _entity:drawRelativeToEntity(_playeractual)
                 end
 
@@ -6042,7 +6063,7 @@ local Oxboow = CPlayerGhost{name = "Oxboow",
     spottingdraw = true,
     spottinglock = true,
     hitbox = Classic.NIL,
-    hovered = true,
+    -- hovered = true,
     -- interactto = {10}
 }
 -- Oxboow:randomWorldWindow()
@@ -6177,7 +6198,7 @@ local House1 = CPlaceHouseAnim{
     name = "House1",
     worldx = -20,
     worldy = 10,
-    hovered = true,
+    -- hovered = true,
 }
 local House2 = CPlaceHouseAnim{
     name = "House2",
