@@ -62,6 +62,8 @@ end
 
 -- Random
 function Nums:random(_num1, _num2) -- solid random, ensure correct interval
+    _num1 = _num1 or 0
+    _num2 = _num2 or 1
     local _min = math.min(_num1, _num2)
     local _max = math.max(_num1, _num2)
     return math.random(_min, _max)

@@ -475,9 +475,6 @@ function Tic:mouseInput() -- set the mouse inputs in a table
         Tic.MOUSEDIRX    = Tic.DIRXRG
     end
 
-    -- _result.screenx = _result.screenx + Tic.MOUSEOFFSETX
-    -- _result.screeny = _result.screeny + Tic.MOUSEOFFSETY
-
     Tic.MOUSE = _result
     return _result -- not useful
 end
@@ -668,10 +665,10 @@ Tic.POSTURESTAND = "stand" -- postures
 Tic.POSTUREKNEEL = "kneel"
 Tic.POSTUREFLOOR = "floor"
 
-Tic.STATUSIDLE   = "idle" -- statuses
+Tic.STATUSIDLE   = "idle" -- statuses at stand or kneel
 Tic.STATUSWORK   = "work"
 Tic.STATUSMOVE   = "move"
-Tic.STATUSSLEEP  = "sleep"
+Tic.STATUSSLEEP  = "sleep" -- statuses at floor
 Tic.STATUSBLEED  = "bleed"
 Tic.STATUSMAGIC  = "magic"
 Tic.STATUSALCHE  = "alche"
@@ -905,6 +902,12 @@ function Tic:entitySpotting(_character)
     _character = _character or Tic:playerActual()
     if not _character then return nil end
 	return _character:entitySpotting()
+end
+
+function Tic:entityHovering(_character)
+    _character = _character or Tic:playerActual()
+    if not _character then return nil end
+	return _character:entityHovering()
 end
 
 
@@ -1714,7 +1717,7 @@ local CEntity = Classic:extend() -- generic entities like worlds, places, object
 Classic.KINDENTITY = "Entity" -- Entity kind
 Classic.NAMEENTITY = "Entity" -- Entity name
 Classic.NAMEEMPTY  = "Empty"  -- Empty name
-Classic.NAMEDEAD   = "Dead"   -- Dead name
+Classic.NAMEDYING  = "Dying"   -- Dying name
 Classic.NAMESILENT = "Silent" -- Silent name
 Classic.NAMELIVING = "Living" -- Living name
 Classic.NAMEANIMED = "Animed" -- Animed name
@@ -2048,16 +2051,12 @@ function CEntityDrawable:drawHitbox() -- draw hitbox if any
     self.hitbox:draw()
 end
 
-function CEntityDrawable:drawRelativeToEntity(_entity) -- draw an entity relative to an other one in world positions
+function CEntityDrawable:adjustScreenXYRelativeToEntity(_entity) -- adjust an entity screen xy relative to an other one in world positions
     if not _entity then return end -- mandatory
-    if not self.discovered then return end -- draw only discovered entities
 	local _offsetx = self.worldx - _entity.worldx
 	local _offsety = self.worldy - _entity.worldy
-	self:save{"screenx", "screeny",}
 	self.screenx = Tic.WORLDWX2 + _offsetx - (Tic.SPRITESIZE2 * self.scale)
 	self.screeny = Tic.WORLDWY2 + _offsety - (Tic.SPRITESIZE2 * self.scale)
-	self:draw()
-	self:load()
 end
 
 function CEntityDrawable:regionWorld() -- return its own region in world
@@ -2066,6 +2065,15 @@ function CEntityDrawable:regionWorld() -- return its own region in world
         rg = self.worldx + (Tic.SPRITESIZE * self.scale) - 1,
         up = self.worldy,
         dw = self.worldy + (Tic.SPRITESIZE * self.scale) - 1, 
+    }
+end
+
+function CEntityDrawable:regionScreen() -- return its own region in screen
+    return CRegion{
+        lf = self.screenx,
+        rg = self.screenx + (Tic.SPRITESIZE * self.scale) - 1,
+        up = self.screeny,
+        dw = self.screeny + (Tic.SPRITESIZE * self.scale) - 1, 
     }
 end
 
@@ -2532,7 +2540,7 @@ end
 local CPlaceTreesIdle = CPlaceTrees:extend() -- generic idle trees
 function CPlaceTreesIdle:new(_argt)
     CPlaceTreesIdle.super.new(self, _argt)
-    self.name = Classic.NAMEDEAD
+    self.name = Classic.NAMEDYING
     self.palette = CPlaceTrees.PALETTEIDLE
     self:argt(_argt) -- override if any
 end
@@ -3120,8 +3128,9 @@ function CCharacter:new(_argt)
     self.diry         = Tic.DIRYMD
     self.direction    = Tic.DIR270
     self.state        = Tic.STATESTANDIDLE -- state
-    self.idlecycler   = CCyclerInt{maxindex = 59} -- cycler to get back to idle
+    self.movecycler   = CCyclerInt{maxindex = 59}  -- cycler to get back to idle after move
     self.workcycler   = CCyclerInt{maxindex = 179} -- cycler to animate work
+    self.idlecycler   = CCyclerInt{maxindex = 179} -- cycler to activate idle animation
     self.hitbox       = CHitbox{entity = self, lf = 2, rg = 4, up = 5, dw = 7}
     self.spotting     = nil -- spotting entity if any
     self.hovering     = nil -- hovering entity if any
@@ -3341,31 +3350,48 @@ function CCharacter:draw() -- set animations and draw layers
 end
 
 function CCharacter:cycle()
-    self:cycleIdle()
+    self:cycleMove()
     self:cycleWork()
+    self:cycleIdle()
 end
 
-function CCharacter:cycleIdle() -- reset to idle after a delay
+function CCharacter:cycleMove() -- reset to idle after move
     local _posture = self:postureGet()
     local _status  = self:statusGet()
     if _posture == Tic.POSTUREFLOOR then return end -- mandatory stand or kneel
-    if _status  == Tic.STATUSWORK then return end -- is at work
+    if not (_status  == Tic.STATUSMOVE) then return end -- mandatory at move
 
-    self.idlecycler:next()
-	if self.idlecycler:isMAX() then -- trigger idlecycler
+    self.movecycler:next()
+	if self.movecycler:isMAX() then -- trigger movecycler
 		self:stateSet(_posture, Tic.STATUSIDLE)
 	end
 end
 
-function CCharacter:cycleWork() -- animate work after a delay
+function CCharacter:cycleWork() -- animate work
     local _posture = self:postureGet()
     local _status  = self:statusGet()
-    if _posture == Tic.POSTUREFLOOR then return end -- not stand or kneel
-    if not (_status == Tic.STATUSWORK) then return end -- not at work
+    if _posture == Tic.POSTUREFLOOR then return end -- mandatory stand or kneel
+    if not (_status == Tic.STATUSWORK) then return end -- mandatory at work
 
     self.workcycler:next()
 	if self.workcycler:isGEH() then -- trigger workcycler
 		self:toggleFrame()
+	end
+end
+
+function CCharacter:cycleIdle() -- animate idle after a delay
+    local _posture = self:postureGet()
+    local _status  = self:statusGet()
+    if _posture == Tic.POSTUREFLOOR then return end -- mandatory stand or kneel
+    if not (_status == Tic.STATUSIDLE) then return end -- mandatory at idle
+
+    self.idlecycler:next()
+	if self.idlecycler:isMAX() then -- trigger idlecycler
+		if Nums:random(Tic.STATSMAX) > self.statmenact then -- only if over statmenact
+            self:moveDirection(Tables:valPickRandom{
+                Tic.DIR045, Tic.DIR090, Tic.DIR135, Tic.DIR225, Tic.DIR270, Tic.DIR315
+            }, true)
+        end
 	end
 end
 
@@ -3595,6 +3621,10 @@ function CCharacter:entitySpotting()
 	return self.spotting
 end
 
+function CCharacter:entityHovering()
+	return self.hovering
+end
+
 function CCharacter:moveWorldXY(_worldx, _worldy) -- move character into world
     if not _worldx or not _worldy then return end -- mandatory
     self.world:moveEntityWorldXY(self, _worldx, _worldy)
@@ -3720,7 +3750,7 @@ function CCharacter:moveDirection(_direction, _movenone,  _moveslow, _moveback) 
     end
     self:moveWorldXY(self.worldx + _movetox, self.worldy + _movetoy)
 
-    self.idlecycler:min() -- reset the idle cycler
+    self.movecycler:min() -- reset the move cycler
 end
 
 function CCharacter:hitboxRefresh() -- refresh the attached hitboxes
@@ -4704,7 +4734,7 @@ end
 --
 local IWindowSpotting = CWindow:extend() -- generic spotting window
 IWindowSpotting.BEHAVIOUR = function(self)
-    self.entity = Tic:entitySpotting()
+    self.entity = (Tic:entityHovering()) and Tic:entityHovering() or Tic:entitySpotting()
     IWindowEntity.BEHAVIOUR(self)
 end
 
@@ -4798,7 +4828,8 @@ function CWindowWorld:drawPlayerActual()
             for _entity, _ in pairs(_locationsaround[_keyy][_keyx]) do -- entities around actual player
                 local _entityregionworld = _entity:regionWorld()
 
-                _entity.spotted = (_entity == _playeractual:entitySpotting() and _playeractual:isSpottingDraw()) -- unspot all entities except spotting one if any
+                _entity.spotted = (_entity == _playeractual:entitySpotting()
+                and _playeractual:isSpottingDraw()) -- unspot all entities except spotting one if any
                     and true
                     or  false
 
@@ -4812,14 +4843,33 @@ function CWindowWorld:drawPlayerActual()
                 end
 
                 if (_entity.drawfade == false) or (_regionmindworld:hasInsideRegion(_entityregionworld)) then -- draw entity ?
-                    if  _playeractual.spottingpick
-                    and not _playeractual.hovering then
-                    -- and _entity:regionScreen() HH
-                        _entity.hovered = true
+                    if _entity.discovered then -- only discovered entities
+                        _entity:adjustScreenXYRelativeToEntity(_playeractual)
+                        local _entityregionscreen = _entity:regionScreen()
+                        if  _playeractual.spottingpick
+                        and not (_entity == _playeractual)
+                        and _entityregionscreen:hasInsidePoint(Tic:mousePointX(), Tic:mousePointY())
+                        and not _playeractual.hovering then
+                            _playeractual.hovering = _entity
+                            _entity.hovered = true
+                            if _playeractual:isSpottingLock() then
+                                local _lock = CText{text = "Lock", colorinside = Tic.COLORWHITE}
+                                _lock.screenx = _entity.screenx - ((_lock.screenw - Tic.SPRITESIZE) // 2)
+                                _lock.screeny = _entity.screeny - _lock.screenh
+                                _lock:draw()
+                                if Tic.MOUSE.clicklf then
+                                    if _playeractual.spotting then
+                                        _playeractual.spotting.spotted = false
+                                    end
+                                    _playeractual.hovering = nil
+                                    _playeractual.spotting = _entity
+                                    _entity.spotted = true
+                                end
+                            end
+                        end --HH
+                        _entity:draw()
                     end
-                    _entity:drawRelativeToEntity(_playeractual)
                 end
-
             end
         end
     end
@@ -5369,7 +5419,7 @@ IButtonSpotting.BEHAVIOUR = function(self)
     self.display = (Tic:entitySpotting()) and true or false
     if not self.display then return end -- no spotting
     local _playerregionworld = Tic:playerActual():regionWorld()
-    local _entityregionworld = Tic:entitySpotting():regionWorld()
+    local _entityregionworld = (Tic:entityHovering()) and Tic:entityHovering():regionWorld() or Tic:entitySpotting():regionWorld()
     local _direction         = _playerregionworld:directionRegion(_entityregionworld)
     self.enabled = true
     self.actived = false
@@ -6256,6 +6306,9 @@ function Tic:draw()
 
     Tic:screenActual():draw()
 
+    -- Tic:logEntity("w", Wulfie)
+    -- Tic:logEntity("o", Oxboow)
+
     Tic:drawLog()
     Tic:logPrint()
 
@@ -6305,6 +6358,10 @@ end
 
 function Tic:logRegion(_pfx, _region)
     Tic:logAppend(_pfx, "u:".._region.up, "d:".._region.dw, "l:".._region.lf, "r:".._region.rg)
+end
+
+function Tic:logEntity(_pfx, _entity)
+    Tic:logAppend(_pfx, _entity.name, _entity.screenx, _entity.screeny)
 end
 
 

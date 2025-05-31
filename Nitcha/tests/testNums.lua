@@ -118,3 +118,7 @@ printPoints(Nums:pointsLine(0, 0, -10, -10, true))
 print()
 printPoints(Nums:pointsPickCount(Nums:pointsLine(0, 0, -10, -10, true), 3, true))
 printPoints(Nums:pointsPickCount(Nums:pointsLine(0, 0, -10, -10, true), 4, true))
+
+print()
+print(Nums:random(10, 0))
+print(Nums:random(10))
