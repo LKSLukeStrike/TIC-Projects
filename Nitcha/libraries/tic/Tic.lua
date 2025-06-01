@@ -1206,41 +1206,42 @@ end
 local CSpriteBG = CSprite:extend() -- bg sprites aka tic tiles
 CSpriteBG.SPRITEBANK  = 0
 CSpriteBG.SPRITEEMPTY = CSpriteBG.SPRITEBANK + 0 -- empty sprite
-CSpriteBG.SIGNSBANK   = 1  -- signs
-CSpriteBG.SIGNQSTMRK  = CSpriteBG.SIGNSBANK + 00 -- question mark
-CSpriteBG.SIGNINTMRK  = CSpriteBG.SIGNSBANK + 01 -- interact mark
-CSpriteBG.SIGNBORSQU  = CSpriteBG.SIGNSBANK + 02 -- borders square
-CSpriteBG.SIGNSPOSQU  = CSpriteBG.SIGNSBANK + 03 -- spotting square
-CSpriteBG.SIGNCROSQU  = CSpriteBG.SIGNSBANK + 04 -- crossed square
-CSpriteBG.SIGNDOTSQU  = CSpriteBG.SIGNSBANK + 05 -- dot square
-CSpriteBG.SIGNARROWD  = CSpriteBG.SIGNSBANK + 06 -- diag arrow
-CSpriteBG.SIGNARROWL  = CSpriteBG.SIGNSBANK + 07 -- line arrow
-CSpriteBG.SIGNCENTER  = CSpriteBG.SIGNSBANK + 08 -- center dot
-CSpriteBG.SIGNPLAYER  = CSpriteBG.SIGNSBANK + 09 -- player sprite
-CSpriteBG.SIGNSPOTIT  = CSpriteBG.SIGNSBANK + 10 -- spotit sprite
-CSpriteBG.SIGNLOCKIT  = CSpriteBG.SIGNSBANK + 11 -- lockit sprite
-CSpriteBG.SIGNPICKIT  = CSpriteBG.SIGNSBANK + 12 -- pickit sprite
-CSpriteBG.BUILDBANK   = 16 -- buildings
+CSpriteBG.SIGNBANK1   = 1  -- signs
+CSpriteBG.SIGNQSTMRK  = CSpriteBG.SIGNBANK1 + 00 -- question mark
+CSpriteBG.SIGNINTMRK  = CSpriteBG.SIGNBANK1 + 01 -- interact mark
+CSpriteBG.SIGNBORSQU  = CSpriteBG.SIGNBANK1 + 02 -- borders square
+CSpriteBG.SIGNSPOSQU  = CSpriteBG.SIGNBANK1 + 03 -- spotting square
+CSpriteBG.SIGNCROSQU  = CSpriteBG.SIGNBANK1 + 04 -- crossed square
+CSpriteBG.SIGNDOTSQU  = CSpriteBG.SIGNBANK1 + 05 -- dot square
+CSpriteBG.SIGNBANK2   = 16 -- signs
+CSpriteBG.SIGNARROWD  = CSpriteBG.SIGNBANK2 + 00 -- diag arrow
+CSpriteBG.SIGNARROWL  = CSpriteBG.SIGNBANK2 + 01 -- line arrow
+CSpriteBG.SIGNCENTER  = CSpriteBG.SIGNBANK2 + 02 -- center dot
+CSpriteBG.SIGNPLAYER  = CSpriteBG.SIGNBANK2 + 03 -- player sprite
+CSpriteBG.SIGNSPOTIT  = CSpriteBG.SIGNBANK2 + 04 -- spotit sprite
+CSpriteBG.SIGNLOCKIT  = CSpriteBG.SIGNBANK2 + 05 -- lockit sprite
+CSpriteBG.SIGNPICKIT  = CSpriteBG.SIGNBANK2 + 06 -- pickit sprite
+CSpriteBG.BUILDBANK   = 32 -- buildings
 CSpriteBG.PLACEHOUSE  = CSpriteBG.BUILDBANK + 0
 CSpriteBG.PLACETOWER  = CSpriteBG.BUILDBANK + 1
 CSpriteBG.PLACEMANOR  = CSpriteBG.BUILDBANK + 2
 CSpriteBG.PLACEKIRKE  = CSpriteBG.BUILDBANK + 3
-CSpriteBG.STANDBANK   = 32 -- stands
+CSpriteBG.STANDBANK   = 48 -- stands
 CSpriteBG.PLACEWATER  = CSpriteBG.STANDBANK + 0
 CSpriteBG.PLACESTALL  = CSpriteBG.STANDBANK + 1
-CSpriteBG.TREESBANK   = 48 -- trees
+CSpriteBG.TREESBANK   = 64 -- trees
 CSpriteBG.PLACETREE0  = CSpriteBG.TREESBANK + 0
 CSpriteBG.PLACETREE1  = CSpriteBG.TREESBANK + 1
-CSpriteBG.MENHRBANK   = 64 -- menhirs
+CSpriteBG.MENHRBANK   = 80 -- menhirs
 CSpriteBG.PLACEMENH0  = CSpriteBG.MENHRBANK + 0
 CSpriteBG.PLACEMENH1  = CSpriteBG.MENHRBANK + 1
-CSpriteBG.DOLMNBANK   = 80 -- dolmens
+CSpriteBG.DOLMNBANK   = 96 -- dolmens
 CSpriteBG.PLACEDOLM0  = CSpriteBG.DOLMNBANK + 0
 CSpriteBG.PLACEDOLM1  = CSpriteBG.DOLMNBANK + 1
-CSpriteBG.CIRKLBANK   = 96 -- circles
+CSpriteBG.CIRKLBANK   = 112 -- circles
 CSpriteBG.PLACECIRK0  = CSpriteBG.CIRKLBANK + 0
 CSpriteBG.PLACECIRK1  = CSpriteBG.CIRKLBANK + 1
-CSpriteBG.ROADSBANK   = 112 -- roads
+CSpriteBG.ROADSBANK   = 128 -- roads
 CSpriteBG.PLACEROAD0  = CSpriteBG.ROADSBANK + 0
 CSpriteBG.PLACEROAD1  = CSpriteBG.ROADSBANK + 1
 function CSpriteBG:new(_argt) -- FIXME can be removed ?
@@ -5313,9 +5314,9 @@ end
 local CButtonPlayerPrev = CButtonArrow270:extend() -- generic player prev button
 function CButtonPlayerPrev:new(_argt)
     CButtonPlayerPrev.super.new(self, _argt)
-	self.behaviour = IButtonPlayer.BEHAVIOUR  -- function to trigger at first
-    self.clicklf   = Tic.FUNCTIONPLAYERPREV
-    self.hovertext = CText{text = "Prev"}
+	self.behaviour      = IButtonPlayer.BEHAVIOUR  -- function to trigger at first
+    self.clicklf        = Tic.FUNCTIONPLAYERPREV
+    self.hovertext      = CText{text = "Prev"}
     self:argt(_argt) -- override if any
 end
 
@@ -5326,9 +5327,9 @@ end
 local CButtonPlayerNext = CButtonArrow090:extend() -- generic player next button
 function CButtonPlayerNext:new(_argt)
     CButtonPlayerNext.super.new(self, _argt)
-	self.behaviour = IButtonPlayer.BEHAVIOUR  -- function to trigger at first
-    self.clicklf   = Tic.FUNCTIONPLAYERNEXT
-    self.hovertext = CText{text = "Next"}
+	self.behaviour      = IButtonPlayer.BEHAVIOUR  -- function to trigger at first
+    self.clicklf        = Tic.FUNCTIONPLAYERNEXT
+    self.hovertext      = CText{text = "Next"}
     self:argt(_argt) -- override if any
 end
 
@@ -5339,11 +5340,11 @@ end
 local CButtonPlayerPick = CButtonClick:extend() -- generic player pick button
 function CButtonPlayerPick:new(_argt)
     CButtonPlayerPick.super.new(self, _argt)
-    self.drawborder    = false
-	self.sprite.sprite = CSpriteBG.SIGNPLAYER
-	self.behaviour     = IButtonPlayer.BEHAVIOUR  -- function to trigger at first
-    self.clicklf       = function(self) Tic:logAppend("Player") end
-    self.hovertext     = CText{text = "Pick"}
+    self.drawborder     = false
+	self.sprite.sprite  = CSpriteBG.SIGNPLAYER
+	self.behaviour      = IButtonPlayer.BEHAVIOUR  -- function to trigger at first
+    self.clicklf        = function(self) Tic:logAppend("Player") end
+    self.hovertext      = CText{text = "Pick"}
     self:argt(_argt) -- override if any
 end
 
