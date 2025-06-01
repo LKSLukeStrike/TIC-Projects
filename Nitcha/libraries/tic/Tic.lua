@@ -745,7 +745,7 @@ function Tic:toggleSleep(_character) -- toggle stand vs sleep
 end
 
 
--- Move System -- move to 8 directions depending on stattious
+-- Direction System -- move to 8 directions depending on stattious
 function Tic:moveDirection000(_character)
     Tic:moveDirection(Tic.DIR000, _character)
 end
@@ -1957,19 +1957,20 @@ function CEntityDrawable:new(_argt)
     CEntityDrawable.super.new(self, _argt)
     self.kind = Classic.KINDDRAWABLE
     self.name = Classic.NAMEDRAWABLE
-    self.world       = World
-    self.sprite      = CSpriteBG.SPRITEEMPTY
-    self.screenx     = 0 -- screen positions -- used to draw the sprite
-    self.screeny     = 0
-    self.dirx        = Nums:random01() -- random flip lf/rg
-    self.scale       = Tic.SCALE01
-    self.animations  = nil -- override if any
-    self.spotted     = false -- use spotted to draw a border
-    self.hovered     = false -- use hovered to draw a border
+    self.world        = World
+    self.sprite       = CSpriteBG.SPRITEEMPTY
+    self.screenx      = 0 -- screen positions -- used to draw the sprite
+    self.screeny      = 0
+    self.dirx         = Nums:random01() -- random flip lf/rg
+    self.scale        = Tic.SCALE01
+    self.portraitmode = false -- is for drawing portrait ?
+    self.animations   = nil -- override if any
+    self.spotted      = false -- use spotted to draw a border
+    self.hovered      = false -- use hovered to draw a border
     self.hitbox       = CHitbox{entity = self, lf = 0, rg = 7, up = 0, dw = 7}
-    self.drawborders = false -- draw behaviour
-    self.drawhitbox  = false
-    self.drawfade    = false
+    self.drawborders  = false -- draw behaviour
+    self.drawhitbox   = false
+    self.drawfade     = false
     self:argt(_argt) -- override if any
     self.world:appendEntity(self) -- append itself to the world
 end
@@ -3332,7 +3333,7 @@ function CCharacter:nearestEntityViewWorld() -- nearest entity in itself view wo
 end
 
 function CCharacter:draw() -- set animations and draw layers
-    self:cycle() -- cycle the cyclers
+    self:cycle()
     self:drawDirs()
     self:drawStatus()
     self:drawWeapon()
@@ -3349,7 +3350,8 @@ function CCharacter:draw() -- set animations and draw layers
     self:drawInteract()
 end
 
-function CCharacter:cycle()
+function CCharacter:cycle() -- cycle the cyclers
+    if self.portraitmode then return end -- no cycling in portraits
     self:cycleMove()
     self:cycleWork()
     self:cycleIdle()
@@ -3389,7 +3391,7 @@ function CCharacter:cycleIdle() -- animate idle after a delay
 	if self.idlecycler:isMAX() then -- trigger idlecycler
 		if Nums:random(Tic.STATSMAX) > self.statmenact then -- only if over statmenact
             self:moveDirection(Tables:valPickRandom{
-                Tic.DIR045, Tic.DIR090, Tic.DIR135, Tic.DIR225, Tic.DIR270, Tic.DIR315
+                Tic.DIR000,Tic.DIR045, Tic.DIR090, Tic.DIR135, Tic.DIR180, Tic.DIR225, Tic.DIR270, Tic.DIR315
             }, true)
         end
 	end
@@ -4546,18 +4548,19 @@ end
 function CWindowPortraitDrawable:drawInside() -- window portrait content for -- [!] drawable entities
     if not self.entity then return end -- nothing to draw
     self.entity:save{"screenx", "screeny", "scale", "drawdirs", "drawview","dirx", "frame", "animations",
-        "interactto", "interactby", "spotted", "hovered"}
-    self.entity.screenx    = self.screenx -- force entity attributes
-    self.entity.screeny    = self.screeny
-    self.entity.scale      = Tic.SCALE02
-    self.entity.drawdirs   = false
-    self.entity.drawview   = false
-    self.entity.interactto = {} -- dont draw interactto in window
-    self.entity.interactby = {} -- dont draw interactby in window
-    self.entity.spotted    = false -- dont draw spotted frame in window
-    self.entity.hovered    = false -- dont draw hovered frame in window
-    local _ticdrawhitbox   = Tic.DRAWHITBOX
-    Tic.DRAWHITBOX         = false -- FIXME remove tic master at one point
+        "interactto", "interactby", "spotted", "hovered", "portraitmode"}
+    self.entity.screenx      = self.screenx -- force entity attributes
+    self.entity.screeny      = self.screeny
+    self.entity.scale        = Tic.SCALE02
+    self.entity.drawdirs     = false
+    self.entity.drawview     = false
+    self.entity.interactto   = {} -- dont draw interactto in window
+    self.entity.interactby   = {} -- dont draw interactby in window
+    self.entity.portraitmode = true -- avoid some drawings in portraitmode
+    self.entity.spotted      = false -- dont draw spotted frame in window
+    self.entity.hovered      = false -- dont draw hovered frame in window
+    local _ticdrawhitbox     = Tic.DRAWHITBOX
+    Tic.DRAWHITBOX           = false -- FIXME remove tic master at one point
     if self.idle then
         self.entity.dirx       = Tic.DIRXLF
         self.entity.frame      = CSprite.FRAME00
@@ -6189,13 +6192,16 @@ end -- generate places
 -- }
 -- Globth:randomWorldWindow()
 
--- local Wulfie = CPlayerWolfe{name = "Wulfie",
---     colorextra = Tic.COLORRED,
---     worldx = -10,
---     interactions = {10},
--- }
+if true then
+local Wulfie = CPlayerWolfe{name = "Wulfie",
+    colorextra = Tic.COLORRED,
+    worldx = -10,
+    interactions = {10},
+}
+end
 -- Wulfie:randomWorldWindow()
 
+if true then
 local Oxboow = CPlayerGhost{name = "Oxboow",
     statphyact = 10,
     statmenact = 10,
@@ -6204,6 +6210,7 @@ local Oxboow = CPlayerGhost{name = "Oxboow",
     spottinglock = true,
     hitbox = Classic.NIL,
 }
+end
 -- Oxboow:randomWorldWindow()
 -- Tic:traceTable("ox", Oxboow.hitbox, {indent = " ", depth = 1})
 -- exit()
@@ -6393,6 +6400,7 @@ function Tic:draw()
     Tic.inputsDo()
 
     Tic:screenActual():draw()
+    -- exit()
 
     -- Tic:logEntity("w", Wulfie)
     -- Tic:logEntity("o", Oxboow)
