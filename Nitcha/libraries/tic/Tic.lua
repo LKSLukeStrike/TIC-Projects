@@ -4874,7 +4874,7 @@ function CWindowWorld:drawPlayerActual()
                                     _entity.spotted = true
                                 end
                             end
-                        end --HH
+                        end
                         _entity:draw()
                     end
                 end
@@ -4913,7 +4913,7 @@ end
 local CButton = CElement:extend() -- generic button
 Classic.KINDBUTTON = "Button" -- Button kind
 Classic.NAMEBUTTON = "Button" -- Button name
-CButton.BEHAVIOUR = function(self)
+CButton.BEHAVIOUR = function(self) -- need at least one function
     if Tables:size(self:functionsDefined()) == 0 then
         self.enabled = false
     end
@@ -5305,10 +5305,22 @@ end
 --
 -- IButtonPlayer -- players buttons implementation
 --
-local IButtonPlayer = CButton:extend() -- generic player button
-IButtonPlayer.BEHAVIOUR = function(self)
+local IButtonPlayer = Classic:extend() -- generic player button
+IButtonPlayer.BEHAVIOUR = function(self) -- need at least one player
+    self.display = (Tic:playerActual()) and true or false
+    if not self.display then return end -- no player
+    CButton.BEHAVIOUR(self) -- FIXME use IButton instead ?
+end
+
+
+--
+-- IButtonPlayerChange -- player change buttons implementation
+--
+local IButtonPlayerChange = Classic:extend() -- generic change player button
+IButtonPlayerChange.BEHAVIOUR = function(self) -- need at least more than one player
+    IButtonPlayer.BEHAVIOUR(self)
+    if not self.display then return end -- no player
     self.enabled = Tables:size(Tic:playerPlayers()) > 1
-    CButton.BEHAVIOUR(self)
 end
 
 
@@ -5318,7 +5330,7 @@ end
 local CButtonPlayerPrev = CButtonArrow270:extend() -- generic player prev button
 function CButtonPlayerPrev:new(_argt)
     CButtonPlayerPrev.super.new(self, _argt)
-	self.behaviour      = IButtonPlayer.BEHAVIOUR  -- function to trigger at first
+	self.behaviour      = IButtonPlayerChange.BEHAVIOUR  -- function to trigger at first
     self.clicklf        = Tic.FUNCTIONPLAYERPREV
     self.hovertext      = CText{text = "Prev"}
     self:argt(_argt) -- override if any
@@ -5331,7 +5343,7 @@ end
 local CButtonPlayerNext = CButtonArrow090:extend() -- generic player next button
 function CButtonPlayerNext:new(_argt)
     CButtonPlayerNext.super.new(self, _argt)
-	self.behaviour      = IButtonPlayer.BEHAVIOUR  -- function to trigger at first
+	self.behaviour      = IButtonPlayerChange.BEHAVIOUR  -- function to trigger at first
     self.clicklf        = Tic.FUNCTIONPLAYERNEXT
     self.hovertext      = CText{text = "Next"}
     self:argt(_argt) -- override if any
@@ -5346,8 +5358,8 @@ function CButtonPlayerPick:new(_argt)
     CButtonPlayerPick.super.new(self, _argt)
     self.drawborder     = false
 	self.sprite.sprite  = CSpriteBG.SIGNPLAYER
-	self.behaviour      = IButtonPlayer.BEHAVIOUR  -- function to trigger at first
-    self.clicklf        = function(self) Tic:logAppend("Player") end
+	self.behaviour      = IButtonPlayerChange.BEHAVIOUR  -- function to trigger at first
+    self.clicklf        = function() Tic:logAppend("Pick") end
     self.hovertext      = CText{text = "Pick"}
     self:argt(_argt) -- override if any
 end
@@ -5357,12 +5369,21 @@ end
 -- CButtonPlayerStand
 --
 local CButtonPlayerStand = CButtonClick:extend() -- generic player stand button
+CButtonPlayerStand.BEHAVIOUR = function(self)
+    IButtonPlayer.BEHAVIOUR(self)
+    if not self.display then return end -- no player
+    if Tic:playerActual():postureGet() == Tic.POSTURESTAND then
+        self.actived = true
+    else
+        self.actived = false
+    end
+end
 function CButtonPlayerStand:new(_argt)
     CButtonPlayerStand.super.new(self, _argt)
     self.drawborder     = false
 	self.sprite.sprite  = CSpriteBG.SIGNDOSTAN
-	self.behaviour      = IButtonPlayer.BEHAVIOUR  -- function to trigger at first
-    self.clicklf        = function(self) Tic:logAppend("Stand") end
+	self.behaviour      = CButtonPlayerStand.BEHAVIOUR  -- function to trigger at first
+    self.clicklf        = function() Tic:toggleKneel() end
     self.hovertext      = CText{text = "Stand"}
     self:argt(_argt) -- override if any
 end
@@ -5372,12 +5393,21 @@ end
 -- CButtonPlayerKneel
 --
 local CButtonPlayerKneel = CButtonClick:extend() -- generic player kneel button
+CButtonPlayerKneel.BEHAVIOUR = function(self)
+    IButtonPlayer.BEHAVIOUR(self)
+    if not self.display then return end -- no player
+    if Tic:playerActual():postureGet() == Tic.POSTUREKNEEL then
+        self.actived = true
+    else
+        self.actived = false
+    end
+end
 function CButtonPlayerKneel:new(_argt)
     CButtonPlayerKneel.super.new(self, _argt)
     self.drawborder     = false
 	self.sprite.sprite  = CSpriteBG.SIGNDOKNEE
-	self.behaviour      = IButtonPlayer.BEHAVIOUR  -- function to trigger at first
-    self.clicklf        = function(self) Tic:logAppend("Kneel") end
+	self.behaviour      = CButtonPlayerKneel.BEHAVIOUR  -- function to trigger at first
+    self.clicklf        = function() Tic:toggleKneel() end
     self.hovertext      = CText{text = "Kneel"}
     self:argt(_argt) -- override if any
 end
@@ -5387,12 +5417,21 @@ end
 -- CButtonPlayerWork
 --
 local CButtonPlayerWork = CButtonClick:extend() -- generic player work button
+CButtonPlayerWork.BEHAVIOUR = function(self)
+    IButtonPlayer.BEHAVIOUR(self)
+    if not self.display then return end -- no player
+    if Tic:playerActual():statusGet() == Tic.STATUSWORK then
+        self.actived = true
+    else
+        self.actived = false
+    end
+end
 function CButtonPlayerWork:new(_argt)
     CButtonPlayerWork.super.new(self, _argt)
     self.drawborder     = false
 	self.sprite.sprite  = CSpriteBG.SIGNDOWORK
-	self.behaviour      = IButtonPlayer.BEHAVIOUR  -- function to trigger at first
-    self.clicklf        = function(self) Tic:logAppend("Work") end
+	self.behaviour      = CButtonPlayerWork.BEHAVIOUR  -- function to trigger at first
+    self.clicklf        = function() Tic:toggleWork() end
     self.hovertext      = CText{text = "Work"}
     self:argt(_argt) -- override if any
 end
@@ -5402,12 +5441,21 @@ end
 -- CButtonPlayerSleep
 --
 local CButtonPlayerSleep = CButtonClick:extend() -- generic player sleep button
+CButtonPlayerSleep.BEHAVIOUR = function(self)
+    IButtonPlayer.BEHAVIOUR(self)
+    if not self.display then return end -- no player
+    if Tic:playerActual():statusGet() == Tic.STATUSSLEEP then
+        self.actived = true
+    else
+        self.actived = false
+    end
+end
 function CButtonPlayerSleep:new(_argt)
     CButtonPlayerSleep.super.new(self, _argt)
     self.drawborder     = false
 	self.sprite.sprite  = CSpriteBG.SIGNDOSLEE
-	self.behaviour      = IButtonPlayer.BEHAVIOUR  -- function to trigger at first
-    self.clicklf        = function(self) Tic:logAppend("Sleep") end
+	self.behaviour      = CButtonPlayerSleep.BEHAVIOUR  -- function to trigger at first
+    self.clicklf        = function() Tic:toggleSleep() end
     self.hovertext      = CText{text = "Sleep"}
     self:argt(_argt) -- override if any
 end
@@ -5557,13 +5605,12 @@ end
 
 
 --
--- IButtonMove -- move buttons implementation
+-- IButtonPlayerMove -- player move buttons implementation
 --
-local IButtonMove = CButton:extend() -- generic move button
-IButtonMove.PALETTE = {[Tic.COLORGREYD] = Tic.COLORKEY}
-IButtonMove.BEHAVIOUR = function(self)
-    CButton.BEHAVIOUR(self)
-    self.display = (Tic:playerActual()) and true or false
+local IButtonPlayerMove = IButtonPlayer:extend() -- generic player move button
+IButtonPlayerMove.PALETTE = {[Tic.COLORGREYD] = Tic.COLORKEY}
+IButtonPlayerMove.BEHAVIOUR = function(self)
+    IButtonPlayer.BEHAVIOUR(self)
     if not self.display then return end -- no move
     if Tic:playerActual().direction == self.direction then
         self.actived = true
@@ -5572,74 +5619,74 @@ IButtonMove.BEHAVIOUR = function(self)
     end
 end
 
-local CButtonMove000 = CButtonArrow000:extend() -- generic move 000 button
-function CButtonMove000:new(_argt)
-    CButtonMove000.super.new(self, _argt)
-    self.sprite.palette = IButtonMove.PALETTE
-    self.behaviour      = IButtonMove.BEHAVIOUR
+local CButtonPlayerMove000 = CButtonArrow000:extend() -- generic player move 000 button
+function CButtonPlayerMove000:new(_argt)
+    CButtonPlayerMove000.super.new(self, _argt)
+    self.sprite.palette = IButtonPlayerMove.PALETTE
+    self.behaviour      = IButtonPlayerMove.BEHAVIOUR
     self.clicklf        = function() Tic:moveDirection(Tic.DIR000) end
     self:argt(_argt) -- override if any
 end
 
-local CButtonMove045 = CButtonArrow045:extend() -- generic move 045 button
-function CButtonMove045:new(_argt)
-    CButtonMove045.super.new(self, _argt)
-    self.sprite.palette = IButtonMove.PALETTE
-    self.behaviour      = IButtonMove.BEHAVIOUR
+local CButtonPlayerMove045 = CButtonArrow045:extend() -- generic player move 045 button
+function CButtonPlayerMove045:new(_argt)
+    CButtonPlayerMove045.super.new(self, _argt)
+    self.sprite.palette = IButtonPlayerMove.PALETTE
+    self.behaviour      = IButtonPlayerMove.BEHAVIOUR
     self.clicklf        = function() Tic:moveDirection(Tic.DIR045) end
     self:argt(_argt) -- override if any
 end
 
-local CButtonMove090 = CButtonArrow090:extend() -- generic move 090 button
-function CButtonMove090:new(_argt)
-    CButtonMove090.super.new(self, _argt)
-    self.sprite.palette = IButtonMove.PALETTE
-    self.behaviour      = IButtonMove.BEHAVIOUR
+local CButtonPlayerMove090 = CButtonArrow090:extend() -- generic player move 090 button
+function CButtonPlayerMove090:new(_argt)
+    CButtonPlayerMove090.super.new(self, _argt)
+    self.sprite.palette = IButtonPlayerMove.PALETTE
+    self.behaviour      = IButtonPlayerMove.BEHAVIOUR
     self.clicklf        = function() Tic:moveDirection(Tic.DIR090) end
     self:argt(_argt) -- override if any
 end
 
-local CButtonMove135 = CButtonArrow135:extend() -- generic move 135 button
-function CButtonMove135:new(_argt)
-    CButtonMove135.super.new(self, _argt)
-    self.sprite.palette = IButtonMove.PALETTE
-    self.behaviour      = IButtonMove.BEHAVIOUR
+local CButtonPlayerMove135 = CButtonArrow135:extend() -- generic player move 135 button
+function CButtonPlayerMove135:new(_argt)
+    CButtonPlayerMove135.super.new(self, _argt)
+    self.sprite.palette = IButtonPlayerMove.PALETTE
+    self.behaviour      = IButtonPlayerMove.BEHAVIOUR
     self.clicklf        = function() Tic:moveDirection(Tic.DIR135) end
     self:argt(_argt) -- override if any
 end
 
-local CButtonMove180 = CButtonArrow180:extend() -- generic move 180 button
-function CButtonMove180:new(_argt)
-    CButtonMove180.super.new(self, _argt)
-    self.sprite.palette = IButtonMove.PALETTE
-    self.behaviour      = IButtonMove.BEHAVIOUR
+local CButtonPlayerMove180 = CButtonArrow180:extend() -- generic player move 180 button
+function CButtonPlayerMove180:new(_argt)
+    CButtonPlayerMove180.super.new(self, _argt)
+    self.sprite.palette = IButtonPlayerMove.PALETTE
+    self.behaviour      = IButtonPlayerMove.BEHAVIOUR
     self.clicklf        = function() Tic:moveDirection(Tic.DIR180) end
     self:argt(_argt) -- override if any
 end
 
-local CButtonMove225 = CButtonArrow225:extend() -- generic move 225 button
-function CButtonMove225:new(_argt)
-    CButtonMove225.super.new(self, _argt)
-    self.sprite.palette = IButtonMove.PALETTE
-    self.behaviour      = IButtonMove.BEHAVIOUR
+local CButtonPlayerMove225 = CButtonArrow225:extend() -- generic player move 225 button
+function CButtonPlayerMove225:new(_argt)
+    CButtonPlayerMove225.super.new(self, _argt)
+    self.sprite.palette = IButtonPlayerMove.PALETTE
+    self.behaviour      = IButtonPlayerMove.BEHAVIOUR
     self.clicklf        = function() Tic:moveDirection(Tic.DIR225) end
     self:argt(_argt) -- override if any
 end
 
-local CButtonMove270 = CButtonArrow270:extend() -- generic move 270 button
-function CButtonMove270:new(_argt)
-    CButtonMove270.super.new(self, _argt)
-    self.sprite.palette = IButtonMove.PALETTE
-    self.behaviour      = IButtonMove.BEHAVIOUR
+local CButtonPlayerMove270 = CButtonArrow270:extend() -- generic player move 270 button
+function CButtonPlayerMove270:new(_argt)
+    CButtonPlayerMove270.super.new(self, _argt)
+    self.sprite.palette = IButtonPlayerMove.PALETTE
+    self.behaviour      = IButtonPlayerMove.BEHAVIOUR
     self.clicklf        = function() Tic:moveDirection(Tic.DIR270) end
     self:argt(_argt) -- override if any
 end
 
-local CButtonMove315 = CButtonArrow315:extend() -- generic move 315 button
-function CButtonMove315:new(_argt)
-    CButtonMove315.super.new(self, _argt)
-    self.sprite.palette = IButtonMove.PALETTE
-    self.behaviour      = IButtonMove.BEHAVIOUR
+local CButtonPlayerMove315 = CButtonArrow315:extend() -- generic player move 315 button
+function CButtonPlayerMove315:new(_argt)
+    CButtonPlayerMove315.super.new(self, _argt)
+    self.sprite.palette = IButtonPlayerMove.PALETTE
+    self.behaviour      = IButtonPlayerMove.BEHAVIOUR
     self.clicklf        = function() Tic:moveDirection(Tic.DIR315) end
     self:argt(_argt) -- override if any
 end
@@ -5806,7 +5853,7 @@ ButtonSpottingPick     = CButtonSpottingPick{}
 ScreenWorldLF:elementsDistributeH(
     {ButtonSpottingDraw, ButtonSpottingLock, ButtonSpottingPick},
     WindowSpottingInfos.screenx + (
-        (WindowSpottingInfos.screenw - CScreen:elementsTotalH({ButtonSpottingDraw, ButtonSpottingLock, ButtonSpottingPick})) // 2),
+        (WindowSpottingInfos.screenw - CScreen:elementsTotalW({ButtonSpottingDraw, ButtonSpottingLock, ButtonSpottingPick})) // 2),
     WindowSpottingInfos.screeny - Tic.SPRITESIZE
 )
 WindowSpottingPortrait = CWindowSpottingPortrait{}
@@ -5876,38 +5923,38 @@ ButtonPlayerNext     = CButtonPlayerNext{}
 ScreenWorldRG:elementsDistributeH(
     {ButtonPlayerPrev, ButtonPlayerPick, ButtonPlayerNext},
     WindowPlayerInfos.screenx + (
-        (WindowPlayerInfos.screenw - CScreen:elementsTotalH({ButtonPlayerPrev, ButtonPlayerPick, ButtonPlayerNext})) // 2),
+        (WindowPlayerInfos.screenw - CScreen:elementsTotalW({ButtonPlayerPrev, ButtonPlayerPick, ButtonPlayerNext})) // 2),
     WindowPlayerInfos.screeny - Tic.SPRITESIZE
 )
 WindowPlayerPortrait = CWindowPlayerPortrait{}
-ButtonMove000        = CButtonMove000{}
-ButtonMove045        = CButtonMove045{}
-ButtonMove090        = CButtonMove090{}
-ButtonMove135        = CButtonMove135{}
-ButtonMove180        = CButtonMove180{}
-ButtonMove225        = CButtonMove225{}
-ButtonMove270        = CButtonMove270{}
-ButtonMove315        = CButtonMove315{}
+ButtonPlayerMove000  = CButtonPlayerMove000{}
+ButtonPlayerMove045  = CButtonPlayerMove045{}
+ButtonPlayerMove090  = CButtonPlayerMove090{}
+ButtonPlayerMove135  = CButtonPlayerMove135{}
+ButtonPlayerMove180  = CButtonPlayerMove180{}
+ButtonPlayerMove225  = CButtonPlayerMove225{}
+ButtonPlayerMove270  = CButtonPlayerMove270{}
+ButtonPlayerMove315  = CButtonPlayerMove315{}
 ScreenWorldRG:elementsDistributeH( -- up h line
-    {ButtonMove315, ButtonMove045},
+    {ButtonPlayerMove315, ButtonPlayerMove045},
     WindowPlayerPortrait.screenx - 6,
     WindowPlayerPortrait.screeny - Tic.SPRITESIZE + 2,
     12
 )
 ScreenWorldRG:elementsDistributeH( -- md h line
-    {ButtonMove270, ButtonMove090},
+    {ButtonPlayerMove270, ButtonPlayerMove090},
     WindowPlayerPortrait.screenx - 7,
     WindowPlayerPortrait.screeny + 4,
     14
 )
 ScreenWorldRG:elementsDistributeH( -- dw h line
-    {ButtonMove225, ButtonMove135},
+    {ButtonPlayerMove225, ButtonPlayerMove135},
     WindowPlayerPortrait.screenx - 6,
     WindowPlayerPortrait.screeny + WindowPlayerPortrait.screenh - 2,
     12
 )
 ScreenWorldRG:elementsDistributeV( -- md v line
-    {ButtonMove000, ButtonMove180},
+    {ButtonPlayerMove000, ButtonPlayerMove180},
     WindowPlayerPortrait.screenx + 4,
     WindowPlayerPortrait.screeny - 7,
     14
@@ -5918,11 +5965,17 @@ ButtonPlayerStand    = CButtonPlayerStand{}
 ButtonPlayerKneel    = CButtonPlayerKneel{}
 ButtonPlayerWork     = CButtonPlayerWork{}
 ButtonPlayerSleep    = CButtonPlayerSleep{}
-ScreenWorldRG:elementsDistributeH(
+ScreenWorldRG:elementsDistributeV(
     {ButtonPlayerStand, ButtonPlayerKneel},
-    WindowPlayerState.screenx + (
-        (WindowPlayerInfos.screenw - CScreen:elementsTotalH({ButtonPlayerStand, ButtonPlayerKneel})) // 2),
-    WindowPlayerState.screeny - Tic.SPRITESIZE
+    WindowPlayerState.screenx - Tic.SPRITESIZE,
+    WindowPlayerState.screeny + (
+        (WindowPlayerInfos.screenh - CScreen:elementsTotalH({ButtonPlayerStand, ButtonPlayerKneel})) // 2)
+)
+ScreenWorldRG:elementsDistributeV(
+    {ButtonPlayerWork, ButtonPlayerSleep},
+    WindowPlayerState.screenx + WindowPlayerState.screenw,
+    WindowPlayerState.screeny + (
+        (WindowPlayerInfos.screenh - CScreen:elementsTotalH({ButtonPlayerWork, ButtonPlayerSleep})) // 2)
 )
 ScreenWorldRG:appendElements{
     WindowPlayerInfos,
@@ -5932,16 +5985,18 @@ ScreenWorldRG:appendElements{
     ButtonPlayerPrev,
     ButtonPlayerPick,
     ButtonPlayerNext,
-    ButtonMove000,
-    ButtonMove045,
-    ButtonMove090,
-    ButtonMove135,
-    ButtonMove180,
-    ButtonMove225,
-    ButtonMove270,
-    ButtonMove315,
+    ButtonPlayerMove000,
+    ButtonPlayerMove045,
+    ButtonPlayerMove090,
+    ButtonPlayerMove135,
+    ButtonPlayerMove180,
+    ButtonPlayerMove225,
+    ButtonPlayerMove270,
+    ButtonPlayerMove315,
     ButtonPlayerStand,
     ButtonPlayerKneel,
+    ButtonPlayerWork,
+    ButtonPlayerSleep,
 }
 
 ScreenWorld:appendElements{
@@ -6278,7 +6333,7 @@ Wulfie = CPlayerWolfe{name = "Wulfie",
 end
 -- Wulfie:randomWorldWindow()
 
-if true then
+if false then
 Oxboow = CPlayerGhost{name = "Oxboow",
     statphyact = 10,
     statmenact = 10,
