@@ -1221,6 +1221,10 @@ CSpriteBG.SIGNPLAYER  = CSpriteBG.SIGNBANK2 + 03 -- player sprite
 CSpriteBG.SIGNSPOTIT  = CSpriteBG.SIGNBANK2 + 04 -- spotit sprite
 CSpriteBG.SIGNLOCKIT  = CSpriteBG.SIGNBANK2 + 05 -- lockit sprite
 CSpriteBG.SIGNPICKIT  = CSpriteBG.SIGNBANK2 + 06 -- pickit sprite
+CSpriteBG.SIGNDOSTAN  = CSpriteBG.SIGNBANK2 + 07 -- stand
+CSpriteBG.SIGNDOKNEE  = CSpriteBG.SIGNBANK2 + 08 -- kneel
+CSpriteBG.SIGNDOWORK  = CSpriteBG.SIGNBANK2 + 09 -- work
+CSpriteBG.SIGNDOSLEE  = CSpriteBG.SIGNBANK2 + 10 -- sleep
 CSpriteBG.BUILDBANK   = 32 -- buildings
 CSpriteBG.PLACEHOUSE  = CSpriteBG.BUILDBANK + 0
 CSpriteBG.PLACETOWER  = CSpriteBG.BUILDBANK + 1
@@ -5350,6 +5354,66 @@ end
 
 
 --
+-- CButtonPlayerStand
+--
+local CButtonPlayerStand = CButtonClick:extend() -- generic player stand button
+function CButtonPlayerStand:new(_argt)
+    CButtonPlayerStand.super.new(self, _argt)
+    self.drawborder     = false
+	self.sprite.sprite  = CSpriteBG.SIGNDOSTAN
+	self.behaviour      = IButtonPlayer.BEHAVIOUR  -- function to trigger at first
+    self.clicklf        = function(self) Tic:logAppend("Stand") end
+    self.hovertext      = CText{text = "Stand"}
+    self:argt(_argt) -- override if any
+end
+
+
+--
+-- CButtonPlayerKneel
+--
+local CButtonPlayerKneel = CButtonClick:extend() -- generic player kneel button
+function CButtonPlayerKneel:new(_argt)
+    CButtonPlayerKneel.super.new(self, _argt)
+    self.drawborder     = false
+	self.sprite.sprite  = CSpriteBG.SIGNDOKNEE
+	self.behaviour      = IButtonPlayer.BEHAVIOUR  -- function to trigger at first
+    self.clicklf        = function(self) Tic:logAppend("Kneel") end
+    self.hovertext      = CText{text = "Kneel"}
+    self:argt(_argt) -- override if any
+end
+
+
+--
+-- CButtonPlayerWork
+--
+local CButtonPlayerWork = CButtonClick:extend() -- generic player work button
+function CButtonPlayerWork:new(_argt)
+    CButtonPlayerWork.super.new(self, _argt)
+    self.drawborder     = false
+	self.sprite.sprite  = CSpriteBG.SIGNDOWORK
+	self.behaviour      = IButtonPlayer.BEHAVIOUR  -- function to trigger at first
+    self.clicklf        = function(self) Tic:logAppend("Work") end
+    self.hovertext      = CText{text = "Work"}
+    self:argt(_argt) -- override if any
+end
+
+
+--
+-- CButtonPlayerSleep
+--
+local CButtonPlayerSleep = CButtonClick:extend() -- generic player sleep button
+function CButtonPlayerSleep:new(_argt)
+    CButtonPlayerSleep.super.new(self, _argt)
+    self.drawborder     = false
+	self.sprite.sprite  = CSpriteBG.SIGNDOSLEE
+	self.behaviour      = IButtonPlayer.BEHAVIOUR  -- function to trigger at first
+    self.clicklf        = function(self) Tic:logAppend("Sleep") end
+    self.hovertext      = CText{text = "Sleep"}
+    self:argt(_argt) -- override if any
+end
+
+
+--
 -- CButtonSpottingDraw
 --
 local CButtonSpottingDraw = CButtonCheck:extend() -- generic spottingdraw check button
@@ -5730,30 +5794,30 @@ end
 -- INTERFACE -- order is important !
 --
 if true then
-local ScreenWorld = CScreen{name = "World", keysfunctions = Tic.KEYSFUNCTIONSWORLD}
+ScreenWorld = CScreen{name = "World", keysfunctions = Tic.KEYSFUNCTIONSWORLD}
 Tic:screenAppend(ScreenWorld)
 
 -- lf panel
-local ScreenWorldLF = CScreen{}
-local WindowSpottingInfos    = CWindowSpottingInfos{}
-local ButtonSpottingDraw     = CButtonSpottingDraw{}
-local ButtonSpottingLock     = CButtonSpottingLock{}
-local ButtonSpottingPick     = CButtonSpottingPick{}
+ScreenWorldLF = CScreen{}
+WindowSpottingInfos    = CWindowSpottingInfos{}
+ButtonSpottingDraw     = CButtonSpottingDraw{}
+ButtonSpottingLock     = CButtonSpottingLock{}
+ButtonSpottingPick     = CButtonSpottingPick{}
 ScreenWorldLF:elementsDistributeH(
     {ButtonSpottingDraw, ButtonSpottingLock, ButtonSpottingPick},
     WindowSpottingInfos.screenx + (
         (WindowSpottingInfos.screenw - CScreen:elementsTotalH({ButtonSpottingDraw, ButtonSpottingLock, ButtonSpottingPick})) // 2),
     WindowSpottingInfos.screeny - Tic.SPRITESIZE
 )
-local WindowSpottingPortrait = CWindowSpottingPortrait{}
-local ButtonSpotting000      = CButtonSpotting000{}
-local ButtonSpotting045      = CButtonSpotting045{}
-local ButtonSpotting090      = CButtonSpotting090{}
-local ButtonSpotting135      = CButtonSpotting135{}
-local ButtonSpotting180      = CButtonSpotting180{}
-local ButtonSpotting225      = CButtonSpotting225{}
-local ButtonSpotting270      = CButtonSpotting270{}
-local ButtonSpotting315      = CButtonSpotting315{}
+WindowSpottingPortrait = CWindowSpottingPortrait{}
+ButtonSpotting000      = CButtonSpotting000{}
+ButtonSpotting045      = CButtonSpotting045{}
+ButtonSpotting090      = CButtonSpotting090{}
+ButtonSpotting135      = CButtonSpotting135{}
+ButtonSpotting180      = CButtonSpotting180{}
+ButtonSpotting225      = CButtonSpotting225{}
+ButtonSpotting270      = CButtonSpotting270{}
+ButtonSpotting315      = CButtonSpotting315{}
 ScreenWorldLF:elementsDistributeH( -- up h line
     {ButtonSpotting135, ButtonSpotting225},
     WindowSpottingPortrait.screenx - 6,
@@ -5795,35 +5859,35 @@ ScreenWorldLF:appendElements{
 }
 
 -- md panel
-local ScreenWorldMD = CScreen{}
-local WindowWorld      = CWindowWorld{spottingwindows = {WindowSpottingInfos, WindowSpottingPortrait}}
-local WindowInfosWorld = CWindowInfosWorld{}
+ScreenWorldMD = CScreen{}
+WindowWorld      = CWindowWorld{spottingwindows = {WindowSpottingInfos, WindowSpottingPortrait}}
+WindowInfosWorld = CWindowInfosWorld{}
 ScreenWorldMD:appendElements{
     WindowWorld,
     WindowInfosWorld,
 }
 
 -- rg panel
-local ScreenWorldRG = CScreen{}
-local WindowPlayerInfos    = CWindowPlayerInfos{}
-local ButtonPlayerPrev     = CButtonPlayerPrev{}
-local ButtonPlayerPick     = CButtonPlayerPick{}
-local ButtonPlayerNext     = CButtonPlayerNext{}
+ScreenWorldRG = CScreen{}
+WindowPlayerInfos    = CWindowPlayerInfos{}
+ButtonPlayerPrev     = CButtonPlayerPrev{}
+ButtonPlayerPick     = CButtonPlayerPick{}
+ButtonPlayerNext     = CButtonPlayerNext{}
 ScreenWorldRG:elementsDistributeH(
     {ButtonPlayerPrev, ButtonPlayerPick, ButtonPlayerNext},
     WindowPlayerInfos.screenx + (
         (WindowPlayerInfos.screenw - CScreen:elementsTotalH({ButtonPlayerPrev, ButtonPlayerPick, ButtonPlayerNext})) // 2),
     WindowPlayerInfos.screeny - Tic.SPRITESIZE
 )
-local WindowPlayerPortrait = CWindowPlayerPortrait{}
-local ButtonMove000        = CButtonMove000{}
-local ButtonMove045        = CButtonMove045{}
-local ButtonMove090        = CButtonMove090{}
-local ButtonMove135        = CButtonMove135{}
-local ButtonMove180        = CButtonMove180{}
-local ButtonMove225        = CButtonMove225{}
-local ButtonMove270        = CButtonMove270{}
-local ButtonMove315        = CButtonMove315{}
+WindowPlayerPortrait = CWindowPlayerPortrait{}
+ButtonMove000        = CButtonMove000{}
+ButtonMove045        = CButtonMove045{}
+ButtonMove090        = CButtonMove090{}
+ButtonMove135        = CButtonMove135{}
+ButtonMove180        = CButtonMove180{}
+ButtonMove225        = CButtonMove225{}
+ButtonMove270        = CButtonMove270{}
+ButtonMove315        = CButtonMove315{}
 ScreenWorldRG:elementsDistributeH( -- up h line
     {ButtonMove315, ButtonMove045},
     WindowPlayerPortrait.screenx - 6,
@@ -5848,8 +5912,18 @@ ScreenWorldRG:elementsDistributeV( -- md v line
     WindowPlayerPortrait.screeny - 7,
     14
 )
-local WindowPlayerStats    = CWindowPlayerStats{}
-local WindowPlayerState    = CWindowPlayerState{}
+WindowPlayerStats    = CWindowPlayerStats{}
+WindowPlayerState    = CWindowPlayerState{}
+ButtonPlayerStand    = CButtonPlayerStand{}
+ButtonPlayerKneel    = CButtonPlayerKneel{}
+ButtonPlayerWork     = CButtonPlayerWork{}
+ButtonPlayerSleep    = CButtonPlayerSleep{}
+ScreenWorldRG:elementsDistributeH(
+    {ButtonPlayerStand, ButtonPlayerKneel},
+    WindowPlayerState.screenx + (
+        (WindowPlayerInfos.screenw - CScreen:elementsTotalH({ButtonPlayerStand, ButtonPlayerKneel})) // 2),
+    WindowPlayerState.screeny - Tic.SPRITESIZE
+)
 ScreenWorldRG:appendElements{
     WindowPlayerInfos,
     WindowPlayerPortrait,
@@ -5866,6 +5940,8 @@ ScreenWorldRG:appendElements{
     ButtonMove225,
     ButtonMove270,
     ButtonMove315,
+    ButtonPlayerStand,
+    ButtonPlayerKneel,
 }
 
 ScreenWorld:appendElements{
@@ -6147,38 +6223,38 @@ end -- generate places
 --
 -- Players
 --
--- local Truduk = CPlayerDwarf{name = "Truduk",
+-- Truduk = CPlayerDwarf{name = "Truduk",
 -- }
 -- Truduk:randomWorldWindow()
--- local Prinnn = CPlayerGnome{name = "Prinnn",
+-- Prinnn = CPlayerGnome{name = "Prinnn",
 --     coloreyesbg  = Tic.COLORRED,
 --     coloreyesfg  = Tic.COLORORANGE,
 -- }
--- local Kaptan = CPlayerMeduz{name = "Kaptan",
+-- Kaptan = CPlayerMeduz{name = "Kaptan",
 -- }
--- local Kaptin = CPlayerMeduz{name = "Kaptin",
+-- Kaptin = CPlayerMeduz{name = "Kaptin",
 --     colorhairsbg = Tic.COLORBLUEL,
 --     colorhairsfg = Tic.COLORBLUEM,
 --     coloreyesbg  = Tic.COLORBLUEM,
 --     coloreyesfg  = Tic.COLORBLUEL,
 -- }
--- local Aegeon = CPlayerElvwe{name = "Aegeon",
+-- Aegeon = CPlayerElvwe{name = "Aegeon",
 --     colorshirt   = Tic.COLORGREENL,
 --     colorarmor   = Tic.COLORGREEND,
 --     colorpants   = Tic.COLORGREENM,
 -- }
--- local Nitcha = CPlayerDrowe{name = "Nitcha",
+-- Nitcha = CPlayerDrowe{name = "Nitcha",
 -- }
--- local Azarel = CPlayerAngel{name = "Azarel",
+-- Azarel = CPlayerAngel{name = "Azarel",
 -- }
--- local Zikkow = CPlayerTifel{name = "Zikkow",
+-- Zikkow = CPlayerTifel{name = "Zikkow",
 --     colorhairsbg = Tic.COLORGREENM,
 --     colorhairsfg = Tic.COLORGREEND,
 --     colorextra   = Tic.COLORGREYM,
 --     coloreyesbg  = Tic.COLORGREENM,
 --     coloreyesfg  = Tic.COLORGREENL,
 -- }
--- local Kaainn = CPlayerDemon{name = "Kaainn",
+-- Kaainn = CPlayerDemon{name = "Kaainn",
 --     colorhairsbg = Tic.COLORGREYL,
 --     colorhairsfg = Tic.COLORWHITE,
 --     coloreyesbg  = Tic.COLORBLUEM,
@@ -6187,14 +6263,14 @@ end -- generate places
 --     colorshirt   = Tic.COLORPURPLE,
 --     colorpants   = Tic.COLORRED,
 -- }
--- local Daemok = CPlayerDemon{name = "Daemok",
+-- Daemok = CPlayerDemon{name = "Daemok",
 -- }
--- local Globth = CPlayerGolth{name = "Globth"
+-- Globth = CPlayerGolth{name = "Globth"
 -- }
 -- Globth:randomWorldWindow()
 
 if true then
-local Wulfie = CPlayerWolfe{name = "Wulfie",
+Wulfie = CPlayerWolfe{name = "Wulfie",
     colorextra = Tic.COLORRED,
     worldx = -10,
     interactions = {10},
@@ -6203,7 +6279,7 @@ end
 -- Wulfie:randomWorldWindow()
 
 if true then
-local Oxboow = CPlayerGhost{name = "Oxboow",
+Oxboow = CPlayerGhost{name = "Oxboow",
     statphyact = 10,
     statmenact = 10,
     statpsyact = 10,
@@ -6221,7 +6297,7 @@ end
 --
 -- Sprites -- TESTING
 --
-local SpriteSFX = CSpriteFGBoard{
+SpriteSFX = CSpriteFGBoard{
     screenx = 30,
     screeny = 120,
     directives = {
@@ -6243,12 +6319,12 @@ local SpriteSFX = CSpriteFGBoard{
         {x = 3, y = 5, color = Tic.COLORPURPLE,},
     },
 }
-local SpriteHTG = CSpriteFG{
+SpriteHTG = CSpriteFG{
     sprite = 458,
     screenx = 30,
     screeny = 100,
 }
-local SpriteBIS = CSpriteFGBoard{
+SpriteBIS = CSpriteFGBoard{
     screenx = 30,
     screeny = 110,
     directives = Tic:boardDirectives(458, {
@@ -6263,7 +6339,7 @@ local SpriteBIS = CSpriteFGBoard{
 --
 -- Regions -- TESTING
 --
-local Region = CRegion{
+Region = CRegion{
     lf = -10,
     rg = 10,
     up = -10,
