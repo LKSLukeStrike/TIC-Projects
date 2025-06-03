@@ -453,6 +453,16 @@ Tic.MOUSEOFFSETXRG = 5
 Tic.MOUSEOFFSETX   = Tic.MOUSEOFFSETXLF
 Tic.MOUSEOFFSETY   = 2
 Tic.MOUSEDIRX      = Tic.DIRXLF
+Tic.MOUSEDELAY     = 60
+Tic.MOUSERESET    = {
+    screenx = 0,
+    screeny = 0,
+    clicklf = false,
+    clickmd = false,
+    clickrg = false,
+    scrollx = 0,
+    scrolly = 0,
+}
 Tic.MOUSE          = {
     screenx = 0,
     screeny = 0,
@@ -464,7 +474,9 @@ Tic.MOUSE          = {
 }
 
 function Tic:mouseInput() -- set the mouse inputs in a table
-    local _result = {}
+    local _result = Tables:merge({}, Tic.MOUSERESET)
+
+    -- for _ = 0, Tic.MOUSEDELAY do end -- mouse delay
 
     _result.screenx, _result.screeny, _result.clicklf, _result.clickmd, _result.clickrg, _result.scrollx, _result.scrolly = mouse()
     if _result.screenx < Tic.MOUSE.screenx then -- adjust mouse direction
@@ -476,7 +488,6 @@ function Tic:mouseInput() -- set the mouse inputs in a table
     end
 
     Tic.MOUSE = _result
-    return _result -- not useful
 end
 
 function Tic:mouseCursor() -- set the mouse cursor sprite
@@ -977,6 +988,14 @@ Tic.TICK60 = CCyclerInt{ -- tick cycler from 0-59
 function Tic:tick() -- increment the timers
     Tic.TICK00:next()
     Tic.TICK60:next()
+end
+
+function Tic:wait(_ticks) -- wait for a number of ticks -- pause the game
+    _ticks = _ticks or 0
+    local _wait = Tic.TICK00.actvalue + math.abs(_ticks)
+    while Tic.TICK00.actvalue < _wait do
+        Tic.TICK00:next()
+    end
 end
 
 
@@ -4820,7 +4839,7 @@ function CWindowWorld:drawPlayerActual()
         _playeractual.spotting  = _nearestentity
     end
 
-    _playeractual.hovering = nil -- hovering
+    _playeractual.hovering = nil -- reset hovering
 
     if  _playeractual:entitySpotting() -- interact
     and _playeractual:entitySpotting():hasInteractions()
@@ -4841,7 +4860,7 @@ function CWindowWorld:drawPlayerActual()
                     and true
                     or  false
 
-                _entity.hovered = false
+                _entity.hovered = false -- reset hovered
 
                 if _regionviewworld:hasInsideRegion(_entityregionworld) then -- if in view
                     _entity.drawfade = false
@@ -4854,25 +4873,30 @@ function CWindowWorld:drawPlayerActual()
                     if _entity.discovered then -- only discovered entities
                         _entity:adjustScreenXYRelativeToEntity(_playeractual)
                         local _entityregionscreen = _entity:regionScreen()
-                        if  _playeractual.spottingpick
-                        and not (_entity == _playeractual)
-                        and _entityregionscreen:hasInsidePoint(Tic:mousePointX(), Tic:mousePointY())
-                        and not _playeractual.hovering then
+
+                        if  _playeractual.spottingpick -- if in pick mode
+                        and not (_entity == _playeractual) -- except itself
+                        and _entityregionscreen:hasInsidePoint(Tic:mousePointX(), Tic:mousePointY()) -- hovering something ?
+                        and not _playeractual.hovering then --hover only one
                             _playeractual.hovering = _entity
                             _entity.hovered = true
-                            if _playeractual:isSpottingLock() then
-                                local _lock = CText{text = "Lock", colorinside = Tic.COLORWHITE}
-                                _lock.screenx = _entity.screenx - ((_lock.screenw - Tic.SPRITESIZE) // 2)
-                                _lock.screeny = _entity.screeny - _lock.screenh
-                                _lock:draw()
-                                if Tic.MOUSE.clicklf then
-                                    if _playeractual.spotting then
-                                        _playeractual.spotting.spotted = false
-                                    end
-                                    _playeractual.hovering = nil
-                                    _playeractual.spotting = _entity
-                                    _entity.spotted = true
+
+                            local _locking  = (_playeractual.spottinglock and _playeractual.spotting == _entity) -- already locking ?
+                            local _locktext = (_locking)
+                                and CText{text = "Unlock", colorinside = Tic.COLORWHITE}
+                                or  CText{text = "Lock", colorinside = Tic.COLORWHITE}
+                            _locktext.screenx = _entity.screenx - ((_locktext.screenw - Tic.SPRITESIZE) // 2)
+                            _locktext.screeny = _entity.screeny - _locktext.screenh
+                            _locktext:draw()
+                            if Tic.MOUSE.clicklf then
+                                _playeractual.hovering = nil
+                                if _playeractual.spotting then -- unspot previous spotted entity if any
+                                    _playeractual.spotting.spotted = false
                                 end
+                                _playeractual.spotting = (_locking) and nil or _entity -- un/spot and un/lock the new one
+                                _entity.spotted = not _locking
+                                _playeractual.spottinglock = not _locking
+                                Tic:wait(600)
                             end
                         end
                         _entity:draw()
@@ -5368,15 +5392,12 @@ end
 --
 -- CButtonPlayerStand
 --
-local CButtonPlayerStand = CButtonClick:extend() -- generic player stand button
+local CButtonPlayerStand = CButtonCheck:extend() -- generic player stand button
 CButtonPlayerStand.BEHAVIOUR = function(self)
     IButtonPlayer.BEHAVIOUR(self)
     if not self.display then return end -- no player
-    if Tic:playerActual():postureGet() == Tic.POSTURESTAND then
-        self.actived = true
-    else
-        self.actived = false
-    end
+    self.checked = Tic:playerActual():postureGet() == Tic.POSTURESTAND
+    self.sprite.flip = Tic:playerActual().dirx
 end
 function CButtonPlayerStand:new(_argt)
     CButtonPlayerStand.super.new(self, _argt)
@@ -5392,15 +5413,12 @@ end
 --
 -- CButtonPlayerKneel
 --
-local CButtonPlayerKneel = CButtonClick:extend() -- generic player kneel button
+local CButtonPlayerKneel = CButtonCheck:extend() -- generic player kneel button
 CButtonPlayerKneel.BEHAVIOUR = function(self)
     IButtonPlayer.BEHAVIOUR(self)
     if not self.display then return end -- no player
-    if Tic:playerActual():postureGet() == Tic.POSTUREKNEEL then
-        self.actived = true
-    else
-        self.actived = false
-    end
+    self.checked = Tic:playerActual():postureGet() == Tic.POSTUREKNEEL
+    self.sprite.flip = Tic:playerActual().dirx
 end
 function CButtonPlayerKneel:new(_argt)
     CButtonPlayerKneel.super.new(self, _argt)
@@ -5416,15 +5434,12 @@ end
 --
 -- CButtonPlayerWork
 --
-local CButtonPlayerWork = CButtonClick:extend() -- generic player work button
+local CButtonPlayerWork = CButtonCheck:extend() -- generic player work button
 CButtonPlayerWork.BEHAVIOUR = function(self)
     IButtonPlayer.BEHAVIOUR(self)
     if not self.display then return end -- no player
-    if Tic:playerActual():statusGet() == Tic.STATUSWORK then
-        self.actived = true
-    else
-        self.actived = false
-    end
+    self.checked = Tic:playerActual():statusGet() == Tic.STATUSWORK
+    self.sprite.flip = Tic:playerActual().dirx
 end
 function CButtonPlayerWork:new(_argt)
     CButtonPlayerWork.super.new(self, _argt)
@@ -5440,15 +5455,12 @@ end
 --
 -- CButtonPlayerSleep
 --
-local CButtonPlayerSleep = CButtonClick:extend() -- generic player sleep button
+local CButtonPlayerSleep = CButtonCheck:extend() -- generic player sleep button
 CButtonPlayerSleep.BEHAVIOUR = function(self)
     IButtonPlayer.BEHAVIOUR(self)
     if not self.display then return end -- no player
-    if Tic:playerActual():statusGet() == Tic.STATUSSLEEP then
-        self.actived = true
-    else
-        self.actived = false
-    end
+    self.checked = Tic:playerActual():statusGet() == Tic.STATUSSLEEP
+    self.sprite.flip = Tic:playerActual().dirx
 end
 function CButtonPlayerSleep:new(_argt)
     CButtonPlayerSleep.super.new(self, _argt)
@@ -5534,8 +5546,10 @@ IButtonSpotting.BEHAVIOUR = function(self)
     self.actived = false
     if _direction == self.direction then
         self.actived = true
+        self.hovertext = CText{text = "Move"} --HH
     else
         self.hovered = true
+        self.hovertext = nil
     end
 end
 
@@ -5612,11 +5626,8 @@ IButtonPlayerMove.PALETTE = {[Tic.COLORGREYD] = Tic.COLORKEY}
 IButtonPlayerMove.BEHAVIOUR = function(self)
     IButtonPlayer.BEHAVIOUR(self)
     if not self.display then return end -- no move
-    if Tic:playerActual().direction == self.direction then
-        self.actived = true
-    else
-        self.actived = false
-    end
+    self.actived = Tic:playerActual().direction == self.direction
+    self.hovertext = CText{text = "Move"}
 end
 
 local CButtonPlayerMove000 = CButtonArrow000:extend() -- generic player move 000 button
