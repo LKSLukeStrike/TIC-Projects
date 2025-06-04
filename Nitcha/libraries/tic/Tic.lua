@@ -453,7 +453,8 @@ Tic.MOUSEOFFSETXRG = 5
 Tic.MOUSEOFFSETX   = Tic.MOUSEOFFSETXLF
 Tic.MOUSEOFFSETY   = 2
 Tic.MOUSEDIRX      = Tic.DIRXLF
-Tic.MOUSEHOLD      = 60
+Tic.MOUSECYCLER    = CCyclerInt{} -- delay cycler
+Tic.MOUSEDELAY     = 10 -- default delay ticks
 Tic.MOUSE          = {
     screenx = 0,
     screeny = 0,
@@ -464,7 +465,20 @@ Tic.MOUSE          = {
     scrolly = 0,
 }
 
+function Tic:mouseDelay(_delay) -- set a refresh mouse delay
+    _delay = _delay or Tic.MOUSEDELAY
+    Tic.MOUSECYCLER = CCyclerInt{maxindex = _delay} -- delay cycler
+end
+
+function Tic:mouseReset(_delay) -- reset refresh mouse delay
+    Tic:mouseDelay(0)
+end
+
 function Tic:mouseInput() -- set the mouse inputs in a table
+    Tic.MOUSECYCLER:next() -- mouse delay if any
+    if not Tic.MOUSECYCLER:isMAX() then return end -- have to wait
+    Tic:mouseReset() -- reset the delay
+
     local _result = {}
 
     _result.screenx, _result.screeny, _result.clicklf, _result.clickmd, _result.clickrg, _result.scrollx, _result.scrolly = mouse()
@@ -1229,10 +1243,12 @@ CSpriteBG.SIGNPLAYER  = CSpriteBG.SIGNBANK2 + 03 -- player sprite
 CSpriteBG.SIGNSPOTIT  = CSpriteBG.SIGNBANK2 + 04 -- spotit sprite
 CSpriteBG.SIGNLOCKIT  = CSpriteBG.SIGNBANK2 + 05 -- lockit sprite
 CSpriteBG.SIGNPICKIT  = CSpriteBG.SIGNBANK2 + 06 -- pickit sprite
-CSpriteBG.SIGNDOSTAN  = CSpriteBG.SIGNBANK2 + 07 -- stand
-CSpriteBG.SIGNDOKNEE  = CSpriteBG.SIGNBANK2 + 08 -- kneel
-CSpriteBG.SIGNDOWORK  = CSpriteBG.SIGNBANK2 + 09 -- work
-CSpriteBG.SIGNDOSLEE  = CSpriteBG.SIGNBANK2 + 10 -- sleep
+CSpriteBG.SIGNSTAIDL  = CSpriteBG.SIGNBANK2 + 07 -- stand idle
+CSpriteBG.SIGNKNEIDL  = CSpriteBG.SIGNBANK2 + 08 -- kneel idle
+CSpriteBG.SIGNSTAMOV  = CSpriteBG.SIGNBANK2 + 09 -- stand move
+CSpriteBG.SIGNKNEMOV  = CSpriteBG.SIGNBANK2 + 10 -- kneel move
+CSpriteBG.SIGNDOWORK  = CSpriteBG.SIGNBANK2 + 11 -- work
+CSpriteBG.SIGNDOSLEE  = CSpriteBG.SIGNBANK2 + 12 -- sleep
 CSpriteBG.BUILDBANK   = 32 -- buildings
 CSpriteBG.PLACEHOUSE  = CSpriteBG.BUILDBANK + 0
 CSpriteBG.PLACETOWER  = CSpriteBG.BUILDBANK + 1
@@ -4841,15 +4857,17 @@ end
 function CWindowWorld:drawPlayerActual()
     local _playeractual     = Tic:playerActual()
     if not _playeractual then return end
-    local _locationsaround  = _playeractual:locationsAround()
-    local _regionviewworld  = _playeractual:regionViewWorld()
-    local _regionmindworld  = _playeractual:regionMindWorld()
-    local _nearestentity    = _playeractual:nearestEntityViewWorld() -- nearest entity if any -- except itself
+    local _playerlocationsaround = _playeractual:locationsAround()
+    local _playerregionviewworld = _playeractual:regionViewWorld()
+    local _playerregionmindworld = _playeractual:regionMindWorld()
+    local _playernearestentity   = _playeractual:nearestEntityViewWorld() -- nearest entity if any -- except itself
 
     _playeractual:hover() -- unhover
 
-    if not _playeractual:entitySpotting() or not _playeractual:isSpottingLock() then -- spot the nearest entity if possible
-        _playeractual:spot(_nearestentity)
+    if not _playeractual:entitySpotting() -- spot the nearest entity if nothing else spotted
+    or not _playeractual:isSpottingLock()
+    then
+        _playeractual:spot(_playernearestentity)
     end
 
     if  _playeractual:entitySpotting() -- interact
@@ -4861,26 +4879,28 @@ function CWindowWorld:drawPlayerActual()
         _playeractual:interacttoDeleteAll()
     end
     
-    for _, _keyy in pairs(Tables:keys(_locationsaround)) do -- draw entities -- sorted by y first
-        for _, _keyx in pairs(Tables:keys(_locationsaround[_keyy])) do -- sorted by x next
-            for _entity, _ in pairs(_locationsaround[_keyy][_keyx]) do -- entities around actual player
+    for _, _keyy in pairs(Tables:keys(_playerlocationsaround)) do -- draw entities -- sorted by y first
+        for _, _keyx in pairs(Tables:keys(_playerlocationsaround[_keyy])) do -- sorted by x next
+            for _entity, _ in pairs(_playerlocationsaround[_keyy][_keyx]) do -- entities around actual player
                 local _entityregionworld = _entity:regionWorld()
 
-                _entity.spotted = (_entity == _playeractual:entitySpotting()
-                and _playeractual:isSpottingDraw()) -- unspot all entities except spotting one if any
+                _entity.hovered = false -- unhover all entities
+
+                _entity.spotted = (_playeractual:isSpottingDraw() -- unspot all entities except spotting one if any
+                and _entity == _playeractual:entitySpotting())
                     and true
                     or  false
 
-                _entity.hovered = false -- reset hovered
-
-                if _regionviewworld:hasInsideRegion(_entityregionworld) then -- if in view
-                    _entity.drawfade = false
+                if _playerregionviewworld:hasInsideRegion(_entityregionworld) then -- draw mode -- in view
                     _entity.discovered = true
+                    _entity.drawfade = false
                 else -- not in view
                     _entity.drawfade = true
                 end
 
-                if (_entity.drawfade == false) or (_regionmindworld:hasInsideRegion(_entityregionworld)) then -- draw entity ?
+                if (_playerregionviewworld:hasInsideRegion(_entityregionworld)) -- draw entity ?
+                or (_playerregionmindworld:hasInsideRegion(_entityregionworld))
+                then
                     if _entity.discovered then -- only discovered entities
                         _entity:adjustScreenXYRelativeToEntity(_playeractual)
                         local _entityregionscreen = _entity:regionScreen()
@@ -4889,8 +4909,7 @@ function CWindowWorld:drawPlayerActual()
                         and not (_entity == _playeractual) -- except itself
                         and _entityregionscreen:hasInsidePoint(Tic:mousePointX(), Tic:mousePointY()) -- hovering something ?
                         and not _playeractual.hovering then --hover only one
-                            _playeractual.hovering = _entity
-                            _entity.hovered = true
+                            _playeractual:hover(_entity)
 
                             local _locking  = (_playeractual.spottinglock and _playeractual.spotting == _entity) -- already locking ?
                             local _locktext = (_locking)
@@ -4899,17 +4918,21 @@ function CWindowWorld:drawPlayerActual()
                             _locktext.screenx = _entity.screenx - ((_locktext.screenw - Tic.SPRITESIZE) // 2)
                             _locktext.screeny = _entity.screeny - _locktext.screenh
                             _locktext:draw()
+
                             if Tic.MOUSE.clicklf then
-                                _playeractual.hovering = nil
-                                if _playeractual.spotting then -- unspot previous spotted entity if any
-                                    _playeractual.spotting.spotted = false
+                                Tic.MOUSE.clicklf = false -- avoid bouncing
+                                Tic:mouseDelay(10)
+                                
+                                if _locking then -- unspot
+                                    _playeractual:spot()
+                                    _playeractual.spottinglock = false
+                                else -- spot
+                                    _playeractual:spot(_entity)
+                                    _playeractual.spottinglock = true
                                 end
-                                _playeractual.spotting = (_locking) and nil or _entity -- un/spot and un/lock the new one
-                                _entity.spotted = not _locking
-                                _playeractual.spottinglock = not _locking
-                                Tic:wait(600)
                             end
                         end
+
                         _entity:draw()
                     end
                 end
@@ -5408,12 +5431,15 @@ CButtonPlayerStand.BEHAVIOUR = function(self)
     IButtonPlayer.BEHAVIOUR(self)
     if not self.display then return end -- no player
     self.checked = Tic:playerActual():postureGet() == Tic.POSTURESTAND
+    self.sprite.sprite = (Tic:playerActual():statusGet() == Tic.STATUSIDLE)
+        and CSpriteBG.SIGNSTAIDL
+        or  CSpriteBG.SIGNSTAMOV
     self.sprite.flip = Tic:playerActual().dirx
 end
 function CButtonPlayerStand:new(_argt)
     CButtonPlayerStand.super.new(self, _argt)
     self.drawborder     = false
-	self.sprite.sprite  = CSpriteBG.SIGNDOSTAN
+	self.sprite.sprite  = CSpriteBG.SIGNSTAIDL
 	self.behaviour      = CButtonPlayerStand.BEHAVIOUR  -- function to trigger at first
     self.clicklf        = function() Tic:toggleKneel() end
     self.hovertext      = CText{text = "Stand"}
@@ -5429,12 +5455,15 @@ CButtonPlayerKneel.BEHAVIOUR = function(self)
     IButtonPlayer.BEHAVIOUR(self)
     if not self.display then return end -- no player
     self.checked = Tic:playerActual():postureGet() == Tic.POSTUREKNEEL
+    self.sprite.sprite = (Tic:playerActual():statusGet() == Tic.STATUSIDLE)
+        and CSpriteBG.SIGNKNEIDL
+        or  CSpriteBG.SIGNKNEMOV
     self.sprite.flip = Tic:playerActual().dirx
 end
 function CButtonPlayerKneel:new(_argt)
     CButtonPlayerKneel.super.new(self, _argt)
     self.drawborder     = false
-	self.sprite.sprite  = CSpriteBG.SIGNDOKNEE
+	self.sprite.sprite  = CSpriteBG.SIGNKNEIDL
 	self.behaviour      = CButtonPlayerKneel.BEHAVIOUR  -- function to trigger at first
     self.clicklf        = function() Tic:toggleKneel() end
     self.hovertext      = CText{text = "Kneel"}
@@ -5873,9 +5902,9 @@ ButtonSpottingDraw     = CButtonSpottingDraw{}
 ButtonSpottingLock     = CButtonSpottingLock{}
 ButtonSpottingPick     = CButtonSpottingPick{}
 ScreenWorldLF:elementsDistributeH(
-    {ButtonSpottingDraw, ButtonSpottingLock, ButtonSpottingPick},
+    {ButtonSpottingDraw, ButtonSpottingPick, ButtonSpottingLock},
     WindowSpottingInfos.screenx + (
-        (WindowSpottingInfos.screenw - CScreen:elementsTotalW({ButtonSpottingDraw, ButtonSpottingLock, ButtonSpottingPick})) // 2),
+        (WindowSpottingInfos.screenw - CScreen:elementsTotalW({ButtonSpottingDraw, ButtonSpottingPick, ButtonSpottingLock})) // 2),
     WindowSpottingInfos.screeny - Tic.SPRITESIZE
 )
 WindowSpottingPortrait = CWindowSpottingPortrait{}

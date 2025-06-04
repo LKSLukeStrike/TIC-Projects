@@ -80,6 +80,10 @@ function Nums:frequence01(_num, _frequence) -- 0 in frequence, 1 out of frequenc
     return math.tointeger((_num // _frequence) % 2)
 end
 
+function Nums:frequenceIsPeak(_num, _frequence) -- is frequence at peak ? (modulo == 0)
+    return (_num % _frequence) == 0
+end
+
 
 -- Toggle
 function Nums:toggle01(_num) -- toggle btw 0 1
