@@ -453,16 +453,7 @@ Tic.MOUSEOFFSETXRG = 5
 Tic.MOUSEOFFSETX   = Tic.MOUSEOFFSETXLF
 Tic.MOUSEOFFSETY   = 2
 Tic.MOUSEDIRX      = Tic.DIRXLF
-Tic.MOUSEDELAY     = 60
-Tic.MOUSERESET    = {
-    screenx = 0,
-    screeny = 0,
-    clicklf = false,
-    clickmd = false,
-    clickrg = false,
-    scrollx = 0,
-    scrolly = 0,
-}
+Tic.MOUSEHOLD      = 60
 Tic.MOUSE          = {
     screenx = 0,
     screeny = 0,
@@ -474,9 +465,7 @@ Tic.MOUSE          = {
 }
 
 function Tic:mouseInput() -- set the mouse inputs in a table
-    local _result = Tables:merge({}, Tic.MOUSERESET)
-
-    -- for _ = 0, Tic.MOUSEDELAY do end -- mouse delay
+    local _result = {}
 
     _result.screenx, _result.screeny, _result.clicklf, _result.clickmd, _result.clickrg, _result.scrollx, _result.scrolly = mouse()
     if _result.screenx < Tic.MOUSE.screenx then -- adjust mouse direction
@@ -1989,8 +1978,8 @@ function CEntityDrawable:new(_argt)
     self.scale        = Tic.SCALE01
     self.portraitmode = false -- is for drawing portrait ?
     self.animations   = nil -- override if any
-    self.spotted      = false -- use spotted to draw a border
     self.hovered      = false -- use hovered to draw a border
+    self.spotted      = false -- use spotted to draw a border
     self.hitbox       = CHitbox{entity = self, lf = 0, rg = 7, up = 0, dw = 7}
     self.drawborders  = false -- draw behaviour
     self.drawhitbox   = false
@@ -3157,8 +3146,8 @@ function CCharacter:new(_argt)
     self.workcycler   = CCyclerInt{maxindex = 179} -- cycler to animate work
     self.idlecycler   = CCyclerInt{maxindex = 179} -- cycler to activate idle animation
     self.hitbox       = CHitbox{entity = self, lf = 2, rg = 4, up = 5, dw = 7}
-    self.spotting     = nil -- spotting entity if any
     self.hovering     = nil -- hovering entity if any
+    self.spotting     = nil -- spotting entity if any
     self.spottingdraw = false -- draw its spotting
     self.spottinglock = false -- lock its spotting
     self.spottingpick = false -- pick its spotting
@@ -3188,6 +3177,28 @@ function CCharacter:new(_argt)
     self:argt(_argt) -- override if any
     self.camera       = CCamera{name = self.name.." "..Classic.NAMECAMERA} -- one camera per character
     self:focus() -- focus its camera on itself
+end
+
+function CCharacter:hover(_entity) -- hover an entity, use nil to unhover
+    if _entity then
+        if self.hovering then self.hovering.hovered = false end -- unhover previous if any
+        _entity.hovered = true
+        self.hovering = _entity
+    else
+        if self.hovering then self.hovering.hovered = false end -- unhover previous if any
+        self.hovering = nil
+    end
+end
+
+function CCharacter:spot(_entity) -- spot an entity, use nil to unspot
+    if _entity then
+        if self.spotting then self.spotting.spotted = false end -- unspot previous if any
+        _entity.spotted = true
+        self.spotting = _entity
+    else
+        if self.spotting then self.spotting.spotted = false end -- unspot previous if any
+        self.spotting = nil
+    end
 end
 
 function CCharacter:postureGet() -- state posture
@@ -4835,11 +4846,11 @@ function CWindowWorld:drawPlayerActual()
     local _regionmindworld  = _playeractual:regionMindWorld()
     local _nearestentity    = _playeractual:nearestEntityViewWorld() -- nearest entity if any -- except itself
 
-    if not _playeractual:entitySpotting() or not _playeractual:isSpottingLock() then -- spotting
-        _playeractual.spotting  = _nearestentity
-    end
+    _playeractual:hover() -- unhover
 
-    _playeractual.hovering = nil -- reset hovering
+    if not _playeractual:entitySpotting() or not _playeractual:isSpottingLock() then -- spot the nearest entity if possible
+        _playeractual:spot(_nearestentity)
+    end
 
     if  _playeractual:entitySpotting() -- interact
     and _playeractual:entitySpotting():hasInteractions()
@@ -6337,9 +6348,15 @@ end -- generate places
 
 if true then
 Wulfie = CPlayerWolfe{name = "Wulfie",
-    colorextra = Tic.COLORRED,
+    statphyact = 10,
+    statmenact = 10,
+    statpsyact = 10,
+      colorextra = Tic.COLORRED,
     worldx = -10,
+    worldy = 30,
     interactions = {10},
+    spottingdraw = true,
+    spottingpick = true,
 }
 end
 -- Wulfie:randomWorldWindow()
@@ -6498,13 +6515,13 @@ local Kirke1 = CPlaceKirkeAnim{
     worldx = -20,
     worldy = 40,
 }
-CPlace:generateRoad(House1.worldx, House1.worldy, House2.worldx, House2.worldy, 15)
-CPlace:generateRoad(House1.worldx, House1.worldy, Kirke1.worldx, Kirke1.worldy, 20)
-CPlace:generateRoad(House2.worldx, House2.worldy, Kirke1.worldx, Kirke1.worldy, 10)
-CPlace:generateRoad(House1.worldx, House1.worldy, House2.worldx, House2.worldy, 10, 5, 5, Tables:generate{
-    [CPlaceTree0Anim] = 4,
-    [CPlaceTree0Idle] = 1,
-})
+-- CPlace:generateRoad(House1.worldx, House1.worldy, House2.worldx, House2.worldy, 15)
+-- CPlace:generateRoad(House1.worldx, House1.worldy, Kirke1.worldx, Kirke1.worldy, 20)
+-- CPlace:generateRoad(House2.worldx, House2.worldy, Kirke1.worldx, Kirke1.worldy, 10)
+-- CPlace:generateRoad(House1.worldx, House1.worldy, House2.worldx, House2.worldy, 10, 5, 5, Tables:generate{
+--     [CPlaceTree0Anim] = 4,
+--     [CPlaceTree0Idle] = 1,
+-- })
 end
 
 if false then
