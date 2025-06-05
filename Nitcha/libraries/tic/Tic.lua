@@ -1310,6 +1310,8 @@ CSpriteFG.STATUSEMPTY = CSpriteBG.SPRITEEMPTY
 CSpriteFG.STATUSSLEEP = CSpriteFG.STATUSBANK + 0
 CSpriteFG.STATUSWOUND = CSpriteFG.STATUSBANK + 1
 CSpriteFG.STATUSDEATH = CSpriteFG.STATUSBANK + 2
+CSpriteFG.WEAPONBANK  = 352 -- weapons types
+CSpriteFG.WEAPONMELEE = CSpriteFG.WEAPONBANK + 0
 function CSpriteFG:new(_argt)
     CSpriteFG.super.new(self, _argt)
     self.spritebank = CSpriteFG.SPRITEBANK
@@ -2941,6 +2943,35 @@ end
 -- CObject
 --
 local CObject = CEntityDrawable:extend() -- objects
+
+
+--
+-- CObjectHandable
+--
+local CObjectHandable = CObject:extend() -- handable objects
+function CObjectHandable:new(_argt)
+    CObjectHandable.super.new(self, _argt)
+    self.handx = 3 -- hand offsets
+    self.handy = 4
+    self:argt(_argt) -- override if any
+end
+
+
+--
+-- CWeapon
+--
+local CWeapon = CObjectHandable:extend() -- weapons
+
+
+--
+-- CWeaponMelee
+--
+local CWeaponMelee = CWeapon:extend() -- melee weapons
+function CWeaponMelee:new(_argt)
+    CWeaponMelee.super.new(self, _argt)
+    self.sprite  = CSpriteFG.WEAPONMELEE
+    self:argt(_argt) -- override if any
+end
 
 
 --
@@ -6411,6 +6442,11 @@ end
 -- exit()
 
 
+--
+-- Weapons -- TESTING
+--
+WeaponMelee = CWeaponMelee{}
+
 
 --
 -- Sprites -- TESTING
@@ -6602,6 +6638,8 @@ function Tic:draw()
 
     Tic:drawLog()
     Tic:logPrint()
+
+    WeaponMelee:draw()
 
     -- Text01:draw()
     -- Text02:draw()
