@@ -3069,30 +3069,30 @@ Tic.STATESETTINGS = { -- states settings
 Tic.POSTURESETTINGS = { -- postures settings
     [Tic.POSTURESTAND] = {
         bodyspriteoffset = 0,
-        bodyxoffset = 0,
-        bodyyoffset = 0,
-        headxoffset = 0,
-        headyoffset = 0,
+        bodyoffsetx = 0,
+        bodyoffsety = 0,
+        headoffsetx = 0,
+        headoffsety = 0,
         headusesize = true,
         rotate = CSprite.ROTATE000,
         frame = nil, -- nil use self.frame
     },
     [Tic.POSTUREKNEEL] = {
         bodyspriteoffset = 4,
-        bodyxoffset = 0,
-        bodyyoffset = 0,
-        headxoffset = 0,
-        headyoffset = 1,
+        bodyoffsetx = 0,
+        bodyoffsety = 0,
+        headoffsetx = 0,
+        headoffsety = 1,
         headusesize = true,
         rotate = CSprite.ROTATE000,
         frame = nil, -- nil use self.frame
     },
     [Tic.POSTUREFLOOR] = {
         bodyspriteoffset = 0,
-        bodyxoffset = nil, -- nil use size
-        bodyyoffset = 2,
-        headxoffset = 0,
-        headyoffset = 2,
+        bodyoffsetx = nil, -- nil use size
+        bodyoffsety = 2,
+        headoffsetx = 0,
+        headoffsety = 2,
         headusesize = false,
         rotate = CSprite.ROTATE090,
         frame = CSprite.FRAME01, -- fix frame
@@ -3604,20 +3604,20 @@ function CCharacter:drawInteract()
     if _posture == Tic.POSTUREFLOOR then return end -- dont draw
     if not self:hasInteractTo() then return end -- dont draw
     local _posturesettings = Tic.POSTURESETTINGS[_posture]
-    local _xoffset         = _posturesettings.headxoffset
-    _xoffset               = (self.dirx == Tic.DIRXLF)
-        and _xoffset - 3
-        or  _xoffset + 3
-    local _yoffset         = _posturesettings.headyoffset - Tic.SPRITESIZE + 1
-    _yoffset               = (_posturesettings.headusesize)
-        and _yoffset + self.size
-        or  _yoffset
+    local _headoffsetx     = _posturesettings.headoffsetx
+    _headoffsetx           = (self.dirx == Tic.DIRXLF)
+        and _headoffsetx - 3
+        or  _headoffsetx + 3
+    local _headoffsety     = _posturesettings.headoffsety - Tic.SPRITESIZE + 1
+    _headoffsety               = (_posturesettings.headusesize)
+        and _headoffsety + self.size
+        or  _headoffsety
 
 
     local _musprite = CSpriteFG() -- multi usage unique sprite
     _musprite.sprite  = CSpriteBG.SIGNINTMRK -- apply the corresponding attributes
-    _musprite.screenx = self.screenx + (_xoffset * self.scale)
-    _musprite.screeny = self.screeny + (_yoffset * self.scale)
+    _musprite.screenx = self.screenx + (_headoffsetx * self.scale)
+    _musprite.screeny = self.screeny + (_headoffsety * self.scale)
     _musprite.scale   = self.scale
     _musprite.flip    = self.dirx
     _musprite.palette = {[Tic.COLORGREYD] = Tic.COLORKEY}
@@ -3890,21 +3890,21 @@ function CCharacterHumanoid:new(_argt)
     self:argt(_argt) -- override if any
 end
 
-function CCharacterHumanoid:drawBody() -- FIXME to rewrite from scratch
+function CCharacterHumanoid:drawBody()
     local _posture         = self:postureGet()
     local _status          = self:statusGet()
     local _posturesettings = Tic.POSTURESETTINGS[_posture]
     local _statussettings  = Tic.STATUSSETTINGS[_status]
 
     local _bodyspriteoffset = _posturesettings.bodyspriteoffset + _statussettings.bodyspriteoffset
-    local _bodyxoffset      = _posturesettings.bodyxoffset
-    _bodyxoffset = (_bodyxoffset == nil and self.dirx == Tic.DIRXLF)
+    local _bodyoffsetx      = _posturesettings.bodyoffsetx
+    _bodyoffsetx = (_bodyoffsetx == nil and self.dirx == Tic.DIRXLF)
         and Nums:pos(self.size) -- nil use size
-        or  _bodyxoffset
-    _bodyxoffset = (_bodyxoffset == nil and self.dirx == Tic.DIRXRG)
+        or  _bodyoffsetx
+    _bodyoffsetx = (_bodyoffsetx == nil and self.dirx == Tic.DIRXRG)
         and Nums:neg(self.size) -- nil use size
-        or  _bodyxoffset
-    local _bodyyoffset      = _posturesettings.bodyyoffset
+        or  _bodyoffsetx
+    local _bodyoffsety      = _posturesettings.bodyoffsety
     local _bodyrotate       = _posturesettings.rotate
     local _bodyframe        = _posturesettings.frame
     _bodyframe = (_bodyframe)
@@ -3913,8 +3913,8 @@ function CCharacterHumanoid:drawBody() -- FIXME to rewrite from scratch
 
     local _musprite = CSpriteFG() -- multi usage unique sprite
     _musprite.sprite  = self.bodysprite + _bodyspriteoffset -- apply the corresponding attributes
-    _musprite.screenx = self.screenx + (_bodyxoffset * self.scale)
-    _musprite.screeny = self.screeny + (_bodyyoffset * self.scale)
+    _musprite.screenx = self.screenx + (_bodyoffsetx * self.scale)
+    _musprite.screeny = self.screeny + (_bodyoffsety * self.scale)
     _musprite.rotate  = _bodyrotate
     _musprite.frame   = _bodyframe
     _musprite.scale   = self.scale
@@ -3931,11 +3931,11 @@ end
 function CCharacterHumanoid:drawHead()
     local _posture         = self:postureGet()
     local _posturesettings = Tic.POSTURESETTINGS[_posture]
-    local _headxoffset     = _posturesettings.headxoffset
-    local _headyoffset     = _posturesettings.headyoffset
-    _headyoffset           = (_posturesettings.headusesize)
-        and _headyoffset + self.size
-        or  _headyoffset
+    local _headoffsetx     = _posturesettings.headoffsetx
+    local _headoffsety     = _posturesettings.headoffsety
+    _headoffsety           = (_posturesettings.headusesize)
+        and _headoffsety + self.size
+        or  _headoffsety
     local _headrotate      = _posturesettings.rotate
     local _headframe       = CSprite.FRAME00 -- heads have only one frame
 
@@ -3945,8 +3945,8 @@ function CCharacterHumanoid:drawHead()
     -- draw head
 
     _musprite.sprite  = self.headsprite -- apply the corresponding attributes
-    _musprite.screenx = self.screenx + (_headxoffset * self.scale)
-    _musprite.screeny = self.screeny + (_headyoffset * self.scale)
+    _musprite.screenx = self.screenx + (_headoffsetx * self.scale)
+    _musprite.screeny = self.screeny + (_headoffsety * self.scale)
     _musprite.rotate  = _headrotate
     _musprite.frame   = _headframe
     _musprite.scale   = self.scale
