@@ -2949,11 +2949,20 @@ local CObject = CEntityDrawable:extend() -- objects
 -- CObjectHandable
 --
 local CObjectHandable = CObject:extend() -- handable objects
+CObjectHandable.HANDLES = {
+    [CSprite.ROTATE000] = {handlex = 3, handley = 4},
+    [CSprite.ROTATE090] = {handlex = 3, handley = 3},
+    [CSprite.ROTATE180] = {handlex = 4, handley = 3},
+    [CSprite.ROTATE270] = {handlex = 4, handley = 4},
+}
 function CObjectHandable:new(_argt)
     CObjectHandable.super.new(self, _argt)
-    self.handx = 3 -- hand offsets
-    self.handy = 4
+    self.handles = CObjectHandable.HANDLES -- handle locations depending on rotate
     self:argt(_argt) -- override if any
+end
+
+function CObjectHandable:handleRotate(_rotate)
+    return self.handles[_rotate]
 end
 
 
@@ -3601,13 +3610,24 @@ function CCharacter:drawHandBG()
     local _slothand = (self.dirx == Tic.DIRXLF)
         and self.slothandrg
         or  self.slothandlf
+    local _handsoffsets = self:handsOffsets()
+    local _handoffsetx  = (self.dirx == Tic.DIRXLF)
+        and _handsoffsets.handrgx
+        or  _handsoffsets.handlfx
+    local _handoffsety  = (self.dirx == Tic.DIRXLF)
+        and _handsoffsets.handrgy
+        or  _handsoffsets.handlfy
+    local _handler = _slothand:handleRotate(_handsoffsets.rotate)
+    local _handoffsetx  = _handoffsetx - _handler.handlex
+    local _handoffsety  = _handoffsety - _handler.handley
 
     local _musprite = CSpriteFG() -- multi usage unique sprite
     _musprite.sprite  = _slothand.sprite
-    _musprite.screenx = self.screenx - 10
-    _musprite.screeny = self.screeny
+    _musprite.screenx = self.screenx + (_handoffsetx * self.scale)
+    _musprite.screeny = self.screeny + (_handoffsety * self.scale)
     _musprite.flip    = self.dirx
     _musprite.scale   = self.scale
+    _musprite.rotate  = _handsoffsets.rotate
     -- _musprite.palette = _palette
     _musprite:draw()
 end
@@ -4010,6 +4030,19 @@ function CCharacterHumanoid:drawHead()
     }
     _musprite:draw()
 end
+
+function CCharacterHumanoid:handsOffsets()
+    local _result = {
+        handrgx = 2,
+        handrgy = 6,
+        handlfx = 5,
+        handlfy = 6,
+        rotate  = CSprite.ROTATE270,
+    }
+
+    return _result
+end
+
 
 
 local IPlayer = CCharacter:extend() -- players characters implementation
