@@ -3221,6 +3221,8 @@ function CCharacter:new(_argt)
     self.drawview     = false
     self.drawmind     = false
     self.drawmove     = false
+    self.slothandlf   = nil -- character slots
+    self.slothandrg   = nil
     self:argt(_argt) -- override if any
     self.camera       = CCamera{name = self.name.." "..Classic.NAMECAMERA} -- one camera per character
     self:focus() -- focus its camera on itself
@@ -3418,10 +3420,10 @@ function CCharacter:draw() -- set animations and draw layers
     self:cycle()
     self:drawDirs()
     self:drawStatus()
-    self:drawWeapon()
-    self:drawShield()
+    self:drawHandBG()
     self:drawBody()
     self:drawHead()
+    self:drawHandFG()
     self:drawSpotted()
     self:drawHovered()
     self:drawBorders()
@@ -3592,10 +3594,28 @@ function CCharacter:drawStatus()
     _musprite:draw()
 end
 
-function CCharacter:drawWeapon()
+function CCharacter:drawHandBG()
+    if self.dirx == Tic.DIRXLF and not self.slothandrg then return end -- nothing in rg hand
+    if self.dirx == Tic.DIRXRG and not self.slothandlf then return end -- nothing in lf hand
+    Tic:logAppend("hand BG")
+    local _slothand = (self.dirx == Tic.DIRXLF)
+        and self.slothandrg
+        or  self.slothandlf
+
+    local _musprite = CSpriteFG() -- multi usage unique sprite
+    _musprite.sprite  = _slothand.sprite
+    _musprite.screenx = self.screenx - 10
+    _musprite.screeny = self.screeny
+    _musprite.flip    = self.dirx
+    _musprite.scale   = self.scale
+    -- _musprite.palette = _palette
+    _musprite:draw()
 end
 
-function CCharacter:drawShield()
+function CCharacter:drawHandFG()
+    if self.dirx == Tic.DIRXLF and not self.slothandlf then return end -- nothing in lf hand
+    if self.dirx == Tic.DIRXRG and not self.slothandrg then return end -- nothing in rg hand
+    Tic:logAppend("hand FG")
 end
 
 function CCharacter:drawInteract()
@@ -6423,6 +6443,7 @@ Wulfie = CPlayerWolfe{name = "Wulfie",
     interactions = {10},
     spottingdraw = true,
     spottingpick = true,
+    slothandrg = CWeaponMelee{},
 }
 end
 -- Wulfie:randomWorldWindow()
@@ -6639,7 +6660,7 @@ function Tic:draw()
     Tic:drawLog()
     Tic:logPrint()
 
-    WeaponMelee:draw()
+    -- WeaponMelee:draw()
 
     -- Text01:draw()
     -- Text02:draw()
