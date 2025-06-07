@@ -1312,6 +1312,9 @@ CSpriteFG.STATUSWOUND = CSpriteFG.STATUSBANK + 1
 CSpriteFG.STATUSDEATH = CSpriteFG.STATUSBANK + 2
 CSpriteFG.WEAPONBANK  = 352 -- weapons types
 CSpriteFG.WEAPONMELEE = CSpriteFG.WEAPONBANK + 0
+CSpriteFG.WEAPONRANGE = CSpriteFG.WEAPONBANK + 1
+CSpriteFG.WEAPONSHIEL = CSpriteFG.WEAPONBANK + 2
+CSpriteFG.WEAPONALCHE = CSpriteFG.WEAPONBANK + 3
 function CSpriteFG:new(_argt)
     CSpriteFG.super.new(self, _argt)
     self.spritebank = CSpriteFG.SPRITEBANK
@@ -1989,6 +1992,7 @@ function CEntityDrawable:new(_argt)
     self.kind = Classic.KINDDRAWABLE
     self.name = Classic.NAMEDRAWABLE
     self.world        = World
+    self.worldappend  = true -- append to the world ?
     self.sprite       = CSpriteBG.SPRITEEMPTY
     self.screenx      = 0 -- screen positions -- used to draw the sprite
     self.screeny      = 0
@@ -2003,7 +2007,7 @@ function CEntityDrawable:new(_argt)
     self.drawhitbox   = false
     self.drawfade     = false
     self:argt(_argt) -- override if any
-    self.world:appendEntity(self) -- append itself to the world
+    if self.worldappend then self.world:appendEntity(self) end -- append itself to the world
 end
 
 function CEntityDrawable:draw() -- default draw for drawable entities -- override if any
@@ -2979,8 +2983,33 @@ local CWeaponMelee = CWeapon:extend() -- melee weapons
 function CWeaponMelee:new(_argt)
     CWeaponMelee.super.new(self, _argt)
     self.sprite  = CSpriteFG.WEAPONMELEE
+    self.handles = {
+        [CSprite.ROTATE000] = {handlex = 3, handley = 5},
+        [CSprite.ROTATE090] = {handlex = 2, handley = 3},
+        [CSprite.ROTATE180] = {handlex = 4, handley = 2},
+        [CSprite.ROTATE270] = {handlex = 5, handley = 4},
+    }
     self.palettefg = {[Tic.COLORGREYD] = Tic.COLORBLUEM, [Tic.COLORGREYM] = Tic.COLORBLUEL}
     self.palettebg = {[Tic.COLORGREYD] = Tic.COLORBLUED, [Tic.COLORGREYM] = Tic.COLORBLUEM}
+    self:argt(_argt) -- override if any
+end
+
+
+--
+-- CWeaponRange
+--
+local CWeaponRange = CWeapon:extend() -- range weapons
+function CWeaponRange:new(_argt)
+    CWeaponRange.super.new(self, _argt)
+    self.sprite  = CSpriteFG.WEAPONRANGE
+    self.handles = {
+        [CSprite.ROTATE000] = {handlex = 3, handley = 3},
+        [CSprite.ROTATE090] = {handlex = 4, handley = 3},
+        [CSprite.ROTATE180] = {handlex = 4, handley = 4},
+        [CSprite.ROTATE270] = {handlex = 3, handley = 4},
+    }
+    self.palettefg = {[Tic.COLORGREYD] = Tic.COLORORANGE, [Tic.COLORGREYM] = Tic.COLORBLUEL}
+    self.palettebg = {[Tic.COLORGREYD] = Tic.COLORRED, [Tic.COLORGREYM] = Tic.COLORBLUEM}
     self:argt(_argt) -- override if any
 end
 
@@ -3620,9 +3649,13 @@ function CCharacter:drawHandBG()
     local _itemhand = (self.dirx == Tic.DIRXLF)
         and self.itemhandrg
         or  self.itemhandlf
-    local _itemhandle = _itemhand:handleRotate(_handsoffsets.rotate)
+    local _itemhandle   = _itemhand:handleRotate(_handsoffsets.rotate)
     local _handoffsetx  = _handoffsetx - _itemhandle.handlex
     local _handoffsety  = _handoffsety - _itemhandle.handley
+
+    local _rotate  = (_itemhandle.rotate)
+        and _itemhandle.rotate
+        or  _handsoffsets.rotate
 
     local _palette = Tables:merge(_itemhand.palettebg, {[Tic.COLORWHITE] = self.colorskin})
 
@@ -3631,7 +3664,7 @@ function CCharacter:drawHandBG()
     _musprite.screenx = self.screenx + (_handoffsetx * self.scale)
     _musprite.screeny = self.screeny + (_handoffsety * self.scale)
     _musprite.scale   = self.scale
-    _musprite.rotate  = _handsoffsets.rotate
+    _musprite.rotate  = _rotate
     _musprite.palette = _palette
     _musprite:draw()
 end
@@ -3655,6 +3688,10 @@ function CCharacter:drawHandFG()
     local _handoffsetx  = _handoffsetx - _itemhandle.handlex
     local _handoffsety  = _handoffsety - _itemhandle.handley
 
+    local _rotate  = (_itemhandle.rotate)
+        and _itemhandle.rotate
+        or  _handsoffsets.rotate
+
     local _palette = Tables:merge(_itemhand.palettefg, {[Tic.COLORWHITE] = self.colorskin})
 
     local _musprite = CSpriteFG() -- multi usage unique sprite
@@ -3662,7 +3699,7 @@ function CCharacter:drawHandFG()
     _musprite.screenx = self.screenx + (_handoffsetx * self.scale)
     _musprite.screeny = self.screeny + (_handoffsety * self.scale)
     _musprite.scale   = self.scale
-    _musprite.rotate  = _handsoffsets.rotate
+    _musprite.rotate  = _rotate
     _musprite.palette = _palette
     _musprite:draw()
 end
@@ -6534,32 +6571,32 @@ end -- generate places
 -- Globth:randomWorldWindow()
 
 if true then
-Wulfie = CPlayerWolfe{name = "Wulfie",
-    statphyact = 10,
-    statmenact = 10,
-    statpsyact = 10,
-    colorextra = Tic.COLORRED,
-    worldx = -10,
-    worldy = 30,
-    interactions = {10},
-    spottingdraw = true,
-    spottingpick = true,
-    itemhandrg = CWeaponMelee{},
-    itemhandlf = CWeaponMelee{},
-}
-Wolfie = CPlayerWolfe{name = "Wolfie",
-    statphyact = 10,
-    statmenact = 10,
-    statpsyact = 10,
-    colorextra = Tic.COLORCYAN,
-    worldx = 0,
-    worldy = 30,
-    interactions = {10},
-    spottingdraw = true,
-    spottingpick = true,
-    itemhandrg = CWeaponMelee{},
-    -- itemhandlf = CWeaponMelee{},
-}
+-- Wulfie = CPlayerWolfe{name = "Wulfie",
+--     statphyact = 10,
+--     statmenact = 10,
+--     statpsyact = 10,
+--     colorextra = Tic.COLORRED,
+--     worldx = -10,
+--     worldy = 30,
+--     interactions = {10},
+--     spottingdraw = true,
+--     spottingpick = true,
+--     itemhandrg = CWeaponMelee{},
+--     itemhandlf = CWeaponMelee{},
+-- }
+-- Wolfie = CPlayerWolfe{name = "Wolfie",
+--     statphyact = 10,
+--     statmenact = 10,
+--     statpsyact = 10,
+--     colorextra = Tic.COLORCYAN,
+--     worldx = 0,
+--     worldy = 30,
+--     interactions = {10},
+--     spottingdraw = true,
+--     spottingpick = true,
+--     itemhandrg = CWeaponRange{},
+--     -- itemhandlf = CWeaponMelee{},
+-- }
 Wilfie = CPlayerWolfe{name = "Wilfie",
     statphyact = 10,
     statmenact = 10,
@@ -6571,7 +6608,7 @@ Wilfie = CPlayerWolfe{name = "Wilfie",
     spottingdraw = true,
     spottingpick = true,
     -- itemhandrg = CWeaponMelee{},
-    itemhandlf = CWeaponMelee{},
+    itemhandlf = CWeaponRange{worldappend = false},
 }
 end
 -- Wulfie:randomWorldWindow()
@@ -6594,7 +6631,7 @@ end
 --
 -- Weapons -- TESTING
 --
-WeaponMelee = CWeaponMelee{}
+-- WeaponMelee = CWeaponMelee{}
 
 
 --
