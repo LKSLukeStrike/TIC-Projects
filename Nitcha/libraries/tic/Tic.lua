@@ -2950,10 +2950,10 @@ local CObject = CEntityDrawable:extend() -- objects
 --
 local CObjectHandable = CObject:extend() -- handable objects
 CObjectHandable.HANDLES = {
-    [CSprite.ROTATE000] = {handlex = 3, handley = 4},
-    [CSprite.ROTATE090] = {handlex = 3, handley = 3},
-    [CSprite.ROTATE180] = {handlex = 4, handley = 3},
-    [CSprite.ROTATE270] = {handlex = 4, handley = 4},
+    [CSprite.ROTATE000] = {handlex = 3, handley = 5},
+    [CSprite.ROTATE090] = {handlex = 2, handley = 3},
+    [CSprite.ROTATE180] = {handlex = 4, handley = 2},
+    [CSprite.ROTATE270] = {handlex = 5, handley = 4},
 }
 function CObjectHandable:new(_argt)
     CObjectHandable.super.new(self, _argt)
@@ -2979,6 +2979,8 @@ local CWeaponMelee = CWeapon:extend() -- melee weapons
 function CWeaponMelee:new(_argt)
     CWeaponMelee.super.new(self, _argt)
     self.sprite  = CSpriteFG.WEAPONMELEE
+    self.palettefg = {[Tic.COLORGREYD] = Tic.COLORBLUEM, [Tic.COLORGREYM] = Tic.COLORBLUEL}
+    self.palettebg = {[Tic.COLORGREYD] = Tic.COLORBLUED, [Tic.COLORGREYM] = Tic.COLORBLUEM}
     self:argt(_argt) -- override if any
 end
 
@@ -3230,8 +3232,8 @@ function CCharacter:new(_argt)
     self.drawview     = false
     self.drawmind     = false
     self.drawmove     = false
-    self.slothandlf   = nil -- character slots
-    self.slothandrg   = nil
+    self.itemhandlf   = nil -- character items
+    self.itemhandrg   = nil
     self:argt(_argt) -- override if any
     self.camera       = CCamera{name = self.name.." "..Classic.NAMECAMERA} -- one camera per character
     self:focus() -- focus its camera on itself
@@ -3604,12 +3606,9 @@ function CCharacter:drawStatus()
 end
 
 function CCharacter:drawHandBG()
-    if self.dirx == Tic.DIRXLF and not self.slothandrg then return end -- nothing in rg hand
-    if self.dirx == Tic.DIRXRG and not self.slothandlf then return end -- nothing in lf hand
-    Tic:logAppend("hand BG")
-    local _slothand = (self.dirx == Tic.DIRXLF)
-        and self.slothandrg
-        or  self.slothandlf
+    if self.dirx == Tic.DIRXLF and not self.itemhandrg then return end -- nothing in rg hand
+    if self.dirx == Tic.DIRXRG and not self.itemhandlf then return end -- nothing in lf hand
+
     local _handsoffsets = self:handsOffsets()
     local _handoffsetx  = (self.dirx == Tic.DIRXLF)
         and _handsoffsets.handrgx
@@ -3617,25 +3616,55 @@ function CCharacter:drawHandBG()
     local _handoffsety  = (self.dirx == Tic.DIRXLF)
         and _handsoffsets.handrgy
         or  _handsoffsets.handlfy
-    local _handler = _slothand:handleRotate(_handsoffsets.rotate)
-    local _handoffsetx  = _handoffsetx - _handler.handlex
-    local _handoffsety  = _handoffsety - _handler.handley
+    
+    local _itemhand = (self.dirx == Tic.DIRXLF)
+        and self.itemhandrg
+        or  self.itemhandlf
+    local _itemhandle = _itemhand:handleRotate(_handsoffsets.rotate)
+    local _handoffsetx  = _handoffsetx - _itemhandle.handlex
+    local _handoffsety  = _handoffsety - _itemhandle.handley
+
+    local _palette = Tables:merge(_itemhand.palettebg, {[Tic.COLORWHITE] = self.colorskin})
 
     local _musprite = CSpriteFG() -- multi usage unique sprite
-    _musprite.sprite  = _slothand.sprite
+    _musprite.sprite  = _itemhand.sprite
     _musprite.screenx = self.screenx + (_handoffsetx * self.scale)
     _musprite.screeny = self.screeny + (_handoffsety * self.scale)
-    _musprite.flip    = self.dirx
     _musprite.scale   = self.scale
     _musprite.rotate  = _handsoffsets.rotate
-    -- _musprite.palette = _palette
+    _musprite.palette = _palette
     _musprite:draw()
 end
 
 function CCharacter:drawHandFG()
-    if self.dirx == Tic.DIRXLF and not self.slothandlf then return end -- nothing in lf hand
-    if self.dirx == Tic.DIRXRG and not self.slothandrg then return end -- nothing in rg hand
-    Tic:logAppend("hand FG")
+    if self.dirx == Tic.DIRXLF and not self.itemhandlf then return end -- nothing in lf hand
+    if self.dirx == Tic.DIRXRG and not self.itemhandrg then return end -- nothing in rg hand
+
+    local _handsoffsets = self:handsOffsets()
+    local _handoffsetx  = (self.dirx == Tic.DIRXLF)
+        and _handsoffsets.handlfx
+        or  _handsoffsets.handrgx
+    local _handoffsety  = (self.dirx == Tic.DIRXLF)
+        and _handsoffsets.handlfy
+        or  _handsoffsets.handrgy
+    
+    local _itemhand = (self.dirx == Tic.DIRXLF)
+        and self.itemhandlf
+        or  self.itemhandrg
+    local _itemhandle = _itemhand:handleRotate(_handsoffsets.rotate)
+    local _handoffsetx  = _handoffsetx - _itemhandle.handlex
+    local _handoffsety  = _handoffsety - _itemhandle.handley
+
+    local _palette = Tables:merge(_itemhand.palettefg, {[Tic.COLORWHITE] = self.colorskin})
+
+    local _musprite = CSpriteFG() -- multi usage unique sprite
+    _musprite.sprite  = _itemhand.sprite
+    _musprite.screenx = self.screenx + (_handoffsetx * self.scale)
+    _musprite.screeny = self.screeny + (_handoffsety * self.scale)
+    _musprite.scale   = self.scale
+    _musprite.rotate  = _handsoffsets.rotate
+    _musprite.palette = _palette
+    _musprite:draw()
 end
 
 function CCharacter:drawInteract()
@@ -3912,11 +3941,44 @@ end
 --
 -- CCharacterHumanoid
 --
-local CCharacterHumanoid = CCharacter:extend() -- humanoid characters
 Classic.KINDHUMANOID = "Humanoid" -- Humanoid kind
+local CCharacterHumanoid = CCharacter:extend() -- humanoid characters
+CCharacterHumanoid.HANDSOFFSETS = {
+    [Tic.STATUSIDLE] = {
+        [Tic.DIRXLF] = {
+            [CSprite.FRAME00] = {handrgx = 2, handrgy = 6, handlfx = 5, handlfy = 6, rotate = CSprite.ROTATE270},
+            [CSprite.FRAME01] = {handrgx = 2, handrgy = 6, handlfx = 5, handlfy = 6, rotate = CSprite.ROTATE270},
+        },
+        [Tic.DIRXRG] = {
+            [CSprite.FRAME00] = {handrgx = 5, handrgy = 6, handlfx = 2, handlfy = 6, rotate = CSprite.ROTATE090},
+            [CSprite.FRAME01] = {handrgx = 5, handrgy = 6, handlfx = 2, handlfy = 6, rotate = CSprite.ROTATE090},
+        },
+    },
+    [Tic.STATUSMOVE] = {
+        [Tic.DIRXLF] = {
+            [CSprite.FRAME00] = {handrgx = 1, handrgy = 5, handlfx = 6, handlfy = 6, rotate = CSprite.ROTATE000},
+            [CSprite.FRAME01] = {handrgx = 1, handrgy = 6, handlfx = 6, handlfy = 5, rotate = CSprite.ROTATE000},
+        },
+        [Tic.DIRXRG] = {
+            [CSprite.FRAME00] = {handrgx = 6, handrgy = 5, handlfx = 1, handlfy = 6, rotate = CSprite.ROTATE000},
+            [CSprite.FRAME01] = {handrgx = 6, handrgy = 6, handlfx = 1, handlfy = 5, rotate = CSprite.ROTATE000},
+        },
+    },
+    [Tic.POSTUREFLOOR] = {
+        [Tic.DIRXLF] = {
+            [CSprite.FRAME00] = {handrgx = 1, handrgy = 5, handlfx = 6, handlfy = 6, rotate = CSprite.ROTATE000},
+            [CSprite.FRAME01] = {handrgx = 1, handrgy = 6, handlfx = 6, handlfy = 5, rotate = CSprite.ROTATE000},
+        },
+        [Tic.DIRXRG] = {
+            [CSprite.FRAME00] = {handrgx = 6, handrgy = 5, handlfx = 1, handlfy = 6, rotate = CSprite.ROTATE000},
+            [CSprite.FRAME01] = {handrgx = 6, handrgy = 6, handlfx = 1, handlfy = 5, rotate = CSprite.ROTATE000},
+        },
+    },
+}
 function CCharacterHumanoid:new(_argt)
     CCharacterHumanoid.super.new(self, _argt)
     self.kind         = Classic.KINDHUMANOID
+    self.handsoffsets = CCharacterHumanoid.HANDSOFFSETS
     self.colorhairsfg = Tic.COLORGREYD -- head colors
     self.colorhairsbg = Tic.COLORGREYM
     self.colorskin    = Tic.COLORWHITE
@@ -4032,13 +4094,19 @@ function CCharacterHumanoid:drawHead()
 end
 
 function CCharacterHumanoid:handsOffsets()
-    local _result = {
-        handrgx = 2,
-        handrgy = 6,
-        handlfx = 5,
-        handlfy = 6,
-        rotate  = CSprite.ROTATE270,
-    }
+    local _posture = self:postureGet()
+    local _status  = self:statusGet()
+    local _result  = {}
+    if self.handsoffsets[_status] then
+        _result = Tables:merge(_result, self.handsoffsets[_status][self.dirx][self.frame])
+    else
+        _result = Tables:merge(_result, self.handsoffsets[_posture][self.dirx][self.frame])
+    end
+
+    if _posture == Tic.POSTUREKNEEL then
+        _result.handrgy = _result.handrgy + 1
+        _result.handlfy = _result.handlfy + 1
+    end
 
     return _result
 end
@@ -6470,13 +6538,40 @@ Wulfie = CPlayerWolfe{name = "Wulfie",
     statphyact = 10,
     statmenact = 10,
     statpsyact = 10,
-      colorextra = Tic.COLORRED,
+    colorextra = Tic.COLORRED,
     worldx = -10,
     worldy = 30,
     interactions = {10},
     spottingdraw = true,
     spottingpick = true,
-    slothandrg = CWeaponMelee{},
+    itemhandrg = CWeaponMelee{},
+    itemhandlf = CWeaponMelee{},
+}
+Wolfie = CPlayerWolfe{name = "Wolfie",
+    statphyact = 10,
+    statmenact = 10,
+    statpsyact = 10,
+    colorextra = Tic.COLORCYAN,
+    worldx = 0,
+    worldy = 30,
+    interactions = {10},
+    spottingdraw = true,
+    spottingpick = true,
+    itemhandrg = CWeaponMelee{},
+    -- itemhandlf = CWeaponMelee{},
+}
+Wilfie = CPlayerWolfe{name = "Wilfie",
+    statphyact = 10,
+    statmenact = 10,
+    statpsyact = 10,
+    colorextra = Tic.COLORRED,
+    worldx = 10,
+    worldy = 30,
+    interactions = {10},
+    spottingdraw = true,
+    spottingpick = true,
+    -- itemhandrg = CWeaponMelee{},
+    itemhandlf = CWeaponMelee{},
 }
 end
 -- Wulfie:randomWorldWindow()
