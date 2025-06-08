@@ -727,6 +727,14 @@ Tic.STATES = CCyclerTable{acttable = { -- all available states
     Tic.STATEFLOORBREEZ, -- Z
     Tic.STATEFLOORDEATH, -- D
 }}
+Tic.STATEIDLELF  = Tic.STATUSIDLE..Tic.DIRXLF -- direction states for hands items
+Tic.STATEIDLERG  = Tic.STATUSIDLE..Tic.DIRXRG
+Tic.STATEMOVELF  = Tic.STATUSMOVE..Tic.DIRXLF
+Tic.STATEMOVERG  = Tic.STATUSMOVE..Tic.DIRXRG
+Tic.STATEWORKLF  = Tic.STATUSWORK..Tic.DIRXLF
+Tic.STATEWORKRG  = Tic.STATUSWORK..Tic.DIRXRG
+Tic.STATEFLOORLF = Tic.POSTUREFLOOR..Tic.DIRXLF
+Tic.STATEFLOORRG = Tic.POSTUREFLOOR..Tic.DIRXRG
 
 function Tic:statePrev(_character) -- prev state in the stack
     _character = _character or Tic:playerActual()
@@ -1992,7 +2000,6 @@ function CEntityDrawable:new(_argt)
     self.kind = Classic.KINDDRAWABLE
     self.name = Classic.NAMEDRAWABLE
     self.world        = World
-    self.worldappend  = true -- append to the world ?
     self.sprite       = CSpriteBG.SPRITEEMPTY
     self.screenx      = 0 -- screen positions -- used to draw the sprite
     self.screeny      = 0
@@ -2007,7 +2014,7 @@ function CEntityDrawable:new(_argt)
     self.drawhitbox   = false
     self.drawfade     = false
     self:argt(_argt) -- override if any
-    if self.worldappend then self.world:appendEntity(self) end -- append itself to the world
+    self.world:appendEntity(self)-- append itself to the world
 end
 
 function CEntityDrawable:draw() -- default draw for drawable entities -- override if any
@@ -2947,26 +2954,33 @@ end
 -- CObject
 --
 local CObject = CEntityDrawable:extend() -- objects
+Classic.KINDOBJECT = "Object" -- Object kind
+Classic.NAMEOBJECT = "Object" -- Object name
+function CObject:new(_argt)
+    CObject.super.new(self, _argt)
+    self.kind = Classic.KINDOBJECT
+    self.name = Classic.NAMEOBJECT
+    self:argt(_argt) -- override if any
+end
 
 
 --
 -- CObjectHandable
 --
 local CObjectHandable = CObject:extend() -- handable objects
-CObjectHandable.HANDLES = {
-    [CSprite.ROTATE000] = {handlex = 3, handley = 5},
-    [CSprite.ROTATE090] = {handlex = 2, handley = 3},
-    [CSprite.ROTATE180] = {handlex = 4, handley = 2},
-    [CSprite.ROTATE270] = {handlex = 5, handley = 4},
-}
+Classic.KINDHANDABLE = "Handable" -- Object kind
+Classic.NAMEHANDABLE = "Handable" -- Object name
 function CObjectHandable:new(_argt)
     CObjectHandable.super.new(self, _argt)
-    self.handles = CObjectHandable.HANDLES -- handle locations depending on rotate
+    self.kind = Classic.KINDHANDABLE
+    self.name = Classic.KINDHANDABLE
     self:argt(_argt) -- override if any
 end
 
-function CObjectHandable:handleRotate(_rotate)
-    return self.handles[_rotate]
+function CObjectHandable:handleOffsets(_state)
+    local _result = self.handlesoffsets[self.stateshandles[_state]]
+    _result.rotate = self.stateshandles[_state]
+    return _result
 end
 
 
@@ -2974,16 +2988,28 @@ end
 -- CWeapon
 --
 local CWeapon = CObjectHandable:extend() -- weapons
+Classic.KINDWEAPON = "Weapon" -- Weapon kind
+Classic.NAMEWEAPON = "Weapon" -- Weapon name
+function CWeapon:new(_argt)
+    CWeapon.super.new(self, _argt)
+    self.kind = Classic.KINDWEAPON
+    self.name = Classic.NAMEWEAPON
+    self:argt(_argt) -- override if any
+end
 
 
 --
 -- CWeaponMelee
 --
 local CWeaponMelee = CWeapon:extend() -- melee weapons
+Classic.KINDMELEE = "Melee" -- Melee kind
+Classic.NAMEMELEE = "Melee" -- Melee name
 function CWeaponMelee:new(_argt)
     CWeaponMelee.super.new(self, _argt)
+    self.kind = Classic.KINDMELEE
+    self.name = Classic.NAMEMELEE
     self.sprite  = CSpriteFG.WEAPONMELEE
-    self.handles = {
+    self.handlesoffsets = {
         [CSprite.ROTATE000] = {handlex = 3, handley = 5},
         [CSprite.ROTATE090] = {handlex = 2, handley = 3},
         [CSprite.ROTATE180] = {handlex = 4, handley = 2},
@@ -2999,10 +3025,24 @@ end
 -- CWeaponRange
 --
 local CWeaponRange = CWeapon:extend() -- range weapons
+Classic.KINDRANGE = "Range" -- Range kind
+Classic.NAMERANGE = "Range" -- Range name
 function CWeaponRange:new(_argt)
     CWeaponRange.super.new(self, _argt)
+    self.kind = Classic.KINDRANGE
+    self.name = Classic.NAMERANGE
     self.sprite  = CSpriteFG.WEAPONRANGE
-    self.handles = {
+    self.stateshandles = {
+        [Tic.STATEIDLELF]  = CSprite.ROTATE270,
+        [Tic.STATEIDLERG]  = CSprite.ROTATE270,
+        [Tic.STATEMOVELF]  = CSprite.ROTATE000,
+        [Tic.STATEMOVERG]  = CSprite.ROTATE180,
+        [Tic.STATEWORKLF]  = CSprite.ROTATE000,
+        [Tic.STATEWORKRG]  = CSprite.ROTATE180,
+        [Tic.STATEFLOORLF] = CSprite.ROTATE270,
+        [Tic.STATEFLOORRG] = CSprite.ROTATE270,
+    }
+    self.handlesoffsets = {
         [CSprite.ROTATE000] = {handlex = 3, handley = 3},
         [CSprite.ROTATE090] = {handlex = 4, handley = 3},
         [CSprite.ROTATE180] = {handlex = 4, handley = 4},
@@ -3266,6 +3306,9 @@ function CCharacter:new(_argt)
     self:argt(_argt) -- override if any
     self.camera       = CCamera{name = self.name.." "..Classic.NAMECAMERA} -- one camera per character
     self:focus() -- focus its camera on itself
+    for _, _item in ipairs({"itemhandlf", "itemhandrg"}) do -- remove character items from the world
+        self.world:deleteEntity(self[_item])
+    end
 end
 
 function CCharacter:hover(_entity) -- hover an entity, use nil to unhover
@@ -3649,23 +3692,21 @@ function CCharacter:drawHandBG()
     local _itemhand = (self.dirx == Tic.DIRXLF)
         and self.itemhandrg
         or  self.itemhandlf
-    local _itemhandle   = _itemhand:handleRotate(_handsoffsets.rotate)
-    local _handoffsetx  = _handoffsetx - _itemhandle.handlex
-    local _handoffsety  = _handoffsety - _itemhandle.handley
+    local _handleoffsets = _itemhand:handleOffsets(_handsoffsets.state)
+    local _handoffsetx   = _handoffsetx - _handleoffsets.handlex
+    local _handoffsety   = _handoffsety - _handleoffsets.handley
 
-    local _rotate  = (_itemhandle.rotate)
-        and _itemhandle.rotate
-        or  _handsoffsets.rotate
+    local _itemrotate    = _handleoffsets.rotate
 
-    local _palette = Tables:merge(_itemhand.palettebg, {[Tic.COLORWHITE] = self.colorskin})
+    local _itempalette = Tables:merge(_itemhand.palettebg, {[Tic.COLORWHITE] = self.colorskin})
 
     local _musprite = CSpriteFG() -- multi usage unique sprite
     _musprite.sprite  = _itemhand.sprite
     _musprite.screenx = self.screenx + (_handoffsetx * self.scale)
     _musprite.screeny = self.screeny + (_handoffsety * self.scale)
     _musprite.scale   = self.scale
-    _musprite.rotate  = _rotate
-    _musprite.palette = _palette
+    _musprite.rotate  = _itemrotate
+    _musprite.palette = _itempalette
     _musprite:draw()
 end
 
@@ -3684,23 +3725,21 @@ function CCharacter:drawHandFG()
     local _itemhand = (self.dirx == Tic.DIRXLF)
         and self.itemhandlf
         or  self.itemhandrg
-    local _itemhandle = _itemhand:handleRotate(_handsoffsets.rotate)
-    local _handoffsetx  = _handoffsetx - _itemhandle.handlex
-    local _handoffsety  = _handoffsety - _itemhandle.handley
+    local _handleoffsets = _itemhand:handleOffsets(_handsoffsets.state)
+    local _handoffsetx   = _handoffsetx - _handleoffsets.handlex
+    local _handoffsety   = _handoffsety - _handleoffsets.handley
 
-    local _rotate  = (_itemhandle.rotate)
-        and _itemhandle.rotate
-        or  _handsoffsets.rotate
+    local _itemrotate    = _handleoffsets.rotate
 
-    local _palette = Tables:merge(_itemhand.palettefg, {[Tic.COLORWHITE] = self.colorskin})
+    local _itempalette = Tables:merge(_itemhand.palettefg, {[Tic.COLORWHITE] = self.colorskin})
 
     local _musprite = CSpriteFG() -- multi usage unique sprite
     _musprite.sprite  = _itemhand.sprite
     _musprite.screenx = self.screenx + (_handoffsetx * self.scale)
     _musprite.screeny = self.screeny + (_handoffsety * self.scale)
     _musprite.scale   = self.scale
-    _musprite.rotate  = _rotate
-    _musprite.palette = _palette
+    _musprite.rotate  = _itemrotate
+    _musprite.palette = _itempalette
     _musprite:draw()
 end
 
@@ -3983,32 +4022,32 @@ local CCharacterHumanoid = CCharacter:extend() -- humanoid characters
 CCharacterHumanoid.HANDSOFFSETS = {
     [Tic.STATUSIDLE] = {
         [Tic.DIRXLF] = {
-            [CSprite.FRAME00] = {handrgx = 2, handrgy = 6, handlfx = 5, handlfy = 6, rotate = CSprite.ROTATE270},
-            [CSprite.FRAME01] = {handrgx = 2, handrgy = 6, handlfx = 5, handlfy = 6, rotate = CSprite.ROTATE270},
+            [CSprite.FRAME00] = {handrgx = 2, handrgy = 6, handlfx = 5, handlfy = 6, state = Tic.STATEIDLELF},
+            [CSprite.FRAME01] = {handrgx = 2, handrgy = 6, handlfx = 5, handlfy = 6, state = Tic.STATEIDLELF},
         },
         [Tic.DIRXRG] = {
-            [CSprite.FRAME00] = {handrgx = 5, handrgy = 6, handlfx = 2, handlfy = 6, rotate = CSprite.ROTATE090},
-            [CSprite.FRAME01] = {handrgx = 5, handrgy = 6, handlfx = 2, handlfy = 6, rotate = CSprite.ROTATE090},
+            [CSprite.FRAME00] = {handrgx = 5, handrgy = 6, handlfx = 2, handlfy = 6, state = Tic.STATEIDLERG},
+            [CSprite.FRAME01] = {handrgx = 5, handrgy = 6, handlfx = 2, handlfy = 6, state = Tic.STATEIDLERG},
         },
     },
     [Tic.STATUSMOVE] = {
         [Tic.DIRXLF] = {
-            [CSprite.FRAME00] = {handrgx = 1, handrgy = 5, handlfx = 6, handlfy = 6, rotate = CSprite.ROTATE000},
-            [CSprite.FRAME01] = {handrgx = 1, handrgy = 6, handlfx = 6, handlfy = 5, rotate = CSprite.ROTATE000},
+            [CSprite.FRAME00] = {handrgx = 1, handrgy = 5, handlfx = 6, handlfy = 6, state = Tic.STATEMOVELF},
+            [CSprite.FRAME01] = {handrgx = 1, handrgy = 6, handlfx = 6, handlfy = 5, state = Tic.STATEMOVELF},
         },
         [Tic.DIRXRG] = {
-            [CSprite.FRAME00] = {handrgx = 6, handrgy = 5, handlfx = 1, handlfy = 6, rotate = CSprite.ROTATE000},
-            [CSprite.FRAME01] = {handrgx = 6, handrgy = 6, handlfx = 1, handlfy = 5, rotate = CSprite.ROTATE000},
+            [CSprite.FRAME00] = {handrgx = 6, handrgy = 5, handlfx = 1, handlfy = 6, state = Tic.STATEMOVERG},
+            [CSprite.FRAME01] = {handrgx = 6, handrgy = 6, handlfx = 1, handlfy = 5, state = Tic.STATEMOVERG},
         },
     },
     [Tic.POSTUREFLOOR] = {
         [Tic.DIRXLF] = {
-            [CSprite.FRAME00] = {handrgx = 1, handrgy = 5, handlfx = 6, handlfy = 6, rotate = CSprite.ROTATE000},
-            [CSprite.FRAME01] = {handrgx = 1, handrgy = 6, handlfx = 6, handlfy = 5, rotate = CSprite.ROTATE000},
+            [CSprite.FRAME00] = {handrgx = 1, handrgy = 5, handlfx = 6, handlfy = 6, state = Tic.STATEFLOORLF},
+            [CSprite.FRAME01] = {handrgx = 1, handrgy = 6, handlfx = 6, handlfy = 5, state = Tic.STATEFLOORLF},
         },
         [Tic.DIRXRG] = {
-            [CSprite.FRAME00] = {handrgx = 6, handrgy = 5, handlfx = 1, handlfy = 6, rotate = CSprite.ROTATE000},
-            [CSprite.FRAME01] = {handrgx = 6, handrgy = 6, handlfx = 1, handlfy = 5, rotate = CSprite.ROTATE000},
+            [CSprite.FRAME00] = {handrgx = 6, handrgy = 5, handlfx = 1, handlfy = 6, state = Tic.STATEFLOORRG},
+            [CSprite.FRAME01] = {handrgx = 6, handrgy = 6, handlfx = 1, handlfy = 5, state = Tic.STATEFLOORRG},
         },
     },
 }
@@ -6607,8 +6646,8 @@ Wilfie = CPlayerWolfe{name = "Wilfie",
     interactions = {10},
     spottingdraw = true,
     spottingpick = true,
-    -- itemhandrg = CWeaponMelee{},
-    itemhandlf = CWeaponRange{worldappend = false},
+    itemhandrg = CWeaponRange{name = "bill"},
+    -- itemhandlf = CWeaponRange{name = "bull"},
 }
 end
 -- Wulfie:randomWorldWindow()
