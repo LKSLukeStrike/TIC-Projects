@@ -2954,6 +2954,18 @@ end
 -- CObject
 --
 local CObject = CEntityDrawable:extend() -- objects
+CObject.HANDLE = Tic.COLORWHITE
+CObject.BORDER = Tic.COLORGREYD
+CObject.INSIDE = Tic.COLORGREYM
+CObject.EFFECT = Tic.COLORGREYL
+CObject.COLORWOODBG = Tic.COLORRED
+CObject.COLORWOODFG = Tic.COLORORANGE
+CObject.COLORIRONBG = Tic.COLORGREYM
+CObject.COLORIRONFG = Tic.COLORGREYL
+CObject.COLORONYXBG = Tic.COLORGREYD
+CObject.COLORONYXFG = Tic.COLORGREYM
+CObject.COLORAZURBG = Tic.COLORBLUED
+CObject.COLORAZURFG = Tic.COLORBLUEM
 Classic.KINDOBJECT = "Object" -- Object kind
 Classic.NAMEOBJECT = "Object" -- Object name
 function CObject:new(_argt)
@@ -3009,14 +3021,24 @@ function CWeaponMelee:new(_argt)
     self.kind = Classic.KINDMELEE
     self.name = Classic.NAMEMELEE
     self.sprite  = CSpriteFG.WEAPONMELEE
+    self.stateshandles = {
+        [Tic.STATEIDLELF]  = CSprite.ROTATE270,
+        [Tic.STATEIDLERG]  = CSprite.ROTATE090,
+        [Tic.STATEMOVELF]  = CSprite.ROTATE000,
+        [Tic.STATEMOVERG]  = CSprite.ROTATE000,
+        [Tic.STATEWORKLF]  = CSprite.ROTATE270,
+        [Tic.STATEWORKRG]  = CSprite.ROTATE090,
+        [Tic.STATEFLOORLF] = CSprite.ROTATE270,
+        [Tic.STATEFLOORRG] = CSprite.ROTATE090,
+    }
     self.handlesoffsets = {
         [CSprite.ROTATE000] = {handlex = 3, handley = 5},
         [CSprite.ROTATE090] = {handlex = 2, handley = 3},
         [CSprite.ROTATE180] = {handlex = 4, handley = 2},
         [CSprite.ROTATE270] = {handlex = 5, handley = 4},
     }
-    self.palettefg = {[Tic.COLORGREYD] = Tic.COLORBLUEM, [Tic.COLORGREYM] = Tic.COLORBLUEL}
-    self.palettebg = {[Tic.COLORGREYD] = Tic.COLORBLUED, [Tic.COLORGREYM] = Tic.COLORBLUEM}
+    self.palettefg = {[CObject.BORDER] = CObject.COLORIRONFG, [CObject.INSIDE] = CObject.COLORWOODFG, [CObject.EFFECT] = CObject.COLORWOODFG}
+    self.palettebg = {[CObject.BORDER] = CObject.COLORIRONBG, [CObject.INSIDE] = CObject.COLORWOODBG, [CObject.EFFECT] = CObject.COLORWOODBG}
     self:argt(_argt) -- override if any
 end
 
@@ -3048,8 +3070,8 @@ function CWeaponRange:new(_argt)
         [CSprite.ROTATE180] = {handlex = 4, handley = 4},
         [CSprite.ROTATE270] = {handlex = 3, handley = 4},
     }
-    self.palettefg = {[Tic.COLORGREYD] = Tic.COLORORANGE, [Tic.COLORGREYM] = Tic.COLORBLUEL}
-    self.palettebg = {[Tic.COLORGREYD] = Tic.COLORRED, [Tic.COLORGREYM] = Tic.COLORBLUEM}
+    self.palettefg = {[CObject.BORDER] = CObject.COLORWOODFG, [CObject.INSIDE] = CObject.COLORIRONBG, [CObject.EFFECT] = CObject.COLORIRONFG}
+    self.palettebg = {[CObject.BORDER] = CObject.COLORWOODBG, [CObject.INSIDE] = CObject.COLORONYXBG, [CObject.EFFECT] = CObject.COLORONYXFG}
     self:argt(_argt) -- override if any
 end
 
@@ -6610,19 +6632,19 @@ end -- generate places
 -- Globth:randomWorldWindow()
 
 if true then
--- Wulfie = CPlayerWolfe{name = "Wulfie",
---     statphyact = 10,
---     statmenact = 10,
---     statpsyact = 10,
---     colorextra = Tic.COLORRED,
---     worldx = -10,
---     worldy = 30,
---     interactions = {10},
---     spottingdraw = true,
---     spottingpick = true,
---     itemhandrg = CWeaponMelee{},
---     itemhandlf = CWeaponMelee{},
--- }
+Wulfie = CPlayerWolfe{name = "Wulfie",
+    statphyact = 10,
+    statmenact = 10,
+    statpsyact = 10,
+    colorextra = Tic.COLORRED,
+    worldx = -10,
+    worldy = 30,
+    interactions = {10},
+    -- spottingdraw = true,
+    spottingpick = true,
+    itemhandrg = CWeaponMelee{},
+    itemhandlf = CWeaponMelee{},
+}
 -- Wolfie = CPlayerWolfe{name = "Wolfie",
 --     statphyact = 10,
 --     statmenact = 10,
@@ -6644,10 +6666,10 @@ Wilfie = CPlayerWolfe{name = "Wilfie",
     worldx = 10,
     worldy = 30,
     interactions = {10},
-    spottingdraw = true,
+    -- spottingdraw = true,
     spottingpick = true,
-    itemhandrg = CWeaponRange{name = "bill"},
-    -- itemhandlf = CWeaponRange{name = "bull"},
+    itemhandrg = CWeaponRange{name = "bill", sprite = 369},
+    itemhandlf = CWeaponRange{name = "bull"},
 }
 end
 -- Wulfie:randomWorldWindow()
