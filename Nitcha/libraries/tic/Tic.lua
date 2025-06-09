@@ -2998,8 +2998,12 @@ function CObjectHandable:new(_argt)
 end
 
 function CObjectHandable:handleOffsets(_state)
-    local _result = self.handlesoffsets[self.stateshandles[_state]]
-    _result.rotate = self.stateshandles[_state]
+    local _result = self.handlesoffsets[self.stateshandles[_state].rotate]
+    _result.rotate = self.stateshandles[_state].rotate
+    _result.flip   = self.stateshandles[_state].flip
+    _result.handlex = (_result.flip == Tic.DIRXLF)
+        and _result.handlex
+        or  Tic.SPRITESIZE - 1 - _result.handlex
     return _result
 end
 
@@ -3030,14 +3034,14 @@ function CWeaponMelee:new(_argt)
     self.name = Classic.NAMEMELEE
     self.sprite  = CSpriteFG.WEAPONMELEE
     self.stateshandles = {
-        [Tic.STATEIDLELF]  = CSprite.ROTATE270,
-        [Tic.STATEIDLERG]  = CSprite.ROTATE090,
-        [Tic.STATEMOVELF]  = CSprite.ROTATE000,
-        [Tic.STATEMOVERG]  = CSprite.ROTATE000,
-        [Tic.STATEWORKLF]  = CSprite.ROTATE270,
-        [Tic.STATEWORKRG]  = CSprite.ROTATE090,
-        [Tic.STATEFLOORLF] = CSprite.ROTATE270,
-        [Tic.STATEFLOORRG] = CSprite.ROTATE090,
+        [Tic.STATEIDLELF]  = {rotate = CSprite.ROTATE270, flip = Tic.DIRXLF},
+        [Tic.STATEIDLERG]  = {rotate = CSprite.ROTATE090, flip = Tic.DIRXRG},
+        [Tic.STATEMOVELF]  = {rotate = CSprite.ROTATE000, flip = Tic.DIRXLF},
+        [Tic.STATEMOVERG]  = {rotate = CSprite.ROTATE000, flip = Tic.DIRXRG},
+        [Tic.STATEWORKLF]  = {rotate = CSprite.ROTATE270, flip = Tic.DIRXLF},
+        [Tic.STATEWORKRG]  = {rotate = CSprite.ROTATE090, flip = Tic.DIRXRG},
+        [Tic.STATEFLOORLF] = {rotate = CSprite.ROTATE270, flip = Tic.DIRXLF},
+        [Tic.STATEFLOORRG] = {rotate = CSprite.ROTATE090, flip = Tic.DIRXRG},
     }
     self.handlesoffsets = {
         [CSprite.ROTATE000] = {handlex = 3, handley = 5},
@@ -3063,14 +3067,14 @@ function CWeaponRange:new(_argt)
     self.name = Classic.NAMERANGE
     self.sprite  = CSpriteFG.WEAPONRANGE
     self.stateshandles = {
-        [Tic.STATEIDLELF]  = CSprite.ROTATE270,
-        [Tic.STATEIDLERG]  = CSprite.ROTATE270,
-        [Tic.STATEMOVELF]  = CSprite.ROTATE000,
-        [Tic.STATEMOVERG]  = CSprite.ROTATE180,
-        [Tic.STATEWORKLF]  = CSprite.ROTATE000,
-        [Tic.STATEWORKRG]  = CSprite.ROTATE180,
-        [Tic.STATEFLOORLF] = CSprite.ROTATE270,
-        [Tic.STATEFLOORRG] = CSprite.ROTATE270,
+        [Tic.STATEIDLELF]  = {rotate = CSprite.ROTATE270, flip = Tic.DIRXLF},
+        [Tic.STATEIDLERG]  = {rotate = CSprite.ROTATE270, flip = Tic.DIRXRG},
+        [Tic.STATEMOVELF]  = {rotate = CSprite.ROTATE000, flip = Tic.DIRXLF},
+        [Tic.STATEMOVERG]  = {rotate = CSprite.ROTATE000, flip = Tic.DIRXRG},
+        [Tic.STATEWORKLF]  = {rotate = CSprite.ROTATE000, flip = Tic.DIRXLF},
+        [Tic.STATEWORKRG]  = {rotate = CSprite.ROTATE000, flip = Tic.DIRXRG},
+        [Tic.STATEFLOORLF] = {rotate = CSprite.ROTATE000, flip = Tic.DIRXLF},
+        [Tic.STATEFLOORRG] = {rotate = CSprite.ROTATE000, flip = Tic.DIRXRG},
     }
     self.handlesoffsets = {
         [CSprite.ROTATE000] = {handlex = 4, handley = 3},
@@ -3080,6 +3084,28 @@ function CWeaponRange:new(_argt)
     }
     self.palettefg = {[CObject.BORDER] = CObject.COLORWOODFG, [CObject.INSIDE] = CObject.COLORIRONBG, [CObject.EFFECT] = CObject.COLORIRONFG}
     self.palettebg = {[CObject.BORDER] = CObject.COLORWOODBG, [CObject.INSIDE] = CObject.COLORONYXBG, [CObject.EFFECT] = CObject.COLORONYXFG}
+    self:argt(_argt) -- override if any
+end
+
+local CWeaponLongBow = CWeaponRange:extend() -- long bow weapons
+Classic.KINDLGBOW = "L.Bow" -- Long Bow kind
+Classic.NAMELGBOW = "L.Bow" -- Long Bow name
+function CWeaponLongBow:new(_argt)
+    CWeaponLongBow.super.new(self, _argt)
+    self.kind = Classic.KINDLGBOW
+    self.name = Classic.NAMELGBOW
+    self.sprite  = CSpriteFG.WEAPONLGBOW
+    self:argt(_argt) -- override if any
+end
+
+local CWeaponCrossBow = CWeaponRange:extend() -- cross bow weapons
+Classic.KINDCXBOW = "X.Bow" -- Cross Bow kind
+Classic.NAMECXBOW = "X.Bow" -- Cross Bow name
+function CWeaponCrossBow:new(_argt)
+    CWeaponCrossBow.super.new(self, _argt)
+    self.kind = Classic.KINDCXBOW
+    self.name = Classic.NAMECXBOW
+    self.sprite  = CSpriteFG.WEAPONCXBOW
     self:argt(_argt) -- override if any
 end
 
@@ -3727,6 +3753,7 @@ function CCharacter:drawHandBG()
     local _handoffsety   = _handoffsety - _handleoffsets.handley
 
     local _itemrotate    = _handleoffsets.rotate
+    local _itemflip      = _handleoffsets.flip
 
     local _itempalette = Tables:merge(_itemhand.palettebg, {[Tic.COLORWHITE] = self.colorskin})
 
@@ -3736,6 +3763,7 @@ function CCharacter:drawHandBG()
     _musprite.screeny = self.screeny + (_handoffsety * self.scale)
     _musprite.scale   = self.scale
     _musprite.rotate  = _itemrotate
+    _musprite.flip    = _itemflip
     _musprite.palette = _itempalette
     _musprite:draw()
 end
@@ -3760,8 +3788,9 @@ function CCharacter:drawHandFG()
     local _handoffsety   = _handoffsety - _handleoffsets.handley
 
     local _itemrotate    = _handleoffsets.rotate
+    local _itemflip      = _handleoffsets.flip
 
-    local _itempalette = Tables:merge(_itemhand.palettefg, {[Tic.COLORWHITE] = self.colorskin})
+    local _itempalette = Tables:merge(_itemhand.palettefg, {[CObject.HANDLE] = self.colorskin})
 
     local _musprite = CSpriteFG() -- multi usage unique sprite
     _musprite.sprite  = _itemhand.sprite
@@ -3769,6 +3798,7 @@ function CCharacter:drawHandFG()
     _musprite.screeny = self.screeny + (_handoffsety * self.scale)
     _musprite.scale   = self.scale
     _musprite.rotate  = _itemrotate
+    _musprite.flip    = _itemflip
     _musprite.palette = _itempalette
     _musprite:draw()
 end
@@ -6639,7 +6669,7 @@ end -- generate places
 -- }
 -- Globth:randomWorldWindow()
 
-if true then
+if false then
 Wulfie = CPlayerWolfe{name = "Wulfie",
     statphyact = 10,
     statmenact = 10,
@@ -6653,6 +6683,7 @@ Wulfie = CPlayerWolfe{name = "Wulfie",
     itemhandrg = CWeaponMelee{},
     itemhandlf = CWeaponMelee{},
 }
+end
 -- Wolfie = CPlayerWolfe{name = "Wolfie",
 --     statphyact = 10,
 --     statmenact = 10,
@@ -6666,6 +6697,7 @@ Wulfie = CPlayerWolfe{name = "Wulfie",
 --     itemhandrg = CWeaponRange{},
 --     -- itemhandlf = CWeaponMelee{},
 -- }
+if true then
 Wilfie = CPlayerWolfe{name = "Wilfie",
     statphyact = 10,
     statmenact = 10,
@@ -6676,8 +6708,8 @@ Wilfie = CPlayerWolfe{name = "Wilfie",
     interactions = {10},
     -- spottingdraw = true,
     spottingpick = true,
-    itemhandrg = CWeaponRange{name = "bill"},
-    itemhandlf = CWeaponRange{name = "bull"},
+    itemhandrg = CWeaponLongBow{name = "bill"},
+    itemhandlf = CWeaponCrossBow{name = "bull"},
 }
 end
 -- Wulfie:randomWorldWindow()
@@ -6743,6 +6775,15 @@ SpriteBIS = CSpriteFGBoard{
         [Tic.COLORRED] = Tic.COLORKEY,
     }),
 }
+SpriteWeapon = CSpriteFG{
+    sprite = 388,
+    screenx = 30,
+    screeny = 100,
+    -- rotate = 0, --CSprite.ROTATE270,
+    -- flip = 0, --Tic.DIRXRG,
+}
+SpriteWeapon.rotate = 3
+SpriteWeapon.flip = 0
 
 
 --
@@ -6903,6 +6944,7 @@ function Tic:draw()
     -- SpriteSFX:draw()
     -- SpriteHTG:draw()
     -- SpriteBIS:draw()
+    SpriteWeapon:draw()
 
     Tic:tick() -- [!] required in the draw function
     end
