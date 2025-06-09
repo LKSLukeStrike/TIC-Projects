@@ -1320,9 +1320,17 @@ CSpriteFG.STATUSWOUND = CSpriteFG.STATUSBANK + 1
 CSpriteFG.STATUSDEATH = CSpriteFG.STATUSBANK + 2
 CSpriteFG.WEAPONBANK  = 352 -- weapons types
 CSpriteFG.WEAPONMELEE = CSpriteFG.WEAPONBANK + 0
+CSpriteFG.WEAPONSWORD = CSpriteFG.WEAPONMELEE + 0
+CSpriteFG.WEAPONHAMMR = CSpriteFG.WEAPONMELEE + 16
 CSpriteFG.WEAPONRANGE = CSpriteFG.WEAPONBANK + 1
-CSpriteFG.WEAPONSHIEL = CSpriteFG.WEAPONBANK + 2
-CSpriteFG.WEAPONALCHE = CSpriteFG.WEAPONBANK + 3
+CSpriteFG.WEAPONLGBOW = CSpriteFG.WEAPONRANGE + 0
+CSpriteFG.WEAPONCXBOW = CSpriteFG.WEAPONRANGE + 16
+CSpriteFG.WEAPONSHLDS = CSpriteFG.WEAPONBANK + 2
+CSpriteFG.WEAPONSHLDT = CSpriteFG.WEAPONSHLDS + 0
+CSpriteFG.WEAPONSHLDR = CSpriteFG.WEAPONSHLDS + 16
+CSpriteFG.WEAPONFLASK = CSpriteFG.WEAPONBANK + 3
+CSpriteFG.WEAPONFLASS = CSpriteFG.WEAPONFLASK + 0
+CSpriteFG.WEAPONFLASM = CSpriteFG.WEAPONFLASK + 16
 function CSpriteFG:new(_argt)
     CSpriteFG.super.new(self, _argt)
     self.spritebank = CSpriteFG.SPRITEBANK
@@ -3065,10 +3073,10 @@ function CWeaponRange:new(_argt)
         [Tic.STATEFLOORRG] = CSprite.ROTATE270,
     }
     self.handlesoffsets = {
-        [CSprite.ROTATE000] = {handlex = 3, handley = 3},
-        [CSprite.ROTATE090] = {handlex = 4, handley = 3},
-        [CSprite.ROTATE180] = {handlex = 4, handley = 4},
-        [CSprite.ROTATE270] = {handlex = 3, handley = 4},
+        [CSprite.ROTATE000] = {handlex = 4, handley = 3},
+        [CSprite.ROTATE090] = {handlex = 4, handley = 4},
+        [CSprite.ROTATE180] = {handlex = 3, handley = 4},
+        [CSprite.ROTATE270] = {handlex = 3, handley = 3},
     }
     self.palettefg = {[CObject.BORDER] = CObject.COLORWOODFG, [CObject.INSIDE] = CObject.COLORIRONBG, [CObject.EFFECT] = CObject.COLORIRONFG}
     self.palettebg = {[CObject.BORDER] = CObject.COLORWOODBG, [CObject.INSIDE] = CObject.COLORONYXBG, [CObject.EFFECT] = CObject.COLORONYXFG}
@@ -6668,7 +6676,7 @@ Wilfie = CPlayerWolfe{name = "Wilfie",
     interactions = {10},
     -- spottingdraw = true,
     spottingpick = true,
-    itemhandrg = CWeaponRange{name = "bill", sprite = 369},
+    itemhandrg = CWeaponRange{name = "bill"},
     itemhandlf = CWeaponRange{name = "bull"},
 }
 end
