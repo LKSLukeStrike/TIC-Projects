@@ -13,6 +13,19 @@ CCycler = require("libraries/lks/CCycler")
 
 
 --
+-- Strings -- for debugging
+--
+D = "D:"
+E = "E:"
+F = "F:"
+N = "N:"
+R = "R:"
+S = "S:"
+X = "X:"
+Y = "Y:"
+
+
+--
 -- Tic
 --
 Tic = {}
@@ -1029,7 +1042,7 @@ function Tic:logAppend(...) -- add item to the log buffer
     for _, _val in ipairs(_args) do
         _item = _item..Tic:val2string(_val).." "
     end
-    Tables:valInsert(Tic.LOGBUFFER, _item, true)
+    Tables:valInsert(Tic.LOGBUFFER, _item)
 end
 
 function Tic:logRecordActive(_active) -- set log record active on/off
@@ -3004,6 +3017,7 @@ function CObjectHandable:handleOffsets(_state)
     _result.handlex = (_result.flip == Tic.DIRXLF)
         and _result.handlex
         or  Tic.SPRITESIZE - 1 - _result.handlex
+    Tic:logAppend("HX", X.._result.handlex)
     return _result
 end
 
@@ -3049,8 +3063,10 @@ function CWeaponMelee:new(_argt)
         [CSprite.ROTATE180] = {handlex = 4, handley = 2},
         [CSprite.ROTATE270] = {handlex = 5, handley = 4},
     }
-    self.palettefg = {[CObject.BORDER] = CObject.COLORIRONFG, [CObject.INSIDE] = CObject.COLORWOODFG, [CObject.EFFECT] = CObject.COLORWOODFG}
-    self.palettebg = {[CObject.BORDER] = CObject.COLORIRONBG, [CObject.INSIDE] = CObject.COLORWOODBG, [CObject.EFFECT] = CObject.COLORWOODBG}
+    -- self.palettefg = {[CObject.BORDER] = CObject.COLORIRONFG, [CObject.INSIDE] = CObject.COLORWOODFG, [CObject.EFFECT] = CObject.COLORWOODFG}
+    -- self.palettebg = {[CObject.BORDER] = CObject.COLORIRONBG, [CObject.INSIDE] = CObject.COLORWOODBG, [CObject.EFFECT] = CObject.COLORWOODBG}
+    self.palettefg = {[CObject.BORDER] = CObject.COLORWOODFG, [CObject.INSIDE] = CObject.COLORWOODFG, [CObject.EFFECT] = CObject.COLORWOODFG}
+    self.palettebg = {[CObject.BORDER] = CObject.COLORWOODBG, [CObject.INSIDE] = CObject.COLORWOODBG, [CObject.EFFECT] = CObject.COLORWOODBG}
     self:argt(_argt) -- override if any
 end
 
@@ -3756,8 +3772,8 @@ function CCharacter:drawStatus()
 end
 
 function CCharacter:drawHandBG()
-    if self.dirx == Tic.DIRXLF and not self.itemhandrg then return end -- nothing in rg hand
-    if self.dirx == Tic.DIRXRG and not self.itemhandlf then return end -- nothing in lf hand
+    if (self.dirx == Tic.DIRXLF) and (not self.itemhandrg) then return end -- nothing in rg hand
+    if (self.dirx == Tic.DIRXRG) and (not self.itemhandlf) then return end -- nothing in lf hand
 
     local _handsoffsets = self:handsOffsets()
     local _handoffsetx  = (self.dirx == Tic.DIRXLF)
@@ -3772,7 +3788,12 @@ function CCharacter:drawHandBG()
         or  self.itemhandlf
     local _handleoffsets = _itemhand:handleOffsets(_handsoffsets.state)
     local _handoffsetx   = _handoffsetx - _handleoffsets.handlex
+    -- _handoffsetx = (self.dirx == Tic.DIRXLF)
+    --     and _handoffsetx
+    --     or  Tic.SPRITESIZE - 1 - _handoffsetx
     local _handoffsety   = _handoffsety - _handleoffsets.handley
+    Tic:logAppend("BG", D..self.dirx, S..self.scale, X..(_handoffsetx), Y..(_handoffsety))
+    Tic:logAppend("BG", D..self.dirx, S..self.scale, X..(_handoffsetx * self.scale), Y..(_handoffsety * self.scale))
 
     local _itemrotate    = _handleoffsets.rotate
     local _itemflip      = _handleoffsets.flip
@@ -3791,8 +3812,8 @@ function CCharacter:drawHandBG()
 end
 
 function CCharacter:drawHandFG()
-    if self.dirx == Tic.DIRXLF and not self.itemhandlf then return end -- nothing in lf hand
-    if self.dirx == Tic.DIRXRG and not self.itemhandrg then return end -- nothing in rg hand
+    if (self.dirx == Tic.DIRXLF) and (not self.itemhandlf) then return end -- nothing in lf hand
+    if (self.dirx == Tic.DIRXRG) and (not self.itemhandrg) then return end -- nothing in rg hand
 
     local _handsoffsets = self:handsOffsets()
     local _handoffsetx  = (self.dirx == Tic.DIRXLF)
@@ -3807,7 +3828,12 @@ function CCharacter:drawHandFG()
         or  self.itemhandrg
     local _handleoffsets = _itemhand:handleOffsets(_handsoffsets.state)
     local _handoffsetx   = _handoffsetx - _handleoffsets.handlex
+    -- _handoffsetx = (self.dirx == Tic.DIRXLF)
+    --     and _handoffsetx
+        -- or  Tic.SPRITESIZE - 1 - _handoffsetx
     local _handoffsety   = _handoffsety - _handleoffsets.handley
+    Tic:logAppend("BG", D..self.dirx, S..self.scale, X..(_handoffsetx), Y..(_handoffsety))
+    Tic:logAppend("FG", D..self.dirx, S..self.scale, X..(_handoffsetx * self.scale), Y..(_handoffsety * self.scale))
 
     local _itemrotate    = _handleoffsets.rotate
     local _itemflip      = _handleoffsets.flip
@@ -4930,6 +4956,7 @@ function CWindowPortraitDrawable:drawInside() -- window portrait content for -- 
         self.entity.frame      = CSprite.FRAME00
         self.entity.animations = {}
     end
+    Tic:logAppend() ;Tic:logAppend("portrait", N..self.entity.name, D..self.entity.dirx, S..self.entity.scale)
     self.entity:draw()
     Tic.DRAWHITBOX = _ticdrawhitbox
     self.entity:load()
@@ -6710,8 +6737,8 @@ Wulfie = CPlayerWolfe{name = "Wulfie",
     interactions = {10},
     -- spottingdraw = true,
     spottingpick = true,
-    itemhandrg = CWeaponHammer{},
-    itemhandlf = CWeaponHammer{},
+    itemhandrg = CWeaponSword{},
+    -- itemhandlf = CWeaponHammer{},
 }
 end
 -- Wolfie = CPlayerWolfe{name = "Wolfie",
