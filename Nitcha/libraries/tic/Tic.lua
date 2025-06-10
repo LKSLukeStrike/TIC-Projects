@@ -3025,7 +3025,7 @@ end
 --
 -- CWeaponMelee
 --
-local CWeaponMelee = CWeapon:extend() -- melee weapons
+local CWeaponMelee = CWeapon:extend() -- Melee weapons
 Classic.KINDMELEE = "Melee" -- Melee kind
 Classic.NAMEMELEE = "Melee" -- Melee name
 function CWeaponMelee:new(_argt)
@@ -3035,13 +3035,13 @@ function CWeaponMelee:new(_argt)
     self.sprite  = CSpriteFG.WEAPONMELEE
     self.stateshandles = {
         [Tic.STATEIDLELF]  = {rotate = CSprite.ROTATE270, flip = Tic.DIRXLF},
-        [Tic.STATEIDLERG]  = {rotate = CSprite.ROTATE090, flip = Tic.DIRXRG},
+        [Tic.STATEIDLERG]  = {rotate = CSprite.ROTATE270, flip = Tic.DIRXRG},
         [Tic.STATEMOVELF]  = {rotate = CSprite.ROTATE000, flip = Tic.DIRXLF},
         [Tic.STATEMOVERG]  = {rotate = CSprite.ROTATE000, flip = Tic.DIRXRG},
         [Tic.STATEWORKLF]  = {rotate = CSprite.ROTATE270, flip = Tic.DIRXLF},
-        [Tic.STATEWORKRG]  = {rotate = CSprite.ROTATE090, flip = Tic.DIRXRG},
+        [Tic.STATEWORKRG]  = {rotate = CSprite.ROTATE270, flip = Tic.DIRXRG},
         [Tic.STATEFLOORLF] = {rotate = CSprite.ROTATE270, flip = Tic.DIRXLF},
-        [Tic.STATEFLOORRG] = {rotate = CSprite.ROTATE090, flip = Tic.DIRXRG},
+        [Tic.STATEFLOORRG] = {rotate = CSprite.ROTATE270, flip = Tic.DIRXRG},
     }
     self.handlesoffsets = {
         [CSprite.ROTATE000] = {handlex = 3, handley = 5},
@@ -3054,11 +3054,33 @@ function CWeaponMelee:new(_argt)
     self:argt(_argt) -- override if any
 end
 
+local CWeaponSword = CWeaponMelee:extend() -- Sword weapons
+Classic.KINDSWORD = "Sword" -- Sword kind
+Classic.NAMESWORD = "Sword" -- Sword name
+function CWeaponSword:new(_argt)
+    CWeaponSword.super.new(self, _argt)
+    self.kind = Classic.KINDSWORD
+    self.name = Classic.NAMESWORD
+    self.sprite  = CSpriteFG.WEAPONSWORD
+    self:argt(_argt) -- override if any
+end
+
+local CWeaponHammer = CWeaponMelee:extend() -- Hammer weapons
+Classic.KINDHAMMER= "Hammer" -- Hammer kind
+Classic.NAMEHAMMER= "Hammer" -- Hammer name
+function CWeaponHammer:new(_argt)
+    CWeaponHammer.super.new(self, _argt)
+    self.kind = Classic.KINDHAMMER
+    self.name = Classic.NAMEHAMMER
+    self.sprite  = CSpriteFG.WEAPONHAMMR
+    self:argt(_argt) -- override if any
+end
+
 
 --
 -- CWeaponRange
 --
-local CWeaponRange = CWeapon:extend() -- range weapons
+local CWeaponRange = CWeapon:extend() -- Range weapons
 Classic.KINDRANGE = "Range" -- Range kind
 Classic.NAMERANGE = "Range" -- Range name
 function CWeaponRange:new(_argt)
@@ -3087,9 +3109,9 @@ function CWeaponRange:new(_argt)
     self:argt(_argt) -- override if any
 end
 
-local CWeaponLongBow = CWeaponRange:extend() -- long bow weapons
-Classic.KINDLGBOW = "L.Bow" -- Long Bow kind
-Classic.NAMELGBOW = "L.Bow" -- Long Bow name
+local CWeaponLongBow = CWeaponRange:extend() -- LongBow weapons
+Classic.KINDLGBOW = "L.Bow" -- LongBow kind
+Classic.NAMELGBOW = "L.Bow" -- LongBow name
 function CWeaponLongBow:new(_argt)
     CWeaponLongBow.super.new(self, _argt)
     self.kind = Classic.KINDLGBOW
@@ -3098,9 +3120,9 @@ function CWeaponLongBow:new(_argt)
     self:argt(_argt) -- override if any
 end
 
-local CWeaponCrossBow = CWeaponRange:extend() -- cross bow weapons
-Classic.KINDCXBOW = "X.Bow" -- Cross Bow kind
-Classic.NAMECXBOW = "X.Bow" -- Cross Bow name
+local CWeaponCrossBow = CWeaponRange:extend() -- CrossBow weapons
+Classic.KINDCXBOW = "C.Bow" -- CrossBow kind
+Classic.NAMECXBOW = "C.Bow" -- CrossBow name
 function CWeaponCrossBow:new(_argt)
     CWeaponCrossBow.super.new(self, _argt)
     self.kind = Classic.KINDCXBOW
@@ -4879,15 +4901,19 @@ end
 local CWindowPortraitDrawable = CWindowPortrait:extend() -- window portrait for -- [!] drawable entities
 function CWindowPortraitDrawable:new(_argt)
     CWindowPortraitDrawable.super.new(self, _argt)
-    self.idle   = false -- idle portait or not
+    self.idle   = false --false -- idle portait or not
 	self.entity = nil -- override
+    self.drawframes = false
+    self.drawcaches = false
     self:argt(_argt) -- override if any
 end
 
 function CWindowPortraitDrawable:drawInside() -- window portrait content for -- [!] drawable entities
     if not self.entity then return end -- nothing to draw
-    self.entity:save{"screenx", "screeny", "scale", "drawdirs", "drawview","dirx", "frame", "animations",
-        "interactto", "interactby", "spotted", "hovered", "portraitmode"}
+    self.entity:save{"screenx", "screeny", "scale", "drawdirs", "drawview",
+        "interactto", "interactby", "portraitmode", "spotted", "hovered",
+        "dirx", "frame", "animations"}
+    local _ticdrawhitbox     = Tic.DRAWHITBOX
     self.entity.screenx      = self.screenx -- force entity attributes
     self.entity.screeny      = self.screeny
     self.entity.scale        = Tic.SCALE02
@@ -4898,10 +4924,9 @@ function CWindowPortraitDrawable:drawInside() -- window portrait content for -- 
     self.entity.portraitmode = true -- avoid some drawings in portraitmode
     self.entity.spotted      = false -- dont draw spotted frame in window
     self.entity.hovered      = false -- dont draw hovered frame in window
-    local _ticdrawhitbox     = Tic.DRAWHITBOX
     Tic.DRAWHITBOX           = false -- FIXME remove tic master at one point
     if self.idle then
-        self.entity.dirx       = Tic.DIRXLF
+        self.entity.dirx       = Tic.DIRXRG --Tic.DIRXLF
         self.entity.frame      = CSprite.FRAME00
         self.entity.animations = {}
     end
@@ -4922,6 +4947,11 @@ function CWindowPlayerPortrait:new(_argt)
 	self.entity    = Tic:playerActual()
 	self.behaviour = IWindowPlayer.BEHAVIOUR
     self:argt(_argt) -- override if any
+end
+
+function CWindowPlayerPortrait:drawInside()
+    self.entity = Tic:playerActual()
+    CWindowPlayerPortrait.super.drawInside(self)
 end
 
 
@@ -6669,7 +6699,7 @@ end -- generate places
 -- }
 -- Globth:randomWorldWindow()
 
-if false then
+if true then
 Wulfie = CPlayerWolfe{name = "Wulfie",
     statphyact = 10,
     statmenact = 10,
@@ -6680,8 +6710,8 @@ Wulfie = CPlayerWolfe{name = "Wulfie",
     interactions = {10},
     -- spottingdraw = true,
     spottingpick = true,
-    itemhandrg = CWeaponMelee{},
-    itemhandlf = CWeaponMelee{},
+    itemhandrg = CWeaponHammer{},
+    itemhandlf = CWeaponHammer{},
 }
 end
 -- Wolfie = CPlayerWolfe{name = "Wolfie",
@@ -6697,7 +6727,7 @@ end
 --     itemhandrg = CWeaponRange{},
 --     -- itemhandlf = CWeaponMelee{},
 -- }
-if true then
+if false then
 Wilfie = CPlayerWolfe{name = "Wilfie",
     statphyact = 10,
     statmenact = 10,
@@ -6708,7 +6738,7 @@ Wilfie = CPlayerWolfe{name = "Wilfie",
     interactions = {10},
     -- spottingdraw = true,
     spottingpick = true,
-    itemhandrg = CWeaponLongBow{name = "bill"},
+    itemhandrg = CWeaponCrossBow{name = "bill"},
     itemhandlf = CWeaponCrossBow{name = "bull"},
 }
 end
@@ -6865,7 +6895,7 @@ function CPlace:generateRoad(_worldx0, _worldy0, _worldx1, _worldy1, _percent, _
 end
 
 
-if true then
+if false then
 local House1 = CPlaceHouseAnim{
     name = "House1",
     worldx = -20,
