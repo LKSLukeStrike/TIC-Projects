@@ -5,17 +5,17 @@
 --
 -- Packages
 package.path  = package.path..";G:/TIC80 1.1/TICProjects/Nitcha/?.lua"
-local Classic = require("libraries/ext/Classic")                
-local Nums    = require("libraries/lks/Nums")
-local Tables  = require("libraries/lks/Tables")
-local Names   = require("libraries/lks/Names")
-local CCycler = require("libraries/lks/CCycler")                
+Classic = require("libraries/ext/Classic")                
+Nums    = require("libraries/lks/Nums")
+Tables  = require("libraries/lks/Tables")
+Names   = require("libraries/lks/Names")
+CCycler = require("libraries/lks/CCycler")                
 
 
 --
 -- Tic
 --
-local Tic = {}
+Tic = {}
 
 
 -- Fonts sizes
@@ -1185,7 +1185,7 @@ end
 --
 -- CSprite
 --
-local CSprite = Classic:extend() -- generic sprites
+CSprite = Classic:extend() -- generic sprites
 CSprite.SPRITEBANK = 0
 CSprite.FRAMEOF    = 16 -- sprites frames offset multiplier
 CSprite.FRAME00    = 00 -- sprites frames -- [!] start at 0, used to compute the offset
@@ -1233,7 +1233,7 @@ end
 --
 -- CSpriteBG
 --
-local CSpriteBG = CSprite:extend() -- bg sprites aka tic tiles
+CSpriteBG = CSprite:extend() -- bg sprites aka tic tiles
 CSpriteBG.SPRITEBANK  = 0
 CSpriteBG.SPRITEEMPTY = CSpriteBG.SPRITEBANK + 0 -- empty sprite
 CSpriteBG.SIGNBANK1   = 1  -- signs
@@ -1289,7 +1289,7 @@ end
 --
 -- CSpriteFG
 --
-local CSpriteFG = CSprite:extend() -- fg sprites aka tic sprites
+CSpriteFG = CSprite:extend() -- fg sprites aka tic sprites
 CSpriteFG.SPRITEBANK  = 256
 CSpriteFG.SPRITEBOARD = CSpriteFG.SPRITEBANK + 0 -- board sprite -- for creating a sprite by code
 CSpriteFG.SPRITEPIXEL = CSpriteFG.SPRITEBANK + 1 -- pixel sprite
@@ -1342,7 +1342,7 @@ end
 --
 -- CSpriteFGEmpty
 --
-local CSpriteFGEmpty = CSpriteFG:extend() -- empty sprites
+CSpriteFGEmpty = CSpriteFG:extend() -- empty sprites
 function CSpriteFGEmpty:new(_argt)
     CSpriteFGEmpty.super.new(self, _argt)
     self.sprite = CSpriteBG.SPRITEEMPTY
@@ -1353,7 +1353,7 @@ end
 --
 -- CSpriteFGPixel
 --
-local CSpriteFGPixel = CSpriteFG:extend() -- pixel sprites
+CSpriteFGPixel = CSpriteFG:extend() -- pixel sprites
 function CSpriteFGPixel:new(_argt)
     CSpriteFGPixel.super.new(self, _argt)
     self.sprite = CSpriteFG.SPRITEPIXEL
@@ -1364,7 +1364,7 @@ end
 --
 -- CSpriteFGBoard
 --
-local CSpriteFGBoard = CSpriteFG:extend() -- board sprites
+CSpriteFGBoard = CSpriteFG:extend() -- board sprites
 function CSpriteFGBoard:new(_argt)
     CSpriteFGBoard.super.new(self, _argt)
     self.sprite = CSpriteFG.SPRITEBOARD
@@ -1381,7 +1381,7 @@ end
 --
 -- CAnimation
 --
-local CAnimation = Classic:extend() -- generic palette animation for entities
+CAnimation = Classic:extend() -- generic palette animation for entities
 function CAnimation:new(_argt)
     CAnimation.super.new(self, _argt)
     self.frequence = Tic.FREQUENCE0060
@@ -1395,7 +1395,7 @@ end
 --
 -- CInteraction
 --
-local CInteraction = Classic:extend() -- generic interaction for entities
+CInteraction = Classic:extend() -- generic interaction for entities
 function CInteraction:new(_argt)
     CInteraction.super.new(self, _argt)
     self:argt(_argt) -- override if any
@@ -1405,7 +1405,7 @@ end
 --
 -- CRegion
 --
-local CRegion = Classic:extend() -- generic region -- lf rg up dw around a point
+CRegion = Classic:extend() -- generic region -- lf rg up dw around a point
 Classic.KINDREGION = "Region" -- Region kind
 Classic.NAMEREGION = "Region" -- Region name
 function CRegion:new(_argt)
@@ -1499,7 +1499,7 @@ end
 --
 -- CHitbox
 --
-local CHitbox = CRegion:extend() -- generic hitbox region
+CHitbox = CRegion:extend() -- generic hitbox region
 Classic.KINDHITBOX = "Hitbox" -- Hitbox kind
 Classic.NAMEHITBOX = "Hitbox" -- Hitbox name
 CHitbox.LF = 0 -- hitbox region sizes
@@ -1587,7 +1587,7 @@ end
 --
 -- CLocations
 --
-local CLocations = Classic:extend() -- generic entities locations -- {worldy {worldx {entity = entity}}} -- FIXME change entity by true ?
+CLocations = Classic:extend() -- generic entities locations -- {worldy {worldx {entity = entity}}} -- FIXME change entity by true ?
 function CLocations:new(_argt)
     CLocations.super.new(self, _argt)
     self.locations = {}
@@ -1701,7 +1701,7 @@ end
 --
 -- CEntitiesLocations
 --
-local CEntitiesLocations = Classic:extend() -- generic locations for entities
+CEntitiesLocations = Classic:extend() -- generic locations for entities
 function CEntitiesLocations:new(_argt)
     CEntitiesLocations.super.new(self, _argt)
     self.entities  = {} -- record each entity -- has to have worldx and worldy attributes
@@ -1763,7 +1763,7 @@ end
 --
 -- CEntity
 --
-local CEntity = Classic:extend() -- generic entities like worlds, places, objects, characters, cameras ...
+CEntity = Classic:extend() -- generic entities like worlds, places, objects, characters, cameras ...
 Classic.KINDENTITY = "Entity" -- Entity kind
 Classic.NAMEENTITY = "Entity" -- Entity name
 Classic.NAMEEMPTY  = "Empty"  -- Empty name
@@ -1902,7 +1902,7 @@ end
 --
 -- CWorld
 --
-local CWorld = CEntity:extend() -- generic world that contains entities
+CWorld = CEntity:extend() -- generic world that contains entities
 Classic.KINDWORLD = "World" -- World kind
 Classic.NAMEWORLD = "World" -- World name
 function CWorld:new(_argt)
@@ -1914,7 +1914,7 @@ function CWorld:new(_argt)
     self:argt(_argt) -- override if any
 end
 -- CWorld instance
-local World = CWorld{}
+World = CWorld{}
 
 function CWorld:appendEntity(_entity) -- append an entity in the world
     if not _entity then return end -- mandatory
@@ -1962,7 +1962,7 @@ end
 --
 -- CCamera
 --
-local CCamera = CEntity:extend() -- camera
+CCamera = CEntity:extend() -- camera
 Classic.KINDCAMERA = "Camera" -- Camera kind
 Classic.NAMECAMERA = "Camera" -- Camera name
 CCamera.RANGEX = Tic.WORLDWW / 2
@@ -2000,7 +2000,7 @@ end
 --
 -- CEntityDrawable
 --
-local CEntityDrawable = CEntity:extend() -- generic entities with a sprite representation
+CEntityDrawable = CEntity:extend() -- generic entities with a sprite representation
 Classic.KINDDRAWABLE = "Drawable" -- Drawable kind
 Classic.NAMEDRAWABLE = "Drawable" -- Drawable name
 function CEntityDrawable:new(_argt)
@@ -2183,7 +2183,7 @@ end
 --
 -- CPlace
 --
-local CPlace = CEntityDrawable:extend() -- places
+CPlace = CEntityDrawable:extend() -- places
 Classic.KINDPLACE = "Place" -- Place kind
 Classic.NAMEPLACE = "Place" -- Place name
 CPlace.EMPTY    = Tic.COLORKEY -- anims
@@ -2243,7 +2243,7 @@ end
 --
 -- CPlaceBuild
 --
-local CPlaceBuild = CPlace:extend() -- builds
+CPlaceBuild = CPlace:extend() -- builds
 Classic.KINDBUILD = "Build" -- Build kind
 Classic.NAMEBUILD = "Build" -- Build name
 CPlaceBuild.PALETTEIDLE  = {
@@ -2275,7 +2275,7 @@ end
 --
 -- CPlaceHouse
 --
-local CPlaceHouse = CPlaceBuild:extend() -- houses
+CPlaceHouse = CPlaceBuild:extend() -- houses
 Classic.KINDHOUSE = "House" -- House kind
 function CPlaceHouse:new(_argt)
     CPlaceHouse.super.new(self, _argt)
@@ -2284,7 +2284,7 @@ function CPlaceHouse:new(_argt)
     self:argt(_argt) -- override if any
 end
 
-local CPlaceHouseAnim = CPlaceHouse:extend() -- anim houses
+CPlaceHouseAnim = CPlaceHouse:extend() -- anim houses
 function CPlaceHouseAnim:new(_argt)
     CPlaceHouseAnim.super.new(self, _argt)
     self.animations = {
@@ -2304,7 +2304,7 @@ function CPlaceHouseAnim:new(_argt)
     self:argt(_argt) -- override if any
 end
 
-local CPlaceHouseIdle = CPlaceHouse:extend() -- idle houses
+CPlaceHouseIdle = CPlaceHouse:extend() -- idle houses
 function CPlaceHouseIdle:new(_argt)
     CPlaceHouseIdle.super.new(self, _argt)
     self.name = Classic.NAMEEMPTY
@@ -2316,7 +2316,7 @@ end
 --
 -- CPlaceTower
 --
-local CPlaceTower = CPlaceBuild:extend() -- towers
+CPlaceTower = CPlaceBuild:extend() -- towers
 Classic.KINDTOWER = "Tower" -- Tower kind
 function CPlaceTower:new(_argt)
     CPlaceTower.super.new(self, _argt)
@@ -2325,7 +2325,7 @@ function CPlaceTower:new(_argt)
     self:argt(_argt) -- override if any
 end
 
-local CPlaceTowerAnim = CPlaceTower:extend() -- anim towers
+CPlaceTowerAnim = CPlaceTower:extend() -- anim towers
 function CPlaceTowerAnim:new(_argt)
     CPlaceTowerAnim.super.new(self, _argt)
     self.animations = {
@@ -2345,7 +2345,7 @@ function CPlaceTowerAnim:new(_argt)
     self:argt(_argt) -- override if any
 end
 
-local CPlaceTowerIdle = CPlaceTower:extend() -- idle towers
+CPlaceTowerIdle = CPlaceTower:extend() -- idle towers
 function CPlaceTowerIdle:new(_argt)
     CPlaceTowerIdle.super.new(self, _argt)
     self.name = Classic.NAMEEMPTY
@@ -2357,7 +2357,7 @@ end
 --
 -- CPlaceManor
 --
-local CPlaceManor = CPlaceBuild:extend() -- manors
+CPlaceManor = CPlaceBuild:extend() -- manors
 Classic.KINDMANOR = "Manor" -- Manor kind
 function CPlaceManor:new(_argt)
     CPlaceManor.super.new(self, _argt)
@@ -2367,7 +2367,7 @@ function CPlaceManor:new(_argt)
     self:argt(_argt) -- override if any
 end
 
-local CPlaceManorAnim = CPlaceManor:extend() -- anim manors
+CPlaceManorAnim = CPlaceManor:extend() -- anim manors
 function CPlaceManorAnim:new(_argt)
     CPlaceManorAnim.super.new(self, _argt)
     self.animations = {
@@ -2393,7 +2393,7 @@ function CPlaceManorAnim:new(_argt)
     self:argt(_argt) -- override if any
 end
 
-local CPlaceManorIdle = CPlaceManor:extend() -- idle manors
+CPlaceManorIdle = CPlaceManor:extend() -- idle manors
 function CPlaceManorIdle:new(_argt)
     CPlaceManorIdle.super.new(self, _argt)
     self.name = Classic.NAMEEMPTY
@@ -2405,7 +2405,7 @@ end
 --
 -- CPlaceKirke
 --
-local CPlaceKirke = CPlaceBuild:extend() -- kirkes
+CPlaceKirke = CPlaceBuild:extend() -- kirkes
 Classic.KINDKIRKE = "Kirke" -- Kirke kind
 function CPlaceKirke:new(_argt)
     CPlaceKirke.super.new(self, _argt)
@@ -2415,7 +2415,7 @@ function CPlaceKirke:new(_argt)
     self:argt(_argt) -- override if any
 end
 
-local CPlaceKirkeAnim = CPlaceKirke:extend() -- anim kirkes
+CPlaceKirkeAnim = CPlaceKirke:extend() -- anim kirkes
 function CPlaceKirkeAnim:new(_argt)
     CPlaceKirkeAnim.super.new(self, _argt)
     self.animations = {
@@ -2435,7 +2435,7 @@ function CPlaceKirkeAnim:new(_argt)
     self:argt(_argt) -- override if any
 end
 
-local CPlaceKirkeIdle = CPlaceKirke:extend() -- idle kirkes
+CPlaceKirkeIdle = CPlaceKirke:extend() -- idle kirkes
 function CPlaceKirkeIdle:new(_argt)
     CPlaceKirkeIdle.super.new(self, _argt)
     self.name = Classic.NAMEEMPTY
@@ -2447,7 +2447,7 @@ end
 --
 -- CPlaceWater
 --
-local CPlaceWater = CPlaceBuild:extend() -- waters
+CPlaceWater = CPlaceBuild:extend() -- waters
 Classic.KINDWATER = "Water" -- Water kind
 function CPlaceWater:new(_argt)
     CPlaceWater.super.new(self, _argt)
@@ -2457,7 +2457,7 @@ function CPlaceWater:new(_argt)
     self:argt(_argt) -- override if any
 end
 
-local CPlaceWaterAnim = CPlaceWater:extend() -- anim waters
+CPlaceWaterAnim = CPlaceWater:extend() -- anim waters
 function CPlaceWaterAnim:new(_argt)
     CPlaceWaterAnim.super.new(self, _argt)
     self.animations = {
@@ -2477,7 +2477,7 @@ function CPlaceWaterAnim:new(_argt)
     self:argt(_argt) -- override if any
 end
 
-local CPlaceWaterIdle = CPlaceWater:extend() -- idle waters
+CPlaceWaterIdle = CPlaceWater:extend() -- idle waters
 function CPlaceWaterIdle:new(_argt)
     CPlaceWaterIdle.super.new(self, _argt)
     self.name = Classic.NAMEEMPTY
@@ -2489,7 +2489,7 @@ end
 --
 -- CPlaceStall
 --
-local CPlaceStall = CPlaceBuild:extend() -- stalls
+CPlaceStall = CPlaceBuild:extend() -- stalls
 Classic.KINDSTALL = "Stall" -- Stall kind
 function CPlaceStall:new(_argt)
     CPlaceStall.super.new(self, _argt)
@@ -2499,7 +2499,7 @@ function CPlaceStall:new(_argt)
     self:argt(_argt) -- override if any
 end
 
-local CPlaceStallAnim = CPlaceStall:extend() -- anim stalls
+CPlaceStallAnim = CPlaceStall:extend() -- anim stalls
 function CPlaceStallAnim:new(_argt)
     CPlaceStallAnim.super.new(self, _argt)
     self.animations = {
@@ -2525,7 +2525,7 @@ function CPlaceStallAnim:new(_argt)
     self:argt(_argt) -- override if any
 end
 
-local CPlaceStallIdle = CPlaceStall:extend() -- idle stalls
+CPlaceStallIdle = CPlaceStall:extend() -- idle stalls
 function CPlaceStallIdle:new(_argt)
     CPlaceStallIdle.super.new(self, _argt)
     self.name = Classic.NAMEEMPTY
@@ -2537,7 +2537,7 @@ end
 --
 -- CPlaceTrees
 --
-local CPlaceTrees = CPlace:extend() -- trees
+CPlaceTrees = CPlace:extend() -- trees
 Classic.KINDTREES = "Trees" -- Trees kind
 CPlaceTrees.PALETTEIDLE   = {
     [CPlace.NEST]    = CPlace.EMPTY,
@@ -2562,7 +2562,7 @@ function CPlaceTrees:new(_argt)
     self:argt(_argt) -- override if any
 end
 
-local CPlaceTreesAnim = CPlaceTrees:extend() -- generic anim trees
+CPlaceTreesAnim = CPlaceTrees:extend() -- generic anim trees
 function CPlaceTreesAnim:new(_argt)
     CPlaceTreesAnim.super.new(self, _argt)
     self.animations = {
@@ -2588,7 +2588,7 @@ function CPlaceTreesAnim:new(_argt)
     self:argt(_argt) -- override if any
 end
 
-local CPlaceTreesIdle = CPlaceTrees:extend() -- generic idle trees
+CPlaceTreesIdle = CPlaceTrees:extend() -- generic idle trees
 function CPlaceTreesIdle:new(_argt)
     CPlaceTreesIdle.super.new(self, _argt)
     self.name = Classic.NAMEDYING
@@ -2596,28 +2596,28 @@ function CPlaceTreesIdle:new(_argt)
     self:argt(_argt) -- override if any
 end
 
-local CPlaceTree0Anim = CPlaceTreesAnim:extend() -- anim tree0
+CPlaceTree0Anim = CPlaceTreesAnim:extend() -- anim tree0
 function CPlaceTree0Anim:new(_argt)
     CPlaceTree0Anim.super.new(self, _argt)
     self.sprite  = CSpriteBG.PLACETREE0
     self:argt(_argt) -- override if any
 end
 
-local CPlaceTree0Idle = CPlaceTreesIdle:extend() -- idle tree0
+CPlaceTree0Idle = CPlaceTreesIdle:extend() -- idle tree0
 function CPlaceTree0Idle:new(_argt)
     CPlaceTree0Idle.super.new(self, _argt)
     self.sprite  = CSpriteBG.PLACETREE0
     self:argt(_argt) -- override if any
 end
 
-local CPlaceTree1Anim = CPlaceTreesAnim:extend() -- anim tree1
+CPlaceTree1Anim = CPlaceTreesAnim:extend() -- anim tree1
 function CPlaceTree1Anim:new(_argt)
     CPlaceTree1Anim.super.new(self, _argt)
     self.sprite  = CSpriteBG.PLACETREE1
     self:argt(_argt) -- override if any
 end
 
-local CPlaceTree1Idle = CPlaceTreesIdle:extend() -- idle tree1
+CPlaceTree1Idle = CPlaceTreesIdle:extend() -- idle tree1
 function CPlaceTree1Idle:new(_argt)
     CPlaceTree1Idle.super.new(self, _argt)
     self.sprite  = CSpriteBG.PLACETREE1
@@ -2628,7 +2628,7 @@ end
 --
 -- CPlaceStone
 --
-local CPlaceStone = CPlace:extend() -- stones
+CPlaceStone = CPlace:extend() -- stones
 Classic.KINDSTONE = "Stone" -- Stone kind
 Classic.NAMESTONE = "Stone" -- Stone name
 CPlaceStone.PALETTEIDLE   = {
@@ -2658,7 +2658,7 @@ end
 --
 -- CPlaceMenhr
 --
-local CPlaceMenhr = CPlaceStone:extend() -- menhrs
+CPlaceMenhr = CPlaceStone:extend() -- menhrs
 Classic.KINDMENHR = "Menhr" -- Menhr kind
 function CPlaceMenhr:new(_argt)
     CPlaceMenhr.super.new(self, _argt)
@@ -2667,7 +2667,7 @@ function CPlaceMenhr:new(_argt)
     self:argt(_argt) -- override if any
 end
 
-local CPlaceMenhrAnim = CPlaceMenhr:extend() -- anim menhrs
+CPlaceMenhrAnim = CPlaceMenhr:extend() -- anim menhrs
 function CPlaceMenhrAnim:new(_argt)
     CPlaceMenhrAnim.super.new(self, _argt)
     self.animations = {
@@ -2693,7 +2693,7 @@ function CPlaceMenhrAnim:new(_argt)
     self:argt(_argt) -- override if any
 end
 
-local CPlaceMenhrIdle = CPlaceMenhr:extend() -- idle menhrs
+CPlaceMenhrIdle = CPlaceMenhr:extend() -- idle menhrs
 function CPlaceMenhrIdle:new(_argt)
     CPlaceMenhrIdle.super.new(self, _argt)
     self.name = Classic.NAMESILENT
@@ -2701,28 +2701,28 @@ function CPlaceMenhrIdle:new(_argt)
     self:argt(_argt) -- override if any
 end
 
-local CPlaceMenh0Anim = CPlaceMenhrAnim:extend() -- anim menh0
+CPlaceMenh0Anim = CPlaceMenhrAnim:extend() -- anim menh0
 function CPlaceMenh0Anim:new(_argt)
     CPlaceMenh0Anim.super.new(self, _argt)
     self.sprite  = CSpriteBG.PLACEMENH0
     self:argt(_argt) -- override if any
 end
 
-local CPlaceMenh0Idle = CPlaceMenhrIdle:extend() -- idle menh0
+CPlaceMenh0Idle = CPlaceMenhrIdle:extend() -- idle menh0
 function CPlaceMenh0Idle:new(_argt)
     CPlaceMenh0Idle.super.new(self, _argt)
     self.sprite  = CSpriteBG.PLACEMENH0
     self:argt(_argt) -- override if any
 end
 
-local CPlaceMenh1Anim = CPlaceMenhrAnim:extend() -- anim menh1
+CPlaceMenh1Anim = CPlaceMenhrAnim:extend() -- anim menh1
 function CPlaceMenh1Anim:new(_argt)
     CPlaceMenh1Anim.super.new(self, _argt)
     self.sprite  = CSpriteBG.PLACEMENH1
     self:argt(_argt) -- override if any
 end
 
-local CPlaceMenh1Idle = CPlaceMenhrIdle:extend() -- idle menh1
+CPlaceMenh1Idle = CPlaceMenhrIdle:extend() -- idle menh1
 function CPlaceMenh1Idle:new(_argt)
     CPlaceMenh1Idle.super.new(self, _argt)
     self.sprite  = CSpriteBG.PLACEMENH1
@@ -2733,7 +2733,7 @@ end
 --
 -- CPlaceDolmn
 --
-local CPlaceDolmn = CPlaceStone:extend() -- dolmns
+CPlaceDolmn = CPlaceStone:extend() -- dolmns
 Classic.KINDDOLMN = "Dolmn" -- Dolmn kind
 function CPlaceDolmn:new(_argt)
     CPlaceDolmn.super.new(self, _argt)
@@ -2743,7 +2743,7 @@ function CPlaceDolmn:new(_argt)
      self:argt(_argt) -- override if any
 end
 
-local CPlaceDolmnAnim = CPlaceDolmn:extend() -- anim dolmns
+CPlaceDolmnAnim = CPlaceDolmn:extend() -- anim dolmns
 function CPlaceDolmnAnim:new(_argt)
     CPlaceDolmnAnim.super.new(self, _argt)
     self.animations = {
@@ -2769,7 +2769,7 @@ function CPlaceDolmnAnim:new(_argt)
     self:argt(_argt) -- override if any
 end
 
-local CPlaceDolmnIdle = CPlaceDolmn:extend() -- idle dolmns
+CPlaceDolmnIdle = CPlaceDolmn:extend() -- idle dolmns
 function CPlaceDolmnIdle:new(_argt)
     CPlaceDolmnIdle.super.new(self, _argt)
     self.name = Classic.NAMESILENT
@@ -2777,28 +2777,28 @@ function CPlaceDolmnIdle:new(_argt)
     self:argt(_argt) -- override if any
 end
 
-local CPlaceDolm0Anim = CPlaceDolmnAnim:extend() -- anim dolm0
+CPlaceDolm0Anim = CPlaceDolmnAnim:extend() -- anim dolm0
 function CPlaceDolm0Anim:new(_argt)
     CPlaceDolm0Anim.super.new(self, _argt)
     self.sprite  = CSpriteBG.PLACEDOLM0
     self:argt(_argt) -- override if any
 end
 
-local CPlaceDolm0Idle = CPlaceDolmnIdle:extend() -- idle dolm0
+CPlaceDolm0Idle = CPlaceDolmnIdle:extend() -- idle dolm0
 function CPlaceDolm0Idle:new(_argt)
     CPlaceDolm0Idle.super.new(self, _argt)
     self.sprite  = CSpriteBG.PLACEDOLM0
     self:argt(_argt) -- override if any
 end
 
-local CPlaceDolm1Anim = CPlaceDolmnAnim:extend() -- anim dolm1
+CPlaceDolm1Anim = CPlaceDolmnAnim:extend() -- anim dolm1
 function CPlaceDolm1Anim:new(_argt)
     CPlaceDolm1Anim.super.new(self, _argt)
     self.sprite  = CSpriteBG.PLACEDOLM1
     self:argt(_argt) -- override if any
 end
 
-local CPlaceDolm1Idle = CPlaceDolmnIdle:extend() -- idle dolm1
+CPlaceDolm1Idle = CPlaceDolmnIdle:extend() -- idle dolm1
 function CPlaceDolm1Idle:new(_argt)
     CPlaceDolm1Idle.super.new(self, _argt)
     self.sprite  = CSpriteBG.PLACEDOLM1
@@ -2809,7 +2809,7 @@ end
 --
 -- CPlaceCirkl
 --
-local CPlaceCirkl = CPlaceStone:extend() -- cirkls
+CPlaceCirkl = CPlaceStone:extend() -- cirkls
 Classic.KINDCIRKL = "Cirkl" -- Cirkl kind
 function CPlaceCirkl:new(_argt)
     CPlaceCirkl.super.new(self, _argt)
@@ -2819,7 +2819,7 @@ function CPlaceCirkl:new(_argt)
     self:argt(_argt) -- override if any
 end
 
-local CPlaceCirklAnim = CPlaceCirkl:extend() -- anim cirkls
+CPlaceCirklAnim = CPlaceCirkl:extend() -- anim cirkls
 function CPlaceCirklAnim:new(_argt)
     CPlaceCirklAnim.super.new(self, _argt)
     self.animations = {
@@ -2845,7 +2845,7 @@ function CPlaceCirklAnim:new(_argt)
     self:argt(_argt) -- override if any
 end
 
-local CPlaceCirklIdle = CPlaceCirkl:extend() -- idle cirkls
+CPlaceCirklIdle = CPlaceCirkl:extend() -- idle cirkls
 function CPlaceCirklIdle:new(_argt)
     CPlaceCirklIdle.super.new(self, _argt)
     self.name = Classic.NAMESILENT
@@ -2853,28 +2853,28 @@ function CPlaceCirklIdle:new(_argt)
     self:argt(_argt) -- override if any
 end
 
-local CPlaceCirk0Anim = CPlaceCirklAnim:extend() -- anim cirk0
+CPlaceCirk0Anim = CPlaceCirklAnim:extend() -- anim cirk0
 function CPlaceCirk0Anim:new(_argt)
     CPlaceCirk0Anim.super.new(self, _argt)
     self.sprite  = CSpriteBG.PLACECIRK0
     self:argt(_argt) -- override if any
 end
 
-local CPlaceCirk0Idle = CPlaceCirklIdle:extend() -- idle cirk0
+CPlaceCirk0Idle = CPlaceCirklIdle:extend() -- idle cirk0
 function CPlaceCirk0Idle:new(_argt)
     CPlaceCirk0Idle.super.new(self, _argt)
     self.sprite  = CSpriteBG.PLACECIRK0
     self:argt(_argt) -- override if any
 end
 
-local CPlaceCirk1Anim = CPlaceCirklAnim:extend() -- anim cirk1
+CPlaceCirk1Anim = CPlaceCirklAnim:extend() -- anim cirk1
 function CPlaceCirk1Anim:new(_argt)
     CPlaceCirk1Anim.super.new(self, _argt)
     self.sprite  = CSpriteBG.PLACECIRK1
     self:argt(_argt) -- override if any
 end
 
-local CPlaceCirk1Idle = CPlaceCirklIdle:extend() -- idle cirk1
+CPlaceCirk1Idle = CPlaceCirklIdle:extend() -- idle cirk1
 function CPlaceCirk1Idle:new(_argt)
     CPlaceCirk1Idle.super.new(self, _argt)
     self.sprite  = CSpriteBG.PLACECIRK1
@@ -2885,7 +2885,7 @@ end
 --
 -- CPlaceRoads
 --
-local CPlaceRoads = CPlaceStone:extend() -- roads
+CPlaceRoads = CPlaceStone:extend() -- roads
 Classic.KINDROADS = "Roads" -- Roads kind
 function CPlaceRoads:new(_argt)
     CPlaceRoads.super.new(self, _argt)
@@ -2895,7 +2895,7 @@ function CPlaceRoads:new(_argt)
     self:argt(_argt) -- override if any
 end
 
-local CPlaceRoadsAnim = CPlaceRoads:extend() -- anim roads
+CPlaceRoadsAnim = CPlaceRoads:extend() -- anim roads
 function CPlaceRoadsAnim:new(_argt)
     CPlaceRoadsAnim.super.new(self, _argt)
     self.animations = {
@@ -2921,7 +2921,7 @@ function CPlaceRoadsAnim:new(_argt)
     self:argt(_argt) -- override if any
 end
 
-local CPlaceRoadsIdle = CPlaceRoads:extend() -- idle roads
+CPlaceRoadsIdle = CPlaceRoads:extend() -- idle roads
 function CPlaceRoadsIdle:new(_argt)
     CPlaceRoadsIdle.super.new(self, _argt)
     self.name = Classic.NAMESILENT
@@ -2929,28 +2929,28 @@ function CPlaceRoadsIdle:new(_argt)
     self:argt(_argt) -- override if any
 end
 
-local CPlaceRoad0Anim = CPlaceRoadsAnim:extend() -- anim road0
+CPlaceRoad0Anim = CPlaceRoadsAnim:extend() -- anim road0
 function CPlaceRoad0Anim:new(_argt)
     CPlaceRoad0Anim.super.new(self, _argt)
     self.sprite  = CSpriteBG.PLACEROAD0
     self:argt(_argt) -- override if any
 end
 
-local CPlaceRoad0Idle = CPlaceRoadsIdle:extend() -- idle road0
+CPlaceRoad0Idle = CPlaceRoadsIdle:extend() -- idle road0
 function CPlaceRoad0Idle:new(_argt)
     CPlaceRoad0Idle.super.new(self, _argt)
     self.sprite  = CSpriteBG.PLACEROAD0
     self:argt(_argt) -- override if any
 end
 
-local CPlaceRoad1Anim = CPlaceRoadsAnim:extend() -- anim road1
+CPlaceRoad1Anim = CPlaceRoadsAnim:extend() -- anim road1
 function CPlaceRoad1Anim:new(_argt)
     CPlaceRoad1Anim.super.new(self, _argt)
     self.sprite  = CSpriteBG.PLACEROAD1
     self:argt(_argt) -- override if any
 end
 
-local CPlaceRoad1Idle = CPlaceRoadsIdle:extend() -- idle road1
+CPlaceRoad1Idle = CPlaceRoadsIdle:extend() -- idle road1
 function CPlaceRoad1Idle:new(_argt)
     CPlaceRoad1Idle.super.new(self, _argt)
     self.sprite  = CSpriteBG.PLACEROAD1
@@ -2961,7 +2961,7 @@ end
 --
 -- CObject
 --
-local CObject = CEntityDrawable:extend() -- objects
+CObject = CEntityDrawable:extend() -- objects
 CObject.HANDLE = Tic.COLORWHITE
 CObject.BORDER = Tic.COLORGREYD
 CObject.INSIDE = Tic.COLORGREYM
@@ -2987,7 +2987,7 @@ end
 --
 -- CObjectHandable
 --
-local CObjectHandable = CObject:extend() -- handable objects
+CObjectHandable = CObject:extend() -- handable objects
 Classic.KINDHANDABLE = "Handable" -- Object kind
 Classic.NAMEHANDABLE = "Handable" -- Object name
 function CObjectHandable:new(_argt)
@@ -3011,7 +3011,7 @@ end
 --
 -- CWeapon
 --
-local CWeapon = CObjectHandable:extend() -- weapons
+CWeapon = CObjectHandable:extend() -- weapons
 Classic.KINDWEAPON = "Weapon" -- Weapon kind
 Classic.NAMEWEAPON = "Weapon" -- Weapon name
 function CWeapon:new(_argt)
@@ -3025,7 +3025,7 @@ end
 --
 -- CWeaponMelee
 --
-local CWeaponMelee = CWeapon:extend() -- Melee weapons
+CWeaponMelee = CWeapon:extend() -- Melee weapons
 Classic.KINDMELEE = "Melee" -- Melee kind
 Classic.NAMEMELEE = "Melee" -- Melee name
 function CWeaponMelee:new(_argt)
@@ -3054,7 +3054,7 @@ function CWeaponMelee:new(_argt)
     self:argt(_argt) -- override if any
 end
 
-local CWeaponSword = CWeaponMelee:extend() -- Sword weapons
+CWeaponSword = CWeaponMelee:extend() -- Sword weapons
 Classic.KINDSWORD = "Sword" -- Sword kind
 Classic.NAMESWORD = "Sword" -- Sword name
 function CWeaponSword:new(_argt)
@@ -3065,7 +3065,7 @@ function CWeaponSword:new(_argt)
     self:argt(_argt) -- override if any
 end
 
-local CWeaponHammer = CWeaponMelee:extend() -- Hammer weapons
+CWeaponHammer = CWeaponMelee:extend() -- Hammer weapons
 Classic.KINDHAMMER= "Hammer" -- Hammer kind
 Classic.NAMEHAMMER= "Hammer" -- Hammer name
 function CWeaponHammer:new(_argt)
@@ -3080,7 +3080,7 @@ end
 --
 -- CWeaponRange
 --
-local CWeaponRange = CWeapon:extend() -- Range weapons
+CWeaponRange = CWeapon:extend() -- Range weapons
 Classic.KINDRANGE = "Range" -- Range kind
 Classic.NAMERANGE = "Range" -- Range name
 function CWeaponRange:new(_argt)
@@ -3109,7 +3109,7 @@ function CWeaponRange:new(_argt)
     self:argt(_argt) -- override if any
 end
 
-local CWeaponLongBow = CWeaponRange:extend() -- LongBow weapons
+CWeaponLongBow = CWeaponRange:extend() -- LongBow weapons
 Classic.KINDLGBOW = "L.Bow" -- LongBow kind
 Classic.NAMELGBOW = "L.Bow" -- LongBow name
 function CWeaponLongBow:new(_argt)
@@ -3120,7 +3120,7 @@ function CWeaponLongBow:new(_argt)
     self:argt(_argt) -- override if any
 end
 
-local CWeaponCrossBow = CWeaponRange:extend() -- CrossBow weapons
+CWeaponCrossBow = CWeaponRange:extend() -- CrossBow weapons
 Classic.KINDCXBOW = "C.Bow" -- CrossBow kind
 Classic.NAMECXBOW = "C.Bow" -- CrossBow name
 function CWeaponCrossBow:new(_argt)
@@ -3135,7 +3135,7 @@ end
 --
 -- CCharacter
 --
-local CCharacter = CEntityDrawable:extend() -- characters
+CCharacter = CEntityDrawable:extend() -- characters
 Classic.KINDCHARACTER = "Character" -- Character kind
 Classic.NAMECHARACTER = "Character" -- Character name
 CCharacter.SIZEL = 0 -- character sizes -- for the head sprite y offset
@@ -4100,7 +4100,7 @@ end
 -- CCharacterHumanoid
 --
 Classic.KINDHUMANOID = "Humanoid" -- Humanoid kind
-local CCharacterHumanoid = CCharacter:extend() -- humanoid characters
+CCharacterHumanoid = CCharacter:extend() -- humanoid characters
 CCharacterHumanoid.HANDSOFFSETS = {
     [Tic.STATUSIDLE] = {
         [Tic.DIRXLF] = {
@@ -4271,13 +4271,13 @@ end
 
 
 
-local IPlayer = CCharacter:extend() -- players characters implementation
+IPlayer = CCharacter:extend() -- players characters implementation
 function IPlayer:playerAppend()
     Tic:playerAppend(self) -- record the new player on tic
 end
 
 
-local CPlayerHumanoid = CCharacterHumanoid:extend() -- humanoid player characters
+CPlayerHumanoid = CCharacterHumanoid:extend() -- humanoid player characters
 function CPlayerHumanoid:new(_argt)
     CPlayerHumanoid.super.new(self, _argt)
     self.discovered = true
@@ -4287,7 +4287,7 @@ function CPlayerHumanoid:new(_argt)
 end
 
 
-local CPlayerDwarf = CPlayerHumanoid:extend() -- Dwarf player characters
+CPlayerDwarf = CPlayerHumanoid:extend() -- Dwarf player characters
 Classic.KINDDWARF = "Dwarf" -- Dwarf kind
 function CPlayerDwarf:new(_argt)
     CPlayerDwarf.super.new(self, _argt)
@@ -4306,7 +4306,7 @@ function CPlayerDwarf:new(_argt)
 end
 
 
-local CPlayerGnome = CPlayerHumanoid:extend() -- Gnome player characters
+CPlayerGnome = CPlayerHumanoid:extend() -- Gnome player characters
 Classic.KINDGNOME = "Gnome" -- Gnome kind
 function CPlayerGnome:new(_argt)
     CPlayerGnome.super.new(self, _argt)
@@ -4326,7 +4326,7 @@ function CPlayerGnome:new(_argt)
 end
 
 
-local CPlayerElvwe = CPlayerHumanoid:extend() -- Elvwe player characters
+CPlayerElvwe = CPlayerHumanoid:extend() -- Elvwe player characters
 Classic.KINDELVWE = "Elvwe" -- Elvwe kind
 function CPlayerElvwe:new(_argt)
     CPlayerElvwe.super.new(self, _argt)
@@ -4347,7 +4347,7 @@ function CPlayerElvwe:new(_argt)
 end
 
 
-local CPlayerDrowe = CPlayerElvwe:extend() -- Drowe player characters
+CPlayerDrowe = CPlayerElvwe:extend() -- Drowe player characters
 Classic.KINDDROWE = "Drowe" -- Drowe kind
 function CPlayerDrowe:new(_argt)
     CPlayerDrowe.super.new(self, _argt)
@@ -4367,7 +4367,7 @@ function CPlayerDrowe:new(_argt)
 end
 
 
-local CPlayerAngel = CPlayerHumanoid:extend() -- Angel player characters
+CPlayerAngel = CPlayerHumanoid:extend() -- Angel player characters
 Classic.KINDANGEL = "Angel" -- Angel kind
 function CPlayerAngel:new(_argt)
     CPlayerAngel.super.new(self, _argt)
@@ -4387,7 +4387,7 @@ function CPlayerAngel:new(_argt)
 end
 
 
-local CPlayerGolth = CPlayerHumanoid:extend() -- Golth player characters
+CPlayerGolth = CPlayerHumanoid:extend() -- Golth player characters
 Classic.KINDGOLTH = "Golth" -- Golth kind
 function CPlayerGolth:new(_argt)
     CPlayerGolth.super.new(self, _argt)
@@ -4409,7 +4409,7 @@ function CPlayerGolth:new(_argt)
 end
 
 
-local CPlayerHorne = CPlayerHumanoid:extend() -- Horne player characters
+CPlayerHorne = CPlayerHumanoid:extend() -- Horne player characters
 Classic.KINDHORNE = "Horne" -- Horne kind
 function CPlayerHorne:new(_argt)
     CPlayerHorne.super.new(self, _argt)
@@ -4429,7 +4429,7 @@ function CPlayerHorne:new(_argt)
 end
 
 
-local CPlayerDemon = CPlayerHorne:extend() -- Demon player characters
+CPlayerDemon = CPlayerHorne:extend() -- Demon player characters
 Classic.KINDDEMON = "Demon" -- Demon kind
 function CPlayerDemon:new(_argt)
     CPlayerDemon.super.new(self, _argt)
@@ -4444,7 +4444,7 @@ function CPlayerDemon:new(_argt)
 end
 
 
-local CPlayerTifel = CPlayerHorne:extend() -- Tifel player characters
+CPlayerTifel = CPlayerHorne:extend() -- Tifel player characters
 Classic.KINDTIFEL = "Tifel" -- Tifel kind
 function CPlayerTifel:new(_argt)
     CPlayerTifel.super.new(self, _argt)
@@ -4460,7 +4460,7 @@ function CPlayerTifel:new(_argt)
 end
 
 
-local CPlayerMeduz = CPlayerHumanoid:extend() -- Meduz player characters
+CPlayerMeduz = CPlayerHumanoid:extend() -- Meduz player characters
 Classic.KINDMEDUZ = "Meduz" -- Meduz kind
 function CPlayerMeduz:new(_argt)
     CPlayerMeduz.super.new(self, _argt)
@@ -4479,7 +4479,7 @@ function CPlayerMeduz:new(_argt)
 end
 
 
-local CPlayerGnoll = CPlayerHumanoid:extend() -- Gnoll player characters
+CPlayerGnoll = CPlayerHumanoid:extend() -- Gnoll player characters
 Classic.KINDGNOLL = "Gnoll" -- Gnoll kind
 function CPlayerGnoll:new(_argt)
     CPlayerGnoll.super.new(self, _argt)
@@ -4498,7 +4498,7 @@ function CPlayerGnoll:new(_argt)
 end
 
 
-local CPlayerWolfe = CPlayerGnoll:extend() -- Wolfe player characters
+CPlayerWolfe = CPlayerGnoll:extend() -- Wolfe player characters
 Classic.KINDWOLFE = "Wolfe" -- Wolfe kind
 function CPlayerWolfe:new(_argt)
     CPlayerWolfe.super.new(self, _argt)
@@ -4507,7 +4507,7 @@ function CPlayerWolfe:new(_argt)
 end
 
 
-local CPlayerGhost = CPlayerHumanoid:extend() -- Ghost player characters
+CPlayerGhost = CPlayerHumanoid:extend() -- Ghost player characters
 Classic.KINDGHOST = "Ghost" -- Ghost kind
 function CPlayerGhost:new(_argt)
     CPlayerGhost.super.new(self, _argt)
@@ -4527,16 +4527,16 @@ function CPlayerGhost:new(_argt)
 end
 
 
-local CNeutral= CCharacter:extend() -- neutral characters
+CNeutral= CCharacter:extend() -- neutral characters
 
 
-local CEnnemy = CCharacter:extend() -- ennemy characters
+CEnnemy = CCharacter:extend() -- ennemy characters
 
 
 --
 -- CElement
 --
-local CElement = Classic:extend() -- generic screen element -- TODO build this class
+CElement = Classic:extend() -- generic screen element -- TODO build this class
 Classic.KINDELEMENT = "Element" -- Element kind
 Classic.NAMEELEMENT = "Element" -- Element name
 function CElement:new(_argt)
@@ -4712,7 +4712,7 @@ end
 --
 -- CText
 --
-local CText = CElement:extend() -- generic text element
+CText = CElement:extend() -- generic text element
 Classic.KINDTEXT = "Text" -- Text kind
 Classic.NAMETEXT = "Text" -- Text name
 function CText:new(_argt)
@@ -4773,7 +4773,7 @@ end
 --
 -- CWindow
 --
-local CWindow = CElement:extend() -- generic window element
+CWindow = CElement:extend() -- generic window element
 Classic.KINDWINDOW = "Window" -- Window kind
 Classic.NAMEWINDOW = "Window" -- Window name
 function CWindow:new(_argt)
@@ -4788,7 +4788,7 @@ end
 --
 -- CWindowScreen
 --
-local CWindowScreen = CWindow:extend() -- window screen
+CWindowScreen = CWindow:extend() -- window screen
 function CWindowScreen:new(_argt)
     CWindowScreen.super.new(self, _argt)
     self.drawcaches = false
@@ -4800,7 +4800,7 @@ end
 --
 -- CWindowInfos
 --
-local CWindowInfos = CWindow:extend() -- window infos
+CWindowInfos = CWindow:extend() -- window infos
 function CWindowInfos:new(_argt)
     CWindowInfos.super.new(self, _argt)
     self.drawcaches  = false
@@ -4823,7 +4823,7 @@ end
 --
 -- IWindowEntity -- entities windows implementation
 --
-local IWindowEntity = CWindow:extend() -- generic entity window
+IWindowEntity = CWindow:extend() -- generic entity window
 IWindowEntity.BEHAVIOUR = function(self)
     self.drawinside = (self.entity) and true or false
 end
@@ -4832,7 +4832,7 @@ end
 --
 -- CWindowInfosEntity
 --
-local CWindowInfosEntity = CWindowInfos:extend() -- window infos for entities
+CWindowInfosEntity = CWindowInfos:extend() -- window infos for entities
 function CWindowInfosEntity:new(_argt)
     CWindowInfosEntity.super.new(self, _argt)
     self.align  = Tic.DIR000
@@ -4852,7 +4852,7 @@ end
 --
 -- IWindowPlayer -- players windows implementation
 --
-local IWindowPlayer = CWindow:extend() -- generic player window
+IWindowPlayer = CWindow:extend() -- generic player window
 IWindowPlayer.BEHAVIOUR = function(self)
     self.entity = Tic:playerActual()
     IWindowEntity.BEHAVIOUR(self)
@@ -4862,7 +4862,7 @@ end
 --
 -- CWindowPlayerInfos
 --
-local CWindowPlayerInfos = CWindowInfosEntity:extend() -- window infos for player
+CWindowPlayerInfos = CWindowInfosEntity:extend() -- window infos for player
 function CWindowPlayerInfos:new(_argt)
     CWindowPlayerInfos.super.new(self, _argt)
     self.screenx   = Tic.PLAYERINFOSWX
@@ -4878,7 +4878,7 @@ end
 --
 -- CWindowPortrait
 --
-local CWindowPortrait = CWindow:extend() -- window portrait
+CWindowPortrait = CWindow:extend() -- window portrait
 function CWindowPortrait:new(_argt)
     CWindowPortrait.super.new(self, _argt)
     self.screenw     = Tic.PLAYERPORTRAITWW -- sizes
@@ -4898,7 +4898,7 @@ end
 --
 -- CWindowPortraitDrawable
 --
-local CWindowPortraitDrawable = CWindowPortrait:extend() -- window portrait for -- [!] drawable entities
+CWindowPortraitDrawable = CWindowPortrait:extend() -- window portrait for -- [!] drawable entities
 function CWindowPortraitDrawable:new(_argt)
     CWindowPortraitDrawable.super.new(self, _argt)
     self.idle   = false --false -- idle portait or not
@@ -4939,7 +4939,7 @@ end
 --
 -- CWindowPlayerPortrait
 --
-local CWindowPlayerPortrait = CWindowPortraitDrawable:extend() -- window portrait for player
+CWindowPlayerPortrait = CWindowPortraitDrawable:extend() -- window portrait for player
 function CWindowPlayerPortrait:new(_argt)
     CWindowPlayerPortrait.super.new(self, _argt)
     self.screenx   = Tic.PLAYERPORTRAITWX
@@ -4958,7 +4958,7 @@ end
 --
 -- CWindowStats
 --
-local CWindowStats = CWindow:extend() -- window stats
+CWindowStats = CWindow:extend() -- window stats
 function CWindowStats:new(_argt)
     CWindowStats.super.new(self, _argt)
     self.screenw     = Tic.PLAYERSTATSWW -- sizes
@@ -4978,7 +4978,7 @@ end
 --
 -- CWindowStatsCharacter
 --
-local CWindowStatsCharacter = CWindowStats:extend() -- window portrait for -- [!] characters
+CWindowStatsCharacter = CWindowStats:extend() -- window portrait for -- [!] characters
 function CWindowStatsCharacter:new(_argt)
     CWindowStatsCharacter.super.new(self, _argt)
 	self.entity = nil -- override
@@ -5055,7 +5055,7 @@ end
 --
 -- CWindowPlayerStats
 --
-local CWindowPlayerStats = CWindowStatsCharacter:extend() -- window stats for player
+CWindowPlayerStats = CWindowStatsCharacter:extend() -- window stats for player
 function CWindowPlayerStats:new(_argt)
     CWindowPlayerStats.super.new(self, _argt)
     self.screenx   = Tic.PLAYERSTATSWX
@@ -5069,7 +5069,7 @@ end
 --
 -- CWindowPlayerState
 --
-local CWindowPlayerState = CWindowInfos:extend() -- window state for player
+CWindowPlayerState = CWindowInfos:extend() -- window state for player
 function CWindowPlayerState:new(_argt)
     CWindowPlayerState.super.new(self, _argt)
     self.screenx   = Tic.PLAYERSTATEWX
@@ -5094,7 +5094,7 @@ end
 --
 -- IWindowPlayer -- players windows implementation
 --
-local IWindowPlayer = CWindow:extend() -- generic player window
+IWindowPlayer = CWindow:extend() -- generic player window
 IWindowPlayer.BEHAVIOUR = function(self)
     self.entity = Tic:playerActual()
     IWindowEntity.BEHAVIOUR(self)
@@ -5104,7 +5104,7 @@ end
 --
 -- IWindowSpotting -- spotting windows implementation
 --
-local IWindowSpotting = CWindow:extend() -- generic spotting window
+IWindowSpotting = CWindow:extend() -- generic spotting window
 IWindowSpotting.BEHAVIOUR = function(self)
     self.entity = (Tic:entityHovering()) and Tic:entityHovering() or Tic:entitySpotting()
     IWindowEntity.BEHAVIOUR(self)
@@ -5114,7 +5114,7 @@ end
 --
 -- CWindowSpottingInfos
 --
-local CWindowSpottingInfos = CWindowInfosEntity:extend() -- window infos for spotting
+CWindowSpottingInfos = CWindowInfosEntity:extend() -- window infos for spotting
 Classic.KINDWINDOWSPOTTINGINFOS = "WindowSpottingInfos" -- WindowSpottingInfos kind
 function CWindowSpottingInfos:new(_argt)
     CWindowSpottingInfos.super.new(self, _argt)
@@ -5131,7 +5131,7 @@ end
 --
 -- CWindowSpottingPortrait
 --
-local CWindowSpottingPortrait = CWindowPortraitDrawable:extend() -- window portrait for spotting
+CWindowSpottingPortrait = CWindowPortraitDrawable:extend() -- window portrait for spotting
 Classic.KINDWINDOWSPOTTINGPORTRAIT = "WindowSpottingPortrait" -- WindowSpottingPortrait kind
 function CWindowSpottingPortrait:new(_argt)
     CWindowSpottingPortrait.super.new(self, _argt)
@@ -5152,7 +5152,7 @@ end
 --
 -- CWindowWorld
 --
-local CWindowWorld = CWindow:extend() -- window world
+CWindowWorld = CWindow:extend() -- window world
 function CWindowWorld:new(_argt)
     CWindowWorld.super.new(self, _argt)
     self.screenx         = Tic.WORLDWX -- positions
@@ -5263,7 +5263,7 @@ end
 --
 -- CWindowInfosWorld
 --
-local CWindowInfosWorld = CWindowInfos:extend() -- window infos for world
+CWindowInfosWorld = CWindowInfos:extend() -- window infos for world
 function CWindowInfosWorld:new(_argt)
     CWindowInfosWorld.super.new(self, _argt)
     self.screenx    = Tic.WORLDINFOSWX
@@ -5286,7 +5286,7 @@ end
 --
 -- CButton
 --
-local CButton = CElement:extend() -- generic button
+CButton = CElement:extend() -- generic button
 Classic.KINDBUTTON = "Button" -- Button kind
 Classic.NAMEBUTTON = "Button" -- Button name
 CButton.BEHAVIOUR = function(self) -- need at least one function
@@ -5436,7 +5436,7 @@ end
 --
 -- CButtonText
 --
-local CButtonText = CButton:extend() -- generic text button
+CButtonText = CButton:extend() -- generic text button
 function CButtonText:new(_argt)
     CButtonText.super.new(self, _argt)
 	self.text = nil -- override with CText if any
@@ -5460,7 +5460,7 @@ end
 --
 -- CButtonMenu
 --
-local CButtonMenu = CButtonText:extend() -- generic menu button
+CButtonMenu = CButtonText:extend() -- generic menu button
 function CButtonMenu:new(_argt)
     CButtonMenu.super.new(self, _argt)
     self.rounded = false
@@ -5472,7 +5472,7 @@ end
 --
 -- CButtonSprite
 --
-local CButtonSprite = CButton:extend() -- generic sprite button
+CButtonSprite = CButton:extend() -- generic sprite button
 function CButtonSprite:new(_argt)
     CButtonSprite.super.new(self, _argt)
 	self.sprite = CSpriteBG{}
@@ -5502,13 +5502,13 @@ end
 --
 -- CButtonClick
 --
-local CButtonClick = CButtonSprite:extend() -- generic click button
+CButtonClick = CButtonSprite:extend() -- generic click button
 
 
 --
 -- CButtonArrow
 --
-local CButtonArrow = CButtonClick:extend() -- generic arrow click button
+CButtonArrow = CButtonClick:extend() -- generic arrow click button
 function CButtonArrow:new(_argt)
     CButtonArrow.super.new(self, _argt)
     self.drawborder    = false
@@ -5519,7 +5519,7 @@ end
 --
 -- CButtonArrowLine
 --
-local CButtonArrowLine = CButtonArrow:extend() -- generic line arrow click button
+CButtonArrowLine = CButtonArrow:extend() -- generic line arrow click button
 function CButtonArrowLine:new(_argt)
     CButtonArrowLine.super.new(self, _argt)
 	self.sprite.sprite = CSpriteBG.SIGNARROWL
@@ -5530,7 +5530,7 @@ end
 --
 -- CButtonArrowDiag
 --
-local CButtonArrowDiag = CButtonArrow:extend() -- generic diag arrow click button
+CButtonArrowDiag = CButtonArrow:extend() -- generic diag arrow click button
 function CButtonArrowDiag:new(_argt)
     CButtonArrowDiag.super.new(self, _argt)
 	self.sprite.sprite = CSpriteBG.SIGNARROWD
@@ -5541,7 +5541,7 @@ end
 --
 -- CButtonArrow000
 --
-local CButtonArrow000 = CButtonArrowLine:extend() -- generic arrow 000 click button
+CButtonArrow000 = CButtonArrowLine:extend() -- generic arrow 000 click button
 function CButtonArrow000:new(_argt)
     CButtonArrow000.super.new(self, _argt)
     self.direction     = Tic.DIR000
@@ -5553,7 +5553,7 @@ end
 --
 -- CButtonArrow045
 --
-local CButtonArrow045 = CButtonArrowDiag:extend() -- generic arrow 045 click button
+CButtonArrow045 = CButtonArrowDiag:extend() -- generic arrow 045 click button
 function CButtonArrow045:new(_argt)
     CButtonArrow045.super.new(self, _argt)
     self.direction     = Tic.DIR045
@@ -5565,7 +5565,7 @@ end
 --
 -- CButtonArrow090
 --
-local CButtonArrow090 = CButtonArrowLine:extend() -- generic arrow 090 click button
+CButtonArrow090 = CButtonArrowLine:extend() -- generic arrow 090 click button
 function CButtonArrow090:new(_argt)
     CButtonArrow090.super.new(self, _argt)
     self.direction     = Tic.DIR090
@@ -5577,7 +5577,7 @@ end
 --
 -- CButtonArrow135
 --
-local CButtonArrow135 = CButtonArrowDiag:extend() -- generic arrow 135 click button
+CButtonArrow135 = CButtonArrowDiag:extend() -- generic arrow 135 click button
 function CButtonArrow135:new(_argt)
     CButtonArrow135.super.new(self, _argt)
     self.direction     = Tic.DIR135
@@ -5589,7 +5589,7 @@ end
 --
 -- CButtonArrow180
 --
-local CButtonArrow180 = CButtonArrowLine:extend() -- generic arrow 180 click button
+CButtonArrow180 = CButtonArrowLine:extend() -- generic arrow 180 click button
 function CButtonArrow180:new(_argt)
     CButtonArrow180.super.new(self, _argt)
     self.direction     = Tic.DIR180
@@ -5601,7 +5601,7 @@ end
 --
 -- CButtonArrow225
 --
-local CButtonArrow225 = CButtonArrowDiag:extend() -- generic arrow 225 click button
+CButtonArrow225 = CButtonArrowDiag:extend() -- generic arrow 225 click button
 function CButtonArrow225:new(_argt)
     CButtonArrow225.super.new(self, _argt)
     self.direction     = Tic.DIR225
@@ -5613,7 +5613,7 @@ end
 --
 -- CButtonArrow270
 --
-local CButtonArrow270 = CButtonArrowLine:extend() -- generic arrow 270 click button
+CButtonArrow270 = CButtonArrowLine:extend() -- generic arrow 270 click button
 function CButtonArrow270:new(_argt)
     CButtonArrow270.super.new(self, _argt)
     self.direction     = Tic.DIR270
@@ -5625,7 +5625,7 @@ end
 --
 -- CButtonArrow315
 --
-local CButtonArrow315 = CButtonArrowDiag:extend() -- generic arrow 315 click button
+CButtonArrow315 = CButtonArrowDiag:extend() -- generic arrow 315 click button
 function CButtonArrow315:new(_argt)
     CButtonArrow315.super.new(self, _argt)
     self.direction     = Tic.DIR315
@@ -5637,7 +5637,7 @@ end
 --
 -- CButtonCenter
 --
-local CButtonCenter = CButtonArrow:extend() -- generic center click button
+CButtonCenter = CButtonArrow:extend() -- generic center click button
 function CButtonCenter:new(_argt)
     CButtonCenter.super.new(self, _argt)
     self.direction     = nil
@@ -5649,7 +5649,7 @@ end
 --
 -- CButtonCheck
 --
-local CButtonCheck = CButtonSprite:extend() -- generic check button
+CButtonCheck = CButtonSprite:extend() -- generic check button
 function CButtonCheck:new(_argt)
     CButtonCheck.super.new(self, _argt)
 	self.checked = false
@@ -5681,7 +5681,7 @@ end
 --
 -- IButtonPlayer -- players buttons implementation
 --
-local IButtonPlayer = Classic:extend() -- generic player button
+IButtonPlayer = Classic:extend() -- generic player button
 IButtonPlayer.BEHAVIOUR = function(self) -- need at least one player
     self.display = (Tic:playerActual()) and true or false
     if not self.display then return end -- no player
@@ -5692,7 +5692,7 @@ end
 --
 -- IButtonPlayerChange -- player change buttons implementation
 --
-local IButtonPlayerChange = Classic:extend() -- generic change player button
+IButtonPlayerChange = Classic:extend() -- generic change player button
 IButtonPlayerChange.BEHAVIOUR = function(self) -- need at least more than one player
     IButtonPlayer.BEHAVIOUR(self)
     if not self.display then return end -- no player
@@ -5703,7 +5703,7 @@ end
 --
 -- CButtonPlayerPrev
 --
-local CButtonPlayerPrev = CButtonArrow270:extend() -- generic player prev button
+CButtonPlayerPrev = CButtonArrow270:extend() -- generic player prev button
 function CButtonPlayerPrev:new(_argt)
     CButtonPlayerPrev.super.new(self, _argt)
 	self.behaviour      = IButtonPlayerChange.BEHAVIOUR  -- function to trigger at first
@@ -5716,7 +5716,7 @@ end
 --
 -- CButtonPlayerNext
 --
-local CButtonPlayerNext = CButtonArrow090:extend() -- generic player next button
+CButtonPlayerNext = CButtonArrow090:extend() -- generic player next button
 function CButtonPlayerNext:new(_argt)
     CButtonPlayerNext.super.new(self, _argt)
 	self.behaviour      = IButtonPlayerChange.BEHAVIOUR  -- function to trigger at first
@@ -5729,7 +5729,7 @@ end
 --
 -- CButtonPlayerPick
 --
-local CButtonPlayerPick = CButtonClick:extend() -- generic player pick button
+CButtonPlayerPick = CButtonClick:extend() -- generic player pick button
 function CButtonPlayerPick:new(_argt)
     CButtonPlayerPick.super.new(self, _argt)
     self.drawborder     = false
@@ -5744,7 +5744,7 @@ end
 --
 -- CButtonPlayerStand
 --
-local CButtonPlayerStand = CButtonCheck:extend() -- generic player stand button
+CButtonPlayerStand = CButtonCheck:extend() -- generic player stand button
 CButtonPlayerStand.BEHAVIOUR = function(self)
     IButtonPlayer.BEHAVIOUR(self)
     if not self.display then return end -- no player
@@ -5768,7 +5768,7 @@ end
 --
 -- CButtonPlayerKneel
 --
-local CButtonPlayerKneel = CButtonCheck:extend() -- generic player kneel button
+CButtonPlayerKneel = CButtonCheck:extend() -- generic player kneel button
 CButtonPlayerKneel.BEHAVIOUR = function(self)
     IButtonPlayer.BEHAVIOUR(self)
     if not self.display then return end -- no player
@@ -5792,7 +5792,7 @@ end
 --
 -- CButtonPlayerWork
 --
-local CButtonPlayerWork = CButtonCheck:extend() -- generic player work button
+CButtonPlayerWork = CButtonCheck:extend() -- generic player work button
 CButtonPlayerWork.BEHAVIOUR = function(self)
     IButtonPlayer.BEHAVIOUR(self)
     if not self.display then return end -- no player
@@ -5813,7 +5813,7 @@ end
 --
 -- CButtonPlayerSleep
 --
-local CButtonPlayerSleep = CButtonCheck:extend() -- generic player sleep button
+CButtonPlayerSleep = CButtonCheck:extend() -- generic player sleep button
 CButtonPlayerSleep.BEHAVIOUR = function(self)
     IButtonPlayer.BEHAVIOUR(self)
     if not self.display then return end -- no player
@@ -5834,7 +5834,7 @@ end
 --
 -- CButtonSpottingDraw
 --
-local CButtonSpottingDraw = CButtonCheck:extend() -- generic spottingdraw check button
+CButtonSpottingDraw = CButtonCheck:extend() -- generic spottingdraw check button
 CButtonSpottingDraw.BEHAVIOUR = function(self)
     self.checked = Tic:isSpottingDraw()
     CButton.BEHAVIOUR(self)
@@ -5853,7 +5853,7 @@ end
 --
 -- CButtonSpottingLock
 --
-local CButtonSpottingLock = CButtonCheck:extend() -- generic spottinglock check button
+CButtonSpottingLock = CButtonCheck:extend() -- generic spottinglock check button
 CButtonSpottingLock.BEHAVIOUR = function(self)
     self.checked = Tic:isSpottingLock()
     CButton.BEHAVIOUR(self)
@@ -5872,7 +5872,7 @@ end
 --
 -- CButtonSpottingPick
 --
-local CButtonSpottingPick = CButtonCheck:extend() -- generic spottingpick check button
+CButtonSpottingPick = CButtonCheck:extend() -- generic spottingpick check button
 CButtonSpottingPick.BEHAVIOUR = function(self)
     self.checked = Tic:isSpottingPick()
     CButton.BEHAVIOUR(self)
@@ -5891,7 +5891,7 @@ end
 --
 -- IButtonSpotting -- spotting buttons implementation
 --
-local IButtonSpotting = CButton:extend() -- generic spotting button
+IButtonSpotting = CButton:extend() -- generic spotting button
 IButtonSpotting.PALETTE = {[Tic.COLORGREYD] = Tic.COLORKEY}
 IButtonSpotting.BEHAVIOUR = function(self)
     CButton.BEHAVIOUR(self)
@@ -5909,7 +5909,7 @@ IButtonSpotting.BEHAVIOUR = function(self)
     end
 end
 
-local CButtonSpotting000 = CButtonArrow000:extend() -- generic spotting 000 button
+CButtonSpotting000 = CButtonArrow000:extend() -- generic spotting 000 button
 function CButtonSpotting000:new(_argt)
     CButtonSpotting000.super.new(self, _argt)
     self.sprite.palette = IButtonSpotting.PALETTE
@@ -5918,7 +5918,7 @@ function CButtonSpotting000:new(_argt)
     self:argt(_argt) -- override if any
 end
 
-local CButtonSpotting045 = CButtonArrow045:extend() -- generic spotting 045 button
+CButtonSpotting045 = CButtonArrow045:extend() -- generic spotting 045 button
 function CButtonSpotting045:new(_argt)
     CButtonSpotting045.super.new(self, _argt)
     self.sprite.palette = IButtonSpotting.PALETTE
@@ -5927,7 +5927,7 @@ function CButtonSpotting045:new(_argt)
     self:argt(_argt) -- override if any
 end
 
-local CButtonSpotting090 = CButtonArrow090:extend() -- generic spotting 090 button
+CButtonSpotting090 = CButtonArrow090:extend() -- generic spotting 090 button
 function CButtonSpotting090:new(_argt)
     CButtonSpotting090.super.new(self, _argt)
     self.sprite.palette = IButtonSpotting.PALETTE
@@ -5936,7 +5936,7 @@ function CButtonSpotting090:new(_argt)
     self:argt(_argt) -- override if any
 end
 
-local CButtonSpotting135 = CButtonArrow135:extend() -- generic spotting 135 button
+CButtonSpotting135 = CButtonArrow135:extend() -- generic spotting 135 button
 function CButtonSpotting135:new(_argt)
     CButtonSpotting135.super.new(self, _argt)
     self.sprite.palette = IButtonSpotting.PALETTE
@@ -5945,7 +5945,7 @@ function CButtonSpotting135:new(_argt)
     self:argt(_argt) -- override if any
 end
 
-local CButtonSpotting180 = CButtonArrow180:extend() -- generic spotting 180 button
+CButtonSpotting180 = CButtonArrow180:extend() -- generic spotting 180 button
 function CButtonSpotting180:new(_argt)
     CButtonSpotting180.super.new(self, _argt)
     self.sprite.palette = IButtonSpotting.PALETTE
@@ -5954,7 +5954,7 @@ function CButtonSpotting180:new(_argt)
     self:argt(_argt) -- override if any
 end
 
-local CButtonSpotting225 = CButtonArrow225:extend() -- generic spotting 225 button
+CButtonSpotting225 = CButtonArrow225:extend() -- generic spotting 225 button
 function CButtonSpotting225:new(_argt)
     CButtonSpotting225.super.new(self, _argt)
     self.sprite.palette = IButtonSpotting.PALETTE
@@ -5963,7 +5963,7 @@ function CButtonSpotting225:new(_argt)
     self:argt(_argt) -- override if any
 end
 
-local CButtonSpotting270 = CButtonArrow270:extend() -- generic spotting 270 button
+CButtonSpotting270 = CButtonArrow270:extend() -- generic spotting 270 button
 function CButtonSpotting270:new(_argt)
     CButtonSpotting270.super.new(self, _argt)
     self.sprite.palette = IButtonSpotting.PALETTE
@@ -5972,7 +5972,7 @@ function CButtonSpotting270:new(_argt)
     self:argt(_argt) -- override if any
 end
 
-local CButtonSpotting315 = CButtonArrow315:extend() -- generic spotting 315 button
+CButtonSpotting315 = CButtonArrow315:extend() -- generic spotting 315 button
 function CButtonSpotting315:new(_argt)
     CButtonSpotting315.super.new(self, _argt)
     self.sprite.palette = IButtonSpotting.PALETTE
@@ -5985,7 +5985,7 @@ end
 --
 -- IButtonPlayerMove -- player move buttons implementation
 --
-local IButtonPlayerMove = IButtonPlayer:extend() -- generic player move button
+IButtonPlayerMove = IButtonPlayer:extend() -- generic player move button
 IButtonPlayerMove.PALETTE = {[Tic.COLORGREYD] = Tic.COLORKEY}
 IButtonPlayerMove.BEHAVIOUR = function(self)
     IButtonPlayer.BEHAVIOUR(self)
@@ -5994,7 +5994,7 @@ IButtonPlayerMove.BEHAVIOUR = function(self)
     self.hovertext = CText{text = "Move"}
 end
 
-local CButtonPlayerMove000 = CButtonArrow000:extend() -- generic player move 000 button
+CButtonPlayerMove000 = CButtonArrow000:extend() -- generic player move 000 button
 function CButtonPlayerMove000:new(_argt)
     CButtonPlayerMove000.super.new(self, _argt)
     self.sprite.palette = IButtonPlayerMove.PALETTE
@@ -6003,7 +6003,7 @@ function CButtonPlayerMove000:new(_argt)
     self:argt(_argt) -- override if any
 end
 
-local CButtonPlayerMove045 = CButtonArrow045:extend() -- generic player move 045 button
+CButtonPlayerMove045 = CButtonArrow045:extend() -- generic player move 045 button
 function CButtonPlayerMove045:new(_argt)
     CButtonPlayerMove045.super.new(self, _argt)
     self.sprite.palette = IButtonPlayerMove.PALETTE
@@ -6012,7 +6012,7 @@ function CButtonPlayerMove045:new(_argt)
     self:argt(_argt) -- override if any
 end
 
-local CButtonPlayerMove090 = CButtonArrow090:extend() -- generic player move 090 button
+CButtonPlayerMove090 = CButtonArrow090:extend() -- generic player move 090 button
 function CButtonPlayerMove090:new(_argt)
     CButtonPlayerMove090.super.new(self, _argt)
     self.sprite.palette = IButtonPlayerMove.PALETTE
@@ -6021,7 +6021,7 @@ function CButtonPlayerMove090:new(_argt)
     self:argt(_argt) -- override if any
 end
 
-local CButtonPlayerMove135 = CButtonArrow135:extend() -- generic player move 135 button
+CButtonPlayerMove135 = CButtonArrow135:extend() -- generic player move 135 button
 function CButtonPlayerMove135:new(_argt)
     CButtonPlayerMove135.super.new(self, _argt)
     self.sprite.palette = IButtonPlayerMove.PALETTE
@@ -6030,7 +6030,7 @@ function CButtonPlayerMove135:new(_argt)
     self:argt(_argt) -- override if any
 end
 
-local CButtonPlayerMove180 = CButtonArrow180:extend() -- generic player move 180 button
+CButtonPlayerMove180 = CButtonArrow180:extend() -- generic player move 180 button
 function CButtonPlayerMove180:new(_argt)
     CButtonPlayerMove180.super.new(self, _argt)
     self.sprite.palette = IButtonPlayerMove.PALETTE
@@ -6039,7 +6039,7 @@ function CButtonPlayerMove180:new(_argt)
     self:argt(_argt) -- override if any
 end
 
-local CButtonPlayerMove225 = CButtonArrow225:extend() -- generic player move 225 button
+CButtonPlayerMove225 = CButtonArrow225:extend() -- generic player move 225 button
 function CButtonPlayerMove225:new(_argt)
     CButtonPlayerMove225.super.new(self, _argt)
     self.sprite.palette = IButtonPlayerMove.PALETTE
@@ -6048,7 +6048,7 @@ function CButtonPlayerMove225:new(_argt)
     self:argt(_argt) -- override if any
 end
 
-local CButtonPlayerMove270 = CButtonArrow270:extend() -- generic player move 270 button
+CButtonPlayerMove270 = CButtonArrow270:extend() -- generic player move 270 button
 function CButtonPlayerMove270:new(_argt)
     CButtonPlayerMove270.super.new(self, _argt)
     self.sprite.palette = IButtonPlayerMove.PALETTE
@@ -6057,7 +6057,7 @@ function CButtonPlayerMove270:new(_argt)
     self:argt(_argt) -- override if any
 end
 
-local CButtonPlayerMove315 = CButtonArrow315:extend() -- generic player move 315 button
+CButtonPlayerMove315 = CButtonArrow315:extend() -- generic player move 315 button
 function CButtonPlayerMove315:new(_argt)
     CButtonPlayerMove315.super.new(self, _argt)
     self.sprite.palette = IButtonPlayerMove.PALETTE
@@ -6070,7 +6070,7 @@ end
 --
 -- CScreen
 --
-local CScreen = CElement:extend() -- generic screen -- HAS TO BE AFTER WINDOWS AND BUTTONS
+CScreen = CElement:extend() -- generic screen -- HAS TO BE AFTER WINDOWS AND BUTTONS
 Classic.KINDSCREEN = "Screen" -- Screen kind
 Classic.NAMESCREEN = "Screen" -- Screen name
 function CScreen:new(_argt)
@@ -6383,16 +6383,16 @@ ScreenWorld:appendElements{
 end
 
 if false then
-local _function = function(self) -- FIXME axecute functions with self
+_function = function(self) -- FIXME axecute functions with self
     -- Tic:logAppend((self.name or "None"))
     Tic:logAppend("Plop")
 end
 
 -- local ScreenIntro = CScreen{name = "Intro", keysfunctions = Tic.KEYSFUNCTIONSINTRO}
-local ScreenIntro = CScreen{name = "Intro", keysfunctions = Tic.KEYSFUNCTIONSINTRO}
+ScreenIntro = CScreen{name = "Intro", keysfunctions = Tic.KEYSFUNCTIONSINTRO}
 Tic:screenAppend(ScreenIntro)
 
-local Button1 = CButtonText{
+Button1 = CButtonText{
     -- screenx = 10,
     -- screeny = 10,
     screenw = 16,
@@ -6403,7 +6403,7 @@ local Button1 = CButtonText{
     clicklf = _function,
     clickrg = _function,
 }
-local Button2 = CButtonText{
+Button2 = CButtonText{
     -- screenx = 10,
     -- screeny = 20,
     screenw = 8,
@@ -6417,14 +6417,14 @@ local Button2 = CButtonText{
     -- align = Tic.DIR270,
     clicklf = _function,
 }
-local Button3 = CButtonText{
+Button3 = CButtonText{
     -- screenx = 10,
     -- screeny = 30,
     screenw = 16,
     -- enabled = false,
     name = "dummy",
 }
-local Button4 = CButtonMenu{
+Button4 = CButtonMenu{
     screenx = 10,
     screeny = 40,
     screenw = 28,
@@ -6433,7 +6433,7 @@ local Button4 = CButtonMenu{
     text = CText{text = "Open", marginlf = 2},
     clicklf = function() end,
 }
-local Button5 = CButtonMenu{
+Button5 = CButtonMenu{
     screenx = 10,
     screeny = 49,
     screenw = 28,
@@ -6443,29 +6443,29 @@ local Button5 = CButtonMenu{
     clicklf = _function,
     -- colorinside = Tic.COLORKEY
 }
-local Button6 = CButton{
+Button6 = CButton{
     screenx = 10,
     screeny = 60,
     rounded = false,
 }
-local Button7 = CButton{
+Button7 = CButton{
     screenx = 10,
     screeny = 70,
     screenw = 16,
     rounded = false,
     enabled = false,
 }
-local Button11 = CButtonArrow315{}
-local Button12 = CButtonArrow225{}
-local Button13 = CButtonArrow135{}
-local Button14 = CButtonArrow045{}
-local Button15 = CButtonCenter{}
+Button11 = CButtonArrow315{}
+Button12 = CButtonArrow225{}
+Button13 = CButtonArrow135{}
+Button14 = CButtonArrow045{}
+Button15 = CButtonCenter{}
 
-local Button16 = CButtonCenter{
+Button16 = CButtonCenter{
     screenx = 30,
     screeny = 60,
 }
-local Button17 = CButtonCenter{
+Button17 = CButtonCenter{
     screenx = 30,
     screeny = 70,
     enabled = false,
@@ -6896,18 +6896,18 @@ end
 
 
 if false then
-local House1 = CPlaceHouseAnim{
+House1 = CPlaceHouseAnim{
     name = "House1",
     worldx = -20,
     worldy = 10,
     -- hovered = true,
 }
-local House2 = CPlaceHouseAnim{
+House2 = CPlaceHouseAnim{
     name = "House2",
     worldx = 30,
     worldy = 40,
 }
-local Kirke1 = CPlaceKirkeAnim{
+Kirke1 = CPlaceKirkeAnim{
     name = "Kirke1",
     worldx = -20,
     worldy = 40,
