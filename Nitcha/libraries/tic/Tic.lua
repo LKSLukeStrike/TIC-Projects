@@ -2982,6 +2982,7 @@ CObject.COLORONYXBG = Tic.COLORGREYD
 CObject.COLORONYXFG = Tic.COLORGREYM
 CObject.COLORAZURBG = Tic.COLORBLUED
 CObject.COLORAZURFG = Tic.COLORBLUEM
+CObject.COLORFLASKG = Tic.COLORGREEND
 Classic.KINDOBJECT = "Object" -- Object kind
 Classic.NAMEOBJECT = "Object" -- Object name
 function CObject:new(_argt)
@@ -3074,12 +3075,12 @@ function CWeaponSword:new(_argt)
 end
 
 CWeaponHammer = CWeaponMelee:extend() -- Hammer weapons
-Classic.KINDHAMMER= "Hammer" -- Hammer kind
-Classic.NAMEHAMMER= "Hammer" -- Hammer name
+Classic.KINDHAMMR= "Hammer" -- Hammer kind
+Classic.NAMEHAMMR= "Hammer" -- Hammer name
 function CWeaponHammer:new(_argt)
     CWeaponHammer.super.new(self, _argt)
-    self.kind = Classic.KINDHAMMER
-    self.name = Classic.NAMEHAMMER
+    self.kind = Classic.KINDHAMMR
+    self.name = Classic.NAMEHAMMR
     self.sprite  = CSpriteFG.WEAPONHAMMR
     self:argt(_argt) -- override if any
 end
@@ -3136,6 +3137,116 @@ function CWeaponCrossBow:new(_argt)
     self.kind = Classic.KINDCXBOW
     self.name = Classic.NAMECXBOW
     self.sprite  = CSpriteFG.WEAPONCXBOW
+    self:argt(_argt) -- override if any
+end
+
+
+--
+-- CWeaponShield
+--
+CWeaponShield = CWeapon:extend() -- Shield weapons
+Classic.KINDSHLDS = "Shield" -- Shield kind
+Classic.NAMESHLDS = "Shield" -- Shield name
+function CWeaponShield:new(_argt)
+    CWeaponShield.super.new(self, _argt)
+    self.kind = Classic.KINDSHLDS
+    self.name = Classic.NAMESHLDS
+    self.sprite  = CSpriteFG.WEAPONSHLDS
+    self.stateshandles = {
+        [Tic.STATEIDLELF]  = {rotate = CSprite.ROTATE000, flip = Tic.DIRXLF},
+        [Tic.STATEIDLERG]  = {rotate = CSprite.ROTATE000, flip = Tic.DIRXRG},
+        [Tic.STATEMOVELF]  = {rotate = CSprite.ROTATE270, flip = Tic.DIRXLF},
+        [Tic.STATEMOVERG]  = {rotate = CSprite.ROTATE270, flip = Tic.DIRXRG},
+        [Tic.STATEWORKLF]  = {rotate = CSprite.ROTATE270, flip = Tic.DIRXLF},
+        [Tic.STATEWORKRG]  = {rotate = CSprite.ROTATE270, flip = Tic.DIRXRG},
+        [Tic.STATEFLOORLF] = {rotate = CSprite.ROTATE270, flip = Tic.DIRXLF},
+        [Tic.STATEFLOORRG] = {rotate = CSprite.ROTATE270, flip = Tic.DIRXRG},
+    }
+    self.handlesoffsets = {
+        [CSprite.ROTATE000] = {handlex = 3, handley = 3},
+        [CSprite.ROTATE090] = {handlex = 4, handley = 3},
+        [CSprite.ROTATE180] = {handlex = 4, handley = 4},
+        [CSprite.ROTATE270] = {handlex = 3, handley = 4},
+    }
+    self.palettefg = {[CObject.BORDER] = CObject.COLORIRONFG, [CObject.INSIDE] = CObject.COLORWOODFG, [CObject.EFFECT] = CObject.COLORWOODFG}
+    self.palettebg = {[CObject.BORDER] = CObject.COLORIRONBG, [CObject.INSIDE] = CObject.COLORWOODBG, [CObject.EFFECT] = CObject.COLORWOODBG}
+    self:argt(_argt) -- override if any
+end
+
+CWeaponTeeShield = CWeaponShield:extend() -- TeeShield weapons
+Classic.KINDSHLDT = "T.Ecu" -- TeeShield kind
+Classic.NAMESHLDT = "T.Ecu" -- TeeShield name
+function CWeaponTeeShield:new(_argt)
+    CWeaponTeeShield.super.new(self, _argt)
+    self.kind = Classic.KINDSHLDT
+    self.name = Classic.NAMESHLDT
+    self.sprite  = CSpriteFG.WEAPONSHLDT
+    self:argt(_argt) -- override if any
+end
+
+CWeaponRoundShield = CWeaponShield:extend() -- RoundShield weapons
+Classic.KINDSHLDR= "R.Ecu" -- RoundShield kind
+Classic.NAMESHLDR= "R.Ecu" -- RoundShield name
+function CWeaponRoundShield:new(_argt)
+    CWeaponRoundShield.super.new(self, _argt)
+    self.kind = Classic.KINDSHLDR
+    self.name = Classic.NAMESHLDR
+    self.sprite  = CSpriteFG.WEAPONSHLDR
+    self:argt(_argt) -- override if any
+end
+
+
+--
+-- CWeaponFlask
+--
+CWeaponFlask = CWeapon:extend() -- Flask weapons
+Classic.KINDFLASK = "Flask" -- Flask kind
+Classic.NAMEFLASK = "Flask" -- Flask name
+function CWeaponFlask:new(_argt)
+    CWeaponFlask.super.new(self, _argt)
+    self.kind = Classic.KINDFLASK
+    self.name = Classic.NAMEFLASK
+    self.sprite  = CSpriteFG.WEAPONFLASK
+    self.stateshandles = {
+        [Tic.STATEIDLELF]  = {rotate = CSprite.ROTATE000, flip = Tic.DIRXLF},
+        [Tic.STATEIDLERG]  = {rotate = CSprite.ROTATE000, flip = Tic.DIRXRG},
+        [Tic.STATEMOVELF]  = {rotate = CSprite.ROTATE270, flip = Tic.DIRXLF},
+        [Tic.STATEMOVERG]  = {rotate = CSprite.ROTATE270, flip = Tic.DIRXRG},
+        [Tic.STATEWORKLF]  = {rotate = CSprite.ROTATE270, flip = Tic.DIRXLF},
+        [Tic.STATEWORKRG]  = {rotate = CSprite.ROTATE270, flip = Tic.DIRXRG},
+        [Tic.STATEFLOORLF] = {rotate = CSprite.ROTATE270, flip = Tic.DIRXLF},
+        [Tic.STATEFLOORRG] = {rotate = CSprite.ROTATE270, flip = Tic.DIRXRG},
+    }
+    self.handlesoffsets = {
+        [CSprite.ROTATE000] = {handlex = 3, handley = 1},
+        [CSprite.ROTATE090] = {handlex = 6, handley = 3},
+        [CSprite.ROTATE180] = {handlex = 4, handley = 6},
+        [CSprite.ROTATE270] = {handlex = 1, handley = 4},
+    }
+    self.palettefg = {[CObject.BORDER] = CObject.COLORFLASKG, [CObject.INSIDE] = CObject.COLORWOODFG, [CObject.EFFECT] = CObject.COLORWOODFG}
+    self.palettebg = {[CObject.BORDER] = CObject.COLORFLASKG, [CObject.INSIDE] = CObject.COLORWOODBG, [CObject.EFFECT] = CObject.COLORWOODBG}
+    self:argt(_argt) -- override if any
+end
+
+CWeaponSmallFlask = CWeaponFlask:extend() -- SmallFlask weapons
+Classic.KINDFLASS = "S.Oil" -- SmallFlask kind
+Classic.NAMEFLASS = "S.Oil" -- SmallFlask name
+function CWeaponSmallFlask:new(_argt)
+    CWeaponSmallFlask.super.new(self, _argt)
+    self.kind = Classic.KINDFLASS
+    self.name = Classic.NAMEFLASS
+    self.sprite  = CSpriteFG.WEAPONFLASS
+    self:argt(_argt) -- override if any
+end
+
+CWeaponMediumFlask = CWeaponFlask:extend() -- MediumFlask weapons
+Classic.KINDFLASM = "M.Oil" -- MediumFlask kind
+Classic.NAMEFLASM = "M.Oil" -- MediumFlask name
+function CWeaponMediumFlask:new(_argt)
+    CWeaponMediumFlask.super.new(self, _argt)
+    self.kind = Classic.KINDFLASM
+    self.name = Classic.NAMEFLASM
+    self.sprite  = CSpriteFG.WEAPONFLASM
     self:argt(_argt) -- override if any
 end
 
@@ -6697,19 +6808,21 @@ Wulfie = CPlayerWolfe{name = "Wulfie",
     itemhandlf = CWeaponSword{},
 }
 end
--- Wolfie = CPlayerWolfe{name = "Wolfie",
---     statphyact = 10,
---     statmenact = 10,
---     statpsyact = 10,
---     colorextra = Tic.COLORCYAN,
---     worldx = 0,
---     worldy = 30,
---     interactions = {10},
---     spottingdraw = true,
---     spottingpick = true,
---     itemhandrg = CWeaponRange{},
---     -- itemhandlf = CWeaponMelee{},
--- }
+if true then
+Wolfie = CPlayerWolfe{name = "Wolfie",
+    statphyact = 10,
+    statmenact = 10,
+    statpsyact = 10,
+    colorextra = Tic.COLORCYAN,
+    worldx = 0,
+    worldy = 30,
+    interactions = {10},
+    -- spottingdraw = true,
+    spottingpick = true,
+    itemhandrg = CWeaponRoundShield{},
+    itemhandlf = CWeaponTeeShield{},
+}
+end
 if true then
 Wilfie = CPlayerWolfe{name = "Wilfie",
     statphyact = 10,
@@ -6725,7 +6838,21 @@ Wilfie = CPlayerWolfe{name = "Wilfie",
     itemhandlf = CWeaponLongBow{},
 }
 end
--- Wulfie:randomWorldWindow()
+if true then
+Welfie = CPlayerWolfe{name = "Welfie",
+    statphyact = 10,
+    statmenact = 10,
+    statpsyact = 10,
+    colorextra = Tic.COLORORANGE,
+    worldx = 20,
+    worldy = 30,
+    interactions = {10},
+    -- spottingdraw = true,
+    spottingpick = true,
+    itemhandrg = CWeaponMediumFlask{},
+    itemhandlf = CWeaponSmallFlask{},
+}
+end
 
 if false then
 Oxboow = CPlayerGhost{name = "Oxboow",
