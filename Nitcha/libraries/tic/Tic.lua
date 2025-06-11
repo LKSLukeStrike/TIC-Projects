@@ -259,21 +259,16 @@ Tic.DIRSOFFSETS = { -- directions to x y offsets and dirs
     },
 }
 
+-- Draw Layers
+Tic.DRAWBG = "drawbg"
+Tic.DRAWFG = "drawfg"
+
+-- Stats
 Tic.STATSMIN  = 0 -- stats handling
 Tic.STATSMAX  = 10
 
-Tic.STRESSMIN = 0 -- stress handling
-Tic.STRESSMAX = 100
-
-Tic.WEAPONBANK = 448 -- weapons types
-Tic.WEAPONEMPTY = -1
-Tic.WEAPONMELEE = 0
-Tic.WEAPONRANGE = 1
-Tic.WEAPONMAGIC = 2
-Tic.WEAPONLIGHT = 3
-Tic.WEAPONALCHE = 4
-
-Tic.FREQUENCE0000 = 0000 -- frequences -- each 0 second
+-- Frequences
+Tic.FREQUENCE0000 = 0000 -- each 0 second
 Tic.FREQUENCE0030 = 0030 -- each 0.5 second
 Tic.FREQUENCE0060 = 0060 -- each 1 second
 Tic.FREQUENCE0090 = 0090 -- each 1.5 second
@@ -3011,13 +3006,12 @@ function CObjectHandable:new(_argt)
 end
 
 function CObjectHandable:handleOffsets(_state)
-    local _result = self.handlesoffsets[self.stateshandles[_state].rotate]
-    _result.rotate = self.stateshandles[_state].rotate
-    _result.flip   = self.stateshandles[_state].flip
-    _result.handlex = (_result.flip == Tic.DIRXLF)
+    local _result   = Tables:merge({}, self.handlesoffsets[self.stateshandles[_state].rotate])
+    _result.rotate  = self.stateshandles[_state].rotate
+    _result.flip    = self.stateshandles[_state].flip
+    _result.handlex = (_result.flip == Tic.DIRXLF) -- flip the handlex if any
         and _result.handlex
         or  Tic.SPRITESIZE - 1 - _result.handlex
-    Tic:logAppend("HX", X.._result.handlex)
     return _result
 end
 
@@ -3063,10 +3057,8 @@ function CWeaponMelee:new(_argt)
         [CSprite.ROTATE180] = {handlex = 4, handley = 2},
         [CSprite.ROTATE270] = {handlex = 5, handley = 4},
     }
-    -- self.palettefg = {[CObject.BORDER] = CObject.COLORIRONFG, [CObject.INSIDE] = CObject.COLORWOODFG, [CObject.EFFECT] = CObject.COLORWOODFG}
-    -- self.palettebg = {[CObject.BORDER] = CObject.COLORIRONBG, [CObject.INSIDE] = CObject.COLORWOODBG, [CObject.EFFECT] = CObject.COLORWOODBG}
-    self.palettefg = {[CObject.BORDER] = CObject.COLORWOODFG, [CObject.INSIDE] = CObject.COLORWOODFG, [CObject.EFFECT] = CObject.COLORWOODFG}
-    self.palettebg = {[CObject.BORDER] = CObject.COLORWOODBG, [CObject.INSIDE] = CObject.COLORWOODBG, [CObject.EFFECT] = CObject.COLORWOODBG}
+    self.palettefg = {[CObject.BORDER] = CObject.COLORIRONFG, [CObject.INSIDE] = CObject.COLORWOODFG, [CObject.EFFECT] = CObject.COLORWOODFG}
+    self.palettebg = {[CObject.BORDER] = CObject.COLORIRONBG, [CObject.INSIDE] = CObject.COLORWOODBG, [CObject.EFFECT] = CObject.COLORWOODBG}
     self:argt(_argt) -- override if any
 end
 
@@ -3772,78 +3764,46 @@ function CCharacter:drawStatus()
 end
 
 function CCharacter:drawHandBG()
-    if (self.dirx == Tic.DIRXLF) and (not self.itemhandrg) then return end -- nothing in rg hand
-    if (self.dirx == Tic.DIRXRG) and (not self.itemhandlf) then return end -- nothing in lf hand
-
-    local _handsoffsets = self:handsOffsets()
-    local _handoffsetx  = (self.dirx == Tic.DIRXLF)
-        and _handsoffsets.handrgx
-        or  _handsoffsets.handlfx
-    local _handoffsety  = (self.dirx == Tic.DIRXLF)
-        and _handsoffsets.handrgy
-        or  _handsoffsets.handlfy
-    
-    local _itemhand = (self.dirx == Tic.DIRXLF)
-        and self.itemhandrg
-        or  self.itemhandlf
-    local _handleoffsets = _itemhand:handleOffsets(_handsoffsets.state)
-    local _handoffsetx   = _handoffsetx - _handleoffsets.handlex
-    -- _handoffsetx = (self.dirx == Tic.DIRXLF)
-    --     and _handoffsetx
-    --     or  Tic.SPRITESIZE - 1 - _handoffsetx
-    local _handoffsety   = _handoffsety - _handleoffsets.handley
-    Tic:logAppend("BG", D..self.dirx, S..self.scale, X..(_handoffsetx), Y..(_handoffsety))
-    Tic:logAppend("BG", D..self.dirx, S..self.scale, X..(_handoffsetx * self.scale), Y..(_handoffsety * self.scale))
-
-    local _itemrotate    = _handleoffsets.rotate
-    local _itemflip      = _handleoffsets.flip
-
-    local _itempalette = Tables:merge(_itemhand.palettebg, {[Tic.COLORWHITE] = self.colorskin})
-
-    local _musprite = CSpriteFG() -- multi usage unique sprite
-    _musprite.sprite  = _itemhand.sprite
-    _musprite.screenx = self.screenx + (_handoffsetx * self.scale)
-    _musprite.screeny = self.screeny + (_handoffsety * self.scale)
-    _musprite.scale   = self.scale
-    _musprite.rotate  = _itemrotate
-    _musprite.flip    = _itemflip
-    _musprite.palette = _itempalette
-    _musprite:draw()
+    self:drawHand(Tic.DRAWBG)
 end
 
 function CCharacter:drawHandFG()
-    if (self.dirx == Tic.DIRXLF) and (not self.itemhandlf) then return end -- nothing in lf hand
-    if (self.dirx == Tic.DIRXRG) and (not self.itemhandrg) then return end -- nothing in rg hand
+    self:drawHand(Tic.DRAWFG)
+end
 
-    local _handsoffsets = self:handsOffsets()
-    local _handoffsetx  = (self.dirx == Tic.DIRXLF)
-        and _handsoffsets.handlfx
-        or  _handsoffsets.handrgx
-    local _handoffsety  = (self.dirx == Tic.DIRXLF)
-        and _handsoffsets.handlfy
-        or  _handsoffsets.handrgy
-    
-    local _itemhand = (self.dirx == Tic.DIRXLF)
-        and self.itemhandlf
-        or  self.itemhandrg
-    local _handleoffsets = _itemhand:handleOffsets(_handsoffsets.state)
-    local _handoffsetx   = _handoffsetx - _handleoffsets.handlex
-    -- _handoffsetx = (self.dirx == Tic.DIRXLF)
-    --     and _handoffsetx
-        -- or  Tic.SPRITESIZE - 1 - _handoffsetx
-    local _handoffsety   = _handoffsety - _handleoffsets.handley
-    Tic:logAppend("BG", D..self.dirx, S..self.scale, X..(_handoffsetx), Y..(_handoffsety))
-    Tic:logAppend("FG", D..self.dirx, S..self.scale, X..(_handoffsetx * self.scale), Y..(_handoffsety * self.scale))
+function CCharacter:drawHand(_bgfg)
+    local _item = nil  -- determine the corresponding item if any
+    if _bgfg == Tic.DRAWBG and self.dirx == Tic.DIRXLF then _item = self.itemhandrg end
+    if _bgfg == Tic.DRAWBG and self.dirx == Tic.DIRXRG then _item = self.itemhandlf end
+    if _bgfg == Tic.DRAWFG and self.dirx == Tic.DIRXLF then _item = self.itemhandlf end
+    if _bgfg == Tic.DRAWFG and self.dirx == Tic.DIRXRG then _item = self.itemhandrg end
+    if not _item then return end -- nothing in hand
 
-    local _itemrotate    = _handleoffsets.rotate
-    local _itemflip      = _handleoffsets.flip
+    local _handsoffsets = self:handsOffsets() -- determine the corresponding hand offsets
+    local _handx = nil
+    local _handy = nil
+    if _bgfg == Tic.DRAWBG and self.dirx == Tic.DIRXLF then _handx = _handsoffsets.handrgx ; _handy = _handsoffsets.handrgy end
+    if _bgfg == Tic.DRAWBG and self.dirx == Tic.DIRXRG then _handx = _handsoffsets.handlfx ; _handy = _handsoffsets.handlfy end
+    if _bgfg == Tic.DRAWFG and self.dirx == Tic.DIRXLF then _handx = _handsoffsets.handlfx ; _handy = _handsoffsets.handlfy end
+    if _bgfg == Tic.DRAWFG and self.dirx == Tic.DIRXRG then _handx = _handsoffsets.handrgx ; _handy = _handsoffsets.handrgy end
+   
+    local _handleoffsets = _item:handleOffsets(_handsoffsets.state) -- determine the item handle offsets
+    local _handlex     = _handleoffsets.handlex
+    local _handley     = _handleoffsets.handley
+    local _itemrotate  = _handleoffsets.rotate
+    local _itemflip    = _handleoffsets.flip
+    local _itempalette = (_bgfg == Tic.DRAWBG)
+        and Tables:merge(_item.palettebg, {[Tic.COLORWHITE] = self.colorskin})
+        or  Tables:merge(_item.palettefg, {[Tic.COLORWHITE] = self.colorskin})
 
-    local _itempalette = Tables:merge(_itemhand.palettefg, {[CObject.HANDLE] = self.colorskin})
+    local _handx   = _handx - _handlex -- adjust handle to hand
+    local _handy   = _handy - _handley
+
 
     local _musprite = CSpriteFG() -- multi usage unique sprite
-    _musprite.sprite  = _itemhand.sprite
-    _musprite.screenx = self.screenx + (_handoffsetx * self.scale)
-    _musprite.screeny = self.screeny + (_handoffsety * self.scale)
+    _musprite.sprite  = _item.sprite
+    _musprite.screenx = self.screenx + (_handx * self.scale)
+    _musprite.screeny = self.screeny + (_handy * self.scale)
     _musprite.scale   = self.scale
     _musprite.rotate  = _itemrotate
     _musprite.flip    = _itemflip
@@ -4909,7 +4869,6 @@ function CWindowPortrait:new(_argt)
     CWindowPortrait.super.new(self, _argt)
     self.screenw     = Tic.PLAYERPORTRAITWW -- sizes
     self.screenh     = Tic.PLAYERPORTRAITWH
-    self.cachestick  = 4 -- caches thickness
     self.colorground = Tic.COLORBIOMENIGHT
     self.drawborder  = false
     self:argt(_argt) -- override if any
@@ -4929,8 +4888,6 @@ function CWindowPortraitDrawable:new(_argt)
     CWindowPortraitDrawable.super.new(self, _argt)
     self.idle   = false --false -- idle portait or not
 	self.entity = nil -- override
-    self.drawframes = false
-    self.drawcaches = false
     self:argt(_argt) -- override if any
 end
 
@@ -4956,7 +4913,6 @@ function CWindowPortraitDrawable:drawInside() -- window portrait content for -- 
         self.entity.frame      = CSprite.FRAME00
         self.entity.animations = {}
     end
-    Tic:logAppend() ;Tic:logAppend("portrait", N..self.entity.name, D..self.entity.dirx, S..self.entity.scale)
     self.entity:draw()
     Tic.DRAWHITBOX = _ticdrawhitbox
     self.entity:load()
@@ -6292,8 +6248,8 @@ ScreenWorldLF:elementsDistributeV( -- md v line
     14
 )
 ScreenWorldLF:appendElements{
-    WindowSpottingInfos,
     WindowSpottingPortrait,
+    WindowSpottingInfos,
     ButtonSpottingDraw,
     ButtonSpottingLock,
     ButtonSpottingPick,
@@ -6380,8 +6336,8 @@ ScreenWorldRG:elementsDistributeV(
         (WindowPlayerInfos.screenh - CScreen:elementsTotalH({ButtonPlayerWork, ButtonPlayerSleep})) // 2)
 )
 ScreenWorldRG:appendElements{
-    WindowPlayerInfos,
     WindowPlayerPortrait,
+    WindowPlayerInfos,
     WindowPlayerStats,
     WindowPlayerState,
     ButtonPlayerPrev,
@@ -6737,8 +6693,8 @@ Wulfie = CPlayerWolfe{name = "Wulfie",
     interactions = {10},
     -- spottingdraw = true,
     spottingpick = true,
-    itemhandrg = CWeaponSword{},
-    -- itemhandlf = CWeaponHammer{},
+    itemhandrg = CWeaponHammer{},
+    itemhandlf = CWeaponSword{},
 }
 end
 -- Wolfie = CPlayerWolfe{name = "Wolfie",
@@ -6754,7 +6710,7 @@ end
 --     itemhandrg = CWeaponRange{},
 --     -- itemhandlf = CWeaponMelee{},
 -- }
-if false then
+if true then
 Wilfie = CPlayerWolfe{name = "Wilfie",
     statphyact = 10,
     statmenact = 10,
@@ -6765,8 +6721,8 @@ Wilfie = CPlayerWolfe{name = "Wilfie",
     interactions = {10},
     -- spottingdraw = true,
     spottingpick = true,
-    itemhandrg = CWeaponCrossBow{name = "bill"},
-    itemhandlf = CWeaponCrossBow{name = "bull"},
+    itemhandrg = CWeaponCrossBow{},
+    itemhandlf = CWeaponLongBow{},
 }
 end
 -- Wulfie:randomWorldWindow()
@@ -7001,7 +6957,7 @@ function Tic:draw()
     -- SpriteSFX:draw()
     -- SpriteHTG:draw()
     -- SpriteBIS:draw()
-    SpriteWeapon:draw()
+    -- SpriteWeapon:draw()
 
     Tic:tick() -- [!] required in the draw function
     end
