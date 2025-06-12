@@ -348,11 +348,13 @@ Tic.FUNCTIONTOGGLEVIEW       = function() Tic:viewToggleDraw() end
 Tic.FUNCTIONTOGGLEMIND       = function() Tic:mindToggleDraw() end
 Tic.FUNCTIONTOGGLEMOVE       = function() Tic:moveToggleDraw() end
 Tic.FUNCTIONSCALENEXT        = function() Tic:scaleNext() end
+Tic.FUNCTIONSCREENPREV       = function() Tic:screenPrev() end
 Tic.FUNCTIONSCREENNEXT       = function() Tic:screenNext() end
 
 -- Keys to Functions -- per screen
 Tic.KEYSFUNCTIONSINTRO = {
-    [Tic.KEY_ANY]          = Tic.FUNCTIONSCREENNEXT,
+    [Tic.KEY_NUMPADMINUS]  = Tic.FUNCTIONSCREENPREV,
+    [Tic.KEY_NUMPADPLUS]   = Tic.FUNCTIONSCREENNEXT,
 }
 Tic.KEYSFUNCTIONSWORLD = {
     [Tic.KEY_LEFT]         = Tic.FUNCTIONPLAYERPREV, -- cycle actual player
@@ -384,7 +386,8 @@ Tic.KEYSFUNCTIONSWORLD = {
     [Tic.KEY_X]            = Tic.FUNCTIONTOGGLEMOVE,
     [Tic.KEY_Y]            = Tic.FUNCTIONSTATPSYACT,
     [Tic.KEY_Z]            = Tic.FUNCTIONSCALENEXT,
-    [Tic.KEY_SPACE]        = Tic.FUNCTIONSCREENNEXT,
+    [Tic.KEY_NUMPADMINUS]  = Tic.FUNCTIONSCREENPREV,
+    [Tic.KEY_NUMPADPLUS]   = Tic.FUNCTIONSCREENNEXT,
 }
 
 
@@ -4649,7 +4652,7 @@ function CElement:new(_argt)
     self.marginrg    = 0
     self.marginup    = 0
     self.margindw    = 0
-    self.elements    = {} -- sub elements if any
+    self.elements    = {}   -- sub elements if any
     self.behaviour   = nil  -- behaviour function if any
     self.display     = true -- display or not ?
     self.drawground  = true -- draw beheviors
@@ -4678,6 +4681,9 @@ function CElement:draw() -- element drawing
     if self.drawcaches then self:drawCaches() end
     if self.drawborder then self:drawBorder() end
     if self.drawframes then self:drawFrames() end
+    for _, _element in ipairs(self.elements) do
+        _element:draw()
+    end
 end
 
 function CElement:drawGround() -- element ground
@@ -4886,8 +4892,12 @@ end
 -- CWindowScreen
 --
 CWindowScreen = CWindow:extend() -- window screen
+Classic.KINDWINDOWSCREEN = "WindowScreen" -- Window kind
+Classic.NAMEWINDOWSCREEN = "WindowScreen" -- Window name
 function CWindowScreen:new(_argt)
     CWindowScreen.super.new(self, _argt)
+    self.kind = Classic.KINDWINDOWSCREEN
+    self.name = Classic.NAMEWINDOWSCREEN
     self.drawcaches = false
     self.drawframes = false
     self:argt(_argt) -- override if any
@@ -4898,8 +4908,12 @@ end
 -- CWindowInfos
 --
 CWindowInfos = CWindow:extend() -- window infos
+Classic.KINDWINDOWINFOS = "WindowInfos" -- Window kind
+Classic.NAMEWINDOWINFOS = "WindowInfos" -- Window name
 function CWindowInfos:new(_argt)
     CWindowInfos.super.new(self, _argt)
+    self.kind = Classic.KINDWINDOWINFOS
+    self.name = Classic.NAMEWINDOWINFOS
     self.drawcaches  = false
     self.drawborder  = false
     self.colorground = Tic.COLORBIOMENIGHT
@@ -4939,8 +4953,8 @@ end
 
 function CWindowInfosEntity:drawInside() -- window infos content for entities
     if not self.entity then return end -- nothing to draw
-    local _name = CText{text = self.entity.name, case = Names.CASEFIRST, shadow = true, marginup = 1}
-    local _kind = CText{text = self.entity.kind, case = Names.CASEFIRST, shadow = true, marginup = 2}
+    local _name = CText{text = self.entity.name, case = Names.CASECAMEL, shadow = true, marginup = 1}
+    local _kind = CText{text = self.entity.kind, case = Names.CASECAMEL, shadow = true, marginup = 2}
     self.elements = {_name, _kind}
     CWindowInfosEntity.super.drawInside(self)
 end
@@ -5178,8 +5192,8 @@ end
 
 function CWindowPlayerState:drawInside() -- window state content for player
     if not self.entity then return end -- nothing to draw
-    local _posture = CText{text = self.entity:postureGet(), case = Names.CASEFIRST, shadow = true, marginup = 1}
-    local _status  = CText{text = self.entity:statusGet(), case = Names.CASEFIRST, shadow = true, marginup = 2}
+    local _posture = CText{text = self.entity:postureGet(), case = Names.CASECAMEL, shadow = true, marginup = 1}
+    local _status  = CText{text = self.entity:statusGet(), case = Names.CASECAMEL, shadow = true, marginup = 2}
     self.elements = {_posture, _status}
     CWindowPlayerState.super.drawInside(self)
 end
@@ -5404,7 +5418,8 @@ function CButton:new(_argt)
 	self.scrollx       = nil   -- function to trigger on scroll x
 	self.scrolly       = nil   -- function to trigger on scroll y
 	self.behaviour     = CButton.BEHAVIOUR  -- function to trigger at first
-    self.hovertext     = nil   -- hover CText if any
+    self.hovertextlf   = nil   -- hover CText for clicklf if any
+    self.hovertextrg   = nil   -- hover CText for clickrg if any
 	self.rounded       = false -- rounded border and frames ?
     self.drawground    = true  -- draw beheviors
     self.drawguides    = false
@@ -5424,7 +5439,8 @@ end
 
 function CButton:draw() -- button drawing
     CButton.super.draw(self)
-    if self.hovered and (self.hovertext and self.hovertext:is(CText)) then self:drawHovertext() end
+    if self.hovered and (self.hovertextlf and self.hovertextlf:is(CText)) then self:drawHovertextLF() end
+    if self.hovered and (self.hovertextrg and self.hovertextrg:is(CText)) then self:drawHovertextRG() end
 end
 
 function CButton:drawGround()
@@ -5460,27 +5476,50 @@ function CButton:drawBorder()
     self:load()
 end
 
-function CButton:drawHovertext()
+function CButton:drawHovertextLF()
     if self.colorhoverground then
         rect(
-            self.hovertext.screenx -1,
-            self.hovertext.screeny,
-            self.hovertext.screenw + 1,
-            self.hovertext.screenh,
+            self.hovertextlf.screenx -1,
+            self.hovertextlf.screeny,
+            self.hovertextlf.screenw + 1,
+            self.hovertextlf.screenh,
             self.colorhoverground
         )
         rect(
-            self.hovertext.screenx,
-            self.hovertext.screeny - 1,
-            self.hovertext.screenw - 1,
-            self.hovertext.screenh + 2,
+            self.hovertextlf.screenx,
+            self.hovertextlf.screeny - 1,
+            self.hovertextlf.screenw - 1,
+            self.hovertextlf.screenh + 2,
             self.colorhoverground
         )
     end
-    self.hovertext.colorinside = self.colorground
-    self.hovertext.screenx = self.screenx - ((self.hovertext.screenw - self.screenw) // 2) + 1
-    self.hovertext.screeny = self.screeny - self.hovertext.screenh
-    self.hovertext:draw()
+    self.hovertextlf.colorinside = self.colorground
+    self.hovertextlf.screenx = self.screenx - ((self.hovertextlf.screenw - self.screenw) // 2) + 1
+    self.hovertextlf.screeny = self.screeny - self.hovertextlf.screenh
+    self.hovertextlf:draw()
+end
+
+function CButton:drawHovertextRG()
+    if self.colorhoverground then
+        rect(
+            self.hovertextrg.screenx -1,
+            self.hovertextrg.screeny,
+            self.hovertextrg.screenw + 1,
+            self.hovertextrg.screenh,
+            self.colorhoverground
+        )
+        rect(
+            self.hovertextrg.screenx,
+            self.hovertextrg.screeny - 1,
+            self.hovertextrg.screenw - 1,
+            self.hovertextrg.screenh + 2,
+            self.colorhoverground
+        )
+    end
+    self.hovertextrg.colorinside = self.colorground
+    self.hovertextrg.screenx = self.screenx - ((self.hovertextrg.screenw - self.screenw) // 2) + 1
+    self.hovertextrg.screeny = self.screeny - self.hovertextrg.screenh
+    self.hovertextrg:draw()
 end
 
 function CButton:functionsDefined() -- defined functions of a button
@@ -5802,7 +5841,7 @@ function CButtonPlayerPrev:new(_argt)
     CButtonPlayerPrev.super.new(self, _argt)
 	self.behaviour      = IButtonPlayerChange.BEHAVIOUR  -- function to trigger at first
     self.clicklf        = Tic.FUNCTIONPLAYERPREV
-    self.hovertext      = CText{text = "Prev"}
+    self.hovertextlf    = CText{text = "Prev"}
     self:argt(_argt) -- override if any
 end
 
@@ -5815,7 +5854,7 @@ function CButtonPlayerNext:new(_argt)
     CButtonPlayerNext.super.new(self, _argt)
 	self.behaviour      = IButtonPlayerChange.BEHAVIOUR  -- function to trigger at first
     self.clicklf        = Tic.FUNCTIONPLAYERNEXT
-    self.hovertext      = CText{text = "Next"}
+    self.hovertextlf    = CText{text = "Next"}
     self:argt(_argt) -- override if any
 end
 
@@ -5830,7 +5869,7 @@ function CButtonPlayerPick:new(_argt)
 	self.sprite.sprite  = CSpriteBG.SIGNPLAYER
 	self.behaviour      = IButtonPlayerChange.BEHAVIOUR  -- function to trigger at first
     self.clicklf        = function() Tic:logAppend("Pick") end
-    self.hovertext      = CText{text = "Pick"}
+    self.hovertextlf    = CText{text = "Pick"}
     self:argt(_argt) -- override if any
 end
 
@@ -5854,7 +5893,7 @@ function CButtonPlayerStand:new(_argt)
 	self.sprite.sprite  = CSpriteBG.SIGNSTAIDL
 	self.behaviour      = CButtonPlayerStand.BEHAVIOUR  -- function to trigger at first
     self.clicklf        = function() Tic:toggleKneel() end
-    self.hovertext      = CText{text = "Stand"}
+    self.hovertextlf    = CText{text = "Stand"}
     self:argt(_argt) -- override if any
 end
 
@@ -5878,7 +5917,7 @@ function CButtonPlayerKneel:new(_argt)
 	self.sprite.sprite  = CSpriteBG.SIGNKNEIDL
 	self.behaviour      = CButtonPlayerKneel.BEHAVIOUR  -- function to trigger at first
     self.clicklf        = function() Tic:toggleKneel() end
-    self.hovertext      = CText{text = "Kneel"}
+    self.hovertextlf    = CText{text = "Kneel"}
     self:argt(_argt) -- override if any
 end
 
@@ -5899,7 +5938,7 @@ function CButtonPlayerWork:new(_argt)
 	self.sprite.sprite  = CSpriteBG.SIGNDOWORK
 	self.behaviour      = CButtonPlayerWork.BEHAVIOUR  -- function to trigger at first
     self.clicklf        = function() Tic:toggleWork() end
-    self.hovertext      = CText{text = "Work"}
+    self.hovertextlf    = CText{text = "Work"}
     self:argt(_argt) -- override if any
 end
 
@@ -5920,7 +5959,7 @@ function CButtonPlayerSleep:new(_argt)
 	self.sprite.sprite  = CSpriteBG.SIGNDOSLEE
 	self.behaviour      = CButtonPlayerSleep.BEHAVIOUR  -- function to trigger at first
     self.clicklf        = function() Tic:toggleSleep() end
-    self.hovertext      = CText{text = "Sleep"}
+    self.hovertextlf    = CText{text = "Sleep"}
     self:argt(_argt) -- override if any
 end
 
@@ -5939,7 +5978,7 @@ function CButtonSpottingDraw:new(_argt)
 	self.sprite.sprite = CSpriteBG.SIGNSPOTIT
 	self.behaviour     = CButtonSpottingDraw.BEHAVIOUR  -- function to trigger at first
     self.clicklf       = function() Tic:spottingToggleDraw() end
-    self.hovertext     = CText{text = "Spot"}
+    self.hovertextlf   = CText{text = "Spot"}
     self:argt(_argt) -- override if any
 end
 
@@ -5958,7 +5997,7 @@ function CButtonSpottingLock:new(_argt)
 	self.sprite.sprite = CSpriteBG.SIGNLOCKIT
 	self.behaviour     = CButtonSpottingLock.BEHAVIOUR  -- function to trigger at first
     self.clicklf       = function() Tic:spottingToggleLock() end
-    self.hovertext     = CText{text = "Lock"}
+    self.hovertextlf   = CText{text = "Lock"}
     self:argt(_argt) -- override if any
 end
 
@@ -5977,7 +6016,7 @@ function CButtonSpottingPick:new(_argt)
 	self.sprite.sprite = CSpriteBG.SIGNPICKIT
 	self.behaviour     = CButtonSpottingPick.BEHAVIOUR  -- function to trigger at first
     self.clicklf       = function() Tic:spottingTogglePick() end
-    self.hovertext     = CText{text = "Pick"}
+    self.hovertextlf   = CText{text = "Pick"}
     self:argt(_argt) -- override if any
 end
 
@@ -6309,9 +6348,136 @@ end
 --
 -- INTERFACE -- order is important !
 --
+
+if true then
+_function = function(_argt) -- FIXME axecute functions with self
+    _argt = _argt or {}
+    local _text = _argt.text or "Plop"
+    Tic:logAppend(_text)
+end
+
+ScreenIntro = CScreen{name = "Intro", keysfunctions = Tic.KEYSFUNCTIONSINTRO}
+
+Button1 = CButtonText{
+    -- name = "B1",
+    screenw = 16,
+    screenh = 8,
+    name = "plop 1",
+    hovertextlf = CText{text = "Plop"},
+    text = CText{text = "Op"},
+    clicklf = _function,
+    clickrg = function() _function{text = "Plip"} end,
+}
+Button2 = CButtonText{
+    -- name = "B2",
+    screenw = 8,
+    screenh = 8,
+    name = "plop 2",
+    hovertextlf = CText{text = "TWO"},
+    colorinside = Classic.NIL,
+    text = CText{text = "C", colorinside = Tic.COLORBLUEL},
+    -- drawborder = false,
+    -- drawground = false,
+    -- align = Tic.DIR270,
+    clicklf = _function,
+}
+Button3 = CButtonText{
+    -- name = "B3",
+    screenw = 16,
+    -- enabled = false,
+    name = "dummy",
+}
+Button4 = CButtonMenu{
+    -- name = "B4",
+    screenx = 10,
+    screeny = 40,
+    screenw = 28,
+    screenh = 10,
+    rounded = false,
+    text = CText{text = "Open", marginlf = 2},
+    clicklf = function() end,
+}
+Button5 = CButtonMenu{
+    -- name = "B5",
+    screenx = 10,
+    screeny = 49,
+    screenw = 28,
+    screenh = 10,
+    rounded = false,
+    text = CText{text = "Close", marginlf = 2},
+    clicklf = _function,
+    -- colorinside = Tic.COLORKEY
+}
+Button6 = CButton{
+    -- name = "B6",
+    screenx = 10,
+    screeny = 60,
+    rounded = false,
+}
+Button7 = CButton{
+    -- name = "B7",
+    screenx = 10,
+    screeny = 70,
+    screenw = 16,
+    rounded = false,
+    enabled = false,
+}
+Button11 = CButtonArrow315{}
+Button12 = CButtonArrow225{}
+Button13 = CButtonArrow135{}
+Button14 = CButtonArrow045{}
+Button15 = CButtonCenter{}
+
+Button16 = CButtonCenter{
+    screenx = 30,
+    screeny = 60,
+}
+Button17 = CButtonCenter{
+    screenx = 30,
+    screeny = 70,
+    enabled = false,
+}
+
+ScreenIntro:appendElements{
+    CWindowScreen{name = "Intro"},
+    CWindowInfos{
+        name = "PressKey",
+        -- screenx = 0,
+        -- screeny = 0,
+        drawground = false,
+        drawframes = false,
+        align = CWindowInfos.ALIGNMD,
+        elements = {CText{text = "Press"}, CText{text = "Key"}},
+    },
+    Button1,
+    -- Button2,
+    -- Button3,
+    -- Button4,
+    -- Button5,
+    -- Button6,
+    -- Button7,
+
+    -- Button11,
+    -- Button12,
+    -- Button13,
+    -- Button14,
+    -- Button15,
+
+    -- Button16,
+    -- Button17,
+    -- ButtonPlayerPrev,
+    -- ButtonPlayerNext,
+}
+
+Button15.clicklf = Tic.FUNCTIONSCREENNEXT
+-- Button7.clicklf = Tic.FUNCTIONSCREENNEXT
+
+ScreenIntro:elementsDistributeH({Button11, Button12, Button15, Button13, Button14}, 30, 10)
+ScreenIntro:elementsDistributeV({Button1, Button2, Button3}, 10, 10, 2)
+end
+
 if true then
 ScreenWorld = CScreen{name = "World", keysfunctions = Tic.KEYSFUNCTIONSWORLD}
-Tic:screenAppend(ScreenWorld)
 
 -- lf panel
 ScreenWorldLF = CScreen{}
@@ -6476,131 +6642,20 @@ ScreenWorld:appendElements{
 }
 end
 
-if false then
-_function = function(self) -- FIXME axecute functions with self
-    -- Tic:logAppend((self.name or "None"))
-    Tic:logAppend("Plop")
+if true then
+ScreenMenus = CScreen{name = "Intro", keysfunctions = Tic.KEYSFUNCTIONSINTRO}
+ScreenMenus:appendElements{
+    CWindowScreen{colorground = 7},
+}
 end
 
--- local ScreenIntro = CScreen{name = "Intro", keysfunctions = Tic.KEYSFUNCTIONSINTRO}
-ScreenIntro = CScreen{name = "Intro", keysfunctions = Tic.KEYSFUNCTIONSINTRO}
-Tic:screenAppend(ScreenIntro)
 
-Button1 = CButtonText{
-    -- screenx = 10,
-    -- screeny = 10,
-    screenw = 16,
-    screenh = 8,
-    name = "plop 1",
-    hovertext = CText{text = "One"},
-    text = CText{text = "Op"},
-    clicklf = _function,
-    clickrg = _function,
-}
-Button2 = CButtonText{
-    -- screenx = 10,
-    -- screeny = 20,
-    screenw = 8,
-    screenh = 8,
-    name = "plop 2",
-    hovertext = CText{text = "TWO"},
-    colorinside = Classic.NIL,
-    text = CText{text = "C", colorinside = Tic.COLORBLUEL},
-    -- drawborder = false,
-    -- drawground = false,
-    -- align = Tic.DIR270,
-    clicklf = _function,
-}
-Button3 = CButtonText{
-    -- screenx = 10,
-    -- screeny = 30,
-    screenw = 16,
-    -- enabled = false,
-    name = "dummy",
-}
-Button4 = CButtonMenu{
-    screenx = 10,
-    screeny = 40,
-    screenw = 28,
-    screenh = 10,
-    rounded = false,
-    text = CText{text = "Open", marginlf = 2},
-    clicklf = function() end,
-}
-Button5 = CButtonMenu{
-    screenx = 10,
-    screeny = 49,
-    screenw = 28,
-    screenh = 10,
-    rounded = false,
-    text = CText{text = "Close", marginlf = 2},
-    clicklf = _function,
-    -- colorinside = Tic.COLORKEY
-}
-Button6 = CButton{
-    screenx = 10,
-    screeny = 60,
-    rounded = false,
-}
-Button7 = CButton{
-    screenx = 10,
-    screeny = 70,
-    screenw = 16,
-    rounded = false,
-    enabled = false,
-}
-Button11 = CButtonArrow315{}
-Button12 = CButtonArrow225{}
-Button13 = CButtonArrow135{}
-Button14 = CButtonArrow045{}
-Button15 = CButtonCenter{}
+-- SCREENS
+-- if true then Tic:screenAppend(ScreenWorld) end
+if true then Tic:screenAppend(ScreenIntro) end
+-- if true then Tic:screenAppend(ScreenMenus) end
 
-Button16 = CButtonCenter{
-    screenx = 30,
-    screeny = 60,
-}
-Button17 = CButtonCenter{
-    screenx = 30,
-    screeny = 70,
-    enabled = false,
-}
 
-ScreenIntro:appendElements{
-    CWindowScreen(),
-    CWindowInfos{
-        screenx = 107,
-        screeny = 60,
-        drawground = false,
-        drawframes = false,
-        align = CWindowInfos.ALIGNMD,
-        infos = {"Press", "Key",},
-    },
-    Button1,
-    Button2,
-    Button3,
-    Button4,
-    Button5,
-    Button6,
-    Button7,
-
-    Button11,
-    Button12,
-    Button13,
-    Button14,
-    Button15,
-
-    Button16,
-    Button17,
-    ButtonPlayerPrev,
-    ButtonPlayerNext,
-}
-
-Button15.clicklf = Tic.FUNCTIONSCREENNEXT
--- Button7.clicklf = Tic.FUNCTIONSCREENNEXT
-
-ScreenIntro:elementsDistributeH({Button11, Button12, Button15, Button13, Button14}, 30, 10)
-ScreenIntro:elementsDistributeV({Button1, Button2, Button3}, 10, 10, 2)
-end
 
 -- trace(print("hello"))
 Text01 = CText{screenx = 65, screeny = 30, text = "cozy world", fixed = false, small = false, shadow = true, case = Names.CASECAMEL, marginlf = 2}
