@@ -5518,7 +5518,7 @@ function CButton:drawHovertextRG()
     end
     self.hovertextrg.colorinside = self.colorground
     self.hovertextrg.screenx = self.screenx - ((self.hovertextrg.screenw - self.screenw) // 2) + 1
-    self.hovertextrg.screeny = self.screeny - self.hovertextrg.screenh
+    self.hovertextrg.screeny = self.screeny - self.hovertextrg.screenh + self.screeny + self.screenh - 4
     self.hovertextrg:draw()
 end
 
@@ -6364,6 +6364,7 @@ Button1 = CButtonText{
     screenh = 8,
     name = "plop 1",
     hovertextlf = CText{text = "Plop"},
+    hovertextrg = CText{text = "Plip"},
     text = CText{text = "Op"},
     clicklf = _function,
     clickrg = function() _function{text = "Plip"} end,
