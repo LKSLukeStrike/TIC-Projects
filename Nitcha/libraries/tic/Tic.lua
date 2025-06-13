@@ -4905,6 +4905,20 @@ end
 
 
 --
+-- CWindowMenu
+--
+CWindowMenu = CWindowScreen:extend() -- window menu
+Classic.KINDWINDOWMENU = "WindowMenu" -- Window kind
+Classic.NAMEWINDOWMENU = "WindowMenu" -- Window name
+function CWindowMenu:new(_argt)
+    CWindowMenu.super.new(self, _argt)
+    self.kind = Classic.KINDWINDOWMENU
+    self.name = Classic.NAMEWINDOWMENU
+    self:argt(_argt) -- override if any
+end
+
+
+--
 -- CWindowInfos
 --
 CWindowInfos = CWindow:extend() -- window infos
@@ -6387,7 +6401,8 @@ Button2 = CButtonText{
 }
 Button3 = CButtonText{
     -- name = "B3",
-    screenw = 16,
+    screenw = 24,
+    text = CText{text = "Menu"},
     -- enabled = false,
     name = "dummy",
 }
@@ -6446,16 +6461,14 @@ ScreenIntro:appendElements{
     CWindowScreen{name = "Intro"},
     CWindowInfos{
         name = "PressKey",
-        -- screenx = 0,
-        -- screeny = 0,
         drawground = false,
         drawframes = false,
         align = CWindowInfos.ALIGNMD,
-        elements = {CText{text = "Press"}, CText{text = "Key"}},
+        elements = {CText{text = "Press"}, CText{text = "a"}, CText{text = "Key"}},
     },
     Button1,
     Button2,
-    -- Button3,
+    Button3,
     -- Button4,
     -- Button5,
     -- Button6,
@@ -6649,7 +6662,7 @@ end
 if true then
 ScreenMenus = CScreen{name = "Intro", keysfunctions = Tic.KEYSFUNCTIONSINTRO}
 ScreenMenus:appendElements{
-    CWindowScreen{colorground = 7},
+    CWindowMenu{colorground = 7, screenx = 10, screeny = 10, screenw = 24, screenh = 40},
 }
 end
 
@@ -6657,7 +6670,7 @@ end
 -- SCREENS
 -- if true then Tic:screenAppend(ScreenWorld) end
 if true then Tic:screenAppend(ScreenIntro) end
--- if true then Tic:screenAppend(ScreenMenus) end
+if true then Tic:screenAppend(ScreenMenus) end
 
 
 
