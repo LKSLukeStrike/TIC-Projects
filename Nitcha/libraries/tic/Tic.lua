@@ -6236,9 +6236,12 @@ function CScreen:drawWindows() -- draw ordered
 end
 
 function CScreen:drawButtons() -- draw ordered
+    local _buttonhovered = nil
     for _, _button in ipairs(self.buttons or {}) do
         _button:draw()
+        if _button.hovered then _buttonhovered = _button end -- record hovered button
     end
+    if _buttonhovered then _buttonhovered:draw() end -- redraw hovered button in front (for hovertext) if any
 end
 
 function CScreen:appendWindow(_window) -- append window -- unique
@@ -6451,7 +6454,7 @@ ScreenIntro:appendElements{
         elements = {CText{text = "Press"}, CText{text = "Key"}},
     },
     Button1,
-    -- Button2,
+    Button2,
     -- Button3,
     -- Button4,
     -- Button5,
