@@ -4652,6 +4652,7 @@ function CElement:new(_argt)
     self.marginrg    = 0
     self.marginup    = 0
     self.margindw    = 0
+    self.separatory  = 0    -- separator between elements in px if any
     self.elements    = {}   -- sub elements if any
     self.behaviour   = nil  -- behaviour function if any
     self.display     = true -- display or not ?
@@ -4915,6 +4916,18 @@ function CWindowMenu:new(_argt)
     self.kind = Classic.KINDWINDOWMENU
     self.name = Classic.NAMEWINDOWMENU
     self:argt(_argt) -- override if any
+    self:adjustWH()
+end
+
+function CWindowMenu:adjustWH()
+    local _screenw = 0
+    local _screenh = 0
+    for _, _element in ipairs(self.elements or {}) do
+        _screenw = Nums:max(_screenw, _element.screenw)
+        _screenh = _screenh + _element.screenh 
+    end
+    self.screenw = self.marginlf + self.marginrg + _screenw
+    self.screenh = self.marginup + self.margindw + _screenh
 end
 
 
@@ -6463,7 +6476,6 @@ ScreenIntro:appendElements{
         name = "PressKey",
         drawground = false,
         drawframes = false,
-        align = CWindowInfos.ALIGNMD,
         elements = {CText{text = "Press"}, CText{text = "a"}, CText{text = "Key"}},
     },
     Button1,
@@ -6662,7 +6674,11 @@ end
 if true then
 ScreenMenus = CScreen{name = "Intro", keysfunctions = Tic.KEYSFUNCTIONSINTRO}
 ScreenMenus:appendElements{
-    CWindowMenu{colorground = 7, screenx = 10, screeny = 10, screenw = 24, screenh = 40},
+    CWindowMenu{
+        colorground = Tic.COLORRED, screenx = 50, screeny = 10, screenw = 24, screenh = 40,
+        marginup = 2, margindw = 2, marginlf = 2, marginrg = 2,
+        elements = {Button1, Button2, Button3},
+    },
 }
 end
 
