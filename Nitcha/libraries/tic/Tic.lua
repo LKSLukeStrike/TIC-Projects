@@ -4652,11 +4652,13 @@ function CElement:new(_argt)
     self.marginrg    = 0
     self.marginup    = 0
     self.margindw    = 0
-    self.separatory  = 0    -- separator between elements in px if any
-    self.elements    = {}   -- sub elements if any
-    self.behaviour   = nil  -- behaviour function if any
-    self.display     = true -- display or not ?
-    self.drawground  = true -- draw beheviors
+    self.separatorx  = 0     -- separator between elements in px if any
+    self.separatory  = 0     -- separator between elements in px if any
+    self.stretch     = false -- stretch elements ?
+    self.elements    = {}    -- sub elements if any
+    self.behaviour   = nil   -- behaviour function if any
+    self.display     = true  -- display or not ?
+    self.drawground  = true  -- draw beheviors
     self.drawguides  = true
     self.drawinside  = true
     self.drawcaches  = true
@@ -4674,8 +4676,7 @@ function CElement:new(_argt)
 end
 
 function CElement:draw() -- element drawing
-    if type(self.behaviour) == "function" then self:behaviour() end -- execute behaviour function first if any
-    if not self.display then return end -- nothing to draw
+    if not self:behave() then return end -- nothing to draw
     if self.drawground then self:drawGround() end
     if self.drawguides then self:drawGuides() end
     if self.drawinside then self:drawInside() end
@@ -4685,6 +4686,15 @@ function CElement:draw() -- element drawing
     for _, _element in ipairs(self.elements) do
         _element:draw()
     end
+end
+
+function CElement:sizeWH() -- total WH sizes including margins
+    return {sizew = self.marginlf + self.screenw + self.marginrg, sizeh = self.marginup + self.screenh + self.margindw}
+end
+
+function CElement:behave() -- execute the behaviour if any
+    if type(self.behaviour) == "function" then self:behaviour() end
+    return self.display -- display ?
 end
 
 function CElement:drawGround() -- element ground
@@ -4919,15 +4929,49 @@ function CWindowMenu:new(_argt)
     self:adjustWH()
 end
 
-function CWindowMenu:adjustWH()
-    local _screenw = 0
-    local _screenh = 0
+function CWindowMenu:sizeWH()
+    local _maxsizew = 0
+    local _maxsizeh = 0
+    local _totsizeh = 0
     for _, _element in ipairs(self.elements or {}) do
-        _screenw = Nums:max(_screenw, _element.screenw)
-        _screenh = _screenh + _element.screenh 
+        if _element:behave() then -- take element in account ?
+            local _sizewh = _element:sizeWH()
+            _maxsizew = Nums:max(_maxsizew, _sizewh.sizew)
+            _maxsizeh = Nums:max(_maxsizeh, _sizewh.sizeh)
+            _totsizeh =_totsizeh + _sizewh.sizeh
+        end
     end
-    self.screenw = self.marginlf + self.marginrg + _screenw
-    self.screenh = self.marginup + self.margindw + _screenh
+    local _size = Tables:size(self.elements)
+    _totsizeh = (self.stretch) and _maxsizeh * _size or _totsizeh
+    _totsizeh = (_size > 0) and _totsizeh + (self.separatory * (_size - 1)) or _totsizeh
+    return {size = _size, sizew = self.marginlf + _maxsizew + self.marginrg, sizeh = self.marginup + _totsizeh + self.margindw,
+        maxsizew = _maxsizew, maxsizeh = _maxsizeh, totsizeh = _totsizeh}
+end
+
+function CWindowMenu:adjustWH()
+    local _sizewh = self:sizeWH()
+    self.screenw = _sizewh.sizew
+    self.screenh = _sizewh.sizeh
+end
+
+function CWindowMenu:drawInside()
+    local _sizewh = self:sizeWH()
+    local _screenx = self.screenx + self.marginlf
+    local _screeny = self.screeny + self.marginup
+    for _, _element in ipairs(self.elements or {}) do
+        if _element:behave() then -- take element in account ?
+            _element:save{"screenx", "screeny", "screenw", "screenh"}
+            _element.screenx = _screenx
+            _element.screeny = _screeny
+            if self.stretch then
+                _element.screenw = _sizewh.maxsizew
+                _element.screenh = _sizewh.maxsizeh
+            end
+            _screeny = _screeny + _element.screenh + self.separatory
+            _element:draw()
+            _element:load()
+        end
+    end
 end
 
 
@@ -6676,7 +6720,9 @@ ScreenMenus = CScreen{name = "Intro", keysfunctions = Tic.KEYSFUNCTIONSINTRO}
 ScreenMenus:appendElements{
     CWindowMenu{
         colorground = Tic.COLORRED, screenx = 50, screeny = 10, screenw = 24, screenh = 40,
-        marginup = 2, margindw = 2, marginlf = 2, marginrg = 2,
+        -- marginup = 2, margindw = 2, marginlf = 2, marginrg = 2,
+        separatory = -1,
+        stretch = true,
         elements = {Button1, Button2, Button3},
     },
 }
