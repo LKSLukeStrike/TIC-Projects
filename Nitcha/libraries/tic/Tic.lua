@@ -4655,6 +4655,7 @@ function CElement:new(_argt)
     self.separatorx  = 0     -- separator between elements in px if any
     self.separatory  = 0     -- separator between elements in px if any
     self.stretch     = false -- stretch elements ?
+	self.rounded     = false -- rounded border and frames ?
     self.parent      = nil   -- parent element
     self.elements    = {}    -- sub elements if any
     self.behaviour   = nil   -- behaviour function if any
@@ -4699,7 +4700,12 @@ function CElement:behave() -- execute the behaviour if any
 end
 
 function CElement:drawGround() -- element ground
-    rect(self.screenx, self.screeny, self.screenw, self.screenh, self.colorground)
+    if self.rounded then
+        rect(self.screenx + 2, self.screeny + 1, self.screenw - 4, self.screenh - 2, self.colorground)
+        rect(self.screenx + 1, self.screeny + 2, self.screenw - 2, self.screenh - 4, self.colorground)
+    else
+        rect(self.screenx, self.screeny, self.screenw, self.screenh, self.colorground)
+    end
 end
 
 function CElement:drawGuides() -- element guides -- FIXME still not working -- use ratio w h ?
@@ -4769,13 +4775,24 @@ function CElement:drawCaches() -- element caches
 end
 
 function CElement:drawBorder() -- element single border
-    rectb(
-        self.screenx,
-        self.screeny,
-        self.screenw,
-        self.screenh,
-        self.colorborder
-    )
+    if self.rounded then
+        rect(self.screenx + 1, self.screeny, self.screenw - 2, 1, self.colorborder)
+        rect(self.screenx + 1, self.screeny + 1, 1, 1, self.colorborder)
+        rect(self.screenx +  self.screenw - 2, self.screeny + 1, 1, 1, self.colorborder)
+        rect(self.screenx, self.screeny + 1, 1, self.screenh - 2, self.colorborder)
+        rect(self.screenx + 1, self.screeny + self.screenh - 1, self.screenw - 2, 1, self.colorborder)
+        rect(self.screenx + 1, self.screeny + self.screenh - 2, 1, 1, self.colorborder)
+        rect(self.screenx +  self.screenw - 2, self.screeny + self.screenh - 2, 1, 1, self.colorborder)
+        rect(self.screenx + self.screenw - 1, self.screeny + 1, 1, self.screenh - 2, self.colorborder)
+    else
+        rectb(
+            self.screenx,
+            self.screeny,
+            self.screenw,
+            self.screenh,
+            self.colorborder
+        )
+    end
 end
 
 function CElement:drawFrames() -- element double frames
@@ -4934,18 +4951,19 @@ function CWindowMenu:sizeWH()
     local _maxsizew = 0
     local _maxsizeh = 0
     local _totsizeh = 0
+    local _count    = 0
     for _, _element in ipairs(self.elements or {}) do
-        if _element:behave() then -- take element in account ?
+        if _element:behave() and _element.enabled then -- take element in account ?
             local _sizewh = _element:sizeWH()
             _maxsizew = Nums:max(_maxsizew, _sizewh.sizew)
             _maxsizeh = Nums:max(_maxsizeh, _sizewh.sizeh)
             _totsizeh =_totsizeh + _sizewh.sizeh
+            _count    = _count + 1
         end
     end
-    local _size = Tables:size(self.elements)
-    _totsizeh = (self.stretch) and _maxsizeh * _size or _totsizeh
-    _totsizeh = (_size > 0) and _totsizeh + (self.separatory * (_size - 1)) or _totsizeh
-    return {size = _size, sizew = self.marginlf + _maxsizew + self.marginrg, sizeh = self.marginup + _totsizeh + self.margindw,
+    _totsizeh = (self.stretch) and _maxsizeh * _count or _totsizeh
+    _totsizeh = (_count > 0) and _totsizeh + (self.separatory * (_count - 1)) or _totsizeh
+    return {count = _count, sizew = self.marginlf + _maxsizew + self.marginrg, sizeh = self.marginup + _totsizeh + self.margindw,
         maxsizew = _maxsizew, maxsizeh = _maxsizeh, totsizeh = _totsizeh}
 end
 
@@ -4960,7 +4978,7 @@ function CWindowMenu:drawInside()
     local _screenx = self.screenx + self.marginlf
     local _screeny = self.screeny + self.marginup
     for _, _element in ipairs(self.elements or {}) do
-        if _element:behave() then -- take element in account ?
+        if _element:behave() and _element.enabled then -- take element in account ?
             _element:save{"screenx", "screeny", "screenw", "screenh"}
             _element.screenx = _screenx
             _element.screeny = _screeny
@@ -5492,7 +5510,6 @@ function CButton:new(_argt)
 	self.behaviour     = CButton.BEHAVIOUR  -- function to trigger at first
     self.hovertextlf   = nil   -- hover CText for clicklf if any
     self.hovertextrg   = nil   -- hover CText for clickrg if any
-	self.rounded       = false -- rounded border and frames ?
     self.drawground    = true  -- draw beheviors
     self.drawguides    = false
     self.drawinside    = true
@@ -5521,30 +5538,14 @@ function CButton:drawGround()
     self.colorground = (self.actived) and self.colorgroundactived  or self.colorground
     self.colorground = (self.enabled) and self.colorground or self.colorgrounddisabled
     self.colorborder = (self.enabled) and self.colorborder or self.colorborderdisabled
-    if not self.rounded then -- standard drawing
-        CButton.super.drawGround(self)
-    else
-        rect(self.screenx + 2, self.screeny + 1, self.screenw - 4, self.screenh - 2, self.colorground)
-        rect(self.screenx + 1, self.screeny + 2, self.screenw - 2, self.screenh - 4, self.colorground)
-    end
+    CButton.super.drawGround(self)
     self:load()
 end
 
 function CButton:drawBorder()
     self:save{"colorborder"}
     self.colorborder = (self.enabled) and self.colorborder or self.colorborderdisabled
-    if not self.rounded then -- standard drawing
-        CButton.super.drawBorder(self)
-    else
-        rect(self.screenx + 1, self.screeny, self.screenw - 2, 1, self.colorborder)
-        rect(self.screenx + 1, self.screeny + 1, 1, 1, self.colorborder)
-        rect(self.screenx +  self.screenw - 2, self.screeny + 1, 1, 1, self.colorborder)
-        rect(self.screenx, self.screeny + 1, 1, self.screenh - 2, self.colorborder)
-        rect(self.screenx + 1, self.screeny + self.screenh - 1, self.screenw - 2, 1, self.colorborder)
-        rect(self.screenx + 1, self.screeny + self.screenh - 2, 1, 1, self.colorborder)
-        rect(self.screenx +  self.screenw - 2, self.screeny + self.screenh - 2, 1, 1, self.colorborder)
-        rect(self.screenx + self.screenw - 1, self.screeny + 1, 1, self.screenh - 2, self.colorborder)
-    end
+    CButton.super.drawBorder(self)
     self:load()
 end
 
@@ -6722,9 +6723,9 @@ if true then
 ScreenMenus = CScreen{name = "Menus", keysfunctions = Tic.KEYSFUNCTIONSINTRO}
 ScreenMenus:appendElements{
     CWindowMenu{
-        colorground = Tic.COLORRED, screenx = 50, screeny = 10, screenw = 24, screenh = 40,
-        -- marginup = 2, margindw = 2, marginlf = 2, marginrg = 2,
-        separatory = -1,
+        colorground = Tic.COLORGREEND, screenx = 50, screeny = 10, screenw = 24, screenh = 40, rounded = true, drawframes = true,
+        marginup = 2, margindw = 2, marginlf = 2, marginrg = 2,
+        separatory = 0,
         stretch = true,
         elements = {Button1, Button2, Button3},
     },
