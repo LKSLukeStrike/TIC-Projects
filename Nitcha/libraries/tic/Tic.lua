@@ -4685,9 +4685,9 @@ function CElement:draw() -- element drawing
     if self.drawcaches then self:drawCaches() end
     if self.drawborder then self:drawBorder() end
     if self.drawframes then self:drawFrames() end
-    for _, _element in ipairs(self.elements) do
-        _element:draw()
-    end
+    -- for _, _element in ipairs(self.elements) do
+    --     _element:draw()
+    -- end
 end
 
 function CElement:sizeWH() -- total WH sizes including margins
@@ -4837,6 +4837,20 @@ function CElement:alignElementDirection(_element, _direction) -- align a sub ele
         _element.screeny = self.screeny + ((self.screenh - _element.screenh) // 2)
     else -- DW
         _element.screeny = self.screeny + (self.screenh - _element.screenh)
+    end
+end
+
+function CElement:appendElement(_element) -- append element -- unique
+    if not _element then return end -- mandarory
+    if not _element:is(CElement) then return end -- only elements
+    if Tables:valFind(self.elements, _element) then return end -- already exists
+    _element.parent = self -- record parent
+    Tables:valInsert(self.elements, _element, true)
+end
+
+function CElement:appendElements(_elements) -- append elements -- unique
+    for _, _element in ipairs(_elements or {}) do
+        self:appendElement(_element)
     end
 end
 
@@ -6322,38 +6336,27 @@ end
 function CScreen:appendWindow(_window) -- append window -- unique
     if not _window then return end -- mandarory
     if not _window:is(CWindow) then return end -- only windows
-    if Tables:valFind(self.windows, _window) then return end -- already exists
-    _window.screen = self -- record parent
     Tables:valInsert(self.windows, _window, true)
 end
 
 function CScreen:appendButton(_button) -- append button -- unique
     if not _button then return end -- mandarory
     if not _button:is(CButton) then return end -- only buttons
-    if Tables:valFind(self.buttons, _button) then return end -- already exists
-    _button.screen = self -- record parent
     Tables:valInsert(self.buttons, _button, true)
 end
 
 function CScreen:appendScreen(_screen) -- append screen -- unique
     if not _screen then return end -- mandarory
     if not _screen:is(CScreen) then return end -- only screens
-    if Tables:valFind(self.screens, _screen) then return end -- already exists
-    _screen.screen = self -- record parent
     Tables:valInsert(self.screens, _screen, true)
 end
 
 function CScreen:appendElement(_element) -- append element -- unique
     if not _element then return end -- mandarory
+    CScreen.super.appendElement(self, _element)
     self:appendWindow(_element) -- try all kinds
     self:appendButton(_element)
     self:appendScreen(_element)
-end
-
-function CScreen:appendElements(_elements) -- append elements -- unique
-    for _, _element in ipairs(_elements or {}) do
-        self:appendElement(_element)
-    end
 end
 
 function CScreen:elementsTotalW(_elements, _separator) -- total w of elements with optional separator
@@ -6735,7 +6738,7 @@ end
 
 -- SCREENS
 -- if true then Tic:screenAppend(ScreenWorld) end
-if true then Tic:screenAppend(ScreenIntro) end
+-- if true then Tic:screenAppend(ScreenIntro) end
 if true then Tic:screenAppend(ScreenMenus) end
 
 
