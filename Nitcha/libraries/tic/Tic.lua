@@ -4655,6 +4655,7 @@ function CElement:new(_argt)
     self.separatorx  = 0     -- separator between elements in px if any
     self.separatory  = 0     -- separator between elements in px if any
     self.stretch     = false -- stretch elements ?
+    self.parent      = nil   -- parent element
     self.elements    = {}    -- sub elements if any
     self.behaviour   = nil   -- behaviour function if any
     self.display     = true  -- display or not ?
@@ -6291,6 +6292,8 @@ end
 
 function CScreen:draw()
     if not self.display then return end -- nothing to display
+    rect(0, 0, 100,20, 2)
+    Tic:logAppend(self.name, Tables:size(self.buttons))
     Tic:screenKeyboard(self) -- adjust keyboard mapping
     Tic:screenButtons(self)  -- adjust buttons mapping
     self:drawWindows()
@@ -6716,7 +6719,7 @@ ScreenWorld:appendElements{
 end
 
 if true then
-ScreenMenus = CScreen{name = "Intro", keysfunctions = Tic.KEYSFUNCTIONSINTRO}
+ScreenMenus = CScreen{name = "Menus", keysfunctions = Tic.KEYSFUNCTIONSINTRO}
 ScreenMenus:appendElements{
     CWindowMenu{
         colorground = Tic.COLORRED, screenx = 50, screeny = 10, screenw = 24, screenh = 40,
