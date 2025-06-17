@@ -4685,9 +4685,6 @@ function CElement:draw() -- element drawing
     if self.drawcaches then self:drawCaches() end
     if self.drawborder then self:drawBorder() end
     if self.drawframes then self:drawFrames() end
-    -- for _, _element in ipairs(self.elements) do
-    --     _element:draw()
-    -- end
 end
 
 function CElement:sizeWH() -- total WH sizes including margins
@@ -4881,10 +4878,10 @@ function CText:new(_argt)
     self.colorinside = Tic.COLORGREYL
     self.colorshadow = Tic.COLORGREYD
     self:argt(_argt) -- override if any
-    self:adjustWH()
+    self:adjust()
 end
 
-function CText:adjustWH() -- adjust screenw, screenh
+function CText:adjust() -- adjust screenw, screenh
     self.screenw = print((self.text or ""), Nums.MININTEGER, Nums.MININTEGER, self.colorinside, self.fixed, self.scale, self.small)
     self.screenw = self.screenw + (self.marginlf * self.scale) + (self.marginrg * self.scale)
     self.screenh = Tic.FONTH
@@ -4958,53 +4955,53 @@ function CWindowMenu:new(_argt)
     self.kind = Classic.KINDWINDOWMENU
     self.name = Classic.NAMEWINDOWMENU
     self:argt(_argt) -- override if any
-    self:adjustWH()
+    self:adjust()
 end
 
-function CWindowMenu:sizeWH()
+function CWindowMenu:adjust()
+    local _content = self:content()
+    self.screenw   = _content.sizew
+    self.screenh   = _content.sizeh
+end
+
+function CWindowMenu:content()
     local _maxsizew = 0
     local _maxsizeh = 0
     local _totsizeh = 0
-    local _count    = 0
+    local _elements = {}
     for _, _element in ipairs(self.elements or {}) do
         if _element:behave() and _element.enabled then -- take element in account ?
             local _sizewh = _element:sizeWH()
             _maxsizew = Nums:max(_maxsizew, _sizewh.sizew)
             _maxsizeh = Nums:max(_maxsizeh, _sizewh.sizeh)
             _totsizeh =_totsizeh + _sizewh.sizeh
-            _count    = _count + 1
+            Tables:valInsert(_elements, _element)
         end
     end
-    _totsizeh = (self.stretch) and _maxsizeh * _count or _totsizeh
-    _totsizeh = (_count > 0) and _totsizeh + (self.separatory * (_count - 1)) or _totsizeh
-    return {count = _count, sizew = self.marginlf + _maxsizew + self.marginrg, sizeh = self.marginup + _totsizeh + self.margindw,
+    local _size = Tables:size(_elements)
+    _totsizeh = (self.stretch) and _maxsizeh * _size or _totsizeh
+    _totsizeh = (_size > 0) and _totsizeh + (self.separatory * (_size - 1)) or _totsizeh
+    return {size = _size, elements = _elements,
+        sizew = self.marginlf + _maxsizew + self.marginrg, sizeh = self.marginup + _totsizeh + self.margindw,
         maxsizew = _maxsizew, maxsizeh = _maxsizeh, totsizeh = _totsizeh}
 end
 
-function CWindowMenu:adjustWH()
-    local _sizewh = self:sizeWH()
-    self.screenw = _sizewh.sizew
-    self.screenh = _sizewh.sizeh
-end
-
 function CWindowMenu:drawInside()
-    local _sizewh = self:sizeWH()
+    local _content = self:content()
     local _screenx = self.screenx + self.marginlf
     local _screeny = self.screeny + self.marginup
-    for _, _element in ipairs(self.elements or {}) do
-        if _element:behave() and _element.enabled then -- take element in account ?
-            _element:save{"screenx", "screeny", "screenw", "screenh"}
-            _element.screenx = _screenx
-            _element.screeny = _screeny
-            if self.stretch then
-                _element.screenw = _sizewh.maxsizew
-                _element.screenh = _sizewh.maxsizeh
-            end
-            _screeny = _screeny + _element.screenh + self.separatory
-            _element:draw()
-            _element:load()
+    for _, _element in ipairs(_content.elements or {}) do
+        _element.screenx = _screenx
+        _element.screeny = _screeny
+        if self.stretch then
+            _element.screenw = _content.maxsizew
+            _element.screenh = _content.maxsizeh
         end
+        _screeny = _screeny + _element.screenh + self.separatory
+        _element:draw()
     end
+    Tic:logAppend("menu", self.parent.name)
+    self.parent:appendElements(_content.elements)
 end
 
 
@@ -6726,7 +6723,7 @@ if true then
 ScreenMenus = CScreen{name = "Menus", keysfunctions = Tic.KEYSFUNCTIONSINTRO}
 ScreenMenus:appendElements{
     CWindowMenu{
-        colorground = Tic.COLORGREEND, screenx = 50, screeny = 10, screenw = 24, screenh = 40, rounded = true, drawframes = true,
+        colorground = Tic.COLORGREEND, screenx = 50, screeny = 100, screenw = 24, screenh = 40, rounded = true, drawframes = true,
         marginup = 2, margindw = 2, marginlf = 2, marginrg = 2,
         separatory = 0,
         stretch = true,
