@@ -5577,7 +5577,7 @@ function CButton:drawHovertextLF()
             self.colorhoverground
         )
     end
-    self.hovertextlf.colorinside = self.colorground
+    self.hovertextlf.colorinside = 2 --self.colorground
     self.hovertextlf.screenx = self.screenx - ((self.hovertextlf.screenw - self.screenw) // 2) + 1
     self.hovertextlf.screeny = self.screeny - self.hovertextlf.screenh
     self.hovertextlf:draw()
@@ -5600,7 +5600,7 @@ function CButton:drawHovertextRG()
             self.colorhoverground
         )
     end
-    self.hovertextrg.colorinside = self.colorground
+    self.hovertextrg.colorinside = 3 --self.colorground
     self.hovertextrg.screenx = self.screenx - ((self.hovertextrg.screenw - self.screenw) // 2) + 1
     self.hovertextrg.screeny = self.screeny - self.hovertextrg.screenh + self.screeny + self.screenh - 4
     self.hovertextrg:draw()
@@ -6723,9 +6723,9 @@ if true then
 ScreenMenus = CScreen{name = "Menus", keysfunctions = Tic.KEYSFUNCTIONSINTRO}
 ScreenMenus:appendElements{
     CWindowMenu{
-        colorground = Tic.COLORGREEND, screenx = 50, screeny = 100, screenw = 24, screenh = 40, rounded = true, drawframes = true,
+        colorground = Tic.COLORGREEND, screenx = 50, screeny = 50, screenw = 24, screenh = 40, rounded = true, drawframes = true,
         marginup = 2, margindw = 2, marginlf = 2, marginrg = 2,
-        separatory = 0,
+        separatory = 10,
         stretch = true,
         elements = {Button1, Button2, Button3},
     },
