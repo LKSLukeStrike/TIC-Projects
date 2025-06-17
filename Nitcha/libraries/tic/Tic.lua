@@ -5000,7 +5000,6 @@ function CWindowMenu:drawInside()
         _screeny = _screeny + _element.screenh + self.separatory
         _element:draw()
     end
-    Tic:logAppend("menu", self.parent.name)
     self.parent:appendElements(_content.elements)
 end
 
@@ -5577,7 +5576,7 @@ function CButton:drawHovertextLF()
             self.colorhoverground
         )
     end
-    self.hovertextlf.colorinside = self.colorground
+    self.hovertextlf.colorinside = self.colorgroundactived
     self.hovertextlf.screenx = self.screenx - ((self.hovertextlf.screenw - self.screenw) // 2) + 1
     self.hovertextlf.screeny = self.screeny - self.hovertextlf.screenh
     self.hovertextlf:draw()
@@ -5600,7 +5599,7 @@ function CButton:drawHovertextRG()
             self.colorhoverground
         )
     end
-    self.hovertextrg.colorinside = self.colorground
+    self.hovertextrg.colorinside = self.colorgroundactived
     self.hovertextrg.screenx = self.screenx - ((self.hovertextrg.screenw - self.screenw) // 2) + 1
     self.hovertextrg.screeny = self.screeny + self.screenh
     self.hovertextrg:draw()
@@ -6304,8 +6303,6 @@ end
 
 function CScreen:draw()
     if not self.display then return end -- nothing to display
-    rect(0, 0, 100,20, 2)
-    Tic:logAppend(self.name, Tables:size(self.buttons))
     Tic:screenKeyboard(self) -- adjust keyboard mapping
     Tic:screenButtons(self)  -- adjust buttons mapping
     self:drawWindows()
@@ -6475,7 +6472,7 @@ Button4 = CButtonMenu{
     screenh = 10,
     rounded = false,
     text = CText{text = "Open", marginlf = 2},
-    clicklf = function() end,
+    clicklf = _function,
 }
 Button5 = CButtonMenu{
     -- name = "B5",
@@ -6725,9 +6722,9 @@ ScreenMenus:appendElements{
     CWindowMenu{
         colorground = Tic.COLORGREEND, screenx = 50, screeny = 50, screenw = 24, screenh = 40, rounded = true, drawframes = true,
         marginup = 2, margindw = 2, marginlf = 2, marginrg = 2,
-        separatory = 10,
+        separatory = -1,
         stretch = true,
-        elements = {Button1, Button2, Button3},
+        elements = {Button4, Button5, Button6},
     },
 }
 end
@@ -6735,7 +6732,7 @@ end
 
 -- SCREENS
 -- if true then Tic:screenAppend(ScreenWorld) end
--- if true then Tic:screenAppend(ScreenIntro) end
+if true then Tic:screenAppend(ScreenIntro) end
 if true then Tic:screenAppend(ScreenMenus) end
 
 
