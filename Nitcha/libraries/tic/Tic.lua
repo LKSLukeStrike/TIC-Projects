@@ -5577,7 +5577,7 @@ function CButton:drawHovertextLF()
             self.colorhoverground
         )
     end
-    self.hovertextlf.colorinside = 2 --self.colorground
+    self.hovertextlf.colorinside = self.colorground
     self.hovertextlf.screenx = self.screenx - ((self.hovertextlf.screenw - self.screenw) // 2) + 1
     self.hovertextlf.screeny = self.screeny - self.hovertextlf.screenh
     self.hovertextlf:draw()
@@ -5600,9 +5600,9 @@ function CButton:drawHovertextRG()
             self.colorhoverground
         )
     end
-    self.hovertextrg.colorinside = 3 --self.colorground
+    self.hovertextrg.colorinside = self.colorground
     self.hovertextrg.screenx = self.screenx - ((self.hovertextrg.screenw - self.screenw) // 2) + 1
-    self.hovertextrg.screeny = self.screeny - self.hovertextrg.screenh + self.screeny + self.screenh - 4
+    self.hovertextrg.screeny = self.screeny + self.screenh
     self.hovertextrg:draw()
 end
 
