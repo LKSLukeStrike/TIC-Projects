@@ -5502,6 +5502,7 @@ CButton.BEHAVIOUR = function(self) -- need at least one function
         self.enabled = false
     end
 end
+
 function CButton:new(_argt)
     CButton.super.new(self, _argt)
     self.kind = Classic.KINDBUTTON
@@ -6434,7 +6435,7 @@ end
 ScreenIntro = CScreen{name = "Intro", keysfunctions = Tic.KEYSFUNCTIONSINTRO}
 
 Button1 = CButtonText{
-    -- name = "B1",
+    name = "B1",
     screenw = 16,
     screenh = 8,
     name = "plop 1",
@@ -6445,7 +6446,7 @@ Button1 = CButtonText{
     clickrg = function() _function{text = "Plip"} end,
 }
 Button2 = CButtonText{
-    -- name = "B2",
+    name = "B2",
     screenw = 8,
     screenh = 8,
     name = "plop 2",
@@ -6458,14 +6459,14 @@ Button2 = CButtonText{
     clicklf = _function,
 }
 Button3 = CButtonText{
-    -- name = "B3",
+    name = "B3",
     screenw = 24,
     text = CText{text = "Menu"},
     -- enabled = false,
     name = "dummy",
 }
 Button4 = CButtonMenu{
-    -- name = "B4",
+    name = "B4",
     screenx = 10,
     screeny = 40,
     screenw = 28,
@@ -6475,7 +6476,7 @@ Button4 = CButtonMenu{
     clicklf = _function,
 }
 Button5 = CButtonMenu{
-    -- name = "B5",
+    name = "B5",
     screenx = 10,
     screeny = 49,
     screenw = 28,
