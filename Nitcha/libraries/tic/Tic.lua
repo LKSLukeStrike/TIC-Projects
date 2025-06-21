@@ -6466,31 +6466,34 @@ Button3 = CButtonText{
     name = "dummy",
 }
 Button4 = CButtonMenu{
-    name = "B4",
-    screenx = 10,
-    screeny = 40,
-    screenw = 28,
-    screenh = 10,
-    rounded = false,
+    name = "Open",
+    -- screenx = 10,
+    -- screeny = 40,
+    screenw = 20,
+    -- screenh = 10,
+    rounded = true,
     text = CText{text = "Open", marginlf = 2},
     clicklf = _function,
 }
 Button5 = CButtonMenu{
-    name = "B5",
-    screenx = 10,
-    screeny = 49,
-    screenw = 28,
-    screenh = 10,
-    rounded = false,
+    name = "Close",
+    -- screenx = 10,
+    -- screeny = 49,
+    -- screenw = 28,
+    -- screenh = 10,
+    rounded = true,
     text = CText{text = "Close", marginlf = 2},
     clicklf = _function,
-    -- colorinside = Tic.COLORKEY
 }
-Button6 = CButton{
-    -- name = "B6",
-    screenx = 10,
-    screeny = 60,
-    rounded = false,
+Button6 = CButtonMenu{
+    name = "Quit",
+    -- screenx = 10,
+    -- screeny = 58,
+    -- screenw = 28,
+    -- screenh = 10,
+    rounded = true,
+    text = CText{text = "Quit", marginlf = 2},
+    clicklf = _function,
 }
 Button7 = CButton{
     -- name = "B7",
@@ -6732,7 +6735,7 @@ end
 
 
 -- SCREENS
--- if true then Tic:screenAppend(ScreenWorld) end
+if true then Tic:screenAppend(ScreenWorld) end
 if true then Tic:screenAppend(ScreenIntro) end
 if true then Tic:screenAppend(ScreenMenus) end
 
