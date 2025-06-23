@@ -4647,6 +4647,7 @@ function CElement:new(_argt)
     self.screeny     = Tic.SCREENY
     self.screenw     = Tic.SCREENW -- sizes
     self.screenh     = Tic.SCREENH
+    self.scale       = Tic.SCALE01
     self.align       = Tic.DIRHIT -- sub elements alignment
     self.marginlf    = 0
     self.marginrg    = 0
@@ -4871,17 +4872,16 @@ function CText:new(_argt)
     self.drawframes  = false
     self.text        = nil
     self.fixed       = true
-    self.scale       = Tic.SCALE01
     self.small       = true
     self.shadow      = false -- add a shadow ?
     self.case        = nil
     self.colorinside = Tic.COLORGREYL
     self.colorshadow = Tic.COLORGREYD
     self:argt(_argt) -- override if any
-    self:adjust()
+    self:adjustWH()
 end
 
-function CText:adjust() -- adjust screenw, screenh
+function CText:adjustWH() -- adjust screenw, screenh
     self.screenw = print((self.text or ""), Nums.MININTEGER, Nums.MININTEGER, self.colorinside, self.fixed, self.scale, self.small)
     self.screenw = self.screenw + (self.marginlf * self.scale) + (self.marginrg * self.scale)
     self.screenh = Tic.FONTH
@@ -4955,10 +4955,10 @@ function CWindowMenu:new(_argt)
     self.kind = Classic.KINDWINDOWMENU
     self.name = Classic.NAMEWINDOWMENU
     self:argt(_argt) -- override if any
-    self:adjust()
+    self:adjustWH()
 end
 
-function CWindowMenu:adjust()
+function CWindowMenu:adjustWH()
     local _content = self:content()
     self.screenw   = _content.sizew
     self.screenh   = _content.sizeh
@@ -5656,10 +5656,20 @@ end
 CButtonText = CButton:extend() -- generic text button
 function CButtonText:new(_argt)
     CButtonText.super.new(self, _argt)
-	self.text = nil -- override with CText if any
+	self.text = CText{} -- override with CText if any
+    self.text.marginup = 2
+    self.text.margindw = 2
+    self.text.marginlf = 2
+    self.text.marginrg = 2
     self.rounded = true
     self.colorinside = self.colorborder
     self:argt(_argt) -- override if any
+    self:adjustWH()
+end
+
+function CButtonText:adjustWH() -- adjust screenw, screenh
+    self.screenw = (self.marginlf * self.scale) + self.text.screenw + (self.marginrg * self.scale)
+    self.screenh = (self.marginup * self.scale) + self.text.screenh + (self.margindw * self.scale)
 end
 
 function CButtonText:draw() -- button drawing
@@ -6441,7 +6451,7 @@ Button1 = CButtonText{
     name = "plop 1",
     hovertextlf = CText{text = "Plop"},
     hovertextrg = CText{text = "Plip"},
-    text = CText{text = "Op"},
+    text = CText{text = "Op", marginup = 2, margindw = 2, marginlf = 2, marginrg = 2},
     clicklf = _function,
     clickrg = function() _function{text = "Plip"} end,
 }
@@ -6452,7 +6462,7 @@ Button2 = CButtonText{
     name = "plop 2",
     hovertextlf = CText{text = "TWO"},
     colorinside = Classic.NIL,
-    text = CText{text = "C", colorinside = Tic.COLORBLUEL},
+    text = CText{text = "C", marginup = 2, margindw = 2, marginlf = 2, marginrg = 2, colorinside = Tic.COLORBLUEL},
     -- drawborder = false,
     -- drawground = false,
     -- align = Tic.DIR270,
@@ -6469,10 +6479,10 @@ Button4 = CButtonMenu{
     name = "Open",
     -- screenx = 10,
     -- screeny = 40,
-    screenw = 20,
+    -- screenw = 28,
     -- screenh = 10,
     rounded = true,
-    text = CText{text = "Open", marginlf = 2},
+    text = CText{text = "Open", marginlf = 2, marginup = 2, margindw = 2, marginrg = 2},
     clicklf = _function,
 }
 Button5 = CButtonMenu{
@@ -6482,7 +6492,7 @@ Button5 = CButtonMenu{
     -- screenw = 28,
     -- screenh = 10,
     rounded = true,
-    text = CText{text = "Close", marginlf = 2},
+    text = CText{text = "Close", marginlf = 2, marginup = 1, margindw = 1, marginrg = 2},
     clicklf = _function,
 }
 Button6 = CButtonMenu{
@@ -6492,7 +6502,7 @@ Button6 = CButtonMenu{
     -- screenw = 28,
     -- screenh = 10,
     rounded = true,
-    text = CText{text = "Quit", marginlf = 2},
+    text = CText{text = "Quit", marginlf = 2, marginup = 1, margindw = 1, marginrg = 2},
     clicklf = _function,
 }
 Button7 = CButton{
@@ -6725,7 +6735,7 @@ ScreenMenus = CScreen{name = "Menus", keysfunctions = Tic.KEYSFUNCTIONSINTRO}
 ScreenMenus:appendElements{
     CWindowMenu{
         colorground = Tic.COLORGREEND, screenx = 50, screeny = 50, screenw = 24, screenh = 40, rounded = true, drawframes = true,
-        marginup = 2, margindw = 2, marginlf = 2, marginrg = 2,
+        -- marginup = 2, margindw = 2, marginlf = 2, marginrg = 2,
         separatory = -1,
         stretch = true,
         elements = {Button4, Button5, Button6},
