@@ -3463,7 +3463,6 @@ function CCharacter:new(_argt)
     self.kind         = Classic.KINDCHARACTER
     self.name         = Classic.NAMECHARACTER
     self.size         = CCharacter.SIZEM -- size
-    self.scale        = Tic.SCALE01 -- scale
     self.frame        = CSprite.FRAME00 -- frame
     self.dirx         = Tic.DIRXLF -- directions
     self.diry         = Tic.DIRYMD
@@ -4870,7 +4869,7 @@ function CText:new(_argt)
     self.drawcaches  = false
     self.drawborder  = false
     self.drawframes  = false
-    self.text        = nil
+    self.text        = ""
     self.fixed       = true
     self.small       = true
     self.shadow      = false -- add a shadow ?
@@ -4882,9 +4881,9 @@ function CText:new(_argt)
 end
 
 function CText:adjustWH() -- adjust screenw, screenh
-    self.screenw = print((self.text or ""), Nums.MININTEGER, Nums.MININTEGER, self.colorinside, self.fixed, self.scale, self.small)
+    self.screenw = print(self.text, Nums.MININTEGER, Nums.MININTEGER, self.colorinside, self.fixed, self.scale, self.small)
     self.screenw = self.screenw + (self.marginlf * self.scale) + (self.marginrg * self.scale)
-    self.screenh = Tic.FONTH
+    self.screenh = Tic.FONTH * self.scale
     self.screenh = self.screenh + (self.marginup * self.scale) + (self.margindw * self.scale)
 end
 
@@ -5657,10 +5656,6 @@ CButtonText = CButton:extend() -- generic text button
 function CButtonText:new(_argt)
     CButtonText.super.new(self, _argt)
 	self.text = CText{} -- override with CText if any
-    self.text.marginup = 2
-    self.text.margindw = 2
-    self.text.marginlf = 2
-    self.text.marginrg = 2
     self.rounded = true
     self.colorinside = self.colorborder
     self:argt(_argt) -- override if any
@@ -5685,11 +5680,39 @@ end
 
 
 --
+-- CButtonTextM2
+--
+CButtonTextM2 = CButtonText:extend() -- generic text button with margins 2
+function CButtonTextM2:new(_argt)
+    CButtonTextM2.super.new(self, _argt)
+    self:argt(_argt) -- override if any
+    self.text.marginup = 2
+    self.text.margindw = 2
+    self.text.marginlf = 2
+    self.text.marginrg = 2
+    self.text:adjustWH()
+    self:adjustWH()
+end
+
+
+--
 -- CButtonMenu
 --
 CButtonMenu = CButtonText:extend() -- generic menu button
 function CButtonMenu:new(_argt)
     CButtonMenu.super.new(self, _argt)
+    self.rounded = false
+    self.align   = Tic.DIR270
+    self:argt(_argt) -- override if any
+end
+
+
+--
+-- CButtonMenuM2
+--
+CButtonMenuM2 = CButtonTextM2:extend() -- generic menu button with margins 2
+function CButtonMenuM2:new(_argt)
+    CButtonMenuM2.super.new(self, _argt)
     self.rounded = false
     self.align   = Tic.DIR270
     self:argt(_argt) -- override if any
@@ -6444,65 +6467,51 @@ end
 
 ScreenIntro = CScreen{name = "Intro", keysfunctions = Tic.KEYSFUNCTIONSINTRO}
 
-Button1 = CButtonText{
+Button1 = CButtonTextM2{
     name = "B1",
     screenw = 16,
     screenh = 8,
     name = "plop 1",
     hovertextlf = CText{text = "Plop"},
     hovertextrg = CText{text = "Plip"},
-    text = CText{text = "Op", marginup = 2, margindw = 2, marginlf = 2, marginrg = 2},
+    text = CText{text = "Op"},
     clicklf = _function,
     clickrg = function() _function{text = "Plip"} end,
 }
-Button2 = CButtonText{
+Button2 = CButtonTextM2{
     name = "B2",
     screenw = 8,
     screenh = 8,
     name = "plop 2",
-    hovertextlf = CText{text = "TWO"},
+    hovertextlf = CText{text = "Plop"},
     colorinside = Classic.NIL,
-    text = CText{text = "C", marginup = 2, margindw = 2, marginlf = 2, marginrg = 2, colorinside = Tic.COLORBLUEL},
+    text = CText{text = "C", colorinside = Tic.COLORBLUEL},
+    clicklf = _function,
     -- drawborder = false,
     -- drawground = false,
     -- align = Tic.DIR270,
-    clicklf = _function,
 }
-Button3 = CButtonText{
+Button3 = CButtonTextM2{
     name = "B3",
     screenw = 24,
     text = CText{text = "Menu"},
-    -- enabled = false,
-    name = "dummy",
 }
-Button4 = CButtonMenu{
+Button4 = CButtonMenuM2{
     name = "Open",
-    -- screenx = 10,
-    -- screeny = 40,
-    -- screenw = 28,
-    -- screenh = 10,
     rounded = true,
-    text = CText{text = "Open", marginlf = 2, marginup = 2, margindw = 2, marginrg = 2},
+    text = CText{text = "Open"},
     clicklf = _function,
 }
-Button5 = CButtonMenu{
+Button5 = CButtonMenuM2{
     name = "Close",
-    -- screenx = 10,
-    -- screeny = 49,
-    -- screenw = 28,
-    -- screenh = 10,
     rounded = true,
-    text = CText{text = "Close", marginlf = 2, marginup = 1, margindw = 1, marginrg = 2},
+    text = CText{text = "Close"},
     clicklf = _function,
 }
-Button6 = CButtonMenu{
+Button6 = CButtonMenuM2{
     name = "Quit",
-    -- screenx = 10,
-    -- screeny = 58,
-    -- screenw = 28,
-    -- screenh = 10,
-    rounded = true,
-    text = CText{text = "Quit", marginlf = 2, marginup = 1, margindw = 1, marginrg = 2},
+   rounded = true,
+    text = CText{text = "Quit"},
     clicklf = _function,
 }
 Button7 = CButton{
@@ -6977,7 +6986,7 @@ Wilfie = CPlayerWolfe{name = "Wilfie",
     statphyact = 10,
     statmenact = 10,
     statpsyact = 10,
-    colorextra = Tic.COLORRED,
+    colorextra = Tic.COLORORANGE,
     worldx = 10,
     worldy = 30,
     interactions = {10},
@@ -6992,7 +7001,7 @@ Welfie = CPlayerWolfe{name = "Welfie",
     statphyact = 10,
     statmenact = 10,
     statpsyact = 10,
-    colorextra = Tic.COLORORANGE,
+    colorextra = Tic.COLORGREENL,
     worldx = 20,
     worldy = 30,
     interactions = {10},

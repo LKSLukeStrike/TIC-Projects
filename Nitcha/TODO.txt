@@ -1,11 +1,11 @@
 -- [-] animation system for characters
 -- [-] autofill act stats at creation
 
--- [x] FIXME extend the caches areas
+-- [x] extend the caches areas
 
 -- [x] add hitboxes to places etc
 
--- [x] TODO add detection of shift/ctrl/? to reduce the move
+-- [x] add detection of shift/ctrl/? to reduce the move
 
 -- FIXME adjust animations frequences
 
