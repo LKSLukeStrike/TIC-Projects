@@ -531,14 +531,14 @@ Tic.BUTTONSCROLLY = "scrolly"
 Tic.BUTTONS = {}
 
 function Tic:buttonsHandleInput()
-    local _buttontreated = false -- avoid overlaping buttons, just keep the first one
+    local _treatedbutton = nil -- avoid overlaping buttons, just keep the first one
 
     for _, _button in ipairs(Tic.BUTTONS) do -- handle input functions
         _button:deactivate()
 
         if _button:activable() then -- check if a button is active and hovered
             if _button:region():hasInsidePoint(Tic:mousePointX(), Tic:mousePointY()) then
-                if not _buttontreated then
+                if not _treatedbutton then
                     local _functionsactived = _button:functionsActived()
                     if Tables:size(_functionsactived) > 0 then -- activate
                         _button:activate()
@@ -546,7 +546,7 @@ function Tic:buttonsHandleInput()
                     else -- or just hover
                         _button.hovered = true
                     end
-                    _buttontreated = true
+                    _treatedbutton = _button
                 end
             end
         else -- disable all functions related to hidden/disabled buttons
@@ -6150,9 +6150,9 @@ IButtonSpotting.BEHAVIOUR = function(self)
     local _playerregionworld = Tic:playerActual():regionWorld()
     local _entityregionworld = (Tic:entityHovering()) and Tic:entityHovering():regionWorld() or Tic:entitySpotting():regionWorld()
     local _direction         = _playerregionworld:directionRegion(_entityregionworld)
-    self.hovertext = CText{text = "Move"}
-    self.enabled   = false
-    self.actived   = false
+    self.hovertextlf = CText{text = "Move"}
+    self.enabled     = false
+    self.actived     = false
     if _direction == self.direction then
         self.enabled = true
         self.actived = true
@@ -6240,8 +6240,8 @@ IButtonPlayerMove.PALETTE = {[Tic.COLORGREYD] = Tic.COLORKEY}
 IButtonPlayerMove.BEHAVIOUR = function(self)
     IButtonPlayer.BEHAVIOUR(self)
     if not self.display then return end -- no move
-    self.actived = Tic:playerActual().direction == self.direction
-    self.hovertext = CText{text = "Move"}
+    self.actived     = Tic:playerActual().direction == self.direction
+    self.hovertextlf = CText{text = "Move"}
 end
 
 CButtonPlayerMove000 = CButtonArrow000:extend() -- generic player move 000 button
