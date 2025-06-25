@@ -3217,8 +3217,8 @@ function CWeaponFlask:new(_argt)
         [Tic.STATEMOVERG]  = {rotate = CSprite.ROTATE270, flip = Tic.DIRXRG},
         [Tic.STATEWORKLF]  = {rotate = CSprite.ROTATE270, flip = Tic.DIRXLF},
         [Tic.STATEWORKRG]  = {rotate = CSprite.ROTATE270, flip = Tic.DIRXRG},
-        [Tic.STATEFLOORLF] = {rotate = CSprite.ROTATE270, flip = Tic.DIRXLF},
-        [Tic.STATEFLOORRG] = {rotate = CSprite.ROTATE270, flip = Tic.DIRXRG},
+        [Tic.STATEFLOORLF] = {rotate = CSprite.ROTATE000, flip = Tic.DIRXLF},
+        [Tic.STATEFLOORRG] = {rotate = CSprite.ROTATE000, flip = Tic.DIRXRG},
     }
     self.handlesoffsets = {
         [CSprite.ROTATE000] = {handlex = 3, handley = 1},
@@ -4233,12 +4233,14 @@ CCharacterHumanoid.HANDSOFFSETS = {
     },
     [Tic.POSTUREFLOOR] = {
         [Tic.DIRXLF] = {
-            [CSprite.FRAME00] = {handrgx = 1, handrgy = 5, handlfx = 6, handlfy = 6, state = Tic.STATEFLOORLF},
-            [CSprite.FRAME01] = {handrgx = 1, handrgy = 6, handlfx = 6, handlfy = 5, state = Tic.STATEFLOORLF},
+            [CCharacter.SIZES] = {handrgx = 5, handrgy = 2, handlfx =  1, handlfy = 9, state = Tic.STATEFLOORLF},
+            [CCharacter.SIZEM] = {handrgx = 4, handrgy = 2, handlfx =  0, handlfy = 9, state = Tic.STATEFLOORLF},
+            [CCharacter.SIZEL] = {handrgx = 3, handrgy = 2, handlfx = -1, handlfy = 9, state = Tic.STATEFLOORLF},
         },
         [Tic.DIRXRG] = {
-            [CSprite.FRAME00] = {handrgx = 6, handrgy = 5, handlfx = 1, handlfy = 6, state = Tic.STATEFLOORRG},
-            [CSprite.FRAME01] = {handrgx = 6, handrgy = 6, handlfx = 1, handlfy = 5, state = Tic.STATEFLOORRG},
+            [CCharacter.SIZES] = {handrgx = 6, handrgy = 9, handlfx = 2, handlfy = 2, state = Tic.STATEFLOORRG},
+            [CCharacter.SIZEM] = {handrgx = 7, handrgy = 9, handlfx = 3, handlfy = 2, state = Tic.STATEFLOORRG},
+            [CCharacter.SIZEL] = {handrgx = 8, handrgy = 9, handlfx = 4, handlfy = 2, state = Tic.STATEFLOORRG},
         },
     },
 }
@@ -4367,7 +4369,7 @@ function CCharacterHumanoid:handsOffsets()
     if self.handsoffsets[_status] then
         _result = Tables:merge(_result, self.handsoffsets[_status][self.dirx][self.frame])
     else
-        _result = Tables:merge(_result, self.handsoffsets[_posture][self.dirx][self.frame])
+        _result = Tables:merge(_result, self.handsoffsets[_posture][self.dirx][self.size])
     end
 
     if _posture == Tic.POSTUREKNEEL then
