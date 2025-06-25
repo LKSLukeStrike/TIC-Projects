@@ -4221,6 +4221,16 @@ CCharacterHumanoid.HANDSOFFSETS = {
             [CSprite.FRAME01] = {handrgx = 6, handrgy = 6, handlfx = 1, handlfy = 5, state = Tic.STATEMOVERG},
         },
     },
+    [Tic.STATUSWORK] = {
+        [Tic.DIRXLF] = {
+            [CSprite.FRAME00] = {handrgx = 1, handrgy = 5, handlfx = 6, handlfy = 6, state = Tic.STATEWORKLF},
+            [CSprite.FRAME01] = {handrgx = 1, handrgy = 6, handlfx = 6, handlfy = 5, state = Tic.STATEWORKLF},
+        },
+        [Tic.DIRXRG] = {
+            [CSprite.FRAME00] = {handrgx = 6, handrgy = 5, handlfx = 1, handlfy = 6, state = Tic.STATEWORKRG},
+            [CSprite.FRAME01] = {handrgx = 6, handrgy = 6, handlfx = 1, handlfy = 5, state = Tic.STATEWORKRG},
+        },
+    },
     [Tic.POSTUREFLOOR] = {
         [Tic.DIRXLF] = {
             [CSprite.FRAME00] = {handrgx = 1, handrgy = 5, handlfx = 6, handlfy = 6, state = Tic.STATEFLOORLF},
@@ -6905,8 +6915,8 @@ end -- generate places
 --
 -- Players
 --
--- Truduk = CPlayerDwarf{name = "Truduk",
--- }
+Truduk = CPlayerDwarf{name = "Truduk",
+}
 -- Truduk:randomWorldWindow()
 -- Prinnn = CPlayerGnome{name = "Prinnn",
 --     coloreyesbg  = Tic.COLORRED,
@@ -6925,8 +6935,9 @@ end -- generate places
 --     colorarmor   = Tic.COLORGREEND,
 --     colorpants   = Tic.COLORGREENM,
 -- }
--- Nitcha = CPlayerDrowe{name = "Nitcha",
--- }
+Nitcha = CPlayerDrowe{name = "Nitcha",
+    worldx = 10,
+}
 -- Azarel = CPlayerAngel{name = "Azarel",
 -- }
 -- Zikkow = CPlayerTifel{name = "Zikkow",
@@ -6947,8 +6958,9 @@ end -- generate places
 -- }
 -- Daemok = CPlayerDemon{name = "Daemok",
 -- }
--- Globth = CPlayerGolth{name = "Globth"
--- }
+Globth = CPlayerGolth{name = "Globth",
+    worldx = 20,
+}
 -- Globth:randomWorldWindow()
 
 if true then
