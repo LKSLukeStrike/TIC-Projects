@@ -172,7 +172,7 @@ Tic.COLOREYESFG   = Tic.COLORGREYD -- 4 colors for the eyes
 Tic.COLOREYESBU   = Tic.COLORGREYM
 Tic.COLOREYESBM   = Tic.COLORGREYL
 Tic.COLOREYESBD   = Tic.COLORWHITE
--- TODO weapons fg/bg + status
+Tic.COLORHOVER    = Tic.COLORBLUEL -- hovertext color
 
 -- Directions
 Tic.DIRXLF = 0 -- x directions -- also the sprite flip
@@ -3162,8 +3162,8 @@ function CWeaponShield:new(_argt)
         [Tic.STATEMOVERG]  = {rotate = CSprite.ROTATE270, flip = Tic.DIRXRG},
         [Tic.STATEWORKLF]  = {rotate = CSprite.ROTATE270, flip = Tic.DIRXLF},
         [Tic.STATEWORKRG]  = {rotate = CSprite.ROTATE270, flip = Tic.DIRXRG},
-        [Tic.STATEFLOORLF] = {rotate = CSprite.ROTATE270, flip = Tic.DIRXLF},
-        [Tic.STATEFLOORRG] = {rotate = CSprite.ROTATE270, flip = Tic.DIRXRG},
+        [Tic.STATEFLOORLF] = {rotate = CSprite.ROTATE000, flip = Tic.DIRXLF},
+        [Tic.STATEFLOORRG] = {rotate = CSprite.ROTATE000, flip = Tic.DIRXRG},
     }
     self.handlesoffsets = {
         [CSprite.ROTATE000] = {handlex = 3, handley = 3},
@@ -4233,14 +4233,14 @@ CCharacterHumanoid.HANDSOFFSETS = {
     },
     [Tic.POSTUREFLOOR] = {
         [Tic.DIRXLF] = {
-            [CCharacter.SIZES] = {handrgx = 5, handrgy = 2, handlfx =  1, handlfy = 9, state = Tic.STATEFLOORLF},
-            [CCharacter.SIZEM] = {handrgx = 4, handrgy = 2, handlfx =  0, handlfy = 9, state = Tic.STATEFLOORLF},
-            [CCharacter.SIZEL] = {handrgx = 3, handrgy = 2, handlfx = -1, handlfy = 9, state = Tic.STATEFLOORLF},
+            [CCharacter.SIZES] = {handrgx = 2, handrgy = 2, handlfx =  1, handlfy = 6, state = Tic.STATEFLOORLF},
+            [CCharacter.SIZEM] = {handrgx = 1, handrgy = 2, handlfx =  0, handlfy = 6, state = Tic.STATEFLOORLF},
+            [CCharacter.SIZEL] = {handrgx = 0, handrgy = 2, handlfx = -1, handlfy = 6, state = Tic.STATEFLOORLF},
         },
         [Tic.DIRXRG] = {
-            [CCharacter.SIZES] = {handrgx = 6, handrgy = 9, handlfx = 2, handlfy = 2, state = Tic.STATEFLOORRG},
-            [CCharacter.SIZEM] = {handrgx = 7, handrgy = 9, handlfx = 3, handlfy = 2, state = Tic.STATEFLOORRG},
-            [CCharacter.SIZEL] = {handrgx = 8, handrgy = 9, handlfx = 4, handlfy = 2, state = Tic.STATEFLOORRG},
+            [CCharacter.SIZES] = {handrgx = 6, handrgy = 9, handlfx = 5, handlfy = 2, state = Tic.STATEFLOORRG},
+            [CCharacter.SIZEM] = {handrgx = 7, handrgy = 9, handlfx = 6, handlfy = 2, state = Tic.STATEFLOORRG},
+            [CCharacter.SIZEL] = {handrgx = 8, handrgy = 6, handlfx = 7, handlfy = 2, state = Tic.STATEFLOORRG},
         },
     },
 }
@@ -4678,7 +4678,7 @@ function CElement:new(_argt)
     self.drawcaches  = true
     self.drawborder  = true
     self.drawframes  = true
-    self.cachestick  = Tic.SPRITESIZE -- caches thickness
+    self.cachestick  = Tic.SPRITESIZE     -- caches thickness
     self.colorground = Tic.COLORHUDSCREEN -- colors
     self.colorguides = Tic.COLORGREYM
     self.colorinside = Tic.COLORGREYM
@@ -5107,6 +5107,7 @@ function CWindowPortrait:new(_argt)
     self.screenh     = Tic.PLAYERPORTRAITWH
     self.colorground = Tic.COLORBIOMENIGHT
     self.drawborder  = false
+    self.cachestick  = Tic.SPRITESIZE * Tic.SCALE02 -- caches thickness
     self:argt(_argt) -- override if any
 end
 
@@ -5450,8 +5451,8 @@ function CWindowWorld:drawPlayerActual()
 
                             local _locking  = (_playeractual.spottinglock and _playeractual.spotting == _entity) -- already locking ?
                             local _locktext = (_locking)
-                                and CText{text = "Unlock", colorinside = Tic.COLORWHITE}
-                                or  CText{text = "Lock", colorinside = Tic.COLORWHITE}
+                                and CText{text = "Unlock", colorinside = Tic.COLORHOVER}
+                                or  CText{text = "Lock", colorinside = Tic.COLORHOVER}
                             _locktext.screenx = _entity.screenx - ((_locktext.screenw - Tic.SPRITESIZE) // 2)
                             _locktext.screeny = _entity.screeny - _locktext.screenh
                             _locktext:draw()
@@ -5543,7 +5544,7 @@ function CButton:new(_argt)
     self.colorhover          = Tic.COLORHUDSCREEN
     self.colorgrounddisabled = Tic.COLORGREYL
     self.colorborderdisabled = Tic.COLORGREYM
-    self.colorgroundactived  = Tic.COLORBLUEL
+    self.colorgroundactived  = Tic.COLORHOVER
     self.colorhoverground    = nil
     self:argt(_argt) -- override if any
 end
@@ -6918,6 +6919,8 @@ end -- generate places
 -- Players
 --
 Truduk = CPlayerDwarf{name = "Truduk",
+    itemhandrg = CWeaponHammer{},
+    itemhandlf = CWeaponRoundShield{},
 }
 -- Truduk:randomWorldWindow()
 -- Prinnn = CPlayerGnome{name = "Prinnn",
@@ -6939,6 +6942,8 @@ Truduk = CPlayerDwarf{name = "Truduk",
 -- }
 Nitcha = CPlayerDrowe{name = "Nitcha",
     worldx = 10,
+    itemhandrg = CWeaponCrossBow{},
+    itemhandlf = CWeaponSmallFlask{},
 }
 -- Azarel = CPlayerAngel{name = "Azarel",
 -- }
@@ -6962,10 +6967,12 @@ Nitcha = CPlayerDrowe{name = "Nitcha",
 -- }
 Globth = CPlayerGolth{name = "Globth",
     worldx = 20,
+    itemhandrg = CWeaponSword{},
+    itemhandlf = CWeaponTeeShield{},
 }
 -- Globth:randomWorldWindow()
 
-if true then
+if false then
 Wulfie = CPlayerWolfe{name = "Wulfie",
     statphyact = 10,
     statmenact = 10,
@@ -6980,7 +6987,7 @@ Wulfie = CPlayerWolfe{name = "Wulfie",
     itemhandlf = CWeaponSword{},
 }
 end
-if true then
+if false then
 Wolfie = CPlayerWolfe{name = "Wolfie",
     statphyact = 10,
     statmenact = 10,
@@ -6995,7 +7002,7 @@ Wolfie = CPlayerWolfe{name = "Wolfie",
     itemhandlf = CWeaponTeeShield{},
 }
 end
-if true then
+if false then
 Wilfie = CPlayerWolfe{name = "Wilfie",
     statphyact = 10,
     statmenact = 10,
@@ -7010,7 +7017,7 @@ Wilfie = CPlayerWolfe{name = "Wilfie",
     itemhandlf = CWeaponLongBow{},
 }
 end
-if true then
+if false then
 Welfie = CPlayerWolfe{name = "Welfie",
     statphyact = 10,
     statmenact = 10,
