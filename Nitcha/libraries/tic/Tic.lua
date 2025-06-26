@@ -3160,8 +3160,8 @@ function CWeaponShield:new(_argt)
         [Tic.STATEIDLERG]  = {rotate = CSprite.ROTATE000, flip = Tic.DIRXRG},
         [Tic.STATEMOVELF]  = {rotate = CSprite.ROTATE270, flip = Tic.DIRXLF},
         [Tic.STATEMOVERG]  = {rotate = CSprite.ROTATE270, flip = Tic.DIRXRG},
-        [Tic.STATEWORKLF]  = {rotate = CSprite.ROTATE270, flip = Tic.DIRXLF},
-        [Tic.STATEWORKRG]  = {rotate = CSprite.ROTATE270, flip = Tic.DIRXRG},
+        [Tic.STATEWORKLF]  = {rotate = CSprite.ROTATE000, flip = Tic.DIRXLF},
+        [Tic.STATEWORKRG]  = {rotate = CSprite.ROTATE000, flip = Tic.DIRXRG},
         [Tic.STATEFLOORLF] = {rotate = CSprite.ROTATE000, flip = Tic.DIRXLF},
         [Tic.STATEFLOORRG] = {rotate = CSprite.ROTATE000, flip = Tic.DIRXRG},
     }
@@ -3215,8 +3215,8 @@ function CWeaponFlask:new(_argt)
         [Tic.STATEIDLERG]  = {rotate = CSprite.ROTATE000, flip = Tic.DIRXRG},
         [Tic.STATEMOVELF]  = {rotate = CSprite.ROTATE270, flip = Tic.DIRXLF},
         [Tic.STATEMOVERG]  = {rotate = CSprite.ROTATE270, flip = Tic.DIRXRG},
-        [Tic.STATEWORKLF]  = {rotate = CSprite.ROTATE270, flip = Tic.DIRXLF},
-        [Tic.STATEWORKRG]  = {rotate = CSprite.ROTATE270, flip = Tic.DIRXRG},
+        [Tic.STATEWORKLF]  = {rotate = CSprite.ROTATE000, flip = Tic.DIRXLF},
+        [Tic.STATEWORKRG]  = {rotate = CSprite.ROTATE000, flip = Tic.DIRXRG},
         [Tic.STATEFLOORLF] = {rotate = CSprite.ROTATE000, flip = Tic.DIRXLF},
         [Tic.STATEFLOORRG] = {rotate = CSprite.ROTATE000, flip = Tic.DIRXRG},
     }
@@ -4223,12 +4223,12 @@ CCharacterHumanoid.HANDSOFFSETS = {
     },
     [Tic.STATUSWORK] = {
         [Tic.DIRXLF] = {
-            [CSprite.FRAME00] = {handrgx = 1, handrgy = 5, handlfx = 6, handlfy = 6, state = Tic.STATEWORKLF},
-            [CSprite.FRAME01] = {handrgx = 1, handrgy = 6, handlfx = 6, handlfy = 5, state = Tic.STATEWORKLF},
+            [CSprite.FRAME00] = {handrgx = 1, handrgy = 7, handlfx = 6, handlfy = 6, state = Tic.STATEWORKLF},
+            [CSprite.FRAME01] = {handrgx = 1, handrgy = 7, handlfx = 6, handlfy = 6, state = Tic.STATEWORKLF},
         },
         [Tic.DIRXRG] = {
-            [CSprite.FRAME00] = {handrgx = 6, handrgy = 5, handlfx = 1, handlfy = 6, state = Tic.STATEWORKRG},
-            [CSprite.FRAME01] = {handrgx = 6, handrgy = 6, handlfx = 1, handlfy = 5, state = Tic.STATEWORKRG},
+            [CSprite.FRAME00] = {handrgx = 6, handrgy = 7, handlfx = 1, handlfy = 6, state = Tic.STATEWORKRG},
+            [CSprite.FRAME01] = {handrgx = 6, handrgy = 7, handlfx = 1, handlfy = 6, state = Tic.STATEWORKRG},
         },
     },
     [Tic.POSTUREFLOOR] = {
