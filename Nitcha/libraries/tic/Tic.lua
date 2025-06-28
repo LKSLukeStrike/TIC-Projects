@@ -158,7 +158,7 @@ Tic.COLORBIOMESANDY = Tic.COLORYELLOW
 Tic.COLORBIOMEGREEN = Tic.COLORGREENM
 Tic.COLORBIOMEROCKY = Tic.COLORGREYL
 
--- Special palette colors that can be replaced
+-- Palette colors for characters
 Tic.COLORKEY      = Tic.COLORBLACK -- transparent color
 Tic.COLORARMOR    = Tic.COLORGREYD -- 4 colors for the bodies
 Tic.COLORSHIRT    = Tic.COLORGREYM
@@ -172,6 +172,19 @@ Tic.COLOREYESFG   = Tic.COLORGREYD -- 4 colors for the eyes
 Tic.COLOREYESBU   = Tic.COLORGREYM
 Tic.COLOREYESBM   = Tic.COLORGREYL
 Tic.COLOREYESBD   = Tic.COLORWHITE
+
+-- Palette colors for characters stats
+Tic.COLORPHYGT    = Tic.COLORPURPLE
+Tic.COLORPHYEQ    = Tic.COLORRED
+Tic.COLORPHYLT    = Tic.COLORORANGE
+Tic.COLORMENGT    = Tic.COLORGREEND
+Tic.COLORMENEQ    = Tic.COLORGREENM
+Tic.COLORMENLT    = Tic.COLORGREENL
+Tic.COLORPSYGT    = Tic.COLORBLUED
+Tic.COLORPSYEQ    = Tic.COLORBLUEM
+Tic.COLORPSYLT    = Tic.COLORBLUEL
+
+-- Palette colors for buttons
 Tic.COLORHOVER    = Tic.COLORBLUEL -- hovertext color
 
 -- Directions
@@ -1268,6 +1281,9 @@ CSpriteBG.SIGNSTAMOV  = CSpriteBG.SIGNBANK2 + 09 -- stand move
 CSpriteBG.SIGNKNEMOV  = CSpriteBG.SIGNBANK2 + 10 -- kneel move
 CSpriteBG.SIGNDOWORK  = CSpriteBG.SIGNBANK2 + 11 -- work
 CSpriteBG.SIGNDOSLEE  = CSpriteBG.SIGNBANK2 + 12 -- sleep
+CSpriteBG.SIGNACTPHY  = CSpriteBG.SIGNBANK2 + 13 -- actual phy
+CSpriteBG.SIGNACTMEN  = CSpriteBG.SIGNBANK2 + 14 -- actual men
+CSpriteBG.SIGNACTPSY  = CSpriteBG.SIGNBANK2 + 15 -- actual psy
 CSpriteBG.BUILDBANK   = 32 -- buildings
 CSpriteBG.PLACEHOUSE  = CSpriteBG.BUILDBANK + 0
 CSpriteBG.PLACETOWER  = CSpriteBG.BUILDBANK + 1
@@ -3510,6 +3526,24 @@ function CCharacter:new(_argt)
     end
 end
 
+function CCharacter:colorPhyAct()
+    if self.statphyact > self.statphymax then return Tic.COLORPHYGT end
+    if self.statphyact < self.statphymax then return Tic.COLORPHYLT end
+    return Tic.COLORPHYEQ
+end
+
+function CCharacter:colorMenAct()
+    if self.statmenact > self.statmenmax then return Tic.COLORMENGT end
+    if self.statmenact < self.statmenmax then return Tic.COLORMENLT end
+    return Tic.COLORMENEQ
+end
+
+function CCharacter:colorPsyAct()
+    if self.statpsyact > self.statpsymax then return Tic.COLORPSYGT end
+    if self.statpsyact < self.statpsymax then return Tic.COLORPSYLT end
+    return Tic.COLORPSYEQ
+end
+
 function CCharacter:hover(_entity) -- hover an entity, use nil to unhover
     if _entity then
         if self.hovering then self.hovering.hovered = false end -- unhover previous if any
@@ -5185,9 +5219,9 @@ function CWindowStats:new(_argt)
     self.screenh     = Tic.PLAYERSTATSWH
     self.colorground = Tic.COLORBIOMENIGHT
     self.colorborder = Tic.COLORWHITE
-    self.colorphyact = Tic.COLORRED -- stats colors
-    self.colormenact = Tic.COLORGREENM
-    self.colorpsyact = Tic.COLORBLUEM
+    -- self.colorphyact = Tic.COLORRED -- stats colors
+    -- self.colormenact = Tic.COLORGREENM
+    -- self.colorpsyact = Tic.COLORBLUEM
     self.colorlesser = Tic.COLORGREYL -- if the act stat is lesser than the max stat
     self.drawcaches  = false
     self.drawborder  = false
@@ -5232,21 +5266,21 @@ function CWindowStatsCharacter:drawInside() -- window portrait content for -- [!
         self.screeny + 02 + Tic.STATSMAX - self.entity.statphyact + 1,
         02,
         self.entity.statphyact,
-        self.colorphyact
+        self.entity:colorPhyAct()
     )
     rect ( -- men act bar
         self.screenx + 07,
         self.screeny + 02 + Tic.STATSMAX - self.entity.statmenact + 1,
         02,
         self.entity.statmenact,
-        self.colormenact
+        self.entity:colorMenAct()
     )
     rect ( -- psy act bar
         self.screenx + 12,
         self.screeny + 02 + Tic.STATSMAX - self.entity.statpsyact + 1,
         02,
         self.entity.statpsyact,
-        self.colorpsyact
+        self.entity:colorPsyAct()
     )
     rectb( -- phy max line
         self.screenx + 02,
