@@ -76,19 +76,19 @@ Tic.PLAYERINFOSWY = Tic.WORLDWY -- player infos window y position
 Tic.PLAYERPORTRAITWW = 16 -- player portrait window width
 Tic.PLAYERPORTRAITWH = 16 -- player portrait window height
 Tic.PLAYERPORTRAITWX = Tic.SCREENW - Tic.PLAYERPORTRAITWW - ((Tic.WORLDWX - Tic.PLAYERPORTRAITWW) // 2) -- player portrait window x position
-Tic.PLAYERPORTRAITWY = Tic.PLAYERINFOSWY + 25 -- player portrait window y position
+Tic.PLAYERPORTRAITWY = Tic.PLAYERINFOSWY + 26 -- player portrait window y position
 
 -- Player Stats Window positions and sizes (hud)
-Tic.PLAYERSTATSWW = 16 -- player stats window width
+Tic.PLAYERSTATSWW = 26 -- player stats window width
 Tic.PLAYERSTATSWH = 16 -- player stats window height
-Tic.PLAYERSTATSWX = Tic.PLAYERPORTRAITWX -- player stats window x position
-Tic.PLAYERSTATSWY = Tic.PLAYERPORTRAITWY + 25 -- player stats window y position
+Tic.PLAYERSTATSWX = Tic.PLAYERINFOSWX -- player stats window x position
+Tic.PLAYERSTATSWY = Tic.PLAYERPORTRAITWY + 30 -- player stats window y position
 
 -- Player State Window positions and sizes (hud)
 Tic.PLAYERSTATEWW = 26 -- player state window width
 Tic.PLAYERSTATEWH = 16 -- player state window height
 Tic.PLAYERSTATEWX = Tic.PLAYERINFOSWX -- player state window x position
-Tic.PLAYERSTATEWY = Tic.PLAYERSTATSWY + 25 -- player state window y position
+Tic.PLAYERSTATEWY = Tic.PLAYERSTATSWY + 26 -- player state window y position
 
 -- Spotting Infos Window positions and sizes (hud)
 Tic.SPOTTINGINFOSWW = 26 -- spotting infos window width
@@ -100,7 +100,7 @@ Tic.SPOTTINGINFOSWY = Tic.WORLDWY -- spotting infos window y position
 Tic.SPOTTINGPORTRAITWW = 16 -- spotting portrait window width
 Tic.SPOTTINGPORTRAITWH = 16 -- spotting portrait window height
 Tic.SPOTTINGPORTRAITWX = ((Tic.WORLDWX - Tic.SPOTTINGPORTRAITWW) // 2) -- spotting portrait window x position
-Tic.SPOTTINGPORTRAITWY = Tic.SPOTTINGINFOSWY + 25 -- spotting portrait window y position
+Tic.SPOTTINGPORTRAITWY = Tic.SPOTTINGINFOSWY + 26 -- spotting portrait window y position
 
 -- Palette map
 Tic.PALETTEMAP = 0x3FF0 * 2 -- vram bank 1
@@ -174,6 +174,7 @@ Tic.COLOREYESBM   = Tic.COLORGREYL
 Tic.COLOREYESBD   = Tic.COLORWHITE
 
 -- Palette colors for characters stats
+Tic.COLORSTAT0    = Tic.COLORGREYD
 Tic.COLORPHYGT    = Tic.COLORPURPLE
 Tic.COLORPHYEQ    = Tic.COLORRED
 Tic.COLORPHYLT    = Tic.COLORORANGE
@@ -349,9 +350,9 @@ Tic.FUNCTIONMOVEDIRECTION180 = function() Tic:moveDirection180() end
 Tic.FUNCTIONMOVEDIRECTION225 = function() Tic:moveDirection225() end
 Tic.FUNCTIONMOVEDIRECTION270 = function() Tic:moveDirection270() end
 Tic.FUNCTIONMOVEDIRECTION315 = function() Tic:moveDirection315() end
-Tic.FUNCTIONSTATPHYACT       = function() Tic:statPhyAct() end
-Tic.FUNCTIONSTATMENACT       = function() Tic:statMenAct() end
-Tic.FUNCTIONSTATPSYACT       = function() Tic:statPsyAct() end
+Tic.FUNCTIONSTATACTPHY       = function() Tic:statActPhy() end
+Tic.FUNCTIONSTATACTMEN       = function() Tic:statActMen() end
+Tic.FUNCTIONSTATACTPSY       = function() Tic:statActPsy() end
 Tic.FUNCTIONBIOMENEXT        = function() Tic:biomeNext() end
 Tic.FUNCTIONTOGGLEHITBOX     = function() Tic:hitboxToggleDraw() end
 Tic.FUNCTIONTOGGLESPOTTING    = function() Tic:spottingToggle() end
@@ -389,15 +390,15 @@ Tic.KEYSFUNCTIONSWORLD = {
     [Tic.KEY_B]            = Tic.FUNCTIONBIOMENEXT,
     [Tic.KEY_D]            = Tic.FUNCTIONTOGGLEDIRS,
     [Tic.KEY_H]            = Tic.FUNCTIONTOGGLEHITBOX,
-    [Tic.KEY_M]            = Tic.FUNCTIONSTATMENACT,
+    [Tic.KEY_M]            = Tic.FUNCTIONSTATACTMEN,
     [Tic.KEY_O]            = Tic.FUNCTIONPLAYERONLY,
-    [Tic.KEY_P]            = Tic.FUNCTIONSTATPHYACT,
+    [Tic.KEY_P]            = Tic.FUNCTIONSTATACTPHY,
     [Tic.KEY_Q]            = Tic.FUNCTIONTOGGLEBORDERS,
     [Tic.KEY_R]            = Tic.FUNCTIONTOGGLEMIND,
     [Tic.KEY_S]            = Tic.FUNCTIONTOGGLESPOTTING,
     [Tic.KEY_V]            = Tic.FUNCTIONTOGGLEVIEW,
     [Tic.KEY_X]            = Tic.FUNCTIONTOGGLEMOVE,
-    [Tic.KEY_Y]            = Tic.FUNCTIONSTATPSYACT,
+    [Tic.KEY_Y]            = Tic.FUNCTIONSTATACTPSY,
     [Tic.KEY_Z]            = Tic.FUNCTIONSCALENEXT,
     [Tic.KEY_NUMPADMINUS]  = Tic.FUNCTIONSCREENPREV,
     [Tic.KEY_NUMPADPLUS]   = Tic.FUNCTIONSCREENNEXT,
@@ -840,17 +841,17 @@ Tic.STATSET = "set"
 Tic.STATDEC = "dec"
 Tic.STATINC = "inc"
 Tic.STATMAX = "max"
-function Tic:statPhyAct(_character)
+function Tic:statActPhy(_character)
     local _stat = "statphyact"
     Tic:statAct(_stat, _character)
 end
 
-function Tic:statMenAct(_character)
+function Tic:statActMen(_character)
     local _stat = "statmenact"
     Tic:statAct(_stat, _character)
 end
 
-function Tic:statPsyAct(_character)
+function Tic:statActPsy(_character)
     local _stat = "statpsyact"
     Tic:statAct(_stat, _character)
 end
@@ -3527,18 +3528,21 @@ function CCharacter:new(_argt)
 end
 
 function CCharacter:colorPhyAct()
+    if self.statphyact == 0              then return Tic.COLORSTAT0 end
     if self.statphyact > self.statphymax then return Tic.COLORPHYGT end
     if self.statphyact < self.statphymax then return Tic.COLORPHYLT end
     return Tic.COLORPHYEQ
 end
 
 function CCharacter:colorMenAct()
+    if self.statmenact == 0              then return Tic.COLORSTAT0 end
     if self.statmenact > self.statmenmax then return Tic.COLORMENGT end
     if self.statmenact < self.statmenmax then return Tic.COLORMENLT end
     return Tic.COLORMENEQ
 end
 
 function CCharacter:colorPsyAct()
+    if self.statpsyact == 0              then return Tic.COLORSTAT0 end
     if self.statpsyact > self.statpsymax then return Tic.COLORPSYGT end
     if self.statpsyact < self.statpsymax then return Tic.COLORPSYLT end
     return Tic.COLORPSYEQ
@@ -5219,10 +5223,6 @@ function CWindowStats:new(_argt)
     self.screenh     = Tic.PLAYERSTATSWH
     self.colorground = Tic.COLORBIOMENIGHT
     self.colorborder = Tic.COLORWHITE
-    -- self.colorphyact = Tic.COLORRED -- stats colors
-    -- self.colormenact = Tic.COLORGREENM
-    -- self.colorpsyact = Tic.COLORBLUEM
-    self.colorlesser = Tic.COLORGREYL -- if the act stat is lesser than the max stat
     self.drawcaches  = false
     self.drawborder  = false
     self:argt(_argt) -- override if any
@@ -5240,68 +5240,70 @@ function CWindowStatsCharacter:new(_argt)
 end
 
 function CWindowStatsCharacter:drawInside() -- window portrait content for -- [!] characters
-    rectb( -- phy bar border
-        self.screenx + 01,
-        self.screeny + 02,
-        04,
-        12,
-        self.colorborder
-    )
-    rectb( -- men bar border
-        self.screenx + 06,
-        self.screeny + 02,
-        04,
-        12,
-        self.colorborder
-    )
-    rectb( -- psy bar border
-        self.screenx + 11,
-        self.screeny + 02,
-        04,
-        12,
-        self.colorborder
-    )
     rect ( -- phy act bar
         self.screenx + 02,
         self.screeny + 02 + Tic.STATSMAX - self.entity.statphyact + 1,
-        02,
+        06,
         self.entity.statphyact,
         self.entity:colorPhyAct()
     )
     rect ( -- men act bar
-        self.screenx + 07,
+        self.screenx + 10,
         self.screeny + 02 + Tic.STATSMAX - self.entity.statmenact + 1,
-        02,
+        06,
         self.entity.statmenact,
         self.entity:colorMenAct()
     )
     rect ( -- psy act bar
-        self.screenx + 12,
+        self.screenx + 18,
         self.screeny + 02 + Tic.STATSMAX - self.entity.statpsyact + 1,
-        02,
+        06,
         self.entity.statpsyact,
         self.entity:colorPsyAct()
     )
+
+    rectb( -- phy bar border
+        self.screenx + 02,
+        self.screeny + 02,
+        06,
+        12,
+        self.colorborder
+    )
+    rectb( -- men bar border
+        self.screenx + 10,
+        self.screeny + 02,
+        06,
+        12,
+        self.colorborder
+    )
+    rectb( -- psy bar border
+        self.screenx + 18,
+        self.screeny + 02,
+        06,
+        12,
+        self.colorborder
+    )
+
     rectb( -- phy max line
         self.screenx + 02,
         self.screeny + 03 + Tic.STATSMAX - self.entity.statphymax,
-        02,
+        06,
         01,
-        (self.entity.statphyact >= self.entity.statphymax) and self.colorborder or self.colorlesser
+        self.colorborder
     )
     rectb( -- men max line
-        self.screenx + 07,
+        self.screenx + 10,
         self.screeny + 03 + Tic.STATSMAX - self.entity.statmenmax,
-        02,
+        06,
         01,
-        (self.entity.statmenact >= self.entity.statmenmax) and self.colorborder or self.colorlesser
+        self.colorborder
     )
     rectb( -- psy max line
-        self.screenx + 12,
+        self.screenx + 18,
         self.screeny + 03 + Tic.STATSMAX - self.entity.statpsymax,
-        02,
+        06,
         01,
-        (self.entity.statpsyact >= self.entity.statpsymax) and self.colorborder or self.colorlesser
+        self.colorborder
     )
 end
 
@@ -5773,6 +5775,7 @@ CButtonSprite = CButton:extend() -- generic sprite button
 function CButtonSprite:new(_argt)
     CButtonSprite.super.new(self, _argt)
 	self.sprite = CSpriteBG{}
+    self.drawborder = false
     self:argt(_argt) -- override if any
 end
 
@@ -6127,6 +6130,52 @@ function CButtonPlayerSleep:new(_argt)
     self:argt(_argt) -- override if any
 end
 
+
+--
+-- CButtonPlayerStat
+--
+CButtonPlayerStat = CButtonSprite:extend() -- generic stat button
+function CButtonPlayerStat:new(_argt)
+    CButtonPlayerStat.super.new(self, _argt)
+    self.sprite.palette = {[Tic.COLORGREYM] = Tic.COLORWHITE}
+    self.behaviour      = IButtonPlayer.BEHAVIOUR
+    self.colorstat      = nil -- colorstat function if any
+    self:argt(_argt) -- override if any
+end
+
+function CButtonPlayerStat:drawGround()
+    if self.colorstat then
+       self.sprite.palette = Tables:merge(self.sprite.palette, {[Tic.COLORWHITE] = self.colorstat()})
+    end
+
+    self.sprite.screenx = self.screenx
+    self.sprite.screeny = self.screeny
+    self.sprite:draw()
+end
+
+CButtonPlayerStatPhy = CButtonPlayerStat:extend()
+function CButtonPlayerStatPhy:new(_argt)
+    CButtonPlayerStatPhy.super.new(self, _argt)
+    self.sprite.sprite = CSpriteBG.SIGNACTPHY
+    self.colorstat     = function() return Tic:playerActual():colorPhyAct() end
+    self:argt(_argt) -- override if any
+end
+
+CButtonPlayerStatMen = CButtonPlayerStat:extend()
+function CButtonPlayerStatMen:new(_argt)
+    CButtonPlayerStatMen.super.new(self, _argt)
+    self.sprite.sprite = CSpriteBG.SIGNACTMEN
+    self.colorstat     = function() return Tic:playerActual():colorMenAct() end
+    self:argt(_argt) -- override if any
+end
+
+CButtonPlayerStatPsy = CButtonPlayerStat:extend()
+function CButtonPlayerStatPsy:new(_argt)
+    CButtonPlayerStatPsy.super.new(self, _argt)
+    self.sprite.sprite = CSpriteBG.SIGNACTPSY
+    self.colorstat     = function() return Tic:playerActual():colorPsyAct() end
+    self:argt(_argt) -- override if any
+end
 
 --
 -- CButtonSpottingDraw
@@ -6625,6 +6674,7 @@ ScreenWorld = CScreen{name = "World", keysfunctions = Tic.KEYSFUNCTIONSWORLD}
 
 -- lf panel
 ScreenWorldLF = CScreen{}
+
 WindowSpottingInfos    = CWindowSpottingInfos{}
 ButtonSpottingDraw     = CButtonSpottingDraw{}
 ButtonSpottingLock     = CButtonSpottingLock{}
@@ -6635,6 +6685,7 @@ ScreenWorldLF:elementsDistributeH(
         (WindowSpottingInfos.screenw - CScreen:elementsTotalW({ButtonSpottingDraw, ButtonSpottingPick, ButtonSpottingLock})) // 2),
     WindowSpottingInfos.screeny - Tic.SPRITESIZE
 )
+
 WindowSpottingPortrait = CWindowSpottingPortrait{}
 ButtonSpotting000      = CButtonSpotting000{}
 ButtonSpotting045      = CButtonSpotting045{}
@@ -6668,6 +6719,7 @@ ScreenWorldLF:elementsDistributeV( -- md v line
     WindowSpottingPortrait.screeny - 7,
     14
 )
+
 ScreenWorldLF:appendElements{
     WindowSpottingPortrait,
     WindowSpottingInfos,
@@ -6686,6 +6738,7 @@ ScreenWorldLF:appendElements{
 
 -- md panel
 ScreenWorldMD = CScreen{}
+
 WindowWorld      = CWindowWorld{spottingwindows = {WindowSpottingInfos, WindowSpottingPortrait}}
 WindowInfosWorld = CWindowInfosWorld{}
 ScreenWorldMD:appendElements{
@@ -6695,6 +6748,7 @@ ScreenWorldMD:appendElements{
 
 -- rg panel
 ScreenWorldRG = CScreen{}
+
 WindowPlayerInfos    = CWindowPlayerInfos{}
 ButtonPlayerPrev     = CButtonPlayerPrev{}
 ButtonPlayerPick     = CButtonPlayerPick{}
@@ -6705,6 +6759,7 @@ ScreenWorldRG:elementsDistributeH(
         (WindowPlayerInfos.screenw - CScreen:elementsTotalW({ButtonPlayerPrev, ButtonPlayerPick, ButtonPlayerNext})) // 2),
     WindowPlayerInfos.screeny - Tic.SPRITESIZE
 )
+
 WindowPlayerPortrait = CWindowPlayerPortrait{}
 ButtonPlayerMove000  = CButtonPlayerMove000{}
 ButtonPlayerMove045  = CButtonPlayerMove045{}
@@ -6738,7 +6793,18 @@ ScreenWorldRG:elementsDistributeV( -- md v line
     WindowPlayerPortrait.screeny - 7,
     14
 )
+
 WindowPlayerStats    = CWindowPlayerStats{}
+ButtonPlayerStatPhy  = CButtonPlayerStatPhy{}
+ButtonPlayerStatMen  = CButtonPlayerStatMen{}
+ButtonPlayerStatPsy  = CButtonPlayerStatPsy{}
+ScreenWorldLF:elementsDistributeH(
+    {ButtonPlayerStatPhy, ButtonPlayerStatMen, ButtonPlayerStatPsy},
+    WindowPlayerStats.screenx + (
+        (WindowPlayerStats.screenw - CScreen:elementsTotalW({ButtonPlayerStatPhy, ButtonPlayerStatMen, ButtonPlayerStatPsy})) // 2),
+    WindowPlayerStats.screeny - Tic.SPRITESIZE
+)
+
 WindowPlayerState    = CWindowPlayerState{}
 ButtonPlayerStand    = CButtonPlayerStand{}
 ButtonPlayerKneel    = CButtonPlayerKneel{}
@@ -6756,6 +6822,7 @@ ScreenWorldRG:elementsDistributeV(
     WindowPlayerState.screeny + (
         (WindowPlayerInfos.screenh - CScreen:elementsTotalH({ButtonPlayerWork, ButtonPlayerSleep})) // 2)
 )
+
 ScreenWorldRG:appendElements{
     WindowPlayerPortrait,
     WindowPlayerInfos,
@@ -6764,6 +6831,9 @@ ScreenWorldRG:appendElements{
     ButtonPlayerPrev,
     ButtonPlayerPick,
     ButtonPlayerNext,
+    ButtonPlayerStatPhy,
+    ButtonPlayerStatMen,
+    ButtonPlayerStatPsy,
     ButtonPlayerMove000,
     ButtonPlayerMove045,
     ButtonPlayerMove090,
@@ -6952,6 +7022,7 @@ end -- generate places
 --
 -- Players
 --
+if true then
 Truduk = CPlayerDwarf{name = "Truduk",
     itemhandrg = CWeaponHammer{},
     itemhandlf = CWeaponRoundShield{},
@@ -7005,6 +7076,7 @@ Globth = CPlayerGolth{name = "Globth",
     itemhandlf = CWeaponTeeShield{},
 }
 -- Globth:randomWorldWindow()
+end
 
 if false then
 Wulfie = CPlayerWolfe{name = "Wulfie",
