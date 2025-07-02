@@ -1431,6 +1431,66 @@ end
 
 
 --
+-- CInventory
+--
+CInventory = Classic:extend() -- generic inventory
+Classic.KINDINVENTORY = "Inventory" -- Inventory kind
+Classic.NAMEINVENTORY = "Inventory" -- Inventory name
+function CInventory:new(_argt)
+    CInventory.super.new(self, _argt)
+    self.kind = Classic.KINDINVENTORY
+    self.name = Classic.KINDINVENTORY
+    self.objectstypes = nil -- list of allowed inventory classes -- nil = any
+	self.objectsmax   = Nums.MAXINTEGER
+	self.objects      = {}
+    self:argt(_argt) -- override if any
+end
+
+CInventoryAny = CInventory:extend() -- generic any inventory
+Classic.KINDINVENTORYANY = "InventoryAny" -- InventoryAny kind
+Classic.NAMEINVENTORYANY = "InventoryAny" -- InventoryAny name
+function CInventoryAny:new(_argt)
+    CInventoryAny.super.new(self, _argt)
+    self.kind = Classic.KINDINVENTORYANY
+    self.name = Classic.KINDINVENTORYANY
+    self:argt(_argt) -- override if any
+end
+
+CInventoryPhy = CInventory:extend() -- generic phy inventory
+Classic.KINDINVENTORYPHY = "Inventory" -- InventoryPhy kind
+Classic.NAMEINVENTORYPHY = "Inventory" -- InventoryPhy name
+function CInventoryPhy:new(_argt)
+    CInventoryPhy.super.new(self, _argt)
+    self.kind = Classic.KINDINVENTORYPHY
+    self.name = Classic.KINDINVENTORYPHY
+    self.objectstypes = {CInventoryPhy}
+    self:argt(_argt) -- override if any
+end
+
+CInventoryMen = CInventory:extend() -- generic men inventory
+Classic.KINDINVENTORYMEN = "Inventory" -- InventoryMen kind
+Classic.NAMEINVENTORYMEN = "Inventory" -- InventoryMen name
+function CInventoryMen:new(_argt)
+    CInventoryMen.super.new(self, _argt)
+    self.kind = Classic.KINDINVENTORYMEN
+    self.name = Classic.KINDINVENTORYMEN
+    self.objectstypes = {CInventoryMen}
+    self:argt(_argt) -- override if any
+end
+
+CInventoryPsy = CInventory:extend() -- generic psy inventory
+Classic.KINDINVENTORYPSY = "Inventory" -- InventoryPsy kind
+Classic.NAMEINVENTORYPSY = "Inventory" -- InventoryPsy name
+function CInventoryPsy:new(_argt)
+    CInventoryPsy.super.new(self, _argt)
+    self.kind = Classic.KINDINVENTORYPSY
+    self.name = Classic.KINDINVENTORYPSY
+    self.objectstypes = {CInventoryPsy}
+    self:argt(_argt) -- override if any
+end
+
+
+--
 -- CRegion
 --
 CRegion = Classic:extend() -- generic region -- lf rg up dw around a point
