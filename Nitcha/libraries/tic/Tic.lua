@@ -752,7 +752,7 @@ Tic.STATES = CCyclerTable{acttable = { -- all available states
     Tic.STATEFLOORBREEZ, -- Z
     Tic.STATEFLOORDEATH, -- D
 }}
-Tic.STATEIDLELF  = Tic.STATUSIDLE..Tic.DIRXLF -- direction states for hands items
+Tic.STATEIDLELF  = Tic.STATUSIDLE..Tic.DIRXLF -- direction states for hands objects
 Tic.STATEIDLERG  = Tic.STATUSIDLE..Tic.DIRXRG
 Tic.STATEMOVELF  = Tic.STATUSMOVE..Tic.DIRXLF
 Tic.STATEMOVERG  = Tic.STATUSMOVE..Tic.DIRXRG
@@ -1048,36 +1048,36 @@ function Tic:logClearRecord() -- clear the log record
     Tic.LOGRECORD = {}
 end
 
-function Tic:logAppend(...) -- add item to the log buffer
+function Tic:logAppend(...) -- add line to the log buffer
     local _args = {...}
-    local _item = ""
+    local _line = ""
     for _, _val in ipairs(_args) do
-        _item = _item..Tic:val2string(_val).." "
+        _line = _line..Tic:val2string(_val).." "
     end
-    Tables:valInsert(Tic.LOGBUFFER, _item)
+    Tables:valInsert(Tic.LOGBUFFER, _line)
 end
 
 function Tic:logRecordActive(_active) -- set log record active on/off
     Tic.LOGRECORDACTIVE = _active
 end
 
-function Tic:logRecord(...) -- add item to the log record
+function Tic:logRecord(...) -- add line to the log record
     if not Tic.LOGRECORDACTIVE then return end -- log record not active -- do nothing
     local _args = {...}
-    local _item = ""
+    local _line = ""
     for _, _val in ipairs(_args) do
-        _item = _item..Tic:val2string(_val).." "
+        _line = _line..Tic:val2string(_val).." "
     end
-    Tables:valInsert(Tic.LOGRECORD, _item, true)
+    Tables:valInsert(Tic.LOGRECORD, _line, true)
 end
 
 function Tic:logPrint() -- print the log buffer increased by the log record then clear it
-    for _, _item in ipairs(Tic.LOGRECORD) do
-        Tables:valInsert(Tic.LOGBUFFER, _item, true)
+    for _, _line in ipairs(Tic.LOGRECORD) do
+        Tables:valInsert(Tic.LOGBUFFER, _line, true)
     end
-    for _line, _item in ipairs(Tic.LOGBUFFER) do
-        _line = _line - 1 -- line start from 0
-        Tic:print(0, _line * Tic.SPRITESIZE, _item) -- one item per "line"
+    for _liney, _line in ipairs(Tic.LOGBUFFER) do
+        _liney = _liney - 1 -- liney start from 0
+        Tic:print(0, _liney * Tic.SPRITESIZE, _line) -- one line per "line"
     end
     Tic:logClearBuffer()
 end
@@ -3517,13 +3517,13 @@ function CCharacter:new(_argt)
     self.drawview     = false
     self.drawmind     = false
     self.drawmove     = false
-    self.itemhandlf   = nil -- character items
-    self.itemhandrg   = nil
+    self.objecthandlf = nil -- character objects
+    self.objecthandrg = nil
     self:argt(_argt) -- override if any
     self.camera       = CCamera{name = self.name.." "..Classic.NAMECAMERA} -- one camera per character
     self:focus() -- focus its camera on itself
-    for _, _item in ipairs({"itemhandlf", "itemhandrg"}) do -- remove character items from the world
-        self.world:deleteEntity(self[_item])
+    for _, _object in ipairs({"objecthandlf", "objecthandrg"}) do -- remove character objects from the world
+        self.world:deleteEntity(self[_object])
     end
 end
 
@@ -3923,12 +3923,12 @@ function CCharacter:drawHandFG()
 end
 
 function CCharacter:drawHand(_bgfg)
-    local _item = nil  -- determine the corresponding item if any
-    if _bgfg == Tic.DRAWBG and self.dirx == Tic.DIRXLF then _item = self.itemhandrg end
-    if _bgfg == Tic.DRAWBG and self.dirx == Tic.DIRXRG then _item = self.itemhandlf end
-    if _bgfg == Tic.DRAWFG and self.dirx == Tic.DIRXLF then _item = self.itemhandlf end
-    if _bgfg == Tic.DRAWFG and self.dirx == Tic.DIRXRG then _item = self.itemhandrg end
-    if not _item then return end -- nothing in hand
+    local _object = nil  -- determine the corresponding object if any
+    if _bgfg == Tic.DRAWBG and self.dirx == Tic.DIRXLF then _object = self.objecthandrg end
+    if _bgfg == Tic.DRAWBG and self.dirx == Tic.DIRXRG then _object = self.objecthandlf end
+    if _bgfg == Tic.DRAWFG and self.dirx == Tic.DIRXLF then _object = self.objecthandlf end
+    if _bgfg == Tic.DRAWFG and self.dirx == Tic.DIRXRG then _object = self.objecthandrg end
+    if not _object then return end -- nothing in hand
 
     local _handsoffsets = self:handsOffsets() -- determine the corresponding hand offsets
     local _handx = nil
@@ -3938,27 +3938,27 @@ function CCharacter:drawHand(_bgfg)
     if _bgfg == Tic.DRAWFG and self.dirx == Tic.DIRXLF then _handx = _handsoffsets.handlfx ; _handy = _handsoffsets.handlfy end
     if _bgfg == Tic.DRAWFG and self.dirx == Tic.DIRXRG then _handx = _handsoffsets.handrgx ; _handy = _handsoffsets.handrgy end
    
-    local _handleoffsets = _item:handleOffsets(_handsoffsets.state) -- determine the item handle offsets
-    local _handlex     = _handleoffsets.handlex
-    local _handley     = _handleoffsets.handley
-    local _itemrotate  = _handleoffsets.rotate
-    local _itemflip    = _handleoffsets.flip
-    local _itempalette = (_bgfg == Tic.DRAWBG)
-        and Tables:merge(_item.palettebg, {[Tic.COLORWHITE] = self.colorskin})
-        or  Tables:merge(_item.palettefg, {[Tic.COLORWHITE] = self.colorskin})
+    local _handleoffsets = _object:handleOffsets(_handsoffsets.state) -- determine the object handle offsets
+    local _handlex       = _handleoffsets.handlex
+    local _handley       = _handleoffsets.handley
+    local _objectrotate  = _handleoffsets.rotate
+    local _objectflip    = _handleoffsets.flip
+    local _objectpalette = (_bgfg == Tic.DRAWBG)
+        and Tables:merge(_object.palettebg, {[Tic.COLORWHITE] = self.colorskin})
+        or  Tables:merge(_object.palettefg, {[Tic.COLORWHITE] = self.colorskin})
 
     local _handx   = _handx - _handlex -- adjust handle to hand
     local _handy   = _handy - _handley
 
 
     local _musprite = CSpriteFG() -- multi usage unique sprite
-    _musprite.sprite  = _item.sprite
+    _musprite.sprite  = _object.sprite
     _musprite.screenx = self.screenx + (_handx * self.scale)
     _musprite.screeny = self.screeny + (_handy * self.scale)
     _musprite.scale   = self.scale
-    _musprite.rotate  = _itemrotate
-    _musprite.flip    = _itemflip
-    _musprite.palette = _itempalette
+    _musprite.rotate  = _objectrotate
+    _musprite.flip    = _objectflip
+    _musprite.palette = _objectpalette
     _musprite:draw()
 end
 
@@ -7024,8 +7024,8 @@ end -- generate places
 --
 if true then
 Truduk = CPlayerDwarf{name = "Truduk",
-    itemhandrg = CWeaponHammer{},
-    itemhandlf = CWeaponRoundShield{},
+    objecthandrg = CWeaponHammer{},
+    objecthandlf = CWeaponRoundShield{},
 }
 -- Truduk:randomWorldWindow()
 -- Prinnn = CPlayerGnome{name = "Prinnn",
@@ -7047,8 +7047,8 @@ Truduk = CPlayerDwarf{name = "Truduk",
 -- }
 Nitcha = CPlayerDrowe{name = "Nitcha",
     worldx = 10,
-    itemhandrg = CWeaponCrossBow{},
-    itemhandlf = CWeaponSmallFlask{},
+    objecthandrg = CWeaponCrossBow{},
+    objecthandlf = CWeaponSmallFlask{},
 }
 -- Azarel = CPlayerAngel{name = "Azarel",
 -- }
@@ -7072,8 +7072,8 @@ Nitcha = CPlayerDrowe{name = "Nitcha",
 -- }
 Globth = CPlayerGolth{name = "Globth",
     worldx = 20,
-    itemhandrg = CWeaponSword{},
-    itemhandlf = CWeaponTeeShield{},
+    objecthandrg = CWeaponSword{},
+    objecthandlf = CWeaponTeeShield{},
 }
 -- Globth:randomWorldWindow()
 end
@@ -7089,8 +7089,8 @@ Wulfie = CPlayerWolfe{name = "Wulfie",
     interactions = {10},
     -- spottingdraw = true,
     spottingpick = true,
-    itemhandrg = CWeaponHammer{},
-    itemhandlf = CWeaponSword{},
+    objecthandrg = CWeaponHammer{},
+    objecthandlf = CWeaponSword{},
 }
 end
 if false then
@@ -7104,8 +7104,8 @@ Wolfie = CPlayerWolfe{name = "Wolfie",
     interactions = {10},
     -- spottingdraw = true,
     spottingpick = true,
-    itemhandrg = CWeaponRoundShield{},
-    itemhandlf = CWeaponTeeShield{},
+    objecthandrg = CWeaponRoundShield{},
+    objecthandlf = CWeaponTeeShield{},
 }
 end
 if false then
@@ -7119,8 +7119,8 @@ Wilfie = CPlayerWolfe{name = "Wilfie",
     interactions = {10},
     -- spottingdraw = true,
     spottingpick = true,
-    itemhandrg = CWeaponCrossBow{},
-    itemhandlf = CWeaponLongBow{},
+    objecthandrg = CWeaponCrossBow{},
+    objecthandlf = CWeaponLongBow{},
 }
 end
 if false then
@@ -7134,8 +7134,8 @@ Welfie = CPlayerWolfe{name = "Welfie",
     interactions = {10},
     -- spottingdraw = true,
     spottingpick = true,
-    itemhandrg = CWeaponMediumFlask{},
-    itemhandlf = CWeaponSmallFlask{},
+    objecthandrg = CWeaponMediumFlask{},
+    objecthandlf = CWeaponSmallFlask{},
 }
 end
 
