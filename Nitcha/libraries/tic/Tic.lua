@@ -1439,7 +1439,7 @@ Classic.NAMEINVENTORY = "Inventory" -- Inventory name
 function CInventory:new(_argt)
     CInventory.super.new(self, _argt)
     self.kind = Classic.KINDINVENTORY
-    self.name = Classic.KINDINVENTORY
+    self.name = Classic.NAMEINVENTORY
     self.objectstypes = nil -- list of allowed inventory classes -- nil = any
 	self.objectsmax   = Nums.MAXINTEGER
 	self.objects      = {}
@@ -1452,7 +1452,7 @@ Classic.NAMEINVENTORYANY = "InventoryAny" -- InventoryAny name
 function CInventoryAny:new(_argt)
     CInventoryAny.super.new(self, _argt)
     self.kind = Classic.KINDINVENTORYANY
-    self.name = Classic.KINDINVENTORYANY
+    self.name = Classic.NAMEINVENTORYANY
     self:argt(_argt) -- override if any
 end
 
@@ -1462,7 +1462,7 @@ Classic.NAMEINVENTORYPHY = "Inventory" -- InventoryPhy name
 function CInventoryPhy:new(_argt)
     CInventoryPhy.super.new(self, _argt)
     self.kind = Classic.KINDINVENTORYPHY
-    self.name = Classic.KINDINVENTORYPHY
+    self.name = Classic.NAMEINVENTORYPHY
     self.objectstypes = {CInventoryPhy}
     self:argt(_argt) -- override if any
 end
@@ -1473,7 +1473,7 @@ Classic.NAMEINVENTORYMEN = "Inventory" -- InventoryMen name
 function CInventoryMen:new(_argt)
     CInventoryMen.super.new(self, _argt)
     self.kind = Classic.KINDINVENTORYMEN
-    self.name = Classic.KINDINVENTORYMEN
+    self.name = Classic.NAMEINVENTORYMEN
     self.objectstypes = {CInventoryMen}
     self:argt(_argt) -- override if any
 end
@@ -1484,7 +1484,7 @@ Classic.NAMEINVENTORYPSY = "Inventory" -- InventoryPsy name
 function CInventoryPsy:new(_argt)
     CInventoryPsy.super.new(self, _argt)
     self.kind = Classic.KINDINVENTORYPSY
-    self.name = Classic.KINDINVENTORYPSY
+    self.name = Classic.NAMEINVENTORYPSY
     self.objectstypes = {CInventoryPsy}
     self:argt(_argt) -- override if any
 end
