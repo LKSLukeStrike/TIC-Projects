@@ -1210,7 +1210,9 @@ end
 --
 -- CSprite
 --
-CSprite = Classic:extend() -- generic sprites
+CSprite = Classic:extend() -- generic sprite
+Classic.KINDSPRITE = "Sprite" -- Sprite kind
+Classic.NAMESPRITE = "Sprite" -- Sprite name
 CSprite.SPRITEBANK = 0
 CSprite.FRAMEOF    = 16 -- sprites frames offset multiplier
 CSprite.FRAME00    = 00 -- sprites frames -- [!] start at 0, used to compute the offset
@@ -1222,6 +1224,8 @@ CSprite.ROTATE270  = 3
 CSprite.SPRITEBOARD = 256
 function CSprite:new(_argt)
     CSprite.super.new(self, _argt)
+    self.kind = Classic.KINDSPRITE
+    self.name = Classic.NAMESPRITE
     self.spritebank = CSprite.SPRITEBANK
     self.sprite    = self.spritebank -- initial sprite number
     self.screenx   = 0 -- screen positions
@@ -1259,6 +1263,8 @@ end
 -- CSpriteBG
 --
 CSpriteBG = CSprite:extend() -- bg sprites aka tic tiles
+Classic.KINDSPRITEBG = "SpriteBG" -- SpriteBG kind
+Classic.NAMESPRITEBG = "SpriteBG" -- SpriteBG name
 CSpriteBG.SPRITEBANK  = 0
 CSpriteBG.SPRITEEMPTY = CSpriteBG.SPRITEBANK + 0 -- empty sprite
 CSpriteBG.SIGNBANK1   = 1  -- signs
@@ -1310,6 +1316,8 @@ CSpriteBG.PLACEROAD0  = CSpriteBG.ROADSBANK + 0
 CSpriteBG.PLACEROAD1  = CSpriteBG.ROADSBANK + 1
 function CSpriteBG:new(_argt) -- FIXME can be removed ?
     CSpriteBG.super.new(self, _argt)
+    self.kind = Classic.KINDSPRITEBG
+    self.name = Classic.NAMESPRITEBG
     self:argt(_argt) -- override if any
 end
 
@@ -1318,6 +1326,8 @@ end
 -- CSpriteFG
 --
 CSpriteFG = CSprite:extend() -- fg sprites aka tic sprites
+Classic.KINDSPRITEFG = "SpriteFG" -- SpriteFG kind
+Classic.NAMESPRITEFG = "SpriteFG" -- SpriteFG name
 CSpriteFG.SPRITEBANK  = 256
 CSpriteFG.SPRITEBOARD = CSpriteFG.SPRITEBANK + 0 -- board sprite -- for creating a sprite by code
 CSpriteFG.SPRITEPIXEL = CSpriteFG.SPRITEBANK + 1 -- pixel sprite
@@ -1361,6 +1371,8 @@ CSpriteFG.WEAPONFLASS = CSpriteFG.WEAPONFLASK + 0
 CSpriteFG.WEAPONFLASM = CSpriteFG.WEAPONFLASK + 16
 function CSpriteFG:new(_argt)
     CSpriteFG.super.new(self, _argt)
+    self.kind = Classic.KINDSPRITEFG
+    self.name = Classic.NAMESPRITEFG
     self.spritebank = CSpriteFG.SPRITEBANK
     self.sprite = self.spritebank
     self:argt(_argt) -- override if any
@@ -1371,8 +1383,12 @@ end
 -- CSpriteFGEmpty
 --
 CSpriteFGEmpty = CSpriteFG:extend() -- empty sprites
+Classic.KINDSPRITEFGEMPTY = "SpriteFGEmpty" -- SpriteFGEmpty kind
+Classic.NAMESPRITEFGEMPTY = "SpriteFGEmpty" -- SpriteFGEmpty name
 function CSpriteFGEmpty:new(_argt)
     CSpriteFGEmpty.super.new(self, _argt)
+    self.kind = Classic.KINDSPRITEFGEMPTY
+    self.name = Classic.NAMESPRITEFGEMPTY
     self.sprite = CSpriteBG.SPRITEEMPTY
     self:argt(_argt) -- override if any
 end
@@ -1382,8 +1398,12 @@ end
 -- CSpriteFGPixel
 --
 CSpriteFGPixel = CSpriteFG:extend() -- pixel sprites
+Classic.KINDSPRITEFGPIXEL = "SpriteFGPixel" -- SpriteFGPixel kind
+Classic.NAMESPRITEFGPIXEL = "SpriteFGPixel" -- SpriteFGPixel name
 function CSpriteFGPixel:new(_argt)
     CSpriteFGPixel.super.new(self, _argt)
+    self.kind = Classic.KINDSPRITEFGPIXEL
+    self.name = Classic.NAMESPRITEFGPIXEL
     self.sprite = CSpriteFG.SPRITEPIXEL
     self:argt(_argt) -- override if any
 end
@@ -1393,8 +1413,12 @@ end
 -- CSpriteFGBoard
 --
 CSpriteFGBoard = CSpriteFG:extend() -- board sprites
+Classic.KINDSPRITEFGBOARD = "SpriteFGBoard" -- SpriteFGBoard kind
+Classic.NAMESPRITEFGBOARD = "SpriteFGBoard" -- SpriteFGBoard name
 function CSpriteFGBoard:new(_argt)
     CSpriteFGBoard.super.new(self, _argt)
+    self.kind = Classic.KINDSPRITEFGBOARD
+    self.name = Classic.NAMESPRITEFGBOARD
     self.sprite = CSpriteFG.SPRITEBOARD
     self.directives = {} -- table of painting directives {{x = 0-7, y = 0-7, color = 0-15,}, ...}
     self:argt(_argt) -- override if any
@@ -1410,8 +1434,12 @@ end
 -- CAnimation
 --
 CAnimation = Classic:extend() -- generic palette animation for entities
+Classic.KINDANIMATION = "Animation" -- Animation kind
+Classic.NAMEANIMATION = "Animation" -- Animation name
 function CAnimation:new(_argt)
     CAnimation.super.new(self, _argt)
+    self.kind = Classic.KINDANIMATION
+    self.name = Classic.NAMEANIMATION
     self.frequence = Tic.FREQUENCE0060
     self.percent0  = 0.5
     self.palette0  = {}
@@ -1424,8 +1452,12 @@ end
 -- CInteraction
 --
 CInteraction = Classic:extend() -- generic interaction for entities
+Classic.KINDINTERACTION = "Interaction" -- Interaction kind
+Classic.NAMEINTERACTION = "Interaction" -- Interaction name
 function CInteraction:new(_argt)
     CInteraction.super.new(self, _argt)
+    self.kind = Classic.KINDINTERACTION
+    self.name = Classic.NAMEINTERACTION
     self:argt(_argt) -- override if any
 end
 
@@ -1457,8 +1489,8 @@ function CInventoryAny:new(_argt)
 end
 
 CInventoryPhy = CInventory:extend() -- generic phy inventory
-Classic.KINDINVENTORYPHY = "Inventory" -- InventoryPhy kind
-Classic.NAMEINVENTORYPHY = "Inventory" -- InventoryPhy name
+Classic.KINDINVENTORYPHY = "InventoryPhy" -- InventoryPhy kind
+Classic.NAMEINVENTORYPHY = "InventoryPhy" -- InventoryPhy name
 function CInventoryPhy:new(_argt)
     CInventoryPhy.super.new(self, _argt)
     self.kind = Classic.KINDINVENTORYPHY
@@ -1468,8 +1500,8 @@ function CInventoryPhy:new(_argt)
 end
 
 CInventoryMen = CInventory:extend() -- generic men inventory
-Classic.KINDINVENTORYMEN = "Inventory" -- InventoryMen kind
-Classic.NAMEINVENTORYMEN = "Inventory" -- InventoryMen name
+Classic.KINDINVENTORYMEN = "InventoryMen" -- InventoryMen kind
+Classic.NAMEINVENTORYMEN = "InventoryMen" -- InventoryMen name
 function CInventoryMen:new(_argt)
     CInventoryMen.super.new(self, _argt)
     self.kind = Classic.KINDINVENTORYMEN
@@ -1479,8 +1511,8 @@ function CInventoryMen:new(_argt)
 end
 
 CInventoryPsy = CInventory:extend() -- generic psy inventory
-Classic.KINDINVENTORYPSY = "Inventory" -- InventoryPsy kind
-Classic.NAMEINVENTORYPSY = "Inventory" -- InventoryPsy name
+Classic.KINDINVENTORYPSY = "InventoryPsy" -- InventoryPsy kind
+Classic.NAMEINVENTORYPSY = "InventoryPsy" -- InventoryPsy name
 function CInventoryPsy:new(_argt)
     CInventoryPsy.super.new(self, _argt)
     self.kind = Classic.KINDINVENTORYPSY
@@ -1676,8 +1708,12 @@ end
 -- CLocations
 --
 CLocations = Classic:extend() -- generic entities locations -- {worldy {worldx {entity = entity}}} -- FIXME change entity by true ?
+Classic.KINDLOCATIONS = "Locations" -- Locations kind
+Classic.NAMELOCATIONS = "Locations" -- Locations name
 function CLocations:new(_argt)
     CLocations.super.new(self, _argt)
+    self.kind = Classic.KINDLOCATIONS
+    self.name = Classic.NAMELOCATIONS
     self.locations = {}
     self:argt(_argt) -- override if any
 end
@@ -1790,8 +1826,12 @@ end
 -- CEntitiesLocations
 --
 CEntitiesLocations = Classic:extend() -- generic locations for entities
+Classic.KINDENTITIESLOCATIONS = "EntitiesLocations" -- EntitiesLocations kind
+Classic.NAMEENTITIESLOCATIONS = "EntitiesLocations" -- EntitiesLocations name
 function CEntitiesLocations:new(_argt)
     CEntitiesLocations.super.new(self, _argt)
+    self.kind = Classic.KINDENTITIESLOCATIONS
+    self.name = Classic.NAMEENTITIESLOCATIONS
     self.entities  = {} -- record each entity -- has to have worldx and worldy attributes
     self.locations = CLocations{} -- record each entity locations
     self:argt(_argt) -- override if any
