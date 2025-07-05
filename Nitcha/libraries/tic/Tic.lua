@@ -2129,12 +2129,12 @@ end
 -- CEntityDrawable
 --
 CEntityDrawable = CEntity:extend() -- generic entities with a sprite representation
-Classic.KINDDRAWABLE = "Drawable" -- Drawable kind
-Classic.NAMEDRAWABLE = "Drawable" -- Drawable name
+Classic.KINDENTITYDRAWABLE = "EntityDrawable" -- EntityDrawable kind
+Classic.NAMEENTITYDRAWABLE = "EntityDrawable" -- EntityDrawable name
 function CEntityDrawable:new(_argt)
     CEntityDrawable.super.new(self, _argt)
-    self.kind = Classic.KINDDRAWABLE
-    self.name = Classic.NAMEDRAWABLE
+    self.kind = Classic.KINDENTITYDRAWABLE
+    self.name = Classic.NAMEENTITYDRAWABLE
     self.world        = World
     self.sprite       = CSpriteBG.SPRITEEMPTY
     self.screenx      = 0 -- screen positions -- used to draw the sprite
@@ -2372,8 +2372,7 @@ end
 -- CPlaceBuild
 --
 CPlaceBuild = CPlace:extend() -- builds
-Classic.KINDBUILD = "Build" -- Build kind
-Classic.NAMEBUILD = "Build" -- Build name
+Classic.KINDPLACEBUILD = "Build" -- Build kind
 CPlaceBuild.PALETTEIDLE  = {
     [CPlace.SMOKE]    = CPlace.EMPTY,
     [CPlace.WINDOW01] = CPlace.WALLS,
@@ -2392,7 +2391,7 @@ CPlaceBuild.PALETTEFADE  = {
 }
 function CPlaceBuild:new(_argt)
     CPlaceBuild.super.new(self, _argt)
-    self.kind = Classic.KINDBUILD
+    self.kind = Classic.KINDPLACEBUILD
     self.name = Classic.NAMEANIMED
     self.hitbox      = CHitbox{entity = self, lf = 2, rg = 4, up = 5, dw = 7}
     self.palettefade = CPlaceBuild.PALETTEFADE
@@ -2404,10 +2403,10 @@ end
 -- CPlaceHouse
 --
 CPlaceHouse = CPlaceBuild:extend() -- houses
-Classic.KINDHOUSE = "House" -- House kind
+Classic.KINDPLACEHOUSE = "House" -- House kind
 function CPlaceHouse:new(_argt)
     CPlaceHouse.super.new(self, _argt)
-    self.kind = Classic.KINDHOUSE
+    self.kind = Classic.KINDPLACEHOUSE
     self.sprite      = CSpriteBG.PLACEHOUSE
     self:argt(_argt) -- override if any
 end
@@ -2445,10 +2444,10 @@ end
 -- CPlaceTower
 --
 CPlaceTower = CPlaceBuild:extend() -- towers
-Classic.KINDTOWER = "Tower" -- Tower kind
+Classic.KINDPLACETOWER = "Tower" -- Tower kind
 function CPlaceTower:new(_argt)
     CPlaceTower.super.new(self, _argt)
-    self.kind = Classic.KINDTOWER
+    self.kind = Classic.KINDPLACETOWER
     self.sprite  = CSpriteBG.PLACETOWER
     self:argt(_argt) -- override if any
 end
@@ -2486,10 +2485,10 @@ end
 -- CPlaceManor
 --
 CPlaceManor = CPlaceBuild:extend() -- manors
-Classic.KINDMANOR = "Manor" -- Manor kind
+Classic.KINDPLACEMANOR = "Manor" -- Manor kind
 function CPlaceManor:new(_argt)
     CPlaceManor.super.new(self, _argt)
-    self.kind = Classic.KINDMANOR
+    self.kind = Classic.KINDPLACEMANOR
     self.sprite  = CSpriteBG.PLACEMANOR
     self.hitbox  = CHitbox{entity = self, lf = 1, rg = 4, up = 5, dw = 7}
     self:argt(_argt) -- override if any
@@ -2534,10 +2533,10 @@ end
 -- CPlaceKirke
 --
 CPlaceKirke = CPlaceBuild:extend() -- kirkes
-Classic.KINDKIRKE = "Kirke" -- Kirke kind
+Classic.KINDPLACEKIRKE = "Kirke" -- Kirke kind
 function CPlaceKirke:new(_argt)
     CPlaceKirke.super.new(self, _argt)
-    self.kind = Classic.KINDKIRKE
+    self.kind = Classic.KINDPLACEKIRKE
     self.sprite  = CSpriteBG.PLACEKIRKE
     self.hitbox  = CHitbox{entity = self, lf = 1, rg = 4, up = 5, dw = 7}
     self:argt(_argt) -- override if any
@@ -2576,10 +2575,10 @@ end
 -- CPlaceWater
 --
 CPlaceWater = CPlaceBuild:extend() -- waters
-Classic.KINDWATER = "Water" -- Water kind
+Classic.KINDPLACEWATER = "Water" -- Water kind
 function CPlaceWater:new(_argt)
     CPlaceWater.super.new(self, _argt)
-    self.kind = Classic.KINDWATER
+    self.kind = Classic.KINDPLACEWATER
     self.sprite  = CSpriteBG.PLACEWATER
     self.hitbox  = CHitbox{entity = self, lf = 1, rg = 4, up = 5, dw = 7}
     self:argt(_argt) -- override if any
@@ -2618,10 +2617,10 @@ end
 -- CPlaceStall
 --
 CPlaceStall = CPlaceBuild:extend() -- stalls
-Classic.KINDSTALL = "Stall" -- Stall kind
+Classic.KINDPLACESTALL = "Stall" -- Stall kind
 function CPlaceStall:new(_argt)
     CPlaceStall.super.new(self, _argt)
-    self.kind = Classic.KINDSTALL
+    self.kind = Classic.KINDPLACESTALL
     self.sprite  = CSpriteBG.PLACESTALL
     self.hitbox  = CHitbox{entity = self, lf = 0, rg = 3, up = 5, dw = 7}
     self:argt(_argt) -- override if any
@@ -2666,7 +2665,7 @@ end
 -- CPlaceTrees
 --
 CPlaceTrees = CPlace:extend() -- trees
-Classic.KINDTREES = "Trees" -- Trees kind
+Classic.KINDPLACETREES = "Trees" -- Trees kind
 CPlaceTrees.PALETTEIDLE   = {
     [CPlace.NEST]    = CPlace.EMPTY,
     [CPlace.FLOOR01] = CPlace.BARK,
@@ -2683,7 +2682,7 @@ CPlaceTrees.PALETTEFADE   = {
 }
 function CPlaceTrees:new(_argt)
     CPlaceTrees.super.new(self, _argt)
-    self.kind = Classic.KINDTREES
+    self.kind = Classic.KINDPLACETREES
     self.name = Classic.NAMELIVING
     self.hitbox       = CHitbox{entity = self, lf = 2, rg = 4, up = 6, dw = 7}
     self.palettefade = CPlaceTrees.PALETTEFADE
@@ -2757,8 +2756,7 @@ end
 -- CPlaceStone
 --
 CPlaceStone = CPlace:extend() -- stones
-Classic.KINDSTONE = "Stone" -- Stone kind
-Classic.NAMESTONE = "Stone" -- Stone name
+Classic.KINDPLACESTONE = "Stone" -- Stone kind
 CPlaceStone.PALETTEIDLE   = {
     [CPlace.MOON]    = CPlace.EMPTY,
     [CPlace.FLOOR01] = CPlace.STONEBG,
@@ -2775,7 +2773,7 @@ CPlaceStone.PALETTEFADE   = {
 }
 function CPlaceStone:new(_argt)
     CPlaceStone.super.new(self, _argt)
-    self.kind = Classic.KINDSTONE
+    self.kind = Classic.KINDPLACESTONE
     self.name = Classic.NAMEFITFUL
     self.hitbox      = CHitbox{entity = self, lf = 2, rg = 4, up = 6, dw = 7}
     self.palettefade = CPlaceStone.PALETTEFADE
@@ -2787,10 +2785,10 @@ end
 -- CPlaceMenhr
 --
 CPlaceMenhr = CPlaceStone:extend() -- menhrs
-Classic.KINDMENHR = "Menhr" -- Menhr kind
+Classic.KINDPLACEMENHR = "Menhr" -- Menhr kind
 function CPlaceMenhr:new(_argt)
     CPlaceMenhr.super.new(self, _argt)
-    self.kind = Classic.KINDMENHR
+    self.kind = Classic.KINDPLACEMENHR
     self.sprite      = CSpriteBG.PLACEMENHR
     self:argt(_argt) -- override if any
 end
@@ -2862,10 +2860,10 @@ end
 -- CPlaceDolmn
 --
 CPlaceDolmn = CPlaceStone:extend() -- dolmns
-Classic.KINDDOLMN = "Dolmn" -- Dolmn kind
+Classic.KINDPLACEDOLMN = "Dolmn" -- Dolmn kind
 function CPlaceDolmn:new(_argt)
     CPlaceDolmn.super.new(self, _argt)
-    self.kind = Classic.KINDDOLMN
+    self.kind = Classic.KINDPLACEDOLMN
     self.sprite = CSpriteBG.PLACEDOLMN
     self.hitbox = CHitbox{entity = self, lf = 1, rg = 4, up = 6, dw = 7}
      self:argt(_argt) -- override if any
@@ -2938,10 +2936,10 @@ end
 -- CPlaceCirkl
 --
 CPlaceCirkl = CPlaceStone:extend() -- cirkls
-Classic.KINDCIRKL = "Cirkl" -- Cirkl kind
+Classic.KINDPLACECIRKL = "Cirkl" -- Cirkl kind
 function CPlaceCirkl:new(_argt)
     CPlaceCirkl.super.new(self, _argt)
-    self.kind = Classic.KINDCIRKL
+    self.kind = Classic.KINDPLACECIRKL
     self.sprite = CSpriteBG.PLACECIRKL
     self.hitbox = CHitbox{entity = self, lf = 3, rg = 4, up = 6, dw = 7}
     self:argt(_argt) -- override if any
@@ -3014,10 +3012,10 @@ end
 -- CPlaceRoads
 --
 CPlaceRoads = CPlaceStone:extend() -- roads
-Classic.KINDROADS = "Roads" -- Roads kind
+Classic.KINDPLACEROADS = "Roads" -- Roads kind
 function CPlaceRoads:new(_argt)
     CPlaceRoads.super.new(self, _argt)
-    self.kind = Classic.KINDROADS
+    self.kind = Classic.KINDPLACEROADS
     self.sprite      = CSpriteBG.PLACEROADS
     self.hitbox = nil
     self:argt(_argt) -- override if any
@@ -3090,6 +3088,8 @@ end
 -- CObject
 --
 CObject = CEntityDrawable:extend() -- objects
+Classic.KINDOBJECT = "Object" -- Object kind
+Classic.NAMEOBJECT = "Object" -- Object name
 CObject.HANDLE = Tic.COLORWHITE
 CObject.BORDER = Tic.COLORGREYD
 CObject.INSIDE = Tic.COLORGREYM
@@ -3103,8 +3103,6 @@ CObject.COLORONYXFG = Tic.COLORGREYM
 CObject.COLORAZURBG = Tic.COLORBLUED
 CObject.COLORAZURFG = Tic.COLORBLUEM
 CObject.COLORFLASKG = Tic.COLORGREEND
-Classic.KINDOBJECT = "Object" -- Object kind
-Classic.NAMEOBJECT = "Object" -- Object name
 function CObject:new(_argt)
     CObject.super.new(self, _argt)
     self.kind = Classic.KINDOBJECT
@@ -3116,13 +3114,13 @@ end
 --
 -- CObjectHandable
 --
-CObjectHandable = CObject:extend() -- handable objects
-Classic.KINDHANDABLE = "Handable" -- Object kind
-Classic.NAMEHANDABLE = "Handable" -- Object name
+CObjectHandable = CObject:extend() -- handable (inventory) objects
+Classic.KINDOBJECTHANDABLE = "Handable" -- ObjectHandable kind
+Classic.NAMEOBJECTHANDABLE = "Handable" -- ObjectHandable name
 function CObjectHandable:new(_argt)
     CObjectHandable.super.new(self, _argt)
-    self.kind = Classic.KINDHANDABLE
-    self.name = Classic.KINDHANDABLE
+    self.kind = Classic.KINDOBJECTHANDABLE
+    self.name = Classic.KINDOBJECTHANDABLE
     self:argt(_argt) -- override if any
 end
 
@@ -3155,12 +3153,12 @@ end
 -- CWeaponMelee
 --
 CWeaponMelee = CWeapon:extend() -- Melee weapons
-Classic.KINDMELEE = "Melee" -- Melee kind
-Classic.NAMEMELEE = "Melee" -- Melee name
+Classic.KINDDWEAPONMELEE = "Melee" -- Melee kind
+Classic.NAMEDWEAPONMELEE = "Melee" -- Melee name
 function CWeaponMelee:new(_argt)
     CWeaponMelee.super.new(self, _argt)
-    self.kind = Classic.KINDMELEE
-    self.name = Classic.NAMEMELEE
+    self.kind = Classic.KINDDWEAPONMELEE
+    self.name = Classic.NAMEDWEAPONMELEE
     self.sprite  = CSpriteFG.WEAPONMELEE
     self.stateshandles = {
         [Tic.STATEIDLELF]  = {rotate = CSprite.ROTATE270, flip = Tic.DIRXLF},
@@ -3184,23 +3182,23 @@ function CWeaponMelee:new(_argt)
 end
 
 CWeaponSword = CWeaponMelee:extend() -- Sword weapons
-Classic.KINDSWORD = "Sword" -- Sword kind
-Classic.NAMESWORD = "Sword" -- Sword name
+Classic.KINDDWEAPONSWORD = "Sword" -- Sword kind
+Classic.NAMEDWEAPONSWORD = "Sword" -- Sword name
 function CWeaponSword:new(_argt)
     CWeaponSword.super.new(self, _argt)
-    self.kind = Classic.KINDSWORD
-    self.name = Classic.NAMESWORD
+    self.kind = Classic.KINDDWEAPONSWORD
+    self.name = Classic.NAMEDWEAPONSWORD
     self.sprite  = CSpriteFG.WEAPONSWORD
     self:argt(_argt) -- override if any
 end
 
 CWeaponHammer = CWeaponMelee:extend() -- Hammer weapons
-Classic.KINDHAMMR= "Hammer" -- Hammer kind
-Classic.NAMEHAMMR= "Hammer" -- Hammer name
+Classic.KINDDWEAPONHAMMR= "Hammer" -- Hammer kind
+Classic.NAMEDWEAPONHAMMR= "Hammer" -- Hammer name
 function CWeaponHammer:new(_argt)
     CWeaponHammer.super.new(self, _argt)
-    self.kind = Classic.KINDHAMMR
-    self.name = Classic.NAMEHAMMR
+    self.kind = Classic.KINDDWEAPONHAMMR
+    self.name = Classic.NAMEDWEAPONHAMMR
     self.sprite  = CSpriteFG.WEAPONHAMMR
     self:argt(_argt) -- override if any
 end
@@ -3210,12 +3208,12 @@ end
 -- CWeaponRange
 --
 CWeaponRange = CWeapon:extend() -- Range weapons
-Classic.KINDRANGE = "Range" -- Range kind
-Classic.NAMERANGE = "Range" -- Range name
+Classic.KINDDWEAPONRANGE = "Range" -- Range kind
+Classic.NAMEDWEAPONRANGE = "Range" -- Range name
 function CWeaponRange:new(_argt)
     CWeaponRange.super.new(self, _argt)
-    self.kind = Classic.KINDRANGE
-    self.name = Classic.NAMERANGE
+    self.kind = Classic.KINDDWEAPONRANGE
+    self.name = Classic.NAMEDWEAPONRANGE
     self.sprite  = CSpriteFG.WEAPONRANGE
     self.stateshandles = {
         [Tic.STATEIDLELF]  = {rotate = CSprite.ROTATE270, flip = Tic.DIRXLF},
@@ -3239,23 +3237,23 @@ function CWeaponRange:new(_argt)
 end
 
 CWeaponLongBow = CWeaponRange:extend() -- LongBow weapons
-Classic.KINDLGBOW = "L.Bow" -- LongBow kind
-Classic.NAMELGBOW = "L.Bow" -- LongBow name
+Classic.KINDDWEAPONLGBOW = "L.Bow" -- LongBow kind
+Classic.NAMEDWEAPONLGBOW = "L.Bow" -- LongBow name
 function CWeaponLongBow:new(_argt)
     CWeaponLongBow.super.new(self, _argt)
-    self.kind = Classic.KINDLGBOW
-    self.name = Classic.NAMELGBOW
+    self.kind = Classic.KINDDWEAPONLGBOW
+    self.name = Classic.NAMEDWEAPONLGBOW
     self.sprite  = CSpriteFG.WEAPONLGBOW
     self:argt(_argt) -- override if any
 end
 
 CWeaponCrossBow = CWeaponRange:extend() -- CrossBow weapons
-Classic.KINDCXBOW = "C.Bow" -- CrossBow kind
-Classic.NAMECXBOW = "C.Bow" -- CrossBow name
+Classic.KINDDWEAPONCXBOW = "C.Bow" -- CrossBow kind
+Classic.NAMEDWEAPONCXBOW = "C.Bow" -- CrossBow name
 function CWeaponCrossBow:new(_argt)
     CWeaponCrossBow.super.new(self, _argt)
-    self.kind = Classic.KINDCXBOW
-    self.name = Classic.NAMECXBOW
+    self.kind = Classic.KINDDWEAPONCXBOW
+    self.name = Classic.NAMEDWEAPONCXBOW
     self.sprite  = CSpriteFG.WEAPONCXBOW
     self:argt(_argt) -- override if any
 end
@@ -3265,12 +3263,12 @@ end
 -- CWeaponShield
 --
 CWeaponShield = CWeapon:extend() -- Shield weapons
-Classic.KINDSHLDS = "Shield" -- Shield kind
-Classic.NAMESHLDS = "Shield" -- Shield name
+Classic.KINDDWEAPONSHLDS = "Shield" -- Shield kind
+Classic.NAMEDWEAPONSHLDS = "Shield" -- Shield name
 function CWeaponShield:new(_argt)
     CWeaponShield.super.new(self, _argt)
-    self.kind = Classic.KINDSHLDS
-    self.name = Classic.NAMESHLDS
+    self.kind = Classic.KINDDWEAPONSHLDS
+    self.name = Classic.NAMEDWEAPONSHLDS
     self.sprite  = CSpriteFG.WEAPONSHLDS
     self.stateshandles = {
         [Tic.STATEIDLELF]  = {rotate = CSprite.ROTATE000, flip = Tic.DIRXLF},
@@ -3294,23 +3292,23 @@ function CWeaponShield:new(_argt)
 end
 
 CWeaponTeeShield = CWeaponShield:extend() -- TeeShield weapons
-Classic.KINDSHLDT = "T.Ecu" -- TeeShield kind
-Classic.NAMESHLDT = "T.Ecu" -- TeeShield name
+Classic.KINDDWEAPONSHLDT = "T.Ecu" -- TeeShield kind
+Classic.NAMEDWEAPONSHLDT = "T.Ecu" -- TeeShield name
 function CWeaponTeeShield:new(_argt)
     CWeaponTeeShield.super.new(self, _argt)
-    self.kind = Classic.KINDSHLDT
-    self.name = Classic.NAMESHLDT
+    self.kind = Classic.KINDDWEAPONSHLDT
+    self.name = Classic.NAMEDWEAPONSHLDT
     self.sprite  = CSpriteFG.WEAPONSHLDT
     self:argt(_argt) -- override if any
 end
 
 CWeaponRoundShield = CWeaponShield:extend() -- RoundShield weapons
-Classic.KINDSHLDR= "R.Ecu" -- RoundShield kind
-Classic.NAMESHLDR= "R.Ecu" -- RoundShield name
+Classic.KINDDWEAPONSHLDR= "R.Ecu" -- RoundShield kind
+Classic.NAMEDWEAPONSHLDR= "R.Ecu" -- RoundShield name
 function CWeaponRoundShield:new(_argt)
     CWeaponRoundShield.super.new(self, _argt)
-    self.kind = Classic.KINDSHLDR
-    self.name = Classic.NAMESHLDR
+    self.kind = Classic.KINDDWEAPONSHLDR
+    self.name = Classic.NAMEDWEAPONSHLDR
     self.sprite  = CSpriteFG.WEAPONSHLDR
     self:argt(_argt) -- override if any
 end
@@ -3320,12 +3318,12 @@ end
 -- CWeaponFlask
 --
 CWeaponFlask = CWeapon:extend() -- Flask weapons
-Classic.KINDFLASK = "Flask" -- Flask kind
-Classic.NAMEFLASK = "Flask" -- Flask name
+Classic.KINDDWEAPONFLASK = "Flask" -- Flask kind
+Classic.NAMEDWEAPONFLASK = "Flask" -- Flask name
 function CWeaponFlask:new(_argt)
     CWeaponFlask.super.new(self, _argt)
-    self.kind = Classic.KINDFLASK
-    self.name = Classic.NAMEFLASK
+    self.kind = Classic.KINDDWEAPONFLASK
+    self.name = Classic.NAMEDWEAPONFLASK
     self.sprite  = CSpriteFG.WEAPONFLASK
     self.stateshandles = {
         [Tic.STATEIDLELF]  = {rotate = CSprite.ROTATE000, flip = Tic.DIRXLF},
@@ -3349,23 +3347,23 @@ function CWeaponFlask:new(_argt)
 end
 
 CWeaponSmallFlask = CWeaponFlask:extend() -- SmallFlask weapons
-Classic.KINDFLASS = "S.Oil" -- SmallFlask kind
-Classic.NAMEFLASS = "S.Oil" -- SmallFlask name
+Classic.KINDDWEAPONFLASS = "S.Oil" -- SmallFlask kind
+Classic.NAMEDWEAPONFLASS = "S.Oil" -- SmallFlask name
 function CWeaponSmallFlask:new(_argt)
     CWeaponSmallFlask.super.new(self, _argt)
-    self.kind = Classic.KINDFLASS
-    self.name = Classic.NAMEFLASS
+    self.kind = Classic.KINDDWEAPONFLASS
+    self.name = Classic.NAMEDWEAPONFLASS
     self.sprite  = CSpriteFG.WEAPONFLASS
     self:argt(_argt) -- override if any
 end
 
 CWeaponMediumFlask = CWeaponFlask:extend() -- MediumFlask weapons
-Classic.KINDFLASM = "M.Oil" -- MediumFlask kind
-Classic.NAMEFLASM = "M.Oil" -- MediumFlask name
+Classic.KINDDWEAPONFLASM = "M.Oil" -- MediumFlask kind
+Classic.NAMEDWEAPONFLASM = "M.Oil" -- MediumFlask name
 function CWeaponMediumFlask:new(_argt)
     CWeaponMediumFlask.super.new(self, _argt)
-    self.kind = Classic.KINDFLASM
-    self.name = Classic.NAMEFLASM
+    self.kind = Classic.KINDDWEAPONFLASM
+    self.name = Classic.NAMEDWEAPONFLASM
     self.sprite  = CSpriteFG.WEAPONFLASM
     self:argt(_argt) -- override if any
 end

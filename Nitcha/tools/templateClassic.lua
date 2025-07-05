@@ -9,6 +9,9 @@ _nclassic = "Classic.NAME".._uclassic
 
 
 _template = [[
+--
+-- _cclassic
+--
 _cclassic = _cextend:extend() -- _comment
 _kclassic = "_classic" -- _classic kind
 _nclassic = "_classic" -- _classic name
