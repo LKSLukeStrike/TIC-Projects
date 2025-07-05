@@ -3087,7 +3087,7 @@ end
 --
 -- CObject
 --
-CObject = CEntityDrawable:extend() -- objects
+CObject = CEntityDrawable:extend() -- generic objects
 Classic.KINDOBJECT = "Object" -- Object kind
 Classic.NAMEOBJECT = "Object" -- Object name
 CObject.HANDLE = Tic.COLORWHITE
@@ -3114,7 +3114,7 @@ end
 --
 -- CObjectHandable
 --
-CObjectHandable = CObject:extend() -- handable (inventory) objects
+CObjectHandable = CObject:extend() -- generic handable (inventory) objects
 Classic.KINDOBJECTHANDABLE = "Handable" -- ObjectHandable kind
 Classic.NAMEOBJECTHANDABLE = "Handable" -- ObjectHandable name
 function CObjectHandable:new(_argt)
@@ -3134,11 +3134,55 @@ function CObjectHandable:handleOffsets(_state)
     return _result
 end
 
+CObjectHandableAny = CObjectHandable:extend() -- generic handable (inventory any) objects
+Classic.KINDOBJECTHANDABLEANY = "ObjectHandableAny" -- ObjectHandableAny kind
+Classic.NAMEOBJECTHANDABLEANY = "ObjectHandableAny" -- ObjectHandableAny name
+function CObjectHandableAny:new(_argt)
+    CObjectHandableAny.super.new(self, _argt)
+    self.kind = Classic.KINDOBJECTHANDABLEANY
+    self.name = Classic.NAMEOBJECTHANDABLEANY
+    self.inventorytype = CInventoryAny
+    self:argt(_argt) -- override if any
+end
+
+CObjectHandablePhy = CObjectHandable:extend() -- generic handable (inventory phy) objects
+Classic.KINDOBJECTHANDABLEPHY = "ObjectHandablePhy" -- ObjectHandablePhy kind
+Classic.NAMEOBJECTHANDABLEPHY = "ObjectHandablePhy" -- ObjectHandablePhy name
+function CObjectHandablePhy:new(_argt)
+    CObjectHandablePhy.super.new(self, _argt)
+    self.kind = Classic.KINDOBJECTHANDABLEPHY
+    self.name = Classic.NAMEOBJECTHANDABLEPHY
+    self.inventorytype = CInventoryPhy
+    self:argt(_argt) -- override if any
+end
+
+CObjectHandableMen = CObjectHandable:extend() -- generic handable (inventory men) objects
+Classic.KINDOBJECTHANDABLEMEN = "ObjectHandableMen" -- ObjectHandableMen kind
+Classic.NAMEOBJECTHANDABLEMEN = "ObjectHandableMen" -- ObjectHandableMen name
+function CObjectHandableMen:new(_argt)
+    CObjectHandableMen.super.new(self, _argt)
+    self.kind = Classic.KINDOBJECTHANDABLEMEN
+    self.name = Classic.NAMEOBJECTHANDABLEMEN
+    self.inventorytype = CInventoryMen
+    self:argt(_argt) -- override if any
+end
+
+CObjectHandablePsy = CObjectHandable:extend() -- generic handable (inventory psy) objects
+Classic.KINDOBJECTHANDABLEPSY = "ObjectHandablePsy" -- ObjectHandablePsy kind
+Classic.NAMEOBJECTHANDABLEPSY = "ObjectHandablePsy" -- ObjectHandablePsy name
+function CObjectHandablePsy:new(_argt)
+    CObjectHandablePsy.super.new(self, _argt)
+    self.kind = Classic.KINDOBJECTHANDABLEPSY
+    self.name = Classic.NAMEOBJECTHANDABLEPSY
+    self.inventorytype = CInventoryPsy
+    self:argt(_argt) -- override if any
+end
+
 
 --
 -- CWeapon
 --
-CWeapon = CObjectHandable:extend() -- weapons
+CWeapon = CObjectHandablePhy:extend() -- weapons
 Classic.KINDWEAPON = "Weapon" -- Weapon kind
 Classic.NAMEWEAPON = "Weapon" -- Weapon name
 function CWeapon:new(_argt)
@@ -3615,11 +3659,19 @@ function CCharacter:new(_argt)
     self.drawview     = false
     self.drawmind     = false
     self.drawmove     = false
-    self.objecthandlf = nil -- character objects
+    self.objecthandlf = nil -- character objects slots
     self.objecthandrg = nil
+    self.inventories  = {[CInventoryPhy] = CInventoryPhy{}, [CInventoryMen] = CInventoryMen{}, [CInventoryPsy] = CInventoryPsy{}} -- standard inventories
     self:argt(_argt) -- override if any
     self.camera       = CCamera{name = self.name.." "..Classic.NAMECAMERA} -- one camera per character
     self:focus() -- focus its camera on itself
+    self:adjustInventories() -- adjust standard inventories sizes
+end
+
+function CCharacter:adjustInventories()
+    self.inventories[CInventoryPhy].objectsmax = self.statphymax
+    self.inventories[CInventoryMen].objectsmax = self.statmenmax
+    self.inventories[CInventoryPsy].objectsmax = self.statpsymax
     for _, _object in ipairs({"objecthandlf", "objecthandrg"}) do -- remove character objects from the world
         self.world:deleteEntity(self[_object])
     end
@@ -4334,8 +4386,8 @@ end
 --
 -- CCharacterHumanoid
 --
-Classic.KINDHUMANOID = "Humanoid" -- Humanoid kind
 CCharacterHumanoid = CCharacter:extend() -- humanoid characters
+Classic.KINDCHARACTERHUMANOID = "Humanoid" -- Humanoid kind
 CCharacterHumanoid.HANDSOFFSETS = {
     [Tic.STATUSIDLE] = {
         [Tic.DIRXLF] = {
@@ -4382,7 +4434,7 @@ CCharacterHumanoid.HANDSOFFSETS = {
 }
 function CCharacterHumanoid:new(_argt)
     CCharacterHumanoid.super.new(self, _argt)
-    self.kind         = Classic.KINDHUMANOID
+    self.kind         = Classic.KINDCHARACTERHUMANOID
     self.handsoffsets = CCharacterHumanoid.HANDSOFFSETS
     self.colorhairsfg = Tic.COLORGREYD -- head colors
     self.colorhairsbg = Tic.COLORGREYM
@@ -4550,6 +4602,7 @@ function CPlayerDwarf:new(_argt)
     self.statpsymax   = 2
     self.statpsyact   = self.statpsymax
     self:argt(_argt) -- override if any
+    self:adjustInventories() -- adjust standard inventories sizes
 end
 
 
@@ -4570,6 +4623,7 @@ function CPlayerGnome:new(_argt)
     self.statpsymax   = 6
     self.statpsyact   = self.statpsymax
     self:argt(_argt) -- override if any
+    self:adjustInventories() -- adjust standard inventories sizes
 end
 
 
@@ -4591,6 +4645,7 @@ function CPlayerElvwe:new(_argt)
     self.statpsymax   = 5
     self.statpsyact   = self.statpsymax
     self:argt(_argt) -- override if any
+    self:adjustInventories() -- adjust standard inventories sizes
 end
 
 
@@ -4611,6 +4666,7 @@ function CPlayerDrowe:new(_argt)
     self.statpsymax   = 4
     self.statpsyact   = self.statpsymax
     self:argt(_argt) -- override if any
+    self:adjustInventories() -- adjust standard inventories sizes
 end
 
 
@@ -4631,6 +4687,7 @@ function CPlayerAngel:new(_argt)
     self.statpsymax   = 6
     self.statpsyact   = self.statpsymax
     self:argt(_argt) -- override if any
+    self:adjustInventories() -- adjust standard inventories sizes
 end
 
 
@@ -4653,6 +4710,7 @@ function CPlayerGolth:new(_argt)
     self.statpsymax   = 1
     self.statpsyact   = self.statpsymax
     self:argt(_argt) -- override if any
+    self:adjustInventories() -- adjust standard inventories sizes
 end
 
 
@@ -4673,6 +4731,7 @@ function CPlayerHorne:new(_argt)
     self.statpsymax   = 7
     self.statpsyact   = self.statpsymax
     self:argt(_argt) -- override if any
+    self:adjustInventories() -- adjust standard inventories sizes
 end
 
 
@@ -4688,6 +4747,7 @@ function CPlayerDemon:new(_argt)
     self.statpsymax   = 7
     self.statpsyact   = self.statpsymax
     self:argt(_argt) -- override if any
+    self:adjustInventories() -- adjust standard inventories sizes
 end
 
 
@@ -4704,6 +4764,7 @@ function CPlayerTifel:new(_argt)
     self.statpsymax   = 5
     self.statpsyact   = self.statpsymax
     self:argt(_argt) -- override if any
+    self:adjustInventories() -- adjust standard inventories sizes
 end
 
 
@@ -4723,6 +4784,7 @@ function CPlayerMeduz:new(_argt)
     self.statpsymax   = 5
     self.statpsyact   = self.statpsymax
     self:argt(_argt) -- override if any
+    self:adjustInventories() -- adjust standard inventories sizes
 end
 
 
@@ -4742,6 +4804,7 @@ function CPlayerGnoll:new(_argt)
     self.statpsymax   = 2
     self.statpsyact   = self.statpsymax
     self:argt(_argt) -- override if any
+    self:adjustInventories() -- adjust standard inventories sizes
 end
 
 
@@ -4751,6 +4814,7 @@ function CPlayerWolfe:new(_argt)
     CPlayerWolfe.super.new(self, _argt)
     self.kind         = Classic.KINDWOLFE
     self:argt(_argt) -- override if any
+    self:adjustInventories() -- adjust standard inventories sizes
 end
 
 
@@ -4771,6 +4835,7 @@ function CPlayerGhost:new(_argt)
     self.statpsymax   = 6
     self.statpsyact   = self.statpsymax
     self:argt(_argt) -- override if any
+    self:adjustInventories() -- adjust standard inventories sizes
 end
 
 
@@ -7450,10 +7515,6 @@ function Tic:draw()
     Tic.inputsDo()
 
     Tic:screenActual():draw()
-    -- exit()
-
-    -- Tic:logEntity("w", Wulfie)
-    -- Tic:logEntity("o", Oxboow)
 
     Tic:drawLog()
     Tic:logPrint()
@@ -7483,26 +7544,10 @@ function Tic:drawLog() -- [-] remove
     local _dirx    = _playeractual.dirx
     local _diry    = _playeractual.diry
 
-    -- Oxboow.hitbox.scale = 1
-    -- local _ho = Oxboow:hitboxRegionWorld()
-    -- local _hw = Wulfie:hitboxRegionWorld()
-    -- Tic:logAppend("oxE", Oxboow.hitbox.entity)
-    -- Tic:logAppend("oxW", Oxboow.worldx, Oxboow.worldy)
-    -- Tic:logRegion("oxH", Oxboow.hitbox)
-    -- Tic:logRegion("oxR", _ho)
-    -- Tic:logAppend("wuW", Wulfie.worldx, Wulfie.worldy)
-    -- Tic:logRegion("wuH", Wulfie.hitbox)
-    -- Tic:logRegion("wuR", _hw)
-    -- Tic:logAppend("HIT", _ho:hasInsideRegion(_hw))
-    
-    -- for _key, _val in pairs(Tic.MODIFIERKEYS) do -- modifier keys state
-    --     Tic:logAppend(_key, _val)
-    -- end
-
-    -- Tic:logAppend("wx", _playeractual.worldx)
-    -- Tic:logAppend("wy", _playeractual.worldy)
-
-    -- Tic:logAppend(Nums:frequence01(_tick00, Tic.FREQUENCE0240))
+    Tic:logAppend(_playeractual.name)
+    for _, _inventory in pairs(_playeractual.inventories) do
+        Tic:logAppend(_inventory.kind, _inventory.objectsmax)
+    end
 end
 
 function Tic:logRegion(_pfx, _region)
