@@ -1478,6 +1478,23 @@ function CInventory:new(_argt)
     self:argt(_argt) -- override if any
 end
 
+function CInventory:appendObject(_object)
+    if not _object then return end -- mandatory
+    if not _object.inventorytype then return end -- mandatory -- only storable objects
+    if self.objectstypes and not Tables:valFind(self.objectstypes, _object.inventorytype) then return end -- allowed type if any
+    if Tables:valFind(self.objects, _object) then return _object end -- already in inventory so it's ok
+    if Tables:size(self.objects >= self.objectsmax) then return end -- cannot append, inventory full
+    Tables:valInsert(self.objects, _object, true) -- add the object
+    return _object -- ok
+end
+
+function CInventory:removeObject(_object)
+    if not _object then return end -- mandatory
+    if not Tables:valFind(self.objects, _object) then return end -- not in inventory
+    Tables:valRemove(self.objects, _object) -- remove all -- should not append
+    return _object -- ok
+end
+
 CInventoryAny = CInventory:extend() -- generic any inventory
 Classic.KINDINVENTORYANY = "InventoryAny" -- InventoryAny kind
 Classic.NAMEINVENTORYANY = "InventoryAny" -- InventoryAny name
@@ -1837,21 +1854,21 @@ function CEntitiesLocations:new(_argt)
     self:argt(_argt) -- override if any
 end
 
-function CEntitiesLocations:exists(_entity) -- if exists an entity
+function CEntitiesLocations:existsEntity(_entity) -- if exists an entity
     if not _entity then return false end -- mandatory
     return self.entities[_entity]
 end
 
 function CEntitiesLocations:appendEntity(_entity) -- add a new entity
     if not _entity then return end -- mandatory
-    if self:exists(_entity) then return end -- avoid doublons
+    if self:existsEntity(_entity) then return end -- avoid doublons
     self.entities[_entity] = true
     self.locations:appendEntity(_entity)
 end
 
 function CEntitiesLocations:deleteEntity(_entity) -- delete an entity
     if not _entity then return end -- mandatory
-    if not self:exists(_entity) then return end -- doesnt exist
+    if not self:existsEntity(_entity) then return end -- doesnt exist
     self.entities[_entity] = nil
     self.locations:deleteEntity(_entity)
 end
@@ -7544,9 +7561,11 @@ function Tic:drawLog() -- [-] remove
     local _dirx    = _playeractual.dirx
     local _diry    = _playeractual.diry
 
-    Tic:logAppend(_playeractual.name)
+    Tic:logAppend(_playeractual.world.name, Tables:size(_playeractual.world.entitieslocations.entities))
+    Tic:logAppend()
+    Tic:logAppend(_playeractual.name, _playeractual.statphymax, _playeractual.statmenmax, _playeractual.statpsymax)
     for _, _inventory in pairs(_playeractual.inventories) do
-        Tic:logAppend(_inventory.kind, _inventory.objectsmax)
+        Tic:logAppend(_inventory.kind, Tables:size(_inventory.objects).."/".._inventory.objectsmax)
     end
 end
 

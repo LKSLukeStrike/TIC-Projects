@@ -123,7 +123,7 @@ end
 
 function Tables:valInsert(_table, _val, _once, _key) -- insert a val entry (ipaired tables) -- once of any (avoid doublons)
     if not _table or not _val then return end -- mandatory
-    if Tables:valFind(_table, _val) and _once then return end -- avoid doublons
+    if _once and Tables:valFind(_table, _val) then return end -- avoid doublons
     if _key then
         table.insert(_table, _key, _val) -- at _key
     else
