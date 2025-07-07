@@ -2,7 +2,7 @@
 package.path = package.path..";G:/TIC80 1.1/TICProjects/Nitcha/?.lua"
 local Tables = require("libraries/lks/Tables")
 
-
+if false then
 local _tbl = {a = 10, b = 100, c = 1000, d = 10000, e = {e1 = "hello", e2 = "world",},}
 print"KEYS"
 Tables:print(Tables:keys(_tbl))
@@ -40,7 +40,9 @@ print"KREM"
 Tables:print(_tbl)
 Tables:keyDelete(_tbl, "a")
 Tables:print(_tbl, {indent = ">"})
+end
 
+if false then
 print()
 t = {"auto", "velo", "moto"}
 print(Tables:valFind(t, "plane"))
@@ -62,13 +64,21 @@ Tables:print(t)
 print()
 Tables:keyRemoveNAt(t, 1)
 Tables:print(t)
+end
 
+if false then
 print()
 Tables:print(Tables:generate{
     ["a"] = 10,
     ["b"] = 5,
     ["c"] = 1,
 })
+end
 
+if true then
 print()
-print(Tables:size(nil))
+Tables:print(Tables:icopy({10, 10, 20}))
+Tables:print(Tables:icopy({10, 10, 20}, true))
+Tables:print(Tables:imerge({10, 10, 20}, {10, 10, 200}))
+Tables:print(Tables:imerge({10, 10, 20}, {10, 10, 200}, true))
+end

@@ -1478,14 +1478,19 @@ function CInventory:new(_argt)
     self:argt(_argt) -- override if any
 end
 
+function CInventory:canAppendObject(_object)
+    if not _object then return false end -- mandatory
+    if not _object.inventorytype then return false end -- mandatory -- only storable objects
+    if self.objectstypes and not Tables:valFind(self.objectstypes, _object.inventorytype) then return false end -- not allowed type if any
+    if not Tables:valFind(self.objects, _object) -- not in inventory
+    and Tables:size(self.objects) >= self.objectsmax then return false end -- and cannot append, inventory full
+    return true
+end
+
 function CInventory:appendObject(_object)
-    if not _object then return end -- mandatory
-    if not _object.inventorytype then return end -- mandatory -- only storable objects
-    if self.objectstypes and not Tables:valFind(self.objectstypes, _object.inventorytype) then return end -- allowed type if any
-    if Tables:valFind(self.objects, _object) then return _object end -- already in inventory so it's ok
-    if Tables:size(self.objects >= self.objectsmax) then return end -- cannot append, inventory full
+    if self:canAppendObject(_object) then return end -- nil = false
     Tables:valInsert(self.objects, _object, true) -- add the object
-    return _object -- ok
+    return _object -- done
 end
 
 function CInventory:removeObject(_object)
@@ -2883,7 +2888,7 @@ function CPlaceDolmn:new(_argt)
     self.kind = Classic.KINDPLACEDOLMN
     self.sprite = CSpriteBG.PLACEDOLMN
     self.hitbox = CHitbox{entity = self, lf = 1, rg = 4, up = 6, dw = 7}
-     self:argt(_argt) -- override if any
+    self:argt(_argt) -- override if any
 end
 
 CPlaceDolmnAnim = CPlaceDolmn:extend() -- anim dolmns
@@ -3678,14 +3683,24 @@ function CCharacter:new(_argt)
     self.drawmove     = false
     self.objecthandlf = nil -- character objects slots
     self.objecthandrg = nil
-    self.inventories  = {[CInventoryPhy] = CInventoryPhy{}, [CInventoryMen] = CInventoryMen{}, [CInventoryPsy] = CInventoryPsy{}} -- standard inventories
+    self.inventories  = {
+                         [CInventoryPhy] = CInventoryPhy{},
+                         [CInventoryMen] = CInventoryMen{},
+                         [CInventoryPsy] = CInventoryPsy{},
+                         [CInventoryAny] = CInventoryAny{},
+                        } -- standard inventories
     self:argt(_argt) -- override if any
     self.camera       = CCamera{name = self.name.." "..Classic.NAMECAMERA} -- one camera per character
     self:focus() -- focus its camera on itself
-    self:adjustInventories() -- adjust standard inventories sizes
+end
+
+function CCharacter:argt(_argt)
+    CCharacter.super.argt(self, _argt)
+   self:adjustInventories() -- adjust standard inventories sizes
 end
 
 function CCharacter:adjustInventories()
+    if not self.inventories then return end -- mandatory (argt)
     self.inventories[CInventoryPhy].objectsmax = self.statphymax
     self.inventories[CInventoryMen].objectsmax = self.statmenmax
     self.inventories[CInventoryPsy].objectsmax = self.statpsymax
@@ -4619,7 +4634,6 @@ function CPlayerDwarf:new(_argt)
     self.statpsymax   = 2
     self.statpsyact   = self.statpsymax
     self:argt(_argt) -- override if any
-    self:adjustInventories() -- adjust standard inventories sizes
 end
 
 
@@ -4640,7 +4654,6 @@ function CPlayerGnome:new(_argt)
     self.statpsymax   = 6
     self.statpsyact   = self.statpsymax
     self:argt(_argt) -- override if any
-    self:adjustInventories() -- adjust standard inventories sizes
 end
 
 
@@ -4662,7 +4675,6 @@ function CPlayerElvwe:new(_argt)
     self.statpsymax   = 5
     self.statpsyact   = self.statpsymax
     self:argt(_argt) -- override if any
-    self:adjustInventories() -- adjust standard inventories sizes
 end
 
 
@@ -4683,7 +4695,6 @@ function CPlayerDrowe:new(_argt)
     self.statpsymax   = 4
     self.statpsyact   = self.statpsymax
     self:argt(_argt) -- override if any
-    self:adjustInventories() -- adjust standard inventories sizes
 end
 
 
@@ -4704,7 +4715,6 @@ function CPlayerAngel:new(_argt)
     self.statpsymax   = 6
     self.statpsyact   = self.statpsymax
     self:argt(_argt) -- override if any
-    self:adjustInventories() -- adjust standard inventories sizes
 end
 
 
@@ -4727,7 +4737,6 @@ function CPlayerGolth:new(_argt)
     self.statpsymax   = 1
     self.statpsyact   = self.statpsymax
     self:argt(_argt) -- override if any
-    self:adjustInventories() -- adjust standard inventories sizes
 end
 
 
@@ -4748,7 +4757,6 @@ function CPlayerHorne:new(_argt)
     self.statpsymax   = 7
     self.statpsyact   = self.statpsymax
     self:argt(_argt) -- override if any
-    self:adjustInventories() -- adjust standard inventories sizes
 end
 
 
@@ -4764,7 +4772,6 @@ function CPlayerDemon:new(_argt)
     self.statpsymax   = 7
     self.statpsyact   = self.statpsymax
     self:argt(_argt) -- override if any
-    self:adjustInventories() -- adjust standard inventories sizes
 end
 
 
@@ -4781,7 +4788,6 @@ function CPlayerTifel:new(_argt)
     self.statpsymax   = 5
     self.statpsyact   = self.statpsymax
     self:argt(_argt) -- override if any
-    self:adjustInventories() -- adjust standard inventories sizes
 end
 
 
@@ -4801,7 +4807,6 @@ function CPlayerMeduz:new(_argt)
     self.statpsymax   = 5
     self.statpsyact   = self.statpsymax
     self:argt(_argt) -- override if any
-    self:adjustInventories() -- adjust standard inventories sizes
 end
 
 
@@ -4821,7 +4826,6 @@ function CPlayerGnoll:new(_argt)
     self.statpsymax   = 2
     self.statpsyact   = self.statpsymax
     self:argt(_argt) -- override if any
-    self:adjustInventories() -- adjust standard inventories sizes
 end
 
 
@@ -4831,7 +4835,6 @@ function CPlayerWolfe:new(_argt)
     CPlayerWolfe.super.new(self, _argt)
     self.kind         = Classic.KINDWOLFE
     self:argt(_argt) -- override if any
-    self:adjustInventories() -- adjust standard inventories sizes
 end
 
 
@@ -4852,7 +4855,6 @@ function CPlayerGhost:new(_argt)
     self.statpsymax   = 6
     self.statpsyact   = self.statpsymax
     self:argt(_argt) -- override if any
-    self:adjustInventories() -- adjust standard inventories sizes
 end
 
 
@@ -7250,11 +7252,14 @@ Nitcha = CPlayerDrowe{name = "Nitcha",
 -- }
 -- Daemok = CPlayerDemon{name = "Daemok",
 -- }
+Sword = CWeaponSword{}
 Globth = CPlayerGolth{name = "Globth",
     worldx = 20,
-    objecthandrg = CWeaponSword{},
+    objecthandrg = Sword,
     objecthandlf = CWeaponTeeShield{},
 }
+Globth.inventories[CInventoryPhy].objects = {Sword, Sword}
+
 -- Globth:randomWorldWindow()
 end
 
@@ -7565,7 +7570,14 @@ function Tic:drawLog() -- [-] remove
     Tic:logAppend()
     Tic:logAppend(_playeractual.name, _playeractual.statphymax, _playeractual.statmenmax, _playeractual.statpsymax)
     for _, _inventory in pairs(_playeractual.inventories) do
-        Tic:logAppend(_inventory.kind, Tables:size(_inventory.objects).."/".._inventory.objectsmax)
+        Tic:logInventory(_inventory)
+    end
+end
+
+function Tic:logInventory(_inventory)
+    Tic:logAppend(_inventory.kind, Tables:size(_inventory.objects).."/".._inventory.objectsmax)
+    for _, _object in ipairs(_inventory.objects) do
+        Tic:logAppend(_object.kind, _object.name)
     end
 end
 
