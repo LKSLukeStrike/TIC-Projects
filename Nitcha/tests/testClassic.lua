@@ -2,6 +2,7 @@
 package.path  = package.path..";G:/TIC80 1.1/TICProjects/Nitcha/?.lua"
 local Classic = require("libraries/ext/Classic")
 local Tables  = require("libraries/lks/Tables")
+trace = print
 
 
 IHello = Classic:extend()
@@ -42,11 +43,12 @@ CPlayerExtra = CPlayer:extend()
 function CPlayerExtra:new(_argt)
   CPlayerExtra.super.new(self, _argt)
   self.kind = "CPlayerExtra"
+  self.inv = {phy = 1000, men = 2000, psy = {h = "hello", w = "world"}}
   self:argt(_argt)
 end
 function CPlayerExtra:argt(_argt)
   CPlayerExtra.super.argt(self, _argt)
-  self.fullname = (self.firstname or "")..":"..(self.lastname or "")
+  self.fullname = (self.firstname or "").."_"..(self.lastname or "")
 end
 
 
@@ -93,6 +95,14 @@ AlainDucon = CPlayerExtra{
   x = 1000,
   firstname = "Alain",
   lastname = "Ducon",
+  ["inv.phy"] = -100,
+  ["inv.psy.h"] = "coucou",
+  ["inv.men.h"] = "coucou",
+  ["inv.any.h"] = "coucou",
 }
+-- AlainDucon.inv.men = -200,
+AlainDucon["inv"]["men"] = -200,
 
-AlainDucon:printMe()
+-- AlainDucon:printMe()
+print()
+Tables:print(AlainDucon, {indent = "\t"})

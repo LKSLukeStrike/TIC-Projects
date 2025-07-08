@@ -142,10 +142,27 @@ end
 
 function Classic:argt(_argt) -- set a classic tables key/val from a _argt table {k = v, ...}
   for _key, _val in pairs(_argt or {}) do
+    local _subkeys = {}
+    for _subkey in string.gmatch(_key, "[^%.]+") do
+        table.insert(_subkeys, _subkey)
+    end
+
+    local _ptrkey = self
+    local _subkey = _subkeys[1]
+
+    for _idxkey = 1, #_subkeys - 1 do
+      _subkey = _subkeys[_idxkey]
+      if not _ptrkey[_subkey] then _ptrkey[_subkey] = {} end
+      if type(_ptrkey[_subkey]) == "table" then
+        _ptrkey = _ptrkey[_subkey]
+        _subkey = _subkeys[_idxkey + 1]
+      end
+    end
+
     if _val == Classic.NIL then
-      self[_key] = nil -- remove a key
+      _ptrkey[_subkey] = nil -- remove a key
     else
-      self[_key] = _val
+      _ptrkey[_subkey] = _val
     end
   end
 end

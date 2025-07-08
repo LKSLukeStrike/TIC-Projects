@@ -3684,10 +3684,10 @@ function CCharacter:new(_argt)
     self.objecthandlf = nil -- character objects slots
     self.objecthandrg = nil
     self.inventories  = {
-                         [CInventoryPhy] = CInventoryPhy{},
-                         [CInventoryMen] = CInventoryMen{},
-                         [CInventoryPsy] = CInventoryPsy{},
-                         [CInventoryAny] = CInventoryAny{},
+                         phy = CInventoryPhy{},
+                         men = CInventoryMen{},
+                         psy = CInventoryPsy{},
+                         any = CInventoryAny{},
                         } -- standard inventories
     self:argt(_argt) -- override if any
     self.camera       = CCamera{name = self.name.." "..Classic.NAMECAMERA} -- one camera per character
@@ -3701,9 +3701,9 @@ end
 
 function CCharacter:adjustInventories()
     if not self.inventories then return end -- mandatory (argt)
-    self.inventories[CInventoryPhy].objectsmax = self.statphymax
-    self.inventories[CInventoryMen].objectsmax = self.statmenmax
-    self.inventories[CInventoryPsy].objectsmax = self.statpsymax
+    self.inventories.phy.objectsmax = self.statphymax
+    self.inventories.men.objectsmax = self.statmenmax
+    self.inventories.psy.objectsmax = self.statpsymax
     for _, _object in ipairs({"objecthandlf", "objecthandrg"}) do -- remove character objects from the world
         self.world:deleteEntity(self[_object])
     end
@@ -7258,7 +7258,7 @@ Globth = CPlayerGolth{name = "Globth",
     objecthandrg = Sword,
     objecthandlf = CWeaponTeeShield{},
 }
-Globth.inventories[CInventoryPhy].objects = {Sword, Sword}
+Globth.inventories.phy.objects = {Sword, Sword}
 
 -- Globth:randomWorldWindow()
 end
