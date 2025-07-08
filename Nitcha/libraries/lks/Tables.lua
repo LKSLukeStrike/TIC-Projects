@@ -145,8 +145,8 @@ function Tables:valRemove(_table, _val, _once) -- remove a val entry (ipaired ta
 end
 
 
--- Copy and Merge
-function Tables:copy(_table) -- copy a dic table -- SORTED -- only first level -- FIXME ?
+-- Clone and Merge
+function Tables:clone(_table) -- clone a dic table -- SORTED -- only first level -- FIXME ?
     local _result = {}
     local _keys = Tables:keys(_table) -- sorted keys
     for _, _key in ipairs(_keys) do
@@ -155,7 +155,7 @@ function Tables:copy(_table) -- copy a dic table -- SORTED -- only first level -
     return _result
 end
 
-function Tables:icopy(_table, _once) -- copy a seq table -- unique vals if any
+function Tables:iclone(_table, _once) -- clone a seq table -- unique vals if any
     local _result = {}
     for _, _val in ipairs(_table or {}) do
         Tables:valInsert(_result, _val, _once)
@@ -171,7 +171,7 @@ function Tables:merge(_tablea, _tableb) -- merge two dic tables -- do not alter 
 end
 
 function Tables:imerge(_tablea, _tableb, _once) -- merge two seq tables -- unique vals if any
-    local _result = Tables:icopy(_tablea, _once)
+    local _result = Tables:iclone(_tablea, _once)
     for _, _val in ipairs(_tableb or {}) do
         Tables:valInsert(_result, _val, _once)
     end

@@ -1488,7 +1488,7 @@ function CInventory:canAppendObject(_object)
 end
 
 function CInventory:appendObject(_object)
-    if self:canAppendObject(_object) then return end -- nil = false
+    if not self:canAppendObject(_object) then return end -- nil = false
     Tables:valInsert(self.objects, _object, true) -- add the object
     return _object -- done
 end
@@ -1498,6 +1498,44 @@ function CInventory:removeObject(_object)
     if not Tables:valFind(self.objects, _object) then return end -- not in inventory
     Tables:valRemove(self.objects, _object) -- remove all -- should not append
     return _object -- ok
+end
+
+function CInventory:cleanup()
+    local _objects = Tables:iclone(self.objects, true) -- prepare the cleanup
+    local _garbage = {}
+    self.objects = {}
+    for _, _object in ipairs(_objects) do
+        Tic:trace(_object.kind)
+        if not self:appendObject(_object) then Tables:valInsert(_garbage, _object, true) end
+        Tic:trace(Tables:size(_garbage))
+    end
+    return _garbage
+end
+
+function CInventory:copytoInventory(_inventory)
+    if not _inventory then return end -- mandatory
+    local _garbage = {}
+    local _objects = Tables:iclone(self.objects, true)
+    for _, _object in ipairs(_objects) do
+        if not _inventory:appendObject(_object) then
+            Tables:valInsert(_garbage, _object, true)
+        end
+    end
+    return _garbage
+end
+
+function CInventory:movetoInventory(_inventory)
+    if not _inventory then return end -- mandatory
+    local _garbage = {}
+    local _objects = Tables:iclone(self.objects, true)
+    for _, _object in ipairs(_objects) do
+        if not _inventory:appendObject(_object) then
+            Tables:valInsert(_garbage, _object, true)
+        else
+            self:removeObject(_object)
+        end
+    end
+    return _garbage
 end
 
 CInventoryAny = CInventory:extend() -- generic any inventory
@@ -1867,7 +1905,7 @@ end
 function CEntitiesLocations:appendEntity(_entity) -- add a new entity
     if not _entity then return end -- mandatory
     if self:existsEntity(_entity) then return end -- avoid doublons
-    self.entities[_entity] = true
+    self.entities[_entity] = _entity
     self.locations:appendEntity(_entity)
 end
 
@@ -3357,22 +3395,22 @@ function CWeaponShield:new(_argt)
     self:argt(_argt) -- override if any
 end
 
-CWeaponTeeShield = CWeaponShield:extend() -- TeeShield weapons
-Classic.KINDDWEAPONSHLDT = "T.Ecu" -- TeeShield kind
-Classic.NAMEDWEAPONSHLDT = "T.Ecu" -- TeeShield name
-function CWeaponTeeShield:new(_argt)
-    CWeaponTeeShield.super.new(self, _argt)
+CWeaponShieldTee = CWeaponShield:extend() -- ShieldTee weapons
+Classic.KINDDWEAPONSHLDT = "Ecu.T" -- ShieldTee kind
+Classic.NAMEDWEAPONSHLDT = "Ecu.T" -- ShieldTee name
+function CWeaponShieldTee:new(_argt)
+    CWeaponShieldTee.super.new(self, _argt)
     self.kind = Classic.KINDDWEAPONSHLDT
     self.name = Classic.NAMEDWEAPONSHLDT
     self.sprite  = CSpriteFG.WEAPONSHLDT
     self:argt(_argt) -- override if any
 end
 
-CWeaponRoundShield = CWeaponShield:extend() -- RoundShield weapons
-Classic.KINDDWEAPONSHLDR= "R.Ecu" -- RoundShield kind
-Classic.NAMEDWEAPONSHLDR= "R.Ecu" -- RoundShield name
-function CWeaponRoundShield:new(_argt)
-    CWeaponRoundShield.super.new(self, _argt)
+CWeaponShieldRound = CWeaponShield:extend() -- ShieldRound weapons
+Classic.KINDDWEAPONSHLDR= "Ecu.R" -- ShieldRound kind
+Classic.NAMEDWEAPONSHLDR= "Ecu.R" -- ShieldRound name
+function CWeaponShieldRound:new(_argt)
+    CWeaponShieldRound.super.new(self, _argt)
     self.kind = Classic.KINDDWEAPONSHLDR
     self.name = Classic.NAMEDWEAPONSHLDR
     self.sprite  = CSpriteFG.WEAPONSHLDR
@@ -3412,22 +3450,22 @@ function CWeaponFlask:new(_argt)
     self:argt(_argt) -- override if any
 end
 
-CWeaponSmallFlask = CWeaponFlask:extend() -- SmallFlask weapons
-Classic.KINDDWEAPONFLASS = "S.Oil" -- SmallFlask kind
-Classic.NAMEDWEAPONFLASS = "S.Oil" -- SmallFlask name
-function CWeaponSmallFlask:new(_argt)
-    CWeaponSmallFlask.super.new(self, _argt)
+CWeaponFlaskSmall = CWeaponFlask:extend() -- FlaskSmall weapons
+Classic.KINDDWEAPONFLASS = "Oil.S" -- FlaskSmall kind
+Classic.NAMEDWEAPONFLASS = "Oil.S" -- FlaskSmall name
+function CWeaponFlaskSmall:new(_argt)
+    CWeaponFlaskSmall.super.new(self, _argt)
     self.kind = Classic.KINDDWEAPONFLASS
     self.name = Classic.NAMEDWEAPONFLASS
     self.sprite  = CSpriteFG.WEAPONFLASS
     self:argt(_argt) -- override if any
 end
 
-CWeaponMediumFlask = CWeaponFlask:extend() -- MediumFlask weapons
-Classic.KINDDWEAPONFLASM = "M.Oil" -- MediumFlask kind
-Classic.NAMEDWEAPONFLASM = "M.Oil" -- MediumFlask name
-function CWeaponMediumFlask:new(_argt)
-    CWeaponMediumFlask.super.new(self, _argt)
+CWeaponFlaskMedium = CWeaponFlask:extend() -- FlaskMedium weapons
+Classic.KINDDWEAPONFLASM = "Oil.M" -- FlaskMedium kind
+Classic.NAMEDWEAPONFLASM = "Oil.M" -- FlaskMedium name
+function CWeaponFlaskMedium:new(_argt)
+    CWeaponFlaskMedium.super.new(self, _argt)
     self.kind = Classic.KINDDWEAPONFLASM
     self.name = Classic.NAMEDWEAPONFLASM
     self.sprite  = CSpriteFG.WEAPONFLASM
@@ -3701,11 +3739,34 @@ end
 
 function CCharacter:adjustInventories()
     if not self.inventories then return end -- mandatory (argt)
-    self.inventories.phy.objectsmax = self.statphymax
-    self.inventories.men.objectsmax = self.statmenmax
-    self.inventories.psy.objectsmax = self.statpsymax
-    for _, _object in ipairs({"objecthandlf", "objecthandrg"}) do -- remove character objects from the world
-        self.world:deleteEntity(self[_object])
+    if not self.inventories.any then return end -- ensure we already have inventories
+
+    local _inventoryany = self.inventories.any -- grab all objects
+    local _inventoryphy = self.inventories.phy
+    local _inventorymen = self.inventories.men
+    local _inventorypsy = self.inventories.psy
+    local _objectslots = {"objecthandlf", "objecthandrg"}
+    for _, _objectslot in ipairs(_objectslots) do
+        _inventoryany:appendObject(self[_objectslot])
+    end
+    _inventoryphy:movetoInventory(_inventoryany)
+    _inventorymen:movetoInventory(_inventoryany)
+    _inventorypsy:movetoInventory(_inventoryany)
+
+    for _, _object in ipairs(_inventoryany.objects) do -- delete from the world
+        self.world:deleteEntity(_object)
+    end
+
+    _inventoryphy.objectsmax = self.statphymax -- adjust inventories limits
+    _inventorymen.objectsmax = self.statmenmax
+    _inventorypsy.objectsmax = self.statpsymax
+
+    _inventoryany:movetoInventory(_inventoryphy) -- redispatch objects if possible
+    _inventoryany:movetoInventory(_inventorymen)
+    _inventoryany:movetoInventory(_inventorypsy)
+
+    for _, _objectslot in ipairs(_objectslots) do -- check if objects in slots are still available
+        if self[_objectslot] and Tables:valFind(_inventoryany.objects, self[_objectslot]) then self[_objectslot] = nil end
     end
 end
 
@@ -6824,9 +6885,9 @@ ScreenIntro:appendElements{
         drawframes = false,
         elements = {CText{text = "Press"}, CText{text = "a"}, CText{text = "Key"}},
     },
-    Button1,
-    Button2,
-    Button3,
+    -- Button1,
+    -- Button2,
+    -- Button3,
     -- Button4,
     -- Button5,
     -- Button6,
@@ -7038,7 +7099,7 @@ ScreenWorld:appendElements{
 }
 end
 
-if true then
+if false then
 ScreenMenus = CScreen{name = "Menus", keysfunctions = Tic.KEYSFUNCTIONSINTRO}
 ScreenMenus:appendElements{
     CWindowMenu{
@@ -7055,7 +7116,7 @@ end
 -- SCREENS
 if true then Tic:screenAppend(ScreenWorld) end
 if true then Tic:screenAppend(ScreenIntro) end
-if true then Tic:screenAppend(ScreenMenus) end
+if false then Tic:screenAppend(ScreenMenus) end
 
 
 
@@ -7204,10 +7265,10 @@ end -- generate places
 --
 -- Players
 --
-if true then
+if false then
 Truduk = CPlayerDwarf{name = "Truduk",
     objecthandrg = CWeaponHammer{},
-    objecthandlf = CWeaponRoundShield{},
+    objecthandlf = CWeaponShieldRound{},
 }
 -- Truduk:randomWorldWindow()
 -- Prinnn = CPlayerGnome{name = "Prinnn",
@@ -7230,7 +7291,7 @@ Truduk = CPlayerDwarf{name = "Truduk",
 Nitcha = CPlayerDrowe{name = "Nitcha",
     worldx = 10,
     objecthandrg = CWeaponCrossBow{},
-    objecthandlf = CWeaponSmallFlask{},
+    objecthandlf = CWeaponFlaskSmall{},
 }
 -- Azarel = CPlayerAngel{name = "Azarel",
 -- }
@@ -7252,16 +7313,23 @@ Nitcha = CPlayerDrowe{name = "Nitcha",
 -- }
 -- Daemok = CPlayerDemon{name = "Daemok",
 -- }
-Sword = CWeaponSword{}
+end
+
+if true then
+Sword = CWeaponSword{name = "swo_1"}
+Flask = CWeaponFlaskSmall{inventorytype = CInventoryMen, name = "fla_1"}
+
 Globth = CPlayerGolth{name = "Globth",
     worldx = 20,
     objecthandrg = Sword,
-    objecthandlf = CWeaponTeeShield{},
+    objecthandlf = CWeaponShieldTee{name = "ecu_1"},
+    ["inventories.men"] = CInventoryMen{objects = {Flask, Flask}},
+    ["inventories.phy"] = CInventoryPhy{objects = {Sword, Sword}},
 }
-Globth.inventories.phy.objects = {Sword, Sword}
 
 -- Globth:randomWorldWindow()
 end
+-- exit()
 
 if false then
 Wulfie = CPlayerWolfe{name = "Wulfie",
@@ -7289,8 +7357,8 @@ Wolfie = CPlayerWolfe{name = "Wolfie",
     interactions = {10},
     -- spottingdraw = true,
     spottingpick = true,
-    objecthandrg = CWeaponRoundShield{},
-    objecthandlf = CWeaponTeeShield{},
+    objecthandrg = CWeaponShieldRound{},
+    objecthandlf = CWeaponShieldTee{},
 }
 end
 if false then
@@ -7319,8 +7387,8 @@ Welfie = CPlayerWolfe{name = "Welfie",
     interactions = {10},
     -- spottingdraw = true,
     spottingpick = true,
-    objecthandrg = CWeaponMediumFlask{},
-    objecthandlf = CWeaponSmallFlask{},
+    objecthandrg = CWeaponFlaskMedium{},
+    objecthandlf = CWeaponFlaskSmall{},
 }
 end
 
@@ -7567,11 +7635,16 @@ function Tic:drawLog() -- [-] remove
     local _diry    = _playeractual.diry
 
     Tic:logAppend(_playeractual.world.name, Tables:size(_playeractual.world.entitieslocations.entities))
+    for _, _entity in pairs(_playeractual.world.entitieslocations.entities) do
+        Tic:logAppend(_entity.kind, _entity.name)
+    end
     Tic:logAppend()
     Tic:logAppend(_playeractual.name, _playeractual.statphymax, _playeractual.statmenmax, _playeractual.statpsymax)
     for _, _inventory in pairs(_playeractual.inventories) do
         Tic:logInventory(_inventory)
     end
+    if _playeractual.objecthandlf then Tic:logAppend("handlf", _playeractual.objecthandlf.kind, _playeractual.objecthandlf.name) end
+    if _playeractual.objecthandrg then Tic:logAppend("handrg", _playeractual.objecthandrg.kind, _playeractual.objecthandrg.name) end
 end
 
 function Tic:logInventory(_inventory)
