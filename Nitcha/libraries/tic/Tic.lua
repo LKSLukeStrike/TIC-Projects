@@ -6392,13 +6392,13 @@ function CButtonPlayerStat:new(_argt)
     CButtonPlayerStat.super.new(self, _argt)
     self.sprite.palette = {[Tic.COLORGREYM] = Tic.COLORWHITE}
     self.behaviour      = IButtonPlayer.BEHAVIOUR
-    self.colorstat      = nil -- colorstat function if any
+    self.getcolorstat   = nil -- getcolorstat function if any
     self:argt(_argt) -- override if any
 end
 
 function CButtonPlayerStat:drawGround()
-    if self.colorstat then
-       self.sprite.palette = Tables:merge(self.sprite.palette, {[Tic.COLORWHITE] = self.colorstat()})
+    if self.getcolorstat then
+       self.sprite.palette = Tables:merge(self.sprite.palette, {[Tic.COLORWHITE] = self:getcolorstat()})
     end
 
     self.sprite.screenx = self.screenx
@@ -6410,7 +6410,7 @@ CButtonPlayerStatPhy = CButtonPlayerStat:extend()
 function CButtonPlayerStatPhy:new(_argt)
     CButtonPlayerStatPhy.super.new(self, _argt)
     self.sprite.sprite = CSpriteBG.SIGNACTPHY
-    self.colorstat     = function() return Tic:playerActual():colorPhyAct() end
+    self.getcolorstat  = function() return Tic:playerActual():colorPhyAct() end
     self:argt(_argt) -- override if any
 end
 
@@ -6418,7 +6418,7 @@ CButtonPlayerStatMen = CButtonPlayerStat:extend()
 function CButtonPlayerStatMen:new(_argt)
     CButtonPlayerStatMen.super.new(self, _argt)
     self.sprite.sprite = CSpriteBG.SIGNACTMEN
-    self.colorstat     = function() return Tic:playerActual():colorMenAct() end
+    self.getcolorstat  = function() return Tic:playerActual():colorMenAct() end
     self:argt(_argt) -- override if any
 end
 
@@ -6426,7 +6426,68 @@ CButtonPlayerStatPsy = CButtonPlayerStat:extend()
 function CButtonPlayerStatPsy:new(_argt)
     CButtonPlayerStatPsy.super.new(self, _argt)
     self.sprite.sprite = CSpriteBG.SIGNACTPSY
-    self.colorstat     = function() return Tic:playerActual():colorPsyAct() end
+    self.getcolorstat  = function() return Tic:playerActual():colorPsyAct() end
+    self:argt(_argt) -- override if any
+end
+
+
+--
+-- CButtonPlayerSlot
+--
+CButtonPlayerSlot = CButtonSprite:extend() -- generic slot button
+function CButtonPlayerSlot:new(_argt)
+    CButtonPlayerSlot.super.new(self, _argt)
+    self.behaviour           = IButtonPlayer.BEHAVIOUR
+    self.getslotobject       = nil -- getslotobject function if any
+    self.drawborder          = false
+    self.colorborderdisabled = Tic.COLORWHITE
+    self:argt(_argt) -- override if any
+end
+
+function CButtonPlayerSlot:drawGround()
+    local _object = nil
+    if self.getslotobject then
+       _object = self:getslotobject()
+    end
+	if not _object then return end -- empty slot
+
+    -- _object:draw()
+    local _musprite = CSpriteFG() -- multi usage unique sprite
+    _musprite.sprite  = _object.sprite
+    _musprite.screenx = self.screenx
+    _musprite.screeny = self.screeny
+    -- _musprite.scale   = self.scale
+    -- _musprite.rotate  = _objectrotate
+    _musprite.flip    = Tic:playerActual().dirx
+    _musprite.palette = _object.palettefg
+    _musprite:draw()
+end
+
+CButtonPlayerSlotHead = CButtonPlayerSlot:extend()
+function CButtonPlayerSlotHead:new(_argt)
+    CButtonPlayerSlotHead.super.new(self, _argt)
+    self.getslotobject = function() return Tic:playerActual().slothead end
+    self:argt(_argt) -- override if any
+end
+
+CButtonPlayerSlotBack = CButtonPlayerSlot:extend()
+function CButtonPlayerSlotBack:new(_argt)
+    CButtonPlayerSlotBack.super.new(self, _argt)
+    self.getslotobject = function() return Tic:playerActual().slotback end
+    self:argt(_argt) -- override if any
+end
+
+CButtonPlayerSlotHandLF = CButtonPlayerSlot:extend()
+function CButtonPlayerSlotHandLF:new(_argt)
+    CButtonPlayerSlotHandLF.super.new(self, _argt)
+    self.getslotobject = function() return Tic:playerActual().slothandlf end
+    self:argt(_argt) -- override if any
+end
+
+CButtonPlayerSlotHandRG = CButtonPlayerSlot:extend()
+function CButtonPlayerSlotHandRG:new(_argt)
+    CButtonPlayerSlotHandRG.super.new(self, _argt)
+    self.getslotobject = function() return Tic:playerActual().slothandrg end
     self:argt(_argt) -- override if any
 end
 
@@ -7015,14 +7076,18 @@ ScreenWorldRG:elementsDistributeH(
 )
 
 WindowPlayerPortrait = CWindowPlayerPortrait{}
-ButtonPlayerMove000  = CButtonPlayerMove000{}
-ButtonPlayerMove045  = CButtonPlayerMove045{}
-ButtonPlayerMove090  = CButtonPlayerMove090{}
-ButtonPlayerMove135  = CButtonPlayerMove135{}
-ButtonPlayerMove180  = CButtonPlayerMove180{}
-ButtonPlayerMove225  = CButtonPlayerMove225{}
-ButtonPlayerMove270  = CButtonPlayerMove270{}
-ButtonPlayerMove315  = CButtonPlayerMove315{}
+ButtonPlayerMove000    = CButtonPlayerMove000{}
+ButtonPlayerMove045    = CButtonPlayerMove045{}
+ButtonPlayerMove090    = CButtonPlayerMove090{}
+ButtonPlayerMove135    = CButtonPlayerMove135{}
+ButtonPlayerMove180    = CButtonPlayerMove180{}
+ButtonPlayerMove225    = CButtonPlayerMove225{}
+ButtonPlayerMove270    = CButtonPlayerMove270{}
+ButtonPlayerMove315    = CButtonPlayerMove315{}
+ButtonPlayerSlotHead   = CButtonPlayerSlotHead{}
+ButtonPlayerSlotBack   = CButtonPlayerSlotBack{}
+ButtonPlayerSlotHandLF = CButtonPlayerSlotHandLF{}
+ButtonPlayerSlotHandRG = CButtonPlayerSlotHandRG{}
 ScreenWorldRG:elementsDistributeH( -- up h line
     {ButtonPlayerMove315, ButtonPlayerMove045},
     WindowPlayerPortrait.screenx - 6,
@@ -7047,12 +7112,24 @@ ScreenWorldRG:elementsDistributeV( -- md v line
     WindowPlayerPortrait.screeny - 7,
     14
 )
+ScreenWorldRG:elementsDistributeH( -- head and back slots
+    {ButtonPlayerSlotHead, ButtonPlayerSlotBack},
+    WindowPlayerPortrait.screenx - Tic.SPRITESIZE - 6,
+    WindowPlayerPortrait.screeny - 1,
+    28
+)
+ScreenWorldRG:elementsDistributeH( -- handrg and handlf slots
+    {ButtonPlayerSlotHandRG, ButtonPlayerSlotHandLF},
+    WindowPlayerPortrait.screenx - Tic.SPRITESIZE - 6,
+    WindowPlayerPortrait.screeny + Tic.SPRITESIZE + 1,
+    28
+)
 
 WindowPlayerStats    = CWindowPlayerStats{}
 ButtonPlayerStatPhy  = CButtonPlayerStatPhy{}
 ButtonPlayerStatMen  = CButtonPlayerStatMen{}
 ButtonPlayerStatPsy  = CButtonPlayerStatPsy{}
-ScreenWorldLF:elementsDistributeH(
+ScreenWorldRG:elementsDistributeH(
     {ButtonPlayerStatPhy, ButtonPlayerStatMen, ButtonPlayerStatPsy},
     WindowPlayerStats.screenx + (
         (WindowPlayerStats.screenw - CScreen:elementsTotalW({ButtonPlayerStatPhy, ButtonPlayerStatMen, ButtonPlayerStatPsy})) // 2),
@@ -7096,6 +7173,10 @@ ScreenWorldRG:appendElements{
     ButtonPlayerMove225,
     ButtonPlayerMove270,
     ButtonPlayerMove315,
+    ButtonPlayerSlotHead,
+    ButtonPlayerSlotBack,
+    ButtonPlayerSlotHandLF,
+    ButtonPlayerSlotHandRG,
     ButtonPlayerStand,
     ButtonPlayerKneel,
     ButtonPlayerWork,
@@ -7635,7 +7716,11 @@ function Tic:draw()
     end
 end
 
-function Tic:drawLog() -- [-] remove
+function Tic:drawLog()
+    -- Tic:drawInventories()
+end
+
+function Tic:drawInventories() -- [-] remove
     local _tick00 = Tic.TICK00.actvalue
     local _tick60 = Tic.TICK60.actvalue
     local _playeractual = Tic:playerActual()
