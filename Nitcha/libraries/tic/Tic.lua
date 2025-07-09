@@ -6437,14 +6437,18 @@ end
 CButtonPlayerSlot = CButtonSprite:extend() -- generic slot button
 function CButtonPlayerSlot:new(_argt)
     CButtonPlayerSlot.super.new(self, _argt)
+    self.screenw             = 10
+    self.screenh             = 10
     self.behaviour           = IButtonPlayer.BEHAVIOUR
     self.getslotobject       = nil -- getslotobject function if any
-    self.drawborder          = false
+    self.drawborder          = true
     self.colorborderdisabled = Tic.COLORWHITE
     self:argt(_argt) -- override if any
 end
 
 function CButtonPlayerSlot:drawGround()
+    rect(self.screenx + 1, self.screeny + 1, Tic.SPRITESIZE, Tic.SPRITESIZE, Tic.COLORBIOMENIGHT)
+
     local _object = nil
     if self.getslotobject then
        _object = self:getslotobject()
@@ -6454,8 +6458,8 @@ function CButtonPlayerSlot:drawGround()
     -- _object:draw()
     local _musprite = CSpriteFG() -- multi usage unique sprite
     _musprite.sprite  = _object.sprite
-    _musprite.screenx = self.screenx
-    _musprite.screeny = self.screeny
+    _musprite.screenx = self.screenx + 1
+    _musprite.screeny = self.screeny + 1
     -- _musprite.scale   = self.scale
     -- _musprite.rotate  = _objectrotate
     _musprite.flip    = Tic:playerActual().dirx
@@ -7114,13 +7118,13 @@ ScreenWorldRG:elementsDistributeV( -- md v line
 )
 ScreenWorldRG:elementsDistributeH( -- head and back slots
     {ButtonPlayerSlotHead, ButtonPlayerSlotBack},
-    WindowPlayerPortrait.screenx - Tic.SPRITESIZE - 6,
-    WindowPlayerPortrait.screeny - 1,
+    WindowPlayerPortrait.screenx - Tic.SPRITESIZE - 8,
+    WindowPlayerPortrait.screeny - 3,
     28
 )
 ScreenWorldRG:elementsDistributeH( -- handrg and handlf slots
     {ButtonPlayerSlotHandRG, ButtonPlayerSlotHandLF},
-    WindowPlayerPortrait.screenx - Tic.SPRITESIZE - 6,
+    WindowPlayerPortrait.screenx - Tic.SPRITESIZE - 8,
     WindowPlayerPortrait.screeny + Tic.SPRITESIZE + 1,
     28
 )
