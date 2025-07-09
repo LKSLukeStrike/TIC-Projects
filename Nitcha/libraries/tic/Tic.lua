@@ -1118,7 +1118,7 @@ function Tic:print(_screenx, _screeny, ...) -- print with multiple args
         _val = Tic:val2string(_val)
         _output = _output.._val.." "
     end
-    print( _output, _screenx, _screeny, Tic.COLORCYAN, true)
+    print( _output, _screenx, _screeny, Tic.COLORCYAN, true, 1, true)
 end
 
 
@@ -3304,6 +3304,12 @@ function CWeaponHammer:new(_argt)
     self.kind = Classic.KINDDWEAPONHAMMR
     self.name = Classic.NAMEDWEAPONHAMMR
     self.sprite  = CSpriteFG.WEAPONHAMMR
+    self.handlesoffsets = {
+        [CSprite.ROTATE000] = {handlex = 4, handley = 5},
+        [CSprite.ROTATE090] = {handlex = 2, handley = 4},
+        [CSprite.ROTATE180] = {handlex = 3, handley = 2},
+        [CSprite.ROTATE270] = {handlex = 5, handley = 3},
+    }
     self:argt(_argt) -- override if any
 end
 
@@ -3719,8 +3725,10 @@ function CCharacter:new(_argt)
     self.drawview     = false
     self.drawmind     = false
     self.drawmove     = false
-    self.objecthandlf = nil -- character objects slots
-    self.objecthandrg = nil
+    self.slothead     = nil -- character objects slots
+    self.slotback     = nil
+    self.slothandlf   = nil
+    self.slothandrg   = nil
     self.inventories  = {
                          phy = CInventoryPhy{},
                          men = CInventoryMen{},
@@ -3745,7 +3753,7 @@ function CCharacter:adjustInventories()
     local _inventoryphy = self.inventories.phy
     local _inventorymen = self.inventories.men
     local _inventorypsy = self.inventories.psy
-    local _objectslots = {"objecthandlf", "objecthandrg"}
+    local _objectslots = {"slothandlf", "slothandrg"}
     for _, _objectslot in ipairs(_objectslots) do
         _inventoryany:appendObject(self[_objectslot])
     end
@@ -3768,6 +3776,8 @@ function CCharacter:adjustInventories()
     for _, _objectslot in ipairs(_objectslots) do -- check if objects in slots are still available
         if self[_objectslot] and Tables:valFind(_inventoryany.objects, self[_objectslot]) then self[_objectslot] = nil end
     end
+
+    _inventoryany.objects = {} -- get rid of extra objects
 end
 
 function CCharacter:colorPhyAct()
@@ -3791,7 +3801,7 @@ function CCharacter:colorPsyAct()
     return Tic.COLORPSYEQ
 end
 
-function CCharacter:hover(_entity) -- hover an entity, use nil to unhover
+function CCharacter:hoverEntity(_entity) -- hover an entity, use nil to unhover
     if _entity then
         if self.hovering then self.hovering.hovered = false end -- unhover previous if any
         _entity.hovered = true
@@ -3802,7 +3812,7 @@ function CCharacter:hover(_entity) -- hover an entity, use nil to unhover
     end
 end
 
-function CCharacter:spot(_entity) -- spot an entity, use nil to unspot
+function CCharacter:spotEntity(_entity) -- spot an entity, use nil to unspot
     if _entity then
         if self.spotting then self.spotting.spotted = false end -- unspot previous if any
         _entity.spotted = true
@@ -4167,10 +4177,10 @@ end
 
 function CCharacter:drawHand(_bgfg)
     local _object = nil  -- determine the corresponding object if any
-    if _bgfg == Tic.DRAWBG and self.dirx == Tic.DIRXLF then _object = self.objecthandrg end
-    if _bgfg == Tic.DRAWBG and self.dirx == Tic.DIRXRG then _object = self.objecthandlf end
-    if _bgfg == Tic.DRAWFG and self.dirx == Tic.DIRXLF then _object = self.objecthandlf end
-    if _bgfg == Tic.DRAWFG and self.dirx == Tic.DIRXRG then _object = self.objecthandrg end
+    if _bgfg == Tic.DRAWBG and self.dirx == Tic.DIRXLF then _object = self.slothandrg end
+    if _bgfg == Tic.DRAWBG and self.dirx == Tic.DIRXRG then _object = self.slothandlf end
+    if _bgfg == Tic.DRAWFG and self.dirx == Tic.DIRXLF then _object = self.slothandlf end
+    if _bgfg == Tic.DRAWFG and self.dirx == Tic.DIRXRG then _object = self.slothandrg end
     if not _object then return end -- nothing in hand
 
     local _handsoffsets = self:handsOffsets() -- determine the corresponding hand offsets
@@ -4514,14 +4524,14 @@ CCharacterHumanoid.HANDSOFFSETS = {
     },
     [Tic.POSTUREFLOOR] = {
         [Tic.DIRXLF] = {
-            [CCharacter.SIZES] = {handrgx = 2, handrgy = 2, handlfx =  1, handlfy = 6, state = Tic.STATEFLOORLF},
-            [CCharacter.SIZEM] = {handrgx = 1, handrgy = 2, handlfx =  0, handlfy = 6, state = Tic.STATEFLOORLF},
-            [CCharacter.SIZEL] = {handrgx = 0, handrgy = 2, handlfx = -1, handlfy = 6, state = Tic.STATEFLOORLF},
+            [CCharacter.SIZES] = {handrgx =  1, handrgy = 3, handlfx =  1, handlfy = 6, state = Tic.STATEFLOORLF},
+            [CCharacter.SIZEM] = {handrgx =  0, handrgy = 3, handlfx =  0, handlfy = 6, state = Tic.STATEFLOORLF},
+            [CCharacter.SIZEL] = {handrgx = -1, handrgy = 3, handlfx = -1, handlfy = 6, state = Tic.STATEFLOORLF},
         },
         [Tic.DIRXRG] = {
-            [CCharacter.SIZES] = {handrgx = 6, handrgy = 9, handlfx = 5, handlfy = 2, state = Tic.STATEFLOORRG},
-            [CCharacter.SIZEM] = {handrgx = 7, handrgy = 9, handlfx = 6, handlfy = 2, state = Tic.STATEFLOORRG},
-            [CCharacter.SIZEL] = {handrgx = 8, handrgy = 6, handlfx = 7, handlfy = 2, state = Tic.STATEFLOORRG},
+            [CCharacter.SIZES] = {handrgx = 6, handrgy = 8, handlfx = 6, handlfy = 3, state = Tic.STATEFLOORRG},
+            [CCharacter.SIZEM] = {handrgx = 7, handrgy = 8, handlfx = 7, handlfy = 3, state = Tic.STATEFLOORRG},
+            [CCharacter.SIZEL] = {handrgx = 8, handrgy = 8, handlfx = 8, handlfy = 3, state = Tic.STATEFLOORRG},
         },
     },
 }
@@ -5475,14 +5485,14 @@ end
 --
 -- CWindowStatsCharacter
 --
-CWindowStatsCharacter = CWindowStats:extend() -- window portrait for -- [!] characters
+CWindowStatsCharacter = CWindowStats:extend() -- window stats for -- [!] characters
 function CWindowStatsCharacter:new(_argt)
     CWindowStatsCharacter.super.new(self, _argt)
 	self.entity = nil -- override
     self:argt(_argt) -- override if any
 end
 
-function CWindowStatsCharacter:drawInside() -- window portrait content for -- [!] characters
+function CWindowStatsCharacter:drawInside() -- window stats content for -- [!] characters
     rect ( -- phy act bar
         self.screenx + 02,
         self.screeny + 02 + Tic.STATSMAX - self.entity.statphyact + 1,
@@ -5679,12 +5689,12 @@ function CWindowWorld:drawPlayerActual()
     local _playerregionmindworld = _playeractual:regionMindWorld()
     local _playernearestentity   = _playeractual:nearestEntityViewWorld() -- nearest entity if any -- except itself
 
-    _playeractual:hover() -- unhover
+    _playeractual:hoverEntity() -- unhover
 
     if not _playeractual:entitySpotting() -- spot the nearest entity if nothing else spotted
     or not _playeractual:isSpottingLock()
     then
-        _playeractual:spot(_playernearestentity)
+        _playeractual:spotEntity(_playernearestentity)
     end
 
     if  _playeractual:entitySpotting() -- interact
@@ -5726,7 +5736,7 @@ function CWindowWorld:drawPlayerActual()
                         and not (_entity == _playeractual) -- except itself
                         and _entityregionscreen:hasInsidePoint(Tic:mousePointX(), Tic:mousePointY()) -- hovering something ?
                         and not _playeractual.hovering then --hover only one
-                            _playeractual:hover(_entity)
+                            _playeractual:hoverEntity(_entity)
 
                             local _locking  = (_playeractual.spottinglock and _playeractual.spotting == _entity) -- already locking ?
                             local _locktext = (_locking)
@@ -5741,10 +5751,10 @@ function CWindowWorld:drawPlayerActual()
                                 Tic:mouseDelay(10)
                                 
                                 if _locking then -- unspot
-                                    _playeractual:spot()
+                                    _playeractual:spotEntity()
                                     _playeractual.spottinglock = false
                                 else -- spot
-                                    _playeractual:spot(_entity)
+                                    _playeractual:spotEntity(_entity)
                                     _playeractual.spottinglock = true
                                 end
                             end
@@ -6419,6 +6429,7 @@ function CButtonPlayerStatPsy:new(_argt)
     self.colorstat     = function() return Tic:playerActual():colorPsyAct() end
     self:argt(_argt) -- override if any
 end
+
 
 --
 -- CButtonSpottingDraw
@@ -7115,7 +7126,7 @@ end
 
 -- SCREENS
 if true then Tic:screenAppend(ScreenWorld) end
-if true then Tic:screenAppend(ScreenIntro) end
+if false then Tic:screenAppend(ScreenIntro) end
 if false then Tic:screenAppend(ScreenMenus) end
 
 
@@ -7265,10 +7276,10 @@ end -- generate places
 --
 -- Players
 --
-if false then
+if true then
 Truduk = CPlayerDwarf{name = "Truduk",
-    objecthandrg = CWeaponHammer{},
-    objecthandlf = CWeaponShieldRound{},
+    slothandrg = CWeaponHammer{},
+    slothandlf = CWeaponShieldRound{},
 }
 -- Truduk:randomWorldWindow()
 -- Prinnn = CPlayerGnome{name = "Prinnn",
@@ -7290,8 +7301,8 @@ Truduk = CPlayerDwarf{name = "Truduk",
 -- }
 Nitcha = CPlayerDrowe{name = "Nitcha",
     worldx = 10,
-    objecthandrg = CWeaponCrossBow{},
-    objecthandlf = CWeaponFlaskSmall{},
+    slothandrg = CWeaponCrossBow{},
+    slothandlf = CWeaponFlaskSmall{},
 }
 -- Azarel = CPlayerAngel{name = "Azarel",
 -- }
@@ -7321,8 +7332,8 @@ Flask = CWeaponFlaskSmall{inventorytype = CInventoryMen, name = "fla_1"}
 
 Globth = CPlayerGolth{name = "Globth",
     worldx = 20,
-    objecthandrg = Sword,
-    objecthandlf = CWeaponShieldTee{name = "ecu_1"},
+    slothandrg = Sword,
+    slothandlf = CWeaponShieldTee{name = "ecu_1"},
     ["inventories.men"] = CInventoryMen{objects = {Flask, Flask}},
     ["inventories.phy"] = CInventoryPhy{objects = {Sword, Sword}},
 }
@@ -7342,8 +7353,8 @@ Wulfie = CPlayerWolfe{name = "Wulfie",
     interactions = {10},
     -- spottingdraw = true,
     spottingpick = true,
-    objecthandrg = CWeaponHammer{},
-    objecthandlf = CWeaponSword{},
+    slothandrg = CWeaponHammer{},
+    slothandlf = CWeaponSword{},
 }
 end
 if false then
@@ -7357,8 +7368,8 @@ Wolfie = CPlayerWolfe{name = "Wolfie",
     interactions = {10},
     -- spottingdraw = true,
     spottingpick = true,
-    objecthandrg = CWeaponShieldRound{},
-    objecthandlf = CWeaponShieldTee{},
+    slothandrg = CWeaponShieldRound{},
+    slothandlf = CWeaponShieldTee{},
 }
 end
 if false then
@@ -7372,8 +7383,8 @@ Wilfie = CPlayerWolfe{name = "Wilfie",
     interactions = {10},
     -- spottingdraw = true,
     spottingpick = true,
-    objecthandrg = CWeaponCrossBow{},
-    objecthandlf = CWeaponLongBow{},
+    slothandrg = CWeaponCrossBow{},
+    slothandlf = CWeaponLongBow{},
 }
 end
 if false then
@@ -7387,8 +7398,8 @@ Welfie = CPlayerWolfe{name = "Welfie",
     interactions = {10},
     -- spottingdraw = true,
     spottingpick = true,
-    objecthandrg = CWeaponFlaskMedium{},
-    objecthandlf = CWeaponFlaskSmall{},
+    slothandrg = CWeaponFlaskMedium{},
+    slothandlf = CWeaponFlaskSmall{},
 }
 end
 
@@ -7643,8 +7654,8 @@ function Tic:drawLog() -- [-] remove
     for _, _inventory in pairs(_playeractual.inventories) do
         Tic:logInventory(_inventory)
     end
-    if _playeractual.objecthandlf then Tic:logAppend("handlf", _playeractual.objecthandlf.kind, _playeractual.objecthandlf.name) end
-    if _playeractual.objecthandrg then Tic:logAppend("handrg", _playeractual.objecthandrg.kind, _playeractual.objecthandrg.name) end
+    if _playeractual.slothandlf then Tic:logAppend("handlf", _playeractual.slothandlf.kind, _playeractual.slothandlf.name) end
+    if _playeractual.slothandrg then Tic:logAppend("handrg", _playeractual.slothandrg.kind, _playeractual.slothandrg.name) end
 end
 
 function Tic:logInventory(_inventory)
