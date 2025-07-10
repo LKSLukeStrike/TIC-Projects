@@ -901,7 +901,7 @@ end
 -- Spotting System -- toggle spotting draw/lock
 function Tic:spottingToggle(_character)
     if Tic.MODIFIERKEYS[Tic.KEY_SHIFT] then
-        Tic:spottingToggleDraw(_character)
+        Tic:spottingToggleSpot(_character)
     elseif Tic.MODIFIERKEYS[Tic.KEY_CTRL] then
         Tic:spottingTogglePick(_character)
     else
@@ -909,10 +909,10 @@ function Tic:spottingToggle(_character)
     end
 end
 
-function Tic:spottingToggleDraw(_character)
+function Tic:spottingToggleSpot(_character)
     _character = _character or Tic:playerActual()
     if not _character then return end
-	_character:spottingToggleDraw()
+	_character:spottingToggleSpot()
 end
 
 function Tic:spottingTogglePick(_character)
@@ -927,10 +927,10 @@ function Tic:spottingToggleLock(_character)
 	_character:spottingToggleLock()
 end
 
-function Tic:isSpottingDraw(_character)
+function Tic:isSpottingSpot(_character)
     _character = _character or Tic:playerActual()
     if not _character then return false end
-	return _character:isSpottingDraw()
+	return _character:isSpottingSpot()
 end
 
 function Tic:isSpottingPick(_character)
@@ -2205,6 +2205,7 @@ function CEntityDrawable:new(_argt)
     self.screeny      = 0
     self.dirx         = Nums:random01() -- random flip lf/rg
     self.scale        = Tic.SCALE01
+    self.rotate       = CSprite.ROTATE000
     self.portraitmode = false -- is for drawing portrait ?
     self.animations   = nil -- override if any
     self.hovered      = false -- use hovered to draw a border
@@ -2213,15 +2214,17 @@ function CEntityDrawable:new(_argt)
     self.drawborders  = false -- draw behaviour
     self.drawhitbox   = false
     self.drawfade     = false
+    self.drawbgfg     = Tic.DRAWFG -- use bg/fg palette if any
     self:argt(_argt) -- override if any
     self.world:appendEntity(self)-- append itself to the world
 end
 
 function CEntityDrawable:draw() -- default draw for drawable entities -- override if any
     local _tick00      = Tic.TICK00.actvalue
-    local _palette     = (self.drawfade)
-        and Tables:merge(self.palette, self.palettefade)
-        or  Tables:merge(self.palette, {})
+    local _palette     = Tables:merge(self.palette)
+    _palette = (self.drawfade)
+        and Tables:merge(_palette, self.palettefade)
+        or  _palette
 
     for _, _animation in pairs(self.animations or {}) do -- animate
         local _frequence   = _animation.frequence
@@ -2242,6 +2245,7 @@ function CEntityDrawable:draw() -- default draw for drawable entities -- overrid
     _musprite.screeny = self.screeny
     _musprite.flip    = self.dirx
     _musprite.scale   = self.scale
+    _musprite.rotate  = self.rotate
     _musprite.palette = _palette
     _musprite:draw()
 
@@ -2271,6 +2275,7 @@ function CEntityDrawable:drawHovered() -- draw hovered if any
     _musprite.screeny = self.screeny
     _musprite.flip    = self.dirx
     _musprite.scale   = self.scale
+    _musprite.rotate  = self.rotate
     _musprite.palette = {[Tic.COLORGREYM] = Tic.COLORGREYL,}
     _musprite:draw()
 end
@@ -3707,7 +3712,7 @@ function CCharacter:new(_argt)
     self.hitbox       = CHitbox{entity = self, lf = 2, rg = 4, up = 5, dw = 7}
     self.hovering     = nil -- hovering entity if any
     self.spotting     = nil -- spotting entity if any
-    self.spottingdraw = false -- draw its spotting
+    self.spottingspot = false -- spot its spotting
     self.spottinglock = false -- lock its spotting
     self.spottingpick = false -- pick its spotting
     self.colorhairsfg = Tic.COLORHAIRSFG -- colors
@@ -4303,8 +4308,8 @@ function CCharacter:toggleFrame() -- toggle frame 0-1
     self.frame = Nums:toggle01(self.frame) -- animate continuous move in the same dirx
 end
 
-function CCharacter:spottingToggleDraw()
-	self.spottingdraw = Nums:toggleTF(self.spottingdraw)
+function CCharacter:spottingToggleSpot()
+	self.spottingspot = Nums:toggleTF(self.spottingspot)
 end
 
 function CCharacter:spottingToggleLock()
@@ -4315,8 +4320,8 @@ function CCharacter:spottingTogglePick()
 	self.spottingpick = Nums:toggleTF(self.spottingpick)
 end
 
-function CCharacter:isSpottingDraw()
-	return self.spottingdraw
+function CCharacter:isSpottingSpot()
+	return self.spottingspot
 end
 
 function CCharacter:isSpottingLock()
@@ -5720,7 +5725,7 @@ function CWindowWorld:drawPlayerActual()
 
                 _entity.hovered = false -- unhover all entities
 
-                _entity.spotted = (_playeractual:isSpottingDraw() -- unspot all entities except spotting one if any
+                _entity.spotted = (_playeractual:isSpottingSpot() -- unspot all entities except spotting one if any
                 and _entity == _playeractual:entitySpotting())
                     and true
                     or  false
@@ -6462,16 +6467,13 @@ function CButtonPlayerSlot:drawGround()
     end
 	if not _object then return end -- empty slot
 
-    -- _object:draw()
-    local _musprite = CSpriteFG() -- multi usage unique sprite
-    _musprite.sprite  = _object.sprite
-    _musprite.screenx = self.screenx + 1
-    _musprite.screeny = self.screeny + 1
-    -- _musprite.scale   = self.scale
-    -- _musprite.rotate  = _objectrotate
-    _musprite.flip    = Tic:playerActual().dirx
-    _musprite.palette = _object.palettefg
-    _musprite:draw()
+    _object:save()
+    _object.screenx = self.screenx + 1
+    _object.screeny = self.screeny + 1
+    _object.dirx    = Tic:playerActual().dirx
+    _object.palette = _object.palettefg
+    _object:draw()
+    _object:load()
 end
 
 CButtonPlayerSlotHead = CButtonPlayerSlot:extend()
@@ -6504,19 +6506,19 @@ end
 
 
 --
--- CButtonSpottingDraw
+-- CButtonSpottingSpot
 --
-CButtonSpottingDraw = CButtonCheck:extend() -- generic spottingdraw check button
-CButtonSpottingDraw.BEHAVIOUR = function(self)
-    self.checked = Tic:isSpottingDraw()
+CButtonSpottingSpot = CButtonCheck:extend() -- generic spottingspot check button
+CButtonSpottingSpot.BEHAVIOUR = function(self)
+    self.checked = Tic:isSpottingSpot()
     CButton.BEHAVIOUR(self)
 end
-function CButtonSpottingDraw:new(_argt)
-    CButtonSpottingDraw.super.new(self, _argt)
+function CButtonSpottingSpot:new(_argt)
+    CButtonSpottingSpot.super.new(self, _argt)
     self.drawborder    = false
 	self.sprite.sprite = CSpriteBG.SIGNSPOTIT
-	self.behaviour     = CButtonSpottingDraw.BEHAVIOUR  -- function to trigger at first
-    self.clicklf       = function() Tic:spottingToggleDraw() end
+	self.behaviour     = CButtonSpottingSpot.BEHAVIOUR  -- function to trigger at first
+    self.clicklf       = function() Tic:spottingToggleSpot() end
     self.hovertextlf   = CText{text = "Spot"}
     self:argt(_argt) -- override if any
 end
@@ -7002,13 +7004,13 @@ ScreenWorld = CScreen{name = "World", keysfunctions = Tic.KEYSFUNCTIONSWORLD}
 ScreenWorldLF = CScreen{}
 
 WindowSpottingInfos    = CWindowSpottingInfos{}
-ButtonSpottingDraw     = CButtonSpottingDraw{}
+ButtonSpottingSpot     = CButtonSpottingSpot{}
 ButtonSpottingLock     = CButtonSpottingLock{}
 ButtonSpottingPick     = CButtonSpottingPick{}
 ScreenWorldLF:elementsDistributeH(
-    {ButtonSpottingDraw, ButtonSpottingPick, ButtonSpottingLock},
+    {ButtonSpottingSpot, ButtonSpottingPick, ButtonSpottingLock},
     WindowSpottingInfos.screenx + (
-        (WindowSpottingInfos.screenw - CScreen:elementsTotalW({ButtonSpottingDraw, ButtonSpottingPick, ButtonSpottingLock})) // 2),
+        (WindowSpottingInfos.screenw - CScreen:elementsTotalW({ButtonSpottingSpot, ButtonSpottingPick, ButtonSpottingLock})) // 2),
     WindowSpottingInfos.screeny - Tic.SPRITESIZE
 )
 
@@ -7049,7 +7051,7 @@ ScreenWorldLF:elementsDistributeV( -- md v line
 ScreenWorldLF:appendElements{
     WindowSpottingPortrait,
     WindowSpottingInfos,
-    ButtonSpottingDraw,
+    ButtonSpottingSpot,
     ButtonSpottingLock,
     ButtonSpottingPick,
     ButtonSpotting000,
@@ -7442,7 +7444,7 @@ Wulfie = CPlayerWolfe{name = "Wulfie",
     worldx = -10,
     worldy = 30,
     interactions = {10},
-    -- spottingdraw = true,
+    -- spottingspot = true,
     spottingpick = true,
     slothandrg = CWeaponHammer{},
     slothandlf = CWeaponSword{},
@@ -7457,7 +7459,7 @@ Wolfie = CPlayerWolfe{name = "Wolfie",
     worldx = 0,
     worldy = 30,
     interactions = {10},
-    -- spottingdraw = true,
+    -- spottingspot = true,
     spottingpick = true,
     slothandrg = CWeaponShieldRound{},
     slothandlf = CWeaponShieldTee{},
@@ -7472,7 +7474,7 @@ Wilfie = CPlayerWolfe{name = "Wilfie",
     worldx = 10,
     worldy = 30,
     interactions = {10},
-    -- spottingdraw = true,
+    -- spottingspot = true,
     spottingpick = true,
     slothandrg = CWeaponCrossBow{},
     slothandlf = CWeaponLongBow{},
@@ -7487,7 +7489,7 @@ Welfie = CPlayerWolfe{name = "Welfie",
     worldx = 20,
     worldy = 30,
     interactions = {10},
-    -- spottingdraw = true,
+    -- spottingspot = true,
     spottingpick = true,
     slothandrg = CObjectFlaskMedium{},
     slothandlf = CObjectFlaskSmall{},
@@ -7499,7 +7501,7 @@ Oxboow = CPlayerGhost{name = "Oxboow",
     statphyact = 10,
     statmenact = 10,
     statpsyact = 10,
-    spottingdraw = true,
+    spottingspot = true,
     spottinglock = true,
     hitbox = Classic.NIL,
 }
@@ -7645,7 +7647,7 @@ function CPlace:generateRoad(_worldx0, _worldy0, _worldx1, _worldy1, _percent, _
 end
 
 
-if false then
+if true then
 House1 = CPlaceHouseAnim{
     name = "House1",
     worldx = -20,
