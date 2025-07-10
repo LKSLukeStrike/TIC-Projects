@@ -5430,10 +5430,9 @@ end
 
 function CWindowPortraitDrawable:drawInside() -- window portrait content for -- [!] drawable entities
     if not self.entity then return end -- nothing to draw
-    self.entity:save{"screenx", "screeny", "scale", "drawdirs", "drawview",
-        "interactto", "interactby", "portraitmode", "spotted", "hovered",
-        "dirx", "frame", "animations"}
     local _ticdrawhitbox     = Tic.DRAWHITBOX
+    Tic.DRAWHITBOX           = false -- FIXME remove tic master at one point
+    self.entity:save()
     self.entity.screenx      = self.screenx -- force entity attributes
     self.entity.screeny      = self.screeny
     self.entity.scale        = Tic.SCALE02
@@ -5444,15 +5443,14 @@ function CWindowPortraitDrawable:drawInside() -- window portrait content for -- 
     self.entity.portraitmode = true -- avoid some drawings in portraitmode
     self.entity.spotted      = false -- dont draw spotted frame in window
     self.entity.hovered      = false -- dont draw hovered frame in window
-    Tic.DRAWHITBOX           = false -- FIXME remove tic master at one point
     if self.idle then
         self.entity.dirx       = Tic.DIRXRG --Tic.DIRXLF
         self.entity.frame      = CSprite.FRAME00
         self.entity.animations = {}
     end
     self.entity:draw()
-    Tic.DRAWHITBOX = _ticdrawhitbox
     self.entity:load()
+    Tic.DRAWHITBOX = _ticdrawhitbox
 end
 
 
@@ -5854,7 +5852,7 @@ function CButton:draw() -- button drawing
 end
 
 function CButton:drawGround()
-    self:save{"colorground", "colorborder"}
+    self:save()
     self.colorground = (self.hovered) and self.colorhover          or self.colorground
     self.colorground = (self.actived) and self.colorgroundactived  or self.colorground
     self.colorground = (self.enabled) and self.colorground or self.colorgrounddisabled
@@ -5864,7 +5862,7 @@ function CButton:drawGround()
 end
 
 function CButton:drawBorder()
-    self:save{"colorborder"}
+    self:save()
     self.colorborder = (self.enabled) and self.colorborder or self.colorborderdisabled
     CButton.super.drawBorder(self)
     self:load()
@@ -7729,7 +7727,7 @@ function Tic:draw()
 end
 
 function Tic:drawLog()
-    Tic:drawInventories()
+    -- Tic:drawInventories()
 end
 
 function Tic:drawInventories() -- [-] remove
