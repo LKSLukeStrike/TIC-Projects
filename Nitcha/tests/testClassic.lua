@@ -100,9 +100,16 @@ AlainDucon = CPlayerExtra{
   ["inv.men.h"] = "coucou",
   ["inv.any.h"] = "coucou",
 }
--- AlainDucon.inv.men = -200,
 AlainDucon["inv"]["men"] = -200,
 
--- AlainDucon:printMe()
-print()
+print("-- BASE --")
+Tables:print(AlainDucon, {indent = "\t"})
+
+print("-- SAVE --")
+AlainDucon:save()
+AlainDucon.x = -10000
+Tables:print(AlainDucon, {indent = "\t"})
+AlainDucon:load()
+
+print("-- LOAD --")
 Tables:print(AlainDucon, {indent = "\t"})

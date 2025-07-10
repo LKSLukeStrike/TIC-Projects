@@ -169,8 +169,14 @@ end
 
 
 function Classic:save(_keys) -- save (into stack) a table of argt from a list of keys {"k", ...}
+  if not _keys or #_keys == 0 then -- all keys by default
+    _keys = {}
+    for _key, _ in pairs(self) do
+      table.insert(_keys, _key)
+    end
+  end
   local _argt = {}
-  for _, _key in pairs(_keys or {}) do
+  for _, _key in pairs(_keys) do
     _argt[_key] = self[_key]
   end
   table.insert(self._savestack, _argt)

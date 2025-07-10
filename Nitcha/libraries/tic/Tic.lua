@@ -1356,19 +1356,23 @@ CSpriteFG.STATUSEMPTY = CSpriteBG.SPRITEEMPTY
 CSpriteFG.STATUSSLEEP = CSpriteFG.STATUSBANK + 0
 CSpriteFG.STATUSWOUND = CSpriteFG.STATUSBANK + 1
 CSpriteFG.STATUSDEATH = CSpriteFG.STATUSBANK + 2
-CSpriteFG.WEAPONBANK  = 352 -- weapons types
-CSpriteFG.WEAPONMELEE = CSpriteFG.WEAPONBANK + 0
+CSpriteFG.OBJECTBANK  = 352 -- objects types
+CSpriteFG.WEAPONMELEE = CSpriteFG.OBJECTBANK + 0
 CSpriteFG.WEAPONSWORD = CSpriteFG.WEAPONMELEE + 0
 CSpriteFG.WEAPONHAMMR = CSpriteFG.WEAPONMELEE + 16
-CSpriteFG.WEAPONRANGE = CSpriteFG.WEAPONBANK + 1
+CSpriteFG.WEAPONRANGE = CSpriteFG.OBJECTBANK + 1
 CSpriteFG.WEAPONLGBOW = CSpriteFG.WEAPONRANGE + 0
 CSpriteFG.WEAPONCXBOW = CSpriteFG.WEAPONRANGE + 16
-CSpriteFG.WEAPONSHLDS = CSpriteFG.WEAPONBANK + 2
+CSpriteFG.WEAPONSHLDS = CSpriteFG.OBJECTBANK + 2
 CSpriteFG.WEAPONSHLDT = CSpriteFG.WEAPONSHLDS + 0
 CSpriteFG.WEAPONSHLDR = CSpriteFG.WEAPONSHLDS + 16
-CSpriteFG.WEAPONFLASK = CSpriteFG.WEAPONBANK + 3
-CSpriteFG.WEAPONFLASS = CSpriteFG.WEAPONFLASK + 0
-CSpriteFG.WEAPONFLASM = CSpriteFG.WEAPONFLASK + 16
+CSpriteFG.OBJECTFLASK = CSpriteFG.OBJECTBANK + 3
+CSpriteFG.OBJECTFLASS = CSpriteFG.OBJECTFLASK + 0
+CSpriteFG.OBJECTFLASM = CSpriteFG.OBJECTFLASK + 16
+CSpriteFG.CLOTHESHEAD = CSpriteFG.OBJECTBANK + 4
+CSpriteFG.CLOTHEHATLG = CSpriteFG.CLOTHESHEAD + 0
+CSpriteFG.CLOTHEHELMT = CSpriteFG.CLOTHESHEAD + 16
+CSpriteFG.CLOTHESBACK = CSpriteFG.OBJECTBANK + 5
 function CSpriteFG:new(_argt)
     CSpriteFG.super.new(self, _argt)
     self.kind = Classic.KINDSPRITEFG
@@ -3163,10 +3167,14 @@ CObject.COLORONYXFG = Tic.COLORGREYM
 CObject.COLORAZURBG = Tic.COLORBLUED
 CObject.COLORAZURFG = Tic.COLORBLUEM
 CObject.COLORFLASKG = Tic.COLORGREEND
+CObject.USEDNONE = "None" -- used levels
+CObject.USEDHALF = "Half"
+CObject.USEDFULL = "Full"
 function CObject:new(_argt)
     CObject.super.new(self, _argt)
     self.kind = Classic.KINDOBJECT
     self.name = Classic.NAMEOBJECT
+    self.used = CObject.USEDNONE
     self:argt(_argt) -- override if any
 end
 
@@ -3425,16 +3433,16 @@ end
 
 
 --
--- CWeaponFlask
+-- CObjectFlask
 --
-CWeaponFlask = CWeapon:extend() -- Flask weapons
-Classic.KINDDWEAPONFLASK = "Flask" -- Flask kind
-Classic.NAMEDWEAPONFLASK = "Flask" -- Flask name
-function CWeaponFlask:new(_argt)
-    CWeaponFlask.super.new(self, _argt)
-    self.kind = Classic.KINDDWEAPONFLASK
-    self.name = Classic.NAMEDWEAPONFLASK
-    self.sprite  = CSpriteFG.WEAPONFLASK
+CObjectFlask = CObjectHandableMen:extend() -- Flask objects
+Classic.KINDDOBJECTFLASK = "Flask" -- Flask kind
+Classic.NAMEDOBJECTFLASK = "Flask" -- Flask name
+function CObjectFlask:new(_argt)
+    CObjectFlask.super.new(self, _argt)
+    self.kind = Classic.KINDDOBJECTFLASK
+    self.name = Classic.NAMEDOBJECTFLASK
+    self.sprite  = CSpriteFG.OBJECTFLASK
     self.stateshandles = {
         [Tic.STATEIDLELF]  = {rotate = CSprite.ROTATE000, flip = Tic.DIRXLF},
         [Tic.STATEIDLERG]  = {rotate = CSprite.ROTATE000, flip = Tic.DIRXRG},
@@ -3456,25 +3464,25 @@ function CWeaponFlask:new(_argt)
     self:argt(_argt) -- override if any
 end
 
-CWeaponFlaskSmall = CWeaponFlask:extend() -- FlaskSmall weapons
-Classic.KINDDWEAPONFLASS = "Oil.S" -- FlaskSmall kind
-Classic.NAMEDWEAPONFLASS = "Oil.S" -- FlaskSmall name
-function CWeaponFlaskSmall:new(_argt)
-    CWeaponFlaskSmall.super.new(self, _argt)
-    self.kind = Classic.KINDDWEAPONFLASS
-    self.name = Classic.NAMEDWEAPONFLASS
-    self.sprite  = CSpriteFG.WEAPONFLASS
+CObjectFlaskSmall = CObjectFlask:extend() -- FlaskSmall weapons
+Classic.KINDDOBJECTFLASS = "Oil.S" -- FlaskSmall kind
+Classic.NAMEDOBJECTFLASS = "Oil.S" -- FlaskSmall name
+function CObjectFlaskSmall:new(_argt)
+    CObjectFlaskSmall.super.new(self, _argt)
+    self.kind = Classic.KINDDOBJECTFLASS
+    self.name = Classic.NAMEDOBJECTFLASS
+    self.sprite  = CSpriteFG.OBJECTFLASS
     self:argt(_argt) -- override if any
 end
 
-CWeaponFlaskMedium = CWeaponFlask:extend() -- FlaskMedium weapons
-Classic.KINDDWEAPONFLASM = "Oil.M" -- FlaskMedium kind
-Classic.NAMEDWEAPONFLASM = "Oil.M" -- FlaskMedium name
-function CWeaponFlaskMedium:new(_argt)
-    CWeaponFlaskMedium.super.new(self, _argt)
-    self.kind = Classic.KINDDWEAPONFLASM
-    self.name = Classic.NAMEDWEAPONFLASM
-    self.sprite  = CSpriteFG.WEAPONFLASM
+CObjectFlaskMedium = CObjectFlask:extend() -- FlaskMedium weapons
+Classic.KINDDOBJECTFLASM = "Oil.M" -- FlaskMedium kind
+Classic.NAMEDOBJECTFLASM = "Oil.M" -- FlaskMedium name
+function CObjectFlaskMedium:new(_argt)
+    CObjectFlaskMedium.super.new(self, _argt)
+    self.kind = Classic.KINDDOBJECTFLASM
+    self.name = Classic.NAMEDOBJECTFLASM
+    self.sprite  = CSpriteFG.OBJECTFLASM
     self:argt(_argt) -- override if any
 end
 
@@ -3730,6 +3738,7 @@ function CCharacter:new(_argt)
     self.slothandlf   = nil
     self.slothandrg   = nil
     self.inventories  = {
+                         exists = true, -- to check if already implemented
                          phy = CInventoryPhy{},
                          men = CInventoryMen{},
                          psy = CInventoryPsy{},
@@ -3747,7 +3756,7 @@ end
 
 function CCharacter:adjustInventories()
     if not self.inventories then return end -- mandatory (argt)
-    if not self.inventories.any then return end -- ensure we already have inventories
+    if not self.inventories.exists then return end -- ensure we already have inventories
 
     local _inventoryany = self.inventories.any -- grab all objects
     local _inventoryphy = self.inventories.phy
@@ -7387,7 +7396,7 @@ Truduk = CPlayerDwarf{name = "Truduk",
 Nitcha = CPlayerDrowe{name = "Nitcha",
     worldx = 10,
     slothandrg = CWeaponCrossBow{},
-    slothandlf = CWeaponFlaskSmall{},
+    slothandlf = CObjectFlaskSmall{},
 }
 -- Azarel = CPlayerAngel{name = "Azarel",
 -- }
@@ -7413,14 +7422,13 @@ end
 
 if true then
 Sword = CWeaponSword{name = "swo_1"}
-Flask = CWeaponFlaskSmall{inventorytype = CInventoryMen, name = "fla_1"}
+Flask = CObjectFlaskSmall{name = "fla_1"}
 
 Globth = CPlayerGolth{name = "Globth",
     worldx = 20,
     slothandrg = Sword,
     slothandlf = CWeaponShieldTee{name = "ecu_1"},
-    ["inventories.men"] = CInventoryMen{objects = {Flask, Flask}},
-    ["inventories.phy"] = CInventoryPhy{objects = {Sword, Sword}},
+    ["inventories.any"] = CInventoryAny{objects = {Sword, Flask}},
 }
 
 -- Globth:randomWorldWindow()
@@ -7483,8 +7491,8 @@ Welfie = CPlayerWolfe{name = "Welfie",
     interactions = {10},
     -- spottingdraw = true,
     spottingpick = true,
-    slothandrg = CWeaponFlaskMedium{},
-    slothandlf = CWeaponFlaskSmall{},
+    slothandrg = CObjectFlaskMedium{},
+    slothandlf = CObjectFlaskSmall{},
 }
 end
 
@@ -7721,7 +7729,7 @@ function Tic:draw()
 end
 
 function Tic:drawLog()
-    -- Tic:drawInventories()
+    Tic:drawInventories()
 end
 
 function Tic:drawInventories() -- [-] remove
@@ -7748,9 +7756,10 @@ function Tic:drawInventories() -- [-] remove
 end
 
 function Tic:logInventory(_inventory)
+    if not _inventory or not (type(_inventory) == "table") then return end
     Tic:logAppend(_inventory.kind, Tables:size(_inventory.objects).."/".._inventory.objectsmax)
     for _, _object in ipairs(_inventory.objects) do
-        Tic:logAppend(_object.kind, _object.name)
+        Tic:logAppend(" ", _object.kind, _object.name)
     end
 end
 
