@@ -1270,8 +1270,8 @@ CSpriteBG.SPRITEEMPTY = CSpriteBG.SPRITEBANK + 0 -- empty sprite
 CSpriteBG.SIGNBANK1   = 1  -- signs
 CSpriteBG.SIGNQSTMRK  = CSpriteBG.SIGNBANK1 + 00 -- question mark
 CSpriteBG.SIGNINTMRK  = CSpriteBG.SIGNBANK1 + 01 -- interact mark
-CSpriteBG.SIGNBORSQU  = CSpriteBG.SIGNBANK1 + 02 -- borders square
-CSpriteBG.SIGNSPOSQU  = CSpriteBG.SIGNBANK1 + 03 -- spotting square
+CSpriteBG.SIGNBORDSQ  = CSpriteBG.SIGNBANK1 + 02 -- borders square
+CSpriteBG.SIGNSPOTSQ  = CSpriteBG.SIGNBANK1 + 03 -- spotting square
 CSpriteBG.SIGNCROSQU  = CSpriteBG.SIGNBANK1 + 04 -- crossed square
 CSpriteBG.SIGNDOTSQU  = CSpriteBG.SIGNBANK1 + 05 -- dot square
 CSpriteBG.SIGNBANK2   = 16 -- signs
@@ -2221,7 +2221,11 @@ end
 
 function CEntityDrawable:draw() -- default draw for drawable entities -- override if any
     local _tick00      = Tic.TICK00.actvalue
-    local _palette     = Tables:merge(self.palette)
+
+    local _palette     = Tables:merge(self.palette) -- apply diverse palettes if any
+    _palette = (self.drawbgfg == Tic.DRAWBG)
+        and Tables:merge(_palette, self.palettebg)
+        or  Tables:merge(_palette, self.palettefg)
     _palette = (self.drawfade)
         and Tables:merge(_palette, self.palettefade)
         or  _palette
@@ -2258,10 +2262,9 @@ end
 function CEntityDrawable:drawSpotted() -- draw spotted if any
     if not self.spotted then return end -- nothing to draw
     local _musprite = CSpriteBG() -- multi usage unique sprite
-    _musprite.sprite  = CSpriteBG.SIGNSPOSQU
+    _musprite.sprite  = CSpriteBG.SIGNSPOTSQ
     _musprite.screenx = self.screenx
     _musprite.screeny = self.screeny
-    _musprite.flip    = self.dirx
     _musprite.scale   = self.scale
     _musprite.palette = {[Tic.COLORGREYM] = Tic.COLORWHITE,}
     _musprite:draw()
@@ -2270,12 +2273,10 @@ end
 function CEntityDrawable:drawHovered() -- draw hovered if any
     if not self.hovered then return end -- nothing to draw
     local _musprite = CSpriteBG() -- multi usage unique sprite
-    _musprite.sprite  = CSpriteBG.SIGNBORSQU
+    _musprite.sprite  = CSpriteBG.SIGNBORDSQ
     _musprite.screenx = self.screenx
     _musprite.screeny = self.screeny
-    _musprite.flip    = self.dirx
     _musprite.scale   = self.scale
-    _musprite.rotate  = self.rotate
     _musprite.palette = {[Tic.COLORGREYM] = Tic.COLORGREYL,}
     _musprite:draw()
 end
@@ -2284,10 +2285,9 @@ function CEntityDrawable:drawBorders() -- draw borders if any
     self.drawborders = Tic.DRAWBORDERS -- use Tic as master
     if not self.drawborders then return end -- nothing to draw
     local _musprite = CSpriteBG() -- multi usage unique sprite
-    _musprite.sprite  = CSpriteBG.SIGNBORSQU
+    _musprite.sprite  = CSpriteBG.SIGNBORDSQ
     _musprite.screenx = self.screenx
     _musprite.screeny = self.screeny
-    _musprite.flip    = self.dirx
     _musprite.scale   = self.scale
     _musprite.palette = {[Tic.COLORGREYM] = Tic.COLORGREYL,}
     _musprite:draw()
@@ -3469,6 +3469,21 @@ function CObjectFlask:new(_argt)
     self:argt(_argt) -- override if any
 end
 
+function CObjectFlask:draw()
+    self:save()
+    if self.used == CObject.USEDHALF then
+        self.palettefg[CObject.EFFECT] = Tic.COLORKEY
+        self.palettebg[CObject.EFFECT] = Tic.COLORKEY
+    elseif self.used == CObject.USEDFULL then
+        self.palettefg[CObject.EFFECT] = Tic.COLORKEY
+        self.palettebg[CObject.EFFECT] = Tic.COLORKEY
+        self.palettefg[CObject.INSIDE] = Tic.COLORKEY
+        self.palettebg[CObject.INSIDE] = Tic.COLORKEY
+    end
+    CObjectFlask.super.draw(self)
+    self:load()
+end
+
 CObjectFlaskSmall = CObjectFlask:extend() -- FlaskSmall weapons
 Classic.KINDDOBJECTFLASS = "Oil.S" -- FlaskSmall kind
 Classic.NAMEDOBJECTFLASS = "Oil.S" -- FlaskSmall name
@@ -4217,16 +4232,15 @@ function CCharacter:drawHand(_bgfg)
     local _handx   = _handx - _handlex -- adjust handle to hand
     local _handy   = _handy - _handley
 
-
-    local _musprite = CSpriteFG() -- multi usage unique sprite
-    _musprite.sprite  = _object.sprite
-    _musprite.screenx = self.screenx + (_handx * self.scale)
-    _musprite.screeny = self.screeny + (_handy * self.scale)
-    _musprite.scale   = self.scale
-    _musprite.rotate  = _objectrotate
-    _musprite.flip    = _objectflip
-    _musprite.palette = _objectpalette
-    _musprite:draw()
+    _object:save()
+    _object.screenx  = self.screenx + (_handx * self.scale)
+    _object.screeny  = self.screeny + (_handy * self.scale)
+    _object.scale    = self.scale
+    _object.rotate   = _objectrotate
+    _object.dirx     = _objectflip
+    _object.drawbgfg = _bgfg
+    _object:draw()
+    _object:load()
 end
 
 function CCharacter:drawInteract()
@@ -6468,10 +6482,9 @@ function CButtonPlayerSlot:drawGround()
 	if not _object then return end -- empty slot
 
     _object:save()
-    _object.screenx = self.screenx + 1
-    _object.screeny = self.screeny + 1
-    _object.dirx    = Tic:playerActual().dirx
-    _object.palette = _object.palettefg
+    _object.screenx  = self.screenx + 1
+    _object.screeny  = self.screeny + 1
+    _object.dirx     = Tic:playerActual().dirx
     _object:draw()
     _object:load()
 end
@@ -7396,7 +7409,7 @@ Truduk = CPlayerDwarf{name = "Truduk",
 Nitcha = CPlayerDrowe{name = "Nitcha",
     worldx = 10,
     slothandrg = CWeaponCrossBow{},
-    slothandlf = CObjectFlaskSmall{},
+    slothandlf = CObjectFlaskSmall{used = CObject.USEDFULL},
 }
 -- Azarel = CPlayerAngel{name = "Azarel",
 -- }
