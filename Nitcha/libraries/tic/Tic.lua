@@ -1467,6 +1467,66 @@ end
 
 
 --
+-- CSlot
+--
+CSlot = Classic:extend() -- generic slot
+Classic.KINDSLOT = "Slot" -- Slot kind
+Classic.NAMESLOT = "Slot" -- Slot name
+function CSlot:new(_argt)
+    CSlot.super.new(self, _argt)
+    self.kind = Classic.KINDSLOT
+    self.name = Classic.NAMESLOT
+    self.slottype = nil -- allowed slot type -- nil = any
+    self.object   = nil -- object contained in the slot
+    self:argt(_argt) -- override if any
+end
+
+function CSlot:isSlot(_slot)
+    return _slot and type(_slot) == "table" and _slot.is and _slot:is(CSlot)
+end
+
+function CSlot:canSlotObject(_object)
+    if not _object then return false end -- mandatory
+    if not _object.slottype then return false end -- mandatory -- only slotable objects
+    if self.slottype and not (_object.slottype == self.slottype) then return false end -- not allowed type if any
+    return true
+end
+
+CSlotHead = CSlot:extend() -- generic head slot
+Classic.KINDSLOTHEAD = "SlotHead" -- SlotHead kind
+Classic.NAMESLOTHEAD = "SlotHead" -- SlotHead name
+function CSlotHead:new(_argt)
+    CSlotHead.super.new(self, _argt)
+    self.kind = Classic.KINDSLOTHEAD
+    self.name = Classic.NAMESLOTHEAD
+    self.slottype = CSlotHead
+    self:argt(_argt) -- override if any
+end
+
+CSlotBack = CSlot:extend() -- generic back slot
+Classic.KINDSLOTBACK = "SlotBack" -- SlotBack kind
+Classic.NAMESLOTBACK = "SlotBack" -- SlotBack name
+function CSlotBack:new(_argt)
+    CSlotBack.super.new(self, _argt)
+    self.kind = Classic.KINDSLOTBACK
+    self.name = Classic.NAMESLOTBACK
+    self.slottype = CSlotBack
+    self:argt(_argt) -- override if any
+end
+
+CSlotHand = CSlot:extend() -- generic hand slot
+Classic.KINDSLOTHAND = "SlotHand" -- SlotHand kind
+Classic.NAMESLOTHAND = "SlotHand" -- SlotHand name
+function CSlotHand:new(_argt)
+    CSlotHand.super.new(self, _argt)
+    self.kind = Classic.KINDSLOTHAND
+    self.name = Classic.NAMESLOTHAND
+    self.slottype = CSlotHand
+    self:argt(_argt) -- override if any
+end
+
+
+--
 -- CInventory
 --
 CInventory = Classic:extend() -- generic inventory
@@ -1480,6 +1540,10 @@ function CInventory:new(_argt)
 	self.objectsmax   = Nums.MAXINTEGER
 	self.objects      = {}
     self:argt(_argt) -- override if any
+end
+
+function CInventory:isInventory(_inventory)
+    return _inventory and type(_inventory) == "table" and _inventory.is and _inventory:is(CInventory)
 end
 
 function CInventory:canAppendObject(_object)
@@ -3185,20 +3249,21 @@ end
 
 
 --
--- CObjectHandable
+-- CObjectHand
 --
-CObjectHandable = CObject:extend() -- generic handable (inventory) objects
-Classic.KINDOBJECTHANDABLE = "Handable" -- ObjectHandable kind
-Classic.NAMEOBJECTHANDABLE = "Handable" -- ObjectHandable name
-function CObjectHandable:new(_argt)
-    CObjectHandable.super.new(self, _argt)
-    self.kind = Classic.KINDOBJECTHANDABLE
-    self.name = Classic.KINDOBJECTHANDABLE
+CObjectHand = CObject:extend() -- generic hand (inventory) objects
+Classic.KINDOBJECHAND = "Hand" -- ObjectHand kind
+Classic.NAMEOBJECHAND = "Hand" -- ObjectHand name
+function CObjectHand:new(_argt)
+    CObjectHand.super.new(self, _argt)
+    self.kind = Classic.KINDOBJECHAND
+    self.name = Classic.KINDOBJECHAND
+    self.slottype = CSlotHand
     self:argt(_argt) -- override if any
 end
 
-function CObjectHandable:handleOffsets(_state)
-    local _result   = Tables:merge({}, self.handlesoffsets[self.stateshandles[_state].rotate])
+function CObjectHand:handleOffsets(_state)
+    local _result   = Tables:merge(self.handlesoffsets[self.stateshandles[_state].rotate])
     _result.rotate  = self.stateshandles[_state].rotate
     _result.flip    = self.stateshandles[_state].flip
     _result.handlex = (_result.flip == Tic.DIRXLF) -- flip the handlex if any
@@ -3207,46 +3272,46 @@ function CObjectHandable:handleOffsets(_state)
     return _result
 end
 
-CObjectHandableAny = CObjectHandable:extend() -- generic handable (inventory any) objects
-Classic.KINDOBJECTHANDABLEANY = "ObjectHandableAny" -- ObjectHandableAny kind
-Classic.NAMEOBJECTHANDABLEANY = "ObjectHandableAny" -- ObjectHandableAny name
-function CObjectHandableAny:new(_argt)
-    CObjectHandableAny.super.new(self, _argt)
-    self.kind = Classic.KINDOBJECTHANDABLEANY
-    self.name = Classic.NAMEOBJECTHANDABLEANY
+CObjectHandAny = CObjectHand:extend() -- generic handable (inventory any) objects
+Classic.KINDOBJECHANDANY = "ObjectHandAny" -- ObjectHandAny kind
+Classic.NAMEOBJECHANDANY = "ObjectHandAny" -- ObjectHandAny name
+function CObjectHandAny:new(_argt)
+    CObjectHandAny.super.new(self, _argt)
+    self.kind = Classic.KINDOBJECHANDANY
+    self.name = Classic.NAMEOBJECHANDANY
     self.inventorytype = CInventoryAny
     self:argt(_argt) -- override if any
 end
 
-CObjectHandablePhy = CObjectHandable:extend() -- generic handable (inventory phy) objects
-Classic.KINDOBJECTHANDABLEPHY = "ObjectHandablePhy" -- ObjectHandablePhy kind
-Classic.NAMEOBJECTHANDABLEPHY = "ObjectHandablePhy" -- ObjectHandablePhy name
-function CObjectHandablePhy:new(_argt)
-    CObjectHandablePhy.super.new(self, _argt)
-    self.kind = Classic.KINDOBJECTHANDABLEPHY
-    self.name = Classic.NAMEOBJECTHANDABLEPHY
+CObjectHandPhy = CObjectHand:extend() -- generic handable (inventory phy) objects
+Classic.KINDOBJECHANDPHY = "ObjectHandPhy" -- ObjectHandPhy kind
+Classic.NAMEOBJECHANDPHY = "ObjectHandPhy" -- ObjectHandPhy name
+function CObjectHandPhy:new(_argt)
+    CObjectHandPhy.super.new(self, _argt)
+    self.kind = Classic.KINDOBJECHANDPHY
+    self.name = Classic.NAMEOBJECHANDPHY
     self.inventorytype = CInventoryPhy
     self:argt(_argt) -- override if any
 end
 
-CObjectHandableMen = CObjectHandable:extend() -- generic handable (inventory men) objects
-Classic.KINDOBJECTHANDABLEMEN = "ObjectHandableMen" -- ObjectHandableMen kind
-Classic.NAMEOBJECTHANDABLEMEN = "ObjectHandableMen" -- ObjectHandableMen name
-function CObjectHandableMen:new(_argt)
-    CObjectHandableMen.super.new(self, _argt)
-    self.kind = Classic.KINDOBJECTHANDABLEMEN
-    self.name = Classic.NAMEOBJECTHANDABLEMEN
+CObjectHandMen = CObjectHand:extend() -- generic handable (inventory men) objects
+Classic.KINDOBJECHANDMEN = "ObjectHandMen" -- ObjectHandMen kind
+Classic.NAMEOBJECHANDMEN = "ObjectHandMen" -- ObjectHandMen name
+function CObjectHandMen:new(_argt)
+    CObjectHandMen.super.new(self, _argt)
+    self.kind = Classic.KINDOBJECHANDMEN
+    self.name = Classic.NAMEOBJECHANDMEN
     self.inventorytype = CInventoryMen
     self:argt(_argt) -- override if any
 end
 
-CObjectHandablePsy = CObjectHandable:extend() -- generic handable (inventory psy) objects
-Classic.KINDOBJECTHANDABLEPSY = "ObjectHandablePsy" -- ObjectHandablePsy kind
-Classic.NAMEOBJECTHANDABLEPSY = "ObjectHandablePsy" -- ObjectHandablePsy name
-function CObjectHandablePsy:new(_argt)
-    CObjectHandablePsy.super.new(self, _argt)
-    self.kind = Classic.KINDOBJECTHANDABLEPSY
-    self.name = Classic.NAMEOBJECTHANDABLEPSY
+CObjectHandPsy = CObjectHand:extend() -- generic handable (inventory psy) objects
+Classic.KINDOBJECHANDPSY = "ObjectHandPsy" -- ObjectHandPsy kind
+Classic.NAMEOBJECHANDPSY = "ObjectHandPsy" -- ObjectHandPsy name
+function CObjectHandPsy:new(_argt)
+    CObjectHandPsy.super.new(self, _argt)
+    self.kind = Classic.KINDOBJECHANDPSY
+    self.name = Classic.NAMEOBJECHANDPSY
     self.inventorytype = CInventoryPsy
     self:argt(_argt) -- override if any
 end
@@ -3255,7 +3320,7 @@ end
 --
 -- CWeapon
 --
-CWeapon = CObjectHandablePhy:extend() -- weapons
+CWeapon = CObjectHandPhy:extend() -- weapons
 Classic.KINDWEAPON = "Weapon" -- Weapon kind
 Classic.NAMEWEAPON = "Weapon" -- Weapon name
 function CWeapon:new(_argt)
@@ -3440,7 +3505,7 @@ end
 --
 -- CObjectFlask
 --
-CObjectFlask = CObjectHandableMen:extend() -- Flask objects
+CObjectFlask = CObjectHandMen:extend() -- Flask objects
 Classic.KINDDOBJECTFLASK = "Flask" -- Flask kind
 Classic.NAMEDOBJECTFLASK = "Flask" -- Flask name
 function CObjectFlask:new(_argt)
@@ -3753,17 +3818,20 @@ function CCharacter:new(_argt)
     self.drawview     = false
     self.drawmind     = false
     self.drawmove     = false
-    self.slothead     = nil -- character objects slots
-    self.slotback     = nil
-    self.slothandlf   = nil
-    self.slothandrg   = nil
-    self.inventories  = {
+    self.slots        = { -- character objects slots
+                         exists = true, -- to check if already implemented
+                         head = CSlotHead{},
+                         back = CSlotBack{},
+                         handlf = CSlotHand{},
+                         handrg = CSlotHand{},
+    }
+    self.inventories  = { -- character standard inventories
                          exists = true, -- to check if already implemented
                          phy = CInventoryPhy{},
                          men = CInventoryMen{},
                          psy = CInventoryPsy{},
                          any = CInventoryAny{},
-                        } -- standard inventories
+                        }
     self:argt(_argt) -- override if any
     self.camera       = CCamera{name = self.name.." "..Classic.NAMECAMERA} -- one camera per character
     self:focus() -- focus its camera on itself
@@ -3771,10 +3839,10 @@ end
 
 function CCharacter:argt(_argt)
     CCharacter.super.argt(self, _argt)
-   self:adjustInventories() -- adjust standard inventories sizes
+   self:adjustInventoriesSlots() -- adjust standard inventories sizes and contents + slots
 end
 
-function CCharacter:adjustInventories()
+function CCharacter:adjustInventoriesSlots()
     if not self.inventories then return end -- mandatory (argt)
     if not self.inventories.exists then return end -- ensure we already have inventories
 
@@ -3782,9 +3850,13 @@ function CCharacter:adjustInventories()
     local _inventoryphy = self.inventories.phy
     local _inventorymen = self.inventories.men
     local _inventorypsy = self.inventories.psy
-    local _objectslots = {"slothandlf", "slothandrg"}
-    for _, _objectslot in ipairs(_objectslots) do
-        _inventoryany:appendObject(self[_objectslot])
+    for _, _slot in pairs(self.slots) do
+        if CSlot:isSlot(_slot) then
+            _inventoryany:appendObject(_slot.object)
+            if not _slot:canSlotObject(_slot.object) then -- keep only if allowed
+                _slot.object = nil
+            end
+        end
     end
     _inventoryphy:movetoInventory(_inventoryany)
     _inventorymen:movetoInventory(_inventoryany)
@@ -3802,8 +3874,10 @@ function CCharacter:adjustInventories()
     _inventoryany:movetoInventory(_inventorymen)
     _inventoryany:movetoInventory(_inventorypsy)
 
-    for _, _objectslot in ipairs(_objectslots) do -- check if objects in slots are still available
-        if self[_objectslot] and Tables:valFind(_inventoryany.objects, self[_objectslot]) then self[_objectslot] = nil end
+    for _, _slot in pairs(self.slots) do -- check if objects in slots are still available
+        if CSlot:isSlot(_slot) then
+            if Tables:valFind(_inventoryany.objects, _slot.object) then _slot.object = nil end
+        end
     end
 
     _inventoryany.objects = {} -- get rid of extra objects
@@ -4206,10 +4280,10 @@ end
 
 function CCharacter:drawHand(_bgfg)
     local _object = nil  -- determine the corresponding object if any
-    if _bgfg == Tic.DRAWBG and self.dirx == Tic.DIRXLF then _object = self.slothandrg end
-    if _bgfg == Tic.DRAWBG and self.dirx == Tic.DIRXRG then _object = self.slothandlf end
-    if _bgfg == Tic.DRAWFG and self.dirx == Tic.DIRXLF then _object = self.slothandlf end
-    if _bgfg == Tic.DRAWFG and self.dirx == Tic.DIRXRG then _object = self.slothandrg end
+    if _bgfg == Tic.DRAWBG and self.dirx == Tic.DIRXLF then _object = self.slots.handrg.object end
+    if _bgfg == Tic.DRAWBG and self.dirx == Tic.DIRXRG then _object = self.slots.handlf.object end
+    if _bgfg == Tic.DRAWFG and self.dirx == Tic.DIRXLF then _object = self.slots.handlf.object end
+    if _bgfg == Tic.DRAWFG and self.dirx == Tic.DIRXRG then _object = self.slots.handrg.object end
     if not _object then return end -- nothing in hand
 
     local _handsoffsets = self:handsOffsets() -- determine the corresponding hand offsets
@@ -6492,28 +6566,28 @@ end
 CButtonPlayerSlotHead = CButtonPlayerSlot:extend()
 function CButtonPlayerSlotHead:new(_argt)
     CButtonPlayerSlotHead.super.new(self, _argt)
-    self.getslotobject = function() return Tic:playerActual().slothead end
+    self.getslotobject = function() return Tic:playerActual().slots.head.object end
     self:argt(_argt) -- override if any
 end
 
 CButtonPlayerSlotBack = CButtonPlayerSlot:extend()
 function CButtonPlayerSlotBack:new(_argt)
     CButtonPlayerSlotBack.super.new(self, _argt)
-    self.getslotobject = function() return Tic:playerActual().slotback end
+    self.getslotobject = function() return Tic:playerActual().slots.back.object end
     self:argt(_argt) -- override if any
 end
 
 CButtonPlayerSlotHandLF = CButtonPlayerSlot:extend()
 function CButtonPlayerSlotHandLF:new(_argt)
     CButtonPlayerSlotHandLF.super.new(self, _argt)
-    self.getslotobject = function() return Tic:playerActual().slothandlf end
+    self.getslotobject = function() return Tic:playerActual().slots.handlf.object end
     self:argt(_argt) -- override if any
 end
 
 CButtonPlayerSlotHandRG = CButtonPlayerSlot:extend()
 function CButtonPlayerSlotHandRG:new(_argt)
     CButtonPlayerSlotHandRG.super.new(self, _argt)
-    self.getslotobject = function() return Tic:playerActual().slothandrg end
+    self.getslotobject = function() return Tic:playerActual().slots.handrg.object end
     self:argt(_argt) -- override if any
 end
 
@@ -7383,10 +7457,10 @@ end -- generate places
 --
 -- Players
 --
-if true then
+if false then
 Truduk = CPlayerDwarf{name = "Truduk",
-    slothandrg = CWeaponHammer{},
-    slothandlf = CWeaponShieldRound{},
+    ["slots.handrg"] = CSlotHand{object = CWeaponHammer{}},
+    ["slots.handlf"] = CSlotHand{object = CWeaponShieldRound{}},
 }
 -- Truduk:randomWorldWindow()
 -- Prinnn = CPlayerGnome{name = "Prinnn",
@@ -7408,8 +7482,8 @@ Truduk = CPlayerDwarf{name = "Truduk",
 -- }
 Nitcha = CPlayerDrowe{name = "Nitcha",
     worldx = 10,
-    slothandrg = CWeaponCrossBow{},
-    slothandlf = CObjectFlaskSmall{used = CObject.USEDFULL},
+    ["slots.handrg"] = CSlotHand{object = CWeaponCrossBow{}},
+    ["slots.handlf"] = CSlotHand{object = CObjectFlaskSmall{used = CObject.USEDFULL}},
 }
 -- Azarel = CPlayerAngel{name = "Azarel",
 -- }
@@ -7439,8 +7513,9 @@ Flask = CObjectFlaskSmall{name = "fla_1"}
 
 Globth = CPlayerGolth{name = "Globth",
     worldx = 20,
-    slothandrg = Sword,
-    slothandlf = CWeaponShieldTee{name = "ecu_1"},
+    ["slots.head"] = CSlotHand{object = CWeaponCrossBow{name = "xxx"}},
+    ["slots.handrg"] = CSlotHand{object = Sword},
+    ["slots.handlf"] = CSlotHand{object = CWeaponShieldTee{name = "ecu_1"}},
     ["inventories.any"] = CInventoryAny{objects = {Sword, Flask}},
 }
 
@@ -7459,8 +7534,8 @@ Wulfie = CPlayerWolfe{name = "Wulfie",
     interactions = {10},
     -- spottingspot = true,
     spottingpick = true,
-    slothandrg = CWeaponHammer{},
-    slothandlf = CWeaponSword{},
+    ["slots.handrg"] = CSlotHand{object = CWeaponHammer{}},
+    ["slots.handlf"] = CSlotHand{object = CWeaponSword{}},
 }
 end
 if false then
@@ -7474,8 +7549,8 @@ Wolfie = CPlayerWolfe{name = "Wolfie",
     interactions = {10},
     -- spottingspot = true,
     spottingpick = true,
-    slothandrg = CWeaponShieldRound{},
-    slothandlf = CWeaponShieldTee{},
+    ["slots.handrg"] = CSlotHand{object = CWeaponShieldRound{}},
+    ["slots.handlf"] = CSlotHand{object = CWeaponShieldTee{}},
 }
 end
 if false then
@@ -7489,8 +7564,8 @@ Wilfie = CPlayerWolfe{name = "Wilfie",
     interactions = {10},
     -- spottingspot = true,
     spottingpick = true,
-    slothandrg = CWeaponCrossBow{},
-    slothandlf = CWeaponLongBow{},
+    ["slots.handrg"] = CSlotHand{object = CWeaponCrossBow{}},
+    ["slots.handlf"] = CSlotHand{object = CWeaponLongBow{}},
 }
 end
 if false then
@@ -7504,8 +7579,8 @@ Welfie = CPlayerWolfe{name = "Welfie",
     interactions = {10},
     -- spottingspot = true,
     spottingpick = true,
-    slothandrg = CObjectFlaskMedium{},
-    slothandlf = CObjectFlaskSmall{},
+    ["slots.handrg"] = CSlotHand{object = CObjectFlaskMedium{}},
+    ["slots.handlf"] = CSlotHand{object = CObjectFlaskSmall{}},
 }
 end
 
@@ -7660,7 +7735,7 @@ function CPlace:generateRoad(_worldx0, _worldy0, _worldx1, _worldy1, _percent, _
 end
 
 
-if true then
+if false then
 House1 = CPlaceHouseAnim{
     name = "House1",
     worldx = -20,
@@ -7742,7 +7817,7 @@ function Tic:draw()
 end
 
 function Tic:drawLog()
-    -- Tic:drawInventories()
+    Tic:drawInventories()
 end
 
 function Tic:drawInventories() -- [-] remove
@@ -7755,25 +7830,38 @@ function Tic:drawInventories() -- [-] remove
     local _dirx    = _playeractual.dirx
     local _diry    = _playeractual.diry
 
-    Tic:logAppend(_playeractual.world.name, Tables:size(_playeractual.world.entitieslocations.entities))
-    for _, _entity in pairs(_playeractual.world.entitieslocations.entities) do
-        Tic:logAppend(_entity.kind, _entity.name)
-    end
+    -- Tic:logWorld(_playeractual.world)
     Tic:logAppend()
     Tic:logAppend(_playeractual.name, _playeractual.statphymax, _playeractual.statmenmax, _playeractual.statpsymax)
-    for _, _inventory in pairs(_playeractual.inventories) do
-        Tic:logInventory(_inventory)
+    for _name, _inventory in pairs(_playeractual.inventories) do
+        Tic:logInventory(_name, _inventory)
     end
-    if _playeractual.slothandlf then Tic:logAppend("handlf", _playeractual.slothandlf.kind, _playeractual.slothandlf.name) end
-    if _playeractual.slothandrg then Tic:logAppend("handrg", _playeractual.slothandrg.kind, _playeractual.slothandrg.name) end
+    for _name, _slot in pairs(_playeractual.slots) do
+        Tic:logSlot(_name, _slot)
+    end
 end
 
-function Tic:logInventory(_inventory)
-    if not _inventory or not (type(_inventory) == "table") then return end
-    Tic:logAppend(_inventory.kind, Tables:size(_inventory.objects).."/".._inventory.objectsmax)
+function Tic:logWorld(_world)
+    if not _world then return end
+    Tic:logAppend(_world.name, Tables:size(_world.entitieslocations.entities))
+    for _, _entity in pairs(_world.entitieslocations.entities) do
+        Tic:logAppend(_entity.kind, _entity.name)
+    end
+end
+
+function Tic:logInventory(_name, _inventory)
+    if not CInventory:isInventory(_inventory) then return end
+    Tic:logAppend(_name, _inventory.kind, Tables:size(_inventory.objects).."/".._inventory.objectsmax)
     for _, _object in ipairs(_inventory.objects) do
         Tic:logAppend(" ", _object.kind, _object.name)
     end
+end
+
+function Tic:logSlot(_name, _slot)
+    if not CSlot:isSlot(_slot) then return end
+    Tic:logAppend(_name, _slot.kind)
+    local _object = _slot.object
+    if _object then Tic:logAppend(" ", _object.kind, _object.name) end
 end
 
 function Tic:logRegion(_pfx, _region)
