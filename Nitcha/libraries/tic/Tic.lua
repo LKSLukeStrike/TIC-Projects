@@ -3247,22 +3247,7 @@ function CObject:new(_argt)
     self:argt(_argt) -- override if any
 end
 
-
---
--- CObjectHand
---
-CObjectHand = CObject:extend() -- generic hand (inventory) objects
-Classic.KINDOBJECHAND = "Hand" -- ObjectHand kind
-Classic.NAMEOBJECHAND = "Hand" -- ObjectHand name
-function CObjectHand:new(_argt)
-    CObjectHand.super.new(self, _argt)
-    self.kind = Classic.KINDOBJECHAND
-    self.name = Classic.KINDOBJECHAND
-    self.slottype = CSlotHand
-    self:argt(_argt) -- override if any
-end
-
-function CObjectHand:handleOffsets(_state)
+function CObject:handleOffsets(_state)
     local _result   = Tables:merge(self.handlesoffsets[self.stateshandles[_state].rotate])
     _result.rotate  = self.stateshandles[_state].rotate
     _result.flip    = self.stateshandles[_state].flip
@@ -3272,7 +3257,22 @@ function CObjectHand:handleOffsets(_state)
     return _result
 end
 
-CObjectHandAny = CObjectHand:extend() -- generic handable (inventory any) objects
+
+--
+-- CObjectHand
+--
+CObjectHand = CObject:extend() -- generic hand (inventory) objects
+Classic.KINDOBJECHAND = "ObjectHand" -- ObjectHand kind
+Classic.NAMEOBJECHAND = "ObjectHand" -- ObjectHand name
+function CObjectHand:new(_argt)
+    CObjectHand.super.new(self, _argt)
+    self.kind = Classic.KINDOBJECHAND
+    self.name = Classic.KINDOBJECHAND
+    self.slottype = CSlotHand
+    self:argt(_argt) -- override if any
+end
+
+CObjectHandAny = CObjectHand:extend() -- generic hand (inventory any) objects
 Classic.KINDOBJECHANDANY = "ObjectHandAny" -- ObjectHandAny kind
 Classic.NAMEOBJECHANDANY = "ObjectHandAny" -- ObjectHandAny name
 function CObjectHandAny:new(_argt)
@@ -3283,7 +3283,7 @@ function CObjectHandAny:new(_argt)
     self:argt(_argt) -- override if any
 end
 
-CObjectHandPhy = CObjectHand:extend() -- generic handable (inventory phy) objects
+CObjectHandPhy = CObjectHand:extend() -- generic hand (inventory phy) objects
 Classic.KINDOBJECHANDPHY = "ObjectHandPhy" -- ObjectHandPhy kind
 Classic.NAMEOBJECHANDPHY = "ObjectHandPhy" -- ObjectHandPhy name
 function CObjectHandPhy:new(_argt)
@@ -3294,7 +3294,7 @@ function CObjectHandPhy:new(_argt)
     self:argt(_argt) -- override if any
 end
 
-CObjectHandMen = CObjectHand:extend() -- generic handable (inventory men) objects
+CObjectHandMen = CObjectHand:extend() -- generic hand (inventory men) objects
 Classic.KINDOBJECHANDMEN = "ObjectHandMen" -- ObjectHandMen kind
 Classic.NAMEOBJECHANDMEN = "ObjectHandMen" -- ObjectHandMen name
 function CObjectHandMen:new(_argt)
@@ -3305,7 +3305,7 @@ function CObjectHandMen:new(_argt)
     self:argt(_argt) -- override if any
 end
 
-CObjectHandPsy = CObjectHand:extend() -- generic handable (inventory psy) objects
+CObjectHandPsy = CObjectHand:extend() -- generic hand (inventory psy) objects
 Classic.KINDOBJECHANDPSY = "ObjectHandPsy" -- ObjectHandPsy kind
 Classic.NAMEOBJECHANDPSY = "ObjectHandPsy" -- ObjectHandPsy name
 function CObjectHandPsy:new(_argt)
@@ -3549,7 +3549,7 @@ function CObjectFlask:draw()
     self:load()
 end
 
-CObjectFlaskSmall = CObjectFlask:extend() -- FlaskSmall weapons
+CObjectFlaskSmall = CObjectFlask:extend() -- FlaskSmall objects
 Classic.KINDDOBJECTFLASS = "Oil.S" -- FlaskSmall kind
 Classic.NAMEDOBJECTFLASS = "Oil.S" -- FlaskSmall name
 function CObjectFlaskSmall:new(_argt)
@@ -3560,7 +3560,7 @@ function CObjectFlaskSmall:new(_argt)
     self:argt(_argt) -- override if any
 end
 
-CObjectFlaskMedium = CObjectFlask:extend() -- FlaskMedium weapons
+CObjectFlaskMedium = CObjectFlask:extend() -- FlaskMedium objects
 Classic.KINDDOBJECTFLASM = "Oil.M" -- FlaskMedium kind
 Classic.NAMEDOBJECTFLASM = "Oil.M" -- FlaskMedium name
 function CObjectFlaskMedium:new(_argt)
@@ -3568,6 +3568,93 @@ function CObjectFlaskMedium:new(_argt)
     self.kind = Classic.KINDDOBJECTFLASM
     self.name = Classic.NAMEDOBJECTFLASM
     self.sprite  = CSpriteFG.OBJECTFLASM
+    self:argt(_argt) -- override if any
+end
+
+
+--
+-- CObjectHead
+--
+CObjectHead = CObject:extend() -- generic head (inventory) objects
+Classic.KINDOBJECTHEAD = "ObjectHead" -- ObjectHead kind
+Classic.NAMEOBJECTHEAD = "ObjectHead" -- ObjectHead name
+function CObjectHead:new(_argt)
+    CObjectHead.super.new(self, _argt)
+    self.kind = Classic.KINDOBJECTHEAD
+    self.name = Classic.NAMEOBJECTHEAD
+    self.slottype = CSlotHead
+    self.stateshandles = {
+        [Tic.STATEIDLELF]  = {rotate = CSprite.ROTATE000, flip = Tic.DIRXLF},
+        [Tic.STATEIDLERG]  = {rotate = CSprite.ROTATE000, flip = Tic.DIRXRG},
+        [Tic.STATEMOVELF]  = {rotate = CSprite.ROTATE000, flip = Tic.DIRXLF},
+        [Tic.STATEMOVERG]  = {rotate = CSprite.ROTATE000, flip = Tic.DIRXRG},
+        [Tic.STATEWORKLF]  = {rotate = CSprite.ROTATE000, flip = Tic.DIRXLF},
+        [Tic.STATEWORKRG]  = {rotate = CSprite.ROTATE000, flip = Tic.DIRXRG},
+        [Tic.STATEFLOORLF] = {rotate = CSprite.ROTATE270, flip = Tic.DIRXLF},
+        [Tic.STATEFLOORRG] = {rotate = CSprite.ROTATE270, flip = Tic.DIRXRG},
+    }
+    self.handlesoffsets = {
+        [CSprite.ROTATE000] = {handlex = 4, handley = 5},
+        [CSprite.ROTATE090] = {handlex = 3, handley = 4},
+        [CSprite.ROTATE180] = {handlex = 3, handley = 3},
+        [CSprite.ROTATE270] = {handlex = 4, handley = 3},
+    }
+    self.palettefg = {[CObject.BORDER] = CObject.COLORIRONFG, [CObject.INSIDE] = CObject.COLORWOODFG, [CObject.EFFECT] = CObject.COLORWOODFG}
+    self:argt(_argt) -- override if any
+end
+
+CObjectHeadAny = CObjectHead:extend() -- generic head (inventory any) objects
+Classic.KINDOBJECHEADANY = "ObjectHeadAny" -- ObjectHeadAny kind
+Classic.NAMEOBJECHEADANY = "ObjectHeadAny" -- ObjectHeadAny name
+function CObjectHeadAny:new(_argt)
+    CObjectHeadAny.super.new(self, _argt)
+    self.kind = Classic.KINDOBJECHEADANY
+    self.name = Classic.NAMEOBJECHEADANY
+    self.inventorytype = CInventoryAny
+    self:argt(_argt) -- override if any
+end
+
+CObjectHeadPhy = CObjectHead:extend() -- generic head (inventory phy) objects
+Classic.KINDOBJECHEADPHY = "ObjectHeadPhy" -- ObjectHeadPhy kind
+Classic.NAMEOBJECHEADPHY = "ObjectHeadPhy" -- ObjectHeadPhy name
+function CObjectHeadPhy:new(_argt)
+    CObjectHeadPhy.super.new(self, _argt)
+    self.kind = Classic.KINDOBJECHEADPHY
+    self.name = Classic.NAMEOBJECHEADPHY
+    self.inventorytype = CInventoryPhy
+    self:argt(_argt) -- override if any
+end
+
+CObjectHeadMen = CObjectHead:extend() -- generic head (inventory men) objects
+Classic.KINDOBJECHEADMEN = "ObjectHeadMen" -- ObjectHeadMen kind
+Classic.NAMEOBJECHEADMEN = "ObjectHeadMen" -- ObjectHeadMen name
+function CObjectHeadMen:new(_argt)
+    CObjectHeadMen.super.new(self, _argt)
+    self.kind = Classic.KINDOBJECHEADMEN
+    self.name = Classic.NAMEOBJECHEADMEN
+    self.inventorytype = CInventoryMen
+    self:argt(_argt) -- override if any
+end
+
+CObjectHeadPsy = CObjectHead:extend() -- generic head (inventory psy) objects
+Classic.KINDOBJECHEADPSY = "ObjectHeadPsy" -- ObjectHeadPsy kind
+Classic.NAMEOBJECHEADPSY = "ObjectHeadPsy" -- ObjectHeadPsy name
+function CObjectHeadPsy:new(_argt)
+    CObjectHeadPsy.super.new(self, _argt)
+    self.kind = Classic.KINDOBJECHEADPSY
+    self.name = Classic.NAMEOBJECHEADPSY
+    self.inventorytype = CInventoryPsy
+    self:argt(_argt) -- override if any
+end
+
+CObjectHatLarge = CObjectHeadPhy:extend() -- HatLarge objects
+Classic.KINDOBJECTHATLARGE = "Hat.L" -- ObjectHatLarge kind
+Classic.NAMEOBJECTHATLARGE = "Hat.L" -- ObjectHatLarge name
+function CObjectHatLarge:new(_argt)
+    CObjectHatLarge.super.new(self, _argt)
+    self.kind = Classic.KINDOBJECTHATLARGE
+    self.name = Classic.NAMEOBJECTHATLARGE
+    self.sprite = CSpriteFG.CLOTHEHATLG
     self:argt(_argt) -- override if any
 end
 
