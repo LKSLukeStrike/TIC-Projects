@@ -168,10 +168,10 @@ Tic.COLORHAIRSFG  = Tic.COLORGREYD -- 4 colors for the heads
 Tic.COLORHAIRSBG  = Tic.COLORGREYM
 Tic.COLOREXTRA    = Tic.COLORGREYL
 Tic.COLORSKIN     = Tic.COLORWHITE
-Tic.COLOREYESFG   = Tic.COLORGREYD -- 4 colors for the eyes
-Tic.COLOREYESBU   = Tic.COLORGREYM
-Tic.COLOREYESBM   = Tic.COLORGREYL
-Tic.COLOREYESBD   = Tic.COLORWHITE
+Tic.COLOREYESFG   = Tic.COLORWHITE -- 4 colors for the eyes
+Tic.COLOREYESBU   = Tic.COLORGREYD
+Tic.COLOREYESBM   = Tic.COLORGREYM
+Tic.COLOREYESBD   = Tic.COLORGREYL
 
 -- Palette colors for characters stats
 Tic.COLORSTAT0    = Tic.COLORGREYD
@@ -1351,11 +1351,11 @@ CSpriteFG.BODYHUMANKNEELWORK = CSpriteFG.BODYHUMAN + 5
 CSpriteFG.BODYHUMANKNEELMOVE = CSpriteFG.BODYHUMAN + 6
 CSpriteFG.EYESBANK    = 320 -- characters eyes
 CSpriteFG.EYESHUMAN   = CSpriteFG.EYESBANK + 0 -- humanoid eyes
-CSpriteFG.STATUSBANK  = 336 -- status types
-CSpriteFG.STATUSEMPTY = CSpriteBG.SPRITEEMPTY
-CSpriteFG.STATUSSLEEP = CSpriteFG.STATUSBANK + 0
-CSpriteFG.STATUSWOUND = CSpriteFG.STATUSBANK + 1
-CSpriteFG.STATUSDEATH = CSpriteFG.STATUSBANK + 2
+CSpriteFG.EFFECTBANK  = 336 -- effects types
+CSpriteFG.EFFECTEMPTY = CSpriteBG.SPRITEEMPTY
+CSpriteFG.EFFECTSLEEP = CSpriteFG.EFFECTBANK + 0
+CSpriteFG.EFFECTWOUND = CSpriteFG.EFFECTBANK + 1
+CSpriteFG.EFFECTDEATH = CSpriteFG.EFFECTBANK + 2
 CSpriteFG.OBJECTBANK  = 352 -- objects types
 CSpriteFG.WEAPONMELEE = CSpriteFG.OBJECTBANK + 0
 CSpriteFG.WEAPONSWORD = CSpriteFG.WEAPONMELEE + 0
@@ -2286,10 +2286,10 @@ end
 function CEntityDrawable:draw() -- default draw for drawable entities -- override if any
     local _tick00      = Tic.TICK00.actvalue
 
-    local _palette     = Tables:merge(self.palette) -- apply diverse palettes if any
+    local _palette     = Tables:merge(self.palette, self.palettefg) -- apply diverse palettes if any
     _palette = (self.drawbgfg == Tic.DRAWBG)
         and Tables:merge(_palette, self.palettebg)
-        or  Tables:merge(_palette, self.palettefg)
+        or  _palette
     _palette = (self.drawfade)
         and Tables:merge(_palette, self.palettefade)
         or  _palette
@@ -3615,7 +3615,6 @@ Tic.STATESETTINGS = { -- states settings
     [Tic.STATEFLOORSLEEP] = {
         posture = Tic.POSTUREFLOOR,
         status  = Tic.STATUSSLEEP,
-        statussprite = CSpriteFG.STATUSSLEEP,
         frequence = Tic.FREQUENCE0090,
     },
     [Tic.STATEFLOORBLEED] = {
@@ -3699,79 +3698,79 @@ Tic.POSTURESETTINGS = { -- postures settings
 Tic.STATUSSETTINGS = { -- statuses settings
     [Tic.STATUSIDLE] = {
         bodyspriteoffset = 0,
-        statussprite = CSpriteFG.STATUSEMPTY,
+        effectsprite = CSpriteFG.EFFECTEMPTY,
         palette0 = {},
         palette1 = {},
     },
     [Tic.STATUSWORK] = {
         bodyspriteoffset = 1,
-        statussprite = CSpriteFG.STATUSEMPTY,
+        effectsprite = CSpriteFG.EFFECTEMPTY,
         palette0 = {},
         palette1 = {},
     },
     [Tic.STATUSMOVE] = {
         bodyspriteoffset = 2,
-        statussprite = CSpriteFG.STATUSEMPTY,
+        effectsprite = CSpriteFG.EFFECTEMPTY,
         palette0 = {},
         palette1 = {},
     },
     [Tic.STATUSSLEEP] = {
         bodyspriteoffset = 0,
-        statussprite = CSpriteFG.STATUSSLEEP,
+        effectsprite = CSpriteFG.EFFECTSLEEP,
         palette0 = {[Tic.COLORWHITE] = Tic.COLORWHITE, [Tic.COLORGREYL] = Tic.COLORGREYL,},
         palette1 = {[Tic.COLORWHITE] = Tic.COLORGREYL, [Tic.COLORGREYL] = Tic.COLORWHITE,},
     },
     [Tic.STATUSBLEED] = {
         bodyspriteoffset = 0,
-        statussprite = CSpriteFG.STATUSWOUND,
+        effectsprite = CSpriteFG.EFFECTWOUND,
         palette0 = {[Tic.COLORWHITE] = Tic.COLORRED,    [Tic.COLORGREYL] = Tic.COLORPURPLE,},
         palette1 = {[Tic.COLORWHITE] = Tic.COLORPURPLE, [Tic.COLORGREYL] = Tic.COLORRED,},
     },
     [Tic.STATUSMAGIC] = {
         bodyspriteoffset = 0,
-        statussprite = CSpriteFG.STATUSWOUND,
+        effectsprite = CSpriteFG.EFFECTWOUND,
         palette0 = {[Tic.COLORWHITE] = Tic.COLORCYAN,  [Tic.COLORGREYL] = Tic.COLORBLUEM,},
         palette1 = {[Tic.COLORWHITE] = Tic.COLORBLUEM, [Tic.COLORGREYL] = Tic.COLORCYAN,},
     },
     [Tic.STATUSALCHE] = {
         bodyspriteoffset = 0,
-        statussprite = CSpriteFG.STATUSWOUND,
+        effectsprite = CSpriteFG.EFFECTWOUND,
         palette0 = {[Tic.COLORWHITE] = Tic.COLORGREENL, [Tic.COLORGREYL] = Tic.COLORGREENM,},
         palette1 = {[Tic.COLORWHITE] = Tic.COLORGREENM, [Tic.COLORGREYL] = Tic.COLORGREENL,},
     },
     [Tic.STATUSKNOCK] = {
         bodyspriteoffset = 0,
-        statussprite = CSpriteFG.STATUSWOUND,
+        effectsprite = CSpriteFG.EFFECTWOUND,
         palette0 = {[Tic.COLORWHITE] = Tic.COLORWHITE, [Tic.COLORGREYL] = Tic.COLORGREYL,},
         palette1 = {[Tic.COLORWHITE] = Tic.COLORGREYL, [Tic.COLORGREYL] = Tic.COLORWHITE,},
     },
     [Tic.STATUSFLAME] = {
         bodyspriteoffset = 0,
-        statussprite = CSpriteFG.STATUSWOUND,
+        effectsprite = CSpriteFG.EFFECTWOUND,
         palette0 = {[Tic.COLORWHITE] = Tic.COLORORANGE, [Tic.COLORGREYL] = Tic.COLORRED,    [Tic.COLORGREYM] = Tic.COLORPURPLE,},
         palette1 = {[Tic.COLORWHITE] = Tic.COLORRED,    [Tic.COLORGREYL] = Tic.COLORORANGE, [Tic.COLORGREYM] = Tic.COLORPURPLE,},
     },
     [Tic.STATUSWATER] = {
         bodyspriteoffset = 0,
-        statussprite = CSpriteFG.STATUSWOUND,
+        effectsprite = CSpriteFG.EFFECTWOUND,
         palette0 = {[Tic.COLORWHITE] = Tic.COLORWHITE, [Tic.COLORGREYL] = Tic.COLORCYAN,},
         palette1 = {[Tic.COLORWHITE] = Tic.COLORCYAN,  [Tic.COLORGREYL] = Tic.COLORWHITE,}
     },
     [Tic.STATUSSTONE] = {
         bodyspriteoffset = 0,
-        statussprite = CSpriteFG.STATUSWOUND,
+        effectsprite = CSpriteFG.EFFECTWOUND,
         palette0 = {[Tic.COLORWHITE] = Tic.COLORGREYM, [Tic.COLORGREYL] = Tic.COLORGREYD,},
         palette1 = {[Tic.COLORWHITE] = Tic.COLORGREYD, [Tic.COLORGREYL] = Tic.COLORGREYM,},
     },
     [Tic.STATUSBREEZ] = {
         bodyspriteoffset = 0,
-        statussprite = CSpriteFG.STATUSWOUND,
+        effectsprite = CSpriteFG.EFFECTWOUND,
         palette0 = {[Tic.COLORWHITE] = Tic.COLORWHITE, [Tic.COLORGREYL] = Tic.COLORGREYL,},
         palette1 = {[Tic.COLORWHITE] = Tic.COLORGREYL, [Tic.COLORGREYL] = Tic.COLORWHITE,},
     },
     [Tic.STATUSDEATH] = {
         bodyspriteoffset = 0,
-        statussprite = CSpriteFG.STATUSDEATH,
+        effectsprite = CSpriteFG.EFFECTDEATH,
         palette0 = {[Tic.COLORRED] = Tic.COLORRED,    [Tic.COLORPURPLE] = Tic.COLORPURPLE,},
         palette1 = {[Tic.COLORRED] = Tic.COLORPURPLE, [Tic.COLORPURPLE] = Tic.COLORRED,},
      },
@@ -4095,11 +4094,13 @@ end
 function CCharacter:draw() -- set animations and draw layers
     self:cycle()
     self:drawDirs()
-    self:drawStatus()
+
     self:drawHandBG()
     self:drawBody()
     self:drawHead()
     self:drawHandFG()
+    self:drawEffect()
+
     self:drawSpotted()
     self:drawHovered()
     self:drawBorders()
@@ -4250,18 +4251,18 @@ function CCharacter:drawMove() -- draw the move of a character
     rectb(_screenlf, _screenup, _screenrg - _screenlf, _screendw - _screenup, _drawcolor)
 end
 
-function CCharacter:drawStatus()
+function CCharacter:drawEffect()
     local _status         = self:statusGet()
     local _statussettings = Tic.STATUSSETTINGS[_status]
     local _frequence      = Tic.STATESETTINGS[self.state].frequence
-    local _statussprite   = _statussettings.statussprite -- status sprite
+    local _effectsprite   = _statussettings.effectsprite -- effect sprite
     local _tick00         = Tic.TICK00.actvalue
     local _palette        = (Nums:frequence01(_tick00, _frequence) == 0)
         and _statussettings.palette0
         or  _statussettings.palette1
 
     local _musprite = CSpriteFG() -- multi usage unique sprite
-    _musprite.sprite  = _statussprite
+    _musprite.sprite  = _effectsprite
     _musprite.screenx = self.screenx
     _musprite.screeny = self.screeny
     _musprite.flip    = self.dirx
@@ -4286,15 +4287,15 @@ function CCharacter:drawHand(_bgfg)
     if _bgfg == Tic.DRAWFG and self.dirx == Tic.DIRXRG then _object = self.slots.handrg.object end
     if not _object then return end -- nothing in hand
 
-    local _handsoffsets = self:handsOffsets() -- determine the corresponding hand offsets
+    local _handlesoffsets = self:handlesOffsets() -- determine the corresponding hand offsets
     local _handx = nil
     local _handy = nil
-    if _bgfg == Tic.DRAWBG and self.dirx == Tic.DIRXLF then _handx = _handsoffsets.handrgx ; _handy = _handsoffsets.handrgy end
-    if _bgfg == Tic.DRAWBG and self.dirx == Tic.DIRXRG then _handx = _handsoffsets.handlfx ; _handy = _handsoffsets.handlfy end
-    if _bgfg == Tic.DRAWFG and self.dirx == Tic.DIRXLF then _handx = _handsoffsets.handlfx ; _handy = _handsoffsets.handlfy end
-    if _bgfg == Tic.DRAWFG and self.dirx == Tic.DIRXRG then _handx = _handsoffsets.handrgx ; _handy = _handsoffsets.handrgy end
+    if _bgfg == Tic.DRAWBG and self.dirx == Tic.DIRXLF then _handx = _handlesoffsets.handrgx ; _handy = _handlesoffsets.handrgy end
+    if _bgfg == Tic.DRAWBG and self.dirx == Tic.DIRXRG then _handx = _handlesoffsets.handlfx ; _handy = _handlesoffsets.handlfy end
+    if _bgfg == Tic.DRAWFG and self.dirx == Tic.DIRXLF then _handx = _handlesoffsets.handlfx ; _handy = _handlesoffsets.handlfy end
+    if _bgfg == Tic.DRAWFG and self.dirx == Tic.DIRXRG then _handx = _handlesoffsets.handrgx ; _handy = _handlesoffsets.handrgy end
    
-    local _handleoffsets = _object:handleOffsets(_handsoffsets.state) -- determine the object handle offsets
+    local _handleoffsets = _object:handleOffsets(_handlesoffsets.state) -- determine the object handle offsets
     local _handlex       = _handleoffsets.handlex
     local _handley       = _handleoffsets.handley
     local _objectrotate  = _handleoffsets.rotate
@@ -4593,64 +4594,136 @@ end
 --
 CCharacterHumanoid = CCharacter:extend() -- humanoid characters
 Classic.KINDCHARACTERHUMANOID = "Humanoid" -- Humanoid kind
-CCharacterHumanoid.HANDSOFFSETS = {
+CCharacterHumanoid.HANDLESOFFSETS = { -- hands, head and back offsets
     [Tic.STATUSIDLE] = {
         [Tic.DIRXLF] = {
-            [CSprite.FRAME00] = {handrgx = 2, handrgy = 6, handlfx = 5, handlfy = 6, state = Tic.STATEIDLELF},
-            [CSprite.FRAME01] = {handrgx = 2, handrgy = 6, handlfx = 5, handlfy = 6, state = Tic.STATEIDLELF},
+            [CSprite.FRAME00] = {
+                handrgx = 2, handrgy = 6, handlfx = 5, handlfy = 6,
+                headx = 4, heady = 2,
+                state = Tic.STATEIDLELF
+            },
+            [CSprite.FRAME01] = {
+                handrgx = 2, handrgy = 6, handlfx = 5, handlfy = 6,
+                headx = 4, heady = 2,
+                state = Tic.STATEIDLELF
+            },
         },
         [Tic.DIRXRG] = {
-            [CSprite.FRAME00] = {handrgx = 5, handrgy = 6, handlfx = 2, handlfy = 6, state = Tic.STATEIDLERG},
-            [CSprite.FRAME01] = {handrgx = 5, handrgy = 6, handlfx = 2, handlfy = 6, state = Tic.STATEIDLERG},
+            [CSprite.FRAME00] = {
+                handrgx = 5, handrgy = 6, handlfx = 2, handlfy = 6,
+                headx = 3, heady = 2,
+                state = Tic.STATEIDLERG
+            },
+            [CSprite.FRAME01] = {
+                handrgx = 5, handrgy = 6, handlfx = 2, handlfy = 6,
+                headx = 3, heady = 2,
+                state = Tic.STATEIDLERG
+            },
         },
     },
     [Tic.STATUSMOVE] = {
         [Tic.DIRXLF] = {
-            [CSprite.FRAME00] = {handrgx = 1, handrgy = 5, handlfx = 6, handlfy = 6, state = Tic.STATEMOVELF},
-            [CSprite.FRAME01] = {handrgx = 1, handrgy = 6, handlfx = 6, handlfy = 5, state = Tic.STATEMOVELF},
+            [CSprite.FRAME00] = {
+                handrgx = 1, handrgy = 5, handlfx = 6, handlfy = 6,
+                headx = 4, heady = 2,
+                state = Tic.STATEMOVELF
+            },
+            [CSprite.FRAME01] = {
+                handrgx = 1, handrgy = 6, handlfx = 6, handlfy = 5,
+                headx = 4, heady = 2,
+                state = Tic.STATEMOVELF
+            },
         },
         [Tic.DIRXRG] = {
-            [CSprite.FRAME00] = {handrgx = 6, handrgy = 5, handlfx = 1, handlfy = 6, state = Tic.STATEMOVERG},
-            [CSprite.FRAME01] = {handrgx = 6, handrgy = 6, handlfx = 1, handlfy = 5, state = Tic.STATEMOVERG},
+            [CSprite.FRAME00] = {
+                handrgx = 6, handrgy = 5, handlfx = 1, handlfy = 6,
+                headx = 3, heady = 2,
+                state = Tic.STATEMOVERG
+            },
+            [CSprite.FRAME01] = {
+                handrgx = 6, handrgy = 6, handlfx = 1, handlfy = 5,
+                headx = 3, heady = 2,
+                state = Tic.STATEMOVERG
+            },
         },
     },
     [Tic.STATUSWORK] = {
         [Tic.DIRXLF] = {
-            [CSprite.FRAME00] = {handrgx = 1, handrgy = 7, handlfx = 6, handlfy = 6, state = Tic.STATEWORKLF},
-            [CSprite.FRAME01] = {handrgx = 1, handrgy = 7, handlfx = 6, handlfy = 6, state = Tic.STATEWORKLF},
+            [CSprite.FRAME00] = {
+                handrgx = 1, handrgy = 7, handlfx = 6, handlfy = 6,
+                headx = 4, heady = 2,
+                state = Tic.STATEWORKLF
+            },
+            [CSprite.FRAME01] = {
+                handrgx = 1, handrgy = 7, handlfx = 6, handlfy = 6,
+                headx = 4, heady = 2,
+                state = Tic.STATEWORKLF
+            },
         },
         [Tic.DIRXRG] = {
-            [CSprite.FRAME00] = {handrgx = 6, handrgy = 7, handlfx = 1, handlfy = 6, state = Tic.STATEWORKRG},
-            [CSprite.FRAME01] = {handrgx = 6, handrgy = 7, handlfx = 1, handlfy = 6, state = Tic.STATEWORKRG},
+            [CSprite.FRAME00] = {
+                handrgx = 6, handrgy = 7, handlfx = 1, handlfy = 6,
+                headx = 3, heady = 2,
+                state = Tic.STATEWORKRG
+            },
+            [CSprite.FRAME01] = {
+                handrgx = 6, handrgy = 7, handlfx = 1, handlfy = 6,
+                headx = 3, heady = 2,
+                state = Tic.STATEWORKRG
+            },
         },
     },
     [Tic.POSTUREFLOOR] = {
         [Tic.DIRXLF] = {
-            [CCharacter.SIZES] = {handrgx =  1, handrgy = 3, handlfx =  1, handlfy = 6, state = Tic.STATEFLOORLF},
-            [CCharacter.SIZEM] = {handrgx =  0, handrgy = 3, handlfx =  0, handlfy = 6, state = Tic.STATEFLOORLF},
-            [CCharacter.SIZEL] = {handrgx = -1, handrgy = 3, handlfx = -1, handlfy = 6, state = Tic.STATEFLOORLF},
+            [CCharacter.SIZES] = {
+                handrgx =  1, handrgy = 3, handlfx =  1, handlfy = 6,
+                headx = 5, heady = 6,
+                state = Tic.STATEFLOORLF
+            },
+            [CCharacter.SIZEM] = {
+                handrgx =  0, handrgy = 3, handlfx =  0, handlfy = 6,
+                headx = 5, heady = 6,
+                state = Tic.STATEFLOORLF
+            },
+            [CCharacter.SIZEL] = {
+                handrgx = -1, handrgy = 3, handlfx = -1, handlfy = 6,
+                headx = 5, heady = 6,
+                state = Tic.STATEFLOORLF
+            },
         },
         [Tic.DIRXRG] = {
-            [CCharacter.SIZES] = {handrgx = 6, handrgy = 8, handlfx = 6, handlfy = 3, state = Tic.STATEFLOORRG},
-            [CCharacter.SIZEM] = {handrgx = 7, handrgy = 8, handlfx = 7, handlfy = 3, state = Tic.STATEFLOORRG},
-            [CCharacter.SIZEL] = {handrgx = 8, handrgy = 8, handlfx = 8, handlfy = 3, state = Tic.STATEFLOORRG},
+            [CCharacter.SIZES] = {
+                handrgx = 6, handrgy = 8, handlfx = 6, handlfy = 3,
+                headx = 2, heady = 6,
+                state = Tic.STATEFLOORRG
+            },
+            [CCharacter.SIZEM] = {
+                handrgx = 7, handrgy = 8, handlfx = 7, handlfy = 3,
+                headx = 2, heady = 6,
+                state = Tic.STATEFLOORRG
+            },
+            [CCharacter.SIZEL] = {
+                handrgx = 8, handrgy = 8, handlfx = 8, handlfy = 3,
+                headx = 2, heady = 6,
+                state = Tic.STATEFLOORRG
+            },
         },
     },
 }
 function CCharacterHumanoid:new(_argt)
     CCharacterHumanoid.super.new(self, _argt)
     self.kind         = Classic.KINDCHARACTERHUMANOID
-    self.handsoffsets = CCharacterHumanoid.HANDSOFFSETS
-    self.colorhairsfg = Tic.COLORGREYD -- head colors
-    self.colorhairsbg = Tic.COLORGREYM
-    self.colorskin    = Tic.COLORWHITE
-    self.colorextra   = self.colorskin
-    self.coloreyesfg  = Tic.COLORGREYL -- eyes colors
-    self.coloreyesbg  = Tic.COLORGREYM
-    self.colorarmor   = Tic.COLORGREYD -- body colors
-    self.colorshirt   = Tic.COLORGREYM
-    self.colorpants   = Tic.COLORGREYL
-    self.colorhands   = self.colorskin
+    self.handlesoffsets = CCharacterHumanoid.HANDLESOFFSETS
+    self.colorhairsfg   = Tic.COLORGREYD -- head colors
+    self.colorhairsbg   = Tic.COLORGREYM
+    self.colorskin      = Tic.COLORWHITE
+    self.colorextra     = self.colorskin
+    self.coloreyesfg    = Tic.COLORGREYL -- eyes colors
+    self.coloreyesbg    = Tic.COLORGREYM
+    self.colorarmor     = Tic.COLORGREYD -- body colors
+    self.colorshirt     = Tic.COLORGREYM
+    self.colorpants     = Tic.COLORGREYL
+    self.colorhands     = self.colorskin
     self:argt(_argt) -- override if any
 end
 
@@ -4695,24 +4768,22 @@ end
 function CCharacterHumanoid:drawHead()
     local _posture         = self:postureGet()
     local _posturesettings = Tic.POSTURESETTINGS[_posture]
+
     local _headoffsetx     = _posturesettings.headoffsetx
     local _headoffsety     = _posturesettings.headoffsety
     _headoffsety           = (_posturesettings.headusesize)
         and _headoffsety + self.size
         or  _headoffsety
     local _headrotate      = _posturesettings.rotate
-    local _headframe       = CSprite.FRAME00 -- heads have only one frame
 
 
     local _musprite = CSpriteFG() -- multi usage unique sprite
 
     -- draw head
-
     _musprite.sprite  = self.headsprite -- apply the corresponding attributes
     _musprite.screenx = self.screenx + (_headoffsetx * self.scale)
     _musprite.screeny = self.screeny + (_headoffsety * self.scale)
     _musprite.rotate  = _headrotate
-    _musprite.frame   = _headframe
     _musprite.scale   = self.scale
     _musprite.flip    = self.dirx
     _musprite.palette = { -- apply head palette
@@ -4723,7 +4794,7 @@ function CCharacterHumanoid:drawHead()
     }
     _musprite:draw()
 
-    -- draw eyes
+    -- draw head eyes
     local _coloreyesfg = Tic.COLORKEY
     local _coloreyesbu = Tic.COLORKEY
     local _coloreyesbm = Tic.COLORKEY
@@ -4753,21 +4824,38 @@ function CCharacterHumanoid:drawHead()
         [Tic.COLOREYESBD] = _coloreyesbd,
     }
     _musprite:draw()
+
+    -- draw head slot if any
+    -- if not self.slots.head.object then return end
+    local _handlesoffsets = self:handlesOffsets() -- determine the corresponding hand offsets
+    local _headx = _handlesoffsets.headx
+    local _heady = _handlesoffsets.heady
+    rect(
+        self.screenx + (_headx * self.scale),
+        self.screeny + (_heady * self.scale),
+        self.scale,
+        self.scale,
+        Tic.COLORORANGE
+    )
 end
 
-function CCharacterHumanoid:handsOffsets()
+function CCharacterHumanoid:handlesOffsets()
     local _posture = self:postureGet()
     local _status  = self:statusGet()
     local _result  = {}
-    if self.handsoffsets[_status] then
-        _result = Tables:merge(_result, self.handsoffsets[_status][self.dirx][self.frame])
+    if self.handlesoffsets[_status] then
+        _result = Tables:merge(_result, self.handlesoffsets[_status][self.dirx][self.frame])
     else
-        _result = Tables:merge(_result, self.handsoffsets[_posture][self.dirx][self.size])
+        _result = Tables:merge(_result, self.handlesoffsets[_posture][self.dirx][self.size])
     end
 
+    if not (_posture == Tic.POSTUREFLOOR) then
+        _result.heady = _result.heady + self.size
+    end
     if _posture == Tic.POSTUREKNEEL then
         _result.handrgy = _result.handrgy + 1
         _result.handlfy = _result.handlfy + 1
+        _result.heady   = _result.heady   + 1
     end
 
     return _result
@@ -7457,7 +7545,7 @@ end -- generate places
 --
 -- Players
 --
-if false then
+if true then
 Truduk = CPlayerDwarf{name = "Truduk",
     ["slots.handrg"] = CSlotHand{object = CWeaponHammer{}},
     ["slots.handlf"] = CSlotHand{object = CWeaponShieldRound{}},
@@ -7513,7 +7601,7 @@ Flask = CObjectFlaskSmall{name = "fla_1"}
 
 Globth = CPlayerGolth{name = "Globth",
     worldx = 20,
-    ["slots.head"] = CSlotHand{object = CWeaponCrossBow{name = "xxx"}},
+    ["slots.head"] = CSlotHead{object = CWeaponCrossBow{name = "xxx"}},
     ["slots.handrg"] = CSlotHand{object = Sword},
     ["slots.handlf"] = CSlotHand{object = CWeaponShieldTee{name = "ecu_1"}},
     ["inventories.any"] = CInventoryAny{objects = {Sword, Flask}},
@@ -7817,7 +7905,7 @@ function Tic:draw()
 end
 
 function Tic:drawLog()
-    Tic:drawInventories()
+    -- Tic:drawInventories()
 end
 
 function Tic:drawInventories() -- [-] remove
