@@ -1357,22 +1357,29 @@ CSpriteFG.EFFECTSLEEP = CSpriteFG.EFFECTBANK + 0
 CSpriteFG.EFFECTWOUND = CSpriteFG.EFFECTBANK + 1
 CSpriteFG.EFFECTDEATH = CSpriteFG.EFFECTBANK + 2
 CSpriteFG.OBJECTBANK  = 352 -- objects types
-CSpriteFG.WEAPONMELEE = CSpriteFG.OBJECTBANK + 0
+CSpriteFG.WEAPONMELEE = CSpriteFG.OBJECTBANK + 0 -- melee bank
 CSpriteFG.WEAPONSWORD = CSpriteFG.WEAPONMELEE + 0
 CSpriteFG.WEAPONHAMMR = CSpriteFG.WEAPONMELEE + 16
-CSpriteFG.WEAPONRANGE = CSpriteFG.OBJECTBANK + 1
+CSpriteFG.WEAPONLANCE = CSpriteFG.WEAPONMELEE + 32
+CSpriteFG.WEAPONRANGE = CSpriteFG.OBJECTBANK + 1 -- range bank
 CSpriteFG.WEAPONLGBOW = CSpriteFG.WEAPONRANGE + 0
 CSpriteFG.WEAPONCXBOW = CSpriteFG.WEAPONRANGE + 16
-CSpriteFG.WEAPONSHLDS = CSpriteFG.OBJECTBANK + 2
+CSpriteFG.WEAPONSHLDS = CSpriteFG.OBJECTBANK + 2 -- shields bank
 CSpriteFG.WEAPONSHLDT = CSpriteFG.WEAPONSHLDS + 0
 CSpriteFG.WEAPONSHLDR = CSpriteFG.WEAPONSHLDS + 16
-CSpriteFG.OBJECTFLASK = CSpriteFG.OBJECTBANK + 3
+CSpriteFG.OBJECTFLASK = CSpriteFG.OBJECTBANK + 3 -- flasks bank
 CSpriteFG.OBJECTFLASS = CSpriteFG.OBJECTFLASK + 0
 CSpriteFG.OBJECTFLASM = CSpriteFG.OBJECTFLASK + 16
-CSpriteFG.CLOTHESHEAD = CSpriteFG.OBJECTBANK + 4
-CSpriteFG.CLOTHEHATLG = CSpriteFG.CLOTHESHEAD + 0
-CSpriteFG.CLOTHEHELMT = CSpriteFG.CLOTHESHEAD + 16
-CSpriteFG.CLOTHESBACK = CSpriteFG.OBJECTBANK + 5
+CSpriteFG.OBJECTFLASL = CSpriteFG.OBJECTFLASK + 32
+CSpriteFG.CLOTHESHATB = CSpriteFG.OBJECTBANK + 4 -- hats bank
+CSpriteFG.CLOTHESHATS = CSpriteFG.CLOTHESHATB + 0
+CSpriteFG.CLOTHESHATM = CSpriteFG.CLOTHESHATB + 16
+CSpriteFG.CLOTHESHATL = CSpriteFG.CLOTHESHATB + 32
+CSpriteFG.CLOTHESHELB = CSpriteFG.OBJECTBANK + 5 -- helmets bank
+CSpriteFG.CLOTHESHELS = CSpriteFG.CLOTHESHELB + 0
+CSpriteFG.CLOTHESHELM = CSpriteFG.CLOTHESHELB + 16
+CSpriteFG.CLOTHESHELL = CSpriteFG.CLOTHESHELB + 32
+CSpriteFG.CLOTHESBACK = CSpriteFG.OBJECTBANK + 6 -- backpacks bank
 function CSpriteFG:new(_argt)
     CSpriteFG.super.new(self, _argt)
     self.kind = Classic.KINDSPRITEFG
@@ -3248,7 +3255,7 @@ function CObject:new(_argt)
 end
 
 function CObject:handleOffsets(_state)
-    local _result   = Tables:merge(self.handlesoffsets[self.stateshandles[_state].rotate])
+    local _result   = Tables:merge(self.handleoffsets[self.stateshandles[_state].rotate])
     _result.rotate  = self.stateshandles[_state].rotate
     _result.flip    = self.stateshandles[_state].flip
     _result.handlex = (_result.flip == Tic.DIRXLF) -- flip the handlex if any
@@ -3352,14 +3359,24 @@ function CWeaponMelee:new(_argt)
         [Tic.STATEFLOORLF] = {rotate = CSprite.ROTATE270, flip = Tic.DIRXLF},
         [Tic.STATEFLOORRG] = {rotate = CSprite.ROTATE270, flip = Tic.DIRXRG},
     }
-    self.handlesoffsets = {
+    self.handleoffsets = {
         [CSprite.ROTATE000] = {handlex = 3, handley = 5},
         [CSprite.ROTATE090] = {handlex = 2, handley = 3},
         [CSprite.ROTATE180] = {handlex = 4, handley = 2},
         [CSprite.ROTATE270] = {handlex = 5, handley = 4},
     }
-    self.palettefg = {[CObject.BORDER] = CObject.COLORIRONFG, [CObject.INSIDE] = CObject.COLORWOODFG, [CObject.EFFECT] = CObject.COLORWOODFG}
-    self.palettebg = {[CObject.BORDER] = CObject.COLORIRONBG, [CObject.INSIDE] = CObject.COLORWOODBG, [CObject.EFFECT] = CObject.COLORWOODBG}
+    self.palettefg = {
+        [CObject.HANDLE] = CObject.HANDLE,
+        [CObject.BORDER] = CObject.COLORIRONFG,
+        [CObject.INSIDE] = CObject.COLORWOODFG,
+        [CObject.EFFECT] = CObject.COLORWOODFG,
+    }
+    self.palettebg = {
+        [CObject.HANDLE] = CObject.HANDLE,
+        [CObject.BORDER] = CObject.COLORIRONBG,
+        [CObject.INSIDE] = CObject.COLORWOODBG,
+        [CObject.EFFECT] = CObject.COLORWOODBG,
+    }
     self:argt(_argt) -- override if any
 end
 
@@ -3382,11 +3399,34 @@ function CWeaponHammer:new(_argt)
     self.kind = Classic.KINDDWEAPONHAMMR
     self.name = Classic.NAMEDWEAPONHAMMR
     self.sprite  = CSpriteFG.WEAPONHAMMR
-    self.handlesoffsets = {
+    self.handleoffsets = {
         [CSprite.ROTATE000] = {handlex = 4, handley = 5},
         [CSprite.ROTATE090] = {handlex = 2, handley = 4},
         [CSprite.ROTATE180] = {handlex = 3, handley = 2},
         [CSprite.ROTATE270] = {handlex = 5, handley = 3},
+    }
+    self:argt(_argt) -- override if any
+end
+
+CWeaponLance = CWeaponMelee:extend() -- Lance weapons
+Classic.KINDDWEAPONLANCE = "Lance" -- Lance kind
+Classic.NAMEDWEAPONLANCE = "Lance" -- Lance name
+function CWeaponLance:new(_argt)
+    CWeaponLance.super.new(self, _argt)
+    self.kind = Classic.KINDDWEAPONLANCE
+    self.name = Classic.NAMEDWEAPONLANCE
+    self.sprite  = CSpriteFG.WEAPONLANCE
+    self.palettefg = {
+        [CObject.HANDLE] = CObject.HANDLE,
+        [CObject.BORDER] = CObject.COLORWOODFG,
+        [CObject.INSIDE] = CObject.COLORIRONBG,
+        [CObject.EFFECT] = CObject.COLORIRONFG,
+    }
+    self.palettebg = {
+        [CObject.HANDLE] = CObject.HANDLE,
+        [CObject.BORDER] = CObject.COLORWOODBG,
+        [CObject.INSIDE] = CObject.COLORONYXBG,
+        [CObject.EFFECT] = CObject.COLORONYXFG,
     }
     self:argt(_argt) -- override if any
 end
@@ -3413,14 +3453,24 @@ function CWeaponRange:new(_argt)
         [Tic.STATEFLOORLF] = {rotate = CSprite.ROTATE000, flip = Tic.DIRXLF},
         [Tic.STATEFLOORRG] = {rotate = CSprite.ROTATE000, flip = Tic.DIRXRG},
     }
-    self.handlesoffsets = {
+    self.handleoffsets = {
         [CSprite.ROTATE000] = {handlex = 4, handley = 3},
         [CSprite.ROTATE090] = {handlex = 4, handley = 4},
         [CSprite.ROTATE180] = {handlex = 3, handley = 4},
         [CSprite.ROTATE270] = {handlex = 3, handley = 3},
     }
-    self.palettefg = {[CObject.BORDER] = CObject.COLORWOODFG, [CObject.INSIDE] = CObject.COLORIRONBG, [CObject.EFFECT] = CObject.COLORIRONFG}
-    self.palettebg = {[CObject.BORDER] = CObject.COLORWOODBG, [CObject.INSIDE] = CObject.COLORONYXBG, [CObject.EFFECT] = CObject.COLORONYXFG}
+    self.palettefg = {
+        [CObject.HANDLE] = CObject.HANDLE,
+        [CObject.BORDER] = CObject.COLORWOODFG,
+        [CObject.INSIDE] = CObject.COLORIRONBG,
+        [CObject.EFFECT] = CObject.COLORIRONFG,
+    }
+    self.palettebg = {
+        [CObject.HANDLE] = CObject.HANDLE,
+        [CObject.BORDER] = CObject.COLORWOODBG,
+        [CObject.INSIDE] = CObject.COLORONYXBG,
+        [CObject.EFFECT] = CObject.COLORONYXFG,
+    }
     self:argt(_argt) -- override if any
 end
 
@@ -3468,14 +3518,24 @@ function CWeaponShield:new(_argt)
         [Tic.STATEFLOORLF] = {rotate = CSprite.ROTATE000, flip = Tic.DIRXLF},
         [Tic.STATEFLOORRG] = {rotate = CSprite.ROTATE000, flip = Tic.DIRXRG},
     }
-    self.handlesoffsets = {
+    self.handleoffsets = {
         [CSprite.ROTATE000] = {handlex = 3, handley = 3},
         [CSprite.ROTATE090] = {handlex = 4, handley = 3},
         [CSprite.ROTATE180] = {handlex = 4, handley = 4},
         [CSprite.ROTATE270] = {handlex = 3, handley = 4},
     }
-    self.palettefg = {[CObject.BORDER] = CObject.COLORIRONFG, [CObject.INSIDE] = CObject.COLORWOODFG, [CObject.EFFECT] = CObject.COLORWOODFG}
-    self.palettebg = {[CObject.BORDER] = CObject.COLORIRONBG, [CObject.INSIDE] = CObject.COLORWOODBG, [CObject.EFFECT] = CObject.COLORWOODBG}
+    self.palettefg = {
+        [CObject.HANDLE] = CObject.HANDLE,
+        [CObject.BORDER] = CObject.COLORIRONFG,
+        [CObject.INSIDE] = CObject.COLORWOODFG,
+        [CObject.EFFECT] = CObject.COLORWOODFG,
+    }
+    self.palettebg = {
+        [CObject.HANDLE] = CObject.HANDLE,
+        [CObject.BORDER] = CObject.COLORIRONBG,
+        [CObject.INSIDE] = CObject.COLORWOODBG,
+        [CObject.EFFECT] = CObject.COLORWOODBG,
+    }
     self:argt(_argt) -- override if any
 end
 
@@ -3523,14 +3583,24 @@ function CObjectFlask:new(_argt)
         [Tic.STATEFLOORLF] = {rotate = CSprite.ROTATE000, flip = Tic.DIRXLF},
         [Tic.STATEFLOORRG] = {rotate = CSprite.ROTATE000, flip = Tic.DIRXRG},
     }
-    self.handlesoffsets = {
+    self.handleoffsets = {
         [CSprite.ROTATE000] = {handlex = 3, handley = 1},
         [CSprite.ROTATE090] = {handlex = 6, handley = 3},
         [CSprite.ROTATE180] = {handlex = 4, handley = 6},
         [CSprite.ROTATE270] = {handlex = 1, handley = 4},
     }
-    self.palettefg = {[CObject.BORDER] = CObject.COLORFLASKG, [CObject.INSIDE] = CObject.COLORWOODFG, [CObject.EFFECT] = CObject.COLORWOODFG}
-    self.palettebg = {[CObject.BORDER] = CObject.COLORFLASKG, [CObject.INSIDE] = CObject.COLORWOODBG, [CObject.EFFECT] = CObject.COLORWOODBG}
+    self.palettefg = {
+        [CObject.HANDLE] = CObject.HANDLE,
+        [CObject.BORDER] = CObject.COLORFLASKG,
+        [CObject.INSIDE] = CObject.COLORWOODFG,
+        [CObject.EFFECT] = CObject.COLORWOODFG,
+    }
+    self.palettebg = {
+        [CObject.HANDLE] = CObject.HANDLE,
+        [CObject.BORDER] = CObject.COLORFLASKG,
+        [CObject.INSIDE] = CObject.COLORWOODBG,
+        [CObject.EFFECT] = CObject.COLORWOODBG,
+    }
     self:argt(_argt) -- override if any
 end
 
@@ -3571,6 +3641,17 @@ function CObjectFlaskMedium:new(_argt)
     self:argt(_argt) -- override if any
 end
 
+CObjectFlaskLarge = CObjectFlask:extend() -- FlaskLarge objects
+Classic.KINDDOBJECTFLASL = "Oil.L" -- FlaskLarge kind
+Classic.NAMEDOBJECTFLASL = "Oil.L" -- FlaskLarge name
+function CObjectFlaskLarge:new(_argt)
+    CObjectFlaskLarge.super.new(self, _argt)
+    self.kind = Classic.KINDDOBJECTFLASL
+    self.name = Classic.NAMEDOBJECTFLASL
+    self.sprite  = CSpriteFG.OBJECTFLASL
+    self:argt(_argt) -- override if any
+end
+
 
 --
 -- CObjectHead
@@ -3590,16 +3671,21 @@ function CObjectHead:new(_argt)
         [Tic.STATEMOVERG]  = {rotate = CSprite.ROTATE000, flip = Tic.DIRXRG},
         [Tic.STATEWORKLF]  = {rotate = CSprite.ROTATE000, flip = Tic.DIRXLF},
         [Tic.STATEWORKRG]  = {rotate = CSprite.ROTATE000, flip = Tic.DIRXRG},
-        [Tic.STATEFLOORLF] = {rotate = CSprite.ROTATE270, flip = Tic.DIRXLF},
-        [Tic.STATEFLOORRG] = {rotate = CSprite.ROTATE270, flip = Tic.DIRXRG},
+        [Tic.STATEFLOORLF] = {rotate = CSprite.ROTATE090, flip = Tic.DIRXLF},
+        [Tic.STATEFLOORRG] = {rotate = CSprite.ROTATE090, flip = Tic.DIRXRG},
     }
-    self.handlesoffsets = {
-        [CSprite.ROTATE000] = {handlex = 4, handley = 5},
+    self.handleoffsets = {
+        [CSprite.ROTATE000] = {handlex = 4, handley = 4},
         [CSprite.ROTATE090] = {handlex = 3, handley = 4},
         [CSprite.ROTATE180] = {handlex = 3, handley = 3},
         [CSprite.ROTATE270] = {handlex = 4, handley = 3},
     }
-    self.palettefg = {[CObject.BORDER] = CObject.COLORIRONFG, [CObject.INSIDE] = CObject.COLORWOODFG, [CObject.EFFECT] = CObject.COLORWOODFG}
+    self.palettefg = {
+        [CObject.HANDLE] = Tic.COLORKEY,
+        [CObject.BORDER] = CObject.COLORWOODBG,
+        [CObject.INSIDE] = CObject.COLORWOODFG,
+        [CObject.EFFECT] = CObject.COLORWOODFG,
+    }
     self:argt(_argt) -- override if any
 end
 
@@ -3647,14 +3733,47 @@ function CObjectHeadPsy:new(_argt)
     self:argt(_argt) -- override if any
 end
 
-CObjectHatLarge = CObjectHeadPhy:extend() -- HatLarge objects
-Classic.KINDOBJECTHATLARGE = "Hat.L" -- ObjectHatLarge kind
-Classic.NAMEOBJECTHATLARGE = "Hat.L" -- ObjectHatLarge name
-function CObjectHatLarge:new(_argt)
-    CObjectHatLarge.super.new(self, _argt)
-    self.kind = Classic.KINDOBJECTHATLARGE
-    self.name = Classic.NAMEOBJECTHATLARGE
-    self.sprite = CSpriteFG.CLOTHEHATLG
+CClothesHatSmall = CObjectHeadPhy:extend() -- HatSmall objects
+Classic.KINDCLOTHESHATSMALL = "Hat.S" -- ClothesHatSmall kind
+Classic.NAMECLOTHESHATSMALL = "Hat.S" -- ClothesHatSmall name
+function CClothesHatSmall:new(_argt)
+    CClothesHatSmall.super.new(self, _argt)
+    self.kind = Classic.KINDCLOTHESHATSMALL
+    self.name = Classic.NAMECLOTHESHATSMALL
+    self.sprite = CSpriteFG.CLOTHESHATS
+    self:argt(_argt) -- override if any
+end
+
+CClothesHatMedium = CObjectHeadPhy:extend() -- HatMedium objects
+Classic.KINDCLOTHESHATMEDIUM = "Hat.M" -- ClothesHatMedium kind
+Classic.NAMECLOTHESHATMEDIUM = "Hat.M" -- ClothesHatMedium name
+function CClothesHatMedium:new(_argt)
+    CClothesHatMedium.super.new(self, _argt)
+    self.kind = Classic.KINDCLOTHESHATMEDIUM
+    self.name = Classic.NAMECLOTHESHATMEDIUM
+    self.sprite = CSpriteFG.CLOTHESHATM
+    self:argt(_argt) -- override if any
+end
+
+CClothesHatLarge = CObjectHeadPhy:extend() -- HatLarge objects
+Classic.KINDCLOTHESHATLARGE = "Hat.L" -- ClothesHatLarge kind
+Classic.NAMECLOTHESHATLARGE = "Hat.L" -- ClothesHatLarge name
+function CClothesHatLarge:new(_argt)
+    CClothesHatLarge.super.new(self, _argt)
+    self.kind = Classic.KINDCLOTHESHATLARGE
+    self.name = Classic.NAMECLOTHESHATLARGE
+    self.sprite = CSpriteFG.CLOTHESHATL
+    self:argt(_argt) -- override if any
+end
+
+CClothesHelmetMedium = CObjectHeadPhy:extend() -- HelmetMedium objects
+Classic.KINDCLOTHESHELMETMEDIUM = "Helm.M" -- ClothesHelmetMedium kind
+Classic.NAMECLOTHESHELMETMEDIUM = "Helm.M" -- ClothesHelmetMedium name
+function CClothesHelmetMedium:new(_argt)
+    CClothesHelmetMedium.super.new(self, _argt)
+    self.kind = Classic.KINDCLOTHESHELMETMEDIUM
+    self.name = Classic.NAMECLOTHESHELMETMEDIUM
+    self.sprite = CSpriteFG.CLOTHESHELM
     self:argt(_argt) -- override if any
 end
 
@@ -4387,9 +4506,6 @@ function CCharacter:drawHand(_bgfg)
     local _handley       = _handleoffsets.handley
     local _objectrotate  = _handleoffsets.rotate
     local _objectflip    = _handleoffsets.flip
-    local _objectpalette = (_bgfg == Tic.DRAWBG)
-        and Tables:merge(_object.palettebg, {[Tic.COLORWHITE] = self.colorskin})
-        or  Tables:merge(_object.palettefg, {[Tic.COLORWHITE] = self.colorskin})
 
     local _handx   = _handx - _handlex -- adjust handle to hand
     local _handy   = _handy - _handley
@@ -4913,17 +5029,37 @@ function CCharacterHumanoid:drawHead()
     _musprite:draw()
 
     -- draw head slot if any
-    -- if not self.slots.head.object then return end
+    local _object = self.slots.head.object
+    if not _object then return end
     local _handlesoffsets = self:handlesOffsets() -- determine the corresponding hand offsets
-    local _headx = _handlesoffsets.headx
-    local _heady = _handlesoffsets.heady
-    rect(
-        self.screenx + (_headx * self.scale),
-        self.screeny + (_heady * self.scale),
-        self.scale,
-        self.scale,
-        Tic.COLORORANGE
-    )
+    local _headx  = _handlesoffsets.headx
+    local _heady  = _handlesoffsets.heady
+
+    -- rect(
+    --     self.screenx + (_headx * self.scale),
+    --     self.screeny + (_heady * self.scale),
+    --     self.scale,
+    --     self.scale,
+    --     Tic.COLORYELLOW
+    -- )
+
+    local _handleoffsets = _object:handleOffsets(_handlesoffsets.state) -- determine the object handle offsets
+    local _handlex       = _handleoffsets.handlex
+    local _handley       = _handleoffsets.handley
+    local _objectrotate  = _handleoffsets.rotate
+    local _objectflip    = _handleoffsets.flip
+
+    local _headx   = _headx - _handlex -- adjust handle to hand
+    local _heady   = _heady - _handley
+
+    _object:save()
+    _object.screenx  = self.screenx + (_headx * self.scale)
+    _object.screeny  = self.screeny + (_heady * self.scale)
+    _object.scale    = self.scale
+    _object.rotate   = _objectrotate
+    _object.dirx     = _objectflip
+    _object:draw()
+    _object:load()
 end
 
 function CCharacterHumanoid:handlesOffsets()
@@ -7634,31 +7770,44 @@ end -- generate places
 --
 if true then
 Truduk = CPlayerDwarf{name = "Truduk",
-    ["slots.handrg"] = CSlotHand{object = CWeaponHammer{}},
-    ["slots.handlf"] = CSlotHand{object = CWeaponShieldRound{}},
+    ["slots.head"] = CSlotHead{object = CClothesHatSmall{}},
+    -- ["slots.handrg"] = CSlotHand{object = CWeaponHammer{}},
+    -- ["slots.handlf"] = CSlotHand{object = CWeaponShieldRound{}},
+    statmenact = 10,
 }
 -- Truduk:randomWorldWindow()
 -- Prinnn = CPlayerGnome{name = "Prinnn",
 --     coloreyesbg  = Tic.COLORRED,
 --     coloreyesfg  = Tic.COLORORANGE,
 -- }
--- Kaptan = CPlayerMeduz{name = "Kaptan",
--- }
--- Kaptin = CPlayerMeduz{name = "Kaptin",
---     colorhairsbg = Tic.COLORBLUEL,
---     colorhairsfg = Tic.COLORBLUEM,
---     coloreyesbg  = Tic.COLORBLUEM,
---     coloreyesfg  = Tic.COLORBLUEL,
--- }
+Kaptan = CPlayerMeduz{name = "Kaptan",
+    worldx = 0,
+    worldy = 15,
+    ["slots.head"] = CSlotHead{object = CClothesHelmetMedium{}},
+    statmenact = 10,
+}
+-- Kaptan.slots.head.object.handleoffsets[CSprite.ROTATE000].handley = 5
+Kaptin = CPlayerMeduz{name = "Kaptin",
+    worldx = 15,
+    worldy = 15,
+    ["slots.head"] = CSlotHead{object = CClothesHatLarge{}},
+    colorhairsbg = Tic.COLORBLUEL,
+    colorhairsfg = Tic.COLORBLUEM,
+    coloreyesbg  = Tic.COLORBLUEM,
+    coloreyesfg  = Tic.COLORBLUEL,
+    statmenact = 10,
+}
 -- Aegeon = CPlayerElvwe{name = "Aegeon",
 --     colorshirt   = Tic.COLORGREENL,
 --     colorarmor   = Tic.COLORGREEND,
 --     colorpants   = Tic.COLORGREENM,
 -- }
 Nitcha = CPlayerDrowe{name = "Nitcha",
-    worldx = 10,
-    ["slots.handrg"] = CSlotHand{object = CWeaponCrossBow{}},
-    ["slots.handlf"] = CSlotHand{object = CObjectFlaskSmall{used = CObject.USEDFULL}},
+    worldx = 15,
+    ["slots.head"] = CSlotHead{object = CClothesHatMedium{}},
+    -- ["slots.handrg"] = CSlotHand{object = CWeaponCrossBow{}},
+    ["slots.handlf"] = CSlotHand{object = CObjectFlaskLarge{used = CObject.USEDHALF}},
+    statmenact = 10,
 }
 -- Azarel = CPlayerAngel{name = "Azarel",
 -- }
@@ -7687,11 +7836,12 @@ Sword = CWeaponSword{name = "swo_1"}
 Flask = CObjectFlaskSmall{name = "fla_1"}
 
 Globth = CPlayerGolth{name = "Globth",
-    worldx = 20,
-    ["slots.head"] = CSlotHead{object = CWeaponCrossBow{name = "xxx"}},
-    ["slots.handrg"] = CSlotHand{object = Sword},
-    ["slots.handlf"] = CSlotHand{object = CWeaponShieldTee{name = "ecu_1"}},
+    worldx = 30,
+    ["slots.head"] = CSlotHead{object = CClothesHelmetMedium{}},
+    ["slots.handrg"] = CSlotHand{object = CWeaponLance{}},
+    ["slots.handlf"] = CSlotHand{object = CWeaponShieldRound{name = "ecu_1"}},
     ["inventories.any"] = CInventoryAny{objects = {Sword, Flask}},
+    statmenact = 10,
 }
 
 -- Globth:randomWorldWindow()
