@@ -3733,7 +3733,18 @@ function CObjectHeadPsy:new(_argt)
     self:argt(_argt) -- override if any
 end
 
-CClothesHatSmall = CObjectHeadPhy:extend() -- HatSmall objects
+CClothesHat = CObjectHeadPhy:extend() -- Hat objects
+Classic.KINDCLOTHESHAT = "Hat" -- ClothesHat kind
+Classic.NAMECLOTHESHAT = "Hat" -- ClothesHat name
+function CClothesHat:new(_argt)
+    CClothesHat.super.new(self, _argt)
+    self.kind = Classic.KINDCLOTHESHAT
+    self.name = Classic.NAMECLOTHESHAT
+    self.sprite = CSpriteFG.CLOTHESHATB
+    self:argt(_argt) -- override if any
+end
+
+CClothesHatSmall = CClothesHat:extend() -- HatSmall objects
 Classic.KINDCLOTHESHATSMALL = "Hat.S" -- ClothesHatSmall kind
 Classic.NAMECLOTHESHATSMALL = "Hat.S" -- ClothesHatSmall name
 function CClothesHatSmall:new(_argt)
@@ -3744,7 +3755,7 @@ function CClothesHatSmall:new(_argt)
     self:argt(_argt) -- override if any
 end
 
-CClothesHatMedium = CObjectHeadPhy:extend() -- HatMedium objects
+CClothesHatMedium = CClothesHat:extend() -- HatMedium objects
 Classic.KINDCLOTHESHATMEDIUM = "Hat.M" -- ClothesHatMedium kind
 Classic.NAMECLOTHESHATMEDIUM = "Hat.M" -- ClothesHatMedium name
 function CClothesHatMedium:new(_argt)
@@ -3755,7 +3766,7 @@ function CClothesHatMedium:new(_argt)
     self:argt(_argt) -- override if any
 end
 
-CClothesHatLarge = CObjectHeadPhy:extend() -- HatLarge objects
+CClothesHatLarge = CClothesHat:extend() -- HatLarge objects
 Classic.KINDCLOTHESHATLARGE = "Hat.L" -- ClothesHatLarge kind
 Classic.NAMECLOTHESHATLARGE = "Hat.L" -- ClothesHatLarge name
 function CClothesHatLarge:new(_argt)
@@ -3766,7 +3777,35 @@ function CClothesHatLarge:new(_argt)
     self:argt(_argt) -- override if any
 end
 
-CClothesHelmetMedium = CObjectHeadPhy:extend() -- HelmetMedium objects
+CClothesHelmet = CObjectHeadPhy:extend() -- Helmet objects
+Classic.KINDCLOTHESHELMET = "Helmet" -- ClothesHelmet kind
+Classic.NAMECLOTHESHELMET = "Helmet" -- ClothesHelmet name
+function CClothesHelmet:new(_argt)
+    CClothesHelmet.super.new(self, _argt)
+    self.kind = Classic.KINDCLOTHESHELMET
+    self.name = Classic.NAMECLOTHESHELMET
+    self.sprite = CSpriteFG.CLOTHESHELB
+    self.palettefg = {
+        [CObject.HANDLE] = Tic.COLORKEY,
+        [CObject.BORDER] = CObject.COLORIRONBG,
+        [CObject.INSIDE] = CObject.COLORIRONFG,
+        [CObject.EFFECT] = CObject.COLORWOODBG,
+    }
+    self:argt(_argt) -- override if any
+end
+
+CClothesHelmetSmall = CClothesHelmet:extend() -- HelmetSmall objects
+Classic.KINDCLOTHESHELMETSMALL = "Helm.S" -- ClothesHelmetSmall kind
+Classic.NAMECLOTHESHELMETSMALL = "Helm.S" -- ClothesHelmetSmall name
+function CClothesHelmetSmall:new(_argt)
+    CClothesHelmetSmall.super.new(self, _argt)
+    self.kind = Classic.KINDCLOTHESHELMETSMALL
+    self.name = Classic.NAMECLOTHESHELMETSMALL
+    self.sprite = CSpriteFG.CLOTHESHELS
+    self:argt(_argt) -- override if any
+end
+
+CClothesHelmetMedium = CClothesHelmet:extend() -- HelmetMedium objects
 Classic.KINDCLOTHESHELMETMEDIUM = "Helm.M" -- ClothesHelmetMedium kind
 Classic.NAMECLOTHESHELMETMEDIUM = "Helm.M" -- ClothesHelmetMedium name
 function CClothesHelmetMedium:new(_argt)
@@ -3774,6 +3813,17 @@ function CClothesHelmetMedium:new(_argt)
     self.kind = Classic.KINDCLOTHESHELMETMEDIUM
     self.name = Classic.NAMECLOTHESHELMETMEDIUM
     self.sprite = CSpriteFG.CLOTHESHELM
+    self:argt(_argt) -- override if any
+end
+
+CClothesHelmetLarge = CClothesHelmet:extend() -- HelmetLarge objects
+Classic.KINDCLOTHESHELMETLARGE = "Helm.L" -- ClothesHelmetLarge kind
+Classic.NAMECLOTHESHELMETLARGE = "Helm.L" -- ClothesHelmetLarge name
+function CClothesHelmetLarge:new(_argt)
+    CClothesHelmetLarge.super.new(self, _argt)
+    self.kind = Classic.KINDCLOTHESHELMETLARGE
+    self.name = Classic.NAMECLOTHESHELMETLARGE
+    self.sprite = CSpriteFG.CLOTHESHELL
     self:argt(_argt) -- override if any
 end
 
@@ -7768,7 +7818,7 @@ end -- generate places
 --
 -- Players
 --
-if true then
+if false then
 Truduk = CPlayerDwarf{name = "Truduk",
     ["slots.head"] = CSlotHead{object = CClothesHatSmall{}},
     -- ["slots.handrg"] = CSlotHand{object = CWeaponHammer{}},
@@ -7839,7 +7889,7 @@ Nitcha = CPlayerDrowe{name = "Nitcha",
 -- }
 end
 
-if true then
+if false then
 Sword = CWeaponSword{name = "swo_1"}
 Flask = CObjectFlaskSmall{name = "fla_1"}
 
@@ -7863,66 +7913,103 @@ Globth.slots.head.object.palettefg = {
 end
 -- exit()
 
-if false then
-Wulfie = CPlayerWolfe{name = "Wulfie",
+if true then
+Walfie = CPlayerWolfe{name = "Walfie",
+    statphyact = 10,
+    statmenact = 10,
+    statpsyact = 10,
+    colorextra = Tic.COLORPURPLE,
+    worldx = 0,
+    worldy = 0,
+    interactions = {10},
+    -- spottingspot = true,
+    spottingpick = true,
+    -- ["slots.handrg"] = CSlotHand{object = CWeaponHammer{}},
+    -- ["slots.handlf"] = CSlotHand{object = CWeaponSword{}},
+    ["slots.head"] = CSlotHead{object = CClothesHatSmall{}},
+}
+end
+if true then
+Welfie = CPlayerWolfe{name = "Welfie",
     statphyact = 10,
     statmenact = 10,
     statpsyact = 10,
     colorextra = Tic.COLORRED,
-    worldx = -10,
-    worldy = 30,
+    worldx = 15,
+    worldy = 0,
     interactions = {10},
     -- spottingspot = true,
     spottingpick = true,
-    ["slots.handrg"] = CSlotHand{object = CWeaponHammer{}},
-    ["slots.handlf"] = CSlotHand{object = CWeaponSword{}},
+    -- ["slots.handrg"] = CSlotHand{object = CWeaponShieldRound{}},
+    -- ["slots.handlf"] = CSlotHand{object = CWeaponShieldTee{}},
+    ["slots.head"] = CSlotHead{object = CClothesHatMedium{}},
 }
 end
-if false then
-Wolfie = CPlayerWolfe{name = "Wolfie",
-    statphyact = 10,
-    statmenact = 10,
-    statpsyact = 10,
-    colorextra = Tic.COLORCYAN,
-    worldx = 0,
-    worldy = 30,
-    interactions = {10},
-    -- spottingspot = true,
-    spottingpick = true,
-    ["slots.handrg"] = CSlotHand{object = CWeaponShieldRound{}},
-    ["slots.handlf"] = CSlotHand{object = CWeaponShieldTee{}},
-}
-end
-if false then
+if true then
 Wilfie = CPlayerWolfe{name = "Wilfie",
     statphyact = 10,
     statmenact = 10,
     statpsyact = 10,
     colorextra = Tic.COLORORANGE,
-    worldx = 10,
-    worldy = 30,
+    worldx = 30,
+    worldy = 0,
     interactions = {10},
     -- spottingspot = true,
     spottingpick = true,
-    ["slots.handrg"] = CSlotHand{object = CWeaponCrossBow{}},
-    ["slots.handlf"] = CSlotHand{object = CWeaponLongBow{}},
+    -- ["slots.handrg"] = CSlotHand{object = CWeaponCrossBow{}},
+    -- ["slots.handlf"] = CSlotHand{object = CWeaponLongBow{}},
+    ["slots.head"] = CSlotHead{object = CClothesHatLarge{}},
 }
 end
-if false then
-Welfie = CPlayerWolfe{name = "Welfie",
+if true then
+Wolfie = CPlayerWolfe{name = "Wolfie",
+    statphyact = 10,
+    statmenact = 10,
+    statpsyact = 10,
+    colorextra = Tic.COLORGREEND,
+    worldx = 0,
+    worldy = 15,
+    interactions = {10},
+    -- spottingspot = true,
+    spottingpick = true,
+    -- ["slots.handrg"] = CSlotHand{object = CObjectFlaskMedium{}},
+    -- ["slots.handlf"] = CSlotHand{object = CObjectFlaskSmall{}},
+    ["slots.head"] = CSlotHead{object = CClothesHelmetSmall{}},
+}
+end
+if true then
+Wulfie = CPlayerWolfe{name = "Wulfie",
+    statphyact = 10,
+    statmenact = 10,
+    statpsyact = 10,
+    colorextra = Tic.COLORGREENM,
+    worldx = 15,
+    worldy = 15,
+    interactions = {10},
+    -- spottingspot = true,
+    spottingpick = true,
+    -- ["slots.handrg"] = CSlotHand{object = CObjectFlaskMedium{}},
+    -- ["slots.handlf"] = CSlotHand{object = CObjectFlaskSmall{}},
+    ["slots.head"] = CSlotHead{object = CClothesHelmetMedium{}},
+}
+end
+if true then
+Wylfie = CPlayerWolfe{name = "Wylfie",
     statphyact = 10,
     statmenact = 10,
     statpsyact = 10,
     colorextra = Tic.COLORGREENL,
-    worldx = 20,
-    worldy = 30,
+    worldx = 30,
+    worldy = 15,
     interactions = {10},
     -- spottingspot = true,
     spottingpick = true,
-    ["slots.handrg"] = CSlotHand{object = CObjectFlaskMedium{}},
-    ["slots.handlf"] = CSlotHand{object = CObjectFlaskSmall{}},
+    -- ["slots.handrg"] = CSlotHand{object = CObjectFlaskMedium{}},
+    -- ["slots.handlf"] = CSlotHand{object = CObjectFlaskSmall{}},
+    ["slots.head"] = CSlotHead{object = CClothesHelmetLarge{}},
 }
 end
+
 
 if false then
 Oxboow = CPlayerGhost{name = "Oxboow",
