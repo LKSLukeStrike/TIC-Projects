@@ -7783,8 +7783,16 @@ Truduk = CPlayerDwarf{name = "Truduk",
 Kaptan = CPlayerMeduz{name = "Kaptan",
     worldx = 0,
     worldy = 15,
-    ["slots.head"] = CSlotHead{object = CClothesHelmetMedium{}},
+    ["slots.head"] = CSlotHead{object = CClothesHatMedium{}},
+    ["slots.handlf"] = CSlotHand{object = CObjectFlaskSmall{used = CObject.USEDHALF}},
+    ["slots.handrg"] = CSlotHand{object = CObjectFlaskSmall{used = CObject.USEDNONE}},
     statmenact = 10,
+}
+Kaptan.slots.head.object.palettefg = {
+    [CObject.HANDLE] = Tic.COLORKEY,
+    [CObject.BORDER] = Tic.COLORPURPLE,
+    [CObject.INSIDE] = Tic.COLORRED,
+    [CObject.EFFECT] = Tic.COLORRED,
 }
 -- Kaptan.slots.head.object.handleoffsets[CSprite.ROTATE000].handley = 5
 Kaptin = CPlayerMeduz{name = "Kaptin",
@@ -7843,6 +7851,13 @@ Globth = CPlayerGolth{name = "Globth",
     ["inventories.any"] = CInventoryAny{objects = {Sword, Flask}},
     statmenact = 10,
 }
+Globth.slots.head.object.palettefg = {
+    [CObject.HANDLE] = Tic.COLORKEY,
+    [CObject.BORDER] = Tic.COLORGREYL,
+    [CObject.INSIDE] = Tic.COLORORANGE,
+    [CObject.EFFECT] = Tic.COLORRED,
+}
+
 
 -- Globth:randomWorldWindow()
 end
