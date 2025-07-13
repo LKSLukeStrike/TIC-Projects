@@ -137,6 +137,16 @@ function CCyclerTable:argt(_argt) -- setup cycler
     return self.actvalue
 end
 
+function CCycler:min() -- min cycler value
+    self.actindex = self.minindex
+    return self:argt()
+end
+
+function CCycler:max() -- max cycler value
+    self.actindex = self.maxindex
+    return self:argt()
+end
+
 function CCyclerTable:insert(_item, _at) -- insert an _item into table _at (end by default) -- TODO add unique ?
     if not _item then return self.actvalue end
     if not _at then

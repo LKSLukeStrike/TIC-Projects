@@ -298,6 +298,7 @@ Tic.KEY_A              = 01
 Tic.KEY_B              = 02
 Tic.KEY_D              = 04
 Tic.KEY_H              = 08
+Tic.KEY_I              = 09
 Tic.KEY_M              = 13
 Tic.KEY_O              = 15
 Tic.KEY_P              = 16
@@ -355,7 +356,8 @@ Tic.FUNCTIONSTATACTMEN       = function() Tic:statActMen() end
 Tic.FUNCTIONSTATACTPSY       = function() Tic:statActPsy() end
 Tic.FUNCTIONBIOMENEXT        = function() Tic:biomeNext() end
 Tic.FUNCTIONTOGGLEHITBOX     = function() Tic:hitboxToggleDraw() end
-Tic.FUNCTIONTOGGLESPOTTING    = function() Tic:spottingToggle() end
+Tic.FUNCTIONTOGGLEINVENTORY  = function() Tic:hitboxToggleInventory() end
+Tic.FUNCTIONTOGGLESPOTTING   = function() Tic:spottingToggle() end
 Tic.FUNCTIONTOGGLEBORDERS    = function() Tic:bordersToggleDraw() end
 Tic.FUNCTIONTOGGLEDIRS       = function() Tic:dirsToggleDraw() end
 Tic.FUNCTIONTOGGLEVIEW       = function() Tic:viewToggleDraw() end
@@ -390,6 +392,7 @@ Tic.KEYSFUNCTIONSWORLD = {
     [Tic.KEY_B]            = Tic.FUNCTIONBIOMENEXT,
     [Tic.KEY_D]            = Tic.FUNCTIONTOGGLEDIRS,
     [Tic.KEY_H]            = Tic.FUNCTIONTOGGLEHITBOX,
+    [Tic.KEY_I]            = Tic.FUNCTIONTOGGLEINVENTORY,
     [Tic.KEY_M]            = Tic.FUNCTIONSTATACTMEN,
     [Tic.KEY_O]            = Tic.FUNCTIONPLAYERONLY,
     [Tic.KEY_P]            = Tic.FUNCTIONSTATACTPHY,
@@ -626,6 +629,15 @@ end
 
 -- Screens System -- handle screens stack
 Tic.SCREENS = CCyclerTable()
+
+function Tic:screenDraw() -- draw screen(s)
+    local _actindex = Tic.SCREENS.actindex -- save initial actindex
+    Tic.SCREENS:min()
+    while Tic.SCREENS.actindex <= _actindex do -- pile each screen
+        if Tic:screenActual() then Tic:screenActual():draw() end
+        if Tic.SCREENS.actindex == _actindex then break else Tic:screenNext() end
+    end
+end
 
 function Tic:screenActual() -- actual screen in the stack
     return Tic.SCREENS.actvalue
@@ -3231,18 +3243,20 @@ CObject = CEntityDrawable:extend() -- generic objects
 Classic.KINDOBJECT = "Object" -- Object kind
 Classic.NAMEOBJECT = "Object" -- Object name
 CObject.HANDLE = Tic.COLORWHITE
-CObject.BORDER = Tic.COLORGREYD
-CObject.INSIDE = Tic.COLORGREYM
-CObject.EFFECT = Tic.COLORGREYL
-CObject.COLORWOODBG = Tic.COLORRED
-CObject.COLORWOODFG = Tic.COLORORANGE
-CObject.COLORIRONBG = Tic.COLORGREYM
-CObject.COLORIRONFG = Tic.COLORGREYL
-CObject.COLORONYXBG = Tic.COLORGREYD
-CObject.COLORONYXFG = Tic.COLORGREYM
-CObject.COLORAZURBG = Tic.COLORBLUED
-CObject.COLORAZURFG = Tic.COLORBLUEM
-CObject.COLORFLASKG = Tic.COLORGREEND
+CObject.BORDER         = Tic.COLORGREYD
+CObject.INSIDE         = Tic.COLORGREYM
+CObject.EFFECT         = Tic.COLORGREYL
+CObject.COLORWOODBG    = Tic.COLORRED -- wood
+CObject.COLORWOODFG    = Tic.COLORORANGE
+CObject.COLORLEATHERBG = Tic.COLORRED -- leather
+CObject.COLORLEATHERFG = Tic.COLORORANGE
+CObject.COLORIRONBG    = Tic.COLORGREYM -- iron
+CObject.COLORIRONFG    = Tic.COLORGREYL
+CObject.COLORONYXBG    = Tic.COLORGREYD -- onyx
+CObject.COLORONYXFG    = Tic.COLORGREYM
+CObject.COLORAZURBG    = Tic.COLORBLUED -- azur
+CObject.COLORAZURFG    = Tic.COLORBLUEM
+CObject.COLORFLASKG    = Tic.COLORGREEND -- flask glass
 CObject.USEDNONE = "None" -- used levels
 CObject.USEDHALF = "Half"
 CObject.USEDFULL = "Full"
@@ -3682,9 +3696,9 @@ function CObjectHead:new(_argt)
     }
     self.palettefg = {
         [CObject.HANDLE] = Tic.COLORKEY,
-        [CObject.BORDER] = CObject.COLORWOODBG,
-        [CObject.INSIDE] = CObject.COLORWOODFG,
-        [CObject.EFFECT] = CObject.COLORWOODFG,
+        [CObject.BORDER] = CObject.COLORLEATHERBG,
+        [CObject.INSIDE] = CObject.COLORLEATHERFG,
+        [CObject.EFFECT] = CObject.COLORLEATHERFG,
     }
     self:argt(_argt) -- override if any
 end
@@ -3786,10 +3800,10 @@ function CClothesHelmet:new(_argt)
     self.name = Classic.NAMECLOTHESHELMET
     self.sprite = CSpriteFG.CLOTHESHELB
     self.palettefg = {
-        [CObject.HANDLE] = Tic.COLORKEY,
+        [CObject.HANDLE] = CObject.COLORLEATHERFG,
         [CObject.BORDER] = CObject.COLORIRONBG,
-        [CObject.INSIDE] = CObject.COLORIRONFG,
-        [CObject.EFFECT] = CObject.COLORWOODBG,
+        [CObject.INSIDE] = CObject.COLORLEATHERFG,
+        [CObject.EFFECT] = CObject.COLORLEATHERFG,
     }
     self:argt(_argt) -- override if any
 end
@@ -7652,7 +7666,7 @@ ScreenWorld:appendElements{
 }
 end
 
-if false then
+if true then
 ScreenMenus = CScreen{name = "Menus", keysfunctions = Tic.KEYSFUNCTIONSINTRO}
 ScreenMenus:appendElements{
     CWindowMenu{
@@ -7667,9 +7681,9 @@ end
 
 
 -- SCREENS
+if true then Tic:screenAppend(ScreenIntro) end
 if true then Tic:screenAppend(ScreenWorld) end
-if false then Tic:screenAppend(ScreenIntro) end
-if false then Tic:screenAppend(ScreenMenus) end
+-- if true then Tic:screenAppend(ScreenMenus) end
 
 
 
@@ -7913,12 +7927,14 @@ Globth.slots.head.object.palettefg = {
 end
 -- exit()
 
+
+local _playerclass = CPlayerGhost
 if true then
-Walfie = CPlayerWolfe{name = "Walfie",
+Walfie = _playerclass{name = "Walfie",
     statphyact = 10,
     statmenact = 10,
     statpsyact = 10,
-    colorextra = Tic.COLORPURPLE,
+    -- colorextra = Tic.COLORPURPLE,
     worldx = 0,
     worldy = 0,
     interactions = {10},
@@ -7930,11 +7946,11 @@ Walfie = CPlayerWolfe{name = "Walfie",
 }
 end
 if true then
-Welfie = CPlayerWolfe{name = "Welfie",
+Welfie = _playerclass{name = "Welfie",
     statphyact = 10,
     statmenact = 10,
     statpsyact = 10,
-    colorextra = Tic.COLORRED,
+    -- colorextra = Tic.COLORRED,
     worldx = 15,
     worldy = 0,
     interactions = {10},
@@ -7946,11 +7962,11 @@ Welfie = CPlayerWolfe{name = "Welfie",
 }
 end
 if true then
-Wilfie = CPlayerWolfe{name = "Wilfie",
+Wilfie = _playerclass{name = "Wilfie",
     statphyact = 10,
     statmenact = 10,
     statpsyact = 10,
-    colorextra = Tic.COLORORANGE,
+    -- colorextra = Tic.COLORORANGE,
     worldx = 30,
     worldy = 0,
     interactions = {10},
@@ -7962,11 +7978,11 @@ Wilfie = CPlayerWolfe{name = "Wilfie",
 }
 end
 if true then
-Wolfie = CPlayerWolfe{name = "Wolfie",
+Wolfie = _playerclass{name = "Wolfie",
     statphyact = 10,
     statmenact = 10,
     statpsyact = 10,
-    colorextra = Tic.COLORGREEND,
+    -- colorextra = Tic.COLORGREEND,
     worldx = 0,
     worldy = 15,
     interactions = {10},
@@ -7978,11 +7994,11 @@ Wolfie = CPlayerWolfe{name = "Wolfie",
 }
 end
 if true then
-Wulfie = CPlayerWolfe{name = "Wulfie",
+Wulfie = _playerclass{name = "Wulfie",
     statphyact = 10,
     statmenact = 10,
     statpsyact = 10,
-    colorextra = Tic.COLORGREENM,
+    -- colorextra = Tic.COLORGREENM,
     worldx = 15,
     worldy = 15,
     interactions = {10},
@@ -7994,11 +8010,11 @@ Wulfie = CPlayerWolfe{name = "Wulfie",
 }
 end
 if true then
-Wylfie = CPlayerWolfe{name = "Wylfie",
+Wylfie = _playerclass{name = "Wylfie",
     statphyact = 10,
     statmenact = 10,
     statpsyact = 10,
-    colorextra = Tic.COLORGREENL,
+    -- colorextra = Tic.COLORGREENL,
     worldx = 30,
     worldy = 15,
     interactions = {10},
@@ -8223,7 +8239,7 @@ function Tic:draw()
     if true then
     Tic.inputsDo()
 
-    Tic:screenActual():draw()
+    Tic:screenDraw()
 
     Tic:drawLog()
     Tic:logPrint()
