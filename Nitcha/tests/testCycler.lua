@@ -2,9 +2,11 @@
 -- Packages
 package.path  = package.path..";G:/TIC80 1.1/TICProjects/Nitcha/?.lua"
 local CCycler = require("libraries/lks/CCycler")                
+local Tables  = require("libraries/lks/Tables")                
 
 
-local CyclerTable = CCyclerTable()
+if false then
+CyclerTable = CCyclerTable()
 
 print(CyclerTable.minindex, CyclerTable.maxindex, CyclerTable.actindex, CyclerTable.actvalue)
 CyclerTable:insert(10)
@@ -33,7 +35,25 @@ print(CyclerTable.minindex, CyclerTable.maxindex, CyclerTable.actindex, CyclerTa
 CyclerTable:prev()
 print(CyclerTable.minindex, CyclerTable.maxindex, CyclerTable.actindex, CyclerTable.actvalue)
 
-local _cyclerint = CCyclerInt{maxindex =  10, mode = CCycler.MODEBLOCK}
-print(_cyclerint.actvalue)
-_cyclerint:prev()
-print(_cyclerint.actvalue)
+CyclerInt = CCyclerInt{maxindex =  10, mode = CCycler.MODEBLOCK}
+print(CyclerInt.actvalue)
+CyclerInt:prev()
+print(CyclerInt.actvalue)
+end
+
+CyclerTable = CCyclerTable()
+CyclerTable:print()
+print("result:", CyclerTable:insert(10))
+CyclerTable:print()
+print("result:", CyclerTable:argt{acttable = {10, 20,30}})
+CyclerTable:print()
+print("result:", CyclerTable:next())
+CyclerTable:print()
+print("result:", CyclerTable:remove())
+CyclerTable:print()
+print("result:", CyclerTable:remove())
+CyclerTable:print()
+print("result:", CyclerTable:remove())
+CyclerTable:print()
+
+-- print(CyclerTable:remove() or "nil")

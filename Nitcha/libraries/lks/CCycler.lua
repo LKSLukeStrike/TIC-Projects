@@ -38,6 +38,11 @@ function CCycler:new(_argt)
     self:argt(_argt) -- override if any
 end
 
+function CCycler:print()
+    print()
+    Tables:print(self, {indent = " "})
+end
+
 function CCycler:min() -- min cycler value
     self.actindex = self.minindex
     self.actvalue = self.actindex -- value = index by default
@@ -143,14 +148,20 @@ function CCyclerTable:insert(_item, _at) -- insert an _item into table _at (end 
         table.insert(self.acttable, _at, _item)
         self.actindex = _at -- adjust actual index
     end
-    self.minindex = 1 -- at least one item
-    self.maxindex = Tables:size(self.acttable)
-    self.actvalue = _item
-    return self.actvalue
+    -- self.minindex = 1 -- at least one item
+    -- self.maxindex = Tables:size(self.acttable)
+    -- self.actvalue = _item
+    return self:argt()
 end
 
 function CCyclerTable:remove(_at) -- remove an item from table _at (end by default)
-    -- TODO
+    _at = _at or self.maxindex
+    _at = (Nums:isLT(_at, self.minindex)) and self.minindex or _at -- beg
+    _at = (Nums:isGT(_at, self.maxindex)) and self.maxindex or _at -- beg
+    if _at == 0 then return end -- empty cycler
+    table.remove(self.acttable, _at)
+    self.actindex = (_at <= self.actindex) and self.actindex - 1 or self.actindex
+    return self:argt()
 end
 
 function CCyclerTable:prev() -- prev cycler value
