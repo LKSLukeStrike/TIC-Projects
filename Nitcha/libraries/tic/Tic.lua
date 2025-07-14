@@ -334,43 +334,47 @@ Tic.KEY_NUMPADMULTIPLY = 91
 Tic.KEY_NUMPADDIVIDE   = 92
 
 -- Functions values
-Tic.FUNCTIONPLAYERPREV       = function() Tic:playerPrev() end
-Tic.FUNCTIONPLAYERNEXT       = function() Tic:playerNext() end
-Tic.FUNCTIONPLAYERDETACH     = function() Tic:playerDetach() end
-Tic.FUNCTIONPLAYERONLY       = function() Tic:playerToggleOnly() end
-Tic.FUNCTIONSTATEPREV        = function() Tic:statePrev() end
-Tic.FUNCTIONSTATENEXT        = function() Tic:stateNext() end
-Tic.FUNCTIONTOGGLEWORK       = function() Tic:toggleWork() end
-Tic.FUNCTIONTOGGLEKNEEL      = function() Tic:toggleKneel() end
-Tic.FUNCTIONTOGGLESLEEP      = function() Tic:toggleSleep() end
-Tic.FUNCTIONMOVEDIRECTION000 = function() Tic:moveDirection000() end
-Tic.FUNCTIONMOVEDIRECTION045 = function() Tic:moveDirection045() end
-Tic.FUNCTIONMOVEDIRECTION090 = function() Tic:moveDirection090() end
-Tic.FUNCTIONMOVEDIRECTION135 = function() Tic:moveDirection135() end
-Tic.FUNCTIONMOVEDIRECTION180 = function() Tic:moveDirection180() end
-Tic.FUNCTIONMOVEDIRECTION225 = function() Tic:moveDirection225() end
-Tic.FUNCTIONMOVEDIRECTION270 = function() Tic:moveDirection270() end
-Tic.FUNCTIONMOVEDIRECTION315 = function() Tic:moveDirection315() end
-Tic.FUNCTIONSTATACTPHY       = function() Tic:statActPhy() end
-Tic.FUNCTIONSTATACTMEN       = function() Tic:statActMen() end
-Tic.FUNCTIONSTATACTPSY       = function() Tic:statActPsy() end
-Tic.FUNCTIONBIOMENEXT        = function() Tic:biomeNext() end
-Tic.FUNCTIONTOGGLEHITBOX     = function() Tic:hitboxToggleDraw() end
-Tic.FUNCTIONTOGGLEINVENTORY  = function() Tic:hitboxToggleInventory() end
-Tic.FUNCTIONTOGGLESPOTTING   = function() Tic:spottingToggle() end
-Tic.FUNCTIONTOGGLEBORDERS    = function() Tic:bordersToggleDraw() end
-Tic.FUNCTIONTOGGLEDIRS       = function() Tic:dirsToggleDraw() end
-Tic.FUNCTIONTOGGLEVIEW       = function() Tic:viewToggleDraw() end
-Tic.FUNCTIONTOGGLEMIND       = function() Tic:mindToggleDraw() end
-Tic.FUNCTIONTOGGLEMOVE       = function() Tic:moveToggleDraw() end
-Tic.FUNCTIONSCALENEXT        = function() Tic:scaleNext() end
-Tic.FUNCTIONSCREENPREV       = function() Tic:screenPrev() end
-Tic.FUNCTIONSCREENNEXT       = function() Tic:screenNext() end
+Tic.FUNCTIONPLAYERPREV          = function() Tic:playerPrev() end
+Tic.FUNCTIONPLAYERNEXT          = function() Tic:playerNext() end
+Tic.FUNCTIONPLAYERDETACH        = function() Tic:playerDetach() end
+Tic.FUNCTIONPLAYERONLY          = function() Tic:playerToggleOnly() end
+Tic.FUNCTIONSTATEPREV           = function() Tic:statePrev() end
+Tic.FUNCTIONSTATENEXT           = function() Tic:stateNext() end
+Tic.FUNCTIONTOGGLEWORK          = function() Tic:toggleWork() end
+Tic.FUNCTIONTOGGLEKNEEL         = function() Tic:toggleKneel() end
+Tic.FUNCTIONTOGGLESLEEP         = function() Tic:toggleSleep() end
+Tic.FUNCTIONMOVEDIRECTION000    = function() Tic:moveDirection000() end
+Tic.FUNCTIONMOVEDIRECTION045    = function() Tic:moveDirection045() end
+Tic.FUNCTIONMOVEDIRECTION090    = function() Tic:moveDirection090() end
+Tic.FUNCTIONMOVEDIRECTION135    = function() Tic:moveDirection135() end
+Tic.FUNCTIONMOVEDIRECTION180    = function() Tic:moveDirection180() end
+Tic.FUNCTIONMOVEDIRECTION225    = function() Tic:moveDirection225() end
+Tic.FUNCTIONMOVEDIRECTION270    = function() Tic:moveDirection270() end
+Tic.FUNCTIONMOVEDIRECTION315    = function() Tic:moveDirection315() end
+Tic.FUNCTIONSTATACTPHY          = function() Tic:statActPhy() end
+Tic.FUNCTIONSTATACTMEN          = function() Tic:statActMen() end
+Tic.FUNCTIONSTATACTPSY          = function() Tic:statActPsy() end
+Tic.FUNCTIONBIOMENEXT           = function() Tic:biomeNext() end
+Tic.FUNCTIONHITBOXTOGGLEDRAW    = function() Tic:hitboxToggleDraw() end
+Tic.FUNCTIONINVENTORYTOGGLESHOW = function() Tic:inventoryToggleShow() end
+Tic.FUNCTIONSPOTTINGTOGGLEMODE  = function() Tic:spottingToggleMode() end
+Tic.FUNCTIONBORDERSTOGGLEDRAW   = function() Tic:bordersToggleDraw() end
+Tic.FUNCTIONDIRSTOGGLEDRAW      = function() Tic:dirsToggleDraw() end
+Tic.FUNCTIONVIEWTOGGLEDRAW      = function() Tic:viewToggleDraw() end
+Tic.FUNCTIONMINDTOGGLEDRAW      = function() Tic:mindToggleDraw() end
+Tic.FUNCTIONMOVETOGGLEDRAW      = function() Tic:moveToggleDraw() end
+Tic.FUNCTIONSCALENEXT           = function() Tic:scaleNext() end
+Tic.FUNCTIONSCREENPREV          = function() Tic:screenPrev() end
+Tic.FUNCTIONSCREENNEXT          = function() Tic:screenNext() end
 
 -- Keys to Functions -- per screen
 Tic.KEYSFUNCTIONSINTRO = {
     [Tic.KEY_NUMPADMINUS]  = Tic.FUNCTIONSCREENPREV,
     [Tic.KEY_NUMPADPLUS]   = Tic.FUNCTIONSCREENNEXT,
+    [Tic.KEY_ANY]          = Tic.FUNCTIONSCREENNEXT,
+}
+Tic.KEYSFUNCTIONSMENUS = {
+    [Tic.KEY_I]            = Tic.FUNCTIONINVENTORYTOGGLESHOW,
 }
 Tic.KEYSFUNCTIONSWORLD = {
     [Tic.KEY_LEFT]         = Tic.FUNCTIONPLAYERPREV, -- cycle actual player
@@ -390,17 +394,17 @@ Tic.KEYSFUNCTIONSWORLD = {
     [Tic.KEY_NUMPAD7]      = Tic.FUNCTIONMOVEDIRECTION315,
     [Tic.KEY_A]            = Tic.FUNCTIONPLAYERDETACH,
     [Tic.KEY_B]            = Tic.FUNCTIONBIOMENEXT,
-    [Tic.KEY_D]            = Tic.FUNCTIONTOGGLEDIRS,
-    [Tic.KEY_H]            = Tic.FUNCTIONTOGGLEHITBOX,
-    [Tic.KEY_I]            = Tic.FUNCTIONTOGGLEINVENTORY,
+    [Tic.KEY_D]            = Tic.FUNCTIONDIRSTOGGLEDRAW,
+    [Tic.KEY_H]            = Tic.FUNCTIONHITBOXTOGGLEDRAW,
+    [Tic.KEY_I]            = Tic.FUNCTIONINVENTORYTOGGLESHOW,
     [Tic.KEY_M]            = Tic.FUNCTIONSTATACTMEN,
     [Tic.KEY_O]            = Tic.FUNCTIONPLAYERONLY,
     [Tic.KEY_P]            = Tic.FUNCTIONSTATACTPHY,
-    [Tic.KEY_Q]            = Tic.FUNCTIONTOGGLEBORDERS,
-    [Tic.KEY_R]            = Tic.FUNCTIONTOGGLEMIND,
-    [Tic.KEY_S]            = Tic.FUNCTIONTOGGLESPOTTING,
-    [Tic.KEY_V]            = Tic.FUNCTIONTOGGLEVIEW,
-    [Tic.KEY_X]            = Tic.FUNCTIONTOGGLEMOVE,
+    [Tic.KEY_Q]            = Tic.FUNCTIONBORDERSTOGGLEDRAW,
+    [Tic.KEY_R]            = Tic.FUNCTIONMINDTOGGLEDRAW,
+    [Tic.KEY_S]            = Tic.FUNCTIONSPOTTINGTOGGLEDRAW,
+    [Tic.KEY_V]            = Tic.FUNCTIONVIEWTOGGLEDRAW,
+    [Tic.KEY_X]            = Tic.FUNCTIONMOVETOGGLEDRAW,
     [Tic.KEY_Y]            = Tic.FUNCTIONSTATACTPSY,
     [Tic.KEY_Z]            = Tic.FUNCTIONSCALENEXT,
     [Tic.KEY_NUMPADMINUS]  = Tic.FUNCTIONSCREENPREV,
@@ -645,7 +649,14 @@ end
 
 function Tic:screenAppend(_screen) -- append a screen to the stack
     if not _screen then return end -- mandatory
+    if Tic:screenActual() == _screen then return end -- already on stack
     return Tic.SCREENS:insert(_screen)
+end
+
+function Tic:screenRemove(_screen) -- remove last screen from the stack
+    if not _screen then return end -- mandatory
+    if not (Tic:screenActual() == _screen) then return end -- not on stack
+    return Tic.SCREENS:remove()
 end
 
 function Tic:screenPrev() -- prev screen in the stack
@@ -903,15 +914,15 @@ end
 
 
 -- Hitbox System -- toggle hitbox display
-Tic.DRAWHITBOX = false
+Tic.HITBOXDRAW = false
 
 function Tic:hitboxToggleDraw()
-	Tic.DRAWHITBOX = Nums:toggleTF(Tic.DRAWHITBOX)
+	Tic.HITBOXDRAW = Nums:toggleTF(Tic.HITBOXDRAW)
 end
 
 
 -- Spotting System -- toggle spotting draw/lock
-function Tic:spottingToggle(_character)
+function Tic:spottingToggleMode(_character)
     if Tic.MODIFIERKEYS[Tic.KEY_SHIFT] then
         Tic:spottingToggleSpot(_character)
     elseif Tic.MODIFIERKEYS[Tic.KEY_CTRL] then
@@ -971,42 +982,56 @@ end
 
 
 -- Borders System -- toggle borders display
-Tic.DRAWBORDERS = false
+Tic.BORDERSDRAW = false
 
 function Tic:bordersToggleDraw()
-	Tic.DRAWBORDERS = Nums:toggleTF(Tic.DRAWBORDERS)
+	Tic.BORDERSDRAW = Nums:toggleTF(Tic.BORDERSDRAW)
 end
 
 
 -- Dirs System -- toggle dirs display
-Tic.DRAWDIRS = false
+Tic.DIRSDRAW = false
 
 function Tic:dirsToggleDraw()
-	Tic.DRAWDIRS = Nums:toggleTF(Tic.DRAWDIRS)
+	Tic.DIRSDRAW = Nums:toggleTF(Tic.DIRSDRAW)
 end
 
 
 -- View System -- toggle view display
-Tic.DRAWVIEW = false
+Tic.VIEWDRAW = false
 
 function Tic:viewToggleDraw()
-	Tic.DRAWVIEW = Nums:toggleTF(Tic.DRAWVIEW)
+	Tic.VIEWDRAW = Nums:toggleTF(Tic.VIEWDRAW)
 end
 
 
 -- Mind System -- toggle mind display
-Tic.DRAWMIND = false
+Tic.MINDDRAW = false
 
 function Tic:mindToggleDraw()
-	Tic.DRAWMIND = Nums:toggleTF(Tic.DRAWMIND)
+	Tic.MINDDRAW = Nums:toggleTF(Tic.MINDDRAW)
 end
 
 
 -- Move System -- toggle move display
-Tic.DRAWMOVE = false
+Tic.MOVEDRAW = false
 
 function Tic:moveToggleDraw()
-	Tic.DRAWMOVE = Nums:toggleTF(Tic.DRAWMOVE)
+	Tic.MOVEDRAW = Nums:toggleTF(Tic.MOVEDRAW)
+end
+
+
+-- Inventory System -- toggle inventory display
+Tic.INVENTORYSHOW   = false
+Tic.INVENTORYSCREEN = nil
+
+function Tic:inventoryToggleShow()
+	Tic.INVENTORYSHOW = Nums:toggleTF(Tic.INVENTORYSHOW)
+    if Tic.INVENTORYSHOW then
+        Tic:screenAppend(Tic.INVENTORYSCREEN)
+    else
+        Tic:screenRemove(Tic.INVENTORYSCREEN)
+    end
 end
 
 
@@ -2365,7 +2390,7 @@ function CEntityDrawable:drawHovered() -- draw hovered if any
 end
 
 function CEntityDrawable:drawBorders() -- draw borders if any
-    self.drawborders = Tic.DRAWBORDERS -- use Tic as master
+    self.drawborders = Tic.BORDERSDRAW -- use Tic as master
     if not self.drawborders then return end -- nothing to draw
     local _musprite = CSpriteBG() -- multi usage unique sprite
     _musprite.sprite  = CSpriteBG.SIGNBORDSQ
@@ -2377,7 +2402,7 @@ function CEntityDrawable:drawBorders() -- draw borders if any
 end
 
 function CEntityDrawable:drawHitbox() -- draw hitbox if any
-    self.drawhitbox = Tic.DRAWHITBOX -- use Tic as master
+    self.drawhitbox = Tic.HITBOXDRAW -- use Tic as master
     if not self.drawhitbox or not self.hitbox then return end -- nothing to draw
     self.hitbox:draw()
 end
@@ -4430,7 +4455,7 @@ end
 
 function CCharacter:drawDirs() -- draw the directions and ranges around the character -- FIXME why actual player ???
     if Tic.PLAYERONLY and not (self == Tic:playerActual()) then return end -- only actual player
-    self.drawdirs = Tic.DRAWDIRS -- use Tic as master
+    self.drawdirs = Tic.DIRSDRAW -- use Tic as master
     if not self.drawdirs then return end -- nothing to draw
     local _drawcolor = Tic.COLORWHITE
     local _screenx   = Tic.WORLDWX + Tic.WORLDWW2 - (Tic:playerActual().worldx - self.worldx) - 1 --relative to actual player -- feet
@@ -4478,7 +4503,7 @@ end
 
 function CCharacter:drawView() -- draw the view of a character
     if Tic.PLAYERONLY and not (self == Tic:playerActual()) then return end -- only actual player
-    self.drawview = Tic.DRAWVIEW -- use Tic as master
+    self.drawview = Tic.VIEWDRAW -- use Tic as master
     if not self.drawview then return end -- nothing to draw
 
     local _drawcolor = Tic.COLORGREENL
@@ -4493,7 +4518,7 @@ end
 
 function CCharacter:drawMind() -- draw the mind of a character
     if Tic.PLAYERONLY and not (self == Tic:playerActual()) then return end -- only actual player
-    self.drawmind = Tic.DRAWMIND -- use Tic as master
+    self.drawmind = Tic.MINDDRAW -- use Tic as master
     if not self.drawmind then return end -- nothing to draw
 
     local _drawcolor = Tic.COLORGREENM
@@ -4508,7 +4533,7 @@ end
 
 function CCharacter:drawMove() -- draw the move of a character
     if Tic.PLAYERONLY and not (self == Tic:playerActual()) then return end -- only actual player
-    self.drawmove = Tic.DRAWMOVE -- use Tic as master
+    self.drawmove = Tic.MOVEDRAW -- use Tic as master
     if not self.drawmove then return end -- nothing to draw
 
     local _drawcolor = Tic.COLORGREEND
@@ -5898,8 +5923,8 @@ end
 
 function CWindowPortraitDrawable:drawInside() -- window portrait content for -- [!] drawable entities
     if not self.entity then return end -- nothing to draw
-    local _ticdrawhitbox     = Tic.DRAWHITBOX
-    Tic.DRAWHITBOX           = false -- FIXME remove tic master at one point
+    local _tichitboxdraw     = Tic.HITBOXDRAW
+    Tic.HITBOXDRAW           = false -- FIXME remove tic master at one point
     self.entity:save()
     self.entity.screenx      = self.screenx -- force entity attributes
     self.entity.screeny      = self.screeny
@@ -5918,7 +5943,7 @@ function CWindowPortraitDrawable:drawInside() -- window portrait content for -- 
     end
     self.entity:draw()
     self.entity:load()
-    Tic.DRAWHITBOX = _ticdrawhitbox
+    Tic.HITBOXDRAW = _tichitboxdraw
 end
 
 
@@ -7667,7 +7692,7 @@ ScreenWorld:appendElements{
 end
 
 if true then
-ScreenMenus = CScreen{name = "Menus", keysfunctions = Tic.KEYSFUNCTIONSINTRO}
+ScreenMenus = CScreen{name = "Menus", keysfunctions = Tic.KEYSFUNCTIONSMENUS}
 ScreenMenus:appendElements{
     CWindowMenu{
         colorground = Tic.COLORGREEND, screenx = 50, screeny = 50, screenw = 24, screenh = 40, rounded = true, drawframes = true,
@@ -7684,7 +7709,7 @@ end
 if true then Tic:screenAppend(ScreenIntro) end
 if true then Tic:screenAppend(ScreenWorld) end
 -- if true then Tic:screenAppend(ScreenMenus) end
-
+if true then Tic.INVENTORYSCREEN = ScreenMenus end
 
 
 -- trace(print("hello"))
@@ -7928,7 +7953,7 @@ end
 -- exit()
 
 
-local _playerclass = CPlayerGhost
+local _playerclass = CPlayerTifel
 if true then
 Walfie = _playerclass{name = "Walfie",
     statphyact = 10,
@@ -8113,7 +8138,7 @@ Region = CRegion{
 -- Places -- TESTING
 --
 if false then
-Tic.DRAWHITBOX = false
+Tic.HITBOXDRAW = false
 for _, _cplace in pairs({
     -- CPlaceTree0Anim,
     CPlaceTree0Idle,
@@ -8226,10 +8251,10 @@ CPlaceRoad0Idle{worldx = 10, worldy = -40}
 CPlaceRoad1Idle{worldx = 14, worldy = -40}
 end
 
--- Tic.DRAWHITBOX  = true
--- Tic.DRAWBORDERS = true
--- Tic.DRAWVIEW    = true
--- Tic.DRAWMOVE    = true
+-- Tic.HITBOXDRAW  = true
+-- Tic.BORDERSDRAW = true
+-- Tic.VIEWDRAW    = true
+-- Tic.MOVEDRAW    = true
 
 
 --
@@ -8260,21 +8285,26 @@ function Tic:draw()
 end
 
 function Tic:drawLog()
-    -- Tic:drawInventories()
+    -- Tic:logWorld()
+    -- Tic:logInventories()
+    Tic:logScreens()
 end
 
-function Tic:drawInventories() -- [-] remove
-    local _tick00 = Tic.TICK00.actvalue
-    local _tick60 = Tic.TICK60.actvalue
+function Tic:logWorld()
+    local _world = Tic:playerActual().world
+    if not _world then return end
+
+    Tic:logAppend(_world.name, Tables:size(_world.entitieslocations.entities))
+    for _, _entity in pairs(_world.entitieslocations.entities) do
+        Tic:logAppend(_entity.kind, _entity.name)
+    end
+    Tic:logAppend()
+end
+
+function Tic:logInventories() -- [-] remove
     local _playeractual = Tic:playerActual()
     if not _playeractual then return end
-    local _posture = _playeractual:postureGet()
-    local _status  = _playeractual:statusGet()
-    local _dirx    = _playeractual.dirx
-    local _diry    = _playeractual.diry
 
-    -- Tic:logWorld(_playeractual.world)
-    Tic:logAppend()
     Tic:logAppend(_playeractual.name, _playeractual.statphymax, _playeractual.statmenmax, _playeractual.statpsymax)
     for _name, _inventory in pairs(_playeractual.inventories) do
         Tic:logInventory(_name, _inventory)
@@ -8282,18 +8312,12 @@ function Tic:drawInventories() -- [-] remove
     for _name, _slot in pairs(_playeractual.slots) do
         Tic:logSlot(_name, _slot)
     end
-end
-
-function Tic:logWorld(_world)
-    if not _world then return end
-    Tic:logAppend(_world.name, Tables:size(_world.entitieslocations.entities))
-    for _, _entity in pairs(_world.entitieslocations.entities) do
-        Tic:logAppend(_entity.kind, _entity.name)
-    end
+    Tic:logAppend()
 end
 
 function Tic:logInventory(_name, _inventory)
     if not CInventory:isInventory(_inventory) then return end
+
     Tic:logAppend(_name, _inventory.kind, Tables:size(_inventory.objects).."/".._inventory.objectsmax)
     for _, _object in ipairs(_inventory.objects) do
         Tic:logAppend(" ", _object.kind, _object.name)
@@ -8305,6 +8329,14 @@ function Tic:logSlot(_name, _slot)
     Tic:logAppend(_name, _slot.kind)
     local _object = _slot.object
     if _object then Tic:logAppend(" ", _object.kind, _object.name) end
+end
+
+function Tic:logScreens()
+    Tic:logAppend("Screens", Tic.SCREENS.actindex, Tic.SCREENS.maxindex, Tic.INVENTORYSHOW)
+    for _key, _screen in ipairs(Tic.SCREENS.acttable or {}) do
+        Tic:logAppend(_key, _screen.kind, _screen.name)
+    end
+    Tic:logAppend()
 end
 
 function Tic:logRegion(_pfx, _region)

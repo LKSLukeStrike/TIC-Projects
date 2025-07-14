@@ -158,9 +158,6 @@ function CCyclerTable:insert(_item, _at) -- insert an _item into table _at (end 
         table.insert(self.acttable, _at, _item)
         self.actindex = _at -- adjust actual index
     end
-    -- self.minindex = 1 -- at least one item
-    -- self.maxindex = Tables:size(self.acttable)
-    -- self.actvalue = _item
     return self:argt()
 end
 
