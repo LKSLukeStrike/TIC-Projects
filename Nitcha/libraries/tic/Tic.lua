@@ -3950,8 +3950,8 @@ function CObjectBack:new(_argt)
         [Tic.STATEMOVERG]  = {rotate = CSprite.ROTATE000, flip = Tic.DIRXRG},
         [Tic.STATEWORKLF]  = {rotate = CSprite.ROTATE000, flip = Tic.DIRXLF},
         [Tic.STATEWORKRG]  = {rotate = CSprite.ROTATE000, flip = Tic.DIRXRG},
-        [Tic.STATEFLOORLF] = {rotate = CSprite.ROTATE090, flip = Tic.DIRXLF},
-        [Tic.STATEFLOORRG] = {rotate = CSprite.ROTATE090, flip = Tic.DIRXRG},
+        [Tic.STATEFLOORLF] = {rotate = CSprite.ROTATE000, flip = Tic.DIRXLF},
+        [Tic.STATEFLOORRG] = {rotate = CSprite.ROTATE000, flip = Tic.DIRXRG},
     }
     self.handleoffsets = {
         [CSprite.ROTATE000] = {handlex = 1, handley = 3},
@@ -4761,7 +4761,7 @@ function CCharacter:drawEffect()
 end
 
 function CCharacter:drawHandle(_screenx, _screeny, _color) -- for debug
-    if true then
+    if false then
     rect(
         self.screenx + (_screenx * self.scale),
         self.screeny + (_screeny * self.scale),
@@ -4839,7 +4839,62 @@ function CCharacter:drawBackFG()
 end
 
 function CCharacter:drawBack(_bgfg)
-    -- override
+    local _handlesoffsets = self:handlesOffsets() -- determine the corresponding back offsets
+    local _backx  = _handlesoffsets.backx
+    local _backy  = _handlesoffsets.backy
+    self:drawHandle(_backx, _backy, Tic.COLORYELLOW)
+
+    local _object = self.slots.back.object
+    if not _object then return end -- nothing in back
+
+    if self:postureGet() == Tic.POSTUREFLOOR then
+        if _bgfg == Tic.DRAWFG then return end -- alwayq draw in bg
+    else
+        if self.dirx == Tic.DIRXLF and _bgfg == Tic.DRAWFG then return end -- draw bg/fg or not when not floor
+        if self.dirx == Tic.DIRXRG and _bgfg == Tic.DRAWBG then return end
+    end
+ 
+    local _handleoffsets = _object:handleOffsets(_handlesoffsets.state) -- determine the object handle offsets
+    local _objecthandlex = _handleoffsets.handlex
+    local _objecthandley = _handleoffsets.handley
+    local _objectrotate  = _handleoffsets.rotate
+    local _objectflip    = _handleoffsets.flip
+
+    local _backx   = _backx - _objecthandlex -- adjust handles
+    local _backy   = _backy - _objecthandley
+
+    _object:save()
+    _object.screenx  = self.screenx + (_backx * self.scale)
+    _object.screeny  = self.screeny + (_backy * self.scale)
+    _object.scale    = self.scale
+    _object.rotate   = _objectrotate
+    _object.dirx     = _objectflip
+    _object:draw()
+    _object:load()
+end
+
+function CCharacter:handlesOffsets()
+    local _posture = self:postureGet()
+    local _status  = self:statusGet()
+    local _result  = {}
+    if self.handlesoffsets[_status] then
+        _result = Tables:merge(_result, self.handlesoffsets[_status][self.dirx][self.frame])
+    else
+        _result = Tables:merge(_result, self.handlesoffsets[_posture][self.dirx][self.size])
+    end
+
+    if not (_posture == Tic.POSTUREFLOOR) then
+        _result.heady = _result.heady + self.size
+        _result.backy = _result.backy + self.size
+    end
+    if _posture == Tic.POSTUREKNEEL then
+        _result.handrgy = _result.handrgy + 1
+        _result.handlfy = _result.handlfy + 1
+        _result.heady   = _result.heady   + 1
+        _result.backy   = _result.backy   + 1
+    end
+
+    return _result
 end
 
 function CCharacter:drawInteract()
@@ -5225,23 +5280,23 @@ CCharacterHumanoid.HANDLESOFFSETS = { -- hands, head and back offsets
         [Tic.DIRXLF] = {
             [Tic.SIZES] = {
                 handrgx =  1, handrgy = 3,
-                handlfx =  1, handlfy = 6,
+                handlfx =  1, handlfy = 8,
                 headx = 5, heady = 6,
-                backx = 6, backy = 7,
+                backx = 8, backy = 5,
                 state = Tic.STATEFLOORLF
             },
             [Tic.SIZEM] = {
                 handrgx =  0, handrgy = 3,
-                handlfx =  0, handlfy = 6,
+                handlfx =  0, handlfy = 8,
                 headx = 5, heady = 6,
-                backx = 5, backy = 7,
+                backx = 8, backy = 5,
                 state = Tic.STATEFLOORLF
             },
             [Tic.SIZEL] = {
                 handrgx = -1, handrgy = 3,
-                handlfx = -1, handlfy = 6,
+                handlfx = -1, handlfy = 8,
                 headx = 5, heady = 6,
-                backx = 4, backy = 7,
+                backx = 8, backy = 5,
                 state = Tic.STATEFLOORLF
             },
         },
@@ -5250,21 +5305,21 @@ CCharacterHumanoid.HANDLESOFFSETS = { -- hands, head and back offsets
                 handrgx = 6, handrgy = 8,
                 handlfx = 6, handlfy = 3,
                 headx = 2, heady = 6,
-                backx = 1, backy = 7,
+                backx = -1, backy = 5,
                 state = Tic.STATEFLOORRG
             },
             [Tic.SIZEM] = {
                 handrgx = 7, handrgy = 8,
                 handlfx = 7, handlfy = 3,
                 headx = 2, heady = 6,
-                backx = 2, backy = 7,
+                backx = -1, backy = 5,
                 state = Tic.STATEFLOORRG
             },
             [Tic.SIZEL] = {
                 handrgx = 8, handrgy = 8,
                 handlfx = 8, handlfy = 3,
                 headx = 2, heady = 6,
-                backx = 3, backy = 7,
+                backx = -1, backy = 5,
                 state = Tic.STATEFLOORRG
             },
         },
@@ -5411,62 +5466,6 @@ function CCharacterHumanoid:drawHead()
     _object.dirx     = _objectflip
     _object:draw()
     _object:load()
-end
-
-function CCharacterHumanoid:drawBack(_bgfg)
-    local _handlesoffsets = self:handlesOffsets() -- determine the corresponding back offsets
-    local _backx  = _handlesoffsets.backx
-    local _backy  = _handlesoffsets.backy
-    self:drawHandle(_backx, _backy, Tic.COLORYELLOW)
-
-    local _object = self.slots.back.object
-    if not _object then return end -- nothing in back HH
-
-    local _handleoffsets = _object:handleOffsets(_handlesoffsets.state) -- determine the object handle offsets
-    local _objecthandlex = _handleoffsets.handlex
-    local _objecthandley = _handleoffsets.handley
-    local _objectrotate  = _handleoffsets.rotate
-    local _objectflip    = _handleoffsets.flip
-
-    local _backx   = _backx - _objecthandlex -- adjust handles
-    local _backy   = _backy - _objecthandley
-
-    _object:save()
-    _object.screenx  = self.screenx + (_backx * self.scale)
-    _object.screeny  = self.screeny + (_backy * self.scale)
-    _object.scale    = self.scale
-    _object.rotate   = _objectrotate
-    _object.dirx     = _objectflip
-    _object:draw()
-    _object:load()
-end
-
-function CCharacter:handlesOffsets()
-    local _posture = self:postureGet()
-    local _status  = self:statusGet()
-    local _result  = {}
-    if self.handlesoffsets[_status] then
-        _result = Tables:merge(_result, self.handlesoffsets[_status][self.dirx][self.frame])
-    else
-        _result = Tables:merge(_result, self.handlesoffsets[_posture][self.dirx][self.size])
-    end
-
-    if _posture == Tic.POSTUREFLOOR then
-        _result.backx = (self.dirx == Tic.DIRXLF)
-            and _result.backx - self.size 
-            or  _result.backx + self.size 
-    else
-        _result.heady = _result.heady + self.size
-        _result.backy = _result.backy + self.size
-    end
-    if _posture == Tic.POSTUREKNEEL then
-        _result.handrgy = _result.handrgy + 1
-        _result.handlfy = _result.handlfy + 1
-        _result.heady   = _result.heady   + 1
-        _result.backy   = _result.backy   + 1
-    end
-
-    return _result
 end
 
 
@@ -8312,7 +8311,7 @@ Wolfie = _playerclass{name = "Wolfie",
     spottingpick = true,
     -- ["slots.handrg"] = CSlotHand{object = CObjectFlaskMedium{}},
     -- ["slots.handlf"] = CSlotHand{object = CObjectFlaskSmall{}},
-    -- ["slots.head"] = CSlotHead{object = CClothesHelmetSmall{}},
+    ["slots.head"] = CSlotHead{object = CClothesHelmetSmall{}},
     ["slots.back"] = CSlotBack{object = CClothesBackPackSmall{}},
 }
 end
@@ -8330,7 +8329,7 @@ Wulfie = _playerclass{name = "Wulfie",
     spottingpick = true,
     -- ["slots.handrg"] = CSlotHand{object = CObjectFlaskMedium{}},
     -- ["slots.handlf"] = CSlotHand{object = CObjectFlaskSmall{}},
-    -- ["slots.head"] = CSlotHead{object = CClothesHelmetMedium{}},
+    ["slots.head"] = CSlotHead{object = CClothesHelmetMedium{}},
     ["slots.back"] = CSlotBack{object = CClothesBackPackMedium{}},
 }
 end
@@ -8348,7 +8347,7 @@ Wylfie = _playerclass{name = "Wylfie",
     spottingpick = true,
     -- ["slots.handrg"] = CSlotHand{object = CObjectFlaskMedium{}},
     -- ["slots.handlf"] = CSlotHand{object = CObjectFlaskSmall{}},
-    -- ["slots.head"] = CSlotHead{object = CClothesHelmetLarge{}},
+    ["slots.head"] = CSlotHead{object = CClothesHelmetLarge{}},
     ["slots.back"] = CSlotBack{object = CClothesBackPackLarge{}},
 }
 end
