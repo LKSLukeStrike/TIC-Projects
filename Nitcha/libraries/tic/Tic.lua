@@ -1401,22 +1401,25 @@ CSpriteFG.WEAPONLANCE = CSpriteFG.WEAPONMELEE + 32
 CSpriteFG.WEAPONRANGE = CSpriteFG.OBJECTBANK + 1 -- range bank
 CSpriteFG.WEAPONLGBOW = CSpriteFG.WEAPONRANGE + 0
 CSpriteFG.WEAPONCXBOW = CSpriteFG.WEAPONRANGE + 16
-CSpriteFG.WEAPONSHLDS = CSpriteFG.OBJECTBANK + 2 -- shields bank
-CSpriteFG.WEAPONSHLDT = CSpriteFG.WEAPONSHLDS + 0
-CSpriteFG.WEAPONSHLDR = CSpriteFG.WEAPONSHLDS + 16
-CSpriteFG.OBJECTFLASK = CSpriteFG.OBJECTBANK + 3 -- flasks bank
-CSpriteFG.OBJECTFLASS = CSpriteFG.OBJECTFLASK + 0
-CSpriteFG.OBJECTFLASM = CSpriteFG.OBJECTFLASK + 16
-CSpriteFG.OBJECTFLASL = CSpriteFG.OBJECTFLASK + 32
+CSpriteFG.WEAPONSHLDB = CSpriteFG.OBJECTBANK + 2 -- shields bank
+CSpriteFG.WEAPONSHLDT = CSpriteFG.WEAPONSHLDB + 0
+CSpriteFG.WEAPONSHLDR = CSpriteFG.WEAPONSHLDB + 16
+CSpriteFG.OBJECTFLASB = CSpriteFG.OBJECTBANK + 3 -- flasks bank
+CSpriteFG.OBJECTFLASS = CSpriteFG.OBJECTFLASB + 0
+CSpriteFG.OBJECTFLASM = CSpriteFG.OBJECTFLASB + 16
+CSpriteFG.OBJECTFLASL = CSpriteFG.OBJECTFLASB + 32
 CSpriteFG.CLOTHESHATB = CSpriteFG.OBJECTBANK + 4 -- hats bank
 CSpriteFG.CLOTHESHATS = CSpriteFG.CLOTHESHATB + 0
 CSpriteFG.CLOTHESHATM = CSpriteFG.CLOTHESHATB + 16
 CSpriteFG.CLOTHESHATL = CSpriteFG.CLOTHESHATB + 32
-CSpriteFG.CLOTHESHELB = CSpriteFG.OBJECTBANK + 5 -- helmets bank
-CSpriteFG.CLOTHESHELS = CSpriteFG.CLOTHESHELB + 0
-CSpriteFG.CLOTHESHELM = CSpriteFG.CLOTHESHELB + 16
-CSpriteFG.CLOTHESHELL = CSpriteFG.CLOTHESHELB + 32
-CSpriteFG.CLOTHESBACK = CSpriteFG.OBJECTBANK + 6 -- backpacks bank
+CSpriteFG.CLOTHESHLMB = CSpriteFG.OBJECTBANK + 5 -- helmets bank
+CSpriteFG.CLOTHESHLMS = CSpriteFG.CLOTHESHLMB + 0
+CSpriteFG.CLOTHESHLMM = CSpriteFG.CLOTHESHLMB + 16
+CSpriteFG.CLOTHESHLML = CSpriteFG.CLOTHESHLMB + 32
+CSpriteFG.CLOTHESBKPB = CSpriteFG.OBJECTBANK + 6 -- backpacks bank
+CSpriteFG.CLOTHESBKPS = CSpriteFG.CLOTHESBKPB + 0
+CSpriteFG.CLOTHESBKPM = CSpriteFG.CLOTHESBKPB + 16
+CSpriteFG.CLOTHESBKPL = CSpriteFG.CLOTHESBKPB + 32
 function CSpriteFG:new(_argt)
     CSpriteFG.super.new(self, _argt)
     self.kind = Classic.KINDSPRITEFG
@@ -1533,6 +1536,7 @@ function CSlot:canSlotObject(_object)
     if not _object then return false end -- mandatory
     if not _object.slottype then return false end -- mandatory -- only slotable objects
     if self.slottype and not (_object.slottype == self.slottype) then return false end -- not allowed type if any
+    trace'ok'
     return true
 end
 
@@ -1690,6 +1694,61 @@ function CInventoryPsy:new(_argt)
     self.kind = Classic.KINDINVENTORYPSY
     self.name = Classic.NAMEINVENTORYPSY
     self.objectstypes = {CInventoryPsy}
+    self:argt(_argt) -- override if any
+end
+
+CInventoryAny2 = CInventoryAny:extend() -- generic any inventory 2
+Classic.KINDINVENTORYANY2 = "InventoryAny2" -- InventoryAny2 kind
+Classic.NAMEINVENTORYANY2 = "InventoryAny2" -- InventoryAny2 name
+function CInventoryAny2:new(_argt)
+    CInventoryAny2.super.new(self, _argt)
+    self.kind = Classic.KINDINVENTORYANY2
+    self.name = Classic.NAMEINVENTORYANY2
+	self.objectsmax   = 2
+    self:argt(_argt) -- override if any
+end
+
+CInventoryAny4 = CInventoryAny:extend() -- generic any inventory 4
+Classic.KINDINVENTORYANY4 = "InventoryAny4" -- InventoryAny4 kind
+Classic.NAMEINVENTORYANY4 = "InventoryAny4" -- InventoryAny4 name
+function CInventoryAny4:new(_argt)
+    CInventoryAny4.super.new(self, _argt)
+    self.kind = Classic.KINDINVENTORYANY4
+    self.name = Classic.NAMEINVENTORYANY4
+	self.objectsmax   = 4
+    self:argt(_argt) -- override if any
+end
+
+CInventoryAny6 = CInventoryAny:extend() -- generic any inventory 6
+Classic.KINDINVENTORYANY6 = "InventoryAny6" -- InventoryAny6 kind
+Classic.NAMEINVENTORYANY6 = "InventoryAny6" -- InventoryAny6 name
+function CInventoryAny6:new(_argt)
+    CInventoryAny6.super.new(self, _argt)
+    self.kind = Classic.KINDINVENTORYANY6
+    self.name = Classic.NAMEINVENTORYANY6
+	self.objectsmax   = 6
+    self:argt(_argt) -- override if any
+end
+
+CInventoryAny8 = CInventoryAny:extend() -- generic any inventory 8
+Classic.KINDINVENTORYANY8 = "InventoryAny8" -- InventoryAny8 kind
+Classic.NAMEINVENTORYANY8 = "InventoryAny8" -- InventoryAny8 name
+function CInventoryAny8:new(_argt)
+    CInventoryAny8.super.new(self, _argt)
+    self.kind = Classic.KINDINVENTORYANY8
+    self.name = Classic.NAMEINVENTORYANY8
+	self.objectsmax   = 8
+    self:argt(_argt) -- override if any
+end
+
+CInventoryAny10 = CInventoryAny:extend() -- generic any inventory 10
+Classic.KINDINVENTORYANY10 = "InventoryAny10" -- InventoryAny10 kind
+Classic.NAMEINVENTORYANY10 = "InventoryAny10" -- InventoryAny10 name
+function CInventoryAny10:new(_argt)
+    CInventoryAny10.super.new(self, _argt)
+    self.kind = Classic.KINDINVENTORYANY10
+    self.name = Classic.NAMEINVENTORYANY10
+	self.objectsmax   = 10
     self:argt(_argt) -- override if any
 end
 
@@ -3267,10 +3326,11 @@ end
 CObject = CEntityDrawable:extend() -- generic objects
 Classic.KINDOBJECT = "Object" -- Object kind
 Classic.NAMEOBJECT = "Object" -- Object name
-CObject.HANDLE = Tic.COLORWHITE
+CObject.HANDLE         = Tic.COLORWHITE
 CObject.BORDER         = Tic.COLORGREYD
 CObject.INSIDE         = Tic.COLORGREYM
 CObject.EFFECT         = Tic.COLORGREYL
+CObject.EXTRA1         = Tic.COLORPURPLE
 CObject.COLORWOODBG    = Tic.COLORRED -- wood
 CObject.COLORWOODFG    = Tic.COLORORANGE
 CObject.COLORLEATHERBG = Tic.COLORRED -- leather
@@ -3289,7 +3349,8 @@ function CObject:new(_argt)
     CObject.super.new(self, _argt)
     self.kind = Classic.KINDOBJECT
     self.name = Classic.NAMEOBJECT
-    self.used = CObject.USEDNONE
+    self.used      = CObject.USEDNONE -- used level if any
+    self.inventory = nil -- can have an inventory if any
     self:argt(_argt) -- override if any
 end
 
@@ -3540,13 +3601,13 @@ end
 -- CWeaponShield
 --
 CWeaponShield = CWeapon:extend() -- Shield weapons
-Classic.KINDDWEAPONSHLDS = "Shield" -- Shield kind
-Classic.NAMEDWEAPONSHLDS = "Shield" -- Shield name
+Classic.KINDDWEAPONSHIELD = "Shield" -- Shield kind
+Classic.NAMEDWEAPONSHIELD = "Shield" -- Shield name
 function CWeaponShield:new(_argt)
     CWeaponShield.super.new(self, _argt)
-    self.kind = Classic.KINDDWEAPONSHLDS
-    self.name = Classic.NAMEDWEAPONSHLDS
-    self.sprite  = CSpriteFG.WEAPONSHLDS
+    self.kind = Classic.KINDDWEAPONSHIELD
+    self.name = Classic.NAMEDWEAPONSHIELD
+    self.sprite  = CSpriteFG.WEAPONSHLDB
     self.stateshandles = {
         [Tic.STATEIDLELF]  = {rotate = CSprite.ROTATE000, flip = Tic.DIRXLF},
         [Tic.STATEIDLERG]  = {rotate = CSprite.ROTATE000, flip = Tic.DIRXRG},
@@ -3579,23 +3640,23 @@ function CWeaponShield:new(_argt)
 end
 
 CWeaponShieldTee = CWeaponShield:extend() -- ShieldTee weapons
-Classic.KINDDWEAPONSHLDT = "Ecu.T" -- ShieldTee kind
-Classic.NAMEDWEAPONSHLDT = "Ecu.T" -- ShieldTee name
+Classic.KINDWEAPONSHIELDTEE = "Ecu.T" -- ShieldTee kind
+Classic.NAMEWEAPONSHIELDTEE = "Ecu.T" -- ShieldTee name
 function CWeaponShieldTee:new(_argt)
     CWeaponShieldTee.super.new(self, _argt)
-    self.kind = Classic.KINDDWEAPONSHLDT
-    self.name = Classic.NAMEDWEAPONSHLDT
+    self.kind = Classic.KINDWEAPONSHIELDTEE
+    self.name = Classic.KINDWEAPONSHIELDTEE
     self.sprite  = CSpriteFG.WEAPONSHLDT
     self:argt(_argt) -- override if any
 end
 
 CWeaponShieldRound = CWeaponShield:extend() -- ShieldRound weapons
-Classic.KINDDWEAPONSHLDR= "Ecu.R" -- ShieldRound kind
-Classic.NAMEDWEAPONSHLDR= "Ecu.R" -- ShieldRound name
+Classic.KINDWEAPONSHIELDROUND= "Ecu.R" -- ShieldRound kind
+Classic.NAMEWEAPONSHIELDROUND= "Ecu.R" -- ShieldRound name
 function CWeaponShieldRound:new(_argt)
     CWeaponShieldRound.super.new(self, _argt)
-    self.kind = Classic.KINDDWEAPONSHLDR
-    self.name = Classic.NAMEDWEAPONSHLDR
+    self.kind = Classic.KINDWEAPONSHIELDROUND
+    self.name = Classic.NAMEWEAPONSHIELDROUND
     self.sprite  = CSpriteFG.WEAPONSHLDR
     self:argt(_argt) -- override if any
 end
@@ -3611,7 +3672,7 @@ function CObjectFlask:new(_argt)
     CObjectFlask.super.new(self, _argt)
     self.kind = Classic.KINDDOBJECTFLASK
     self.name = Classic.NAMEDOBJECTFLASK
-    self.sprite  = CSpriteFG.OBJECTFLASK
+    self.sprite  = CSpriteFG.OBJECTFLASB
     self.stateshandles = {
         [Tic.STATEIDLELF]  = {rotate = CSprite.ROTATE000, flip = Tic.DIRXLF},
         [Tic.STATEIDLERG]  = {rotate = CSprite.ROTATE000, flip = Tic.DIRXRG},
@@ -3659,34 +3720,34 @@ function CObjectFlask:draw()
 end
 
 CObjectFlaskSmall = CObjectFlask:extend() -- FlaskSmall objects
-Classic.KINDDOBJECTFLASS = "Oil.S" -- FlaskSmall kind
-Classic.NAMEDOBJECTFLASS = "Oil.S" -- FlaskSmall name
+Classic.KINDOBJECTFLASKSMALL = "Oil.S" -- FlaskSmall kind
+Classic.NAMEOBJECTFLASKSMALL = "Oil.S" -- FlaskSmall name
 function CObjectFlaskSmall:new(_argt)
     CObjectFlaskSmall.super.new(self, _argt)
-    self.kind = Classic.KINDDOBJECTFLASS
-    self.name = Classic.NAMEDOBJECTFLASS
+    self.kind = Classic.KINDOBJECTFLASKSMALL
+    self.name = Classic.NAMEOBJECTFLASKSMALL
     self.sprite  = CSpriteFG.OBJECTFLASS
     self:argt(_argt) -- override if any
 end
 
 CObjectFlaskMedium = CObjectFlask:extend() -- FlaskMedium objects
-Classic.KINDDOBJECTFLASM = "Oil.M" -- FlaskMedium kind
-Classic.NAMEDOBJECTFLASM = "Oil.M" -- FlaskMedium name
+Classic.KINDOBJECTFLASKMEDIUM = "Oil.M" -- FlaskMedium kind
+Classic.NAMEOBJECTFLASKMEDIUM = "Oil.M" -- FlaskMedium name
 function CObjectFlaskMedium:new(_argt)
     CObjectFlaskMedium.super.new(self, _argt)
-    self.kind = Classic.KINDDOBJECTFLASM
-    self.name = Classic.NAMEDOBJECTFLASM
+    self.kind = Classic.KINDOBJECTFLASKMEDIUM
+    self.name = Classic.NAMEOBJECTFLASKMEDIUM
     self.sprite  = CSpriteFG.OBJECTFLASM
     self:argt(_argt) -- override if any
 end
 
 CObjectFlaskLarge = CObjectFlask:extend() -- FlaskLarge objects
-Classic.KINDDOBJECTFLASL = "Oil.L" -- FlaskLarge kind
-Classic.NAMEDOBJECTFLASL = "Oil.L" -- FlaskLarge name
+Classic.KINDOBJECTFLASKLARGE = "Oil.L" -- FlaskLarge kind
+Classic.NAMEOBJECTFLASKLARGE = "Oil.L" -- FlaskLarge name
 function CObjectFlaskLarge:new(_argt)
     CObjectFlaskLarge.super.new(self, _argt)
-    self.kind = Classic.KINDDOBJECTFLASL
-    self.name = Classic.NAMEDOBJECTFLASL
+    self.kind = Classic.KINDOBJECTFLASKLARGE
+    self.name = Classic.NAMEOBJECTFLASKLARGE
     self.sprite  = CSpriteFG.OBJECTFLASL
     self:argt(_argt) -- override if any
 end
@@ -3823,7 +3884,7 @@ function CClothesHelmet:new(_argt)
     CClothesHelmet.super.new(self, _argt)
     self.kind = Classic.KINDCLOTHESHELMET
     self.name = Classic.NAMECLOTHESHELMET
-    self.sprite = CSpriteFG.CLOTHESHELB
+    self.sprite = CSpriteFG.CLOTHESHLMB
     self.palettefg = {
         [CObject.HANDLE] = CObject.COLORLEATHERFG,
         [CObject.BORDER] = CObject.COLORIRONBG,
@@ -3840,7 +3901,7 @@ function CClothesHelmetSmall:new(_argt)
     CClothesHelmetSmall.super.new(self, _argt)
     self.kind = Classic.KINDCLOTHESHELMETSMALL
     self.name = Classic.NAMECLOTHESHELMETSMALL
-    self.sprite = CSpriteFG.CLOTHESHELS
+    self.sprite = CSpriteFG.CLOTHESHLMS
     self:argt(_argt) -- override if any
 end
 
@@ -3851,7 +3912,7 @@ function CClothesHelmetMedium:new(_argt)
     CClothesHelmetMedium.super.new(self, _argt)
     self.kind = Classic.KINDCLOTHESHELMETMEDIUM
     self.name = Classic.NAMECLOTHESHELMETMEDIUM
-    self.sprite = CSpriteFG.CLOTHESHELM
+    self.sprite = CSpriteFG.CLOTHESHLMM
     self:argt(_argt) -- override if any
 end
 
@@ -3862,7 +3923,137 @@ function CClothesHelmetLarge:new(_argt)
     CClothesHelmetLarge.super.new(self, _argt)
     self.kind = Classic.KINDCLOTHESHELMETLARGE
     self.name = Classic.NAMECLOTHESHELMETLARGE
-    self.sprite = CSpriteFG.CLOTHESHELL
+    self.sprite = CSpriteFG.CLOTHESHLML
+    self:argt(_argt) -- override if any
+end
+
+
+--
+-- CObjectBack
+--
+CObjectBack = CObject:extend() -- generic back (inventory) objects
+Classic.KINDOBJECTBACK = "ObjectBack" -- ObjectBack kind
+Classic.NAMEOBJECTBACK = "ObjectBack" -- ObjectBack name
+function CObjectBack:new(_argt)
+    CObjectBack.super.new(self, _argt)
+    self.kind = Classic.KINDOBJECTBACK
+    self.name = Classic.NAMEOBJECTBACK
+    self.slottype = CSlotBack
+    self.stateshandles = {
+        [Tic.STATEIDLELF]  = {rotate = CSprite.ROTATE000, flip = Tic.DIRXLF},
+        [Tic.STATEIDLERG]  = {rotate = CSprite.ROTATE000, flip = Tic.DIRXRG},
+        [Tic.STATEMOVELF]  = {rotate = CSprite.ROTATE000, flip = Tic.DIRXLF},
+        [Tic.STATEMOVERG]  = {rotate = CSprite.ROTATE000, flip = Tic.DIRXRG},
+        [Tic.STATEWORKLF]  = {rotate = CSprite.ROTATE000, flip = Tic.DIRXLF},
+        [Tic.STATEWORKRG]  = {rotate = CSprite.ROTATE000, flip = Tic.DIRXRG},
+        [Tic.STATEFLOORLF] = {rotate = CSprite.ROTATE090, flip = Tic.DIRXLF},
+        [Tic.STATEFLOORRG] = {rotate = CSprite.ROTATE090, flip = Tic.DIRXRG},
+    }
+    self.handleoffsets = {
+        [CSprite.ROTATE000] = {handlex = 1, handley = 3},
+        [CSprite.ROTATE090] = {handlex = 4, handley = 1},
+        [CSprite.ROTATE180] = {handlex = 6, handley = 4},
+        [CSprite.ROTATE270] = {handlex = 3, handley = 6},
+    }
+    self.palettefg = {
+        [CObject.HANDLE] = Tic.COLORKEY,
+        [CObject.BORDER] = CObject.COLORIRONBG,
+        [CObject.INSIDE] = CObject.COLORLEATHERFG,
+        [CObject.EFFECT] = CObject.COLORLEATHERBG,
+        [CObject.EXTRA1] = CObject.COLORLEATHERBG,
+    }
+    self:argt(_argt) -- override if any
+end
+
+CObjectBackAny = CObjectBack:extend() -- generic back (inventory any) objects
+Classic.KINDOBJECBACKANY = "ObjectBackAny" -- ObjectBackAny kind
+Classic.NAMEOBJECBACKANY = "ObjectBackAny" -- ObjectBackAny name
+function CObjectBackAny:new(_argt)
+    CObjectBackAny.super.new(self, _argt)
+    self.kind = Classic.KINDOBJECBACKANY
+    self.name = Classic.NAMEOBJECBACKANY
+    self.inventorytype = CInventoryAny
+    self:argt(_argt) -- override if any
+end
+
+CObjectBackPhy = CObjectBack:extend() -- generic back (inventory phy) objects
+Classic.KINDOBJECBACKPHY = "ObjectBackPhy" -- ObjectBackPhy kind
+Classic.NAMEOBJECBACKPHY = "ObjectBackPhy" -- ObjectBackPhy name
+function CObjectBackPhy:new(_argt)
+    CObjectBackPhy.super.new(self, _argt)
+    self.kind = Classic.KINDOBJECBACKPHY
+    self.name = Classic.NAMEOBJECBACKPHY
+    self.inventorytype = CInventoryPhy
+    self:argt(_argt) -- override if any
+end
+
+CObjectBackMen = CObjectBack:extend() -- generic back (inventory men) objects
+Classic.KINDOBJECBACKMEN = "ObjectBackMen" -- ObjectBackMen kind
+Classic.NAMEOBJECBACKMEN = "ObjectBackMen" -- ObjectBackMen name
+function CObjectBackMen:new(_argt)
+    CObjectBackMen.super.new(self, _argt)
+    self.kind = Classic.KINDOBJECBACKMEN
+    self.name = Classic.NAMEOBJECBACKMEN
+    self.inventorytype = CInventoryMen
+    self:argt(_argt) -- override if any
+end
+
+CObjectBackPsy = CObjectBack:extend() -- generic back (inventory psy) objects
+Classic.KINDOBJECBACKPSY = "ObjectBackPsy" -- ObjectBackPsy kind
+Classic.NAMEOBJECBACKPSY = "ObjectBackPsy" -- ObjectBackPsy name
+function CObjectBackPsy:new(_argt)
+    CObjectBackPsy.super.new(self, _argt)
+    self.kind = Classic.KINDOBJECBACKPSY
+    self.name = Classic.NAMEOBJECBACKPSY
+    self.inventorytype = CInventoryPsy
+    self:argt(_argt) -- override if any
+end
+
+CClothesBackPack = CObjectBackPhy:extend() -- BackPack objects
+Classic.KINDCLOTHESBACKPACK = "Bag" -- ClothesBackPack kind
+Classic.NAMECLOTHESBACKPACK = "Bag" -- ClothesBackPack name
+function CClothesBackPack:new(_argt)
+    CClothesBackPack.super.new(self, _argt)
+    self.kind = Classic.KINDCLOTHESBACKPACK
+    self.name = Classic.NAMECLOTHESBACKPACK
+    self.sprite    = CSpriteFG.CLOTHESBKPB
+    self.inventory = CInventoryAny2{}
+    self:argt(_argt) -- override if any
+end
+
+CClothesBackPackSmall = CClothesBackPack:extend() -- BackPackSmall objects
+Classic.KINDCLOTHESBACKPACKSMALL = "Bag.S" -- ClothesBackPackSmall kind
+Classic.NAMECLOTHESBACKPACKSMALL = "Bag.S" -- ClothesBackPackSmall name
+function CClothesBackPackSmall:new(_argt)
+    CClothesBackPackSmall.super.new(self, _argt)
+    self.kind = Classic.KINDCLOTHESBACKPACKSMALL
+    self.name = Classic.NAMECLOTHESBACKPACKSMALL
+    self.sprite    = CSpriteFG.CLOTHESBKPS
+    self.inventory = CInventoryAny2{}
+    self:argt(_argt) -- override if any
+end
+
+CClothesBackPackMedium = CClothesBackPack:extend() -- BackPackMedium objects
+Classic.KINDCLOTHESBACKPACKMEDIUM = "Bag.M" -- ClothesBackPackMedium kind
+Classic.NAMECLOTHESBACKPACKMEDIUM = "Bag.M" -- ClothesBackPackMedium name
+function CClothesBackPackMedium:new(_argt)
+    CClothesBackPackMedium.super.new(self, _argt)
+    self.kind = Classic.KINDCLOTHESBACKPACKMEDIUM
+    self.name = Classic.NAMECLOTHESBACKPACKMEDIUM
+    self.sprite    = CSpriteFG.CLOTHESBKPM
+    self.inventory = CInventoryAny4{}
+    self:argt(_argt) -- override if any
+end
+
+CClothesBackPackLarge = CClothesBackPack:extend() -- BackPackLarge objects
+Classic.KINDCLOTHESBACKPACKLARGE = "Bag.L" -- ClothesBackPackLarge kind
+Classic.NAMECLOTHESBACKPACKLARGE = "Bag.L" -- ClothesBackPackLarge name
+function CClothesBackPackLarge:new(_argt)
+    CClothesBackPackLarge.super.new(self, _argt)
+    self.kind = Classic.KINDCLOTHESBACKPACKLARGE
+    self.name = Classic.NAMECLOTHESBACKPACKLARGE
+    self.sprite    = CSpriteFG.CLOTHESBKPL
+    self.inventory = CInventoryAny6{}
     self:argt(_argt) -- override if any
 end
 
@@ -4892,11 +5083,13 @@ CCharacterHumanoid.HANDLESOFFSETS = { -- hands, head and back offsets
             [CSprite.FRAME00] = {
                 handrgx = 2, handrgy = 6, handlfx = 5, handlfy = 6,
                 headx = 4, heady = 2,
+                backx = 5, backy = 3,
                 state = Tic.STATEIDLELF
             },
             [CSprite.FRAME01] = {
                 handrgx = 2, handrgy = 6, handlfx = 5, handlfy = 6,
                 headx = 4, heady = 2,
+                backx = 5, backy = 3,
                 state = Tic.STATEIDLELF
             },
         },
@@ -4904,11 +5097,13 @@ CCharacterHumanoid.HANDLESOFFSETS = { -- hands, head and back offsets
             [CSprite.FRAME00] = {
                 handrgx = 5, handrgy = 6, handlfx = 2, handlfy = 6,
                 headx = 3, heady = 2,
+                backx = 2, backy = 3,
                 state = Tic.STATEIDLERG
             },
             [CSprite.FRAME01] = {
                 handrgx = 5, handrgy = 6, handlfx = 2, handlfy = 6,
                 headx = 3, heady = 2,
+                backx = 2, backy = 3,
                 state = Tic.STATEIDLERG
             },
         },
@@ -4918,11 +5113,13 @@ CCharacterHumanoid.HANDLESOFFSETS = { -- hands, head and back offsets
             [CSprite.FRAME00] = {
                 handrgx = 1, handrgy = 5, handlfx = 6, handlfy = 6,
                 headx = 4, heady = 2,
+                backx = 5, backy = 3,
                 state = Tic.STATEMOVELF
             },
             [CSprite.FRAME01] = {
                 handrgx = 1, handrgy = 6, handlfx = 6, handlfy = 5,
                 headx = 4, heady = 2,
+                backx = 5, backy = 3,
                 state = Tic.STATEMOVELF
             },
         },
@@ -4930,11 +5127,13 @@ CCharacterHumanoid.HANDLESOFFSETS = { -- hands, head and back offsets
             [CSprite.FRAME00] = {
                 handrgx = 6, handrgy = 5, handlfx = 1, handlfy = 6,
                 headx = 3, heady = 2,
+                backx = 2, backy = 3,
                 state = Tic.STATEMOVERG
             },
             [CSprite.FRAME01] = {
                 handrgx = 6, handrgy = 6, handlfx = 1, handlfy = 5,
                 headx = 3, heady = 2,
+                backx = 2, backy = 3,
                 state = Tic.STATEMOVERG
             },
         },
@@ -4944,11 +5143,13 @@ CCharacterHumanoid.HANDLESOFFSETS = { -- hands, head and back offsets
             [CSprite.FRAME00] = {
                 handrgx = 1, handrgy = 7, handlfx = 6, handlfy = 6,
                 headx = 4, heady = 2,
+                backx = 5, backy = 3,
                 state = Tic.STATEWORKLF
             },
             [CSprite.FRAME01] = {
                 handrgx = 1, handrgy = 7, handlfx = 6, handlfy = 6,
                 headx = 4, heady = 2,
+                backx = 5, backy = 3,
                 state = Tic.STATEWORKLF
             },
         },
@@ -4956,11 +5157,13 @@ CCharacterHumanoid.HANDLESOFFSETS = { -- hands, head and back offsets
             [CSprite.FRAME00] = {
                 handrgx = 6, handrgy = 7, handlfx = 1, handlfy = 6,
                 headx = 3, heady = 2,
+                backx = 2, backy = 3,
                 state = Tic.STATEWORKRG
             },
             [CSprite.FRAME01] = {
                 handrgx = 6, handrgy = 7, handlfx = 1, handlfy = 6,
                 headx = 3, heady = 2,
+                backx = 2, backy = 3,
                 state = Tic.STATEWORKRG
             },
         },
@@ -4970,16 +5173,19 @@ CCharacterHumanoid.HANDLESOFFSETS = { -- hands, head and back offsets
             [CCharacter.SIZES] = {
                 handrgx =  1, handrgy = 3, handlfx =  1, handlfy = 6,
                 headx = 5, heady = 6,
+                backx = 6, backy = 7,
                 state = Tic.STATEFLOORLF
             },
             [CCharacter.SIZEM] = {
                 handrgx =  0, handrgy = 3, handlfx =  0, handlfy = 6,
                 headx = 5, heady = 6,
+                backx = 5, backy = 7,
                 state = Tic.STATEFLOORLF
             },
             [CCharacter.SIZEL] = {
                 handrgx = -1, handrgy = 3, handlfx = -1, handlfy = 6,
                 headx = 5, heady = 6,
+                backx = 4, backy = 7,
                 state = Tic.STATEFLOORLF
             },
         },
@@ -4987,16 +5193,19 @@ CCharacterHumanoid.HANDLESOFFSETS = { -- hands, head and back offsets
             [CCharacter.SIZES] = {
                 handrgx = 6, handrgy = 8, handlfx = 6, handlfy = 3,
                 headx = 2, heady = 6,
+                backx = 1, backy = 7,
                 state = Tic.STATEFLOORRG
             },
             [CCharacter.SIZEM] = {
                 handrgx = 7, handrgy = 8, handlfx = 7, handlfy = 3,
                 headx = 2, heady = 6,
+                backx = 2, backy = 7,
                 state = Tic.STATEFLOORRG
             },
             [CCharacter.SIZEL] = {
                 handrgx = 8, handrgy = 8, handlfx = 8, handlfy = 3,
                 headx = 2, heady = 6,
+                backx = 3, backy = 7,
                 state = Tic.STATEFLOORRG
             },
         },
@@ -7954,7 +8163,7 @@ end
 
 
 local _playerclass = CPlayerTifel
-if true then
+if false then
 Walfie = _playerclass{name = "Walfie",
     statphyact = 10,
     statmenact = 10,
@@ -7970,7 +8179,7 @@ Walfie = _playerclass{name = "Walfie",
     ["slots.head"] = CSlotHead{object = CClothesHatSmall{}},
 }
 end
-if true then
+if false then
 Welfie = _playerclass{name = "Welfie",
     statphyact = 10,
     statmenact = 10,
@@ -7986,7 +8195,7 @@ Welfie = _playerclass{name = "Welfie",
     ["slots.head"] = CSlotHead{object = CClothesHatMedium{}},
 }
 end
-if true then
+if false then
 Wilfie = _playerclass{name = "Wilfie",
     statphyact = 10,
     statmenact = 10,
@@ -8002,7 +8211,7 @@ Wilfie = _playerclass{name = "Wilfie",
     ["slots.head"] = CSlotHead{object = CClothesHatLarge{}},
 }
 end
-if true then
+if false then
 Wolfie = _playerclass{name = "Wolfie",
     statphyact = 10,
     statmenact = 10,
@@ -8015,10 +8224,11 @@ Wolfie = _playerclass{name = "Wolfie",
     spottingpick = true,
     -- ["slots.handrg"] = CSlotHand{object = CObjectFlaskMedium{}},
     -- ["slots.handlf"] = CSlotHand{object = CObjectFlaskSmall{}},
-    ["slots.head"] = CSlotHead{object = CClothesHelmetSmall{}},
+    -- ["slots.head"] = CSlotHead{object = CClothesHelmetSmall{}},
+    ["slots.back"] = CSlotBack{object = CClothesBackPackSmall{}},
 }
 end
-if true then
+if false then
 Wulfie = _playerclass{name = "Wulfie",
     statphyact = 10,
     statmenact = 10,
@@ -8031,7 +8241,8 @@ Wulfie = _playerclass{name = "Wulfie",
     spottingpick = true,
     -- ["slots.handrg"] = CSlotHand{object = CObjectFlaskMedium{}},
     -- ["slots.handlf"] = CSlotHand{object = CObjectFlaskSmall{}},
-    ["slots.head"] = CSlotHead{object = CClothesHelmetMedium{}},
+    -- ["slots.head"] = CSlotHead{object = CClothesHelmetMedium{}},
+    ["slots.back"] = CSlotBack{object = CClothesBackPackMedium{}},
 }
 end
 if true then
@@ -8047,7 +8258,8 @@ Wylfie = _playerclass{name = "Wylfie",
     spottingpick = true,
     -- ["slots.handrg"] = CSlotHand{object = CObjectFlaskMedium{}},
     -- ["slots.handlf"] = CSlotHand{object = CObjectFlaskSmall{}},
-    ["slots.head"] = CSlotHead{object = CClothesHelmetLarge{}},
+    -- ["slots.head"] = CSlotHead{object = CClothesHelmetLarge{}},
+    ["slots.back"] = CSlotBack{object = CClothesBackPackLarge{}},
 }
 end
 
@@ -8286,8 +8498,8 @@ end
 
 function Tic:drawLog()
     -- Tic:logWorld()
-    -- Tic:logInventories()
-    Tic:logScreens()
+    Tic:logInventories()
+    -- Tic:logScreens()
 end
 
 function Tic:logWorld()
@@ -8306,27 +8518,29 @@ function Tic:logInventories() -- [-] remove
     if not _playeractual then return end
 
     Tic:logAppend(_playeractual.name, _playeractual.statphymax, _playeractual.statmenmax, _playeractual.statpsymax)
-    for _name, _inventory in pairs(_playeractual.inventories) do
-        Tic:logInventory(_name, _inventory)
+    for _, _inventory in pairs(_playeractual.inventories) do
+        Tic:logInventory(_inventory)
     end
-    for _name, _slot in pairs(_playeractual.slots) do
-        Tic:logSlot(_name, _slot)
+    for _, _slot in pairs(_playeractual.slots) do
+        Tic:logSlot(_slot)
     end
     Tic:logAppend()
 end
 
-function Tic:logInventory(_name, _inventory)
+function Tic:logInventory(_inventory, _indent)
     if not CInventory:isInventory(_inventory) then return end
+    _indent = _indent or ""
 
-    Tic:logAppend(_name, _inventory.kind, Tables:size(_inventory.objects).."/".._inventory.objectsmax)
+    Tic:logAppend(_indent.._inventory.name, _inventory.kind, Tables:size(_inventory.objects).."/".._inventory.objectsmax)
     for _, _object in ipairs(_inventory.objects) do
-        Tic:logAppend(" ", _object.kind, _object.name)
+        Tic:logAppend(_indent.." ", _object.kind, _object.name)
+        if _object.inventory then Tic:logInventory(_object.inventory, _indent.."  ") end
     end
 end
 
-function Tic:logSlot(_name, _slot)
+function Tic:logSlot(_slot)
     if not CSlot:isSlot(_slot) then return end
-    Tic:logAppend(_name, _slot.kind)
+    Tic:logAppend(_slot.name, _slot.kind)
     local _object = _slot.object
     if _object then Tic:logAppend(" ", _object.kind, _object.name) end
 end
