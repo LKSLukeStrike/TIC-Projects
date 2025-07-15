@@ -1308,7 +1308,7 @@ CSpriteBG = CSprite:extend() -- bg sprites aka tic tiles
 Classic.KINDSPRITEBG = "SpriteBG" -- SpriteBG kind
 Classic.NAMESPRITEBG = "SpriteBG" -- SpriteBG name
 CSpriteBG.SPRITEBANK  = 0
-CSpriteBG.SPRITEEMPTY = CSpriteBG.SPRITEBANK + 0 -- empty sprite
+CSpriteBG.SPRISMALLMPTY = CSpriteBG.SPRITEBANK + 0 -- empty sprite
 CSpriteBG.SIGNBANK1   = 1  -- signs
 CSpriteBG.SIGNQSTMRK  = CSpriteBG.SIGNBANK1 + 00 -- question mark
 CSpriteBG.SIGNINTMRK  = CSpriteBG.SIGNBANK1 + 01 -- interact mark
@@ -1394,7 +1394,7 @@ CSpriteFG.BODYHUMANKNEELMOVE = CSpriteFG.BODYHUMAN + 6
 CSpriteFG.EYESBANK    = 320 -- characters eyes
 CSpriteFG.EYESHUMAN   = CSpriteFG.EYESBANK + 0 -- humanoid eyes
 CSpriteFG.EFFECTBANK  = 336 -- effects types
-CSpriteFG.EFFECTEMPTY = CSpriteBG.SPRITEEMPTY
+CSpriteFG.EFFECTEMPTY = CSpriteBG.SPRISMALLMPTY
 CSpriteFG.EFFECTSLEEP = CSpriteFG.EFFECTBANK + 0
 CSpriteFG.EFFECTWOUND = CSpriteFG.EFFECTBANK + 1
 CSpriteFG.EFFECTDEATH = CSpriteFG.EFFECTBANK + 2
@@ -1407,8 +1407,9 @@ CSpriteFG.WEAPONRANGE = CSpriteFG.OBJECTBANK + 1 -- range bank
 CSpriteFG.WEAPONLGBOW = CSpriteFG.WEAPONRANGE + 0
 CSpriteFG.WEAPONCXBOW = CSpriteFG.WEAPONRANGE + 16
 CSpriteFG.WEAPONSHLDB = CSpriteFG.OBJECTBANK + 2 -- shields bank
-CSpriteFG.WEAPONSHLDT = CSpriteFG.WEAPONSHLDB + 0
-CSpriteFG.WEAPONSHLDR = CSpriteFG.WEAPONSHLDB + 16
+CSpriteFG.WEAPONSHLDS = CSpriteFG.WEAPONSHLDB + 0
+CSpriteFG.WEAPONSHLDM = CSpriteFG.WEAPONSHLDB + 16
+CSpriteFG.WEAPONSHLDL = CSpriteFG.WEAPONSHLDB + 32
 CSpriteFG.OBJECTFLASB = CSpriteFG.OBJECTBANK + 3 -- flasks bank
 CSpriteFG.OBJECTFLASS = CSpriteFG.OBJECTFLASB + 0
 CSpriteFG.OBJECTFLASM = CSpriteFG.OBJECTFLASB + 16
@@ -1445,7 +1446,7 @@ function CSpriteFGEmpty:new(_argt)
     CSpriteFGEmpty.super.new(self, _argt)
     self.kind = Classic.KINDSPRITEFGEMPTY
     self.name = Classic.NAMESPRITEFGEMPTY
-    self.sprite = CSpriteBG.SPRITEEMPTY
+    self.sprite = CSpriteBG.SPRISMALLMPTY
     self:argt(_argt) -- override if any
 end
 
@@ -2371,7 +2372,7 @@ function CEntityDrawable:new(_argt)
     self.kind = Classic.KINDENTITYDRAWABLE
     self.name = Classic.NAMEENTITYDRAWABLE
     self.world        = World
-    self.sprite       = CSpriteBG.SPRITEEMPTY
+    self.sprite       = CSpriteBG.SPRISMALLMPTY
     self.screenx      = 0 -- screen positions -- used to draw the sprite
     self.screeny      = 0
     self.dirx         = Nums:random01() -- random flip lf/rg
@@ -3643,25 +3644,36 @@ function CWeaponShield:new(_argt)
     self:argt(_argt) -- override if any
 end
 
-CWeaponShieldTee = CWeaponShield:extend() -- ShieldTee weapons
-Classic.KINDWEAPONSHIELDTEE = "Ecu.T" -- ShieldTee kind
-Classic.NAMEWEAPONSHIELDTEE = "Ecu.T" -- ShieldTee name
-function CWeaponShieldTee:new(_argt)
-    CWeaponShieldTee.super.new(self, _argt)
-    self.kind = Classic.KINDWEAPONSHIELDTEE
-    self.name = Classic.KINDWEAPONSHIELDTEE
-    self.sprite  = CSpriteFG.WEAPONSHLDT
+CWeaponShieldSmall = CWeaponShield:extend() -- ShieldSmall weapons
+Classic.KINDWEAPONSHIELDSMALL = "Ecu.S" -- ShieldSmall kind
+Classic.NAMEWEAPONSHIELDSMALL = "Ecu.S" -- ShieldSmall name
+function CWeaponShieldSmall:new(_argt)
+    CWeaponShieldSmall.super.new(self, _argt)
+    self.kind = Classic.KINDWEAPONSHIELDSMALL
+    self.name = Classic.KINDWEAPONSHIELDSMALL
+    self.sprite = CSpriteFG.WEAPONSHLDS
     self:argt(_argt) -- override if any
 end
 
-CWeaponShieldRound = CWeaponShield:extend() -- ShieldRound weapons
-Classic.KINDWEAPONSHIELDROUND= "Ecu.R" -- ShieldRound kind
-Classic.NAMEWEAPONSHIELDROUND= "Ecu.R" -- ShieldRound name
-function CWeaponShieldRound:new(_argt)
-    CWeaponShieldRound.super.new(self, _argt)
-    self.kind = Classic.KINDWEAPONSHIELDROUND
-    self.name = Classic.NAMEWEAPONSHIELDROUND
-    self.sprite  = CSpriteFG.WEAPONSHLDR
+CWeaponShieldMedium = CWeaponShield:extend() -- ShieldMedium weapons
+Classic.KINDWEAPONSHIELDMEDIUM= "Ecu.M" -- ShieldMedium kind
+Classic.NAMEWEAPONSHIELDMEDIUM= "Ecu.M" -- ShieldMedium name
+function CWeaponShieldMedium:new(_argt)
+    CWeaponShieldMedium.super.new(self, _argt)
+    self.kind = Classic.KINDWEAPONSHIELDMEDIUM
+    self.name = Classic.NAMEWEAPONSHIELDMEDIUM
+    self.sprite = CSpriteFG.WEAPONSHLDM
+    self:argt(_argt) -- override if any
+end
+
+CWeaponShieldLarge = CWeaponShield:extend() -- ShieldLarge weapons
+Classic.KINDWEAPONSHIELDLARGE= "Ecu.L" -- ShieldLarge kind
+Classic.NAMEWEAPONSHIELDLARGE= "Ecu.L" -- ShieldLarge name
+function CWeaponShieldLarge:new(_argt)
+    CWeaponShieldLarge.super.new(self, _argt)
+    self.kind = Classic.KINDWEAPONSHIELDLARGE
+    self.name = Classic.NAMEWEAPONSHIELDLARGE
+    self.sprite = CSpriteFG.WEAPONSHLDL
     self:argt(_argt) -- override if any
 end
 
@@ -5282,21 +5294,21 @@ CCharacterHumanoid.HANDLESOFFSETS = { -- hands, head and back offsets
                 handrgx =  1, handrgy = 3,
                 handlfx =  1, handlfy = 8,
                 headx = 5, heady = 6,
-                backx = 8, backy = 5,
+                backx = 9, backy = 5,
                 state = Tic.STATEFLOORLF
             },
             [Tic.SIZEM] = {
                 handrgx =  0, handrgy = 3,
                 handlfx =  0, handlfy = 8,
                 headx = 5, heady = 6,
-                backx = 8, backy = 5,
+                backx = 9, backy = 5,
                 state = Tic.STATEFLOORLF
             },
             [Tic.SIZEL] = {
                 handrgx = -1, handrgy = 3,
                 handlfx = -1, handlfy = 8,
                 headx = 5, heady = 6,
-                backx = 8, backy = 5,
+                backx = 9, backy = 5,
                 state = Tic.STATEFLOORLF
             },
         },
@@ -5305,21 +5317,21 @@ CCharacterHumanoid.HANDLESOFFSETS = { -- hands, head and back offsets
                 handrgx = 6, handrgy = 8,
                 handlfx = 6, handlfy = 3,
                 headx = 2, heady = 6,
-                backx = -1, backy = 5,
+                backx = -2, backy = 5,
                 state = Tic.STATEFLOORRG
             },
             [Tic.SIZEM] = {
                 handrgx = 7, handrgy = 8,
                 handlfx = 7, handlfy = 3,
                 headx = 2, heady = 6,
-                backx = -1, backy = 5,
+                backx = -2, backy = 5,
                 state = Tic.STATEFLOORRG
             },
             [Tic.SIZEL] = {
                 handrgx = 8, handrgy = 8,
                 handlfx = 8, handlfy = 3,
                 headx = 2, heady = 6,
-                backx = -1, backy = 5,
+                backx = -2, backy = 5,
                 state = Tic.STATEFLOORRG
             },
         },
@@ -8156,7 +8168,7 @@ if false then
 Truduk = CPlayerDwarf{name = "Truduk",
     ["slots.head"] = CSlotHead{object = CClothesHatSmall{}},
     -- ["slots.handrg"] = CSlotHand{object = CWeaponHammer{}},
-    -- ["slots.handlf"] = CSlotHand{object = CWeaponShieldRound{}},
+    -- ["slots.handlf"] = CSlotHand{object = CWeaponShieldMedium{}},
     statmenact = 10,
 }
 -- Truduk:randomWorldWindow()
@@ -8231,7 +8243,7 @@ Globth = CPlayerGolth{name = "Globth",
     worldx = 30,
     ["slots.head"] = CSlotHead{object = CClothesHelmetMedium{}},
     ["slots.handrg"] = CSlotHand{object = CWeaponLance{}},
-    ["slots.handlf"] = CSlotHand{object = CWeaponShieldRound{name = "ecu_1"}},
+    ["slots.handlf"] = CSlotHand{object = CWeaponShieldMedium{name = "ecu_1"}},
     ["inventories.any"] = CInventoryAny{objects = {Sword, Flask}},
     statmenact = 10,
 }
@@ -8276,8 +8288,8 @@ Welfie = _playerclass{name = "Welfie",
     interactions = {10},
     -- spottingspot = true,
     spottingpick = true,
-    -- ["slots.handrg"] = CSlotHand{object = CWeaponShieldRound{}},
-    -- ["slots.handlf"] = CSlotHand{object = CWeaponShieldTee{}},
+    -- ["slots.handrg"] = CSlotHand{object = CWeaponShieldMedium{}},
+    -- ["slots.handlf"] = CSlotHand{object = CWeaponShieldSmall{}},
     ["slots.head"] = CSlotHead{object = CClothesHatMedium{}},
 }
 end
@@ -8309,10 +8321,10 @@ Wolfie = _playerclass{name = "Wolfie",
     interactions = {10},
     -- spottingspot = true,
     spottingpick = true,
-    -- ["slots.handrg"] = CSlotHand{object = CObjectFlaskMedium{}},
-    -- ["slots.handlf"] = CSlotHand{object = CObjectFlaskSmall{}},
-    ["slots.head"] = CSlotHead{object = CClothesHelmetSmall{}},
-    ["slots.back"] = CSlotBack{object = CClothesBackPackSmall{}},
+    ["slots.handrg"] = CSlotHand{object = CWeaponSword{}},
+    -- ["slots.handlf"] = CSlotHand{object = CWeaponShieldSmall{}},
+    ["slots.head"]   = CSlotHead{object = CClothesHelmetSmall{}},
+    ["slots.back"]   = CSlotBack{object = CClothesBackPackSmall{}},
 }
 end
 if true then
@@ -8327,10 +8339,10 @@ Wulfie = _playerclass{name = "Wulfie",
     interactions = {10},
     -- spottingspot = true,
     spottingpick = true,
-    -- ["slots.handrg"] = CSlotHand{object = CObjectFlaskMedium{}},
-    -- ["slots.handlf"] = CSlotHand{object = CObjectFlaskSmall{}},
-    ["slots.head"] = CSlotHead{object = CClothesHelmetMedium{}},
-    ["slots.back"] = CSlotBack{object = CClothesBackPackMedium{}},
+    ["slots.handrg"] = CSlotHand{object = CWeaponHammer{}},
+    ["slots.handlf"] = CSlotHand{object = CWeaponShieldMedium{}},
+    ["slots.head"]   = CSlotHead{object = CClothesHelmetMedium{}},
+    ["slots.back"]   = CSlotBack{object = CClothesBackPackMedium{}},
 }
 end
 if true then
@@ -8345,10 +8357,10 @@ Wylfie = _playerclass{name = "Wylfie",
     interactions = {10},
     -- spottingspot = true,
     spottingpick = true,
-    -- ["slots.handrg"] = CSlotHand{object = CObjectFlaskMedium{}},
-    -- ["slots.handlf"] = CSlotHand{object = CObjectFlaskSmall{}},
-    ["slots.head"] = CSlotHead{object = CClothesHelmetLarge{}},
-    ["slots.back"] = CSlotBack{object = CClothesBackPackLarge{}},
+    -- ["slots.handrg"] = CSlotHand{object = CWeaponLance{}},
+    ["slots.handlf"] = CSlotHand{object = CWeaponShieldLarge{}},
+    ["slots.head"]   = CSlotHead{object = CClothesHelmetLarge{}},
+    ["slots.back"]   = CSlotBack{object = CClothesBackPackLarge{}},
 }
 end
 
