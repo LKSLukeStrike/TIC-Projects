@@ -42,6 +42,11 @@ Tic.SCALE02 = 02
 Tic.SCALE03 = 03
 Tic.SCALE04 = 04
 
+-- Entities sizes -- used for offsets and size limitations
+Tic.SIZEL = 0 -- large
+Tic.SIZEM = 1 -- medium
+Tic.SIZES = 2 -- small
+
 -- Screen positions and sizes
 Tic.SCREENW  = 240 -- screen width
 Tic.SCREENH  = 136 -- screen height
@@ -1536,7 +1541,6 @@ function CSlot:canSlotObject(_object)
     if not _object then return false end -- mandatory
     if not _object.slottype then return false end -- mandatory -- only slotable objects
     if self.slottype and not (_object.slottype == self.slottype) then return false end -- not allowed type if any
-    trace'ok'
     return true
 end
 
@@ -4064,9 +4068,6 @@ end
 CCharacter = CEntityDrawable:extend() -- characters
 Classic.KINDCHARACTER = "Character" -- Character kind
 Classic.NAMECHARACTER = "Character" -- Character name
-CCharacter.SIZEL = 0 -- character sizes -- for the head sprite y offset
-CCharacter.SIZEM = 1
-CCharacter.SIZES = 2
 Tic.STATESETTINGS = { -- states settings
     [Tic.STATESTANDIDLE] = {
         posture = Tic.POSTURESTAND,
@@ -4265,7 +4266,7 @@ function CCharacter:new(_argt)
     CCharacter.super.new(self, _argt)
     self.kind         = Classic.KINDCHARACTER
     self.name         = Classic.NAMECHARACTER
-    self.size         = CCharacter.SIZEM -- size
+    self.size         = Tic.SIZEM -- size
     self.frame        = CSprite.FRAME00 -- frame
     self.dirx         = Tic.DIRXLF -- directions
     self.diry         = Tic.DIRYMD
@@ -4582,8 +4583,10 @@ function CCharacter:draw() -- set animations and draw layers
     self:drawDirs()
 
     self:drawHandBG()
+    self:drawBackBG()
     self:drawBody()
     self:drawHead()
+    self:drawBackFG()
     self:drawHandFG()
     self:drawEffect()
 
@@ -4757,6 +4760,18 @@ function CCharacter:drawEffect()
     _musprite:draw()
 end
 
+function CCharacter:drawHandle(_screenx, _screeny, _color) -- for debug
+    if true then
+    rect(
+        self.screenx + (_screenx * self.scale),
+        self.screeny + (_screeny * self.scale),
+        self.scale,
+        self.scale,
+        _color
+    )
+    end
+end
+
 function CCharacter:drawHandBG()
     self:drawHand(Tic.DRAWBG)
 end
@@ -4766,6 +4781,28 @@ function CCharacter:drawHandFG()
 end
 
 function CCharacter:drawHand(_bgfg)
+    local _handlesoffsets = self:handlesOffsets() -- determine the corresponding hand offsets
+    local _handx = nil
+    local _handy = nil
+    if _bgfg == Tic.DRAWBG and self.dirx == Tic.DIRXLF then
+        _handx = _handlesoffsets.handrgx
+        _handy = _handlesoffsets.handrgy
+    end
+    if _bgfg == Tic.DRAWBG and self.dirx == Tic.DIRXRG then
+        _handx = _handlesoffsets.handlfx
+        _handy = _handlesoffsets.handlfy
+    end
+    if _bgfg == Tic.DRAWFG and self.dirx == Tic.DIRXLF then
+        _handx = _handlesoffsets.handlfx
+        _handy = _handlesoffsets.handlfy
+    end
+    if _bgfg == Tic.DRAWFG and self.dirx == Tic.DIRXRG then
+        _handx = _handlesoffsets.handrgx
+        _handy = _handlesoffsets.handrgy
+    end
+    self:drawHandle(_handlesoffsets.handrgx, _handlesoffsets.handrgy, Tic.COLORGREENL)
+    self:drawHandle(_handlesoffsets.handlfx, _handlesoffsets.handlfy, Tic.COLORGREENM)
+    
     local _object = nil  -- determine the corresponding object if any
     if _bgfg == Tic.DRAWBG and self.dirx == Tic.DIRXLF then _object = self.slots.handrg.object end
     if _bgfg == Tic.DRAWBG and self.dirx == Tic.DIRXRG then _object = self.slots.handlf.object end
@@ -4773,22 +4810,14 @@ function CCharacter:drawHand(_bgfg)
     if _bgfg == Tic.DRAWFG and self.dirx == Tic.DIRXRG then _object = self.slots.handrg.object end
     if not _object then return end -- nothing in hand
 
-    local _handlesoffsets = self:handlesOffsets() -- determine the corresponding hand offsets
-    local _handx = nil
-    local _handy = nil
-    if _bgfg == Tic.DRAWBG and self.dirx == Tic.DIRXLF then _handx = _handlesoffsets.handrgx ; _handy = _handlesoffsets.handrgy end
-    if _bgfg == Tic.DRAWBG and self.dirx == Tic.DIRXRG then _handx = _handlesoffsets.handlfx ; _handy = _handlesoffsets.handlfy end
-    if _bgfg == Tic.DRAWFG and self.dirx == Tic.DIRXLF then _handx = _handlesoffsets.handlfx ; _handy = _handlesoffsets.handlfy end
-    if _bgfg == Tic.DRAWFG and self.dirx == Tic.DIRXRG then _handx = _handlesoffsets.handrgx ; _handy = _handlesoffsets.handrgy end
-   
     local _handleoffsets = _object:handleOffsets(_handlesoffsets.state) -- determine the object handle offsets
-    local _handlex       = _handleoffsets.handlex
-    local _handley       = _handleoffsets.handley
+    local _objecthandlex = _handleoffsets.handlex
+    local _objecthandley = _handleoffsets.handley
     local _objectrotate  = _handleoffsets.rotate
     local _objectflip    = _handleoffsets.flip
 
-    local _handx   = _handx - _handlex -- adjust handle to hand
-    local _handy   = _handy - _handley
+    local _handx   = _handx - _objecthandlex -- adjust handles
+    local _handy   = _handy - _objecthandley
 
     _object:save()
     _object.screenx  = self.screenx + (_handx * self.scale)
@@ -4799,6 +4828,18 @@ function CCharacter:drawHand(_bgfg)
     _object.drawbgfg = _bgfg
     _object:draw()
     _object:load()
+end
+
+function CCharacter:drawBackBG()
+    self:drawBack(Tic.DRAWBG)
+end
+
+function CCharacter:drawBackFG()
+    self:drawBack(Tic.DRAWFG)
+end
+
+function CCharacter:drawBack(_bgfg)
+    -- override
 end
 
 function CCharacter:drawInteract()
@@ -5081,13 +5122,15 @@ CCharacterHumanoid.HANDLESOFFSETS = { -- hands, head and back offsets
     [Tic.STATUSIDLE] = {
         [Tic.DIRXLF] = {
             [CSprite.FRAME00] = {
-                handrgx = 2, handrgy = 6, handlfx = 5, handlfy = 6,
+                handrgx = 2, handrgy = 6,
+                handlfx = 5, handlfy = 6,
                 headx = 4, heady = 2,
                 backx = 5, backy = 3,
                 state = Tic.STATEIDLELF
             },
             [CSprite.FRAME01] = {
-                handrgx = 2, handrgy = 6, handlfx = 5, handlfy = 6,
+                handrgx = 2, handrgy = 6,
+                handlfx = 5, handlfy = 6,
                 headx = 4, heady = 2,
                 backx = 5, backy = 3,
                 state = Tic.STATEIDLELF
@@ -5095,59 +5138,33 @@ CCharacterHumanoid.HANDLESOFFSETS = { -- hands, head and back offsets
         },
         [Tic.DIRXRG] = {
             [CSprite.FRAME00] = {
-                handrgx = 5, handrgy = 6, handlfx = 2, handlfy = 6,
+                handrgx = 5, handrgy = 6,
+                handlfx = 2, handlfy = 6,
                 headx = 3, heady = 2,
                 backx = 2, backy = 3,
                 state = Tic.STATEIDLERG
             },
             [CSprite.FRAME01] = {
-                handrgx = 5, handrgy = 6, handlfx = 2, handlfy = 6,
+                handrgx = 5, handrgy = 6,
+                handlfx = 2, handlfy = 6,
                 headx = 3, heady = 2,
                 backx = 2, backy = 3,
                 state = Tic.STATEIDLERG
-            },
-        },
-    },
-    [Tic.STATUSMOVE] = {
-        [Tic.DIRXLF] = {
-            [CSprite.FRAME00] = {
-                handrgx = 1, handrgy = 5, handlfx = 6, handlfy = 6,
-                headx = 4, heady = 2,
-                backx = 5, backy = 3,
-                state = Tic.STATEMOVELF
-            },
-            [CSprite.FRAME01] = {
-                handrgx = 1, handrgy = 6, handlfx = 6, handlfy = 5,
-                headx = 4, heady = 2,
-                backx = 5, backy = 3,
-                state = Tic.STATEMOVELF
-            },
-        },
-        [Tic.DIRXRG] = {
-            [CSprite.FRAME00] = {
-                handrgx = 6, handrgy = 5, handlfx = 1, handlfy = 6,
-                headx = 3, heady = 2,
-                backx = 2, backy = 3,
-                state = Tic.STATEMOVERG
-            },
-            [CSprite.FRAME01] = {
-                handrgx = 6, handrgy = 6, handlfx = 1, handlfy = 5,
-                headx = 3, heady = 2,
-                backx = 2, backy = 3,
-                state = Tic.STATEMOVERG
             },
         },
     },
     [Tic.STATUSWORK] = {
         [Tic.DIRXLF] = {
             [CSprite.FRAME00] = {
-                handrgx = 1, handrgy = 7, handlfx = 6, handlfy = 6,
+                handrgx = 1, handrgy = 7,
+                handlfx = 6, handlfy = 6,
                 headx = 4, heady = 2,
                 backx = 5, backy = 3,
                 state = Tic.STATEWORKLF
             },
             [CSprite.FRAME01] = {
-                handrgx = 1, handrgy = 7, handlfx = 6, handlfy = 6,
+                handrgx = 1, handrgy = 7,
+                handlfx = 6, handlfy = 6,
                 headx = 4, heady = 2,
                 backx = 5, backy = 3,
                 state = Tic.STATEWORKLF
@@ -5155,55 +5172,97 @@ CCharacterHumanoid.HANDLESOFFSETS = { -- hands, head and back offsets
         },
         [Tic.DIRXRG] = {
             [CSprite.FRAME00] = {
-                handrgx = 6, handrgy = 7, handlfx = 1, handlfy = 6,
+                handrgx = 6, handrgy = 7,
+                handlfx = 1, handlfy = 6,
                 headx = 3, heady = 2,
                 backx = 2, backy = 3,
                 state = Tic.STATEWORKRG
             },
             [CSprite.FRAME01] = {
-                handrgx = 6, handrgy = 7, handlfx = 1, handlfy = 6,
+                handrgx = 6, handrgy = 7,
+                handlfx = 1, handlfy = 6,
                 headx = 3, heady = 2,
                 backx = 2, backy = 3,
                 state = Tic.STATEWORKRG
             },
         },
     },
+    [Tic.STATUSMOVE] = {
+        [Tic.DIRXLF] = {
+            [CSprite.FRAME00] = {
+                handrgx = 1, handrgy = 5,
+                handlfx = 6, handlfy = 6,
+                headx = 4, heady = 2,
+                backx = 5, backy = 3,
+                state = Tic.STATEMOVELF
+            },
+            [CSprite.FRAME01] = {
+                handrgx = 1, handrgy = 6,
+                handlfx = 6, handlfy = 5,
+                headx = 4, heady = 2,
+                backx = 5, backy = 3,
+                state = Tic.STATEMOVELF
+            },
+        },
+        [Tic.DIRXRG] = {
+            [CSprite.FRAME00] = {
+                handrgx = 6, handrgy = 5,
+                handlfx = 1, handlfy = 6,
+                headx = 3, heady = 2,
+                backx = 2, backy = 3,
+                state = Tic.STATEMOVERG
+            },
+            [CSprite.FRAME01] = {
+                handrgx = 6, handrgy = 6,
+                handlfx = 1, handlfy = 5,
+                headx = 3, heady = 2,
+                backx = 2, backy = 3,
+                state = Tic.STATEMOVERG
+            },
+        },
+    },
     [Tic.POSTUREFLOOR] = {
         [Tic.DIRXLF] = {
-            [CCharacter.SIZES] = {
-                handrgx =  1, handrgy = 3, handlfx =  1, handlfy = 6,
+            [Tic.SIZES] = {
+                handrgx =  1, handrgy = 3,
+                handlfx =  1, handlfy = 6,
                 headx = 5, heady = 6,
                 backx = 6, backy = 7,
                 state = Tic.STATEFLOORLF
             },
-            [CCharacter.SIZEM] = {
-                handrgx =  0, handrgy = 3, handlfx =  0, handlfy = 6,
+            [Tic.SIZEM] = {
+                handrgx =  0, handrgy = 3,
+                handlfx =  0, handlfy = 6,
                 headx = 5, heady = 6,
                 backx = 5, backy = 7,
                 state = Tic.STATEFLOORLF
             },
-            [CCharacter.SIZEL] = {
-                handrgx = -1, handrgy = 3, handlfx = -1, handlfy = 6,
+            [Tic.SIZEL] = {
+                handrgx = -1, handrgy = 3,
+                handlfx = -1, handlfy = 6,
                 headx = 5, heady = 6,
                 backx = 4, backy = 7,
                 state = Tic.STATEFLOORLF
             },
         },
         [Tic.DIRXRG] = {
-            [CCharacter.SIZES] = {
-                handrgx = 6, handrgy = 8, handlfx = 6, handlfy = 3,
+            [Tic.SIZES] = {
+                handrgx = 6, handrgy = 8,
+                handlfx = 6, handlfy = 3,
                 headx = 2, heady = 6,
                 backx = 1, backy = 7,
                 state = Tic.STATEFLOORRG
             },
-            [CCharacter.SIZEM] = {
-                handrgx = 7, handrgy = 8, handlfx = 7, handlfy = 3,
+            [Tic.SIZEM] = {
+                handrgx = 7, handrgy = 8,
+                handlfx = 7, handlfy = 3,
                 headx = 2, heady = 6,
                 backx = 2, backy = 7,
                 state = Tic.STATEFLOORRG
             },
-            [CCharacter.SIZEL] = {
-                handrgx = 8, handrgy = 8, handlfx = 8, handlfy = 3,
+            [Tic.SIZEL] = {
+                handrgx = 8, handrgy = 8,
+                handlfx = 8, handlfy = 3,
                 headx = 2, heady = 6,
                 backx = 3, backy = 7,
                 state = Tic.STATEFLOORRG
@@ -5327,28 +5386,22 @@ function CCharacterHumanoid:drawHead()
     _musprite:draw()
 
     -- draw head slot if any
-    local _object = self.slots.head.object
-    if not _object then return end
-    local _handlesoffsets = self:handlesOffsets() -- determine the corresponding hand offsets
+    local _handlesoffsets = self:handlesOffsets() -- determine the corresponding head offsets
     local _headx  = _handlesoffsets.headx
     local _heady  = _handlesoffsets.heady
+    self:drawHandle(_headx, _heady, Tic.COLORORANGE)
 
-    -- rect(
-    --     self.screenx + (_headx * self.scale),
-    --     self.screeny + (_heady * self.scale),
-    --     self.scale,
-    --     self.scale,
-    --     Tic.COLORYELLOW
-    -- )
+    local _object = self.slots.head.object
+    if not _object then return end
 
     local _handleoffsets = _object:handleOffsets(_handlesoffsets.state) -- determine the object handle offsets
-    local _handlex       = _handleoffsets.handlex
-    local _handley       = _handleoffsets.handley
+    local _objecthandlex = _handleoffsets.handlex
+    local _objecthandley = _handleoffsets.handley
     local _objectrotate  = _handleoffsets.rotate
     local _objectflip    = _handleoffsets.flip
 
-    local _headx   = _headx - _handlex -- adjust handle to hand
-    local _heady   = _heady - _handley
+    local _headx   = _headx - _objecthandlex -- adjust handles
+    local _heady   = _heady - _objecthandley
 
     _object:save()
     _object.screenx  = self.screenx + (_headx * self.scale)
@@ -5360,7 +5413,35 @@ function CCharacterHumanoid:drawHead()
     _object:load()
 end
 
-function CCharacterHumanoid:handlesOffsets()
+function CCharacterHumanoid:drawBack(_bgfg)
+    local _handlesoffsets = self:handlesOffsets() -- determine the corresponding back offsets
+    local _backx  = _handlesoffsets.backx
+    local _backy  = _handlesoffsets.backy
+    self:drawHandle(_backx, _backy, Tic.COLORYELLOW)
+
+    local _object = self.slots.back.object
+    if not _object then return end -- nothing in back HH
+
+    local _handleoffsets = _object:handleOffsets(_handlesoffsets.state) -- determine the object handle offsets
+    local _objecthandlex = _handleoffsets.handlex
+    local _objecthandley = _handleoffsets.handley
+    local _objectrotate  = _handleoffsets.rotate
+    local _objectflip    = _handleoffsets.flip
+
+    local _backx   = _backx - _objecthandlex -- adjust handles
+    local _backy   = _backy - _objecthandley
+
+    _object:save()
+    _object.screenx  = self.screenx + (_backx * self.scale)
+    _object.screeny  = self.screeny + (_backy * self.scale)
+    _object.scale    = self.scale
+    _object.rotate   = _objectrotate
+    _object.dirx     = _objectflip
+    _object:draw()
+    _object:load()
+end
+
+function CCharacter:handlesOffsets()
     local _posture = self:postureGet()
     local _status  = self:statusGet()
     local _result  = {}
@@ -5370,13 +5451,19 @@ function CCharacterHumanoid:handlesOffsets()
         _result = Tables:merge(_result, self.handlesoffsets[_posture][self.dirx][self.size])
     end
 
-    if not (_posture == Tic.POSTUREFLOOR) then
+    if _posture == Tic.POSTUREFLOOR then
+        _result.backx = (self.dirx == Tic.DIRXLF)
+            and _result.backx - self.size 
+            or  _result.backx + self.size 
+    else
         _result.heady = _result.heady + self.size
+        _result.backy = _result.backy + self.size
     end
     if _posture == Tic.POSTUREKNEEL then
         _result.handrgy = _result.handrgy + 1
         _result.handlfy = _result.handlfy + 1
         _result.heady   = _result.heady   + 1
+        _result.backy   = _result.backy   + 1
     end
 
     return _result
@@ -5405,7 +5492,7 @@ Classic.KINDDWARF = "Dwarf" -- Dwarf kind
 function CPlayerDwarf:new(_argt)
     CPlayerDwarf.super.new(self, _argt)
     self.kind         = Classic.KINDDWARF
-    self.size         = CCharacter.SIZES -- size
+    self.size         = Tic.SIZES -- size
     self.colorhairsfg = Tic.COLORRED -- colors
     self.colorhairsbg = Tic.COLORORANGE
     self.headsprite   = CSpriteFG.HEADDWARF -- head
@@ -5424,7 +5511,7 @@ Classic.KINDGNOME = "Gnome" -- Gnome kind
 function CPlayerGnome:new(_argt)
     CPlayerGnome.super.new(self, _argt)
     self.kind         = Classic.KINDGNOME
-    self.size         = CCharacter.SIZES -- size
+    self.size         = Tic.SIZES -- size
     self.colorhairsfg = Tic.COLORORANGE -- colors
     self.colorhairsbg = Tic.COLORYELLOW
     self.colorpants   = self.colorskin
@@ -5444,7 +5531,7 @@ Classic.KINDELVWE = "Elvwe" -- Elvwe kind
 function CPlayerElvwe:new(_argt)
     CPlayerElvwe.super.new(self, _argt)
     self.kind         = Classic.KINDELVWE
-    self.size         = CCharacter.SIZEL -- size
+    self.size         = Tic.SIZEL -- size
     self.coloreyesfg  = Tic.COLORGREENM -- colors
     self.coloreyesbg  = Tic.COLORGREEND
     self.colorhairsfg = Tic.COLORORANGE
@@ -5465,7 +5552,7 @@ Classic.KINDDROWE = "Drowe" -- Drowe kind
 function CPlayerDrowe:new(_argt)
     CPlayerDrowe.super.new(self, _argt)
     self.kind         = Classic.KINDDROWE
-    self.size         = CCharacter.SIZEM -- size
+    self.size         = Tic.SIZEM -- size
     self.coloreyesfg  = Tic.COLORRED -- colors
     self.coloreyesbg  = Tic.COLORPURPLE
     self.colorhairsfg = Tic.COLORGREYD
@@ -5485,7 +5572,7 @@ Classic.KINDANGEL = "Angel" -- Angel kind
 function CPlayerAngel:new(_argt)
     CPlayerAngel.super.new(self, _argt)
     self.kind         = Classic.KINDANGEL
-    self.size         = CCharacter.SIZEM -- size
+    self.size         = Tic.SIZEM -- size
     self.colorhairsfg = Tic.COLORGREYM -- colors
     self.colorhairsbg = Tic.COLORWHITE
     self.colorextra   = Tic.COLORYELLOW
@@ -5505,7 +5592,7 @@ Classic.KINDGOLTH = "Golth" -- Golth kind
 function CPlayerGolth:new(_argt)
     CPlayerGolth.super.new(self, _argt)
     self.kind         = Classic.KINDGOLTH
-    self.size         = CCharacter.SIZEL -- size
+    self.size         = Tic.SIZEL -- size
     self.colorhairsfg = Tic.COLORWHITE -- colors
     self.colorhairsbg = Tic.COLORWHITE
     self.colorextra   = self.colorshirt
@@ -5527,7 +5614,7 @@ Classic.KINDHORNE = "Horne" -- Horne kind
 function CPlayerHorne:new(_argt)
     CPlayerHorne.super.new(self, _argt)
     self.kind         = Classic.KINDHORNE
-    self.size         = CCharacter.SIZEL -- size
+    self.size         = Tic.SIZEL -- size
     self.colorhairsfg = Tic.COLORPURPLE -- colors
     self.colorhairsbg = Tic.COLORRED
     self.colorextra   = Tic.COLORGREYD
@@ -5562,7 +5649,7 @@ Classic.KINDTIFEL = "Tifel" -- Tifel kind
 function CPlayerTifel:new(_argt)
     CPlayerTifel.super.new(self, _argt)
     self.kind         = Classic.KINDTIFEL
-    self.size         = CCharacter.SIZEM -- size
+    self.size         = Tic.SIZEM -- size
     self.statphymax   = 4
     self.statphyact   = self.statphymax
     self.statmenmax   = 6
@@ -5578,7 +5665,7 @@ Classic.KINDMEDUZ = "Meduz" -- Meduz kind
 function CPlayerMeduz:new(_argt)
     CPlayerMeduz.super.new(self, _argt)
     self.kind         = Classic.KINDMEDUZ
-    self.size         = CCharacter.SIZES -- size
+    self.size         = Tic.SIZES -- size
     self.colorhairsfg = Tic.COLORGREEND -- colors
     self.colorhairsbg = Tic.COLORGREENM
     self.headsprite   = CSpriteFG.HEADMEDUZ -- head
@@ -5597,7 +5684,7 @@ Classic.KINDGNOLL = "Gnoll" -- Gnoll kind
 function CPlayerGnoll:new(_argt)
     CPlayerGnoll.super.new(self, _argt)
     self.kind         = Classic.KINDGNOLL
-    self.size         = CCharacter.SIZEL -- size
+    self.size         = Tic.SIZEL -- size
     self.coloreyesfg  = Tic.COLORRED -- colors
     self.coloreyesbg  = Tic.COLORPURPLE
     self.headsprite   = CSpriteFG.HEADGNOLL -- head
@@ -5625,7 +5712,7 @@ Classic.KINDGHOST = "Ghost" -- Ghost kind
 function CPlayerGhost:new(_argt)
     CPlayerGhost.super.new(self, _argt)
     self.kind         = Classic.KINDGHOST
-    self.size         = CCharacter.SIZEL -- size
+    self.size         = Tic.SIZEL -- size
     self.coloreyesfg  = Tic.COLORRED -- colors
     self.coloreyesbg  = Tic.COLORPURPLE
     self.colorhands   = Tic.COLORPURPLE
@@ -8129,7 +8216,7 @@ Nitcha = CPlayerDrowe{name = "Nitcha",
 --     colorhairsfg = Tic.COLORWHITE,
 --     coloreyesbg  = Tic.COLORBLUEM,
 --     coloreyesfg  = Tic.COLORBLUEL,
---     size         = CCharacter.SIZEM,
+--     size         = Tic.SIZEM,
 --     colorshirt   = Tic.COLORPURPLE,
 --     colorpants   = Tic.COLORRED,
 -- }
@@ -8211,8 +8298,9 @@ Wilfie = _playerclass{name = "Wilfie",
     ["slots.head"] = CSlotHead{object = CClothesHatLarge{}},
 }
 end
-if false then
+if true then
 Wolfie = _playerclass{name = "Wolfie",
+    size = Tic.SIZES,
     statphyact = 10,
     statmenact = 10,
     statpsyact = 10,
@@ -8228,8 +8316,9 @@ Wolfie = _playerclass{name = "Wolfie",
     ["slots.back"] = CSlotBack{object = CClothesBackPackSmall{}},
 }
 end
-if false then
+if true then
 Wulfie = _playerclass{name = "Wulfie",
+    size = Tic.SIZEM,
     statphyact = 10,
     statmenact = 10,
     statpsyact = 10,
@@ -8247,6 +8336,7 @@ Wulfie = _playerclass{name = "Wulfie",
 end
 if true then
 Wylfie = _playerclass{name = "Wylfie",
+    size = Tic.SIZEL,
     statphyact = 10,
     statmenact = 10,
     statpsyact = 10,
@@ -8498,7 +8588,7 @@ end
 
 function Tic:drawLog()
     -- Tic:logWorld()
-    Tic:logInventories()
+    -- Tic:logInventories()
     -- Tic:logScreens()
 end
 
