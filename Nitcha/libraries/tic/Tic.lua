@@ -1165,7 +1165,18 @@ end
 
 
 -- Trace System -- extend the simple trace function
+Tic.TRACE = true
+
+function Tic:traceOn()
+    Tic.TRACE = true
+end
+
+function Tic:traceOff()
+    Tic.TRACE = false
+end
+
 function Tic:trace(...) -- trace with multiple args
+    if not Tic.TRACE then return end
     local _args = {...}
     local _output = ""
     for _, _val in ipairs(_args) do
@@ -1175,8 +1186,8 @@ function Tic:trace(...) -- trace with multiple args
     trace(_output)
 end
 
-function Tic:traceTable(_title, _table, _argt) -- trace a table  -- SORTED -- RECURSIVE -- INDENT -- DEPTH
-    if _title then Tic:trace(_title) end
+function Tic:traceTable(_table, _argt) -- trace a table  -- SORTED -- RECURSIVE -- INDENT -- DEPTH
+    if not Tic.TRACE then return end
     Tic:trace(Tables:dump(_table, _argt))
 end
 
@@ -1619,18 +1630,6 @@ function CInventory:removeObject(_object)
     if not Tables:valFind(self.objects, _object) then return end -- not in inventory
     Tables:valRemove(self.objects, _object) -- remove all -- should not append
     return _object -- ok
-end
-
-function CInventory:cleanup()
-    local _objects = Tables:iclone(self.objects, true) -- prepare the cleanup
-    local _garbage = {}
-    self.objects = {}
-    for _, _object in ipairs(_objects) do
-        Tic:trace(_object.kind)
-        if not self:appendObject(_object) then Tables:valInsert(_garbage, _object, true) end
-        Tic:trace(Tables:size(_garbage))
-    end
-    return _garbage
 end
 
 function CInventory:copytoInventory(_inventory)
@@ -2140,6 +2139,8 @@ CEntity.WORLDX = 0
 CEntity.WORLDY = 0
 function CEntity:new(_argt)
     CEntity.super.new(self, _argt)
+    self.classic = CEntity -- instance of
+    self.classed = nil -- override to limit argt
     self.kind = Classic.KINDENTITY
     self.name = Classic.NAMEENTITY
     self.world        = nil -- parent world if any
@@ -2271,9 +2272,10 @@ Classic.KINDWORLD = "World" -- World kind
 Classic.NAMEWORLD = "World" -- World name
 function CWorld:new(_argt)
     CWorld.super.new(self, _argt)
+    self.classic = CWorld -- instance of
     self.kind = Classic.KINDWORLD
     self.name = Classic.NAMEWORLD
-    self.region = CRegion{} -- world boundaries
+    self.region            = CRegion{} -- world boundaries
     self.entitieslocations = CEntitiesLocations{} -- record world entities and their locations
     self:argt(_argt) -- override if any
 end
@@ -2333,6 +2335,7 @@ CCamera.RANGEX = Tic.WORLDWW / 2
 CCamera.RANGEY = Tic.WORLDWH / 2
 function CCamera:new(_argt)
     CCamera.super.new(self, _argt)
+    self.classic = CCamera -- instance of
     self.kind = Classic.KINDCAMERA
     self.name = Classic.NAMECAMERA
     self.world  = World
@@ -2369,6 +2372,7 @@ Classic.KINDENTITYDRAWABLE = "EntityDrawable" -- EntityDrawable kind
 Classic.NAMEENTITYDRAWABLE = "EntityDrawable" -- EntityDrawable name
 function CEntityDrawable:new(_argt)
     CEntityDrawable.super.new(self, _argt)
+    self.classic = CEntityDrawable
     self.kind = Classic.KINDENTITYDRAWABLE
     self.name = Classic.NAMEENTITYDRAWABLE
     self.world        = World
@@ -2603,6 +2607,7 @@ CPlace.COLORFLOOR02 = CPlace.LEAFSBG
 CPlace.COLORMOON    = Tic.COLORGREYL
 function CPlace:new(_argt)
     CPlace.super.new(self, _argt)
+    self.classic = CPlace
     self.kind = Classic.KINDPLACE
     self.name = Classic.NAMEPLACE
     self:argt(_argt) -- override if any
@@ -2632,6 +2637,7 @@ CPlaceBuild.PALETTEFADE  = {
 }
 function CPlaceBuild:new(_argt)
     CPlaceBuild.super.new(self, _argt)
+    self.classic = CPlaceBuild
     self.kind = Classic.KINDPLACEBUILD
     self.name = Classic.NAMEANIMED
     self.hitbox      = CHitbox{entity = self, lf = 2, rg = 4, up = 5, dw = 7}
@@ -2647,6 +2653,7 @@ CPlaceHouse = CPlaceBuild:extend() -- houses
 Classic.KINDPLACEHOUSE = "House" -- House kind
 function CPlaceHouse:new(_argt)
     CPlaceHouse.super.new(self, _argt)
+    self.classic = CPlaceHouse
     self.kind = Classic.KINDPLACEHOUSE
     self.sprite      = CSpriteBG.PLACEHOUSE
     self:argt(_argt) -- override if any
@@ -2655,6 +2662,7 @@ end
 CPlaceHouseAnim = CPlaceHouse:extend() -- anim houses
 function CPlaceHouseAnim:new(_argt)
     CPlaceHouseAnim.super.new(self, _argt)
+    self.classic = CPlaceHouseAnim
     self.animations = {
         CAnimation{ -- smoke
             frequence = Tic.FREQUENCE0300,
@@ -2675,6 +2683,7 @@ end
 CPlaceHouseIdle = CPlaceHouse:extend() -- idle houses
 function CPlaceHouseIdle:new(_argt)
     CPlaceHouseIdle.super.new(self, _argt)
+    self.classic = CPlaceHouseIdle
     self.name = Classic.NAMEEMPTY
     self.palette = CPlaceBuild.PALETTEIDLE
     self:argt(_argt) -- override if any
@@ -4276,8 +4285,9 @@ Tic.STATUSSETTINGS = { -- statuses settings
 }
 function CCharacter:new(_argt)
     CCharacter.super.new(self, _argt)
-    self.kind         = Classic.KINDCHARACTER
-    self.name         = Classic.NAMECHARACTER
+    self.classic = CCharacter -- instance of
+    self.kind    = Classic.KINDCHARACTER
+    self.name    = Classic.NAMECHARACTER
     self.size         = Tic.SIZEM -- size
     self.frame        = CSprite.FRAME00 -- frame
     self.dirx         = Tic.DIRXLF -- directions
@@ -4337,6 +4347,7 @@ end
 
 function CCharacter:argt(_argt)
     CCharacter.super.argt(self, _argt)
+    if not (self.classic == self.classed) then return end
    self:adjustInventoriesSlots() -- adjust standard inventories sizes and contents + slots
 end
 
@@ -5339,7 +5350,8 @@ CCharacterHumanoid.HANDLESOFFSETS = { -- hands, head and back offsets
 }
 function CCharacterHumanoid:new(_argt)
     CCharacterHumanoid.super.new(self, _argt)
-    self.kind         = Classic.KINDCHARACTERHUMANOID
+    self.classic = CCharacterHumanoid
+    self.kind    = Classic.KINDCHARACTERHUMANOID
     self.handlesoffsets = CCharacterHumanoid.HANDLESOFFSETS
     self.colorhairsfg   = Tic.COLORGREYD -- head colors
     self.colorhairsbg   = Tic.COLORGREYM
@@ -5491,6 +5503,7 @@ end
 CPlayerHumanoid = CCharacterHumanoid:extend() -- humanoid player characters
 function CPlayerHumanoid:new(_argt)
     CPlayerHumanoid.super.new(self, _argt)
+    self.classic = CPlayerHumanoid
     self.discovered = true
     self:argt(_argt) -- override if any
     self:implementall(IPlayer)
@@ -5502,7 +5515,8 @@ CPlayerDwarf = CPlayerHumanoid:extend() -- Dwarf player characters
 Classic.KINDDWARF = "Dwarf" -- Dwarf kind
 function CPlayerDwarf:new(_argt)
     CPlayerDwarf.super.new(self, _argt)
-    self.kind         = Classic.KINDDWARF
+    self.classic = CPlayerDwarf
+    self.kind    = Classic.KINDDWARF
     self.size         = Tic.SIZES -- size
     self.colorhairsfg = Tic.COLORRED -- colors
     self.colorhairsbg = Tic.COLORORANGE
@@ -5521,7 +5535,8 @@ CPlayerGnome = CPlayerHumanoid:extend() -- Gnome player characters
 Classic.KINDGNOME = "Gnome" -- Gnome kind
 function CPlayerGnome:new(_argt)
     CPlayerGnome.super.new(self, _argt)
-    self.kind         = Classic.KINDGNOME
+    self.classic = CPlayerGnome
+    self.kind    = Classic.KINDGNOME
     self.size         = Tic.SIZES -- size
     self.colorhairsfg = Tic.COLORORANGE -- colors
     self.colorhairsbg = Tic.COLORYELLOW
@@ -5541,7 +5556,8 @@ CPlayerElvwe = CPlayerHumanoid:extend() -- Elvwe player characters
 Classic.KINDELVWE = "Elvwe" -- Elvwe kind
 function CPlayerElvwe:new(_argt)
     CPlayerElvwe.super.new(self, _argt)
-    self.kind         = Classic.KINDELVWE
+    self.classic = CPlayerElvwe
+    self.kind    = Classic.KINDELVWE
     self.size         = Tic.SIZEL -- size
     self.coloreyesfg  = Tic.COLORGREENM -- colors
     self.coloreyesbg  = Tic.COLORGREEND
@@ -5562,7 +5578,8 @@ CPlayerDrowe = CPlayerElvwe:extend() -- Drowe player characters
 Classic.KINDDROWE = "Drowe" -- Drowe kind
 function CPlayerDrowe:new(_argt)
     CPlayerDrowe.super.new(self, _argt)
-    self.kind         = Classic.KINDDROWE
+    self.classic = CPlayerDrowe
+    self.kind    = Classic.KINDDROWE
     self.size         = Tic.SIZEM -- size
     self.coloreyesfg  = Tic.COLORRED -- colors
     self.coloreyesbg  = Tic.COLORPURPLE
@@ -5582,7 +5599,8 @@ CPlayerAngel = CPlayerHumanoid:extend() -- Angel player characters
 Classic.KINDANGEL = "Angel" -- Angel kind
 function CPlayerAngel:new(_argt)
     CPlayerAngel.super.new(self, _argt)
-    self.kind         = Classic.KINDANGEL
+    self.classic = CPlayerAngel
+    self.kind    = Classic.KINDANGEL
     self.size         = Tic.SIZEM -- size
     self.colorhairsfg = Tic.COLORGREYM -- colors
     self.colorhairsbg = Tic.COLORWHITE
@@ -5602,7 +5620,8 @@ CPlayerGolth = CPlayerHumanoid:extend() -- Golth player characters
 Classic.KINDGOLTH = "Golth" -- Golth kind
 function CPlayerGolth:new(_argt)
     CPlayerGolth.super.new(self, _argt)
-    self.kind         = Classic.KINDGOLTH
+    self.classic = CPlayerGolth
+    self.kind    = Classic.KINDGOLTH
     self.size         = Tic.SIZEL -- size
     self.colorhairsfg = Tic.COLORWHITE -- colors
     self.colorhairsbg = Tic.COLORWHITE
@@ -5624,7 +5643,8 @@ CPlayerHorne = CPlayerHumanoid:extend() -- Horne player characters
 Classic.KINDHORNE = "Horne" -- Horne kind
 function CPlayerHorne:new(_argt)
     CPlayerHorne.super.new(self, _argt)
-    self.kind         = Classic.KINDHORNE
+    self.classic = CPlayerHorne
+    self.kind    = Classic.KINDHORNE
     self.size         = Tic.SIZEL -- size
     self.colorhairsfg = Tic.COLORPURPLE -- colors
     self.colorhairsbg = Tic.COLORRED
@@ -5644,7 +5664,8 @@ CPlayerDemon = CPlayerHorne:extend() -- Demon player characters
 Classic.KINDDEMON = "Demon" -- Demon kind
 function CPlayerDemon:new(_argt)
     CPlayerDemon.super.new(self, _argt)
-    self.kind         = Classic.KINDDEMON
+    self.classic = CPlayerDemon
+    self.kind    = Classic.KINDDEMON
     self.statphymax   = 3
     self.statphyact   = self.statphymax
     self.statmenmax   = 5
@@ -5659,7 +5680,8 @@ CPlayerTifel = CPlayerHorne:extend() -- Tifel player characters
 Classic.KINDTIFEL = "Tifel" -- Tifel kind
 function CPlayerTifel:new(_argt)
     CPlayerTifel.super.new(self, _argt)
-    self.kind         = Classic.KINDTIFEL
+    self.classic = CPlayerTifel
+    self.kind    = Classic.KINDTIFEL
     self.size         = Tic.SIZEM -- size
     self.statphymax   = 4
     self.statphyact   = self.statphymax
@@ -5675,7 +5697,8 @@ CPlayerMeduz = CPlayerHumanoid:extend() -- Meduz player characters
 Classic.KINDMEDUZ = "Meduz" -- Meduz kind
 function CPlayerMeduz:new(_argt)
     CPlayerMeduz.super.new(self, _argt)
-    self.kind         = Classic.KINDMEDUZ
+    self.classic = CPlayerMeduz
+    self.kind    = Classic.KINDMEDUZ
     self.size         = Tic.SIZES -- size
     self.colorhairsfg = Tic.COLORGREEND -- colors
     self.colorhairsbg = Tic.COLORGREENM
@@ -5694,7 +5717,8 @@ CPlayerGnoll = CPlayerHumanoid:extend() -- Gnoll player characters
 Classic.KINDGNOLL = "Gnoll" -- Gnoll kind
 function CPlayerGnoll:new(_argt)
     CPlayerGnoll.super.new(self, _argt)
-    self.kind         = Classic.KINDGNOLL
+    self.classic = CPlayerGnoll
+    self.kind    = Classic.KINDGNOLL
     self.size         = Tic.SIZEL -- size
     self.coloreyesfg  = Tic.COLORRED -- colors
     self.coloreyesbg  = Tic.COLORPURPLE
@@ -5713,7 +5737,8 @@ CPlayerWolfe = CPlayerGnoll:extend() -- Wolfe player characters
 Classic.KINDWOLFE = "Wolfe" -- Wolfe kind
 function CPlayerWolfe:new(_argt)
     CPlayerWolfe.super.new(self, _argt)
-    self.kind         = Classic.KINDWOLFE
+    self.classic = CPlayerWolfe
+    self.kind    = Classic.KINDWOLFE
     self:argt(_argt) -- override if any
 end
 
@@ -5722,7 +5747,8 @@ CPlayerGhost = CPlayerHumanoid:extend() -- Ghost player characters
 Classic.KINDGHOST = "Ghost" -- Ghost kind
 function CPlayerGhost:new(_argt)
     CPlayerGhost.super.new(self, _argt)
-    self.kind         = Classic.KINDGHOST
+    self.classic = CPlayerGhost
+    self.kind    = Classic.KINDGHOST
     self.size         = Tic.SIZEL -- size
     self.coloreyesfg  = Tic.COLORRED -- colors
     self.coloreyesbg  = Tic.COLORPURPLE
@@ -8310,7 +8336,8 @@ Wilfie = _playerclass{name = "Wilfie",
 }
 end
 if true then
-Wolfie = _playerclass{name = "Wolfie",
+Wolfie = _playerclass{
+    name = "Wolfie",
     size = Tic.SIZES,
     statphyact = 10,
     statmenact = 10,
@@ -8322,13 +8349,14 @@ Wolfie = _playerclass{name = "Wolfie",
     -- spottingspot = true,
     spottingpick = true,
     ["slots.handrg"] = CSlotHand{object = CWeaponSword{}},
-    -- ["slots.handlf"] = CSlotHand{object = CWeaponShieldSmall{}},
+    ["slots.handlf"] = CSlotHand{object = CWeaponShieldSmall{}},
     ["slots.head"]   = CSlotHead{object = CClothesHelmetSmall{}},
     ["slots.back"]   = CSlotBack{object = CClothesBackPackSmall{}},
 }
 end
 if true then
-Wulfie = _playerclass{name = "Wulfie",
+Wulfie = _playerclass{
+    name = "Wulfie",
     size = Tic.SIZEM,
     statphyact = 10,
     statmenact = 10,
@@ -8346,7 +8374,8 @@ Wulfie = _playerclass{name = "Wulfie",
 }
 end
 if true then
-Wylfie = _playerclass{name = "Wylfie",
+Wylfie = _playerclass{classed = _playerclass,
+    name = "Wylfie",
     size = Tic.SIZEL,
     statphyact = 10,
     statmenact = 10,
@@ -8357,13 +8386,13 @@ Wylfie = _playerclass{name = "Wylfie",
     interactions = {10},
     -- spottingspot = true,
     spottingpick = true,
-    -- ["slots.handrg"] = CSlotHand{object = CWeaponLance{}},
+    ["slots.handrg"] = CSlotHand{object = CWeaponLance{}},
     ["slots.handlf"] = CSlotHand{object = CWeaponShieldLarge{}},
     ["slots.head"]   = CSlotHead{object = CClothesHelmetLarge{}},
     ["slots.back"]   = CSlotBack{object = CClothesBackPackLarge{}},
 }
 end
-
+-- exit()
 
 if false then
 Oxboow = CPlayerGhost{name = "Oxboow",
@@ -8375,9 +8404,6 @@ Oxboow = CPlayerGhost{name = "Oxboow",
     hitbox = Classic.NIL,
 }
 end
--- Oxboow:randomWorldWindow()
--- Tic:traceTable("ox", Oxboow.hitbox, {indent = " ", depth = 1})
--- exit()
 
 
 --

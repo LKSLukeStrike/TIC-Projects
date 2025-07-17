@@ -65,7 +65,7 @@ function Classic:__tostring()
   local _address = tostring(self)
   _address = string.sub(_address, string.find(_address, " ") + 1)
   setmetatable(self, _mt)
-  return self.kind..": ".._address
+  return (self.kind or "Classic")..": ".._address
 end
 
 

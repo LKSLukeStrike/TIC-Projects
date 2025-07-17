@@ -15,11 +15,19 @@ CCharacter = Classic:extend()
 CCharacter:implementnew(IHello)
 function CCharacter:new(_argt)
   CCharacter.super.new(self, _argt)
+  self.classic = CCharacter
+  self.classed = nil
   self.kind = "CCharacter"
   self.x = 1
   self.y = 2
   self.z = 3
   self:argt(_argt)
+end
+function CCharacter:argt(_argt)
+  CCharacter.super.argt(self, _argt)
+  if not (self.classic == self.classed) then return end
+  self.fullname = (self.firstname or "").."_"..(self.lastname or "")
+  print("x=", self.x)
 end
 
 function CCharacter:printMe(_title)
@@ -34,7 +42,10 @@ end
 CPlayer = CCharacter:extend()
 function CPlayer:new(_argt)
   CPlayer.super.new(self, _argt)
+  self.classic = CPlayer
+  self.classed = nil
   self.kind = "CPlayer"
+  self.x = 10
   self:argt(_argt)
 end
 
@@ -42,13 +53,12 @@ end
 CPlayerExtra = CPlayer:extend()
 function CPlayerExtra:new(_argt)
   CPlayerExtra.super.new(self, _argt)
+  self.classic = CPlayerExtra
+  self.classed = nil
   self.kind = "CPlayerExtra"
+  self.x = 100
   self.inv = {phy = 1000, men = 2000, psy = {h = "hello", w = "world"}}
   self:argt(_argt)
-end
-function CPlayerExtra:argt(_argt)
-  CPlayerExtra.super.argt(self, _argt)
-  self.fullname = (self.firstname or "").."_"..(self.lastname or "")
 end
 
 
@@ -91,8 +101,8 @@ print(Jeandu)
 end
 
 print()
-AlainDucon = CPlayerExtra{
-  x = 1000,
+AlainDucon = CPlayerExtra{classed = CPlayerExtra,
+  x = 2,
   firstname = "Alain",
   lastname = "Ducon",
   ["inv.phy"] = -100,
@@ -100,8 +110,9 @@ AlainDucon = CPlayerExtra{
   ["inv.men.h"] = "coucou",
   ["inv.any.h"] = "coucou",
 }
-AlainDucon["inv"]["men"] = -200,
+AlainDucon["inv"]["men"] = -200
 
+if false then
 print("-- BASE --")
 Tables:print(AlainDucon, {indent = "\t"})
 
@@ -113,3 +124,7 @@ AlainDucon:load()
 
 print("-- LOAD --")
 Tables:print(AlainDucon, {indent = "\t"})
+end
+
+print()
+print(CPlayerExtra{classed = CPlayerExtra})

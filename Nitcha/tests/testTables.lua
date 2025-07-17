@@ -75,10 +75,14 @@ Tables:print(Tables:generate{
 })
 end
 
-if true then
+if false then
 print()
 Tables:print(Tables:icopy({10, 10, 20}))
 Tables:print(Tables:icopy({10, 10, 20}, true))
 Tables:print(Tables:imerge({10, 10, 20}, {10, 10, 200}))
 Tables:print(Tables:imerge({10, 10, 20}, {10, 10, 200}, true))
+end
+
+if true then
+    print(Tables:size({10, 20, 30}))
 end
