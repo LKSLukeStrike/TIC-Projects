@@ -1411,12 +1411,13 @@ CSpriteFG.EFFECTWOUND = CSpriteFG.EFFECTBANK + 1
 CSpriteFG.EFFECTDEATH = CSpriteFG.EFFECTBANK + 2
 CSpriteFG.OBJECTBANK  = 352 -- objects types
 CSpriteFG.WEAPONMELEE = CSpriteFG.OBJECTBANK + 0 -- melee bank
-CSpriteFG.WEAPONSWORD = CSpriteFG.WEAPONMELEE + 0
-CSpriteFG.WEAPONHAMMR = CSpriteFG.WEAPONMELEE + 16
-CSpriteFG.WEAPONLANCE = CSpriteFG.WEAPONMELEE + 32
+CSpriteFG.WEAPONMSWRD = CSpriteFG.WEAPONMELEE + 0
+CSpriteFG.WEAPONMHAMR = CSpriteFG.WEAPONMELEE + 16
+CSpriteFG.WEAPONMLNCE = CSpriteFG.WEAPONMELEE + 32
 CSpriteFG.WEAPONRANGE = CSpriteFG.OBJECTBANK + 1 -- range bank
-CSpriteFG.WEAPONLGBOW = CSpriteFG.WEAPONRANGE + 0
-CSpriteFG.WEAPONCXBOW = CSpriteFG.WEAPONRANGE + 16
+CSpriteFG.WEAPONRBOWS = CSpriteFG.WEAPONRANGE + 0
+CSpriteFG.WEAPONRBOWM = CSpriteFG.WEAPONRANGE + 16
+CSpriteFG.WEAPONRBOWL = CSpriteFG.WEAPONRANGE + 32
 CSpriteFG.WEAPONSHLDB = CSpriteFG.OBJECTBANK + 2 -- shields bank
 CSpriteFG.WEAPONSHLDS = CSpriteFG.WEAPONSHLDB + 0
 CSpriteFG.WEAPONSHLDM = CSpriteFG.WEAPONSHLDB + 16
@@ -3501,7 +3502,7 @@ function CWeaponSword:new(_argt)
     CWeaponSword.super.new(self, _argt)
     self.kind = Classic.KINDDWEAPONSWORD
     self.name = Classic.NAMEDWEAPONSWORD
-    self.sprite  = CSpriteFG.WEAPONSWORD
+    self.sprite  = CSpriteFG.WEAPONMSWRD
     self:argt(_argt) -- override if any
 end
 
@@ -3512,7 +3513,7 @@ function CWeaponHammer:new(_argt)
     CWeaponHammer.super.new(self, _argt)
     self.kind = Classic.KINDDWEAPONHAMMR
     self.name = Classic.NAMEDWEAPONHAMMR
-    self.sprite  = CSpriteFG.WEAPONHAMMR
+    self.sprite  = CSpriteFG.WEAPONMHAMR
     self.handleoffsets = {
         [CSprite.ROTATE000] = {handlex = 4, handley = 5},
         [CSprite.ROTATE090] = {handlex = 2, handley = 4},
@@ -3529,7 +3530,7 @@ function CWeaponLance:new(_argt)
     CWeaponLance.super.new(self, _argt)
     self.kind = Classic.KINDDWEAPONLANCE
     self.name = Classic.NAMEDWEAPONLANCE
-    self.sprite  = CSpriteFG.WEAPONLANCE
+    self.sprite  = CSpriteFG.WEAPONMLNCE
     self.palettefg = {
         [CObject.HANDLE] = CObject.HANDLE,
         [CObject.BORDER] = CObject.COLORWOODFG,
@@ -3588,25 +3589,36 @@ function CWeaponRange:new(_argt)
     self:argt(_argt) -- override if any
 end
 
-CWeaponLongBow = CWeaponRange:extend() -- LongBow weapons
-Classic.KINDDWEAPONLGBOW = "L.Bow" -- LongBow kind
-Classic.NAMEDWEAPONLGBOW = "L.Bow" -- LongBow name
-function CWeaponLongBow:new(_argt)
-    CWeaponLongBow.super.new(self, _argt)
-    self.kind = Classic.KINDDWEAPONLGBOW
-    self.name = Classic.NAMEDWEAPONLGBOW
-    self.sprite  = CSpriteFG.WEAPONLGBOW
+CWeaponBowSmall = CWeaponRange:extend() -- BowSmall weapons
+Classic.KINDDWEAPONBOWSMALL = "Bow.S" -- BowSmall kind
+Classic.NAMEDWEAPONBOWSMALL = "Bow.S" -- BowSmall name
+function CWeaponBowSmall:new(_argt)
+    CWeaponBowSmall.super.new(self, _argt)
+    self.kind = Classic.KINDDWEAPONBOWSMALL
+    self.name = Classic.NAMEDWEAPONBOWSMALL
+    self.sprite  = CSpriteFG.WEAPONRBOWS
     self:argt(_argt) -- override if any
 end
 
-CWeaponCrossBow = CWeaponRange:extend() -- CrossBow weapons
-Classic.KINDDWEAPONCXBOW = "C.Bow" -- CrossBow kind
-Classic.NAMEDWEAPONCXBOW = "C.Bow" -- CrossBow name
-function CWeaponCrossBow:new(_argt)
-    CWeaponCrossBow.super.new(self, _argt)
-    self.kind = Classic.KINDDWEAPONCXBOW
-    self.name = Classic.NAMEDWEAPONCXBOW
-    self.sprite  = CSpriteFG.WEAPONCXBOW
+CWeaponBowMedium = CWeaponRange:extend() -- BowMedium weapons
+Classic.KINDDWEAPONBOWMEDIUM = "Bow.M" -- BowMedium kind
+Classic.NAMEDWEAPONBOWMEDIUM = "Bow.M" -- BowMedium name
+function CWeaponBowMedium:new(_argt)
+    CWeaponBowMedium.super.new(self, _argt)
+    self.kind = Classic.KINDDWEAPONBOWMEDIUM
+    self.name = Classic.NAMEDWEAPONBOWMEDIUM
+    self.sprite  = CSpriteFG.WEAPONRBOWM
+    self:argt(_argt) -- override if any
+end
+
+CWeaponBowLarge = CWeaponRange:extend() -- BowLarge weapons
+Classic.KINDDWEAPONBOWLARGE = "Bow.L" -- BowLarge kind
+Classic.NAMEDWEAPONBOWLARGE = "Bow.L" -- BowLarge name
+function CWeaponBowLarge:new(_argt)
+    CWeaponBowLarge.super.new(self, _argt)
+    self.kind = Classic.KINDDWEAPONBOWLARGE
+    self.name = Classic.NAMEDWEAPONBOWLARGE
+    self.sprite  = CSpriteFG.WEAPONRBOWL
     self:argt(_argt) -- override if any
 end
 
@@ -4347,7 +4359,7 @@ end
 
 function CCharacter:argt(_argt)
     CCharacter.super.argt(self, _argt)
-    if not (self.classic == self.classed) then return end
+    if self.classic and self.classed and not (self.classic == self.classed) then return end -- limit to one classic ?
    self:adjustInventoriesSlots() -- adjust standard inventories sizes and contents + slots
 end
 
@@ -8235,7 +8247,7 @@ Kaptin = CPlayerMeduz{name = "Kaptin",
 Nitcha = CPlayerDrowe{name = "Nitcha",
     worldx = 15,
     ["slots.head"] = CSlotHead{object = CClothesHatMedium{}},
-    -- ["slots.handrg"] = CSlotHand{object = CWeaponCrossBow{}},
+    -- ["slots.handrg"] = CSlotHand{object = CWeaponBowMedium{}},
     ["slots.handlf"] = CSlotHand{object = CObjectFlaskLarge{used = CObject.USEDHALF}},
     statmenact = 10,
 }
@@ -8287,8 +8299,10 @@ end
 
 
 local _playerclass = CPlayerTifel
-if false then
-Walfie = _playerclass{name = "Walfie",
+if true then
+Walfie = _playerclass{classed = _playerclass,
+    name = "Walfie",
+    size = Tic.SIZES,
     statphyact = 10,
     statmenact = 10,
     statpsyact = 10,
@@ -8298,13 +8312,16 @@ Walfie = _playerclass{name = "Walfie",
     interactions = {10},
     -- spottingspot = true,
     spottingpick = true,
-    -- ["slots.handrg"] = CSlotHand{object = CWeaponHammer{}},
-    -- ["slots.handlf"] = CSlotHand{object = CWeaponSword{}},
-    ["slots.head"] = CSlotHead{object = CClothesHatSmall{}},
+    ["slots.handrg"] = CSlotHand{object = CWeaponBowSmall{}},
+    ["slots.handlf"] = CSlotHand{object = CObjectFlaskSmall{}},
+    ["slots.head"]   = CSlotHead{object = CClothesHatSmall{}},
+    ["slots.back"]   = CSlotBack{object = CClothesBackPackSmall{}},
 }
 end
-if false then
-Welfie = _playerclass{name = "Welfie",
+if true then
+Welfie = _playerclass{classed = _playerclass,
+    name = "Welfie",
+    size = Tic.SIZEM,
     statphyact = 10,
     statmenact = 10,
     statpsyact = 10,
@@ -8314,13 +8331,16 @@ Welfie = _playerclass{name = "Welfie",
     interactions = {10},
     -- spottingspot = true,
     spottingpick = true,
-    -- ["slots.handrg"] = CSlotHand{object = CWeaponShieldMedium{}},
-    -- ["slots.handlf"] = CSlotHand{object = CWeaponShieldSmall{}},
-    ["slots.head"] = CSlotHead{object = CClothesHatMedium{}},
+    ["slots.handrg"] = CSlotHand{object = CWeaponBowMedium{}},
+    ["slots.handlf"] = CSlotHand{object = CObjectFlaskMedium{}},
+    ["slots.head"]   = CSlotHead{object = CClothesHatMedium{}},
+    ["slots.back"]   = CSlotBack{object = CClothesBackPackMedium{}},
 }
 end
-if false then
-Wilfie = _playerclass{name = "Wilfie",
+if true then
+Wilfie = _playerclass{classed = _playerclass,
+    name = "Wilfie",
+    size = Tic.SIZEL,
     statphyact = 10,
     statmenact = 10,
     statpsyact = 10,
@@ -8330,13 +8350,15 @@ Wilfie = _playerclass{name = "Wilfie",
     interactions = {10},
     -- spottingspot = true,
     spottingpick = true,
-    -- ["slots.handrg"] = CSlotHand{object = CWeaponCrossBow{}},
-    -- ["slots.handlf"] = CSlotHand{object = CWeaponLongBow{}},
-    ["slots.head"] = CSlotHead{object = CClothesHatLarge{}},
+    ["slots.handrg"] = CSlotHand{object = CWeaponBowLarge{}},
+    ["slots.handlf"] = CSlotHand{object = CObjectFlaskLarge{}},
+    ["slots.head"]   = CSlotHead{object = CClothesHatLarge{}},
+    ["slots.back"]   = CSlotBack{object = CClothesBackPackLarge{}},
 }
 end
+--
 if true then
-Wolfie = _playerclass{
+Wolfie = _playerclass{classed = _playerclass,
     name = "Wolfie",
     size = Tic.SIZES,
     statphyact = 10,
@@ -8344,18 +8366,18 @@ Wolfie = _playerclass{
     statpsyact = 10,
     -- colorextra = Tic.COLORGREEND,
     worldx = 0,
-    worldy = 15,
+    worldy = 20,
     interactions = {10},
     -- spottingspot = true,
     spottingpick = true,
-    ["slots.handrg"] = CSlotHand{object = CWeaponSword{}},
-    ["slots.handlf"] = CSlotHand{object = CWeaponShieldSmall{}},
-    ["slots.head"]   = CSlotHead{object = CClothesHelmetSmall{}},
-    ["slots.back"]   = CSlotBack{object = CClothesBackPackSmall{}},
+    ["slots.handrg"] = CSlotHand{object = CWeaponHammer{}},
+    ["slots.handlf"] = CSlotHand{object = CWeaponShieldMedium{}},
+    ["slots.head"]   = CSlotHead{object = CClothesHelmetMedium{}},
+    ["slots.back"]   = CSlotBack{object = CClothesBackPackMedium{}},
 }
 end
 if true then
-Wulfie = _playerclass{
+Wulfie = _playerclass{classed = _playerclass,
     name = "Wulfie",
     size = Tic.SIZEM,
     statphyact = 10,
@@ -8363,7 +8385,7 @@ Wulfie = _playerclass{
     statpsyact = 10,
     -- colorextra = Tic.COLORGREENM,
     worldx = 15,
-    worldy = 15,
+    worldy = 20,
     interactions = {10},
     -- spottingspot = true,
     spottingpick = true,
@@ -8382,7 +8404,7 @@ Wylfie = _playerclass{classed = _playerclass,
     statpsyact = 10,
     -- colorextra = Tic.COLORGREENL,
     worldx = 30,
-    worldy = 15,
+    worldy = 20,
     interactions = {10},
     -- spottingspot = true,
     spottingpick = true,
@@ -8633,9 +8655,14 @@ function Tic:logWorld()
     local _world = Tic:playerActual().world
     if not _world then return end
 
+    local _kindnames = {}
     Tic:logAppend(_world.name, Tables:size(_world.entitieslocations.entities))
     for _, _entity in pairs(_world.entitieslocations.entities) do
-        Tic:logAppend(_entity.kind, _entity.name)
+        table.insert(_kindnames, _entity.kind.."\t".._entity.name)
+    end
+    table.sort(_kindnames)
+    for _, _kindname in ipairs(_kindnames) do
+        Tic:logAppend(_kindname)
     end
     Tic:logAppend()
 end
