@@ -7277,11 +7277,11 @@ end
 
 
 --
--- CButtonPlayerSlot
+-- CButtonSlot
 --
-CButtonPlayerSlot = CButtonSprite:extend() -- generic slot button
-function CButtonPlayerSlot:new(_argt)
-    CButtonPlayerSlot.super.new(self, _argt)
+CButtonSlot = CButtonSprite:extend() -- generic slot button
+function CButtonSlot:new(_argt)
+    CButtonSlot.super.new(self, _argt)
     self.screenw             = 10
     self.screenh             = 10
     self.behaviour           = IButtonPlayer.BEHAVIOUR
@@ -7291,7 +7291,7 @@ function CButtonPlayerSlot:new(_argt)
     self:argt(_argt) -- override if any
 end
 
-function CButtonPlayerSlot:drawGround()
+function CButtonSlot:drawGround()
     rect(self.screenx + 1, self.screeny + 1, Tic.SPRITESIZE, Tic.SPRITESIZE, Tic.COLORBIOMENIGHT)
 
     local _object = nil
@@ -7308,30 +7308,30 @@ function CButtonPlayerSlot:drawGround()
     _object:load()
 end
 
-CButtonPlayerSlotHead = CButtonPlayerSlot:extend()
-function CButtonPlayerSlotHead:new(_argt)
-    CButtonPlayerSlotHead.super.new(self, _argt)
+CButtonSlotPlayerHead = CButtonSlot:extend()
+function CButtonSlotPlayerHead:new(_argt)
+    CButtonSlotPlayerHead.super.new(self, _argt)
     self.getslotobject = function() return Tic:playerActual().slots.head.object end
     self:argt(_argt) -- override if any
 end
 
-CButtonPlayerSlotBack = CButtonPlayerSlot:extend()
-function CButtonPlayerSlotBack:new(_argt)
-    CButtonPlayerSlotBack.super.new(self, _argt)
+CButtonSlotPlayerBack = CButtonSlot:extend()
+function CButtonSlotPlayerBack:new(_argt)
+    CButtonSlotPlayerBack.super.new(self, _argt)
     self.getslotobject = function() return Tic:playerActual().slots.back.object end
     self:argt(_argt) -- override if any
 end
 
-CButtonPlayerSlotHandLF = CButtonPlayerSlot:extend()
-function CButtonPlayerSlotHandLF:new(_argt)
-    CButtonPlayerSlotHandLF.super.new(self, _argt)
+CButtonSlotPlayerHandLF = CButtonSlot:extend()
+function CButtonSlotPlayerHandLF:new(_argt)
+    CButtonSlotPlayerHandLF.super.new(self, _argt)
     self.getslotobject = function() return Tic:playerActual().slots.handlf.object end
     self:argt(_argt) -- override if any
 end
 
-CButtonPlayerSlotHandRG = CButtonPlayerSlot:extend()
-function CButtonPlayerSlotHandRG:new(_argt)
-    CButtonPlayerSlotHandRG.super.new(self, _argt)
+CButtonSlotPlayerHandRG = CButtonSlot:extend()
+function CButtonSlotPlayerHandRG:new(_argt)
+    CButtonSlotPlayerHandRG.super.new(self, _argt)
     self.getslotobject = function() return Tic:playerActual().slots.handrg.object end
     self:argt(_argt) -- override if any
 end
@@ -7395,11 +7395,11 @@ end
 
 
 --
--- IButtonSpotting -- spotting buttons implementation
+-- IButtonSpottingMove -- spotting buttons implementation
 --
-IButtonSpotting = CButton:extend() -- generic spotting button
-IButtonSpotting.PALETTE = {[Tic.COLORGREYD] = Tic.COLORKEY}
-IButtonSpotting.BEHAVIOUR = function(self)
+IButtonSpottingMove = CButton:extend() -- generic spotting button
+IButtonSpottingMove.PALETTE = {[Tic.COLORGREYD] = Tic.COLORKEY}
+IButtonSpottingMove.BEHAVIOUR = function(self)
     CButton.BEHAVIOUR(self)
     self.display = (Tic:entitySpotting()) and true or false
     if not self.display then return end -- no spotting
@@ -7418,8 +7418,8 @@ end
 CButtonSpotting000 = CButtonArrow000:extend() -- generic spotting 000 button
 function CButtonSpotting000:new(_argt)
     CButtonSpotting000.super.new(self, _argt)
-    self.sprite.palette = IButtonSpotting.PALETTE
-    self.behaviour      = IButtonSpotting.BEHAVIOUR
+    self.sprite.palette = IButtonSpottingMove.PALETTE
+    self.behaviour      = IButtonSpottingMove.BEHAVIOUR
     self.clicklf        = function() Tic:moveDirection000() end
     self:argt(_argt) -- override if any
 end
@@ -7427,8 +7427,8 @@ end
 CButtonSpotting045 = CButtonArrow045:extend() -- generic spotting 045 button
 function CButtonSpotting045:new(_argt)
     CButtonSpotting045.super.new(self, _argt)
-    self.sprite.palette = IButtonSpotting.PALETTE
-    self.behaviour      = IButtonSpotting.BEHAVIOUR
+    self.sprite.palette = IButtonSpottingMove.PALETTE
+    self.behaviour      = IButtonSpottingMove.BEHAVIOUR
     self.clicklf        = function() Tic:moveDirection045() end
     self:argt(_argt) -- override if any
 end
@@ -7436,8 +7436,8 @@ end
 CButtonSpotting090 = CButtonArrow090:extend() -- generic spotting 090 button
 function CButtonSpotting090:new(_argt)
     CButtonSpotting090.super.new(self, _argt)
-    self.sprite.palette = IButtonSpotting.PALETTE
-    self.behaviour      = IButtonSpotting.BEHAVIOUR
+    self.sprite.palette = IButtonSpottingMove.PALETTE
+    self.behaviour      = IButtonSpottingMove.BEHAVIOUR
     self.clicklf        = function() Tic:moveDirection090() end
     self:argt(_argt) -- override if any
 end
@@ -7445,8 +7445,8 @@ end
 CButtonSpotting135 = CButtonArrow135:extend() -- generic spotting 135 button
 function CButtonSpotting135:new(_argt)
     CButtonSpotting135.super.new(self, _argt)
-    self.sprite.palette = IButtonSpotting.PALETTE
-    self.behaviour      = IButtonSpotting.BEHAVIOUR
+    self.sprite.palette = IButtonSpottingMove.PALETTE
+    self.behaviour      = IButtonSpottingMove.BEHAVIOUR
     self.clicklf        = function() Tic:moveDirection135() end
     self:argt(_argt) -- override if any
 end
@@ -7454,8 +7454,8 @@ end
 CButtonSpotting180 = CButtonArrow180:extend() -- generic spotting 180 button
 function CButtonSpotting180:new(_argt)
     CButtonSpotting180.super.new(self, _argt)
-    self.sprite.palette = IButtonSpotting.PALETTE
-    self.behaviour      = IButtonSpotting.BEHAVIOUR
+    self.sprite.palette = IButtonSpottingMove.PALETTE
+    self.behaviour      = IButtonSpottingMove.BEHAVIOUR
     self.clicklf        = function() Tic:moveDirection180() end
     self:argt(_argt) -- override if any
 end
@@ -7463,8 +7463,8 @@ end
 CButtonSpotting225 = CButtonArrow225:extend() -- generic spotting 225 button
 function CButtonSpotting225:new(_argt)
     CButtonSpotting225.super.new(self, _argt)
-    self.sprite.palette = IButtonSpotting.PALETTE
-    self.behaviour      = IButtonSpotting.BEHAVIOUR
+    self.sprite.palette = IButtonSpottingMove.PALETTE
+    self.behaviour      = IButtonSpottingMove.BEHAVIOUR
     self.clicklf        = function() Tic:moveDirection225() end
     self:argt(_argt) -- override if any
 end
@@ -7472,8 +7472,8 @@ end
 CButtonSpotting270 = CButtonArrow270:extend() -- generic spotting 270 button
 function CButtonSpotting270:new(_argt)
     CButtonSpotting270.super.new(self, _argt)
-    self.sprite.palette = IButtonSpotting.PALETTE
-    self.behaviour      = IButtonSpotting.BEHAVIOUR
+    self.sprite.palette = IButtonSpottingMove.PALETTE
+    self.behaviour      = IButtonSpottingMove.BEHAVIOUR
     self.clicklf        = function() Tic:moveDirection270() end
     self:argt(_argt) -- override if any
 end
@@ -7481,8 +7481,8 @@ end
 CButtonSpotting315 = CButtonArrow315:extend() -- generic spotting 315 button
 function CButtonSpotting315:new(_argt)
     CButtonSpotting315.super.new(self, _argt)
-    self.sprite.palette = IButtonSpotting.PALETTE
-    self.behaviour      = IButtonSpotting.BEHAVIOUR
+    self.sprite.palette = IButtonSpottingMove.PALETTE
+    self.behaviour      = IButtonSpottingMove.BEHAVIOUR
     self.clicklf        = function() Tic:moveDirection315() end
     self:argt(_argt) -- override if any
 end
@@ -7929,10 +7929,10 @@ ButtonPlayerMove180    = CButtonPlayerMove180{}
 ButtonPlayerMove225    = CButtonPlayerMove225{}
 ButtonPlayerMove270    = CButtonPlayerMove270{}
 ButtonPlayerMove315    = CButtonPlayerMove315{}
-ButtonPlayerSlotHead   = CButtonPlayerSlotHead{}
-ButtonPlayerSlotBack   = CButtonPlayerSlotBack{}
-ButtonPlayerSlotHandLF = CButtonPlayerSlotHandLF{}
-ButtonPlayerSlotHandRG = CButtonPlayerSlotHandRG{}
+ButtonSlotPlayerHead   = CButtonSlotPlayerHead{}
+ButtonSlotPlayerBack   = CButtonSlotPlayerBack{}
+ButtonSlotPlayerHandLF = CButtonSlotPlayerHandLF{}
+ButtonSlotPlayerHandRG = CButtonSlotPlayerHandRG{}
 ScreenWorldRG:elementsDistributeH( -- up h line
     {ButtonPlayerMove315, ButtonPlayerMove045},
     WindowPlayerPortrait.screenx - 6,
@@ -7958,13 +7958,13 @@ ScreenWorldRG:elementsDistributeV( -- md v line
     14
 )
 ScreenWorldRG:elementsDistributeH( -- head and back slots
-    {ButtonPlayerSlotHead, ButtonPlayerSlotBack},
+    {ButtonSlotPlayerHead, ButtonSlotPlayerBack},
     WindowPlayerPortrait.screenx - Tic.SPRITESIZE - 8,
     WindowPlayerPortrait.screeny - 3,
     28
 )
 ScreenWorldRG:elementsDistributeH( -- handrg and handlf slots
-    {ButtonPlayerSlotHandRG, ButtonPlayerSlotHandLF},
+    {ButtonSlotPlayerHandRG, ButtonSlotPlayerHandLF},
     WindowPlayerPortrait.screenx - Tic.SPRITESIZE - 8,
     WindowPlayerPortrait.screeny + Tic.SPRITESIZE + 1,
     28
@@ -8018,10 +8018,10 @@ ScreenWorldRG:appendElements{
     ButtonPlayerMove225,
     ButtonPlayerMove270,
     ButtonPlayerMove315,
-    ButtonPlayerSlotHead,
-    ButtonPlayerSlotBack,
-    ButtonPlayerSlotHandLF,
-    ButtonPlayerSlotHandRG,
+    ButtonSlotPlayerHead,
+    ButtonSlotPlayerBack,
+    ButtonSlotPlayerHandLF,
+    ButtonSlotPlayerHandRG,
     ButtonPlayerStand,
     ButtonPlayerKneel,
     ButtonPlayerWork,
@@ -8370,10 +8370,10 @@ Wolfie = _playerclass{classed = _playerclass,
     interactions = {10},
     -- spottingspot = true,
     spottingpick = true,
-    ["slots.handrg"] = CSlotHand{object = CWeaponHammer{}},
-    ["slots.handlf"] = CSlotHand{object = CWeaponShieldMedium{}},
-    ["slots.head"]   = CSlotHead{object = CClothesHelmetMedium{}},
-    ["slots.back"]   = CSlotBack{object = CClothesBackPackMedium{}},
+    ["slots.handrg"] = CSlotHand{object = CWeaponSword{}},
+    ["slots.handlf"] = CSlotHand{object = CWeaponShieldSmall{}},
+    ["slots.head"]   = CSlotHead{object = CClothesHelmetSmall{}},
+    ["slots.back"]   = CSlotBack{object = CClothesBackPackSmall{}},
 }
 end
 if true then
