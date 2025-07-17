@@ -4620,8 +4620,8 @@ function CCharacter:draw() -- set animations and draw layers
     self:drawHandBG()
     self:drawBackBG()
     self:drawBody()
-    self:drawHead()
     self:drawBackFG()
+    self:drawHead()
     self:drawHandFG()
     self:drawEffect()
 
@@ -5505,8 +5505,10 @@ function CCharacterHumanoid:drawHead()
 end
 
 
-
-IPlayer = CCharacter:extend() -- players characters implementation
+--
+-- IPlayer
+--
+IPlayer = Classic:extend() -- players characters implementation
 function IPlayer:playerAppend()
     Tic:playerAppend(self) -- record the new player on tic
 end
@@ -5783,6 +5785,13 @@ CEnnemy = CCharacter:extend() -- ennemy characters
 
 
 --
+-- IElement
+--
+IElement = Classic:extend() -- generic screen element implementation
+IElement.BEHAVIOUR = nil
+
+
+--
 -- CElement
 --
 CElement = Classic:extend() -- generic screen element -- TODO build this class
@@ -5808,7 +5817,7 @@ function CElement:new(_argt)
 	self.rounded     = false -- rounded border and frames ?
     self.parent      = nil   -- parent element
     self.elements    = {}    -- sub elements if any
-    self.behaviour   = nil   -- behaviour function if any
+    self.behaviour   = IElement.BEHAVIOUR   -- behaviour function if any
     self.display     = true  -- display or not ?
     self.drawground  = true  -- draw beheviors
     self.drawguides  = true
@@ -6181,9 +6190,9 @@ end
 
 
 --
--- IWindowEntity -- entities windows implementation
+-- IWindowEntity
 --
-IWindowEntity = CWindow:extend() -- generic entity window
+IWindowEntity = Classic:extend() -- entities windows implementation
 IWindowEntity.BEHAVIOUR = function(self)
     self.drawinside = (self.entity) and true or false
 end
@@ -6210,9 +6219,9 @@ end
 
 
 --
--- IWindowPlayer -- players windows implementation
+-- IWindowPlayer
 --
-IWindowPlayer = CWindow:extend() -- generic player window
+IWindowPlayer = Classic:extend() -- players windows implementation
 IWindowPlayer.BEHAVIOUR = function(self)
     self.entity = Tic:playerActual()
     IWindowEntity.BEHAVIOUR(self)
@@ -6446,9 +6455,9 @@ end
 
 
 --
--- IWindowPlayer -- players windows implementation
+-- IWindowPlayer
 --
-IWindowPlayer = CWindow:extend() -- generic player window
+IWindowPlayer = Classic:extend() -- players windows implementation
 IWindowPlayer.BEHAVIOUR = function(self)
     self.entity = Tic:playerActual()
     IWindowEntity.BEHAVIOUR(self)
@@ -6456,9 +6465,9 @@ end
 
 
 --
--- IWindowSpotting -- spotting windows implementation
+-- IWindowSpotting
 --
-IWindowSpotting = CWindow:extend() -- generic spotting window
+IWindowSpotting = Classic:extend() -- spotting windows implementation
 IWindowSpotting.BEHAVIOUR = function(self)
     self.entity = (Tic:entityHovering()) and Tic:entityHovering() or Tic:entitySpotting()
     IWindowEntity.BEHAVIOUR(self)
@@ -6638,17 +6647,22 @@ end
 
 
 --
--- CButton
+-- IButton
 --
-CButton = CElement:extend() -- generic button
-Classic.KINDBUTTON = "Button" -- Button kind
-Classic.NAMEBUTTON = "Button" -- Button name
-CButton.BEHAVIOUR = function(self) -- need at least one function
+IButton = Classic:extend() -- generic button implementation
+IButton.BEHAVIOUR = function(self) -- need at least one function
     if Tables:size(self:functionsDefined()) == 0 then
         self.enabled = false
     end
 end
 
+
+--
+-- CButton
+--
+CButton = CElement:extend() -- generic button
+Classic.KINDBUTTON = "Button" -- Button kind
+Classic.NAMEBUTTON = "Button" -- Button name
 function CButton:new(_argt)
     CButton.super.new(self, _argt)
     self.kind = Classic.KINDBUTTON
@@ -6664,7 +6678,7 @@ function CButton:new(_argt)
 	self.clickrg       = nil   -- function to trigger on click rg
 	self.scrollx       = nil   -- function to trigger on scroll x
 	self.scrolly       = nil   -- function to trigger on scroll y
-	self.behaviour     = CButton.BEHAVIOUR  -- function to trigger at first
+	self.behaviour     = IButton.BEHAVIOUR  -- function to trigger at first
     self.hovertextlf   = nil   -- hover CText for clicklf if any
     self.hovertextrg   = nil   -- hover CText for clickrg if any
     self.drawground    = true  -- draw beheviors
@@ -7077,13 +7091,13 @@ end
 
 
 --
--- IButtonPlayer -- players buttons implementation
+-- IButtonPlayer
 --
-IButtonPlayer = Classic:extend() -- generic player button
+IButtonPlayer = Classic:extend() -- players buttons implementation
 IButtonPlayer.BEHAVIOUR = function(self) -- need at least one player
     self.display = (Tic:playerActual()) and true or false
     if not self.display then return end -- no player
-    CButton.BEHAVIOUR(self) -- FIXME use IButton instead ?
+    IButton.BEHAVIOUR(self)
 end
 
 
@@ -7282,8 +7296,6 @@ end
 CButtonSlot = CButtonSprite:extend() -- generic slot button
 function CButtonSlot:new(_argt)
     CButtonSlot.super.new(self, _argt)
-    self.screenw             = 10
-    self.screenh             = 10
     self.behaviour           = IButtonPlayer.BEHAVIOUR
     self.getslotobject       = nil -- getslotobject function if any
     self.drawborder          = true
@@ -7291,8 +7303,17 @@ function CButtonSlot:new(_argt)
     self:argt(_argt) -- override if any
 end
 
+function CButtonSlot:drawBorder()
+    local _color = self.colorframe2
+    if self.getslotobject then
+       _color = (self:getslotobject()) and self.colorframe1 or _color
+    end
+
+    rectb(self.screenx - 1, self.screeny - 1, self.screenw + 2, self.screenh + 2, _color)
+end
+
 function CButtonSlot:drawGround()
-    rect(self.screenx + 1, self.screeny + 1, Tic.SPRITESIZE, Tic.SPRITESIZE, Tic.COLORBIOMENIGHT)
+    rect(self.screenx, self.screeny, self.screenw, self.screenh, Tic.COLORBIOMENIGHT)
 
     local _object = nil
     if self.getslotobject then
@@ -7301,8 +7322,8 @@ function CButtonSlot:drawGround()
 	if not _object then return end -- empty slot
 
     _object:save()
-    _object.screenx  = self.screenx + 1
-    _object.screeny  = self.screeny + 1
+    _object.screenx  = self.screenx
+    _object.screeny  = self.screeny
     _object.dirx     = Tic:playerActual().dirx
     _object:draw()
     _object:load()
@@ -7343,7 +7364,7 @@ end
 CButtonSpottingSpot = CButtonCheck:extend() -- generic spottingspot check button
 CButtonSpottingSpot.BEHAVIOUR = function(self)
     self.checked = Tic:isSpottingSpot()
-    CButton.BEHAVIOUR(self)
+    IButtonPlayer.BEHAVIOUR(self)
 end
 function CButtonSpottingSpot:new(_argt)
     CButtonSpottingSpot.super.new(self, _argt)
@@ -7362,7 +7383,7 @@ end
 CButtonSpottingLock = CButtonCheck:extend() -- generic spottinglock check button
 CButtonSpottingLock.BEHAVIOUR = function(self)
     self.checked = Tic:isSpottingLock()
-    CButton.BEHAVIOUR(self)
+    IButtonPlayer.BEHAVIOUR(self)
 end
 function CButtonSpottingLock:new(_argt)
     CButtonSpottingLock.super.new(self, _argt)
@@ -7381,7 +7402,7 @@ end
 CButtonSpottingPick = CButtonCheck:extend() -- generic spottingpick check button
 CButtonSpottingPick.BEHAVIOUR = function(self)
     self.checked = Tic:isSpottingPick()
-    CButton.BEHAVIOUR(self)
+    IButtonPlayer.BEHAVIOUR(self)
 end
 function CButtonSpottingPick:new(_argt)
     CButtonSpottingPick.super.new(self, _argt)
@@ -7395,12 +7416,12 @@ end
 
 
 --
--- IButtonSpottingMove -- spotting buttons implementation
+-- IButtonSpottingMove
 --
-IButtonSpottingMove = CButton:extend() -- generic spotting button
+IButtonSpottingMove = Classic:extend() -- spotting buttons implementation
 IButtonSpottingMove.PALETTE = {[Tic.COLORGREYD] = Tic.COLORKEY}
 IButtonSpottingMove.BEHAVIOUR = function(self)
-    CButton.BEHAVIOUR(self)
+    IButton.BEHAVIOUR(self)
     self.display = (Tic:entitySpotting()) and true or false
     if not self.display then return end -- no spotting
     local _playerregionworld = Tic:playerActual():regionWorld()
@@ -7489,9 +7510,9 @@ end
 
 
 --
--- IButtonPlayerMove -- player move buttons implementation
+-- IButtonPlayerMove
 --
-IButtonPlayerMove = IButtonPlayer:extend() -- generic player move button
+IButtonPlayerMove = Classic:extend() -- player move buttons implementation
 IButtonPlayerMove.PALETTE = {[Tic.COLORGREYD] = Tic.COLORKEY}
 IButtonPlayerMove.BEHAVIOUR = function(self)
     IButtonPlayer.BEHAVIOUR(self)
@@ -7959,14 +7980,14 @@ ScreenWorldRG:elementsDistributeV( -- md v line
 )
 ScreenWorldRG:elementsDistributeH( -- head and back slots
     {ButtonSlotPlayerHead, ButtonSlotPlayerBack},
-    WindowPlayerPortrait.screenx - Tic.SPRITESIZE - 8,
-    WindowPlayerPortrait.screeny - 3,
+    WindowPlayerPortrait.screenx - Tic.SPRITESIZE - 6,
+    WindowPlayerPortrait.screeny - 2,
     28
 )
 ScreenWorldRG:elementsDistributeH( -- handrg and handlf slots
     {ButtonSlotPlayerHandRG, ButtonSlotPlayerHandLF},
-    WindowPlayerPortrait.screenx - Tic.SPRITESIZE - 8,
-    WindowPlayerPortrait.screeny + Tic.SPRITESIZE + 1,
+    WindowPlayerPortrait.screenx - Tic.SPRITESIZE - 6,
+    WindowPlayerPortrait.screeny + Tic.SPRITESIZE + 2,
     28
 )
 
@@ -8299,6 +8320,7 @@ end
 
 
 local _playerclass = CPlayerTifel
+if false then
 if true then
 Walfie = _playerclass{classed = _playerclass,
     name = "Walfie",
@@ -8414,16 +8436,23 @@ Wylfie = _playerclass{classed = _playerclass,
     ["slots.back"]   = CSlotBack{object = CClothesBackPackLarge{}},
 }
 end
+end
 -- exit()
 
-if false then
-Oxboow = CPlayerGhost{name = "Oxboow",
+if true then
+Oxboow = CPlayerGhost{classed = CPlayerGhost,
+    name = "Oxboow",
     statphyact = 10,
     statmenact = 10,
     statpsyact = 10,
     spottingspot = true,
     spottinglock = true,
     hitbox = Classic.NIL,
+    slots = nil,
+    -- ["slots.handrg"] = CSlotHand{object = CWeaponLance{}},
+    -- ["slots.handlf"] = CSlotHand{object = CWeaponShieldLarge{}},
+    -- -- ["slots.head"]   = CSlotHead{object = CClothesHatLarge{}},
+    -- ["slots.back"]   = CSlotBack{object = CClothesBackPackLarge{}},
 }
 end
 
