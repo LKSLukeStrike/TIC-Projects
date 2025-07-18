@@ -985,6 +985,10 @@ function Tic:entityHovering(_character)
 	return _character:entityHovering()
 end
 
+function Tic:spottingActual(_character)
+    return (Tic:entityHovering(_character)) and Tic:entityHovering(_character) or Tic:entitySpotting(_character)
+end
+
 
 -- Borders System -- toggle borders display
 Tic.BORDERSDRAW = false
@@ -4371,7 +4375,7 @@ function CCharacter:adjustInventoriesSlots()
     local _inventoryphy = self.inventories.phy
     local _inventorymen = self.inventories.men
     local _inventorypsy = self.inventories.psy
-    for _, _slot in pairs(self.slots) do
+    for _, _slot in pairs(self.slots or {}) do
         if CSlot:isSlot(_slot) then
             _inventoryany:appendObject(_slot.object)
             if not _slot:canSlotObject(_slot.object) then -- keep only if allowed
@@ -4395,7 +4399,7 @@ function CCharacter:adjustInventoriesSlots()
     _inventoryany:movetoInventory(_inventorymen)
     _inventoryany:movetoInventory(_inventorypsy)
 
-    for _, _slot in pairs(self.slots) do -- check if objects in slots are still available
+    for _, _slot in pairs(self.slots or {}) do -- check if objects in slots are still available
         if CSlot:isSlot(_slot) then
             if Tables:valFind(_inventoryany.objects, _slot.object) then _slot.object = nil end
         end
@@ -4816,6 +4820,7 @@ function CCharacter:drawHandFG()
 end
 
 function CCharacter:drawHand(_bgfg)
+    if not self.slots then return end -- mandatory
     local _handlesoffsets = self:handlesOffsets() -- determine the corresponding hand offsets
     local _handx = nil
     local _handy = nil
@@ -4874,6 +4879,7 @@ function CCharacter:drawBackFG()
 end
 
 function CCharacter:drawBack(_bgfg)
+    if not self.slots then return end -- mandatory
     local _handlesoffsets = self:handlesOffsets() -- determine the corresponding back offsets
     local _backx  = _handlesoffsets.backx
     local _backy  = _handlesoffsets.backy
@@ -5477,6 +5483,7 @@ function CCharacterHumanoid:drawHead()
     _musprite:draw()
 
     -- draw head slot if any
+    if not self.slots then return end -- mandatory
     local _handlesoffsets = self:handlesOffsets() -- determine the corresponding head offsets
     local _headx  = _handlesoffsets.headx
     local _heady  = _handlesoffsets.heady
@@ -6469,7 +6476,7 @@ end
 --
 IWindowSpotting = Classic:extend() -- spotting windows implementation
 IWindowSpotting.BEHAVIOUR = function(self)
-    self.entity = (Tic:entityHovering()) and Tic:entityHovering() or Tic:entitySpotting()
+    self.entity = Tic:spottingActual()
     IWindowEntity.BEHAVIOUR(self)
 end
 
@@ -7296,24 +7303,31 @@ end
 CButtonSlot = CButtonSprite:extend() -- generic slot button
 function CButtonSlot:new(_argt)
     CButtonSlot.super.new(self, _argt)
-    self.behaviour           = IButtonPlayer.BEHAVIOUR
     self.getslotobject       = nil -- getslotobject function if any
     self.drawborder          = true
-    self.colorborderdisabled = Tic.COLORWHITE
+    self.colorground         = Tic.COLORBIOMENIGHT
+    self.colorborder         = self.colorframe1
+    self.colorborderdisabled = self.colorframe2
+    self.rounded = true
     self:argt(_argt) -- override if any
 end
 
 function CButtonSlot:drawBorder()
-    local _color = self.colorframe2
     if self.getslotobject then
-       _color = (self:getslotobject()) and self.colorframe1 or _color
+       self.enabled = (self:getslotobject()) and true or false
     end
 
-    rectb(self.screenx - 1, self.screeny - 1, self.screenw + 2, self.screenh + 2, _color)
+    self:save()
+    self.screenx = self.screenx - 1
+    self.screeny = self.screeny - 1
+    self.screenw = self.screenw + 2
+    self.screenh = self.screenh + 2
+    CButtonSlot.super.drawBorder(self)
+    self:load()
 end
 
 function CButtonSlot:drawGround()
-    rect(self.screenx, self.screeny, self.screenw, self.screenh, Tic.COLORBIOMENIGHT)
+    rect(self.screenx, self.screeny, self.screenw, self.screenh, self.colorground)
 
     local _object = nil
     if self.getslotobject then
@@ -7329,31 +7343,106 @@ function CButtonSlot:drawGround()
     _object:load()
 end
 
-CButtonSlotPlayerHead = CButtonSlot:extend()
+
+--
+-- IButtonSlotPlayer
+--
+IButtonSlotPlayer = Classic:extend() -- players buttons implementation
+IButtonSlotPlayer.BEHAVIOUR = function(self) -- need at least one player with slots
+    IButtonPlayer.BEHAVIOUR(self)
+    if not self.display then return end -- no player
+    self.display = (Tic:playerActual().slots) and true or false
+end
+
+CButtonSlotPlayer = CButtonSlot:extend()
+function CButtonSlotPlayer:new(_argt)
+    CButtonSlotPlayer.super.new(self, _argt)
+    self.behaviour           = IButtonSlotPlayer.BEHAVIOUR
+    self:argt(_argt) -- override if any
+end
+
+CButtonSlotPlayerHead = CButtonSlotPlayer:extend()
 function CButtonSlotPlayerHead:new(_argt)
     CButtonSlotPlayerHead.super.new(self, _argt)
     self.getslotobject = function() return Tic:playerActual().slots.head.object end
     self:argt(_argt) -- override if any
 end
 
-CButtonSlotPlayerBack = CButtonSlot:extend()
+CButtonSlotPlayerBack = CButtonSlotPlayer:extend()
 function CButtonSlotPlayerBack:new(_argt)
     CButtonSlotPlayerBack.super.new(self, _argt)
     self.getslotobject = function() return Tic:playerActual().slots.back.object end
     self:argt(_argt) -- override if any
 end
 
-CButtonSlotPlayerHandLF = CButtonSlot:extend()
+CButtonSlotPlayerHandLF = CButtonSlotPlayer:extend()
 function CButtonSlotPlayerHandLF:new(_argt)
     CButtonSlotPlayerHandLF.super.new(self, _argt)
     self.getslotobject = function() return Tic:playerActual().slots.handlf.object end
     self:argt(_argt) -- override if any
 end
 
-CButtonSlotPlayerHandRG = CButtonSlot:extend()
+CButtonSlotPlayerHandRG = CButtonSlotPlayer:extend()
 function CButtonSlotPlayerHandRG:new(_argt)
     CButtonSlotPlayerHandRG.super.new(self, _argt)
     self.getslotobject = function() return Tic:playerActual().slots.handrg.object end
+    self:argt(_argt) -- override if any
+end
+
+
+--
+-- IButtonSpotting
+--
+IButtonSpotting = Classic:extend() -- spotting buttons implementation
+IButtonSpotting.BEHAVIOUR = function(self) -- need at least one spotting
+    self.display = (Tic:spottingActual()) and true or false
+    if not self.display then return end -- no spotting
+    IButton.BEHAVIOUR(self)
+end
+
+
+--
+-- IButtonSlotSpotting
+--
+IButtonSlotSpotting = Classic:extend() -- spotting buttons implementation
+IButtonSlotSpotting.BEHAVIOUR = function(self) -- need at least one spotting with slots
+    IButtonSpotting.BEHAVIOUR(self)
+    if not self.display then return end -- no spotting
+    self.display = (Tic:spottingActual().slots) and true or false
+end
+
+CButtonSlotSpotting = CButtonSlot:extend()
+function CButtonSlotSpotting:new(_argt)
+    CButtonSlotSpotting.super.new(self, _argt)
+    self.behaviour           = IButtonSlotSpotting.BEHAVIOUR
+    self:argt(_argt) -- override if any
+end
+
+CButtonSlotSpottingHead = CButtonSlotSpotting:extend()
+function CButtonSlotSpottingHead:new(_argt)
+    CButtonSlotSpottingHead.super.new(self, _argt)
+    self.getslotobject = function() return Tic:spottingActual().slots.head.object end
+    self:argt(_argt) -- override if any
+end
+
+CButtonSlotSpottingBack = CButtonSlotSpotting:extend()
+function CButtonSlotSpottingBack:new(_argt)
+    CButtonSlotSpottingBack.super.new(self, _argt)
+    self.getslotobject = function() return Tic:spottingActual().slots.back.object end
+    self:argt(_argt) -- override if any
+end
+
+CButtonSlotSpottingHandLF = CButtonSlotSpotting:extend()
+function CButtonSlotSpottingHandLF:new(_argt)
+    CButtonSlotSpottingHandLF.super.new(self, _argt)
+    self.getslotobject = function() return Tic:spottingActual().slots.handlf.object end
+    self:argt(_argt) -- override if any
+end
+
+CButtonSlotSpottingHandRG = CButtonSlotSpotting:extend()
+function CButtonSlotSpottingHandRG:new(_argt)
+    CButtonSlotSpottingHandRG.super.new(self, _argt)
+    self.getslotobject = function() return Tic:spottingActual().slots.handrg.object end
     self:argt(_argt) -- override if any
 end
 
@@ -7425,7 +7514,7 @@ IButtonSpottingMove.BEHAVIOUR = function(self)
     self.display = (Tic:entitySpotting()) and true or false
     if not self.display then return end -- no spotting
     local _playerregionworld = Tic:playerActual():regionWorld()
-    local _entityregionworld = (Tic:entityHovering()) and Tic:entityHovering():regionWorld() or Tic:entitySpotting():regionWorld()
+    local _entityregionworld = Tic:spottingActual():regionWorld()
     local _direction         = _playerregionworld:directionRegion(_entityregionworld)
     self.hovertextlf = CText{text = "Move"}
     self.enabled     = false
@@ -7867,15 +7956,19 @@ ScreenWorldLF:elementsDistributeH(
     WindowSpottingInfos.screeny - Tic.SPRITESIZE
 )
 
-WindowSpottingPortrait = CWindowSpottingPortrait{}
-ButtonSpotting000      = CButtonSpotting000{}
-ButtonSpotting045      = CButtonSpotting045{}
-ButtonSpotting090      = CButtonSpotting090{}
-ButtonSpotting135      = CButtonSpotting135{}
-ButtonSpotting180      = CButtonSpotting180{}
-ButtonSpotting225      = CButtonSpotting225{}
-ButtonSpotting270      = CButtonSpotting270{}
-ButtonSpotting315      = CButtonSpotting315{}
+WindowSpottingPortrait   = CWindowSpottingPortrait{}
+ButtonSpotting000        = CButtonSpotting000{}
+ButtonSpotting045        = CButtonSpotting045{}
+ButtonSpotting090        = CButtonSpotting090{}
+ButtonSpotting135        = CButtonSpotting135{}
+ButtonSpotting180        = CButtonSpotting180{}
+ButtonSpotting225        = CButtonSpotting225{}
+ButtonSpotting270        = CButtonSpotting270{}
+ButtonSpotting315        = CButtonSpotting315{}
+ButtonSlotSpottingHead   = CButtonSlotSpottingHead{}
+ButtonSlotSpottingBack   = CButtonSlotSpottingBack{}
+ButtonSlotSpottingHandLF = CButtonSlotSpottingHandLF{}
+ButtonSlotSpottingHandRG = CButtonSlotSpottingHandRG{}
 ScreenWorldLF:elementsDistributeH( -- up h line
     {ButtonSpotting135, ButtonSpotting225},
     WindowSpottingPortrait.screenx - 6,
@@ -7900,6 +7993,18 @@ ScreenWorldLF:elementsDistributeV( -- md v line
     WindowSpottingPortrait.screeny - 7,
     14
 )
+ScreenWorldLF:elementsDistributeH( -- head and back slots
+    {ButtonSlotSpottingHead, ButtonSlotSpottingBack},
+    WindowSpottingPortrait.screenx - Tic.SPRITESIZE - 6,
+    WindowSpottingPortrait.screeny - 2,
+    28
+)
+ScreenWorldLF:elementsDistributeH( -- handrg and handlf slots
+    {ButtonSlotSpottingHandRG, ButtonSlotSpottingHandLF},
+    WindowSpottingPortrait.screenx - Tic.SPRITESIZE - 6,
+    WindowSpottingPortrait.screeny + Tic.SPRITESIZE + 2,
+    28
+)
 
 ScreenWorldLF:appendElements{
     WindowSpottingPortrait,
@@ -7915,6 +8020,10 @@ ScreenWorldLF:appendElements{
     ButtonSpotting225,
     ButtonSpotting270,
     ButtonSpotting315,
+    ButtonSlotSpottingHead,
+    ButtonSlotSpottingBack,
+    ButtonSlotSpottingHandLF,
+    ButtonSlotSpottingHandRG,
 }
 
 -- md panel
@@ -8051,8 +8160,8 @@ ScreenWorldRG:appendElements{
 
 ScreenWorld:appendElements{
     CWindowScreen{},
-    ScreenWorldLF,
     ScreenWorldMD,
+    ScreenWorldLF,
     ScreenWorldRG,
 }
 end
@@ -8320,7 +8429,7 @@ end
 
 
 local _playerclass = CPlayerTifel
-if false then
+if true then
 if true then
 Walfie = _playerclass{classed = _playerclass,
     name = "Walfie",
@@ -8439,7 +8548,7 @@ end
 end
 -- exit()
 
-if true then
+if false then
 Oxboow = CPlayerGhost{classed = CPlayerGhost,
     name = "Oxboow",
     statphyact = 10,
@@ -8448,11 +8557,11 @@ Oxboow = CPlayerGhost{classed = CPlayerGhost,
     spottingspot = true,
     spottinglock = true,
     hitbox = Classic.NIL,
-    slots = nil,
-    -- ["slots.handrg"] = CSlotHand{object = CWeaponLance{}},
-    -- ["slots.handlf"] = CSlotHand{object = CWeaponShieldLarge{}},
-    -- -- ["slots.head"]   = CSlotHead{object = CClothesHatLarge{}},
-    -- ["slots.back"]   = CSlotBack{object = CClothesBackPackLarge{}},
+    -- slots = Classic.NIL,
+    ["slots.handrg"] = CSlotHand{object = CWeaponLance{}},
+    ["slots.handlf"] = CSlotHand{object = CWeaponShieldLarge{}},
+    ["slots.head"]   = CSlotHead{object = CClothesHatLarge{}},
+    ["slots.back"]   = CSlotBack{object = CClothesBackPackLarge{}},
 }
 end
 
@@ -8593,7 +8702,7 @@ function CPlace:generateRoad(_worldx0, _worldy0, _worldx1, _worldy1, _percent, _
 end
 
 
-if false then
+if true then
 House1 = CPlaceHouseAnim{
     name = "House1",
     worldx = -20,
