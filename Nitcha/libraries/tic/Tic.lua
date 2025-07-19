@@ -8332,21 +8332,27 @@ end -- generate places
 --
 -- Players
 --
-if false then
-Truduk = CPlayerDwarf{name = "Truduk",
-    ["slots.head"] = CSlotHead{object = CClothesHatSmall{}},
-    -- ["slots.handrg"] = CSlotHand{object = CWeaponHammer{}},
-    -- ["slots.handlf"] = CSlotHand{object = CWeaponShieldMedium{}},
-    statmenact = 10,
-}
--- Truduk:randomWorldWindow()
--- Prinnn = CPlayerGnome{name = "Prinnn",
---     coloreyesbg  = Tic.COLORRED,
---     coloreyesfg  = Tic.COLORORANGE,
--- }
-Kaptan = CPlayerMeduz{name = "Kaptan",
+if true then
+Truduk = CPlayerDwarf{
+    name = "Truduk",
+    classed = CPlayerDwarf,
     worldx = 0,
-    worldy = 15,
+    worldy = 0,
+    ["slots.head"] = CSlotHead{object = CClothesHatSmall{}},
+}
+Prinnn = CPlayerGnome{
+    name = "Prinnn",
+    classed = CPlayerGnome,
+    worldx = 10,
+    worldy = 0,
+    coloreyesbg  = Tic.COLORRED,
+    coloreyesfg  = Tic.COLORORANGE,
+}
+Kaptan = CPlayerMeduz{
+    name = "Kaptan",
+    classed = CPlayerMeduz,
+    worldx = 20,
+    worldy = 0,
     ["slots.head"] = CSlotHead{object = CClothesHatMedium{}},
     ["slots.handlf"] = CSlotHand{object = CObjectFlaskSmall{used = CObject.USEDHALF}},
     ["slots.handrg"] = CSlotHand{object = CObjectFlaskSmall{used = CObject.USEDNONE}},
@@ -8358,10 +8364,11 @@ Kaptan.slots.head.object.palettefg = {
     [CObject.INSIDE] = Tic.COLORRED,
     [CObject.EFFECT] = Tic.COLORRED,
 }
--- Kaptan.slots.head.object.handleoffsets[CSprite.ROTATE000].handley = 5
-Kaptin = CPlayerMeduz{name = "Kaptin",
-    worldx = 15,
-    worldy = 15,
+Kaptin = CPlayerMeduz{
+    name = "Kaptin",
+    classed = CPlayerMeduz,
+    worldx = 30,
+    worldy = 0,
     ["slots.head"] = CSlotHead{object = CClothesHatLarge{}},
     colorhairsbg = Tic.COLORBLUEL,
     colorhairsfg = Tic.COLORBLUEM,
@@ -8369,38 +8376,60 @@ Kaptin = CPlayerMeduz{name = "Kaptin",
     coloreyesfg  = Tic.COLORBLUEL,
     statmenact = 10,
 }
--- Aegeon = CPlayerElvwe{name = "Aegeon",
---     colorshirt   = Tic.COLORGREENL,
---     colorarmor   = Tic.COLORGREEND,
---     colorpants   = Tic.COLORGREENM,
--- }
-Nitcha = CPlayerDrowe{name = "Nitcha",
-    worldx = 15,
+Aegeon = CPlayerElvwe{
+    name = "Aegeon",
+    classed = CPlayerElvwe,
+    worldx = 0,
+    worldy = 20,
+    colorshirt   = Tic.COLORGREENL,
+    colorarmor   = Tic.COLORGREEND,
+    colorpants   = Tic.COLORGREENM,
+}
+Nitcha = CPlayerDrowe{
+    name = "Nitcha",
+    classed = CPlayerDrowe,
+    worldx = 10,
+    worldy = 20,
     ["slots.head"] = CSlotHead{object = CClothesHatMedium{}},
-    -- ["slots.handrg"] = CSlotHand{object = CWeaponBowMedium{}},
     ["slots.handlf"] = CSlotHand{object = CObjectFlaskLarge{used = CObject.USEDHALF}},
     statmenact = 10,
 }
--- Azarel = CPlayerAngel{name = "Azarel",
--- }
--- Zikkow = CPlayerTifel{name = "Zikkow",
---     colorhairsbg = Tic.COLORGREENM,
---     colorhairsfg = Tic.COLORGREEND,
---     colorextra   = Tic.COLORGREYM,
---     coloreyesbg  = Tic.COLORGREENM,
---     coloreyesfg  = Tic.COLORGREENL,
--- }
--- Kaainn = CPlayerDemon{name = "Kaainn",
---     colorhairsbg = Tic.COLORGREYL,
---     colorhairsfg = Tic.COLORWHITE,
---     coloreyesbg  = Tic.COLORBLUEM,
---     coloreyesfg  = Tic.COLORBLUEL,
---     size         = Tic.SIZEM,
---     colorshirt   = Tic.COLORPURPLE,
---     colorpants   = Tic.COLORRED,
--- }
--- Daemok = CPlayerDemon{name = "Daemok",
--- }
+Azarel = CPlayerAngel{
+    name = "Azarel",
+    classed = CPlayerAngel,
+    worldx = 20,
+    worldy = 20,
+}
+Zikkow = CPlayerTifel{
+    name = "Zikkow",
+    classed = CPlayerTifel,
+    worldx = 30,
+    worldy = 20,
+    colorhairsbg = Tic.COLORGREENM,
+    colorhairsfg = Tic.COLORGREEND,
+    colorextra   = Tic.COLORGREYM,
+    coloreyesbg  = Tic.COLORGREENM,
+    coloreyesfg  = Tic.COLORGREENL,
+}
+Kaainn = CPlayerDemon{
+    name = "Kaainn",
+    classed = CPlayerDemon,
+    worldx = 0,
+    worldy = 30,
+    colorhairsbg = Tic.COLORGREYL,
+    colorhairsfg = Tic.COLORWHITE,
+    coloreyesbg  = Tic.COLORBLUEM,
+    coloreyesfg  = Tic.COLORBLUEL,
+    size         = Tic.SIZEM,
+    colorshirt   = Tic.COLORPURPLE,
+    colorpants   = Tic.COLORRED,
+}
+Daemok = CPlayerDemon{
+    name = "Daemok",
+    classed = CPlayerDemon,
+    worldx = 10,
+    worldy = 30,
+}
 end
 
 if false then
@@ -8429,7 +8458,7 @@ end
 
 
 local _playerclass = CPlayerTifel
-if true then
+if false then
 if true then
 Walfie = _playerclass{classed = _playerclass,
     name = "Walfie",
