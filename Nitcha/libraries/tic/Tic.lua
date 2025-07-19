@@ -1426,22 +1426,22 @@ CSpriteFG.WEAPONSHLDB = CSpriteFG.OBJECTBANK + 2 -- shields bank
 CSpriteFG.WEAPONSHLDS = CSpriteFG.WEAPONSHLDB + 0
 CSpriteFG.WEAPONSHLDM = CSpriteFG.WEAPONSHLDB + 16
 CSpriteFG.WEAPONSHLDL = CSpriteFG.WEAPONSHLDB + 32
-CSpriteFG.OBJECTFLASB = CSpriteFG.OBJECTBANK + 3 -- flasks bank
-CSpriteFG.OBJECTFLASS = CSpriteFG.OBJECTFLASB + 0
-CSpriteFG.OBJECTFLASM = CSpriteFG.OBJECTFLASB + 16
-CSpriteFG.OBJECTFLASL = CSpriteFG.OBJECTFLASB + 32
-CSpriteFG.CLOTHESHATB = CSpriteFG.OBJECTBANK + 4 -- hats bank
+CSpriteFG.CLOTHESHATB = CSpriteFG.OBJECTBANK + 3 -- hats bank
 CSpriteFG.CLOTHESHATS = CSpriteFG.CLOTHESHATB + 0
 CSpriteFG.CLOTHESHATM = CSpriteFG.CLOTHESHATB + 16
 CSpriteFG.CLOTHESHATL = CSpriteFG.CLOTHESHATB + 32
-CSpriteFG.CLOTHESHLMB = CSpriteFG.OBJECTBANK + 5 -- helmets bank
+CSpriteFG.CLOTHESHLMB = CSpriteFG.OBJECTBANK + 4 -- helmets bank
 CSpriteFG.CLOTHESHLMS = CSpriteFG.CLOTHESHLMB + 0
 CSpriteFG.CLOTHESHLMM = CSpriteFG.CLOTHESHLMB + 16
 CSpriteFG.CLOTHESHLML = CSpriteFG.CLOTHESHLMB + 32
-CSpriteFG.CLOTHESBKPB = CSpriteFG.OBJECTBANK + 6 -- backpacks bank
+CSpriteFG.CLOTHESBKPB = CSpriteFG.OBJECTBANK + 5 -- backpacks bank
 CSpriteFG.CLOTHESBKPS = CSpriteFG.CLOTHESBKPB + 0
 CSpriteFG.CLOTHESBKPM = CSpriteFG.CLOTHESBKPB + 16
 CSpriteFG.CLOTHESBKPL = CSpriteFG.CLOTHESBKPB + 32
+CSpriteFG.OBJECTFLASB = CSpriteFG.OBJECTBANK + 48 -- flasks bank
+CSpriteFG.OBJECTFLASS = CSpriteFG.OBJECTFLASB + 0
+CSpriteFG.OBJECTFLASM = CSpriteFG.OBJECTFLASB + 16
+CSpriteFG.OBJECTFLASL = CSpriteFG.OBJECTFLASB + 32
 function CSpriteFG:new(_argt)
     CSpriteFG.super.new(self, _argt)
     self.kind = Classic.KINDSPRITEFG
@@ -7327,7 +7327,8 @@ function CButtonSlot:drawBorder()
 end
 
 function CButtonSlot:drawGround()
-    rect(self.screenx, self.screeny, self.screenw, self.screenh, self.colorground)
+    local _colorground = (self.hovered) and self.colorhover or self.colorground
+    rect(self.screenx, self.screeny, self.screenw, self.screenh, _colorground)
 
     local _object = nil
     if self.getslotobject then
@@ -7357,7 +7358,11 @@ end
 CButtonSlotPlayer = CButtonSlot:extend()
 function CButtonSlotPlayer:new(_argt)
     CButtonSlotPlayer.super.new(self, _argt)
-    self.behaviour           = IButtonSlotPlayer.BEHAVIOUR
+    self.behaviour   = IButtonSlotPlayer.BEHAVIOUR
+    self.clicklf     = function() Tic:logAppend("Edit") end
+    self.clickrg     = function() Tic:logAppend("Drop") end
+    self.hovertextlf = CText{text = "Edit"}
+    self.hovertextrg = CText{text = "Drop"}
     self:argt(_argt) -- override if any
 end
 
@@ -8332,7 +8337,7 @@ end -- generate places
 --
 -- Players
 --
-if true then
+if false then
 Truduk = CPlayerDwarf{
     name = "Truduk",
     classed = CPlayerDwarf,
@@ -8458,7 +8463,7 @@ end
 
 
 local _playerclass = CPlayerTifel
-if false then
+if true then
 if true then
 Walfie = _playerclass{classed = _playerclass,
     name = "Walfie",
@@ -8569,7 +8574,7 @@ Wylfie = _playerclass{classed = _playerclass,
     -- spottingspot = true,
     spottingpick = true,
     ["slots.handrg"] = CSlotHand{object = CWeaponLance{}},
-    ["slots.handlf"] = CSlotHand{object = CWeaponShieldLarge{}},
+    -- ["slots.handlf"] = CSlotHand{object = CWeaponShieldLarge{}},
     ["slots.head"]   = CSlotHead{object = CClothesHelmetLarge{}},
     ["slots.back"]   = CSlotBack{object = CClothesBackPackLarge{}},
 }
