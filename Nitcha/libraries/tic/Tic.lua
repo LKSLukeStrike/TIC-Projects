@@ -371,6 +371,14 @@ Tic.FUNCTIONMOVETOGGLEDRAW      = function() Tic:moveToggleDraw() end
 Tic.FUNCTIONSCALENEXT           = function() Tic:scaleNext() end
 Tic.FUNCTIONSCREENPREV          = function() Tic:screenPrev() end
 Tic.FUNCTIONSCREENNEXT          = function() Tic:screenNext() end
+Tic.FUNCTIONSLOTGETHEAD         = function() return Tic:slotGetHead() end
+Tic.FUNCTIONSLOTGETBACK         = function() return Tic:slotGetBack() end
+Tic.FUNCTIONSLOTGETHANDLF       = function() return Tic:slotGetHandLF() end
+Tic.FUNCTIONSLOTGETHANDRG       = function() return Tic:slotGetHandRG() end
+Tic.FUNCTIONSLOTDROPHEAD        = function() return Tic:slotDropHead() end
+Tic.FUNCTIONSLOTDROPBACK        = function() return Tic:slotDropBack() end
+Tic.FUNCTIONSLOTDROPHANDLF      = function() return Tic:slotDropHandLF() end
+Tic.FUNCTIONSLOTDROPHANDRG      = function() return Tic:slotDropHandRG() end
 
 -- Keys to Functions -- per screen
 Tic.KEYSFUNCTIONSINTRO = {
@@ -975,18 +983,68 @@ end
 
 function Tic:entitySpotting(_character)
     _character = _character or Tic:playerActual()
-    if not _character then return nil end
+    if not _character then return end
 	return _character:entitySpotting()
 end
 
 function Tic:entityHovering(_character)
     _character = _character or Tic:playerActual()
-    if not _character then return nil end
+    if not _character then return end
 	return _character:entityHovering()
 end
 
 function Tic:spottingActual(_character)
     return (Tic:entityHovering(_character)) and Tic:entityHovering(_character) or Tic:entitySpotting(_character)
+end
+
+
+-- Slot System
+function Tic:slotGetHead(_character)
+    _character = _character or Tic:playerActual()
+    if not _character then return end
+	return _character.slots.head.object
+end
+
+function Tic:slotGetBack(_character)
+    _character = _character or Tic:playerActual()
+    if not _character then return end
+	return _character.slots.back.object
+end
+
+function Tic:slotGetHandLF(_character)
+    _character = _character or Tic:playerActual()
+    if not _character then return end
+	return _character.slots.handlf.object
+end
+
+function Tic:slotGetHandRG(_character)
+    _character = _character or Tic:playerActual()
+    if not _character then return end
+	return _character.slots.handrg.object
+end
+
+function Tic:slotDropHead(_character)
+    _character = _character or Tic:playerActual()
+    if not _character then return end
+	return _character:slotDropHead()
+end
+
+function Tic:slotDropBack(_character)
+    _character = _character or Tic:playerActual()
+    if not _character then return end
+	return _character:slotDropBack()
+end
+
+function Tic:slotDropHandLF(_character)
+    _character = _character or Tic:playerActual()
+    if not _character then return end
+	return _character:slotDropHandLF()
+end
+
+function Tic:slotDropHandRG(_character)
+    _character = _character or Tic:playerActual()
+    if not _character then return end
+	return _character:slotDropHandRG()
 end
 
 
@@ -4354,7 +4412,6 @@ function CCharacter:new(_argt)
                          phy = CInventoryPhy{},
                          men = CInventoryMen{},
                          psy = CInventoryPsy{},
-                         any = CInventoryAny{},
                         }
     self:argt(_argt) -- override if any
     self.camera       = CCamera{name = self.name.." "..Classic.NAMECAMERA} -- one camera per character
@@ -4371,6 +4428,7 @@ function CCharacter:adjustInventoriesSlots()
     if not self.inventories then return end -- mandatory (argt)
     if not self.inventories.exists then return end -- ensure we already have inventories
 
+    if not  self.inventories.any then self.inventories.any = CInventoryAny{} end
     local _inventoryany = self.inventories.any -- grab all objects
     local _inventoryphy = self.inventories.phy
     local _inventorymen = self.inventories.men
@@ -4405,7 +4463,7 @@ function CCharacter:adjustInventoriesSlots()
         end
     end
 
-    _inventoryany.objects = {} -- get rid of extra objects
+    self.inventories.any = nil -- get rid of extra objects
 end
 
 function CCharacter:colorPhyAct()
@@ -6706,8 +6764,10 @@ end
 
 function CButton:draw() -- button drawing
     CButton.super.draw(self)
-    if self.hovered and (self.hovertextlf and self.hovertextlf:is(CText)) then self:drawHovertextLF() end
-    if self.hovered and (self.hovertextrg and self.hovertextrg:is(CText)) then self:drawHovertextRG() end
+    if self.hovered then
+        if self.clicklf and (self.hovertextlf and self.hovertextlf:is(CText)) then self:drawHovertextLF() end
+        if self.clickrg and (self.hovertextrg and self.hovertextrg:is(CText)) then self:drawHovertextRG() end
+    end
 end
 
 function CButton:drawGround()
@@ -7360,7 +7420,7 @@ function CButtonSlotPlayer:new(_argt)
     CButtonSlotPlayer.super.new(self, _argt)
     self.behaviour   = IButtonSlotPlayer.BEHAVIOUR
     self.clicklf     = function() Tic:logAppend("Edit") end
-    self.clickrg     = function() Tic:logAppend("Drop") end
+    self.clickrg     = nil -- override per slot
     self.hovertextlf = CText{text = "Edit"}
     self.hovertextrg = CText{text = "Drop"}
     self:argt(_argt) -- override if any
@@ -7369,28 +7429,28 @@ end
 CButtonSlotPlayerHead = CButtonSlotPlayer:extend()
 function CButtonSlotPlayerHead:new(_argt)
     CButtonSlotPlayerHead.super.new(self, _argt)
-    self.getslotobject = function() return Tic:playerActual().slots.head.object end
+    self.getslotobject = Tic.FUNCTIONSLOTGETHEAD
     self:argt(_argt) -- override if any
 end
 
 CButtonSlotPlayerBack = CButtonSlotPlayer:extend()
 function CButtonSlotPlayerBack:new(_argt)
     CButtonSlotPlayerBack.super.new(self, _argt)
-    self.getslotobject = function() return Tic:playerActual().slots.back.object end
+    self.getslotobject = Tic.FUNCTIONSLOTGETBACK
     self:argt(_argt) -- override if any
 end
 
 CButtonSlotPlayerHandLF = CButtonSlotPlayer:extend()
 function CButtonSlotPlayerHandLF:new(_argt)
     CButtonSlotPlayerHandLF.super.new(self, _argt)
-    self.getslotobject = function() return Tic:playerActual().slots.handlf.object end
+    self.getslotobject = Tic.FUNCTIONSLOTGETHANDLF
     self:argt(_argt) -- override if any
 end
 
 CButtonSlotPlayerHandRG = CButtonSlotPlayer:extend()
 function CButtonSlotPlayerHandRG:new(_argt)
     CButtonSlotPlayerHandRG.super.new(self, _argt)
-    self.getslotobject = function() return Tic:playerActual().slots.handrg.object end
+    self.getslotobject = Tic.FUNCTIONSLOTGETHANDRG
     self:argt(_argt) -- override if any
 end
 
@@ -8577,6 +8637,7 @@ Wylfie = _playerclass{classed = _playerclass,
     -- ["slots.handlf"] = CSlotHand{object = CWeaponShieldLarge{}},
     ["slots.head"]   = CSlotHead{object = CClothesHelmetLarge{}},
     ["slots.back"]   = CSlotBack{object = CClothesBackPackLarge{}},
+    ["inventories.any"]   = CInventoryAny{objects = {CObjectFlaskSmall{}}},
 }
 end
 end
