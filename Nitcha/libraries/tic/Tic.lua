@@ -1023,25 +1023,35 @@ function Tic:slotGetHandRG(_character)
 	return _character.slots.handrg.object
 end
 
+function Tic:slotDropAll(_character)
+    _character = _character or Tic:playerActual()
+    if not _character then return end
+	return _character:slotDropAll()
+end
+
 function Tic:slotDropHead(_character)
+    if Tic.MODIFIERKEYS[Tic.KEY_SHIFT] then Tic:slotDropAll(_character) end
     _character = _character or Tic:playerActual()
     if not _character then return end
 	return _character:slotDropHead()
 end
 
 function Tic:slotDropBack(_character)
+    if Tic.MODIFIERKEYS[Tic.KEY_SHIFT] then Tic:slotDropAll(_character) end
     _character = _character or Tic:playerActual()
     if not _character then return end
 	return _character:slotDropBack()
 end
 
 function Tic:slotDropHandLF(_character)
+    if Tic.MODIFIERKEYS[Tic.KEY_SHIFT] then Tic:slotDropAll(_character) end
     _character = _character or Tic:playerActual()
     if not _character then return end
 	return _character:slotDropHandLF()
 end
 
 function Tic:slotDropHandRG(_character)
+    if Tic.MODIFIERKEYS[Tic.KEY_SHIFT] then Tic:slotDropAll(_character) end
     _character = _character or Tic:playerActual()
     if not _character then return end
 	return _character:slotDropHandRG()
@@ -1619,6 +1629,22 @@ function CSlot:canSlotObject(_object)
     return true
 end
 
+function CSlot:appendObject(_object, _emptyonly)
+    _emptyonly = _emptyonly or false
+    if not self:canAppendObject(_object) then return end -- nil = false
+    if _emptyonly and self.object then return end -- only if slot is empty
+    self.object = _object
+    return _object -- done
+end
+
+function CSlot:removeObject(_object, _sameonly)
+    _sameonly = _sameonly or false
+    if not _object then return end -- mandatory
+    if _sameonly and not (self.object == _object) then return end -- only if object is already in slot
+    self.object = nil
+    return _object -- ok
+end
+
 CSlotHead = CSlot:extend() -- generic head slot
 Classic.KINDSLOTHEAD = "SlotHead" -- SlotHead kind
 Classic.NAMESLOTHEAD = "SlotHead" -- SlotHead name
@@ -1691,12 +1717,13 @@ end
 function CInventory:removeObject(_object)
     if not _object then return end -- mandatory
     if not Tables:valFind(self.objects, _object) then return end -- not in inventory
-    Tables:valRemove(self.objects, _object) -- remove all -- should not append
+    Tables:valRemove(self.objects, _object) -- remove all -- should not happend
     return _object -- ok
 end
 
 function CInventory:copytoInventory(_inventory)
     if not _inventory then return end -- mandatory
+    if _inventory == self then return end -- avoid itself
     local _garbage = {}
     local _objects = Tables:iclone(self.objects, true)
     for _, _object in ipairs(_objects) do
@@ -1709,6 +1736,7 @@ end
 
 function CInventory:movetoInventory(_inventory)
     if not _inventory then return end -- mandatory
+    if _inventory == self then return end -- avoid itself
     local _garbage = {}
     local _objects = Tables:iclone(self.objects, true)
     for _, _object in ipairs(_objects) do
@@ -2030,8 +2058,9 @@ function CLocations:entities(_locations) -- entities in locations
     return _result -- entities
 end
 
-function CLocations:appendEntity(_entity) -- append a new entity -- [!] allows doublons
+function CLocations:appendEntity(_entity, _range) -- append a new entity -- [!] allows doublons
     if not _entity then return end -- mandatory
+    self:spreadEntity(_entity, _range)
     local _worldx = _entity.worldx
     local _worldy = _entity.worldy
     if not self.locations[_worldy] then -- new worldy entry
@@ -2041,6 +2070,24 @@ function CLocations:appendEntity(_entity) -- append a new entity -- [!] allows d
         self.locations[_worldy][_worldx] = {}
     end
     self.locations[_worldy][_worldx][_entity] = _entity
+end
+
+function CLocations:spreadEntity(_entity, _range) -- try to find an empty location within range if any
+    if not _entity then return end -- mandatory
+    _range = Nums:pos(_range) or 0
+    if _range == 0 then return end -- no spread
+    local _spreadlocations = {}
+    for _spready = _entity.worldy - _range, _entity.worldy + _range do
+        for _spreadx = _entity.worldx - _range, _entity.worldx + _range do
+            if not self.locations[_spready] or not self.locations[_spready][_spreadx] then
+                if not _spreadlocations[_spready] then _spreadlocations[_spready] = {} end
+                _spreadlocations[_spready][_spreadx] = true
+            end
+        end
+    end
+    if Tables:size(_spreadlocations) == 0 then return end -- stay on initial positions
+    _entity.worldy = Tables:keyPickRandom(_spreadlocations)
+    _entity.worldx = Tables:keyPickRandom(_spreadlocations[_entity.worldy])
 end
 
 function CLocations:deleteEntity(_entity) -- delete an existing entity
@@ -2053,13 +2100,13 @@ function CLocations:deleteEntity(_entity) -- delete an existing entity
     if Tables:size(self.locations[_worldy]) == 0 then self.locations[_worldy] = nil end
 end
 
-function CLocations:moveEntityWorldXY(_entity, _worldx, _worldy) -- move an existing entity
+function CLocations:moveEntityWorldXY(_entity, _worldx, _worldy, _range) -- move an existing entity
     if not _entity or not _worldx or not _worldy then return end -- mandatory
     if not self.locations[_entity.worldy][_entity.worldx][_entity] then return end -- doesnt exist
     self:deleteEntity(_entity)
     _entity.worldx = _worldx
     _entity.worldy = _worldy
-    self:appendEntity(_entity)
+    self:appendEntity(_entity, _range)
 end
 
 function CLocations:locationsRegion(_region) -- locations in region
@@ -2140,11 +2187,11 @@ function CEntitiesLocations:existsEntity(_entity) -- if exists an entity
     return self.entities[_entity]
 end
 
-function CEntitiesLocations:appendEntity(_entity) -- add a new entity
+function CEntitiesLocations:appendEntity(_entity, _range) -- add a new entity
     if not _entity then return end -- mandatory
     if self:existsEntity(_entity) then return end -- avoid doublons
     self.entities[_entity] = _entity
-    self.locations:appendEntity(_entity)
+    self.locations:appendEntity(_entity, _range)
 end
 
 function CEntitiesLocations:deleteEntity(_entity) -- delete an entity
@@ -2154,10 +2201,10 @@ function CEntitiesLocations:deleteEntity(_entity) -- delete an entity
     self.locations:deleteEntity(_entity)
 end
 
-function CEntitiesLocations:moveEntityWorldXY(_entity, _worldx, _worldy) -- move an existing entity
+function CEntitiesLocations:moveEntityWorldXY(_entity, _worldx, _worldy, _range) -- move an existing entity
     if not _entity or not _worldx or not _worldy then return end -- mandatory
     if not self.entities[_entity] then return end -- doesnt exist
-    self.locations:moveEntityWorldXY(_entity, _worldx, _worldy)
+    self.locations:moveEntityWorldXY(_entity, _worldx, _worldy, _range)
 end
 
 function CEntitiesLocations:locationsRegion(_region) -- locations in region
@@ -2345,10 +2392,10 @@ end
 -- CWorld instance
 World = CWorld{}
 
-function CWorld:appendEntity(_entity) -- append an entity in the world
+function CWorld:appendEntity(_entity, _range) -- append an entity in the world
     if not _entity then return end -- mandatory
     _entity.world = self -- parent world
-    self.entitieslocations:appendEntity(_entity)
+    self.entitieslocations:appendEntity(_entity, _range)
 end
 
 function CWorld:deleteEntity(_entity) -- delete an entity from the world
@@ -2356,9 +2403,9 @@ function CWorld:deleteEntity(_entity) -- delete an entity from the world
     self.entitieslocations:deleteEntity(_entity)
 end
 
-function CWorld:moveEntityWorldXY(_entity, _worldx, _worldy) -- move an entity into the world
+function CWorld:moveEntityWorldXY(_entity, _worldx, _worldy, _range) -- move an entity into the world
     if not _entity or not _worldx or not _worldy then return end -- mandatory
-    self.entitieslocations:moveEntityWorldXY(_entity, _worldx, _worldy)
+    self.entitieslocations:moveEntityWorldXY(_entity, _worldx, _worldy, _range)
     _entity:focus() -- focus its camera on itself
 end
 
@@ -3426,8 +3473,10 @@ function CObject:new(_argt)
     CObject.super.new(self, _argt)
     self.kind = Classic.KINDOBJECT
     self.name = Classic.NAMEOBJECT
-    self.used      = CObject.USEDNONE -- used level if any
-    self.inventory = nil -- can have an inventory if any
+    self.used         = CObject.USEDNONE -- used level if any
+    self.inventory    = nil -- can have an inventory if any
+    self.hitbox       = nil
+    self.interactions = {10}
     self:argt(_argt) -- override if any
 end
 
@@ -4464,6 +4513,56 @@ function CCharacter:adjustInventoriesSlots()
     end
 
     self.inventories.any = nil -- get rid of extra objects
+end
+
+function CCharacter:slotDropAll()
+    self:slotDropHead()
+    self:slotDropBack()
+    self:slotDropHandLF()
+    self:slotDropHandRG()
+end
+
+function CCharacter:slotDropHead()
+    local _object = self.slots.head.object
+    if not _object then return end
+	return self:dropObject(_object)
+end
+
+function CCharacter:slotDropBack()
+    local _object = self.slots.back.object
+    if not _object then return end
+	return self:dropObject(_object)
+end
+
+function CCharacter:slotDropHandLF()
+    local _object = self.slots.handlf.object
+    if not _object then return end
+	return self:dropObject(_object)
+end
+
+function CCharacter:slotDropHandRG()
+    local _object = self.slots.handrg.object
+    if not _object then return end
+	return self:dropObject(_object)
+end
+
+function CCharacter:dropObject(_object)
+    if not _object then return end
+    for _, _slot in pairs(self.slots or {}) do -- remove object from slots
+        if CSlot:isSlot(_slot) then
+            _slot:removeObject(_object, true)
+        end
+    end
+    for _, _inventory in pairs(self.inventories or {}) do -- remove object from inventories
+        if CInventory:isInventory(_inventory) then
+            _inventory:removeObject(_object)
+        end
+    end
+    _object.worldx = self.worldx
+    _object.worldy = self.worldy + Tic.SPRITESIZE + Tic.SPRITESIZE2
+    _object.dirx = self.dirx
+    self.world:appendEntity(_object, Tic.SPRITESIZE)
+    return _object
 end
 
 function CCharacter:colorPhyAct()
@@ -7430,6 +7529,7 @@ CButtonSlotPlayerHead = CButtonSlotPlayer:extend()
 function CButtonSlotPlayerHead:new(_argt)
     CButtonSlotPlayerHead.super.new(self, _argt)
     self.getslotobject = Tic.FUNCTIONSLOTGETHEAD
+    self.clickrg       = Tic.FUNCTIONSLOTDROPHEAD
     self:argt(_argt) -- override if any
 end
 
@@ -7437,6 +7537,7 @@ CButtonSlotPlayerBack = CButtonSlotPlayer:extend()
 function CButtonSlotPlayerBack:new(_argt)
     CButtonSlotPlayerBack.super.new(self, _argt)
     self.getslotobject = Tic.FUNCTIONSLOTGETBACK
+    self.clickrg       = Tic.FUNCTIONSLOTDROPBACK
     self:argt(_argt) -- override if any
 end
 
@@ -7444,6 +7545,7 @@ CButtonSlotPlayerHandLF = CButtonSlotPlayer:extend()
 function CButtonSlotPlayerHandLF:new(_argt)
     CButtonSlotPlayerHandLF.super.new(self, _argt)
     self.getslotobject = Tic.FUNCTIONSLOTGETHANDLF
+    self.clickrg       = Tic.FUNCTIONSLOTDROPHANDLF
     self:argt(_argt) -- override if any
 end
 
@@ -7451,6 +7553,7 @@ CButtonSlotPlayerHandRG = CButtonSlotPlayer:extend()
 function CButtonSlotPlayerHandRG:new(_argt)
     CButtonSlotPlayerHandRG.super.new(self, _argt)
     self.getslotobject = Tic.FUNCTIONSLOTGETHANDRG
+    self.clickrg       = Tic.FUNCTIONSLOTDROPHANDRG
     self:argt(_argt) -- override if any
 end
 
