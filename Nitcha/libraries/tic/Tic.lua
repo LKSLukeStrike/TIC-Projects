@@ -31,6 +31,22 @@ Y = "Y:"
 Tic = {}
 
 
+-- Texts
+Tic.TEXTSPOT   = "Spot"
+Tic.TEXTPICK   = "Pick"
+Tic.TEXTLOCK   = "Lock"
+Tic.TEXTUNLOCK = "Unlock"
+Tic.TEXTMOVE   = "Move"
+Tic.TEXTPREV   = "Prev"
+Tic.TEXTNEXT   = "Next"
+Tic.TEXTEDIT   = "Edit"
+Tic.TEXTDROP   = "Drop"
+Tic.TEXTSTAND  = "Stand"
+Tic.TEXTKNEEL  = "Kneel"
+Tic.TEXTWORK   = "Work"
+Tic.TEXTSLEEP  = "Sleep"
+
+
 -- Fonts sizes
 Tic.FONTWL = 6 -- large font width
 Tic.FONTWS = 4 -- small font width
@@ -5132,10 +5148,15 @@ end
 function CCharacter:toggleWork() -- toggle idle/move vs work
     local _posture = self:postureGet()
     local _status  = self:statusGet()
-    if _posture == Tic.POSTUREFLOOR then return end -- cannot toggle work
-    _status = (_status == Tic.STATUSWORK)
-        and Tic.STATUSIDLE
-        or  Tic.STATUSWORK
+    if _posture == Tic.POSTUREFLOOR and not (_status == Tic.STATUSSLEEP) then return end -- cannot toggle work
+    if _posture == Tic.POSTUREFLOOR then -- sleep to stand + work
+        _posture = Tic.POSTURESTAND
+        _status  = Tic.STATUSWORK
+    elseif _status == Tic.STATUSIDLE then -- idle to work
+        _status  = Tic.STATUSWORK
+    else -- work to idle
+        _status  = Tic.STATUSIDLE
+    end
 	self:stateSet(_posture, _status)
     self:hitboxRefresh() -- refresh the hitboxes
 end
@@ -5144,11 +5165,11 @@ function CCharacter:toggleKneel() -- toggle stand vs kneel
     local _posture = self:postureGet()
     local _status  = self:statusGet()
     if _posture == Tic.POSTUREFLOOR and not (_status == Tic.STATUSSLEEP) then return end -- cannot toggle sleep
-    if _posture == Tic.POSTURESTAND then
+    if _posture == Tic.POSTURESTAND then -- stand to kneel
         _posture = Tic.POSTUREKNEEL
-    elseif _posture == Tic.POSTUREKNEEL then
+    elseif _posture == Tic.POSTUREKNEEL then -- kneel to stad
         _posture = Tic.POSTURESTAND
-    elseif _posture == Tic.POSTUREFLOOR then -- sleeping
+    else -- sleep to kneel
         _posture = Tic.POSTUREKNEEL
         _status = Tic.STATUSIDLE
     end
@@ -5160,12 +5181,13 @@ function CCharacter:toggleSleep() -- toggle stand vs sleep
     local _posture = self:postureGet()
     local _status  = self:statusGet()
     if _posture == Tic.POSTUREFLOOR and not (_status == Tic.STATUSSLEEP) then return end -- cannot toggle sleep
-    _posture = (_posture == Tic.POSTUREFLOOR)
-        and Tic.POSTURESTAND
-        or  Tic.POSTUREFLOOR
-    _status = (_status == Tic.STATUSSLEEP)
-        and Tic.STATUSIDLE
-        or  Tic.STATUSSLEEP
+    if _posture == Tic.POSTUREFLOOR then -- sleep to stand
+        _posture = Tic.POSTURESTAND
+        _status  = Tic.STATUSIDLE
+    else -- stand/kneel to sleep
+        _posture = Tic.POSTUREFLOOR
+        _status  = Tic.STATUSSLEEP
+    end
     self:stateSet(_posture, _status)
     self:hitboxRefresh() -- refresh the hitboxes
 end
@@ -6758,8 +6780,8 @@ function CWindowWorld:drawPlayerActual()
 
                             local _locking  = (_playeractual.spottinglock and _playeractual.spotting == _entity) -- already locking ?
                             local _locktext = (_locking)
-                                and CText{text = "Unlock", colorinside = Tic.COLORHOVER}
-                                or  CText{text = "Lock", colorinside = Tic.COLORHOVER}
+                                and CText{text = Tic.TEXTUNLOCK, colorinside = Tic.COLORHOVER}
+                                or  CText{text = Tic.TEXTLOCK, colorinside = Tic.COLORHOVER}
                             _locktext.screenx = _entity.screenx - ((_locktext.screenw - Tic.SPRITESIZE) // 2)
                             _locktext.screeny = _entity.screeny - _locktext.screenh
                             _locktext:draw()
@@ -7286,7 +7308,7 @@ function CButtonPlayerPrev:new(_argt)
     CButtonPlayerPrev.super.new(self, _argt)
 	self.behaviour      = IButtonPlayerChange.BEHAVIOUR  -- function to trigger at first
     self.clicklf        = Tic.FUNCTIONPLAYERPREV
-    self.hovertextlf    = CText{text = "Prev"}
+    self.hovertextlf    = CText{text = Tic.TEXTPREV}
     self:argt(_argt) -- override if any
 end
 
@@ -7299,7 +7321,7 @@ function CButtonPlayerNext:new(_argt)
     CButtonPlayerNext.super.new(self, _argt)
 	self.behaviour      = IButtonPlayerChange.BEHAVIOUR  -- function to trigger at first
     self.clicklf        = Tic.FUNCTIONPLAYERNEXT
-    self.hovertextlf    = CText{text = "Next"}
+    self.hovertextlf    = CText{text = Tic.TEXTNEXT}
     self:argt(_argt) -- override if any
 end
 
@@ -7313,8 +7335,8 @@ function CButtonPlayerPick:new(_argt)
     self.drawborder     = false
 	self.sprite.sprite  = CSpriteBG.SIGNPLAYER
 	self.behaviour      = IButtonPlayerChange.BEHAVIOUR  -- function to trigger at first
-    self.clicklf        = function() Tic:logAppend("Pick") end
-    self.hovertextlf    = CText{text = "Pick"}
+    self.clicklf        = function() Tic:logAppend(Tic.TEXTPICK) end
+    self.hovertextlf    = CText{text = Tic.TEXTPICK}
     self:argt(_argt) -- override if any
 end
 
@@ -7338,7 +7360,7 @@ function CButtonPlayerStand:new(_argt)
 	self.sprite.sprite  = CSpriteBG.SIGNSTAIDL
 	self.behaviour      = CButtonPlayerStand.BEHAVIOUR  -- function to trigger at first
     self.clicklf        = function() Tic:toggleKneel() end
-    self.hovertextlf    = CText{text = "Stand"}
+    self.hovertextlf    = CText{text = Tic.TEXTSTAND}
     self:argt(_argt) -- override if any
 end
 
@@ -7362,7 +7384,7 @@ function CButtonPlayerKneel:new(_argt)
 	self.sprite.sprite  = CSpriteBG.SIGNKNEIDL
 	self.behaviour      = CButtonPlayerKneel.BEHAVIOUR  -- function to trigger at first
     self.clicklf        = function() Tic:toggleKneel() end
-    self.hovertextlf    = CText{text = "Kneel"}
+    self.hovertextlf    = CText{text = Tic.TEXTKNEEL}
     self:argt(_argt) -- override if any
 end
 
@@ -7383,7 +7405,7 @@ function CButtonPlayerWork:new(_argt)
 	self.sprite.sprite  = CSpriteBG.SIGNDOWORK
 	self.behaviour      = CButtonPlayerWork.BEHAVIOUR  -- function to trigger at first
     self.clicklf        = function() Tic:toggleWork() end
-    self.hovertextlf    = CText{text = "Work"}
+    self.hovertextlf    = CText{text = Tic.TEXTWORK}
     self:argt(_argt) -- override if any
 end
 
@@ -7404,7 +7426,7 @@ function CButtonPlayerSleep:new(_argt)
 	self.sprite.sprite  = CSpriteBG.SIGNDOSLEE
 	self.behaviour      = CButtonPlayerSleep.BEHAVIOUR  -- function to trigger at first
     self.clicklf        = function() Tic:toggleSleep() end
-    self.hovertextlf    = CText{text = "Sleep"}
+    self.hovertextlf    = CText{text = Tic.TEXTSLEEP}
     self:argt(_argt) -- override if any
 end
 
@@ -7518,10 +7540,10 @@ CButtonSlotPlayer = CButtonSlot:extend()
 function CButtonSlotPlayer:new(_argt)
     CButtonSlotPlayer.super.new(self, _argt)
     self.behaviour   = IButtonSlotPlayer.BEHAVIOUR
-    self.clicklf     = function() Tic:logAppend("Edit") end
+    self.clicklf     = function() Tic:logAppend(Tic.TEXTEDIT) end
     self.clickrg     = nil -- override per slot
-    self.hovertextlf = CText{text = "Edit"}
-    self.hovertextrg = CText{text = "Drop"}
+    self.hovertextlf = CText{text = Tic.TEXTEDIT}
+    self.hovertextrg = CText{text = Tic.TEXTDROP}
     self:argt(_argt) -- override if any
 end
 
@@ -7629,7 +7651,7 @@ function CButtonSpottingSpot:new(_argt)
 	self.sprite.sprite = CSpriteBG.SIGNSPOTIT
 	self.behaviour     = CButtonSpottingSpot.BEHAVIOUR  -- function to trigger at first
     self.clicklf       = function() Tic:spottingToggleSpot() end
-    self.hovertextlf   = CText{text = "Spot"}
+    self.hovertextlf   = CText{text = Tic.TEXTSPOT}
     self:argt(_argt) -- override if any
 end
 
@@ -7648,7 +7670,7 @@ function CButtonSpottingLock:new(_argt)
 	self.sprite.sprite = CSpriteBG.SIGNLOCKIT
 	self.behaviour     = CButtonSpottingLock.BEHAVIOUR  -- function to trigger at first
     self.clicklf       = function() Tic:spottingToggleLock() end
-    self.hovertextlf   = CText{text = "Lock"}
+    self.hovertextlf   = CText{text = Tic.TEXTLOCK}
     self:argt(_argt) -- override if any
 end
 
@@ -7667,7 +7689,7 @@ function CButtonSpottingPick:new(_argt)
 	self.sprite.sprite = CSpriteBG.SIGNPICKIT
 	self.behaviour     = CButtonSpottingPick.BEHAVIOUR  -- function to trigger at first
     self.clicklf       = function() Tic:spottingTogglePick() end
-    self.hovertextlf   = CText{text = "Pick"}
+    self.hovertextlf   = CText{text = Tic.TEXTPICK}
     self:argt(_argt) -- override if any
 end
 
@@ -7684,7 +7706,7 @@ IButtonSpottingMove.BEHAVIOUR = function(self)
     local _playerregionworld = Tic:playerActual():regionWorld()
     local _entityregionworld = Tic:spottingActual():regionWorld()
     local _direction         = _playerregionworld:directionRegion(_entityregionworld)
-    self.hovertextlf = CText{text = "Move"}
+    self.hovertextlf = CText{text = Tic.TEXTMOVE}
     self.enabled     = false
     self.actived     = false
     if _direction == self.direction then
@@ -7775,7 +7797,7 @@ IButtonPlayerMove.BEHAVIOUR = function(self)
     IButtonPlayer.BEHAVIOUR(self)
     if not self.display then return end -- no move
     self.actived     = Tic:playerActual().direction == self.direction
-    self.hovertextlf = CText{text = "Move"}
+    self.hovertextlf = CText{text = Tic.TEXTMOVE}
 end
 
 CButtonPlayerMove000 = CButtonArrow000:extend() -- generic player move 000 button
