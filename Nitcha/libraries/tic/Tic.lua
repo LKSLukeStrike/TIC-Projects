@@ -397,9 +397,9 @@ Tic.FUNCTIONSLOTDROPHANDLF      = function() return Tic:slotDropHandLF() end
 Tic.FUNCTIONSLOTDROPHANDRG      = function() return Tic:slotDropHandRG() end
 
 -- Keys to Functions -- per screen
-Tic.KEYSFUNCTIONSINTRO = {
-    [Tic.KEY_NUMPADMINUS]  = Tic.FUNCTIONSCREENPREV,
-    [Tic.KEY_NUMPADPLUS]   = Tic.FUNCTIONSCREENNEXT,
+Tic.KEYSFUNCTIONSINTRO = { -- FIXME conflict with key any
+    -- [Tic.KEY_NUMPADMINUS]  = Tic.FUNCTIONSCREENPREV,
+    -- [Tic.KEY_NUMPADPLUS]   = Tic.FUNCTIONSCREENNEXT,
     [Tic.KEY_ANY]          = Tic.FUNCTIONSCREENNEXT,
 }
 Tic.KEYSFUNCTIONSMENUS = {
@@ -674,6 +674,14 @@ end
 
 function Tic:screenActual() -- actual screen in the stack
     return Tic.SCREENS.actvalue
+end
+
+function Tic:screenMin() -- first screen in the stack
+    return Tic.SCREENS:min()
+end
+
+function Tic:screenMax() -- last screen in the stack
+    return Tic.SCREENS:max()
 end
 
 function Tic:screenAppend(_screen) -- append a screen to the stack
@@ -5700,6 +5708,9 @@ function IPlayer:playerAppend()
 end
 
 
+--
+-- CPlayerHumanoid
+--
 CPlayerHumanoid = CCharacterHumanoid:extend() -- humanoid player characters
 function CPlayerHumanoid:new(_argt)
     CPlayerHumanoid.super.new(self, _argt)
@@ -8094,8 +8105,14 @@ Button17 = CButtonCenter{
     enabled = false,
 }
 
+Button15.clicklf = Tic.FUNCTIONSCREENNEXT
+-- Button7.clicklf = Tic.FUNCTIONSCREENNEXT
+
+ScreenIntro:elementsDistributeH({Button11, Button12, Button15, Button13, Button14}, 30, 10)
+ScreenIntro:elementsDistributeV({Button1, Button2, Button3}, 10, 10, 2)
+
 ScreenIntro:appendElements{
-    CWindowScreen{name = "Intro"},
+    CWindowScreen{name = "Intro", colorground = Tic.COLORRED},
     CWindowInfos{
         name = "PressKey",
         drawground = false,
@@ -8121,12 +8138,6 @@ ScreenIntro:appendElements{
     -- ButtonPlayerPrev,
     -- ButtonPlayerNext,
 }
-
-Button15.clicklf = Tic.FUNCTIONSCREENNEXT
--- Button7.clicklf = Tic.FUNCTIONSCREENNEXT
-
-ScreenIntro:elementsDistributeH({Button11, Button12, Button15, Button13, Button14}, 30, 10)
-ScreenIntro:elementsDistributeV({Button1, Button2, Button3}, 10, 10, 2)
 end
 
 if true then
@@ -8196,9 +8207,20 @@ ScreenWorldLF:elementsDistributeH( -- handrg and handlf slots
     28
 )
 
+WindowMenuInteract = CWindowMenu{
+    colorground = Tic.COLORRED,
+    screenx = 20, screeny = 80, screenw = 24, screenh = 40,
+    rounded = true, drawframes = true,
+    -- marginup = 2, margindw = 2, marginlf = 2, marginrg = 2,
+    separatory = -1,
+    stretch = true,
+    elements = {Button4, Button5, Button6},
+}
+
 ScreenWorldLF:appendElements{
     WindowSpottingPortrait,
     WindowSpottingInfos,
+    WindowMenuInteract,
     ButtonSpottingSpot,
     ButtonSpottingLock,
     ButtonSpottingPick,
@@ -8219,7 +8241,7 @@ ScreenWorldLF:appendElements{
 -- md panel
 ScreenWorldMD = CScreen{}
 
-WindowWorld      = CWindowWorld{spottingwindows = {WindowSpottingInfos, WindowSpottingPortrait}}
+WindowWorld      = CWindowWorld{}
 WindowInfosWorld = CWindowInfosWorld{}
 ScreenWorldMD:appendElements{
     WindowWorld,
@@ -8374,6 +8396,7 @@ end
 if true then Tic:screenAppend(ScreenIntro) end
 if true then Tic:screenAppend(ScreenWorld) end
 -- if true then Tic:screenAppend(ScreenMenus) end
+Tic:screenMin()
 if true then Tic.INVENTORYSCREEN = ScreenMenus end
 
 
