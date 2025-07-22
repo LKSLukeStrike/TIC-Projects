@@ -123,6 +123,12 @@ Tic.SPOTTINGPORTRAITWH = 16 -- spotting portrait window height
 Tic.SPOTTINGPORTRAITWX = ((Tic.WORLDWX - Tic.SPOTTINGPORTRAITWW) // 2) -- spotting portrait window x position
 Tic.SPOTTINGPORTRAITWY = Tic.SPOTTINGINFOSWY + 26 -- spotting portrait window y position
 
+-- Interactions Window positions and sizes (hud)
+Tic.INTERACTIONSWW = 16 -- interactions window width
+Tic.INTERACTIONSWH = 16 -- interactions window height
+Tic.INTERACTIONSWX = ((Tic.WORLDWX - Tic.INTERACTIONSWW) // 2) -- interactions window x position
+Tic.INTERACTIONSWY = Tic.SPOTTINGPORTRAITWY + 26 -- interactions window y position
+
 -- Palette map
 Tic.PALETTEMAP = 0x3FF0 * 2 -- vram bank 1
 
@@ -6336,9 +6342,15 @@ function CWindowMenu:content()
     local _size = Tables:size(_elements)
     _totsizeh = (self.stretch) and _maxsizeh * _size or _totsizeh
     _totsizeh = (_size > 0) and _totsizeh + (self.separatory * (_size - 1)) or _totsizeh
-    return {size = _size, elements = _elements,
-        sizew = self.marginlf + _maxsizew + self.marginrg, sizeh = self.marginup + _totsizeh + self.margindw,
-        maxsizew = _maxsizew, maxsizeh = _maxsizeh, totsizeh = _totsizeh}
+    return {
+        size = _size,
+        elements = _elements,
+        sizew = self.marginlf + _maxsizew + self.marginrg,
+        sizeh = self.marginup + _totsizeh + self.margindw,
+        maxsizew = _maxsizew,
+        maxsizeh = _maxsizeh,
+        totsizeh = _totsizeh
+    }
 end
 
 function CWindowMenu:drawInside()
@@ -6356,6 +6368,49 @@ function CWindowMenu:drawInside()
         _element:draw()
     end
     self.parent:appendElements(_content.elements)
+end
+
+
+--
+-- CWindowMenuInteractions
+--
+CWindowMenuInteractions = CWindowMenu:extend() -- window menu interactions
+Classic.KINDWINDOWMENUINTERACTIONS = "WindowMenuInteractions" -- Window kind
+Classic.NAMEWINDOWMENUINTERACTIONS = "WindowMenuInteractions" -- Window name
+function CWindowMenuInteractions:new(_argt)
+    CWindowMenuInteractions.super.new(self, _argt)
+    self.kind = Classic.KINDWINDOWMENUINTERACTIONS
+    self.name = Classic.NAMEWINDOWMENUINTERACTIONS
+    self.screenx    = Tic.INTERACTIONSWX
+    self.screeny    = Tic.INTERACTIONSWY
+    self.screenw    = Tic.INTERACTIONSWW
+    self.screenh    = Tic.INTERACTIONSWH
+    self.stretch    = true
+    self.drawframes = true
+    self.marginup   = 2
+    self.margindw   = 2
+    self.marginlf   = 2
+    self.marginrg   = 2
+    -- self.behaviour = IWindowSpotting.BEHAVIOUR
+    self:argt(_argt) -- override if any
+    self:adjustWH()
+    self:adjustXY()
+end
+
+function CWindowMenuInteractions:draw()
+    self:adjustXY()
+    CWindowMenuInteractions.super.draw(self)
+end 
+
+function CWindowMenuInteractions:adjustXY()
+    local _element = CElement{
+        screenx = Tic.SCREENX,
+        screeny = self.screeny,
+        screenw = Tic.WORLDWX,
+        screenh = 50,
+        colorground = Tic.COLORRED,
+    }
+    _element:alignElementDirection(self, Tic.DIR000)
 end
 
 
@@ -8072,7 +8127,7 @@ Button4 = CButtonMenuM2{
 Button5 = CButtonMenuM2{
     name = "Close",
     rounded = true,
-    text = CText{text = "Close"},
+    text = CText{text = "BlaBlaBla"},
     clicklf = _function,
 }
 Button6 = CButtonMenuM2{
@@ -8207,20 +8262,14 @@ ScreenWorldLF:elementsDistributeH( -- handrg and handlf slots
     28
 )
 
-WindowMenuInteract = CWindowMenu{
-    colorground = Tic.COLORRED,
-    screenx = 20, screeny = 80, screenw = 24, screenh = 40,
-    rounded = true, drawframes = true,
-    -- marginup = 2, margindw = 2, marginlf = 2, marginrg = 2,
-    separatory = -1,
-    stretch = true,
+WindowMenuInteractions = CWindowMenuInteractions{
     elements = {Button4, Button5, Button6},
 }
 
 ScreenWorldLF:appendElements{
     WindowSpottingPortrait,
     WindowSpottingInfos,
-    WindowMenuInteract,
+    WindowMenuInteractions,
     ButtonSpottingSpot,
     ButtonSpottingLock,
     ButtonSpottingPick,
@@ -8393,7 +8442,7 @@ end
 
 
 -- SCREENS
-if true then Tic:screenAppend(ScreenIntro) end
+-- if true then Tic:screenAppend(ScreenIntro) end
 if true then Tic:screenAppend(ScreenWorld) end
 -- if true then Tic:screenAppend(ScreenMenus) end
 Tic:screenMin()
