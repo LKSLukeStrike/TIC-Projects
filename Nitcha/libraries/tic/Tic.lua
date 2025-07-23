@@ -124,10 +124,10 @@ Tic.SPOTTINGPORTRAITWX = ((Tic.WORLDWX - Tic.SPOTTINGPORTRAITWW) // 2) -- spotti
 Tic.SPOTTINGPORTRAITWY = Tic.SPOTTINGINFOSWY + 26 -- spotting portrait window y position
 
 -- Interactions Window positions and sizes (hud)
-Tic.INTERACTIONSWW = 16 -- interactions window width
-Tic.INTERACTIONSWH = 16 -- interactions window height
-Tic.INTERACTIONSWX = ((Tic.WORLDWX - Tic.INTERACTIONSWW) // 2) -- interactions window x position
+Tic.INTERACTIONSWX = Tic.SCREENX -- interactions window x position
 Tic.INTERACTIONSWY = Tic.SPOTTINGPORTRAITWY + 26 -- interactions window y position
+Tic.INTERACTIONSWW = Tic.WORLDWX - Tic.INTERACTIONSWX -- interactions window width
+Tic.INTERACTIONSWH = Tic.SCREENH - Tic.INTERACTIONSWY -- interactions window height
 
 -- Palette map
 Tic.PALETTEMAP = 0x3FF0 * 2 -- vram bank 1

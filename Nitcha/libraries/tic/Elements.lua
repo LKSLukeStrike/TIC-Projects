@@ -194,6 +194,7 @@ end
 function CElement:alignElementDirection(_element, _direction) -- align a sub element from itself -- use direction
     if not _element then return end -- mandatory
     _direction = _direction or Tic.DIRHIT -- center by default
+
     if Tables:valFind({Tic.DIR315, Tic.DIR270, Tic.DIR225}, _direction) then -- LF
         _element.screenx = self.screenx
     elseif Tables:valFind({Tic.DIR000, Tic.DIRHIT, Tic.DIR180}, _direction) then -- MD
@@ -201,6 +202,7 @@ function CElement:alignElementDirection(_element, _direction) -- align a sub ele
     else -- RG
         _element.screenx = self.screenx + (self.screenw - _element.screenw)
     end
+    
     if Tables:valFind({Tic.DIR315, Tic.DIR000, Tic.DIR045}, _direction) then -- UP
         _element.screeny = self.screeny
     elseif Tables:valFind({Tic.DIR270, Tic.DIRHIT, Tic.DIR090}, _direction) then -- MD

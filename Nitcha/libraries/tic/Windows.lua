@@ -102,54 +102,35 @@ CWindowMenuInteractions = CWindowMenu:extend() -- window menu interactions
 Classic.KINDWINDOWMENUINTERACTIONS = "WindowMenuInteractions" -- Window kind
 Classic.NAMEWINDOWMENUINTERACTIONS = "WindowMenuInteractions" -- Window name
 CWindowMenuInteractions.BEHAVIOUR = function(self)
-    if not Tic:playerActual() then self.display = false end
+    self.display = (Tic:playerActual()) and true or false
     if not self.display then return end
-    Tic:trace(self.kind, self.display)
-    local _caninteract = Tic:playerActual():canInteract()
-    Tic:logAppend(_caninteract)
-    if _caninteract then
-        -- self.display = false
-        Tic:logAppend("ok")
-    else
-        -- self.display = false
-        Tic:logAppend("no")
-    end
-    -- self.display = Tic:playerActual():canInteract()
-    -- self.display = Tic:playerActual():canInteract()
+    self.display = Tic:playerActual():canInteract()
 end
 function CWindowMenuInteractions:new(_argt)
     CWindowMenuInteractions.super.new(self, _argt)
     self.kind = Classic.KINDWINDOWMENUINTERACTIONS
     self.name = Classic.NAMEWINDOWMENUINTERACTIONS
-    self.screenx    = Tic.INTERACTIONSWX
-    self.screeny    = Tic.INTERACTIONSWY
-    self.screenw    = Tic.INTERACTIONSWW
-    self.screenh    = Tic.INTERACTIONSWH
     self.stretch    = true
     self.drawframes = true
     self.drawborder = false
-    -- self.marginup   = 2
-    -- self.margindw   = 2
-    -- self.marginlf   = 2
-    -- self.marginrg   = 2
     self.behaviour = CWindowMenuInteractions.BEHAVIOUR
     self:argt(_argt) -- override if any
     self:adjustWH()
-    self:adjustXY()
 end
 
 function CWindowMenuInteractions:draw()
+    self:save()
     self:adjustXY()
     CWindowMenuInteractions.super.draw(self)
+    self:load()
 end 
 
 function CWindowMenuInteractions:adjustXY()
     local _element = CElement{
-        screenx = Tic.SCREENX,
-        screeny = self.screeny,
-        screenw = Tic.WORLDWX,
-        screenh = 50,
-        colorground = Tic.COLORRED,
+        screenx = Tic.INTERACTIONSWX,
+        screeny = Tic.INTERACTIONSWY,
+        screenw = Tic.INTERACTIONSWW,
+        screenh = Tic.INTERACTIONSWH,
     }
     _element:alignElementDirection(self, Tic.DIR000)
 end
