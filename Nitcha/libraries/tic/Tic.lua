@@ -71,6 +71,7 @@ Tic.SCREENH2 = Tic.SCREENH // 2 -- half screen height
 Tic.SCREENX  = 0 -- screen x position
 Tic.SCREENY  = 0 -- screen y position
 
+
 -- World Window positions and sizes (hud)
 Tic.WORLDWW  = 120 -- world window width
 Tic.WORLDWH  = 100 -- world window height
@@ -87,16 +88,18 @@ Tic.WORLDINFOSWH = 10 -- world infos window height
 Tic.WORLDINFOSWX = Tic.WORLDWX -- world infos window x position
 Tic.WORLDINFOSWY = 3 -- world infos window y position
 
+
 -- Player Infos Window positions and sizes (hud)
 Tic.PLAYERINFOSWW = 26 -- player infos window width
 Tic.PLAYERINFOSWH = 16 -- player infos window height
-Tic.PLAYERINFOSWX = Tic.SCREENW - Tic.PLAYERINFOSWW - ((Tic.WORLDWX - Tic.PLAYERINFOSWW) // 2) -- player infos window x position
+Tic.PLAYERINFOSWX = ((Tic.WORLDWX - Tic.PLAYERINFOSWW) // 2) -- player infos window x position
 Tic.PLAYERINFOSWY = Tic.WORLDWY -- player infos window y position
 
 -- Player Portrait Window positions and sizes (hud)
 Tic.PLAYERPORTRAITWW = 16 -- player portrait window width
 Tic.PLAYERPORTRAITWH = 16 -- player portrait window height
-Tic.PLAYERPORTRAITWX = Tic.SCREENW - Tic.PLAYERPORTRAITWW - ((Tic.WORLDWX - Tic.PLAYERPORTRAITWW) // 2) -- player portrait window x position
+-- Tic.PLAYERPORTRAITWX = Tic.SCREENW - Tic.PLAYERPORTRAITWW - ((Tic.WORLDWX - Tic.PLAYERPORTRAITWW) // 2) -- player portrait window x position
+Tic.PLAYERPORTRAITWX = ((Tic.WORLDWX - Tic.PLAYERPORTRAITWH) // 2) -- player portrait window x position
 Tic.PLAYERPORTRAITWY = Tic.PLAYERINFOSWY + 26 -- player portrait window y position
 
 -- Player Stats Window positions and sizes (hud)
@@ -111,22 +114,23 @@ Tic.PLAYERSTATEWH = 16 -- player state window height
 Tic.PLAYERSTATEWX = Tic.PLAYERINFOSWX -- player state window x position
 Tic.PLAYERSTATEWY = Tic.PLAYERSTATSWY + 26 -- player state window y position
 
+
 -- Spotting Infos Window positions and sizes (hud)
 Tic.SPOTTINGINFOSWW = 26 -- spotting infos window width
 Tic.SPOTTINGINFOSWH = 16 -- spotting infos window height
-Tic.SPOTTINGINFOSWX = ((Tic.WORLDWX - Tic.SPOTTINGINFOSWW) // 2) -- spotting infos window x position
+Tic.SPOTTINGINFOSWX = Tic.SCREENW - Tic.PLAYERINFOSWW - ((Tic.WORLDWX - Tic.PLAYERINFOSWW) // 2) -- spotting infos window x position
 Tic.SPOTTINGINFOSWY = Tic.WORLDWY -- spotting infos window y position
 
 -- Spotting Portrait Window positions and sizes (hud)
 Tic.SPOTTINGPORTRAITWW = 16 -- spotting portrait window width
 Tic.SPOTTINGPORTRAITWH = 16 -- spotting portrait window height
-Tic.SPOTTINGPORTRAITWX = ((Tic.WORLDWX - Tic.SPOTTINGPORTRAITWW) // 2) -- spotting portrait window x position
+Tic.SPOTTINGPORTRAITWX = Tic.SCREENW - Tic.SPOTTINGPORTRAITWW - ((Tic.WORLDWX - Tic.SPOTTINGPORTRAITWW) // 2) -- spotting portrait window x position
 Tic.SPOTTINGPORTRAITWY = Tic.SPOTTINGINFOSWY + 26 -- spotting portrait window y position
 
 -- Interactions Window positions and sizes (hud)
-Tic.INTERACTIONSWX = Tic.SCREENX -- interactions window x position
+Tic.INTERACTIONSWX = Tic.WORLDWX + Tic.WORLDWW -- interactions window x position
 Tic.INTERACTIONSWY = Tic.SPOTTINGPORTRAITWY + 26 -- interactions window y position
-Tic.INTERACTIONSWW = Tic.WORLDWX - Tic.INTERACTIONSWX -- interactions window width
+Tic.INTERACTIONSWW = Tic.SCREENW - Tic.INTERACTIONSWX -- interactions window width
 Tic.INTERACTIONSWH = Tic.SCREENH - Tic.INTERACTIONSWY -- interactions window height
 
 -- Palette map
@@ -5118,14 +5122,14 @@ end
 if true then
 ScreenWorld = CScreen{name = "World", keysfunctions = Tic.KEYSFUNCTIONSWORLD}
 
--- lf panel
-ScreenWorldLF = CScreen{}
+-- rg panel
+ScreenWorldRG = CScreen{}
 
 WindowSpottingInfos    = CWindowSpottingInfos{}
 ButtonSpottingSpot     = CButtonSpottingSpot{}
 ButtonSpottingLock     = CButtonSpottingLock{}
 ButtonSpottingPick     = CButtonSpottingPick{}
-ScreenWorldLF:elementsDistributeH(
+ScreenWorldRG:elementsDistributeH(
     {ButtonSpottingSpot, ButtonSpottingPick, ButtonSpottingLock},
     WindowSpottingInfos.screenx + (
         (WindowSpottingInfos.screenw - CScreen:elementsTotalW({ButtonSpottingSpot, ButtonSpottingPick, ButtonSpottingLock})) // 2),
@@ -5145,37 +5149,37 @@ ButtonSlotSpottingHead   = CButtonSlotSpottingHead{}
 ButtonSlotSpottingBack   = CButtonSlotSpottingBack{}
 ButtonSlotSpottingHandLF = CButtonSlotSpottingHandLF{}
 ButtonSlotSpottingHandRG = CButtonSlotSpottingHandRG{}
-ScreenWorldLF:elementsDistributeH( -- up h line
+ScreenWorldRG:elementsDistributeH( -- up h line
     {ButtonSpotting135, ButtonSpotting225},
     WindowSpottingPortrait.screenx - 6,
     WindowSpottingPortrait.screeny - Tic.SPRITESIZE + 2,
     12
 )
-ScreenWorldLF:elementsDistributeH( -- md h line
+ScreenWorldRG:elementsDistributeH( -- md h line
     {ButtonSpotting090, ButtonSpotting270},
     WindowSpottingPortrait.screenx - 7,
     WindowSpottingPortrait.screeny + 4,
     14
 )
-ScreenWorldLF:elementsDistributeH( -- dw h line
+ScreenWorldRG:elementsDistributeH( -- dw h line
     {ButtonSpotting045, ButtonSpotting315},
     WindowSpottingPortrait.screenx - 6,
     WindowSpottingPortrait.screeny + WindowSpottingPortrait.screenh - 2,
     12
 )
-ScreenWorldLF:elementsDistributeV( -- md v line
+ScreenWorldRG:elementsDistributeV( -- md v line
     {ButtonSpotting180, ButtonSpotting000},
     WindowSpottingPortrait.screenx + 4,
     WindowSpottingPortrait.screeny - 7,
     14
 )
-ScreenWorldLF:elementsDistributeH( -- head and back slots
+ScreenWorldRG:elementsDistributeH( -- head and back slots
     {ButtonSlotSpottingHead, ButtonSlotSpottingBack},
     WindowSpottingPortrait.screenx - Tic.SPRITESIZE - 6,
     WindowSpottingPortrait.screeny - 2,
     28
 )
-ScreenWorldLF:elementsDistributeH( -- handrg and handlf slots
+ScreenWorldRG:elementsDistributeH( -- handrg and handlf slots
     {ButtonSlotSpottingHandRG, ButtonSlotSpottingHandLF},
     WindowSpottingPortrait.screenx - Tic.SPRITESIZE - 6,
     WindowSpottingPortrait.screeny + Tic.SPRITESIZE + 2,
@@ -5186,7 +5190,7 @@ WindowMenuInteractions = CWindowMenuInteractions{
     elements = {Button4, Button5, Button6},
 }
 
-ScreenWorldLF:appendElements{
+ScreenWorldRG:appendElements{
     WindowSpottingPortrait,
     WindowSpottingInfos,
     WindowMenuInteractions,
@@ -5217,14 +5221,14 @@ ScreenWorldMD:appendElements{
     WindowInfosWorld,
 }
 
--- rg panel
-ScreenWorldRG = CScreen{}
+-- lf panel
+ScreenWorldLF = CScreen{}
 
 WindowPlayerInfos    = CWindowPlayerInfos{}
 ButtonPlayerPrev     = CButtonPlayerPrev{}
 ButtonPlayerPick     = CButtonPlayerPick{}
 ButtonPlayerNext     = CButtonPlayerNext{}
-ScreenWorldRG:elementsDistributeH(
+ScreenWorldLF:elementsDistributeH(
     {ButtonPlayerPrev, ButtonPlayerPick, ButtonPlayerNext},
     WindowPlayerInfos.screenx + (
         (WindowPlayerInfos.screenw - CScreen:elementsTotalW({ButtonPlayerPrev, ButtonPlayerPick, ButtonPlayerNext})) // 2),
@@ -5244,37 +5248,37 @@ ButtonSlotPlayerHead   = CButtonSlotPlayerHead{}
 ButtonSlotPlayerBack   = CButtonSlotPlayerBack{}
 ButtonSlotPlayerHandLF = CButtonSlotPlayerHandLF{}
 ButtonSlotPlayerHandRG = CButtonSlotPlayerHandRG{}
-ScreenWorldRG:elementsDistributeH( -- up h line
+ScreenWorldLF:elementsDistributeH( -- up h line
     {ButtonPlayerMove315, ButtonPlayerMove045},
     WindowPlayerPortrait.screenx - 6,
     WindowPlayerPortrait.screeny - Tic.SPRITESIZE + 2,
     12
 )
-ScreenWorldRG:elementsDistributeH( -- md h line
+ScreenWorldLF:elementsDistributeH( -- md h line
     {ButtonPlayerMove270, ButtonPlayerMove090},
     WindowPlayerPortrait.screenx - 7,
     WindowPlayerPortrait.screeny + 4,
     14
 )
-ScreenWorldRG:elementsDistributeH( -- dw h line
+ScreenWorldLF:elementsDistributeH( -- dw h line
     {ButtonPlayerMove225, ButtonPlayerMove135},
     WindowPlayerPortrait.screenx - 6,
     WindowPlayerPortrait.screeny + WindowPlayerPortrait.screenh - 2,
     12
 )
-ScreenWorldRG:elementsDistributeV( -- md v line
+ScreenWorldLF:elementsDistributeV( -- md v line
     {ButtonPlayerMove000, ButtonPlayerMove180},
     WindowPlayerPortrait.screenx + 4,
     WindowPlayerPortrait.screeny - 7,
     14
 )
-ScreenWorldRG:elementsDistributeH( -- head and back slots
+ScreenWorldLF:elementsDistributeH( -- head and back slots
     {ButtonSlotPlayerHead, ButtonSlotPlayerBack},
     WindowPlayerPortrait.screenx - Tic.SPRITESIZE - 6,
     WindowPlayerPortrait.screeny - 2,
     28
 )
-ScreenWorldRG:elementsDistributeH( -- handrg and handlf slots
+ScreenWorldLF:elementsDistributeH( -- handrg and handlf slots
     {ButtonSlotPlayerHandRG, ButtonSlotPlayerHandLF},
     WindowPlayerPortrait.screenx - Tic.SPRITESIZE - 6,
     WindowPlayerPortrait.screeny + Tic.SPRITESIZE + 2,
@@ -5285,7 +5289,7 @@ WindowPlayerStats    = CWindowPlayerStats{}
 ButtonPlayerStatPhy  = CButtonPlayerStatPhy{}
 ButtonPlayerStatMen  = CButtonPlayerStatMen{}
 ButtonPlayerStatPsy  = CButtonPlayerStatPsy{}
-ScreenWorldRG:elementsDistributeH(
+ScreenWorldLF:elementsDistributeH(
     {ButtonPlayerStatPhy, ButtonPlayerStatMen, ButtonPlayerStatPsy},
     WindowPlayerStats.screenx + (
         (WindowPlayerStats.screenw - CScreen:elementsTotalW({ButtonPlayerStatPhy, ButtonPlayerStatMen, ButtonPlayerStatPsy})) // 2),
@@ -5297,20 +5301,20 @@ ButtonPlayerStand    = CButtonPlayerStand{}
 ButtonPlayerKneel    = CButtonPlayerKneel{}
 ButtonPlayerWork     = CButtonPlayerWork{}
 ButtonPlayerSleep    = CButtonPlayerSleep{}
-ScreenWorldRG:elementsDistributeV(
+ScreenWorldLF:elementsDistributeV(
     {ButtonPlayerStand, ButtonPlayerKneel},
     WindowPlayerState.screenx - Tic.SPRITESIZE,
     WindowPlayerState.screeny + (
         (WindowPlayerInfos.screenh - CScreen:elementsTotalH({ButtonPlayerStand, ButtonPlayerKneel})) // 2)
 )
-ScreenWorldRG:elementsDistributeV(
+ScreenWorldLF:elementsDistributeV(
     {ButtonPlayerWork, ButtonPlayerSleep},
     WindowPlayerState.screenx + WindowPlayerState.screenw,
     WindowPlayerState.screeny + (
         (WindowPlayerInfos.screenh - CScreen:elementsTotalH({ButtonPlayerWork, ButtonPlayerSleep})) // 2)
 )
 
-ScreenWorldRG:appendElements{
+ScreenWorldLF:appendElements{
     WindowPlayerPortrait,
     WindowPlayerInfos,
     WindowPlayerStats,
