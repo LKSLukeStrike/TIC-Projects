@@ -23,7 +23,7 @@ function CEntity:new(_argt)
     self.worldy       = CEntity.WORLDY
     self.discovered   = false -- discovered by the player ?
     self.interactions = nil -- possible interactions if any
-    self.interactto   = {}  -- entities interactto -- table
+    self.interactto   = nil -- entity interactto -- single
     self.interactby   = {}  -- entities interactby -- table
     self.camera = nil -- optional camera that follows the entity -- to override if any
     self:argt(_argt) -- override if any
@@ -99,16 +99,11 @@ end
 function CEntity:interacttoAppend(_entity) -- append an entity interactto
     if not _entity then return end -- mandatory
     if not _entity:hasInteractions() then return end -- no interaction possible
-    Tables:keyAppend(self.interactto, _entity)
+    self.interactto = _entity
 end
 
-function CEntity:interacttoDelete(_entity) -- delete an entity interactto
-    if not _entity then return end -- mandatory
-    Tables:keyDelete(self.interactto, _entity)
-end
-
-function CEntity:interacttoDeleteAll() -- delete all entities interactto
-    self.interactto = {}
+function CEntity:interacttoDelete() -- delete an entity interactto
+    self.interactto = nil
 end
 
 function CEntity:interactbyAppend(_entity) -- append an entity interactby
@@ -127,7 +122,7 @@ function CEntity:interactbyDeleteAll() -- delete all entities interactby
 end
 
 function CEntity:hasInteractTo() -- has interactto ?
-    return Tables:size(self.interactto) > 0
+    return (self.interactto) and true or false
 end
 
 function CEntity:hasInteractBy() -- has interactby ?

@@ -259,8 +259,8 @@ function CWindowPortraitDrawable:drawInside() -- window portrait content for -- 
     self.entity.scale        = Tic.SCALE02
     self.entity.drawdirs     = false
     self.entity.drawview     = false
-    self.entity.interactto   = {} -- dont draw interactto in window
-    self.entity.interactby   = {} -- dont draw interactby in window
+    self.entity.interactto   = nil -- dont draw interactto in window
+    self.entity.interactby   = {}  -- dont draw interactby in window
     self.entity.portraitmode = true -- avoid some drawings in portraitmode
     self.entity.spotted      = false -- dont draw spotted frame in window
     self.entity.hovered      = false -- dont draw hovered frame in window
@@ -527,7 +527,7 @@ function CWindowWorld:drawPlayerActual()
     then
         _playeractual:interacttoAppend(_playeractual:entitySpotting())
     else
-        _playeractual:interacttoDeleteAll()
+        _playeractual:interacttoDelete()
     end
     
     for _, _keyy in pairs(Tables:keys(_playerlocationsaround)) do -- draw entities -- sorted by y first
