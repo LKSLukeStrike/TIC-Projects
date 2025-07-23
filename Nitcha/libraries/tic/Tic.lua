@@ -730,7 +730,7 @@ Tic.PLAYERS    = CCyclerTable()
 Tic.PLAYERONLY = true -- to display view, move, etc only for actual player
 
 function Tic:playerAppend(_player) -- stack a new player
-    if Tables:valFind(Tic.PLAYERS, _player) then return end -- avoid doublons
+    if Tables:valFind(Tic:playerPlayers(), _player) then return end -- avoid doublons
     return Tic.PLAYERS:insert(_player)
 end
 
@@ -740,6 +740,14 @@ end
 
 function Tic:playerNext() -- next player in the stack
     return Tic.PLAYERS:next()
+end
+
+function Tic:playerFind(_player) -- find player in the stack -- return index or nil
+    return Tables:valFind(Tic:playerPlayers(), _player)
+end
+
+function Tic:playerPick(_player) -- fipicknd player in the stack
+    return Tic.PLAYERS:at(Tic:playerFind(_player))
 end
 
 function Tic:playerActual() -- actual player in the stack

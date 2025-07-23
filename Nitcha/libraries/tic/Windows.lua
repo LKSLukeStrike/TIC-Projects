@@ -564,6 +564,22 @@ function CWindowWorld:drawPlayerActual()
                         and not _playeractual.hovering then -- hover only one
                             _playeractual:hoverEntity(_entity)
 
+                            local _playerfind = Tic:playerFind(_entity)
+                            Tic:logAppend("player", _playerfind)
+                            if _playerfind then
+                                local _picktext = CText{text = Tic.TEXTPICK, colorinside = Tic.COLORHOVER}
+                                _picktext.screenx = _entity.screenx - ((_picktext.screenw - Tic.SPRITESIZE) // 2)
+                                _picktext.screeny = _entity.screeny - _picktext.screenh
+                                _picktext:draw()
+
+                                if Tic.MOUSE.clicklf then
+                                    Tic.MOUSE.clicklf = false -- avoid bouncing
+                                    Tic:mouseDelay(10)
+                                    
+                                    Tic:playerPick(_entity)
+                                end
+                            end
+
                             local _locking  = (_playeractual.spottinglock and _playeractual.spotting == _entity) -- already locking ?
                             local _locktext = (_locking)
                                 and CText{text = Tic.TEXTUNLOCK, colorinside = Tic.COLORHOVER}

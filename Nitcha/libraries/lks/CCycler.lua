@@ -137,13 +137,19 @@ function CCyclerTable:argt(_argt) -- setup cycler
     return self.actvalue
 end
 
-function CCycler:min() -- min cycler value
+function CCycler:min() -- min cycler item
     self.actindex = self.minindex
     return self:argt()
 end
 
-function CCycler:max() -- max cycler value
+function CCycler:max() -- max cycler item
     self.actindex = self.maxindex
+    return self:argt()
+end
+
+function CCycler:at(_at) -- at cycler item
+    if not Nums:isBW(_at, self.minindex, self.maxindex) then return end -- not in cycler
+    self.actindex = _at
     return self:argt()
 end
 
