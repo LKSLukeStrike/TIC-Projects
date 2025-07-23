@@ -556,10 +556,12 @@ function CWindowWorld:drawPlayerActual()
                         _entity:adjustScreenXYRelativeToEntity(_playeractual)
                         local _entityregionscreen = _entity:regionScreen()
 
+                        _entity:draw()
+
                         if  _playeractual.spottingpick -- if in pick mode
                         and not (_entity == _playeractual) -- except itself
                         and _entityregionscreen:hasInsidePoint(Tic:mousePointX(), Tic:mousePointY()) -- hovering something ?
-                        and not _playeractual.hovering then --hover only one
+                        and not _playeractual.hovering then -- hover only one
                             _playeractual:hoverEntity(_entity)
 
                             local _locking  = (_playeractual.spottinglock and _playeractual.spotting == _entity) -- already locking ?
@@ -567,11 +569,11 @@ function CWindowWorld:drawPlayerActual()
                                 and CText{text = Tic.TEXTUNLOCK, colorinside = Tic.COLORHOVER}
                                 or  CText{text = Tic.TEXTLOCK, colorinside = Tic.COLORHOVER}
                             _locktext.screenx = _entity.screenx - ((_locktext.screenw - Tic.SPRITESIZE) // 2)
-                            _locktext.screeny = _entity.screeny - _locktext.screenh
+                            _locktext.screeny = _entity.screeny + Tic.SPRITESIZE
                             _locktext:draw()
 
-                            if Tic.MOUSE.clicklf then
-                                Tic.MOUSE.clicklf = false -- avoid bouncing
+                            if Tic.MOUSE.clickrg then
+                                Tic.MOUSE.clickrg = false -- avoid bouncing
                                 Tic:mouseDelay(10)
                                 
                                 if _locking then -- unspot
@@ -583,8 +585,6 @@ function CWindowWorld:drawPlayerActual()
                                 end
                             end
                         end
-
-                        _entity:draw()
                     end
                 end
             end
