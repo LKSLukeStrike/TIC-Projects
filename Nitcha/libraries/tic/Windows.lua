@@ -101,6 +101,22 @@ end
 CWindowMenuInteractions = CWindowMenu:extend() -- window menu interactions
 Classic.KINDWINDOWMENUINTERACTIONS = "WindowMenuInteractions" -- Window kind
 Classic.NAMEWINDOWMENUINTERACTIONS = "WindowMenuInteractions" -- Window name
+CWindowMenuInteractions.BEHAVIOUR = function(self)
+    if not Tic:playerActual() then self.display = false end
+    if not self.display then return end
+    Tic:trace(self.kind, self.display)
+    local _caninteract = Tic:playerActual():canInteract()
+    Tic:logAppend(_caninteract)
+    if _caninteract then
+        -- self.display = false
+        Tic:logAppend("ok")
+    else
+        -- self.display = false
+        Tic:logAppend("no")
+    end
+    -- self.display = Tic:playerActual():canInteract()
+    -- self.display = Tic:playerActual():canInteract()
+end
 function CWindowMenuInteractions:new(_argt)
     CWindowMenuInteractions.super.new(self, _argt)
     self.kind = Classic.KINDWINDOWMENUINTERACTIONS
@@ -111,11 +127,12 @@ function CWindowMenuInteractions:new(_argt)
     self.screenh    = Tic.INTERACTIONSWH
     self.stretch    = true
     self.drawframes = true
-    self.marginup   = 2
-    self.margindw   = 2
-    self.marginlf   = 2
-    self.marginrg   = 2
-    -- self.behaviour = IWindowSpotting.BEHAVIOUR
+    self.drawborder = false
+    -- self.marginup   = 2
+    -- self.margindw   = 2
+    -- self.marginlf   = 2
+    -- self.marginrg   = 2
+    self.behaviour = CWindowMenuInteractions.BEHAVIOUR
     self:argt(_argt) -- override if any
     self:adjustWH()
     self:adjustXY()
