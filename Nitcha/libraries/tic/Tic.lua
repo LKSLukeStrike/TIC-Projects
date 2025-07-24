@@ -682,6 +682,8 @@ Tic.SCREENS = CCyclerTable()
 function Tic:screenDraw() -- draw screen(s)
     local _actindex = Tic.SCREENS.actindex -- save initial actindex
     Tic.SCREENS:min()
+    Tic:keyboardClearKeysFunctions()
+    Tic:buttonsClearButtons()
     while Tic.SCREENS.actindex <= _actindex do -- pile each screen
         if Tic:screenActual() then Tic:screenActual():draw() end
         if Tic.SCREENS.actindex == _actindex then break else Tic:screenNext() end
