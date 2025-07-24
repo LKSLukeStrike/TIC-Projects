@@ -102,9 +102,28 @@ CWindowMenuInteractions = CWindowMenu:extend() -- window menu interactions
 Classic.KINDWINDOWMENUINTERACTIONS = "WindowMenuInteractions" -- Window kind
 Classic.NAMEWINDOWMENUINTERACTIONS = "WindowMenuInteractions" -- Window name
 CWindowMenuInteractions.BEHAVIOUR = function(self)
-    self.display = (Tic:playerActual()) and true or false
+    local _playeractual = Tic:playerActual()
+    self.display = (_playeractual) and true or false
     if not self.display then return end
-    self.display = Tic:playerActual():canInteract()
+    self.display = _playeractual:canInteract()
+    if not self.display then return end
+    -- if true then return end
+    self.elements = {}
+    local _interactto   = _playeractual.interactto
+    local _interactions = _interactto.interactions
+    for _, _interaction in ipairs (_interactions) do
+        if _interaction:interactif(_playeractual, _interactto) then
+            Tic:logAppend(_interaction.text)
+            local _buttonmenu = CButtonMenuM2{
+                rounded = true,
+                text = CText{text = _interaction.text},
+                clicklf = function() end
+            }
+            Tables:valInsert(self.elements, _buttonmenu, true)
+        end
+    end
+    self:adjustWH()
+    self:adjustXY()
 end
 function CWindowMenuInteractions:new(_argt)
     CWindowMenuInteractions.super.new(self, _argt)
@@ -116,14 +135,16 @@ function CWindowMenuInteractions:new(_argt)
     self.behaviour = CWindowMenuInteractions.BEHAVIOUR
     self:argt(_argt) -- override if any
     self:adjustWH()
+    self:adjustXY()
 end
 
-function CWindowMenuInteractions:draw()
-    self:save()
-    self:adjustXY()
-    CWindowMenuInteractions.super.draw(self)
-    self:load()
-end 
+-- function CWindowMenuInteractions:draw()
+--     self:save()
+--     self:adjustWH()
+--     self:adjustXY()
+--     CWindowMenuInteractions.super.draw(self)
+--     self:load()
+-- end 
 
 function CWindowMenuInteractions:adjustXY()
     local _element = CElement{

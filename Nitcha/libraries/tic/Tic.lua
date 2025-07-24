@@ -4149,7 +4149,13 @@ function CCharacter:canInteract()
     if not (self == Tic:playerActual()) then return false end -- cannot interact
     if self:postureGet() == Tic.POSTUREFLOOR then return false end -- cannot interact
     if not self:hasInteractTo() then return false end -- cannot interact
-    return true
+    local _interactto   = self.interactto
+    local _interactions = _interactto.interactions
+    if Tables:size(_interactions) == 0 then return false end -- cannot interact
+    for _, _interaction in ipairs(_interactions) do
+        if _interaction:interactif(self, _interactto) then return true end
+    end
+    return false
 end
 
 function CCharacter:statePrev() -- prev state in the stack
@@ -5051,7 +5057,7 @@ Button4 = CButtonMenuM2{
 Button5 = CButtonMenuM2{
     name = "Close",
     rounded = true,
-    text = CText{text = "BlaBlaBla"},
+    text = CText{text = "Bla"},
     clicklf = _function,
 }
 Button6 = CButtonMenuM2{
@@ -5655,7 +5661,7 @@ Walfie = _playerclass{classed = _playerclass,
     -- colorextra = Tic.COLORPURPLE,
     worldx = 0,
     worldy = 0,
-    interactions = {10},
+    interactions = {CInteraction{}},
     -- spottingspot = true,
     spottingpick = true,
     ["slots.handrg"] = CSlotHand{object = CWeaponBowSmall{}},
@@ -5674,7 +5680,7 @@ Welfie = _playerclass{classed = _playerclass,
     -- colorextra = Tic.COLORRED,
     worldx = 15,
     worldy = 0,
-    interactions = {10},
+    interactions = {CInteraction{}},
     -- spottingspot = true,
     spottingpick = true,
     ["slots.handrg"] = CSlotHand{object = CWeaponBowMedium{}},
@@ -5693,7 +5699,7 @@ Wilfie = _playerclass{classed = _playerclass,
     -- colorextra = Tic.COLORORANGE,
     worldx = 30,
     worldy = 0,
-    interactions = {10},
+    interactions = {CInteraction{}},
     -- spottingspot = true,
     spottingpick = true,
     ["slots.handrg"] = CSlotHand{object = CWeaponBowLarge{}},
@@ -5713,7 +5719,7 @@ Wolfie = _playerclass{classed = _playerclass,
     -- colorextra = Tic.COLORGREEND,
     worldx = 0,
     worldy = 20,
-    interactions = {10},
+    interactions = {CInteraction{}},
     -- spottingspot = true,
     spottingpick = true,
     ["slots.handrg"] = CSlotHand{object = CWeaponSword{}},
@@ -5732,7 +5738,7 @@ Wulfie = _playerclass{classed = _playerclass,
     -- colorextra = Tic.COLORGREENM,
     worldx = 15,
     worldy = 20,
-    interactions = {10},
+    interactions = {CInteraction{}, CInteraction{text = "Blabla"}},
     -- spottingspot = true,
     spottingpick = true,
     ["slots.handrg"] = CSlotHand{object = CWeaponHammer{}},
@@ -5751,7 +5757,7 @@ Wylfie = _playerclass{classed = _playerclass,
     -- colorextra = Tic.COLORGREENL,
     worldx = 30,
     worldy = 20,
-    interactions = {10},
+    interactions = {CInteraction{}},
     -- spottingspot = true,
     spottingpick = true,
     ["slots.handrg"] = CSlotHand{object = CWeaponLance{}},
