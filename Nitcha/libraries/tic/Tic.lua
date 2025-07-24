@@ -635,6 +635,12 @@ function Tic:buttonsInsertButtons(_buttons) -- insert buttons (once)
     end
 end
 
+function Tic:buttonsRemoveButtons(_buttons) -- remove buttons (all)
+    for _, _button in ipairs(_buttons or {}) do
+        Tables:valRemove(Tic.BUTTONS, _button, false)
+    end
+end
+
 
 -- Inputs System -- handle mouse and keyboard inputs
 Tic.FUNCTIONS = {}
@@ -5126,10 +5132,10 @@ ScreenIntro:appendElements{
 end
 
 if true then
-ScreenWorld = CScreen{name = "World", keysfunctions = Tic.KEYSFUNCTIONSWORLD}
+ScreenWorld = CScreen{name = "ScreenWorld", keysfunctions = Tic.KEYSFUNCTIONSWORLD}
 
 -- rg panel
-ScreenWorldRG = CScreen{}
+ScreenWorldRG = CScreen{name = "ScreenWorldRG"}
 
 WindowSpottingInfos    = CWindowSpottingInfos{}
 ButtonSpottingSpot     = CButtonSpottingSpot{}
@@ -5197,28 +5203,28 @@ WindowMenuInteractions = CWindowMenuInteractions{
 }
 
 ScreenWorldRG:appendElements{
-    WindowSpottingPortrait,
-    WindowSpottingInfos,
+    -- WindowSpottingPortrait,
+    -- WindowSpottingInfos,
     WindowMenuInteractions,
-    ButtonSpottingSpot,
-    ButtonSpottingLock,
-    ButtonSpottingPick,
-    ButtonSpotting000,
-    ButtonSpotting045,
-    ButtonSpotting090,
-    ButtonSpotting135,
-    ButtonSpotting180,
-    ButtonSpotting225,
-    ButtonSpotting270,
-    ButtonSpotting315,
-    ButtonSlotSpottingHead,
-    ButtonSlotSpottingBack,
-    ButtonSlotSpottingHandLF,
-    ButtonSlotSpottingHandRG,
+    -- ButtonSpottingSpot,
+    -- ButtonSpottingLock,
+    -- ButtonSpottingPick,
+    -- ButtonSpotting000,
+    -- ButtonSpotting045,
+    -- ButtonSpotting090,
+    -- ButtonSpotting135,
+    -- ButtonSpotting180,
+    -- ButtonSpotting225,
+    -- ButtonSpotting270,
+    -- ButtonSpotting315,
+    -- ButtonSlotSpottingHead,
+    -- ButtonSlotSpottingBack,
+    -- ButtonSlotSpottingHandLF,
+    -- ButtonSlotSpottingHandRG,
 }
 
 -- md panel
-ScreenWorldMD = CScreen{}
+ScreenWorldMD = CScreen{name = "ScreenWorldMD"}
 
 WindowWorld      = CWindowWorld{}
 WindowInfosWorld = CWindowInfosWorld{}
@@ -5228,7 +5234,7 @@ ScreenWorldMD:appendElements{
 }
 
 -- lf panel
-ScreenWorldLF = CScreen{}
+ScreenWorldLF = CScreen{name = "ScreenWorldLF"}
 
 WindowPlayerInfos    = CWindowPlayerInfos{}
 ButtonPlayerPrev     = CButtonPlayerPrev{}
@@ -5352,7 +5358,7 @@ ScreenWorldLF:appendElements{
 ScreenWorld:appendElements{
     CWindowScreen{},
     ScreenWorldMD,
-    ScreenWorldLF,
+    -- ScreenWorldLF,
     ScreenWorldRG,
 }
 end
@@ -5986,7 +5992,7 @@ function Tic:draw()
     Tic.inputsDo()
 
     Tic:screenDraw()
-
+Tic:logAppend(Tables:size(Tic.BUTTONS))
     Tic:drawLog()
     Tic:logPrint()
 
