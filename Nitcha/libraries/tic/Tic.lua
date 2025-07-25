@@ -2519,7 +2519,6 @@ function CObject:new(_argt)
     self.used         = CObject.USEDNONE -- used level if any
     self.inventory    = nil -- can have an inventory if any
     self.hitbox       = nil
-    self.interactions = {10}
     self:argt(_argt) -- override if any
 end
 
@@ -5212,24 +5211,24 @@ ScreenWorldRG:elementsDistributeH( -- handrg and handlf slots
 WindowMenuInteractions = CWindowMenuInteractions{}
 
 ScreenWorldRG:appendElements{
-    -- WindowSpottingPortrait,
-    -- WindowSpottingInfos,
+    WindowSpottingPortrait,
+    WindowSpottingInfos,
     WindowMenuInteractions,
-    -- ButtonSpottingSpot,
-    -- ButtonSpottingLock,
-    -- ButtonSpottingPick,
-    -- ButtonSpotting000,
-    -- ButtonSpotting045,
-    -- ButtonSpotting090,
-    -- ButtonSpotting135,
-    -- ButtonSpotting180,
-    -- ButtonSpotting225,
-    -- ButtonSpotting270,
-    -- ButtonSpotting315,
-    -- ButtonSlotSpottingHead,
-    -- ButtonSlotSpottingBack,
-    -- ButtonSlotSpottingHandLF,
-    -- ButtonSlotSpottingHandRG,
+    ButtonSpottingSpot,
+    ButtonSpottingLock,
+    ButtonSpottingPick,
+    ButtonSpotting000,
+    ButtonSpotting045,
+    ButtonSpotting090,
+    ButtonSpotting135,
+    ButtonSpotting180,
+    ButtonSpotting225,
+    ButtonSpotting270,
+    ButtonSpotting315,
+    ButtonSlotSpottingHead,
+    ButtonSlotSpottingBack,
+    ButtonSlotSpottingHandLF,
+    ButtonSlotSpottingHandRG,
 }
 
 -- md panel
@@ -5367,7 +5366,7 @@ ScreenWorldLF:appendElements{
 ScreenWorld:appendElements{
     CWindowScreen{},
     ScreenWorldMD,
-    -- ScreenWorldLF,
+    ScreenWorldLF,
     ScreenWorldRG,
 }
 end
@@ -5640,23 +5639,23 @@ Daemok = CPlayerDemon{
 end
 
 if false then
-Sword = CWeaponSword{name = "swo_1"}
-Flask = CObjectFlaskSmall{name = "fla_1"}
+-- Sword = CWeaponSword{name = "swo_1"}
+-- Flask = CObjectFlaskSmall{name = "fla_1"}
 
 Globth = CPlayerGolth{name = "Globth",
-    worldx = 30,
-    ["slots.head"] = CSlotHead{object = CClothesHelmetMedium{}},
-    ["slots.handrg"] = CSlotHand{object = CWeaponLance{}},
+    ["slots.head"] = CSlotHead{object = CClothesHatMedium{}},
+    ["slots.back"] = CSlotBack{object = CClothesBackPackSmall{}},
+    ["slots.handrg"] = CSlotHand{object = CWeaponBowMedium{}},
     ["slots.handlf"] = CSlotHand{object = CWeaponShieldMedium{name = "ecu_1"}},
-    ["inventories.any"] = CInventoryAny{objects = {Sword, Flask}},
+    -- ["inventories.any"] = CInventoryAny{objects = {Sword, Flask}},
     statmenact = 10,
 }
-Globth.slots.head.object.palettefg = {
-    [CObject.HANDLE] = Tic.COLORKEY,
-    [CObject.BORDER] = Tic.COLORGREYL,
-    [CObject.INSIDE] = Tic.COLORORANGE,
-    [CObject.EFFECT] = Tic.COLORRED,
-}
+-- Globth.slots.head.object.palettefg = {
+--     [CObject.HANDLE] = Tic.COLORKEY,
+--     [CObject.BORDER] = Tic.COLORGREYL,
+--     [CObject.INSIDE] = Tic.COLORORANGE,
+--     [CObject.EFFECT] = Tic.COLORRED,
+-- }
 
 
 -- Globth:randomWorldWindow()
@@ -5776,7 +5775,7 @@ Wylfie = _playerclass{classed = _playerclass,
     -- spottingspot = true,
     spottingpick = true,
     ["slots.handrg"] = CSlotHand{object = CWeaponLance{}},
-    -- ["slots.handlf"] = CSlotHand{object = CWeaponShieldLarge{}},
+    ["slots.handlf"] = CSlotHand{object = CWeaponShieldLarge{}},
     ["slots.head"]   = CSlotHead{object = CClothesHelmetLarge{}},
     ["slots.back"]   = CSlotBack{object = CClothesBackPackLarge{}},
     ["inventories.any"]   = CInventoryAny{objects = {CObjectFlaskSmall{}}},
@@ -5999,9 +5998,9 @@ end
 function Tic:draw()
     if true then
     Tic.inputsDo()
-
+trace(Tic:playerActual().name)
     Tic:screenDraw()
-Tic:logAppend(Tables:size(Tic.BUTTONS))
+
     Tic:drawLog()
     Tic:logPrint()
 
