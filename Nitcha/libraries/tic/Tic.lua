@@ -5209,9 +5209,7 @@ ScreenWorldRG:elementsDistributeH( -- handrg and handlf slots
     28
 )
 
-WindowMenuInteractions = CWindowMenuInteractions{
-    elements = {Button4, Button5, Button6},
-}
+WindowMenuInteractions = CWindowMenuInteractions{}
 
 ScreenWorldRG:appendElements{
     -- WindowSpottingPortrait,

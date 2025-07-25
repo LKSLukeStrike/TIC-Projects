@@ -102,7 +102,20 @@ CWindowMenuInteractions = CWindowMenu:extend() -- window menu interactions
 Classic.KINDWINDOWMENUINTERACTIONS = "WindowMenuInteractions" -- Window kind
 Classic.NAMEWINDOWMENUINTERACTIONS = "WindowMenuInteractions" -- Window name
 CWindowMenuInteractions.BEHAVIOUR = function(self)
-    self.parent:removeElements(self.elements)
+    -- function _logelement(_key, _element)
+    --     if _key < 5 then
+    --         Tic:logAppend(" ", _key, _element.name)
+    --     elseif _key == 5 then
+    --         Tic:logAppend(" ...")
+    --     end
+    -- end
+    -- Tic:logAppend(self.parent.name, Tables:size(self.parent.elements))
+    -- Tables:eachDo(self.parent.elements, function(_key, _element) _logelement(_key, _element) end)
+    -- Tic:logAppend(self.name, Tables:size(self.elements))
+    -- Tables:eachDo(self.elements, function(_key, _element) _logelement(_key, _element) end)
+
+    self.parent:removeElements(self.elements) -- FIXME why parent ???
+    -- self:removeElements(self.elements) -- FIXME doent seems to clean all
     self.elements = {}
 
     local _playeractual = Tic:playerActual()
@@ -110,22 +123,22 @@ CWindowMenuInteractions.BEHAVIOUR = function(self)
     if not self.display then return end
     self.display = _playeractual:canInteract()
     if not self.display then return end
-    
-    Tic:logAppend(self.parent.name)
+
     -- if true then return end
     local _interactto   = _playeractual.interactto
     local _interactions = _interactto.interactions
     for _, _interaction in ipairs (_interactions) do
         if _interaction:interactif(_playeractual, _interactto) then
-            -- Tic:logAppend(_interaction.text)
             local _buttonmenu = CButtonMenuM2{
+                name = _interaction.text,
                 rounded = true,
                 text = CText{text = _interaction.text},
                 clicklf = function() _interaction.interactdo() end
             }
-            Tables:valInsert(self.elements, _buttonmenu, true)
+            self:appendElement(_buttonmenu)
         end
     end
+
     self:adjustWH()
     self:adjustXY()
 end
@@ -141,14 +154,6 @@ function CWindowMenuInteractions:new(_argt)
     self:adjustWH()
     self:adjustXY()
 end
-
--- function CWindowMenuInteractions:draw()
---     self:save()
---     self:adjustWH()
---     self:adjustXY()
---     CWindowMenuInteractions.super.draw(self)
---     self:load()
--- end 
 
 function CWindowMenuInteractions:adjustXY()
     local _element = CElement{

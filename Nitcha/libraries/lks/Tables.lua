@@ -145,6 +145,23 @@ function Tables:valRemove(_table, _val, _once) -- remove a val entry (ipaired ta
 end
 
 
+-- Do and DoIf
+function Tables:eachDo(_table, _do)
+    if not _do or not (type(_do) == "function") then return end -- mandatory
+    for _key, _val in pairs(_table or {}) do
+        _do(_key, _val)
+    end
+end
+
+function Tables:eachDoIf(_table, _do, _if)
+    if not _do or not (type(_do) == "function") then return end -- mandatory
+    if not _if or not (type(_if) == "function") then return end -- mandatory
+    for _key, _val in pairs(_table or {}) do
+        if _if(_key, _val) then _do(_key, _val) end
+    end
+end
+
+
 -- Clone and Merge
 function Tables:clone(_table) -- clone a dic table -- SORTED -- only first level -- FIXME ?
     local _result = {}

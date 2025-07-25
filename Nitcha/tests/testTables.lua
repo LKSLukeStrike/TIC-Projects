@@ -83,6 +83,16 @@ Tables:print(Tables:imerge({10, 10, 20}, {10, 10, 200}))
 Tables:print(Tables:imerge({10, 10, 20}, {10, 10, 200}, true))
 end
 
+if false then
+Tables:eachDo({10, 20, 30}, function (_key, _val) print(_key, _val) end)
+Tables:eachDoIf({10, 20, 30}, function (_key, _val) print(_key, _val) end, function() return true end)
+Tables:eachDoIf({10, 20, 30}, function (_key, _val) print(_key, _val) end, function(_key) if _key == 2 then return true end end)
+end
+
 if true then
-    print(Tables:size({10, 20, 30}))
+local _table = {10, 20, 10, 10, 30}
+Tables:print(_table)
+print()
+Tables:valRemove(_table, 10, false)
+Tables:print(_table)
 end

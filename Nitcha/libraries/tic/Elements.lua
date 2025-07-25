@@ -226,17 +226,17 @@ function CElement:appendElement(_element) -- append element -- unique
     Tables:valInsert(self.elements, _element, true)
 end
 
+function CElement:appendElements(_elements) -- append elements -- unique
+    for _, _element in ipairs(_elements or {}) do
+        self:appendElement(_element)
+    end
+end
+
 function CElement:removeElement(_element) -- remove element -- all
     if not _element then return end -- mandarory
     if not _element:is(CElement) then return end -- only elements
     _element.parent = nil -- remove parent
     Tables:valRemove(self.elements, _element, false)
-end
-
-function CElement:appendElements(_elements) -- append elements -- unique
-    for _, _element in ipairs(_elements or {}) do
-        self:appendElement(_element)
-    end
 end
 
 function CElement:removeElements(_elements) -- remove elements -- all
