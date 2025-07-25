@@ -2593,23 +2593,9 @@ end
 
 
 --
--- CWeapon
---
-CWeapon = CObjectHandPhy:extend() -- weapons
-Classic.KINDWEAPON = "Weapon" -- Weapon kind
-Classic.NAMEWEAPON = "Weapon" -- Weapon name
-function CWeapon:new(_argt)
-    CWeapon.super.new(self, _argt)
-    self.kind = Classic.KINDWEAPON
-    self.name = Classic.NAMEWEAPON
-    self:argt(_argt) -- override if any
-end
-
-
---
 -- CWeaponMelee
 --
-CWeaponMelee = CWeapon:extend() -- Melee weapons
+CWeaponMelee = CObjectHandPhy:extend() -- Melee weapons
 Classic.KINDDWEAPONMELEE = "Melee" -- Melee kind
 Classic.NAMEDWEAPONMELEE = "Melee" -- Melee name
 function CWeaponMelee:new(_argt)
@@ -2703,7 +2689,7 @@ end
 --
 -- CWeaponRange
 --
-CWeaponRange = CWeapon:extend() -- Range weapons
+CWeaponRange = CObjectHandMen:extend() -- Range weapons
 Classic.KINDDWEAPONRANGE = "Range" -- Range kind
 Classic.NAMEDWEAPONRANGE = "Range" -- Range name
 function CWeaponRange:new(_argt)
@@ -2779,7 +2765,7 @@ end
 --
 -- CWeaponShield
 --
-CWeaponShield = CWeapon:extend() -- Shield weapons
+CWeaponShield = CObjectHandPhy:extend() -- Shield weapons
 Classic.KINDDWEAPONSHIELD = "Shield" -- Shield kind
 Classic.NAMEDWEAPONSHIELD = "Shield" -- Shield name
 function CWeaponShield:new(_argt)
@@ -3023,49 +3009,6 @@ function CObjectHeadPsy:new(_argt)
     self:argt(_argt) -- override if any
 end
 
-CClothesHat = CObjectHeadPhy:extend() -- Hat objects
-Classic.KINDCLOTHESHAT = "Hat" -- ClothesHat kind
-Classic.NAMECLOTHESHAT = "Hat" -- ClothesHat name
-function CClothesHat:new(_argt)
-    CClothesHat.super.new(self, _argt)
-    self.kind = Classic.KINDCLOTHESHAT
-    self.name = Classic.NAMECLOTHESHAT
-    self.sprite = CSpriteFG.CLOTHESHATB
-    self:argt(_argt) -- override if any
-end
-
-CClothesHatSmall = CClothesHat:extend() -- HatSmall objects
-Classic.KINDCLOTHESHATSMALL = "Hat.S" -- ClothesHatSmall kind
-Classic.NAMECLOTHESHATSMALL = "Hat.S" -- ClothesHatSmall name
-function CClothesHatSmall:new(_argt)
-    CClothesHatSmall.super.new(self, _argt)
-    self.kind = Classic.KINDCLOTHESHATSMALL
-    self.name = Classic.NAMECLOTHESHATSMALL
-    self.sprite = CSpriteFG.CLOTHESHATS
-    self:argt(_argt) -- override if any
-end
-
-CClothesHatMedium = CClothesHat:extend() -- HatMedium objects
-Classic.KINDCLOTHESHATMEDIUM = "Hat.M" -- ClothesHatMedium kind
-Classic.NAMECLOTHESHATMEDIUM = "Hat.M" -- ClothesHatMedium name
-function CClothesHatMedium:new(_argt)
-    CClothesHatMedium.super.new(self, _argt)
-    self.kind = Classic.KINDCLOTHESHATMEDIUM
-    self.name = Classic.NAMECLOTHESHATMEDIUM
-    self.sprite = CSpriteFG.CLOTHESHATM
-    self:argt(_argt) -- override if any
-end
-
-CClothesHatLarge = CClothesHat:extend() -- HatLarge objects
-Classic.KINDCLOTHESHATLARGE = "Hat.L" -- ClothesHatLarge kind
-Classic.NAMECLOTHESHATLARGE = "Hat.L" -- ClothesHatLarge name
-function CClothesHatLarge:new(_argt)
-    CClothesHatLarge.super.new(self, _argt)
-    self.kind = Classic.KINDCLOTHESHATLARGE
-    self.name = Classic.NAMECLOTHESHATLARGE
-    self.sprite = CSpriteFG.CLOTHESHATL
-    self:argt(_argt) -- override if any
-end
 
 CClothesHelmet = CObjectHeadPhy:extend() -- Helmet objects
 Classic.KINDCLOTHESHELMET = "Helmet" -- ClothesHelmet kind
@@ -3114,6 +3057,96 @@ function CClothesHelmetLarge:new(_argt)
     self.kind = Classic.KINDCLOTHESHELMETLARGE
     self.name = Classic.NAMECLOTHESHELMETLARGE
     self.sprite = CSpriteFG.CLOTHESHLML
+    self:argt(_argt) -- override if any
+end
+
+
+CClothesHat = CObjectHeadMen:extend() -- Hat objects
+Classic.KINDCLOTHESHAT = "Hat" -- ClothesHat kind
+Classic.NAMECLOTHESHAT = "Hat" -- ClothesHat name
+function CClothesHat:new(_argt)
+    CClothesHat.super.new(self, _argt)
+    self.kind = Classic.KINDCLOTHESHAT
+    self.name = Classic.NAMECLOTHESHAT
+    self.sprite = CSpriteFG.CLOTHESHATB
+    self:argt(_argt) -- override if any
+end
+
+CClothesHatSmall = CClothesHat:extend() -- HatSmall objects
+Classic.KINDCLOTHESHATSMALL = "Hat.S" -- ClothesHatSmall kind
+Classic.NAMECLOTHESHATSMALL = "Hat.S" -- ClothesHatSmall name
+function CClothesHatSmall:new(_argt)
+    CClothesHatSmall.super.new(self, _argt)
+    self.kind = Classic.KINDCLOTHESHATSMALL
+    self.name = Classic.NAMECLOTHESHATSMALL
+    self.sprite = CSpriteFG.CLOTHESHATS
+    self:argt(_argt) -- override if any
+end
+
+CClothesHatMedium = CClothesHat:extend() -- HatMedium objects
+Classic.KINDCLOTHESHATMEDIUM = "Hat.M" -- ClothesHatMedium kind
+Classic.NAMECLOTHESHATMEDIUM = "Hat.M" -- ClothesHatMedium name
+function CClothesHatMedium:new(_argt)
+    CClothesHatMedium.super.new(self, _argt)
+    self.kind = Classic.KINDCLOTHESHATMEDIUM
+    self.name = Classic.NAMECLOTHESHATMEDIUM
+    self.sprite = CSpriteFG.CLOTHESHATM
+    self:argt(_argt) -- override if any
+end
+
+CClothesHatLarge = CClothesHat:extend() -- HatLarge objects
+Classic.KINDCLOTHESHATLARGE = "Hat.L" -- ClothesHatLarge kind
+Classic.NAMECLOTHESHATLARGE = "Hat.L" -- ClothesHatLarge name
+function CClothesHatLarge:new(_argt)
+    CClothesHatLarge.super.new(self, _argt)
+    self.kind = Classic.KINDCLOTHESHATLARGE
+    self.name = Classic.NAMECLOTHESHATLARGE
+    self.sprite = CSpriteFG.CLOTHESHATL
+    self:argt(_argt) -- override if any
+end
+
+
+CClothesCap = CObjectHeadPsy:extend() -- Cap objects
+Classic.KINDCLOTHESCAP = "Cap" -- ClothesCap kind
+Classic.NAMECLOTHESCAP = "Cap" -- ClothesCap name
+function CClothesCap:new(_argt)
+    CClothesCap.super.new(self, _argt)
+    self.kind = Classic.KINDCLOTHESCAP
+    self.name = Classic.NAMECLOTHESCAP
+    self.sprite = CSpriteFG.CLOTHESCAPB
+    self:argt(_argt) -- override if any
+end
+
+CClothesCapSmall = CClothesCap:extend() -- CapSmall objects
+Classic.KINDCLOTHESCAPSMALL = "Cap.S" -- ClothesCapSmall kind
+Classic.NAMECLOTHESCAPSMALL = "Cap.S" -- ClothesCapSmall name
+function CClothesCapSmall:new(_argt)
+    CClothesCapSmall.super.new(self, _argt)
+    self.kind = Classic.KINDCLOTHESCAPSMALL
+    self.name = Classic.NAMECLOTHESCAPSMALL
+    self.sprite = CSpriteFG.CLOTHESCAPS
+    self:argt(_argt) -- override if any
+end
+
+CClothesCapMedium = CClothesCap:extend() -- CapMedium objects
+Classic.KINDCLOTHESCAPMEDIUM = "Cap.M" -- ClothesCapMedium kind
+Classic.NAMECLOTHESCAPMEDIUM = "Cap.M" -- ClothesCapMedium name
+function CClothesCapMedium:new(_argt)
+    CClothesCapMedium.super.new(self, _argt)
+    self.kind = Classic.KINDCLOTHESCAPMEDIUM
+    self.name = Classic.NAMECLOTHESCAPMEDIUM
+    self.sprite = CSpriteFG.CLOTHESCAPM
+    self:argt(_argt) -- override if any
+end
+
+CClothesCapLarge = CClothesCap:extend() -- CapLarge objects
+Classic.KINDCLOTHESCAPLARGE = "Cap.L" -- ClothesCapLarge kind
+Classic.NAMECLOTHESCAPLARGE = "Cap.L" -- ClothesCapLarge name
+function CClothesCapLarge:new(_argt)
+    CClothesCapLarge.super.new(self, _argt)
+    self.kind = Classic.KINDCLOTHESCAPLARGE
+    self.name = Classic.NAMECLOTHESCAPLARGE
+    self.sprite = CSpriteFG.CLOTHESCAPL
     self:argt(_argt) -- override if any
 end
 
@@ -3199,6 +3232,7 @@ function CObjectBackPsy:new(_argt)
     self:argt(_argt) -- override if any
 end
 
+
 CClothesBackPack = CObjectBackPhy:extend() -- BackPack objects
 Classic.KINDCLOTHESBACKPACK = "Bag" -- ClothesBackPack kind
 Classic.NAMECLOTHESBACKPACK = "Bag" -- ClothesBackPack name
@@ -3243,6 +3277,55 @@ function CClothesBackPackLarge:new(_argt)
     self.kind = Classic.KINDCLOTHESBACKPACKLARGE
     self.name = Classic.NAMECLOTHESBACKPACKLARGE
     self.sprite    = CSpriteFG.CLOTHESBKPL
+    self.inventory = CInventoryAny6{}
+    self:argt(_argt) -- override if any
+end
+
+
+CClothesToolBox = CObjectBackMen:extend() -- ToolBox objects
+Classic.KINDCLOTHESTOOLBOX = "Box" -- ClothesToolBox kind
+Classic.NAMECLOTHESTOOLBOX = "Box" -- ClothesToolBox name
+function CClothesToolBox:new(_argt)
+    CClothesToolBox.super.new(self, _argt)
+    self.kind = Classic.KINDCLOTHESTOOLBOX
+    self.name = Classic.NAMECLOTHESTOOLBOX
+    self.sprite    = CSpriteFG.CLOTHESTBXB
+    self.inventory = CInventoryAny2{}
+    self:argt(_argt) -- override if any
+end
+
+CClothesToolBoxSmall = CClothesToolBox:extend() -- ToolBoxSmall objects
+Classic.KINDCLOTHESTOOLBOXSMALL = "Box.S" -- ClothesToolBoxSmall kind
+Classic.NAMECLOTHESTOOLBOXSMALL = "Box.S" -- ClothesToolBoxSmall name
+function CClothesToolBoxSmall:new(_argt)
+    CClothesToolBoxSmall.super.new(self, _argt)
+    self.kind = Classic.KINDCLOTHESTOOLBOXSMALL
+    self.name = Classic.NAMECLOTHESTOOLBOXSMALL
+    self.sprite    = CSpriteFG.CLOTHESTBXS
+    self.inventory = CInventoryAny2{}
+    self:argt(_argt) -- override if any
+end
+
+CClothesToolBoxMedium = CClothesToolBox:extend() -- ToolBoxMedium objects
+Classic.KINDCLOTHESTOOLBOXMEDIUM = "Box.M" -- ClothesToolBoxMedium kind
+Classic.NAMECLOTHESTOOLBOXMEDIUM = "Box.M" -- ClothesToolBoxMedium name
+function CClothesToolBoxMedium:new(_argt)
+    CClothesToolBoxMedium.super.new(self, _argt)
+    self.kind = Classic.KINDCLOTHESTOOLBOXMEDIUM
+    self.name = Classic.NAMECLOTHESTOOLBOXMEDIUM
+    self.sprite    = CSpriteFG.CLOTHESTBXM
+    self.inventory = CInventoryAny4{}
+    self:argt(_argt) -- override if any
+end
+
+CClothesToolBoxLarge = CClothesToolBox:extend() -- ToolBoxLarge objects
+Classic.KINDCLOTHESTOOLBOXLARGE = "Box.L" -- ClothesToolBoxLarge kind
+Classic.NAMECLOTHESTOOLBOXLARGE = "Box.L" -- ClothesToolBoxLarge name
+function CClothesToolBoxLarge:new(_argt)
+    CClothesToolBoxLarge.super.new(self, _argt)
+    self.kind = Classic.KINDCLOTHESTOOLBOXLARGE
+    self.name = Classic.NAMECLOTHESTOOLBOXLARGE
+    self.sprite    = CSpriteFG.CLOTHESTBXL
     self.inventory = CInventoryAny6{}
     self:argt(_argt) -- override if any
 end
@@ -5998,7 +6081,7 @@ end
 function Tic:draw()
     if true then
     Tic.inputsDo()
-trace(Tic:playerActual().name)
+
     Tic:screenDraw()
 
     Tic:drawLog()
