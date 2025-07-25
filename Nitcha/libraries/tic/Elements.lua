@@ -47,6 +47,8 @@ function CElement:new(_argt)
     self.colorborder = Tic.COLORGREYM
     self.colorframe1 = Tic.COLORWHITE
     self.colorframe2 = Tic.COLORGREYL
+    self.keysfunctions = nil -- keys to functions mapping if any
+    self.clickable     = false -- act as a button ?
     self:argt(_argt) -- override if any
 end
 
@@ -58,6 +60,11 @@ function CElement:draw() -- element drawing
     if self.drawcaches then self:drawCaches() end
     if self.drawborder then self:drawBorder() end
     if self.drawframes then self:drawFrames() end
+    Tic:keyboardAppendKeysFunctions(self.keysfunctions)
+    if self.clickable then Tic:buttonsInsertButton(self) end
+    for _, _element in ipairs(self.elements or {}) do -- sub elements if any
+        _element:draw()
+    end
 end
 
 function CElement:sizeWH() -- total WH sizes including margins
@@ -235,5 +242,71 @@ end
 function CElement:removeElements(_elements) -- remove elements -- all
     for _, _element in ipairs(_elements or {}) do
         self:removeElement(_element)
+    end
+end
+
+function CElement:elementsTotalW(_elements, _separator) -- total w of elements with optional separator
+    _separator = _separator or 0
+    local _result = 0
+    for _, _element in ipairs(_elements or {}) do
+        _result = _result + _element.screenw + _separator
+    end
+    _result = (_result == 0) and _result or _result - _separator -- skip last separator
+    return _result
+end
+
+function CElement:elementsTotalH(_elements, _separator) -- total h of elements with optional separator
+    _separator = _separator or 0
+    local _result = 0
+    for _, _element in ipairs(_elements or {}) do
+        _result = _result + _element.screenh + _separator
+    end
+    _result = (_result == 0) and _result or _result - _separator -- skip last separator
+    return _result
+end
+
+function CElement:elementsDistributeH(_elements, _screenx, _screeny, _separator) -- distribute h elements with optional separator and xy
+    _separator = _separator or 0
+    for _, _element in ipairs(_elements or {}) do
+        if _screenx then
+            if _screenx >= 0 then -- gt 0 force x
+                _element.screenx = _screenx
+            else -- lt 0 keep its own x -- not useful here
+            end
+        else -- nil ajust x to the first element
+            _screenx = _element.screenx
+        end
+        if _screeny then
+            if _screeny >= 0 then -- gt 0 force y
+                _element.screeny = _screeny
+            else -- lt 0 keep its own y
+            end
+        else -- nil ajust y to the first element
+            _screeny = _element.screeny
+        end
+        _screenx = _screenx + _element.screenw + _separator
+    end
+end
+
+function CElement:elementsDistributeV(_elements, _screenx, _screeny, _separator) -- distribute v elements with optional separator and xy
+    _separator = _separator or 0
+    for _, _element in ipairs(_elements or {}) do
+        if _screenx then
+            if _screenx >= 0 then -- gt 0 force x
+                _element.screenx = _screenx
+            else -- lt 0 keep its own x
+            end
+        else -- nil ajust x to the first element
+            _screenx = _element.screenx
+        end
+        if _screeny then
+            if _screeny >= 0 then -- gt 0 force y
+                _element.screeny = _screeny
+            else -- lt 0 keep its own y -- not useful here
+            end
+        else -- nil ajust y to the first element
+            _screeny = _element.screeny
+        end
+        _screeny = _screeny + _element.screenh + _separator
     end
 end

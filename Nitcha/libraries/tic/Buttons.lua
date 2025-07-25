@@ -19,6 +19,7 @@ function CButton:new(_argt)
     CButton.super.new(self, _argt)
     self.kind = Classic.KINDBUTTON
     self.name = Classic.NAMEBUTTON
+    self.clickable     = true -- act as a button ?
     self.screenw       = Tic.SPRITESIZE -- sizes
     self.screenh       = Tic.SPRITESIZE
     self.enabled       = true  -- can be clicked ?

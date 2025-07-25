@@ -102,15 +102,17 @@ CWindowMenuInteractions = CWindowMenu:extend() -- window menu interactions
 Classic.KINDWINDOWMENUINTERACTIONS = "WindowMenuInteractions" -- Window kind
 Classic.NAMEWINDOWMENUINTERACTIONS = "WindowMenuInteractions" -- Window name
 CWindowMenuInteractions.BEHAVIOUR = function(self)
+    self.parent:removeElements(self.elements)
+    self.elements = {}
+
     local _playeractual = Tic:playerActual()
     self.display = (_playeractual) and true or false
     if not self.display then return end
     self.display = _playeractual:canInteract()
     if not self.display then return end
+    
     Tic:logAppend(self.parent.name)
     -- if true then return end
-    self.parent:removeElements(self.elements)
-    self.elements = {}
     local _interactto   = _playeractual.interactto
     local _interactions = _interactto.interactions
     for _, _interaction in ipairs (_interactions) do

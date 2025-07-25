@@ -410,7 +410,8 @@ Tic.FUNCTIONSLOTDROPHANDRG      = function() return Tic:slotDropHandRG() end
 Tic.KEYSFUNCTIONSINTRO = { -- FIXME conflict with key any
     -- [Tic.KEY_NUMPADMINUS]  = Tic.FUNCTIONSCREENPREV,
     -- [Tic.KEY_NUMPADPLUS]   = Tic.FUNCTIONSCREENNEXT,
-    [Tic.KEY_ANY]          = Tic.FUNCTIONSCREENNEXT,
+    -- [Tic.KEY_ANY]          = Tic.FUNCTIONSCREENNEXT,
+    [Tic.KEY_I]            = Tic.FUNCTIONINVENTORYTOGGLESHOW,
 }
 Tic.KEYSFUNCTIONSMENUS = {
     [Tic.KEY_I]            = Tic.FUNCTIONINVENTORYTOGGLESHOW,
@@ -629,15 +630,23 @@ function Tic:buttonsClearButtons() -- clear buttons stack
     Tic.BUTTONS = {}
 end
 
+function Tic:buttonsInsertButton(_button) -- insert button (once)
+    Tables:valInsert(Tic.BUTTONS, _button, true)
+end
+
 function Tic:buttonsInsertButtons(_buttons) -- insert buttons (once)
     for _, _button in ipairs(_buttons or {}) do
-        Tables:valInsert(Tic.BUTTONS, _button, true)
+        Tic:buttonsInsertButton(_button)
     end
+end
+
+function Tic:buttonsRemoveButton(_button) -- remove button (all)
+    Tables:valRemove(Tic.BUTTONS, _button, false)
 end
 
 function Tic:buttonsRemoveButtons(_buttons) -- remove buttons (all)
     for _, _button in ipairs(_buttons or {}) do
-        Tables:valRemove(Tic.BUTTONS, _button, false)
+        Tic:buttonsRemoveButton(_button)
     end
 end
 
@@ -5112,7 +5121,7 @@ ScreenIntro:appendElements{
         drawframes = false,
         elements = {CText{text = "Press"}, CText{text = "a"}, CText{text = "Key"}},
     },
-    -- Button1,
+    Button1,
     -- Button2,
     -- Button3,
     -- Button4,
