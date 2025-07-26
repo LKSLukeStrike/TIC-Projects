@@ -22,7 +22,7 @@ function Classic:new(...)
 end
 
 
-function Classic:extend()
+function Classic:extend(_argt)
   local _classic = {}
   for _key, _val in pairs(self) do
     if _key:find("__") == 1 then
@@ -32,6 +32,7 @@ function Classic:extend()
   _classic.__index = _classic
   _classic.super = self
   setmetatable(_classic, self)
+  _classic:argt(_argt)
   return _classic
 end
 
