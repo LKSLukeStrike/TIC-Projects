@@ -9,6 +9,9 @@ CObject.BORDER         = Tic.COLORGREYD
 CObject.INSIDE         = Tic.COLORGREYM
 CObject.EFFECT         = Tic.COLORGREYL
 CObject.EXTRA1         = Tic.COLORPURPLE
+CObject.EXTRA2         = Tic.COLORRED
+CObject.USED1          = Tic.COLORBLUEM
+CObject.USED2          = Tic.COLORBLUEL
 CObject.COLORPHYL      = Tic.COLORORANGE -- phy
 CObject.COLORPHYM      = Tic.COLORRED
 CObject.COLORPHYD      = Tic.COLORPURPLE
@@ -24,6 +27,9 @@ CObject.COLORMAGIC2BG  = Tic.COLORBLUEL -- magic2
 CObject.COLORMAGIC2FG  = Tic.COLORCYAN
 CObject.COLORWOODBG    = Tic.COLORRED -- wood
 CObject.COLORWOODFG    = Tic.COLORORANGE
+CObject.COLORFIREBG    = Tic.COLORRED -- fire
+CObject.COLORFIREFG    = Tic.COLORORANGE
+CObject.COLORLEATHERXG = Tic.COLORPURPLE -- leather
 CObject.COLORLEATHERBG = Tic.COLORRED -- leather
 CObject.COLORLEATHERFG = Tic.COLORORANGE
 CObject.COLORIRONBG    = Tic.COLORGREYM -- iron
@@ -466,6 +472,43 @@ IObjectBack = Classic:extend{ -- back objects implementation
 } 
 
 --
+-- IObjectUsable
+--
+IObjectUsable = Classic:extend{ -- usable objects implementation
+    stateshandles = {
+        [Tic.STATEIDLELF]  = {rotate = CSprite.ROTATE000, flip = Tic.DIRXLF},
+        [Tic.STATEIDLERG]  = {rotate = CSprite.ROTATE000, flip = Tic.DIRXRG},
+        [Tic.STATEMOVELF]  = {rotate = CSprite.ROTATE270, flip = Tic.DIRXLF},
+        [Tic.STATEMOVERG]  = {rotate = CSprite.ROTATE270, flip = Tic.DIRXRG},
+        [Tic.STATEWORKLF]  = {rotate = CSprite.ROTATE000, flip = Tic.DIRXLF},
+        [Tic.STATEWORKRG]  = {rotate = CSprite.ROTATE000, flip = Tic.DIRXRG},
+        [Tic.STATEFLOORLF] = {rotate = CSprite.ROTATE000, flip = Tic.DIRXLF},
+        [Tic.STATEFLOORRG] = {rotate = CSprite.ROTATE000, flip = Tic.DIRXRG},
+    },
+}
+function IObjectUsable:draw()
+    self:save()
+    self.palettefg[CObject.USED1] = self.palettefg[CObject.INSIDE]
+    self.palettefg[CObject.USED2] = self.palettefg[CObject.EFFECT]
+    self.palettebg[CObject.USED1] = self.palettebg[CObject.INSIDE]
+    self.palettebg[CObject.USED2] = self.palettebg[CObject.EFFECT]
+    if self.used == CObject.USEDHALF then
+        self.palettefg[CObject.EFFECT] = Tic.COLORKEY
+        self.palettebg[CObject.EFFECT] = Tic.COLORKEY
+    elseif self.used == CObject.USEDFULL then
+        self.palettefg[CObject.EFFECT] = Tic.COLORKEY
+        self.palettebg[CObject.EFFECT] = Tic.COLORKEY
+        self.palettefg[CObject.INSIDE] = Tic.COLORKEY
+        self.palettebg[CObject.INSIDE] = Tic.COLORKEY
+    end
+    CObject.super.draw(self)
+    self:load()
+end
+
+
+
+
+--
 -- CWeaponMelee PHY HAND
 --
 CWeaponMelee = CObjectPhyHand:extend() -- Melee weapons
@@ -690,6 +733,77 @@ end
 
 
 --
+-- CObjectBomb PHY HAND
+--
+CObjectBomb = CObjectPhyHand:extend() -- Bomb objects
+Classic.KINDDOBJECTBOMB = "Bomb" -- Bomb kind
+Classic.NAMEDOBJECTBOMB = "Bomb" -- Bomb name
+function CObjectBomb:new(_argt)
+    CObjectBomb.super.new(self, _argt)
+    self.kind = Classic.KINDDOBJECTBOMB
+    self.name = Classic.NAMEDOBJECTBOMB
+    self.sprite  = CSpriteFG.OBJECTBOMBB
+    self.handleoffsets = {
+        [CSprite.ROTATE000] = {handlex = 4, handley = 2},
+        [CSprite.ROTATE090] = {handlex = 5, handley = 4},
+        [CSprite.ROTATE180] = {handlex = 3, handley = 5},
+        [CSprite.ROTATE270] = {handlex = 2, handley = 3},
+    }
+    self.palettefg = {
+        [CObject.HANDLE] = CObject.HANDLE,
+        [CObject.BORDER] = CObject.COLORONYXBG,
+        [CObject.INSIDE] = CObject.COLORONYXFG,
+        [CObject.EFFECT] = CObject.COLORONYXFG,
+        [CObject.EXTRA1] = CObject.COLORFIREFG,
+        [CObject.EXTRA2] = CObject.COLORIRONFG,
+    }
+    self.palettebg = {
+        [CObject.HANDLE] = CObject.HANDLE,
+        [CObject.BORDER] = CObject.COLORONYXBG,
+        [CObject.INSIDE] = CObject.COLORONYXBG,
+        [CObject.EFFECT] = CObject.COLORONYXBG,
+        [CObject.EXTRA1] = CObject.COLORFIREBG,
+        [CObject.EXTRA2] = CObject.COLORIRONBG,
+    }
+    self:argt(_argt) -- override if any
+    self:implementall(IObjectUsable)
+end
+
+CObjectBombSmall = CObjectBomb:extend() -- BombSmall objects
+Classic.KINDOBJECTBOMBSMALL = "Bomb.S" -- BombSmall kind
+Classic.NAMEOBJECTBOMBSMALL = "Bomb.S" -- BombSmall name
+function CObjectBombSmall:new(_argt)
+    CObjectBombSmall.super.new(self, _argt)
+    self.kind = Classic.KINDOBJECTBOMBSMALL
+    self.name = Classic.NAMEOBJECTBOMBSMALL
+    self.sprite  = CSpriteFG.OBJECTBOMBS
+    self:argt(_argt) -- override if any
+end
+
+CObjectBombMedium = CObjectBomb:extend() -- BombMedium objects
+Classic.KINDOBJECTBOMBMEDIUM = "Bomb.M" -- BombMedium kind
+Classic.NAMEOBJECTBOMBMEDIUM = "Bomb.M" -- BombMedium name
+function CObjectBombMedium:new(_argt)
+    CObjectBombMedium.super.new(self, _argt)
+    self.kind = Classic.KINDOBJECTBOMBMEDIUM
+    self.name = Classic.NAMEOBJECTBOMBMEDIUM
+    self.sprite  = CSpriteFG.OBJECTBOMBM
+    self:argt(_argt) -- override if any
+end
+
+CObjectBombLarge = CObjectBomb:extend() -- BombLarge objects
+Classic.KINDOBJECTBOMBLARGE = "Bomb.L" -- BombLarge kind
+Classic.NAMEOBJECTBOMBLARGE = "Bomb.L" -- BombLarge name
+function CObjectBombLarge:new(_argt)
+    CObjectBombLarge.super.new(self, _argt)
+    self.kind = Classic.KINDOBJECTBOMBLARGE
+    self.name = Classic.NAMEOBJECTBOMBLARGE
+    self.sprite  = CSpriteFG.OBJECTBOMBL
+    self:argt(_argt) -- override if any
+end
+
+
+--
 -- CWeaponRange MEN HAND
 --
 CWeaponRange = CObjectMenHand:extend() -- Range weapons
@@ -793,18 +907,18 @@ function CWeaponBook:new(_argt)
         [CSprite.ROTATE270] = {handlex = 2, handley = 1},
     }
     self.palettefg = {
-        [CObject.HANDLE] = CObject.HANDLE,
+        [CObject.HANDLE] = CObject.COLORIRONFG,
         [CObject.BORDER] = CObject.COLORIRONFG,
-        [CObject.INSIDE] = CObject.COLORIRONBG,
+        [CObject.INSIDE] = CObject.COLORLEATHERBG,
         [CObject.EFFECT] = CObject.COLORLEATHERFG,
-        [CObject.EXTRA1] = CObject.COLORIRONFG,
+        [CObject.EXTRA1] = CObject.COLORONYXFG,
     }
     self.palettebg = {
-        [CObject.HANDLE] = CObject.HANDLE,
+        [CObject.HANDLE] = CObject.COLORIRONBG,
         [CObject.BORDER] = CObject.COLORIRONBG,
-        [CObject.INSIDE] = CObject.COLORONYXBG,
-        [CObject.EFFECT] = CObject.COLORONYXFG,
-        [CObject.EXTRA1] = CObject.COLORIRONFG,
+        [CObject.INSIDE] = CObject.COLORLEATHERXG,
+        [CObject.EFFECT] = CObject.COLORLEATHERBG,
+        [CObject.EXTRA1] = CObject.COLORONYXBG,
     }
     self:argt(_argt) -- override if any
     self:implementnew(IObjectHandDefense)
@@ -970,16 +1084,6 @@ function CObjectFlask:new(_argt)
     self.kind = Classic.KINDDOBJECTFLASK
     self.name = Classic.NAMEDOBJECTFLASK
     self.sprite  = CSpriteFG.OBJECTFLASB
-    self.stateshandles = {
-        [Tic.STATEIDLELF]  = {rotate = CSprite.ROTATE000, flip = Tic.DIRXLF},
-        [Tic.STATEIDLERG]  = {rotate = CSprite.ROTATE000, flip = Tic.DIRXRG},
-        [Tic.STATEMOVELF]  = {rotate = CSprite.ROTATE270, flip = Tic.DIRXLF},
-        [Tic.STATEMOVERG]  = {rotate = CSprite.ROTATE270, flip = Tic.DIRXRG},
-        [Tic.STATEWORKLF]  = {rotate = CSprite.ROTATE000, flip = Tic.DIRXLF},
-        [Tic.STATEWORKRG]  = {rotate = CSprite.ROTATE000, flip = Tic.DIRXRG},
-        [Tic.STATEFLOORLF] = {rotate = CSprite.ROTATE000, flip = Tic.DIRXLF},
-        [Tic.STATEFLOORRG] = {rotate = CSprite.ROTATE000, flip = Tic.DIRXRG},
-    }
     self.handleoffsets = {
         [CSprite.ROTATE000] = {handlex = 3, handley = 1},
         [CSprite.ROTATE090] = {handlex = 6, handley = 3},
@@ -999,26 +1103,12 @@ function CObjectFlask:new(_argt)
         [CObject.EFFECT] = CObject.COLORWOODBG,
     }
     self:argt(_argt) -- override if any
-end
-
-function CObjectFlask:draw()
-    self:save()
-    if self.used == CObject.USEDHALF then
-        self.palettefg[CObject.EFFECT] = Tic.COLORKEY
-        self.palettebg[CObject.EFFECT] = Tic.COLORKEY
-    elseif self.used == CObject.USEDFULL then
-        self.palettefg[CObject.EFFECT] = Tic.COLORKEY
-        self.palettebg[CObject.EFFECT] = Tic.COLORKEY
-        self.palettefg[CObject.INSIDE] = Tic.COLORKEY
-        self.palettebg[CObject.INSIDE] = Tic.COLORKEY
-    end
-    CObjectFlask.super.draw(self)
-    self:load()
+    self:implementall(IObjectUsable)
 end
 
 CObjectFlaskSmall = CObjectFlask:extend() -- FlaskSmall objects
-Classic.KINDOBJECTFLASKSMALL = "Oil.S" -- FlaskSmall kind
-Classic.NAMEOBJECTFLASKSMALL = "Oil.S" -- FlaskSmall name
+Classic.KINDOBJECTFLASKSMALL = "Flask.S" -- FlaskSmall kind
+Classic.NAMEOBJECTFLASKSMALL = "Flask.S" -- FlaskSmall name
 function CObjectFlaskSmall:new(_argt)
     CObjectFlaskSmall.super.new(self, _argt)
     self.kind = Classic.KINDOBJECTFLASKSMALL
@@ -1028,8 +1118,8 @@ function CObjectFlaskSmall:new(_argt)
 end
 
 CObjectFlaskMedium = CObjectFlask:extend() -- FlaskMedium objects
-Classic.KINDOBJECTFLASKMEDIUM = "Oil.M" -- FlaskMedium kind
-Classic.NAMEOBJECTFLASKMEDIUM = "Oil.M" -- FlaskMedium name
+Classic.KINDOBJECTFLASKMEDIUM = "Flask.M" -- FlaskMedium kind
+Classic.NAMEOBJECTFLASKMEDIUM = "Flask.M" -- FlaskMedium name
 function CObjectFlaskMedium:new(_argt)
     CObjectFlaskMedium.super.new(self, _argt)
     self.kind = Classic.KINDOBJECTFLASKMEDIUM
@@ -1039,8 +1129,8 @@ function CObjectFlaskMedium:new(_argt)
 end
 
 CObjectFlaskLarge = CObjectFlask:extend() -- FlaskLarge objects
-Classic.KINDOBJECTFLASKLARGE = "Oil.L" -- FlaskLarge kind
-Classic.NAMEOBJECTFLASKLARGE = "Oil.L" -- FlaskLarge name
+Classic.KINDOBJECTFLASKLARGE = "Flask.L" -- FlaskLarge kind
+Classic.NAMEOBJECTFLASKLARGE = "Flask.L" -- FlaskLarge name
 function CObjectFlaskLarge:new(_argt)
     CObjectFlaskLarge.super.new(self, _argt)
     self.kind = Classic.KINDOBJECTFLASKLARGE
@@ -1284,5 +1374,76 @@ function CClothesScrollCaseLarge:new(_argt)
     self.name = Classic.NAMECLOTHESSCROLLCASELARGE
     self.sprite    = CSpriteFG.CLOTHESCASL
     self.inventory = CInventoryAny6{}
+    self:argt(_argt) -- override if any
+end
+
+
+--
+-- CObjectSpell PSY HAND
+--
+CObjectSpell = CObjectPsyHand:extend() -- Spell objects
+Classic.KINDDOBJECTSPELL = "Spell" -- Spell kind
+Classic.NAMEDOBJECTSPELL = "Spell" -- Spell name
+function CObjectSpell:new(_argt)
+    CObjectSpell.super.new(self, _argt)
+    self.kind = Classic.KINDDOBJECTSPELL
+    self.name = Classic.NAMEDOBJECTSPELL
+    self.sprite  = CSpriteFG.OBJECTSPELB
+    self.handleoffsets = {
+        [CSprite.ROTATE000] = {handlex = 5, handley = 1},
+        [CSprite.ROTATE090] = {handlex = 6, handley = 5},
+        [CSprite.ROTATE180] = {handlex = 2, handley = 6},
+        [CSprite.ROTATE270] = {handlex = 1, handley = 2},
+    }
+    self.palettefg = {
+        [CObject.HANDLE] = CObject.COLORONYXFG,
+        [CObject.BORDER] = CObject.COLORONYXFG,
+        [CObject.INSIDE] = CObject.COLORLEATHERFG,
+        [CObject.EFFECT] = CObject.COLORLEATHERFG,
+        [CObject.EXTRA1] = CObject.COLORLEATHERBG,
+        [CObject.EXTRA2] = CObject.COLORIRONFG,
+    }
+    self.palettebg = {
+        [CObject.HANDLE] = CObject.COLORONYXBG,
+        [CObject.BORDER] = CObject.COLORONYXBG,
+        [CObject.INSIDE] = CObject.COLORLEATHERBG,
+        [CObject.EFFECT] = CObject.COLORLEATHERBG,
+        [CObject.EXTRA1] = CObject.COLORLEATHERXG,
+        [CObject.EXTRA2] = CObject.COLORIRONBG,
+    }
+    self:argt(_argt) -- override if any
+    self:implementall(IObjectUsable)
+end
+
+CObjectSpellSmall = CObjectSpell:extend() -- SpellSmall objects
+Classic.KINDOBJECTSPELLSMALL = "Spell.S" -- SpellSmall kind
+Classic.NAMEOBJECTSPELLSMALL = "Spell.S" -- SpellSmall name
+function CObjectSpellSmall:new(_argt)
+    CObjectSpellSmall.super.new(self, _argt)
+    self.kind = Classic.KINDOBJECTSPELLSMALL
+    self.name = Classic.NAMEOBJECTSPELLSMALL
+    self.sprite  = CSpriteFG.OBJECTSPELS
+    self:argt(_argt) -- override if any
+end
+
+CObjectSpellMedium = CObjectSpell:extend() -- SpellMedium objects
+Classic.KINDOBJECTSPELLMEDIUM = "Spell.M" -- SpellMedium kind
+Classic.NAMEOBJECTSPELLMEDIUM = "Spell.M" -- SpellMedium name
+function CObjectSpellMedium:new(_argt)
+    CObjectSpellMedium.super.new(self, _argt)
+    self.kind = Classic.KINDOBJECTSPELLMEDIUM
+    self.name = Classic.NAMEOBJECTSPELLMEDIUM
+    self.sprite  = CSpriteFG.OBJECTSPELM
+    self:argt(_argt) -- override if any
+end
+
+CObjectSpellLarge = CObjectSpell:extend() -- SpellLarge objects
+Classic.KINDOBJECTSPELLLARGE = "Spell.L" -- SpellLarge kind
+Classic.NAMEOBJECTSPELLLARGE = "Spell.L" -- SpellLarge name
+function CObjectSpellLarge:new(_argt)
+    CObjectSpellLarge.super.new(self, _argt)
+    self.kind = Classic.KINDOBJECTSPELLLARGE
+    self.name = Classic.NAMEOBJECTSPELLLARGE
+    self.sprite  = CSpriteFG.OBJECTSPELL
     self:argt(_argt) -- override if any
 end

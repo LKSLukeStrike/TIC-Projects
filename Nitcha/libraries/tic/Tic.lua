@@ -4898,6 +4898,9 @@ end
 
 local _playerclass = CPlayerTifel
 if true then
+--
+-- phy
+--
 if true then
 Walfie = _playerclass{classed = _playerclass,
     name = "Walfie",
@@ -4913,6 +4916,7 @@ Walfie = _playerclass{classed = _playerclass,
     spottingpick = true,
     ["slots.handrg"] = CSlotHand{object = CWeaponSword{}},
     ["slots.handlf"] = CSlotHand{object = CWeaponShieldSmall{}},
+    -- ["slots.handlf"] = CSlotHand{object = CObjectBombSmall{used = CObject.USEDFULL}},
     ["slots.head"]   = CSlotHead{object = CClothesHelmetSmall{}},
     ["slots.back"]   = CSlotBack{object = CClothesBackPackSmall{}},
 }
@@ -4925,13 +4929,14 @@ Welfie = _playerclass{classed = _playerclass,
     statmenact = 10,
     statpsyact = 10,
     -- colorextra = Tic.COLORRED,
-    worldx = 15,
+    worldx = 20,
     worldy = -20,
     interactions = {CInteraction{}},
     -- spottingspot = true,
     spottingpick = true,
     ["slots.handrg"] = CSlotHand{object = CWeaponHammer{}},
     ["slots.handlf"] = CSlotHand{object = CWeaponShieldMedium{}},
+    -- ["slots.handlf"] = CSlotHand{object = CObjectBombMedium{used = CObject.USEDHALF}},
     ["slots.head"]   = CSlotHead{object = CClothesHelmetMedium{}},
     ["slots.back"]   = CSlotBack{object = CClothesBackPackMedium{}},
 }
@@ -4944,18 +4949,20 @@ Wilfie = _playerclass{classed = _playerclass,
     statmenact = 10,
     statpsyact = 10,
     -- colorextra = Tic.COLORORANGE,
-    worldx = 30,
+    worldx = 40,
     worldy = -20,
     interactions = {CInteraction{}},
     -- spottingspot = true,
     spottingpick = true,
     ["slots.handrg"] = CSlotHand{object = CWeaponLance{}},
     ["slots.handlf"] = CSlotHand{object = CWeaponShieldLarge{}},
+    -- ["slots.handlf"] = CSlotHand{object = CObjectBombLarge{used = CObject.USEDNONE}},
     ["slots.head"]   = CSlotHead{object = CClothesHelmetLarge{}},
     ["slots.back"]   = CSlotBack{object = CClothesBackPackLarge{}},
 }
 end
 --
+-- men
 --
 if true then
 Wolfie = _playerclass{classed = _playerclass,
@@ -4970,11 +4977,11 @@ Wolfie = _playerclass{classed = _playerclass,
     interactions = {CInteraction{}},
     -- spottingspot = true,
     spottingpick = true,
-    -- ["slots.handrg"] = CSlotHand{object = CWeaponBowSmall{}},
+    ["slots.handrg"] = CSlotHand{object = CWeaponBowSmall{}},
     ["slots.handlf"] = CSlotHand{object = CWeaponBookSmall{}},
-    -- ["slots.head"]   = CSlotHead{object = CClothesHatSmall{}},
-    -- ["slots.back"]   = CSlotBack{object = CClothesToolBoxSmall{}},
-    -- ["inventories.any"] = CInventoryAny{objects = {CObjectFlaskSmall{}}},
+    -- ["slots.handlf"] = CSlotHand{object = CObjectFlaskSmall{used = CObject.USEDFULL}},
+    ["slots.head"]   = CSlotHead{object = CClothesHatSmall{}},
+    ["slots.back"]   = CSlotBack{object = CClothesToolBoxSmall{}},
 }
 end
 if true then
@@ -4985,16 +4992,16 @@ Wulfie = _playerclass{classed = _playerclass,
     statmenact = 10,
     statpsyact = 10,
     -- colorextra = Tic.COLORGREENM,
-    worldx = 15,
+    worldx = 20,
     worldy = 0,
     interactions = {CInteraction{}, CInteraction{text = "Blabla"}},
     -- spottingspot = true,
     spottingpick = true,
-    -- ["slots.handrg"] = CSlotHand{object = CWeaponBowMedium{}},
+    ["slots.handrg"] = CSlotHand{object = CWeaponBowMedium{}},
     ["slots.handlf"] = CSlotHand{object = CWeaponBookMedium{}},
-    -- ["slots.head"]   = CSlotHead{object = CClothesHatMedium{}},
-    -- ["slots.back"]   = CSlotBack{object = CClothesToolBoxMedium{}},
-    -- ["inventories.any"] = CInventoryAny{objects = {CObjectFlaskMedium{}}},
+    -- ["slots.handlf"] = CSlotHand{object = CObjectFlaskMedium{used = CObject.USEDHALF}},
+    ["slots.head"]   = CSlotHead{object = CClothesHatMedium{}},
+    ["slots.back"]   = CSlotBack{object = CClothesToolBoxMedium{}},
 }
 end
 if true then
@@ -5005,19 +5012,20 @@ Wylfie = _playerclass{classed = _playerclass,
     statmenact = 10,
     statpsyact = 10,
     -- colorextra = Tic.COLORGREENL,
-    worldx = 30,
+    worldx = 40,
     worldy = 0,
     interactions = {CInteraction{}},
     -- spottingspot = true,
     spottingpick = true,
-    -- ["slots.handrg"] = CSlotHand{object = CWeaponBowLarge{}},
+    ["slots.handrg"] = CSlotHand{object = CWeaponBowLarge{}},
     ["slots.handlf"] = CSlotHand{object = CWeaponBookLarge{}},
-    -- ["slots.head"]   = CSlotHead{object = CClothesHatLarge{}},
-    -- ["slots.back"]   = CSlotBack{object = CClothesToolBoxLarge{}},
-    -- ["inventories.any"] = CInventoryAny{objects = {CObjectFlaskLarge{}}},
+    -- ["slots.handlf"] = CSlotHand{object = CObjectFlaskLarge{used = CObject.USEDNONE}},
+    ["slots.head"]   = CSlotHead{object = CClothesHatLarge{}},
+    ["slots.back"]   = CSlotBack{object = CClothesToolBoxLarge{}},
 }
 end
 --
+-- psy
 --
 if true then
 Wolfie = _playerclass{classed = _playerclass,
@@ -5034,9 +5042,9 @@ Wolfie = _playerclass{classed = _playerclass,
     spottingpick = true,
     ["slots.handrg"] = CSlotHand{object = CWeaponWandSmall{}},
     ["slots.handlf"] = CSlotHand{object = CWeaponRuneSmall{}},
+    -- ["slots.handlf"] = CSlotHand{object = CObjectSpellSmall{used = CObject.USEDFULL}},
     ["slots.head"]   = CSlotHead{object = CClothesCapSmall{}},
     ["slots.back"]   = CSlotBack{object = CClothesScrollCaseSmall{}},
-    ["inventories.any"] = CInventoryAny{objects = {CObjectFlaskSmall{}}},
 }
 end
 if true then
@@ -5047,16 +5055,16 @@ Wulfie = _playerclass{classed = _playerclass,
     statmenact = 10,
     statpsyact = 10,
     -- colorextra = Tic.COLORGREENM,
-    worldx = 15,
+    worldx = 20,
     worldy = 20,
     interactions = {CInteraction{}, CInteraction{text = "Blabla"}},
     -- spottingspot = true,
     spottingpick = true,
     ["slots.handrg"] = CSlotHand{object = CWeaponWandMedium{}},
     ["slots.handlf"] = CSlotHand{object = CWeaponRuneMedium{}},
+    -- ["slots.handlf"] = CSlotHand{object = CObjectSpellMedium{used = CObject.USEDHALF}},
     ["slots.head"]   = CSlotHead{object = CClothesCapMedium{}},
     ["slots.back"]   = CSlotBack{object = CClothesScrollCaseMedium{}},
-    ["inventories.any"] = CInventoryAny{objects = {CObjectFlaskMedium{}}},
 }
 end
 if true then
@@ -5067,16 +5075,16 @@ Wylfie = _playerclass{classed = _playerclass,
     statmenact = 10,
     statpsyact = 10,
     -- colorextra = Tic.COLORGREENL,
-    worldx = 30,
+    worldx = 40,
     worldy = 20,
     interactions = {CInteraction{}},
     -- spottingspot = true,
     spottingpick = true,
     ["slots.handrg"] = CSlotHand{object = CWeaponWandLarge{}},
     ["slots.handlf"] = CSlotHand{object = CWeaponRuneLarge{}},
+    -- ["slots.handlf"] = CSlotHand{object = CObjectSpellLarge{used = CObject.USEDNONE}},
     ["slots.head"]   = CSlotHead{object = CClothesCapLarge{}},
     ["slots.back"]   = CSlotBack{object = CClothesScrollCaseLarge{}},
-    ["inventories.any"] = CInventoryAny{objects = {CObjectFlaskLarge{}}},
 }
 end
 end
