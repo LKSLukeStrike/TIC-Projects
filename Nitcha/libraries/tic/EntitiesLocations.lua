@@ -18,11 +18,11 @@ function CEntitiesLocations:existsEntity(_entity) -- if exists an entity
     return self.entities[_entity]
 end
 
-function CEntitiesLocations:appendEntity(_entity, _range) -- add a new entity
+function CEntitiesLocations:appendEntity(_entity, _range, _trials) -- add a new entity
     if not _entity then return end -- mandatory
     if self:existsEntity(_entity) then return end -- avoid doublons
     self.entities[_entity] = _entity
-    self.locations:appendEntity(_entity, _range)
+    self.locations:appendEntity(_entity, _range, _trials)
 end
 
 function CEntitiesLocations:deleteEntity(_entity) -- delete an entity
@@ -32,10 +32,10 @@ function CEntitiesLocations:deleteEntity(_entity) -- delete an entity
     self.locations:deleteEntity(_entity)
 end
 
-function CEntitiesLocations:moveEntityWorldXY(_entity, _worldx, _worldy, _range) -- move an existing entity
+function CEntitiesLocations:moveEntityWorldXY(_entity, _worldx, _worldy, _range, _trials) -- move an existing entity
     if not _entity or not _worldx or not _worldy then return end -- mandatory
     if not self.entities[_entity] then return end -- doesnt exist
-    self.locations:moveEntityWorldXY(_entity, _worldx, _worldy, _range)
+    self.locations:moveEntityWorldXY(_entity, _worldx, _worldy, _range, _trials)
 end
 
 function CEntitiesLocations:locationsRegion(_region) -- locations in region

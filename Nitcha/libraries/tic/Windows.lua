@@ -595,7 +595,6 @@ function CWindowWorld:drawPlayerActual()
                             _playeractual:hoverEntity(_entity)
 
                             local _playerfind = Tic:playerFind(_entity)
-                            Tic:logAppend("player", _playerfind)
                             if _playerfind then
                                 local _picktext = CText{text = Tic.TEXTPICK, colorinside = Tic.COLORHOVER}
                                 _picktext.screenx = _entity.screenx - ((_picktext.screenw - Tic.SPRITESIZE) // 2)

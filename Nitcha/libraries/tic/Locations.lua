@@ -26,9 +26,20 @@ function CLocations:entities(_locations) -- entities in locations
     return _result -- entities
 end
 
-function CLocations:appendEntity(_entity, _range) -- append a new entity -- [!] allows doublons
+function CLocations:isEmpty(_worldx, _worldy) -- check if a location is empty
+    return not self.locations[_worldy] or not self.locations[_worldy][_worldx]
+end
+
+function CLocations:findEmpty(_trials) -- find an empty location in a list of trials -- nil if not found
+    for _, _trial in ipairs(_trials or {}) do
+        if self:isEmpty(_trial.worldx, _trial.worldy) then return _trial end
+    end
+    return -- nil
+end
+
+function CLocations:appendEntity(_entity, _range, _trials) -- append a new entity -- [!] allows doublons
     if not _entity then return end -- mandatory
-    self:spreadEntity(_entity, _range)
+    self:spreadEntity(_entity, _range, _trials)
     local _worldx = _entity.worldx
     local _worldy = _entity.worldy
     if not self.locations[_worldy] then -- new worldy entry
@@ -40,11 +51,20 @@ function CLocations:appendEntity(_entity, _range) -- append a new entity -- [!] 
     self.locations[_worldy][_worldx][_entity] = _entity
 end
 
-function CLocations:spreadEntity(_entity, _range) -- try to find an empty location within range if any
+function CLocations:spreadEntity(_entity, _range, _trials) -- try to find an empty location within trials or range if any
     if not _entity then return end -- mandatory
+
+    local _trial = self:findEmpty(_trials)
+    if _trial then -- empty location found in trials
+        _entity.worldx = _trial.worldx
+        _entity.worldy = _trial.worldy
+        return
+    end
+
     _range = Nums:pos(_range) or 0
     if _range == 0 then return end -- no spread
-    local _spreadlocations = {}
+
+    local _spreadlocations = {} -- random spread in range
     for _spready = _entity.worldy - _range, _entity.worldy + _range do
         for _spreadx = _entity.worldx - _range, _entity.worldx + _range do
             if not self.locations[_spready] or not self.locations[_spready][_spreadx] then
@@ -68,13 +88,13 @@ function CLocations:deleteEntity(_entity) -- delete an existing entity
     if Tables:size(self.locations[_worldy]) == 0 then self.locations[_worldy] = nil end
 end
 
-function CLocations:moveEntityWorldXY(_entity, _worldx, _worldy, _range) -- move an existing entity
+function CLocations:moveEntityWorldXY(_entity, _worldx, _worldy, _range, _trials) -- move an existing entity
     if not _entity or not _worldx or not _worldy then return end -- mandatory
     if not self.locations[_entity.worldy][_entity.worldx][_entity] then return end -- doesnt exist
     self:deleteEntity(_entity)
     _entity.worldx = _worldx
     _entity.worldy = _worldy
-    self:appendEntity(_entity, _range)
+    self:appendEntity(_entity, _range, _trials)
 end
 
 function CLocations:locationsRegion(_region) -- locations in region

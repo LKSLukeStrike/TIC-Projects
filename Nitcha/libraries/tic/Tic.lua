@@ -245,6 +245,8 @@ Tic.DIRSOFFSETS = { -- directions to x y offsets and dirs
         screeny = 0,
         dirx    = nil,
         diry    = Tic.DIRYUP,
+        dropx   = 0,
+        dropy   = Nums:neg(Tic.SPRITESIZE),
     },
     [Tic.DIR045] = {
         offsetx = Nums:pos(Tic.OFFSETDIAG),
@@ -253,6 +255,8 @@ Tic.DIRSOFFSETS = { -- directions to x y offsets and dirs
         screeny = 0,
         dirx    = Tic.DIRXRG,
         diry    = Tic.DIRYUP,
+        dropx   = Nums:pos(Tic.SPRITESIZE),
+        dropy   = Nums:neg(Tic.SPRITESIZE),
     },
     [Tic.DIR090] = {
         offsetx = Nums:pos(Tic.OFFSETLINE),
@@ -261,6 +265,8 @@ Tic.DIRSOFFSETS = { -- directions to x y offsets and dirs
         screeny = nil, -- double line
         dirx    = Tic.DIRXRG,
         diry    = Tic.DIRYMD,
+        dropx   = Nums:pos(Tic.SPRITESIZE),
+        dropy   = 0,
     },
     [Tic.DIR135] = {
         offsetx = Nums:pos(Tic.OFFSETDIAG),
@@ -269,6 +275,8 @@ Tic.DIRSOFFSETS = { -- directions to x y offsets and dirs
         screeny = 1,
         dirx    = Tic.DIRXRG,
         diry    = Tic.DIRYDW,
+        dropx   = Nums:pos(Tic.SPRITESIZE),
+        dropy   = Nums:pos(Tic.SPRITESIZE),
     },
     [Tic.DIR180] = {
         offsetx = Nums:pos(Tic.OFFSETZERO),
@@ -277,6 +285,8 @@ Tic.DIRSOFFSETS = { -- directions to x y offsets and dirs
         screeny = 0,
         dirx    = nil,
         diry    = Tic.DIRYDW,
+        dropx   = 0,
+        dropy   = Nums:pos(Tic.SPRITESIZE),
     },
     [Tic.DIR225] = {
         offsetx = Nums:neg(Tic.OFFSETDIAG),
@@ -285,6 +295,8 @@ Tic.DIRSOFFSETS = { -- directions to x y offsets and dirs
         screeny = 1,
         dirx    = Tic.DIRXLF,
         diry    = Tic.DIRYDW,
+        dropx   = Nums:neg(Tic.SPRITESIZE),
+        dropy   = Nums:pos(Tic.SPRITESIZE),
     },
     [Tic.DIR270] = {
         offsetx = Nums:neg(Tic.OFFSETLINE),
@@ -293,6 +305,8 @@ Tic.DIRSOFFSETS = { -- directions to x y offsets and dirs
         screeny = nil, -- double line
         dirx    = Tic.DIRXLF,
         diry    = Tic.DIRYMD,
+        dropx   = Nums:neg(Tic.SPRITESIZE),
+        dropy   = 0,
     },
     [Tic.DIR315] = {
         offsetx = Nums:neg(Tic.OFFSETDIAG),
@@ -301,8 +315,20 @@ Tic.DIRSOFFSETS = { -- directions to x y offsets and dirs
         screeny = 0,
         dirx    = Tic.DIRXLF,
         diry    = Tic.DIRYUP,
+        dropx   = Nums:neg(Tic.SPRITESIZE),
+        dropy   = Nums:neg(Tic.SPRITESIZE),
     },
 }
+Tic.DIRSCYCLER = CCyclerTable{acttable = { -- 8 directions around
+    Tic.DIR000,
+    Tic.DIR045,
+    Tic.DIR090,
+    Tic.DIR135,
+    Tic.DIR180,
+    Tic.DIR225,
+    Tic.DIR270,
+    Tic.DIR315,
+}}
 
 -- Draw Layers
 Tic.DRAWBG = "drawbg"
@@ -966,15 +992,13 @@ end
 
 
 -- Biomes System -- set the current biome
-Tic.BIOMES = CCyclerTable{ -- biomes cycler
-    acttable = {
-        Tic.COLORBIOMENIGHT, -- TODO add real biomes instead of just colors ?
-        Tic.COLORBIOMESNOWY,
-        Tic.COLORBIOMESANDY,
-        Tic.COLORBIOMEGREEN,
-        Tic.COLORBIOMEROCKY,
-    },
-}
+Tic.BIOMES = CCyclerTable{acttable = { -- biomes cycler
+    Tic.COLORBIOMENIGHT, -- TODO add real biomes instead of just colors ?
+    Tic.COLORBIOMESNOWY,
+    Tic.COLORBIOMESANDY,
+    Tic.COLORBIOMEGREEN,
+    Tic.COLORBIOMEROCKY,
+}}
 
 function Tic:biomeNext() -- next biome in the stack
     return Tic.BIOMES:next()
@@ -1435,10 +1459,10 @@ function Tic:worldActual() -- TEMP
     return World
 end
 
-function CWorld:appendEntity(_entity, _range) -- append an entity in the world
+function CWorld:appendEntity(_entity, _range, _trials) -- append an entity in the world
     if not _entity then return end -- mandatory
     _entity.world = self -- parent world
-    self.entitieslocations:appendEntity(_entity, _range)
+    self.entitieslocations:appendEntity(_entity, _range, _trials)
 end
 
 function CWorld:deleteEntity(_entity) -- delete an entity from the world
@@ -1446,9 +1470,9 @@ function CWorld:deleteEntity(_entity) -- delete an entity from the world
     self.entitieslocations:deleteEntity(_entity)
 end
 
-function CWorld:moveEntityWorldXY(_entity, _worldx, _worldy, _range) -- move an entity into the world
+function CWorld:moveEntityWorldXY(_entity, _worldx, _worldy, _range, _trials) -- move an entity into the world
     if not _entity or not _worldx or not _worldy then return end -- mandatory
-    self.entitieslocations:moveEntityWorldXY(_entity, _worldx, _worldy, _range)
+    self.entitieslocations:moveEntityWorldXY(_entity, _worldx, _worldy, _range, _trials)
     _entity:focus() -- focus its camera on itself
 end
 
@@ -2779,6 +2803,7 @@ function CCharacter:adjustInventoriesSlots()
     _inventorypsy:movetoInventory(_inventoryany)
 
     for _, _object in ipairs(_inventoryany.objects) do -- delete from the world
+        _object.discovered = true -- the object is discovered
         self.world:deleteEntity(_object)
     end
 
@@ -2802,8 +2827,8 @@ end
 function CCharacter:slotDropAll()
     self:slotDropHead()
     self:slotDropBack()
-    self:slotDropHandLF()
     self:slotDropHandRG()
+    self:slotDropHandLF()
 end
 
 function CCharacter:slotDropHead()
@@ -2818,14 +2843,14 @@ function CCharacter:slotDropBack()
 	return self:dropObject(_object)
 end
 
-function CCharacter:slotDropHandLF()
-    local _object = self.slots.handlf.object
+function CCharacter:slotDropHandRG()
+    local _object = self.slots.handrg.object
     if not _object then return end
 	return self:dropObject(_object)
 end
 
-function CCharacter:slotDropHandRG()
-    local _object = self.slots.handrg.object
+function CCharacter:slotDropHandLF()
+    local _object = self.slots.handlf.object
     if not _object then return end
 	return self:dropObject(_object)
 end
@@ -2842,10 +2867,24 @@ function CCharacter:dropObject(_object)
             _inventory:removeObject(_object)
         end
     end
+
+    local _direction = self.direction -- prepare the trials for dropping
+    Tic.DIRSCYCLER:at(Tables:valFind(Tic.DIRSCYCLER.acttable, _direction))
+    local _actindex = Tic.DIRSCYCLER.actindex
+    local _next = (self.dirx == Tic.DIRXRG) and true or false -- rotating direction -- next or prev
+    local _trials = {}
+    repeat
+        _direction = Tic.DIRSCYCLER.actvalue
+        local _dropx = Tic.DIRSOFFSETS[_direction].dropx
+        local _dropy = Tic.DIRSOFFSETS[_direction].dropy
+        Tables:valInsert(_trials, {worldx = self.worldx + _dropx, worldy = self.worldy + _dropy})
+        if _next then Tic.DIRSCYCLER:next() else Tic.DIRSCYCLER:prev() end
+    until Tic.DIRSCYCLER.actindex == _actindex
+
     _object.worldx = self.worldx
-    _object.worldy = self.worldy + Tic.SPRITESIZE + Tic.SPRITESIZE2
+    _object.worldy = self.worldy
     _object.dirx = self.dirx
-    self.world:appendEntity(_object, Tic.SPRITESIZE)
+    self.world:appendEntity(_object, Tic.SPRITESIZE, _trials)
     return _object
 end
 
@@ -3120,9 +3159,7 @@ function CCharacter:cycleIdle() -- animate idle after a delay
     self.idlecycler:next()
 	if self.idlecycler:isMAX() then -- trigger idlecycler
 		if Nums:random(Tic.STATSMAX) > self.statmenact then -- only if over statmenact
-            self:moveDirection(Tables:valPickRandom{
-                Tic.DIR000,Tic.DIR045, Tic.DIR090, Tic.DIR135, Tic.DIR180, Tic.DIR225, Tic.DIR270, Tic.DIR315
-            }, true)
+            self:moveDirection(Tables:valPickRandom(Tic.DIRSCYCLER.acttable), true)
         end
 	end
 end
