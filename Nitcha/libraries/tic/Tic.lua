@@ -434,10 +434,7 @@ Tic.FUNCTIONSLOTDROPHANDRG      = function() return Tic:slotDropHandRG() end
 
 -- Keys to Functions -- per screen
 Tic.KEYSFUNCTIONSINTRO = { -- FIXME conflict with key any
-    -- [Tic.KEY_NUMPADMINUS]  = Tic.FUNCTIONSCREENPREV,
-    -- [Tic.KEY_NUMPADPLUS]   = Tic.FUNCTIONSCREENNEXT,
-    -- [Tic.KEY_ANY]          = Tic.FUNCTIONSCREENNEXT,
-    [Tic.KEY_I]            = Tic.FUNCTIONINVENTORYTOGGLESHOW,
+    [Tic.KEY_ANY]          = Tic.FUNCTIONSCREENNEXT,
 }
 Tic.KEYSFUNCTIONSMENUS = {
     [Tic.KEY_I]            = Tic.FUNCTIONINVENTORYTOGGLESHOW,
@@ -579,7 +576,8 @@ function Tic:mouseInput() -- set the mouse inputs in a table
 
     local _result = {}
 
-    _result.screenx, _result.screeny, _result.clicklf, _result.clickmd, _result.clickrg, _result.scrollx, _result.scrolly = mouse()
+    _result.screenx, _result.screeny, _result.clicklf, _result.clickmd, _result.clickrg, _result.scrollx, _result.scrolly
+        = mouse()
     if _result.screenx < Tic.MOUSE.screenx then -- adjust mouse direction
         Tic.MOUSEOFFSETX = Tic.MOUSEOFFSETXLF
         Tic.MOUSEDIRX    = Tic.DIRXLF
@@ -881,6 +879,15 @@ Tic.STATEWORKLF  = Tic.STATUSWORK..Tic.DIRXLF
 Tic.STATEWORKRG  = Tic.STATUSWORK..Tic.DIRXRG
 Tic.STATEFLOORLF = Tic.POSTUREFLOOR..Tic.DIRXLF
 Tic.STATEFLOORRG = Tic.POSTUREFLOOR..Tic.DIRXRG
+
+
+-- Character System
+function Tic:characterFunction(_character, _function, _argt)
+    _character = _character or Tic:playerActual()
+    if not _character or not _function or not _character[_function] then return end
+    _argt = _argt or {}
+	return _character[_function](_character, _argt)
+end
 
 function Tic:statePrev(_character) -- prev state in the stack
     _character = _character or Tic:playerActual()
@@ -3448,9 +3455,14 @@ function CCharacter:canInteract()
     local _interactions = _interactto.interactions
     if Tables:size(_interactions) == 0 then return false end -- cannot interact
     for _, _interaction in ipairs(_interactions) do
-        if _interaction:interactif(self, _interactto) then return true end
+        if _interaction:interactiflf(self, _interactto) then return true end
     end
     return false
+end
+
+function CCharacter:sayMessage(_argt)
+    local _message = _argt.message or "Hello"
+    Tic:logAppend(self.name..": ".._message.." "..self.interactto.name)
 end
 
 function CCharacter:statePrev() -- prev state in the stack
@@ -4314,7 +4326,7 @@ end
 
 ScreenIntro = CScreen{name = "Intro", keysfunctions = Tic.KEYSFUNCTIONSINTRO}
 
-Button1 = CButtonTextM2{
+Button1 = CButtonMenuM2{
     name = "B1",
     screenw = 16,
     screenh = 8,

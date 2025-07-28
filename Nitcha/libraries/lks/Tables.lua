@@ -209,7 +209,7 @@ function Tables:dump(_table, _argt) -- dump a table -- SORTED -- RECURSIVE -- IN
     local _keep    = _argt.keep or {} -- override skipped tables with those keys if any
 
     local _tablesdumped = {} -- already dumped tables to avoid dead loops
-    function _dump(_table, _argt)
+    local function _dump(_table, _argt)
         local _indent = _argt._indent
         local _depth  = _argt.depth
     

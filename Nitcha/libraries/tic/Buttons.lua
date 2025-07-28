@@ -134,11 +134,21 @@ end
 function CButton:functionsActived() -- actived functions (in a key table) of a button
     local _result = {}
 
-    if Tic.MOUSE.clicklf and type(self[Tic.BUTTONCLICKLF]) == "function" then Tables:valInsert(_result, self[Tic.BUTTONCLICKLF], true) end
-    if Tic.MOUSE.clickmd and type(self[Tic.BUTTONCLICKMD]) == "function" then Tables:valInsert(_result, self[Tic.BUTTONCLICKMD], true) end
-    if Tic.MOUSE.clickrg and type(self[Tic.BUTTONCLICKRG]) == "function" then Tables:valInsert(_result, self[Tic.BUTTONCLICKRG], true) end
-    if not (Tic.MOUSE.scrollx == 0) and type(self[Tic.BUTTONSCROLLX]) == "function" then Tables:valInsert(_result, self[Tic.BUTTONSCROLLX], true) end
-    if not (Tic.MOUSE.scrolly == 0) and type(self[Tic.BUTTONSCROLLY]) == "function" then Tables:valInsert(_result, self[Tic.BUTTONSCROLLY], true) end
+    if Tic.MOUSE.clicklf and type(self[Tic.BUTTONCLICKLF]) == "function" then
+        Tables:valInsert(_result, self[Tic.BUTTONCLICKLF], true)
+    end
+    if Tic.MOUSE.clickmd and type(self[Tic.BUTTONCLICKMD]) == "function" then
+        Tables:valInsert(_result, self[Tic.BUTTONCLICKMD], true)
+    end
+    if Tic.MOUSE.clickrg and type(self[Tic.BUTTONCLICKRG]) == "function" then
+        Tables:valInsert(_result, self[Tic.BUTTONCLICKRG], true)
+    end
+    if not (Tic.MOUSE.scrollx == 0) and type(self[Tic.BUTTONSCROLLX]) == "function" then
+        Tables:valInsert(_result, self[Tic.BUTTONSCROLLX], true)
+    end
+    if not (Tic.MOUSE.scrolly == 0) and type(self[Tic.BUTTONSCROLLY]) == "function" then
+        Tables:valInsert(_result, self[Tic.BUTTONSCROLLY], true)
+    end
 
     return _result
 end
@@ -217,7 +227,6 @@ end
 CButtonMenu = CButtonText:extend() -- generic menu button
 function CButtonMenu:new(_argt)
     CButtonMenu.super.new(self, _argt)
-    self.rounded = false
     self.align   = Tic.DIR270
     self:argt(_argt) -- override if any
 end
@@ -229,7 +238,6 @@ end
 CButtonMenuM2 = CButtonTextM2:extend() -- generic menu button with margins 2
 function CButtonMenuM2:new(_argt)
     CButtonMenuM2.super.new(self, _argt)
-    self.rounded = false
     self.align   = Tic.DIR270
     self:argt(_argt) -- override if any
 end
