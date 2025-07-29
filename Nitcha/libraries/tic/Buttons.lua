@@ -484,6 +484,8 @@ function CButtonPlayerPrev:new(_argt)
 	self.behaviour      = IButtonPlayerChange.BEHAVIOUR  -- function to trigger at first
     self.clicklf        = Tic.FUNCTIONPLAYERPREV
     self.hovertextlf    = CText{text = Tic.TEXTPREV}
+    self.clickrg        = Tic.FUNCTIONPLAYERMIN
+    self.hovertextrg    = CText{text = Tic.TEXTMIN}
     self:argt(_argt) -- override if any
 end
 
@@ -497,6 +499,8 @@ function CButtonPlayerNext:new(_argt)
 	self.behaviour      = IButtonPlayerChange.BEHAVIOUR  -- function to trigger at first
     self.clicklf        = Tic.FUNCTIONPLAYERNEXT
     self.hovertextlf    = CText{text = Tic.TEXTNEXT}
+    self.clickrg        = Tic.FUNCTIONPLAYERMAX
+    self.hovertextrg    = CText{text = Tic.TEXTMAX}
     self:argt(_argt) -- override if any
 end
 

@@ -47,6 +47,10 @@ Tic.TEXTWORK    = "Work"
 Tic.TEXTSLEEP   = "Sleep"
 Tic.TEXTDEFAULT = "Default"
 Tic.TEXTSAY     = "Say"
+Tic.TEXTMIN     = "First"
+Tic.TEXTMAX     = "Last"
+Tic.TEXTSAYS    = "says"
+Tic.TEXTGETS    = "gets"
 
 
 -- Fonts sizes
@@ -74,21 +78,27 @@ Tic.SCREENX  = 0 -- screen x position
 Tic.SCREENY  = 0 -- screen y position
 
 
+-- World Infos Window positions and sizes (hud)
+Tic.WORLDINFOSWW = 120 -- world infos window width
+Tic.WORLDINFOSWH = 10 -- world infos window height
+Tic.WORLDINFOSWX = (Tic.SCREENW - Tic.WORLDINFOSWW) // 2 -- world infos window x position
+Tic.WORLDINFOSWY = 3 -- world infos window y position
+
 -- World Window positions and sizes (hud)
-Tic.WORLDWW  = 120 -- world window width
-Tic.WORLDWH  = 100 -- world window height
+Tic.WORLDWW  = Tic.WORLDINFOSWW -- world window width
+Tic.WORLDWH  = 96  -- world window height
+Tic.WORLDWX  = Tic.WORLDINFOSWX -- world window x position
+Tic.WORLDWY  = Tic.WORLDINFOSWY + Tic.WORLDINFOSWH + 7 -- world window y position
 Tic.WORLDWW2 = Tic.WORLDWW // 2 -- half world window width
 Tic.WORLDWH2 = Tic.WORLDWH // 2 -- half world window height
-Tic.WORLDWX  = (Tic.SCREENW - Tic.WORLDWW) // 2 -- world window x position
-Tic.WORLDWY  = ((Tic.SCREENH - Tic.WORLDWH) // 2) + 2 -- world window y position
 Tic.WORLDWX2 = Tic.WORLDWX + Tic.WORLDWW2 -- half world window x position
 Tic.WORLDWY2 = Tic.WORLDWY + Tic.WORLDWH2 -- half world window y position
 
--- World Infos Window positions and sizes (hud)
-Tic.WORLDINFOSWW = Tic.WORLDWW -- world infos window width
-Tic.WORLDINFOSWH = 10 -- world infos window height
-Tic.WORLDINFOSWX = Tic.WORLDWX -- world infos window x position
-Tic.WORLDINFOSWY = 3 -- world infos window y position
+-- World Messages Window positions and sizes (hud)
+Tic.WORLDMESSAGESWW = Tic.WORLDINFOSWW -- world messages window width
+Tic.WORLDMESSAGESWH = 10 -- world messages window height
+Tic.WORLDMESSAGESWX = Tic.WORLDINFOSWX -- world messages window x position
+Tic.WORLDMESSAGESWY = Tic.WORLDWY + Tic.WORLDWH + 7 -- world messages window y position
 
 
 -- Player Infos Window positions and sizes (hud)
@@ -395,6 +405,8 @@ Tic.KEY_NUMPADDIVIDE   = 92
 -- Functions values
 Tic.FUNCTIONPLAYERPREV          = function() Tic:playerPrev() end
 Tic.FUNCTIONPLAYERNEXT          = function() Tic:playerNext() end
+Tic.FUNCTIONPLAYERMIN           = function() Tic:playerMin() end
+Tic.FUNCTIONPLAYERMAX           = function() Tic:playerMax() end
 Tic.FUNCTIONPLAYERDETACH        = function() Tic:playerDetach() end
 Tic.FUNCTIONPLAYERONLY          = function() Tic:playerToggleOnly() end
 Tic.FUNCTIONSTATEPREV           = function() Tic:statePrev() end
@@ -776,6 +788,14 @@ end
 Tic.PLAYERS    = CCyclerTable()
 Tic.PLAYERONLY = true -- to display view, move, etc only for actual player
 
+function Tic:playerActual() -- actual player in the stack
+    return Tic.PLAYERS.actvalue
+end
+
+function Tic:playerPlayers() -- all players in the stack
+    return Tic.PLAYERS.acttable
+end
+
 function Tic:playerAppend(_player) -- stack a new player
     if Tables:valFind(Tic:playerPlayers(), _player) then return end -- avoid doublons
     return Tic.PLAYERS:insert(_player)
@@ -789,20 +809,20 @@ function Tic:playerNext() -- next player in the stack
     return Tic.PLAYERS:next()
 end
 
+function Tic:playerMin() -- first player in the stack
+    return Tic.PLAYERS:min()
+end
+
+function Tic:playerMax() -- last player in the stack
+    return Tic.PLAYERS:max()
+end
+
 function Tic:playerFind(_player) -- find player in the stack -- return index or nil
     return Tables:valFind(Tic:playerPlayers(), _player)
 end
 
 function Tic:playerPick(_player) -- fipicknd player in the stack
     return Tic.PLAYERS:at(Tic:playerFind(_player))
-end
-
-function Tic:playerActual() -- actual player in the stack
-    return Tic.PLAYERS.actvalue
-end
-
-function Tic:playerPlayers() -- all players in the stack
-    return Tic.PLAYERS.acttable
 end
 
 function Tic:playerDetach() -- detach all from actual player
@@ -817,6 +837,39 @@ end
 
 function Tic:playerToggleOnly() -- toggle player only
     Tic.PLAYERONLY = Nums:toggleTF(Tic.PLAYERONLY)
+end
+
+
+-- Messages System -- handle a messages stack
+Tic.MESSAGES    = CCyclerTable{acttable = {"Welcome ..."}}
+
+function Tic:messageActual() -- actual message in the stack
+    return Tic.MESSAGES.actvalue
+end
+
+function Tic:messageMessages() -- all messages in the stack
+    return Tic.MESSAGES.acttable
+end
+
+function Tic:messageAppend(_message) -- stack a new message
+	if not _message then return end -- mandatory
+    return Tic.MESSAGES:insert(_message)
+end
+
+function Tic:messagePrev() -- prev message in the stack
+    return Tic.MESSAGES:prev()
+end
+
+function Tic:messageNext() -- next message in the stack
+    return Tic.MESSAGES:next()
+end
+
+function Tic:messageMin() -- first message in the stack
+    return Tic.MESSAGES:min()
+end
+
+function Tic:messageMax() -- last message in the stack
+    return Tic.MESSAGES:max()
 end
 
 
@@ -3468,7 +3521,7 @@ end
 
 function CCharacter:doSayMessage(_argt)
     local _message = _argt.message or "Hello"
-    Tic:logAppend(self.name..": ".._message.." "..self.interactto.name)
+    Tic:messageAppend(self.name.." "..Tic.TEXTSAYS..": '".._message.." "..self.interactto.name.."'")
 end
 
 function CCharacter:ifPickObject(_argt)
@@ -3476,7 +3529,7 @@ function CCharacter:ifPickObject(_argt)
 end
 
 function CCharacter:doPickObject(_argt)
-    Tic:logAppend(self.name..": Pick")
+    Tic:messageAppend(self.name.." "..Tic.TEXTGETS..": "..self.interactto.kind.." "..self.interactto.name)
 end
 
 function CCharacter:statePrev() -- prev state in the stack
@@ -4576,9 +4629,11 @@ ScreenWorldMD = CScreen{name = "ScreenWorldMD"}
 
 WindowWorld      = CWindowWorld{}
 WindowInfosWorld = CWindowInfosWorld{}
+WindowMessagesWorld = CWindowMessagesWorld{}
 ScreenWorldMD:appendElements{
     WindowWorld,
     WindowInfosWorld,
+    WindowMessagesWorld,
 }
 
 -- rg panel
