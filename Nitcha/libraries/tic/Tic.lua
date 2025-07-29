@@ -51,6 +51,8 @@ Tic.TEXTMIN     = "First"
 Tic.TEXTMAX     = "Last"
 Tic.TEXTTRASH   = "Trash"
 Tic.TEXTALL     = "All"
+
+Tic.TEXTWELCOME = "Welcome ..."
 Tic.TEXTSAYS    = "says"
 Tic.TEXTGETS    = "gets"
 
@@ -413,6 +415,8 @@ Tic.FUNCTIONMESSAGEPREV         = function() Tic:messagePrev() end
 Tic.FUNCTIONMESSAGENEXT         = function() Tic:messageNext() end
 Tic.FUNCTIONMESSAGEMIN          = function() Tic:messageMin() end
 Tic.FUNCTIONMESSAGEMAX          = function() Tic:messageMax() end
+Tic.FUNCTIONMESSAGEDELETEONE    = function() Tic:messageDeleteOne() end
+Tic.FUNCTIONMESSAGEDELETEALL    = function() Tic:messageDeleteAll() end
 Tic.FUNCTIONPLAYERDETACH        = function() Tic:playerDetach() end
 Tic.FUNCTIONPLAYERONLY          = function() Tic:playerToggleOnly() end
 Tic.FUNCTIONSTATEPREV           = function() Tic:statePrev() end
@@ -847,7 +851,15 @@ end
 
 
 -- Messages System -- handle a messages stack
-Tic.MESSAGES    = CCyclerTable{acttable = {"Welcome ..."}}
+Tic.MESSAGES    = CCyclerTable{}
+
+function Tic:messageInit() -- initial message in the stack
+    if Tic.MESSAGES.actindex == 0 then
+        Tic.MESSAGES:argt{acttable = {Tic.TEXTWELCOME}}
+    end
+    return Tic.MESSAGES.actvalue
+end
+Tic:messageInit()
 
 function Tic:messageActual() -- actual message in the stack
     return Tic.MESSAGES.actvalue
@@ -876,6 +888,16 @@ end
 
 function Tic:messageMax() -- last message in the stack
     return Tic.MESSAGES:max()
+end
+
+function Tic:messageDeleteOne() -- delete current message from the stack
+    Tic.MESSAGES:remove(Tic.MESSAGES.actindex)
+    return Tic:messageInit()
+end
+
+function Tic:messageDeleteAll() -- delete all messages from the stack
+    Tic.MESSAGES:argt{acttable = {}}
+    return Tic:messageInit()
 end
 
 
@@ -4614,6 +4636,10 @@ ScreenWorldLF:appendElements{
     ButtonPlayerStatPhy,
     ButtonPlayerStatMen,
     ButtonPlayerStatPsy,
+    ButtonSlotPlayerHead,
+    ButtonSlotPlayerBack,
+    ButtonSlotPlayerHandLF,
+    ButtonSlotPlayerHandRG,
     ButtonPlayerMove000,
     ButtonPlayerMove045,
     ButtonPlayerMove090,
@@ -4622,10 +4648,6 @@ ScreenWorldLF:appendElements{
     ButtonPlayerMove225,
     ButtonPlayerMove270,
     ButtonPlayerMove315,
-    ButtonSlotPlayerHead,
-    ButtonSlotPlayerBack,
-    ButtonSlotPlayerHandLF,
-    ButtonSlotPlayerHandRG,
     ButtonPlayerStand,
     ButtonPlayerKneel,
     ButtonPlayerWork,
@@ -4737,6 +4759,10 @@ ScreenWorldRG:appendElements{
     ButtonSpottingSpot,
     ButtonSpottingLock,
     ButtonSpottingPick,
+    ButtonSlotSpottingHead,
+    ButtonSlotSpottingBack,
+    ButtonSlotSpottingHandLF,
+    ButtonSlotSpottingHandRG,
     ButtonSpotting000,
     ButtonSpotting045,
     ButtonSpotting090,
@@ -4745,10 +4771,6 @@ ScreenWorldRG:appendElements{
     ButtonSpotting225,
     ButtonSpotting270,
     ButtonSpotting315,
-    ButtonSlotSpottingHead,
-    ButtonSlotSpottingBack,
-    ButtonSlotSpottingHandLF,
-    ButtonSlotSpottingHandRG,
     ButtonInteractions,
 }
 

@@ -689,8 +689,7 @@ function CWindowMessagesWorld:new(_argt)
 end
 
 function CWindowMessagesWorld:drawInside() -- window messages content for world
-    local _message = Tic:messageActual()
-    if not _message then return end
+    local _message = (Tic:messageActual()) and Tic:messageActual() or ""
     local _text   = CText{text = _message, small = true, marginlf = 2}
     self.elements = {_text}
     CWindowMessagesWorld.super.drawInside(self)

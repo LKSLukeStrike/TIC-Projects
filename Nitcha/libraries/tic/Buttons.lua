@@ -47,7 +47,7 @@ function CButton:new(_argt)
     self.colorgrounddisabled = Tic.COLORGREYL
     self.colorborderdisabled = Tic.COLORGREYM
     self.colorgroundactived  = Tic.COLORHOVER
-    self.colorhoverground    = nil
+    self.colorhoverground    = Tic.COLORBIOMENIGHT
     self:argt(_argt) -- override if any
 end
 
@@ -77,22 +77,8 @@ function CButton:drawBorder()
 end
 
 function CButton:drawHovertextLF()
-    if self.colorhoverground then
-        rect(
-            self.hovertextlf.screenx -1,
-            self.hovertextlf.screeny,
-            self.hovertextlf.screenw + 1,
-            self.hovertextlf.screenh,
-            self.colorhoverground
-        )
-        rect(
-            self.hovertextlf.screenx,
-            self.hovertextlf.screeny - 1,
-            self.hovertextlf.screenw - 1,
-            self.hovertextlf.screenh + 2,
-            self.colorhoverground
-        )
-    end
+    self.hovertextlf.drawground = true
+    self.hovertextlf.colorground = (self.colorhoverground) and self.colorhoverground or self.hovertextlf.colorground
     self.hovertextlf.colorinside = self.colorgroundactived
     self.hovertextlf.screenx = self.screenx - ((self.hovertextlf.screenw - self.screenw) // 2) + 1
     self.hovertextlf.screeny = self.screeny - self.hovertextlf.screenh
@@ -100,22 +86,8 @@ function CButton:drawHovertextLF()
 end
 
 function CButton:drawHovertextRG()
-    if self.colorhoverground then
-        rect(
-            self.hovertextrg.screenx -1,
-            self.hovertextrg.screeny,
-            self.hovertextrg.screenw + 1,
-            self.hovertextrg.screenh,
-            self.colorhoverground
-        )
-        rect(
-            self.hovertextrg.screenx,
-            self.hovertextrg.screeny - 1,
-            self.hovertextrg.screenw - 1,
-            self.hovertextrg.screenh + 2,
-            self.colorhoverground
-        )
-    end
+    self.hovertextrg.drawground = true
+    self.hovertextrg.colorground = (self.colorhoverground) and self.colorhoverground or self.hovertextrg.colorground
     self.hovertextrg.colorinside = self.colorgroundactived
     self.hovertextrg.screenx = self.screenx - ((self.hovertextrg.screenw - self.screenw) // 2) + 1
     self.hovertextrg.screeny = self.screeny + self.screenh
@@ -1143,9 +1115,9 @@ function CButtonMessageDelete:new(_argt)
 	self.sprite.sprite  = CSpriteBG.SIGNDELETE
     self.sprite.palette = IButton.PALETTEKEY
 	self.behaviour      = IButtonMessage.BEHAVIOUR  -- function to trigger at first
-    self.clicklf        = function() Tic:logAppend(Tic.TEXTTRASH) end
+    self.clicklf        = function() Tic:messageDeleteOne() end
     self.hovertextlf    = CText{text = Tic.TEXTTRASH}
-    self.clickrg        = function() Tic:logAppend(Tic.TEXTALL) end
+    self.clickrg        = function() Tic:messageDeleteAll() end
     self.hovertextrg    = CText{text = Tic.TEXTALL}
     self:argt(_argt) -- override if any
 end

@@ -170,7 +170,7 @@ end
 function CCyclerTable:remove(_at) -- remove an item from table _at (end by default)
     _at = _at or self.maxindex
     _at = (Nums:isLT(_at, self.minindex)) and self.minindex or _at -- beg
-    _at = (Nums:isGT(_at, self.maxindex)) and self.maxindex or _at -- beg
+    _at = (Nums:isGT(_at, self.maxindex)) and self.maxindex or _at -- end
     if _at == 0 then return end -- empty cycler
     table.remove(self.acttable, _at)
     self.actindex = (_at <= self.actindex) and self.actindex - 1 or self.actindex
