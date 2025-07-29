@@ -105,29 +105,46 @@ CWindowMenuInteractions.BEHAVIOUR = function(self)
     local function _removeElements()
         self.parent:removeElements(self.elements) -- FIXME why parent ???
         -- self:removeElements(self.elements) -- FIXME doent seems to clean all
-        self.elements = {}
+        self.elements   = {}
+        self.interactto = nil
     end
 
-    local _playeractual = Tic:playerActual()
+    local function _debug()
+        local _p = (Tic:playerActual().interactto) and Tic:playerActual().interactto.name or "none"
+        local _s = (self.interactto) and self.interactto.name or "none"
+        Tic:logAppend("P", _p, "S", _s)
+    end
+
+    -- _debug()
+    local _playeractual = Tic:playerActual() -- no interaction -- cleanup menu
     self.display = (_playeractual) and true or false
     if not self.display then _removeElements() ; return end
     self.display = _playeractual:canInteract()
     if not self.display then _removeElements() ; return end
 
-    local _interactto   = _playeractual.interactto
-    Tic:logAppend(_interactto.name)
-    if self.interactto == _interactto then return end -- same interactto -- no new menu
-    Tic:logAppend(self.interactto.name)
-    self.interactto     = _interactto
+    -- _debug()
+    local _playerinteractto = _playeractual.interactto
+    if (self.interactto) and self.interactto == _playerinteractto then return end -- same interactto -- no new menu
+    -- Tic:logAppend("new")
+    _removeElements() -- brand new menu
+    self.interactto     = _playerinteractto
 
-    local _interactions = _interactto.interactions
+    local _interactions = _playerinteractto.interactions
     for _, _interaction in ipairs (_interactions) do -- TODO add hover texts and handle lf rg buttons
-        if _interaction:interactiflf(_playeractual, _interactto) then
+        if (_interaction.interactiflf and _interaction:interactiflf(_playeractual, _playerinteractto))
+        or (_interaction.interactifrg and _interaction:interactifrg(_playeractual, _playerinteractto)) then
             local _buttonmenu = CButtonMenuM2{
                 name = _interaction.text,
                 text = CText{text = _interaction.text},
-                clicklf = _interaction.interactdolf,
             }
+            if (_interaction.interactiflf and _interaction:interactiflf(_playeractual, _playerinteractto)) then
+                _buttonmenu.clicklf = _interaction.interactdolf
+                _buttonmenu.hovertextlf = _interaction.hovertextlf
+            end
+            if (_interaction.interactifrg and _interaction:interactifrg(_playeractual, _playerinteractto)) then
+                _buttonmenu.clickrg = _interaction.interactdorg
+                _buttonmenu.hovertextrg = _interaction.hovertextrg
+            end
             self:appendElement(_buttonmenu)
         end
     end
