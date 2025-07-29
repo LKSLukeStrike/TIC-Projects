@@ -115,11 +115,13 @@ CWindowMenuInteractions.BEHAVIOUR = function(self)
     if not self.display then _removeElements() ; return end
 
     local _interactto   = _playeractual.interactto
+    Tic:logAppend(_interactto.name)
     if self.interactto == _interactto then return end -- same interactto -- no new menu
+    Tic:logAppend(self.interactto.name)
     self.interactto     = _interactto
 
     local _interactions = _interactto.interactions
-    for _, _interaction in ipairs (_interactions) do
+    for _, _interaction in ipairs (_interactions) do -- TODO add hover texts and handle lf rg buttons
         if _interaction:interactiflf(_playeractual, _interactto) then
             local _buttonmenu = CButtonMenuM2{
                 name = _interaction.text,

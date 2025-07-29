@@ -654,6 +654,27 @@ end
 
 
 --
+-- IButtonInteractions
+--
+IButtonInteractions = Classic:extend() -- interact button implementation
+IButtonInteractions.BEHAVIOUR = function(self) -- need at least one player
+    self.display = (Tic:playerActual()) and true or false
+    if not self.display then return end -- no player
+    self.display = Tic:playerActual():canInteract()
+    if not self.display then return end -- no interaction
+    self.sprite.flip = Tic:playerActual().dirx
+end
+
+CButtonInteractions = CButtonSprite:extend()
+function CButtonInteractions:new(_argt)
+    CButtonInteractions.super.new(self, _argt)
+    self.sprite.sprite = CSpriteBG.SIGNINTMRK
+    self.behaviour     = IButtonInteractions.BEHAVIOUR
+    self:argt(_argt) -- override if any
+end
+
+
+--
 -- CButtonSlot
 --
 CButtonSlot = CButtonSprite:extend() -- generic slot button

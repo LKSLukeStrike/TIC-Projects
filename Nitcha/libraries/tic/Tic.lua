@@ -32,19 +32,21 @@ Tic = {}
 
 
 -- Texts
-Tic.TEXTSPOT   = "Spot"
-Tic.TEXTPICK   = "Pick"
-Tic.TEXTLOCK   = "Lock"
-Tic.TEXTUNLOCK = "Unlock"
-Tic.TEXTMOVE   = "Move"
-Tic.TEXTPREV   = "Prev"
-Tic.TEXTNEXT   = "Next"
-Tic.TEXTEDIT   = "Edit"
-Tic.TEXTDROP   = "Drop"
-Tic.TEXTSTAND  = "Stand"
-Tic.TEXTKNEEL  = "Kneel"
-Tic.TEXTWORK   = "Work"
-Tic.TEXTSLEEP  = "Sleep"
+Tic.TEXTSPOT    = "Spot"
+Tic.TEXTPICK    = "Pick"
+Tic.TEXTLOCK    = "Lock"
+Tic.TEXTUNLOCK  = "Unlock"
+Tic.TEXTMOVE    = "Move"
+Tic.TEXTPREV    = "Prev"
+Tic.TEXTNEXT    = "Next"
+Tic.TEXTEDIT    = "Edit"
+Tic.TEXTDROP    = "Drop"
+Tic.TEXTSTAND   = "Stand"
+Tic.TEXTKNEEL   = "Kneel"
+Tic.TEXTWORK    = "Work"
+Tic.TEXTSLEEP   = "Sleep"
+Tic.TEXTDEFAULT = "Default"
+Tic.TEXTSAY     = "Say"
 
 
 -- Fonts sizes
@@ -129,7 +131,7 @@ Tic.SPOTTINGPORTRAITWY = Tic.SPOTTINGINFOSWY + 26 -- spotting portrait window y 
 
 -- Interactions Window positions and sizes (hud)
 Tic.INTERACTIONSWX = Tic.WORLDWX + Tic.WORLDWW -- interactions window x position
-Tic.INTERACTIONSWY = Tic.SPOTTINGPORTRAITWY + 26 -- interactions window y position
+Tic.INTERACTIONSWY = Tic.SPOTTINGPORTRAITWY + 30 -- interactions window y position
 Tic.INTERACTIONSWW = Tic.SCREENW - Tic.INTERACTIONSWX -- interactions window width
 Tic.INTERACTIONSWH = Tic.SCREENH - Tic.INTERACTIONSWY -- interactions window height
 
@@ -2777,6 +2779,9 @@ function CCharacter:new(_argt)
                          men = CInventoryMen{},
                          psy = CInventoryPsy{},
                         }
+    self.interactions = {
+                         CInteractionSayMessage{},
+                        }
     self:argt(_argt) -- override if any
     self.camera       = CCamera{name = self.name.." "..Classic.NAMECAMERA} -- one camera per character
     self:focus() -- focus its camera on itself
@@ -3455,14 +3460,23 @@ function CCharacter:canInteract()
     local _interactions = _interactto.interactions
     if Tables:size(_interactions) == 0 then return false end -- cannot interact
     for _, _interaction in ipairs(_interactions) do
-        if _interaction:interactiflf(self, _interactto) then return true end
+        if _interaction.interactiflf and _interaction:interactiflf(self, _interactto) then return true end
+        if _interaction.interactifrg and _interaction:interactifrg(self, _interactto) then return true end
     end
     return false
 end
 
-function CCharacter:sayMessage(_argt)
+function CCharacter:doSayMessage(_argt)
     local _message = _argt.message or "Hello"
     Tic:logAppend(self.name..": ".._message.." "..self.interactto.name)
+end
+
+function CCharacter:ifPickObject(_argt)
+    return true
+end
+
+function CCharacter:doPickObject(_argt)
+    Tic:logAppend(self.name..": Pick")
 end
 
 function CCharacter:statePrev() -- prev state in the stack
@@ -4435,103 +4449,6 @@ end
 if true then
 ScreenWorld = CScreen{name = "ScreenWorld", keysfunctions = Tic.KEYSFUNCTIONSWORLD}
 
--- rg panel
-ScreenWorldRG = CScreen{name = "ScreenWorldRG"}
-
-WindowSpottingInfos    = CWindowSpottingInfos{}
-ButtonSpottingSpot     = CButtonSpottingSpot{}
-ButtonSpottingLock     = CButtonSpottingLock{}
-ButtonSpottingPick     = CButtonSpottingPick{}
-ScreenWorldRG:elementsDistributeH(
-    {ButtonSpottingSpot, ButtonSpottingPick, ButtonSpottingLock},
-    WindowSpottingInfos.screenx + (
-        (WindowSpottingInfos.screenw - CScreen:elementsTotalW({ButtonSpottingSpot, ButtonSpottingPick, ButtonSpottingLock})) // 2),
-    WindowSpottingInfos.screeny - Tic.SPRITESIZE
-)
-
-WindowSpottingPortrait   = CWindowSpottingPortrait{}
-ButtonSpotting000        = CButtonSpotting000{}
-ButtonSpotting045        = CButtonSpotting045{}
-ButtonSpotting090        = CButtonSpotting090{}
-ButtonSpotting135        = CButtonSpotting135{}
-ButtonSpotting180        = CButtonSpotting180{}
-ButtonSpotting225        = CButtonSpotting225{}
-ButtonSpotting270        = CButtonSpotting270{}
-ButtonSpotting315        = CButtonSpotting315{}
-ButtonSlotSpottingHead   = CButtonSlotSpottingHead{}
-ButtonSlotSpottingBack   = CButtonSlotSpottingBack{}
-ButtonSlotSpottingHandLF = CButtonSlotSpottingHandLF{}
-ButtonSlotSpottingHandRG = CButtonSlotSpottingHandRG{}
-ScreenWorldRG:elementsDistributeH( -- up h line
-    {ButtonSpotting135, ButtonSpotting225},
-    WindowSpottingPortrait.screenx - 6,
-    WindowSpottingPortrait.screeny - Tic.SPRITESIZE + 2,
-    12
-)
-ScreenWorldRG:elementsDistributeH( -- md h line
-    {ButtonSpotting090, ButtonSpotting270},
-    WindowSpottingPortrait.screenx - 7,
-    WindowSpottingPortrait.screeny + 4,
-    14
-)
-ScreenWorldRG:elementsDistributeH( -- dw h line
-    {ButtonSpotting045, ButtonSpotting315},
-    WindowSpottingPortrait.screenx - 6,
-    WindowSpottingPortrait.screeny + WindowSpottingPortrait.screenh - 2,
-    12
-)
-ScreenWorldRG:elementsDistributeV( -- md v line
-    {ButtonSpotting180, ButtonSpotting000},
-    WindowSpottingPortrait.screenx + 4,
-    WindowSpottingPortrait.screeny - 7,
-    14
-)
-ScreenWorldRG:elementsDistributeH( -- head and back slots
-    {ButtonSlotSpottingHead, ButtonSlotSpottingBack},
-    WindowSpottingPortrait.screenx - Tic.SPRITESIZE - 6,
-    WindowSpottingPortrait.screeny - 2,
-    28
-)
-ScreenWorldRG:elementsDistributeH( -- handrg and handlf slots
-    {ButtonSlotSpottingHandRG, ButtonSlotSpottingHandLF},
-    WindowSpottingPortrait.screenx - Tic.SPRITESIZE - 6,
-    WindowSpottingPortrait.screeny + Tic.SPRITESIZE + 2,
-    28
-)
-
-WindowMenuInteractions = CWindowMenuInteractions{}
-
-ScreenWorldRG:appendElements{
-    WindowSpottingPortrait,
-    WindowSpottingInfos,
-    WindowMenuInteractions,
-    ButtonSpottingSpot,
-    ButtonSpottingLock,
-    ButtonSpottingPick,
-    ButtonSpotting000,
-    ButtonSpotting045,
-    ButtonSpotting090,
-    ButtonSpotting135,
-    ButtonSpotting180,
-    ButtonSpotting225,
-    ButtonSpotting270,
-    ButtonSpotting315,
-    ButtonSlotSpottingHead,
-    ButtonSlotSpottingBack,
-    ButtonSlotSpottingHandLF,
-    ButtonSlotSpottingHandRG,
-}
-
--- md panel
-ScreenWorldMD = CScreen{name = "ScreenWorldMD"}
-
-WindowWorld      = CWindowWorld{}
-WindowInfosWorld = CWindowInfosWorld{}
-ScreenWorldMD:appendElements{
-    WindowWorld,
-    WindowInfosWorld,
-}
-
 -- lf panel
 ScreenWorldLF = CScreen{name = "ScreenWorldLF"}
 
@@ -4652,6 +4569,112 @@ ScreenWorldLF:appendElements{
     ButtonPlayerKneel,
     ButtonPlayerWork,
     ButtonPlayerSleep,
+}
+
+-- md panel
+ScreenWorldMD = CScreen{name = "ScreenWorldMD"}
+
+WindowWorld      = CWindowWorld{}
+WindowInfosWorld = CWindowInfosWorld{}
+ScreenWorldMD:appendElements{
+    WindowWorld,
+    WindowInfosWorld,
+}
+
+-- rg panel
+ScreenWorldRG = CScreen{name = "ScreenWorldRG"}
+
+WindowSpottingInfos    = CWindowSpottingInfos{}
+ButtonSpottingSpot     = CButtonSpottingSpot{}
+ButtonSpottingLock     = CButtonSpottingLock{}
+ButtonSpottingPick     = CButtonSpottingPick{}
+ScreenWorldRG:elementsDistributeH(
+    {ButtonSpottingSpot, ButtonSpottingPick, ButtonSpottingLock},
+    WindowSpottingInfos.screenx + (
+        (WindowSpottingInfos.screenw - CScreen:elementsTotalW({ButtonSpottingSpot, ButtonSpottingPick, ButtonSpottingLock})) // 2),
+    WindowSpottingInfos.screeny - Tic.SPRITESIZE
+)
+
+WindowSpottingPortrait   = CWindowSpottingPortrait{}
+ButtonSpotting000        = CButtonSpotting000{}
+ButtonSpotting045        = CButtonSpotting045{}
+ButtonSpotting090        = CButtonSpotting090{}
+ButtonSpotting135        = CButtonSpotting135{}
+ButtonSpotting180        = CButtonSpotting180{}
+ButtonSpotting225        = CButtonSpotting225{}
+ButtonSpotting270        = CButtonSpotting270{}
+ButtonSpotting315        = CButtonSpotting315{}
+ButtonSlotSpottingHead   = CButtonSlotSpottingHead{}
+ButtonSlotSpottingBack   = CButtonSlotSpottingBack{}
+ButtonSlotSpottingHandLF = CButtonSlotSpottingHandLF{}
+ButtonSlotSpottingHandRG = CButtonSlotSpottingHandRG{}
+ScreenWorldRG:elementsDistributeH( -- up h line
+    {ButtonSpotting135, ButtonSpotting225},
+    WindowSpottingPortrait.screenx - 6,
+    WindowSpottingPortrait.screeny - Tic.SPRITESIZE + 2,
+    12
+)
+ScreenWorldRG:elementsDistributeH( -- md h line
+    {ButtonSpotting090, ButtonSpotting270},
+    WindowSpottingPortrait.screenx - 7,
+    WindowSpottingPortrait.screeny + 4,
+    14
+)
+ScreenWorldRG:elementsDistributeH( -- dw h line
+    {ButtonSpotting045, ButtonSpotting315},
+    WindowSpottingPortrait.screenx - 6,
+    WindowSpottingPortrait.screeny + WindowSpottingPortrait.screenh - 2,
+    12
+)
+ScreenWorldRG:elementsDistributeV( -- md v line
+    {ButtonSpotting180, ButtonSpotting000},
+    WindowSpottingPortrait.screenx + 4,
+    WindowSpottingPortrait.screeny - 7,
+    14
+)
+ScreenWorldRG:elementsDistributeH( -- head and back slots
+    {ButtonSlotSpottingHead, ButtonSlotSpottingBack},
+    WindowSpottingPortrait.screenx - Tic.SPRITESIZE - 6,
+    WindowSpottingPortrait.screeny - 2,
+    28
+)
+ScreenWorldRG:elementsDistributeH( -- handrg and handlf slots
+    {ButtonSlotSpottingHandRG, ButtonSlotSpottingHandLF},
+    WindowSpottingPortrait.screenx - Tic.SPRITESIZE - 6,
+    WindowSpottingPortrait.screeny + Tic.SPRITESIZE + 2,
+    28
+)
+
+WindowMenuInteractions = CWindowMenuInteractions{}
+ButtonInteractions = CButtonInteractions{}
+ScreenWorldRG:elementsDistributeH(
+    {ButtonInteractions},
+    WindowMenuInteractions.screenx + (
+        (WindowMenuInteractions.screenw - CScreen:elementsTotalW({ButtonInteractions})) // 2),
+    WindowMenuInteractions.screeny - Tic.SPRITESIZE
+)
+
+
+ScreenWorldRG:appendElements{
+    WindowSpottingPortrait,
+    WindowSpottingInfos,
+    WindowMenuInteractions,
+    ButtonSpottingSpot,
+    ButtonSpottingLock,
+    ButtonSpottingPick,
+    ButtonSpotting000,
+    ButtonSpotting045,
+    ButtonSpotting090,
+    ButtonSpotting135,
+    ButtonSpotting180,
+    ButtonSpotting225,
+    ButtonSpotting270,
+    ButtonSpotting315,
+    ButtonSlotSpottingHead,
+    ButtonSlotSpottingBack,
+    ButtonSlotSpottingHandLF,
+    ButtonSlotSpottingHandRG,
+    ButtonInteractions,
 }
 
 ScreenWorld:appendElements{
@@ -4960,7 +4983,6 @@ Walfie = _playerclass{classed = _playerclass,
     -- colorextra = Tic.COLORPURPLE,
     worldx = 0,
     worldy = -20,
-    interactions = {CInteraction{}},
     -- spottingspot = true,
     spottingpick = true,
     ["slots.handrg"] = CSlotHand{object = CWeaponSword{}},
@@ -4980,7 +5002,6 @@ Welfie = _playerclass{classed = _playerclass,
     -- colorextra = Tic.COLORRED,
     worldx = 20,
     worldy = -20,
-    interactions = {CInteraction{}},
     -- spottingspot = true,
     spottingpick = true,
     ["slots.handrg"] = CSlotHand{object = CWeaponHammer{}},
@@ -5000,7 +5021,6 @@ Wilfie = _playerclass{classed = _playerclass,
     -- colorextra = Tic.COLORORANGE,
     worldx = 40,
     worldy = -20,
-    interactions = {CInteraction{}},
     -- spottingspot = true,
     spottingpick = true,
     ["slots.handrg"] = CSlotHand{object = CWeaponLance{}},
@@ -5023,7 +5043,6 @@ Wolfie = _playerclass{classed = _playerclass,
     -- colorextra = Tic.COLORGREEND,
     worldx = 0,
     worldy = 0,
-    interactions = {CInteraction{}},
     -- spottingspot = true,
     spottingpick = true,
     ["slots.handrg"] = CSlotHand{object = CWeaponBowSmall{}},
@@ -5043,7 +5062,6 @@ Wulfie = _playerclass{classed = _playerclass,
     -- colorextra = Tic.COLORGREENM,
     worldx = 20,
     worldy = 0,
-    interactions = {CInteraction{}, CInteraction{text = "Blabla"}},
     -- spottingspot = true,
     spottingpick = true,
     ["slots.handrg"] = CSlotHand{object = CWeaponBowMedium{}},
@@ -5063,7 +5081,6 @@ Wylfie = _playerclass{classed = _playerclass,
     -- colorextra = Tic.COLORGREENL,
     worldx = 40,
     worldy = 0,
-    interactions = {CInteraction{}},
     -- spottingspot = true,
     spottingpick = true,
     ["slots.handrg"] = CSlotHand{object = CWeaponBowLarge{}},
@@ -5086,7 +5103,6 @@ Wolfie = _playerclass{classed = _playerclass,
     -- colorextra = Tic.COLORGREEND,
     worldx = 0,
     worldy = 20,
-    interactions = {CInteraction{}},
     -- spottingspot = true,
     spottingpick = true,
     ["slots.handrg"] = CSlotHand{object = CWeaponWandSmall{}},
@@ -5106,7 +5122,6 @@ Wulfie = _playerclass{classed = _playerclass,
     -- colorextra = Tic.COLORGREENM,
     worldx = 20,
     worldy = 20,
-    interactions = {CInteraction{}, CInteraction{text = "Blabla"}},
     -- spottingspot = true,
     spottingpick = true,
     ["slots.handrg"] = CSlotHand{object = CWeaponWandMedium{}},
@@ -5126,7 +5141,6 @@ Wylfie = _playerclass{classed = _playerclass,
     -- colorextra = Tic.COLORGREENL,
     worldx = 40,
     worldy = 20,
-    interactions = {CInteraction{}},
     -- spottingspot = true,
     spottingpick = true,
     ["slots.handrg"] = CSlotHand{object = CWeaponWandLarge{}},

@@ -62,7 +62,10 @@ function CObjectMobile:new(_argt)
     CObjectMobile.super.new(self, _argt)
     self.kind = Classic.KINDOBJECTPHY
     self.name = Classic.NAMEOBJECTPHY
-    self.hitbox = nil -- no hitbox by default to pick
+    self.hitbox       = nil -- no hitbox by default to pick
+    self.interactions = {
+                         CInteractionPickObject{},
+                        }
     self:argt(_argt) -- override if any
 end
 
