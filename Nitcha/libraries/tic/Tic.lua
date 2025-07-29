@@ -49,6 +49,8 @@ Tic.TEXTDEFAULT = "Default"
 Tic.TEXTSAY     = "Say"
 Tic.TEXTMIN     = "First"
 Tic.TEXTMAX     = "Last"
+Tic.TEXTTRASH   = "Trash"
+Tic.TEXTALL     = "All"
 Tic.TEXTSAYS    = "says"
 Tic.TEXTGETS    = "gets"
 
@@ -118,7 +120,7 @@ Tic.PLAYERPORTRAITWY = Tic.PLAYERINFOSWY + 26 -- player portrait window y positi
 Tic.PLAYERSTATSWW = 26 -- player stats window width
 Tic.PLAYERSTATSWH = 16 -- player stats window height
 Tic.PLAYERSTATSWX = Tic.PLAYERINFOSWX -- player stats window x position
-Tic.PLAYERSTATSWY = Tic.PLAYERPORTRAITWY + 30 -- player stats window y position
+Tic.PLAYERSTATSWY = Tic.PLAYERPORTRAITWY + 28 -- player stats window y position
 
 -- Player State Window positions and sizes (hud)
 Tic.PLAYERSTATEWW = 26 -- player state window width
@@ -141,7 +143,7 @@ Tic.SPOTTINGPORTRAITWY = Tic.SPOTTINGINFOSWY + 26 -- spotting portrait window y 
 
 -- Interactions Window positions and sizes (hud)
 Tic.INTERACTIONSWX = Tic.WORLDWX + Tic.WORLDWW -- interactions window x position
-Tic.INTERACTIONSWY = Tic.SPOTTINGPORTRAITWY + 30 -- interactions window y position
+Tic.INTERACTIONSWY = Tic.SPOTTINGPORTRAITWY + 28 -- interactions window y position
 Tic.INTERACTIONSWW = Tic.SCREENW - Tic.INTERACTIONSWX -- interactions window width
 Tic.INTERACTIONSWH = Tic.SCREENH - Tic.INTERACTIONSWY -- interactions window height
 
@@ -402,11 +404,15 @@ Tic.KEY_NUMPADMINUS    = 90
 Tic.KEY_NUMPADMULTIPLY = 91
 Tic.KEY_NUMPADDIVIDE   = 92
 
--- Functions values
+-- Functions Values
 Tic.FUNCTIONPLAYERPREV          = function() Tic:playerPrev() end
 Tic.FUNCTIONPLAYERNEXT          = function() Tic:playerNext() end
 Tic.FUNCTIONPLAYERMIN           = function() Tic:playerMin() end
 Tic.FUNCTIONPLAYERMAX           = function() Tic:playerMax() end
+Tic.FUNCTIONMESSAGEPREV         = function() Tic:messagePrev() end
+Tic.FUNCTIONMESSAGENEXT         = function() Tic:messageNext() end
+Tic.FUNCTIONMESSAGEMIN          = function() Tic:messageMin() end
+Tic.FUNCTIONMESSAGEMAX          = function() Tic:messageMax() end
 Tic.FUNCTIONPLAYERDETACH        = function() Tic:playerDetach() end
 Tic.FUNCTIONPLAYERONLY          = function() Tic:playerToggleOnly() end
 Tic.FUNCTIONSTATEPREV           = function() Tic:statePrev() end
@@ -1615,7 +1621,7 @@ function CEntityDrawable:new(_argt)
     self.kind = Classic.KINDENTITYDRAWABLE
     self.name = Classic.NAMEENTITYDRAWABLE
     self.world        = World
-    self.sprite       = CSpriteBG.SPRISMALLMPTY
+    self.sprite       = CSpriteBG.SIGNEMPTYS
     self.screenx      = 0 -- screen positions -- used to draw the sprite
     self.screeny      = 0
     self.dirx         = Nums:random01() -- random flip lf/rg
@@ -4499,6 +4505,8 @@ ScreenIntro:appendElements{
 }
 end
 
+
+
 if true then
 ScreenWorld = CScreen{name = "ScreenWorld", keysfunctions = Tic.KEYSFUNCTIONSWORLD}
 
@@ -4513,7 +4521,7 @@ ScreenWorldLF:elementsDistributeH(
     {ButtonPlayerPrev, ButtonPlayerPick, ButtonPlayerNext},
     WindowPlayerInfos.screenx + (
         (WindowPlayerInfos.screenw - CScreen:elementsTotalW({ButtonPlayerPrev, ButtonPlayerPick, ButtonPlayerNext})) // 2),
-    WindowPlayerInfos.screeny - Tic.SPRITESIZE
+    WindowPlayerInfos.screeny - Tic.SPRITESIZE + 1
 )
 
 WindowPlayerPortrait = CWindowPlayerPortrait{}
@@ -4574,7 +4582,7 @@ ScreenWorldLF:elementsDistributeH(
     {ButtonPlayerStatPhy, ButtonPlayerStatMen, ButtonPlayerStatPsy},
     WindowPlayerStats.screenx + (
         (WindowPlayerStats.screenw - CScreen:elementsTotalW({ButtonPlayerStatPhy, ButtonPlayerStatMen, ButtonPlayerStatPsy})) // 2),
-    WindowPlayerStats.screeny - Tic.SPRITESIZE
+    WindowPlayerStats.screeny - Tic.SPRITESIZE + 1
 )
 
 WindowPlayerState    = CWindowPlayerState{}
@@ -4627,13 +4635,25 @@ ScreenWorldLF:appendElements{
 -- md panel
 ScreenWorldMD = CScreen{name = "ScreenWorldMD"}
 
-WindowWorld      = CWindowWorld{}
-WindowInfosWorld = CWindowInfosWorld{}
+WindowInfosWorld    = CWindowInfosWorld{}
+WindowWorld         = CWindowWorld{}
 WindowMessagesWorld = CWindowMessagesWorld{}
+ButtonMessagePrev   = CButtonMessagePrev{}
+ButtonMessageDelete = CButtonMessageDelete{}
+ButtonMessageNext   = CButtonMessageNext{}
+ScreenWorldLF:elementsDistributeH(
+    {ButtonMessagePrev, ButtonMessageDelete, ButtonMessageNext},
+    WindowMessagesWorld.screenx + (
+        (WindowMessagesWorld.screenw - CScreen:elementsTotalW({ButtonMessagePrev, ButtonMessageDelete, ButtonMessageNext})) // 2),
+    WindowMessagesWorld.screeny - Tic.SPRITESIZE + 1
+)
 ScreenWorldMD:appendElements{
     WindowWorld,
     WindowInfosWorld,
     WindowMessagesWorld,
+    ButtonMessagePrev,
+    ButtonMessageDelete,
+    ButtonMessageNext,
 }
 
 -- rg panel
@@ -4647,7 +4667,7 @@ ScreenWorldRG:elementsDistributeH(
     {ButtonSpottingSpot, ButtonSpottingPick, ButtonSpottingLock},
     WindowSpottingInfos.screenx + (
         (WindowSpottingInfos.screenw - CScreen:elementsTotalW({ButtonSpottingSpot, ButtonSpottingPick, ButtonSpottingLock})) // 2),
-    WindowSpottingInfos.screeny - Tic.SPRITESIZE
+    WindowSpottingInfos.screeny - Tic.SPRITESIZE + 1
 )
 
 WindowSpottingPortrait   = CWindowSpottingPortrait{}
@@ -4706,7 +4726,7 @@ ScreenWorldRG:elementsDistributeH(
     {ButtonInteractions},
     WindowMenuInteractions.screenx + (
         (WindowMenuInteractions.screenw - CScreen:elementsTotalW({ButtonInteractions})) // 2),
-    WindowMenuInteractions.screeny - Tic.SPRITESIZE
+    WindowMenuInteractions.screeny - Tic.SPRITESIZE + 1
 )
 
 

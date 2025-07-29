@@ -7,6 +7,7 @@ IButton.BEHAVIOUR = function(self) -- need at least one function
         self.enabled = false
     end
 end
+IButton.PALETTEKEY = {[Tic.COLORGREYD] = Tic.COLORKEY}
 
 
 --
@@ -448,7 +449,7 @@ function CButtonCheck:drawGround()
 
     self.sprite.screenx = self.screenx
     self.sprite.screeny = self.screeny
-    self.sprite.palette = _palette
+    self.sprite.palette = Tables:merge(self.sprite.palette, _palette)
     self.sprite:draw()
 end
 
@@ -481,6 +482,7 @@ end
 CButtonPlayerPrev = CButtonArrow270:extend() -- generic player prev button
 function CButtonPlayerPrev:new(_argt)
     CButtonPlayerPrev.super.new(self, _argt)
+    self.sprite.palette = IButton.PALETTEKEY
 	self.behaviour      = IButtonPlayerChange.BEHAVIOUR  -- function to trigger at first
     self.clicklf        = Tic.FUNCTIONPLAYERPREV
     self.hovertextlf    = CText{text = Tic.TEXTPREV}
@@ -496,6 +498,7 @@ end
 CButtonPlayerNext = CButtonArrow090:extend() -- generic player next button
 function CButtonPlayerNext:new(_argt)
     CButtonPlayerNext.super.new(self, _argt)
+    self.sprite.palette = IButton.PALETTEKEY
 	self.behaviour      = IButtonPlayerChange.BEHAVIOUR  -- function to trigger at first
     self.clicklf        = Tic.FUNCTIONPLAYERNEXT
     self.hovertextlf    = CText{text = Tic.TEXTNEXT}
@@ -513,6 +516,7 @@ function CButtonPlayerPick:new(_argt)
     CButtonPlayerPick.super.new(self, _argt)
     self.drawborder     = false
 	self.sprite.sprite  = CSpriteBG.SIGNPLAYER
+    self.sprite.palette = IButton.PALETTEKEY
 	self.behaviour      = IButtonPlayerChange.BEHAVIOUR  -- function to trigger at first
     self.clicklf        = function() Tic:logAppend(Tic.TEXTPICK) end
     self.hovertextlf    = CText{text = Tic.TEXTPICK}
@@ -616,7 +620,7 @@ end
 CButtonPlayerStat = CButtonSprite:extend() -- generic stat button
 function CButtonPlayerStat:new(_argt)
     CButtonPlayerStat.super.new(self, _argt)
-    self.sprite.palette = {[Tic.COLORGREYM] = Tic.COLORWHITE}
+    self.sprite.palette = {[Tic.COLORGREYM] = Tic.COLORWHITE, [Tic.COLORGREYD] = Tic.COLORKEY}
     self.behaviour      = IButtonPlayer.BEHAVIOUR
     self.getcolorstat   = nil -- getcolorstat function if any
     self:argt(_argt) -- override if any
@@ -672,8 +676,9 @@ end
 CButtonInteractions = CButtonSprite:extend()
 function CButtonInteractions:new(_argt)
     CButtonInteractions.super.new(self, _argt)
-    self.sprite.sprite = CSpriteBG.SIGNINTMRK
-    self.behaviour     = IButtonInteractions.BEHAVIOUR
+    self.sprite.sprite  = CSpriteBG.SIGNINTMRK
+    self.sprite.palette = IButton.PALETTEKEY
+    self.behaviour      = IButtonInteractions.BEHAVIOUR
     self:argt(_argt) -- override if any
 end
 
@@ -847,11 +852,12 @@ CButtonSpottingSpot.BEHAVIOUR = function(self)
 end
 function CButtonSpottingSpot:new(_argt)
     CButtonSpottingSpot.super.new(self, _argt)
-    self.drawborder    = false
-	self.sprite.sprite = CSpriteBG.SIGNSPOTIT
-	self.behaviour     = CButtonSpottingSpot.BEHAVIOUR  -- function to trigger at first
-    self.clicklf       = function() Tic:spottingToggleSpot() end
-    self.hovertextlf   = CText{text = Tic.TEXTSPOT}
+    self.drawborder     = false
+	self.sprite.sprite  = CSpriteBG.SIGNSPOTIT
+    self.sprite.palette = IButton.PALETTEKEY
+	self.behaviour      = CButtonSpottingSpot.BEHAVIOUR  -- function to trigger at first
+    self.clicklf        = function() Tic:spottingToggleSpot() end
+    self.hovertextlf    = CText{text = Tic.TEXTSPOT}
     self:argt(_argt) -- override if any
 end
 
@@ -866,11 +872,12 @@ CButtonSpottingLock.BEHAVIOUR = function(self)
 end
 function CButtonSpottingLock:new(_argt)
     CButtonSpottingLock.super.new(self, _argt)
-    self.drawborder    = false
-	self.sprite.sprite = CSpriteBG.SIGNLOCKIT
-	self.behaviour     = CButtonSpottingLock.BEHAVIOUR  -- function to trigger at first
-    self.clicklf       = function() Tic:spottingToggleLock() end
-    self.hovertextlf   = CText{text = Tic.TEXTLOCK}
+    self.drawborder     = false
+	self.sprite.sprite  = CSpriteBG.SIGNLOCKIT
+    self.sprite.palette = IButton.PALETTEKEY
+	self.behaviour      = CButtonSpottingLock.BEHAVIOUR  -- function to trigger at first
+    self.clicklf        = function() Tic:spottingToggleLock() end
+    self.hovertextlf    = CText{text = Tic.TEXTLOCK}
     self:argt(_argt) -- override if any
 end
 
@@ -885,11 +892,12 @@ CButtonSpottingPick.BEHAVIOUR = function(self)
 end
 function CButtonSpottingPick:new(_argt)
     CButtonSpottingPick.super.new(self, _argt)
-    self.drawborder    = false
-	self.sprite.sprite = CSpriteBG.SIGNPICKIT
-	self.behaviour     = CButtonSpottingPick.BEHAVIOUR  -- function to trigger at first
-    self.clicklf       = function() Tic:spottingTogglePick() end
-    self.hovertextlf   = CText{text = Tic.TEXTPICK}
+    self.drawborder     = false
+	self.sprite.sprite  = CSpriteBG.SIGNPICKIT
+    self.sprite.palette = IButton.PALETTEKEY
+	self.behaviour      = CButtonSpottingPick.BEHAVIOUR  -- function to trigger at first
+    self.clicklf        = function() Tic:spottingTogglePick() end
+    self.hovertextlf    = CText{text = Tic.TEXTPICK}
     self:argt(_argt) -- override if any
 end
 
@@ -898,7 +906,6 @@ end
 -- IButtonSpottingMove
 --
 IButtonSpottingMove = Classic:extend() -- spotting buttons implementation
-IButtonSpottingMove.PALETTE = {[Tic.COLORGREYD] = Tic.COLORKEY}
 IButtonSpottingMove.BEHAVIOUR = function(self)
     IButton.BEHAVIOUR(self)
     self.display = (Tic:entitySpotting()) and true or false
@@ -918,7 +925,7 @@ end
 CButtonSpotting000 = CButtonArrow000:extend() -- generic spotting 000 button
 function CButtonSpotting000:new(_argt)
     CButtonSpotting000.super.new(self, _argt)
-    self.sprite.palette = IButtonSpottingMove.PALETTE
+    self.sprite.palette = IButton.PALETTEKEY
     self.behaviour      = IButtonSpottingMove.BEHAVIOUR
     self.clicklf        = function() Tic:moveDirection000() end
     self:argt(_argt) -- override if any
@@ -927,7 +934,7 @@ end
 CButtonSpotting045 = CButtonArrow045:extend() -- generic spotting 045 button
 function CButtonSpotting045:new(_argt)
     CButtonSpotting045.super.new(self, _argt)
-    self.sprite.palette = IButtonSpottingMove.PALETTE
+    self.sprite.palette = IButton.PALETTEKEY
     self.behaviour      = IButtonSpottingMove.BEHAVIOUR
     self.clicklf        = function() Tic:moveDirection045() end
     self:argt(_argt) -- override if any
@@ -936,7 +943,7 @@ end
 CButtonSpotting090 = CButtonArrow090:extend() -- generic spotting 090 button
 function CButtonSpotting090:new(_argt)
     CButtonSpotting090.super.new(self, _argt)
-    self.sprite.palette = IButtonSpottingMove.PALETTE
+    self.sprite.palette = IButton.PALETTEKEY
     self.behaviour      = IButtonSpottingMove.BEHAVIOUR
     self.clicklf        = function() Tic:moveDirection090() end
     self:argt(_argt) -- override if any
@@ -945,7 +952,7 @@ end
 CButtonSpotting135 = CButtonArrow135:extend() -- generic spotting 135 button
 function CButtonSpotting135:new(_argt)
     CButtonSpotting135.super.new(self, _argt)
-    self.sprite.palette = IButtonSpottingMove.PALETTE
+    self.sprite.palette = IButton.PALETTEKEY
     self.behaviour      = IButtonSpottingMove.BEHAVIOUR
     self.clicklf        = function() Tic:moveDirection135() end
     self:argt(_argt) -- override if any
@@ -954,7 +961,7 @@ end
 CButtonSpotting180 = CButtonArrow180:extend() -- generic spotting 180 button
 function CButtonSpotting180:new(_argt)
     CButtonSpotting180.super.new(self, _argt)
-    self.sprite.palette = IButtonSpottingMove.PALETTE
+    self.sprite.palette = IButton.PALETTEKEY
     self.behaviour      = IButtonSpottingMove.BEHAVIOUR
     self.clicklf        = function() Tic:moveDirection180() end
     self:argt(_argt) -- override if any
@@ -963,7 +970,7 @@ end
 CButtonSpotting225 = CButtonArrow225:extend() -- generic spotting 225 button
 function CButtonSpotting225:new(_argt)
     CButtonSpotting225.super.new(self, _argt)
-    self.sprite.palette = IButtonSpottingMove.PALETTE
+    self.sprite.palette = IButton.PALETTEKEY
     self.behaviour      = IButtonSpottingMove.BEHAVIOUR
     self.clicklf        = function() Tic:moveDirection225() end
     self:argt(_argt) -- override if any
@@ -972,7 +979,7 @@ end
 CButtonSpotting270 = CButtonArrow270:extend() -- generic spotting 270 button
 function CButtonSpotting270:new(_argt)
     CButtonSpotting270.super.new(self, _argt)
-    self.sprite.palette = IButtonSpottingMove.PALETTE
+    self.sprite.palette = IButton.PALETTEKEY
     self.behaviour      = IButtonSpottingMove.BEHAVIOUR
     self.clicklf        = function() Tic:moveDirection270() end
     self:argt(_argt) -- override if any
@@ -981,7 +988,7 @@ end
 CButtonSpotting315 = CButtonArrow315:extend() -- generic spotting 315 button
 function CButtonSpotting315:new(_argt)
     CButtonSpotting315.super.new(self, _argt)
-    self.sprite.palette = IButtonSpottingMove.PALETTE
+    self.sprite.palette = IButton.PALETTEKEY
     self.behaviour      = IButtonSpottingMove.BEHAVIOUR
     self.clicklf        = function() Tic:moveDirection315() end
     self:argt(_argt) -- override if any
@@ -992,7 +999,6 @@ end
 -- IButtonPlayerMove
 --
 IButtonPlayerMove = Classic:extend() -- player move buttons implementation
-IButtonPlayerMove.PALETTE = {[Tic.COLORGREYD] = Tic.COLORKEY}
 IButtonPlayerMove.BEHAVIOUR = function(self)
     IButtonPlayer.BEHAVIOUR(self)
     if not self.display then return end -- no move
@@ -1003,7 +1009,7 @@ end
 CButtonPlayerMove000 = CButtonArrow000:extend() -- generic player move 000 button
 function CButtonPlayerMove000:new(_argt)
     CButtonPlayerMove000.super.new(self, _argt)
-    self.sprite.palette = IButtonPlayerMove.PALETTE
+    self.sprite.palette = IButton.PALETTEKEY
     self.behaviour      = IButtonPlayerMove.BEHAVIOUR
     self.clicklf        = function() Tic:moveDirection000() end
     self:argt(_argt) -- override if any
@@ -1012,7 +1018,7 @@ end
 CButtonPlayerMove045 = CButtonArrow045:extend() -- generic player move 045 button
 function CButtonPlayerMove045:new(_argt)
     CButtonPlayerMove045.super.new(self, _argt)
-    self.sprite.palette = IButtonPlayerMove.PALETTE
+    self.sprite.palette = IButton.PALETTEKEY
     self.behaviour      = IButtonPlayerMove.BEHAVIOUR
     self.clicklf        = function() Tic:moveDirection045() end
     self:argt(_argt) -- override if any
@@ -1021,7 +1027,7 @@ end
 CButtonPlayerMove090 = CButtonArrow090:extend() -- generic player move 090 button
 function CButtonPlayerMove090:new(_argt)
     CButtonPlayerMove090.super.new(self, _argt)
-    self.sprite.palette = IButtonPlayerMove.PALETTE
+    self.sprite.palette = IButton.PALETTEKEY
     self.behaviour      = IButtonPlayerMove.BEHAVIOUR
     self.clicklf        = function() Tic:moveDirection090() end
     self:argt(_argt) -- override if any
@@ -1030,7 +1036,7 @@ end
 CButtonPlayerMove135 = CButtonArrow135:extend() -- generic player move 135 button
 function CButtonPlayerMove135:new(_argt)
     CButtonPlayerMove135.super.new(self, _argt)
-    self.sprite.palette = IButtonPlayerMove.PALETTE
+    self.sprite.palette = IButton.PALETTEKEY
     self.behaviour      = IButtonPlayerMove.BEHAVIOUR
     self.clicklf        = function() Tic:moveDirection135() end
     self:argt(_argt) -- override if any
@@ -1039,7 +1045,7 @@ end
 CButtonPlayerMove180 = CButtonArrow180:extend() -- generic player move 180 button
 function CButtonPlayerMove180:new(_argt)
     CButtonPlayerMove180.super.new(self, _argt)
-    self.sprite.palette = IButtonPlayerMove.PALETTE
+    self.sprite.palette = IButton.PALETTEKEY
     self.behaviour      = IButtonPlayerMove.BEHAVIOUR
     self.clicklf        = function() Tic:moveDirection180() end
     self:argt(_argt) -- override if any
@@ -1048,7 +1054,7 @@ end
 CButtonPlayerMove225 = CButtonArrow225:extend() -- generic player move 225 button
 function CButtonPlayerMove225:new(_argt)
     CButtonPlayerMove225.super.new(self, _argt)
-    self.sprite.palette = IButtonPlayerMove.PALETTE
+    self.sprite.palette = IButton.PALETTEKEY
     self.behaviour      = IButtonPlayerMove.BEHAVIOUR
     self.clicklf        = function() Tic:moveDirection225() end
     self:argt(_argt) -- override if any
@@ -1057,7 +1063,7 @@ end
 CButtonPlayerMove270 = CButtonArrow270:extend() -- generic player move 270 button
 function CButtonPlayerMove270:new(_argt)
     CButtonPlayerMove270.super.new(self, _argt)
-    self.sprite.palette = IButtonPlayerMove.PALETTE
+    self.sprite.palette = IButton.PALETTEKEY
     self.behaviour      = IButtonPlayerMove.BEHAVIOUR
     self.clicklf        = function() Tic:moveDirection270() end
     self:argt(_argt) -- override if any
@@ -1066,8 +1072,80 @@ end
 CButtonPlayerMove315 = CButtonArrow315:extend() -- generic player move 315 button
 function CButtonPlayerMove315:new(_argt)
     CButtonPlayerMove315.super.new(self, _argt)
-    self.sprite.palette = IButtonPlayerMove.PALETTE
+    self.sprite.palette = IButton.PALETTEKEY
     self.behaviour      = IButtonPlayerMove.BEHAVIOUR
     self.clicklf        = function() Tic:moveDirection315() end
+    self:argt(_argt) -- override if any
+end
+
+
+--
+-- IButtonMessage
+--
+IButtonMessage = Classic:extend() -- messages buttons implementation
+IButtonMessage.BEHAVIOUR = function(self) -- need at least one message
+    self.display = (Tic:messageActual()) and true or false
+    if not self.display then return end -- no message
+    IButton.BEHAVIOUR(self)
+end
+
+
+--
+-- IButtonMessageChange
+--
+IButtonMessageChange = Classic:extend() -- message change buttons implementation
+IButtonMessageChange.BEHAVIOUR = function(self) -- need at least more than one message
+    IButtonMessage.BEHAVIOUR(self)
+    if not self.display then return end -- no message
+    self.enabled = Tables:size(Tic:messageMessages()) > 1
+end
+
+
+--
+-- CButtonMessagePrev
+--
+CButtonMessagePrev = CButtonArrow000:extend() -- generic message prev button
+function CButtonMessagePrev:new(_argt)
+    CButtonMessagePrev.super.new(self, _argt)
+    self.sprite.palette = IButton.PALETTEKEY
+	self.behaviour      = IButtonMessageChange.BEHAVIOUR  -- function to trigger at first
+    self.clicklf        = Tic.FUNCTIONMESSAGEPREV
+    self.hovertextlf    = CText{text = Tic.TEXTPREV}
+    self.clickrg        = Tic.FUNCTIONMESSAGEMIN
+    self.hovertextrg    = CText{text = Tic.TEXTMIN}
+    self:argt(_argt) -- override if any
+end
+
+
+--
+-- CButtonMessageNext
+--
+CButtonMessageNext = CButtonArrow180:extend() -- generic message next button
+function CButtonMessageNext:new(_argt)
+    CButtonMessageNext.super.new(self, _argt)
+    self.sprite.palette = IButton.PALETTEKEY
+	self.behaviour      = IButtonMessageChange.BEHAVIOUR  -- function to trigger at first
+    self.clicklf        = Tic.FUNCTIONMESSAGENEXT
+    self.hovertextlf    = CText{text = Tic.TEXTNEXT}
+    self.clickrg        = Tic.FUNCTIONMESSAGEMAX
+    self.hovertextrg    = CText{text = Tic.TEXTMAX}
+    self:argt(_argt) -- override if any
+end
+
+
+--
+-- CButtonMessageDelete
+--
+CButtonMessageDelete = CButtonClick:extend() -- generic message delete button
+function CButtonMessageDelete:new(_argt)
+    CButtonMessageDelete.super.new(self, _argt)
+    self.drawborder     = false
+	self.sprite.sprite  = CSpriteBG.SIGNDELETE
+    self.sprite.palette = IButton.PALETTEKEY
+	self.behaviour      = IButtonMessage.BEHAVIOUR  -- function to trigger at first
+    self.clicklf        = function() Tic:logAppend(Tic.TEXTTRASH) end
+    self.hovertextlf    = CText{text = Tic.TEXTTRASH}
+    self.clickrg        = function() Tic:logAppend(Tic.TEXTALL) end
+    self.hovertextrg    = CText{text = Tic.TEXTALL}
     self:argt(_argt) -- override if any
 end
