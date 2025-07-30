@@ -18,17 +18,17 @@ function CSlot:isSlot(_slot)
     return _slot and type(_slot) == "table" and _slot.is and _slot:is(CSlot)
 end
 
-function CSlot:canAppendObject(_object)
+function CSlot:canAppendObject(_object, _emptyonly)
+    _emptyonly = _emptyonly or false
     if not _object then return false end -- mandatory
+    if _emptyonly and self.object then return false end -- only if slot is empty
     if not _object.slottype then return false end -- mandatory -- only slotable objects
     if self.slottype and not (_object.slottype == self.slottype) then return false end -- not allowed type if any
     return true
 end
 
 function CSlot:appendObject(_object, _emptyonly)
-    _emptyonly = _emptyonly or false
-    if not self:canAppendObject(_object) then return end -- nil = false
-    if _emptyonly and self.object then return end -- only if slot is empty
+    if not self:canAppendObject(_object, _emptyonly) then return end -- nil = false
     self.object = _object
     return _object -- done
 end
@@ -38,7 +38,7 @@ function CSlot:removeObject(_object, _sameonly)
     if not _object then return end -- mandatory
     if _sameonly and not (self.object == _object) then return end -- only if object is already in slot
     self.object = nil
-    return _object -- ok
+    return _object -- done
 end
 
 CSlotHead = CSlot:extend() -- generic head slot

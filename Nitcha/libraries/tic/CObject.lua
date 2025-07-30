@@ -81,16 +81,38 @@ function CObjectInventory:handleOffsets(_state)
     return _result
 end
 
-function CObjectInventory:findFreeInventory(_inventories)
+function CObjectInventory:findFreeInventory(_inventories) -- can store oject in inventory ?
     for _, _inventory in pairs(_inventories or {}) do
-        if CInventory:isInventory(_inventory) and _inventory:canAppendObject(self) then return _inventory end
+        if CInventory:isInventory(_inventory) then
+            if _inventory:canAppendObject(self) then return _inventory end
+        end
     end
     return -- not found
 end
 
-function CObjectInventory:findFreeSlot(_slots)
+function CObjectInventory:findWhatInventory(_inventories) -- in what inventory is object stored ?
+    for _, _inventory in pairs(_inventories or {}) do
+        if CInventory:isInventory(_inventory) then
+            if Tables:valFind(_inventory.objects, self) then return _inventory end
+        end
+    end
+    return -- not found
+end
+
+function CObjectInventory:findFreeSlot(_slots) -- can store object in a free slot ?
     for _, _slot in pairs(_slots or {}) do
-        if CSlot:isSlot(_slot) and _slot:canAppendObject(self) then return _slot end
+        if CSlot:isSlot(_slot) then
+            if _slot:canAppendObject(self, true) then return _slot end
+        end
+    end
+    return -- not found
+end
+
+function CObjectInventory:findWhatSlot(_slots) -- in what slot is object stored ?
+    for _, _slot in pairs(_slots or {}) do
+        if CSlot:isSlot(_slot) then
+            if _slot.object == self then return _slot end
+        end
     end
     return -- not found
 end
