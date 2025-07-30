@@ -17,7 +17,7 @@ function CSlot:isSlot(_slot)
     return _slot and type(_slot) == "table" and _slot.is and _slot:is(CSlot)
 end
 
-function CSlot:canSlotObject(_object)
+function CSlot:canAppendObject(_object)
     if not _object then return false end -- mandatory
     if not _object.slottype then return false end -- mandatory -- only slotable objects
     if self.slottype and not (_object.slottype == self.slottype) then return false end -- not allowed type if any

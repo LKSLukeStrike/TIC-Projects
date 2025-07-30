@@ -47,29 +47,30 @@ function CObject:new(_argt)
     self.kind = Classic.KINDOBJECT
     self.name = Classic.NAMEOBJECT
     self.used         = CObject.USEDNONE -- used level if any
-    self.inventory    = nil -- can have an inventory if any
+    self.inventories  = nil -- can have an inventories if any
     self:argt(_argt) -- override if any
 end
 
 
 --
--- CObjectMobile
+-- CObjectInventory
 --
-CObjectMobile = CObject:extend() -- generic mobile objects
+CObjectInventory = CObject:extend() -- generic inventory objects
 Classic.KINDOBJECTPHY = "ObjectPhy" -- ObjectPhy kind
 Classic.NAMEOBJECTPHY = "ObjectPhy" -- ObjectPhy name
-function CObjectMobile:new(_argt)
-    CObjectMobile.super.new(self, _argt)
+function CObjectInventory:new(_argt)
+    CObjectInventory.super.new(self, _argt)
     self.kind = Classic.KINDOBJECTPHY
     self.name = Classic.NAMEOBJECTPHY
-    self.hitbox       = nil -- no hitbox by default to pick
-    self.interactions = {
+    self.hitbox        = nil -- no hitbox by default to pick
+    self.inventorytype = CInventoryAny
+    self.interactions  = {
                          CInteractionPickObject{},
                         }
     self:argt(_argt) -- override if any
 end
 
-function CObjectMobile:handleOffsets(_state)
+function CObjectInventory:handleOffsets(_state)
     local _result   = Tables:merge(self.handleoffsets[self.stateshandles[_state].rotate])
     _result.rotate  = self.stateshandles[_state].rotate
     _result.flip    = self.stateshandles[_state].flip
@@ -79,11 +80,25 @@ function CObjectMobile:handleOffsets(_state)
     return _result
 end
 
+function CObjectInventory:findFreeInventory(_inventories)
+    for _, _inventory in pairs(_inventories or {}) do
+        if CInventory:isInventory(_inventory) and _inventory:canAppendObject(self) then return _inventory end
+    end
+    return -- not found
+end
+
+function CObjectInventory:findFreeSlot(_slots)
+    for _, _slot in pairs(_slots or {}) do
+        if CSlot:isSlot(_slot) and _slot:canAppendObject(self) then return _slot end
+    end
+    return -- not found
+end
+
 
 --
 -- CObjectPhy
 --
-CObjectPhy = CObjectMobile:extend() -- generic phy objects
+CObjectPhy = CObjectInventory:extend() -- generic phy objects
 Classic.KINDOBJECTPHY = "ObjectPhy" -- ObjectPhy kind
 Classic.NAMEOBJECTPHY = "ObjectPhy" -- ObjectPhy name
 function CObjectPhy:new(_argt)
@@ -142,7 +157,7 @@ end
 --
 -- CObjectMen
 --
-CObjectMen = CObjectMobile:extend() -- generic men objects
+CObjectMen = CObjectInventory:extend() -- generic men objects
 Classic.KINDOBJECTMEN = "ObjectMen" -- ObjectMen kind
 Classic.NAMEOBJECTMEN = "ObjectMen" -- ObjectMen name
 function CObjectMen:new(_argt)
@@ -212,7 +227,7 @@ end
 --
 -- CObjectPsy
 --
-CObjectPsy = CObjectMobile:extend() -- generic psy objects
+CObjectPsy = CObjectInventory:extend() -- generic psy objects
 Classic.KINDOBJECTPSY = "ObjectPsy" -- ObjectPsy kind
 Classic.NAMEOBJECTPSY = "ObjectPsy" -- ObjectPsy name
 function CObjectPsy:new(_argt)
@@ -282,7 +297,7 @@ end
 --
 -- CObjectAny
 --
-CObjectAny = CObjectMobile:extend() -- generic any objects
+CObjectAny = CObjectInventory:extend() -- generic any objects
 Classic.KINDOBJECTANY = "ObjectAny" -- ObjectAny kind
 Classic.NAMEOBJECTANY = "ObjectAny" -- ObjectAny name
 function CObjectAny:new(_argt)

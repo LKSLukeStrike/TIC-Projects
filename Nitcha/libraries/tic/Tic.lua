@@ -2886,7 +2886,7 @@ function CCharacter:adjustInventoriesSlots()
     for _, _slot in pairs(self.slots or {}) do
         if CSlot:isSlot(_slot) then
             _inventoryany:appendObject(_slot.object)
-            if not _slot:canSlotObject(_slot.object) then -- keep only if allowed
+            if not _slot:canAppendObject(_slot.object) then -- keep only if allowed
                 _slot.object = nil
             end
         end
@@ -3553,11 +3553,22 @@ function CCharacter:doSayMessage(_argt)
 end
 
 function CCharacter:ifPickObject(_argt)
-    return true
+    local _object = self.interactto
+    if not _object then return false end
+    return (_object:findFreeInventory(self.inventories)) and true or false
 end
 
 function CCharacter:doPickObject(_argt)
-    Tic:messageAppend(self.name.." "..Tic.TEXTGETS..": "..self.interactto.kind.." "..self.interactto.name)
+    local _object = self.interactto
+    if not _object then return end
+    if not self:ifPickObject(_argt) then return end -- just in case
+    local _inventory = _object:findFreeInventory(self.inventories)
+    if not _inventory then return end -- just in case
+    _inventory:appendObject(_object)
+    local _slot = _object:findFreeSlot(self.slots)
+    if not _slot then return end -- just in case
+    _slot:appendObject(_object, true)
+    Tic:messageAppend(self.name.." "..Tic.TEXTGETS..": ".._object.kind.." ".._object.name)
 end
 
 function CCharacter:statePrev() -- prev state in the stack
@@ -5488,7 +5499,7 @@ end
 
 function Tic:drawLog()
     -- Tic:logWorld()
-    -- Tic:logInventories()
+    Tic:logInventories()
     -- Tic:logScreens()
 end
 
@@ -5529,15 +5540,16 @@ function Tic:logInventory(_inventory, _indent)
     Tic:logAppend(_indent.._inventory.name, _inventory.kind, Tables:size(_inventory.objects).."/".._inventory.objectsmax)
     for _, _object in ipairs(_inventory.objects) do
         Tic:logAppend(_indent.." ", _object.kind, _object.name)
-        if _object.inventory then Tic:logInventory(_object.inventory, _indent.."  ") end
+        -- if _object.inventory then Tic:logInventory(_object.inventory, _indent.."  ") end
     end
 end
 
 function Tic:logSlot(_slot)
     if not CSlot:isSlot(_slot) then return end
-    Tic:logAppend(_slot.name, _slot.kind)
     local _object = _slot.object
-    if _object then Tic:logAppend(" ", _object.kind, _object.name) end
+    local _objectkind = (_object) and _object.kind or "--"
+    local _objectname = (_object) and _object.name or "--"
+    Tic:logAppend(_slot.name, _slot.kind.." :", _objectkind, _objectname)
 end
 
 function Tic:logScreens()

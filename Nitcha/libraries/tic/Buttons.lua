@@ -717,9 +717,9 @@ CButtonSlotPlayer = CButtonSlot:extend()
 function CButtonSlotPlayer:new(_argt)
     CButtonSlotPlayer.super.new(self, _argt)
     self.behaviour   = IButtonSlotPlayer.BEHAVIOUR
-    self.clicklf     = function() Tic:logAppend(Tic.TEXTEDIT) end
+    self.clicklf     = function() Tic:logAppend(Tic.TEXTPICK) end
     self.clickrg     = nil -- override per slot
-    self.hovertextlf = CText{text = Tic.TEXTEDIT}
+    self.hovertextlf = CText{text = Tic.TEXTPICK}
     self.hovertextrg = CText{text = Tic.TEXTDROP}
     self:argt(_argt) -- override if any
 end
