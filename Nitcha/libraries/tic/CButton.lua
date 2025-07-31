@@ -1,4 +1,4 @@
-require("libraries/ext/Classic")
+require("libraries/tic/CElement")
 --
 -- IButton
 --
@@ -639,10 +639,11 @@ end
 --
 IButtonInteractions = Classic:extend() -- interact button implementation
 IButtonInteractions.BEHAVIOUR = function(self) -- need at least one player
-    self.display = (Tic:playerActual()) and true or false
+    IButtonPlayer.BEHAVIOUR(self)
     if not self.display then return end -- no player
     self.display = Tic:playerActual():canInteract()
     if not self.display then return end -- no interaction
+    self.enabled = true -- restore enabled
     self.sprite.flip = Tic:playerActual().dirx
 end
 
@@ -673,6 +674,12 @@ IButtonSlot.GROUNDSPRITEHAND = CSpriteBG{
     palette = {[Tic.COLORWHITE] = Tic.COLORGREYL, [Tic.COLORGREYL] = Tic.COLORGREYD},
     rotate  = CSprite.ROTATE270,
 }
+IButtonSlot.BEHAVIOUR = function(self) -- enable if has an object
+    IButton.BEHAVIOUR(self)
+    if self.enabled and self.getslotobject then
+       self.enabled = (self:getslotobject()) and true or false
+    end
+end
 
 --
 -- CButtonSlot
@@ -680,21 +687,21 @@ IButtonSlot.GROUNDSPRITEHAND = CSpriteBG{
 CButtonSlot = CButtonSprite:extend() -- generic slot button
 function CButtonSlot:new(_argt)
     CButtonSlot.super.new(self, _argt)
+    self.behaviour           = IButtonSlot.BEHAVIOUR
     self.getslotobject       = nil -- getslotobject function if any
     self.drawborder          = true
     self.colorground         = Tic.COLORBIOMENIGHT
     self.colorborder         = self.colorframe1
     self.colorborderdisabled = self.colorframe2
-    self.rounded = true
+    self.rounded             = true
     self:argt(_argt) -- override if any
 end
 
 function CButtonSlot:drawBorder()
-    if self.getslotobject then
+    self:save()
+    if self.enabled and self.getslotobject then
        self.enabled = (self:getslotobject()) and true or false
     end
-
-    self:save()
     self.screenx = self.screenx - 1
     self.screeny = self.screeny - 1
     self.screenw = self.screenw + 2
