@@ -615,7 +615,7 @@ function CWindowWorld:drawPlayerActual()
 
                                 if Tic.MOUSE.clicklf then
                                     Tic.MOUSE.clicklf = false -- avoid bouncing
-                                    Tic:mouseDelay(10)
+                                    Tic:mouseDelay()
                                     
                                     Tic:playerPick(_entity)
                                 end
@@ -631,7 +631,7 @@ function CWindowWorld:drawPlayerActual()
 
                             if Tic.MOUSE.clickrg then
                                 Tic.MOUSE.clickrg = false -- avoid bouncing
-                                Tic:mouseDelay(10)
+                                Tic:mouseDelay()
                                 
                                 if _locking then -- unspot
                                     _playeractual:spotEntity()
