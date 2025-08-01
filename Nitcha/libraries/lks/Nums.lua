@@ -241,8 +241,8 @@ end
 
 function Nums:isBW(_num, _valx, _valy, _inmin, _inmax) -- between _valx and _valy, inclusive (default) or exclusive
     if (not _num) or (not _valx) or (not _valy) then return false end
-    _inmin = (_inmin == nil or _inmin == true) and true or false
-    _inmax = (_inmax == nil or _inmax == true) and true or false
+    _inmin = (_inmin == nil or _inmin == true) 
+    _inmax = (_inmax == nil or _inmax == true) 
     local _min = math.min(_valx, _valy) -- adjust the min and max
     local _max = math.max(_valx, _valy)
     if (_inmin) and Nums:isLT(_num, _min) then return false end

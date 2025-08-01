@@ -1041,9 +1041,9 @@ function Tic:moveDirection(_direction, _character)
     if not _direction then return end -- mandatory
     _character = _character or Tic:playerActual()
     if not _character then return end -- FIXME ensure another way that character exists ? (in world ?)
-    local _movenone = (Tic.MODIFIERKEYS[Tic.KEY_CTRL]) and true or false -- force none move if ctrl
-    local _moveslow = (Tic.MODIFIERKEYS[Tic.KEY_CAPSLOCK]) and true or false -- force slow move if caps
-    local _moveback = (Tic.MODIFIERKEYS[Tic.KEY_SHIFT]) and true or false -- force back move if shift
+    local _movenone = (Tic.MODIFIERKEYS[Tic.KEY_CTRL])  -- force none move if ctrl
+    local _moveslow = (Tic.MODIFIERKEYS[Tic.KEY_CAPSLOCK])  -- force slow move if caps
+    local _moveback = (Tic.MODIFIERKEYS[Tic.KEY_SHIFT])  -- force back move if shift
     _character:moveDirection(_direction, _movenone, _moveslow, _moveback)
 end
 
@@ -1472,7 +1472,7 @@ end
 
 function Tic:boardPaint(_sprite, _directives, _clean) -- paint a board sprite
     if not _sprite or not _directives then return end -- mandatory
-    _clean = (_clean == nil or _clean == true) and true or false
+    _clean = (_clean == nil or _clean == true) 
     if _clean then Tic:boardClean(_sprite) end -- clean by default
     for _, _directive in pairs(_directives) do
         Tic:boardPixel(_sprite, _directive.x, _directive.y, _directive.color) -- paint each pixel

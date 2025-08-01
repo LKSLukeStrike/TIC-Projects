@@ -118,7 +118,7 @@ CWindowMenuInteractions.BEHAVIOUR = function(self)
 
     -- _debug()
     local _playeractual = Tic:playerActual() -- no interaction -- cleanup menu
-    self.display = (_playeractual) and true or false
+    self.display = (_playeractual) 
     if not self.display then _removeElements() ; return end
     self.display = _playeractual:canInteract()
     if not self.display then _removeElements() ; return end
@@ -210,7 +210,7 @@ end
 --
 IWindowEntity = Classic:extend() -- entities windows implementation
 IWindowEntity.BEHAVIOUR = function(self)
-    self.drawinside = (self.entity) and true or false
+    self.drawinside = (self.entity) 
 end
 
 

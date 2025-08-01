@@ -123,7 +123,7 @@ function CEntity:interactbyDeleteAll() -- delete all entities interactby
 end
 
 function CEntity:hasInteractTo() -- has interactto ?
-    return (self.interactto) and true or false
+    return (self.interactto) 
 end
 
 function CEntity:hasInteractBy() -- has interactby ?

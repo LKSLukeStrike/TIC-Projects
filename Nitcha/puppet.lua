@@ -6,7 +6,7 @@
 
 --
 -- Wrappers for calls external to tic80
-TIC80 = (exit) and true or false
+TIC80 = (exit) 
 if not TIC80 then
     function trace(...)
         print("trace:")

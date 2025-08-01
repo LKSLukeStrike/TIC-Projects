@@ -128,7 +128,7 @@ function CButton:functionsActived() -- actived functions (in a key table) of a b
 end
 
 function CButton:functionsContains(_function) -- does the button contains a function ?
-    return (Tables:valFind(self:functionsDefined(), _function)) and true or false
+    return (Tables:valFind(self:functionsDefined(), _function))
 end
 
 function CButton:activable() -- is the button activable ?
@@ -168,7 +168,7 @@ function CButtonText:adjustWH() -- adjust screenw, screenh
 end
 
 function CButtonText:draw() -- button drawing
-    self.drawinside = (self.text and self.text:is(CText)) and true or false
+    self.drawinside = (self.text and self.text:is(CText))
     CButtonText.super.draw(self)
 end
 
@@ -432,9 +432,9 @@ end
 --
 IButtonPlayer = Classic:extend() -- players buttons implementation
 IButtonPlayer.BEHAVIOUR = function(self) -- need at least one player
-    self.display = (Tic:playerActual()) and true or false
-    if not self.display then return end -- no player
-    IButton.BEHAVIOUR(self)
+    IButton.BEHAVIOUR(self) -- enabled if at least one function
+    self.entity  = Tic:playerActual()
+    self.display = (self.entity)
 end
 
 
@@ -641,10 +641,10 @@ IButtonInteractions = Classic:extend() -- interact button implementation
 IButtonInteractions.BEHAVIOUR = function(self) -- need at least one player
     IButtonPlayer.BEHAVIOUR(self)
     if not self.display then return end -- no player
-    self.display = Tic:playerActual():canInteract()
+    self.display = self.entity:canInteract()
     if not self.display then return end -- no interaction
     self.enabled = true -- restore enabled
-    self.sprite.flip = Tic:playerActual().dirx
+    self.sprite.flip = self.entity.dirx
 end
 
 CButtonInteractions = CButtonSprite:extend()
@@ -677,7 +677,7 @@ IButtonSlot.GROUNDSPRITEHAND = CSpriteBG{
 IButtonSlot.BEHAVIOUR = function(self) -- enable if has an object
     IButton.BEHAVIOUR(self)
     if self.enabled and self.getslotobject then
-       self.enabled = (self:getslotobject()) and true or false
+       self.enabled = (self:getslotobject())
     end
 end
 
@@ -699,9 +699,6 @@ end
 
 function CButtonSlot:drawBorder()
     self:save()
-    if self.enabled and self.getslotobject then
-       self.enabled = (self:getslotobject()) and true or false
-    end
     self.screenx = self.screenx - 1
     self.screeny = self.screeny - 1
     self.screenw = self.screenw + 2
@@ -746,9 +743,8 @@ IButtonPlayerSlot = Classic:extend() -- players buttons implementation
 IButtonPlayerSlot.BEHAVIOUR = function(self) -- need at least one player with slots
     IButtonPlayer.BEHAVIOUR(self)
     if not self.display then return end -- no player
-    self.display = (Tic:playerActual().slots) and true or false
-    if not self.display then return end -- no slots
-    self.entity  = Tic:playerActual()
+    self.display = (self.entity.slots)
+    self.enabled = (self:canPick() or self:canDrop())
 end
 
 CButtonSlotPlayer = CButtonSlot:extend()
@@ -756,10 +752,28 @@ function CButtonSlotPlayer:new(_argt)
     CButtonSlotPlayer.super.new(self, _argt)
     self.behaviour   = IButtonPlayerSlot.BEHAVIOUR
     self.clicklf     = function() Tic:logAppend(Tic.TEXTPICK) end
-    self.clickrg     = nil -- override per slot
     self.hovertextlf = CText{text = Tic.TEXTPICK}
+    self.clickrg     = nil -- override per slot
     self.hovertextrg = CText{text = Tic.TEXTDROP}
     self:argt(_argt) -- override if any
+end
+
+function CButtonSlotPlayer:canPick()
+    return false
+end
+
+function CButtonSlotPlayer:canDrop()
+    return (self.getslotobject and self:getslotobject())
+end
+
+function CButtonSlotPlayer:drawHovertextLF()
+    if not self:canPick() then return end
+    CButtonSlotPlayer.super.drawHovertextLF(self)
+end
+
+function CButtonSlotPlayer:drawHovertextRG()
+    if not self:canDrop() then return end
+    CButtonSlotPlayer.super.drawHovertextRG(self)
 end
 
 CButtonSlotPlayerHead = CButtonSlotPlayer:extend()
@@ -804,9 +818,9 @@ end
 --
 IButtonSpotting = Classic:extend() -- spotting buttons implementation
 IButtonSpotting.BEHAVIOUR = function(self) -- need at least one spotting
-    self.display = (Tic:spottingActual()) and true or false
-    if not self.display then return end -- no spotting
-    IButton.BEHAVIOUR(self)
+    IButton.BEHAVIOUR(self) -- enabled if at least one function
+    self.entity  = Tic:spottingActual()
+    self.display = (self.entity)
 end
 
 
@@ -817,9 +831,7 @@ IButtonSpottingSlot = Classic:extend() -- spotting buttons implementation
 IButtonSpottingSlot.BEHAVIOUR = function(self) -- need at least one spotting with slots
     IButtonSpotting.BEHAVIOUR(self)
     if not self.display then return end -- no spotting
-    self.display = (Tic:spottingActual().slots) and true or false
-    if not self.display then return end -- no slots
-    self.entity  = Tic:spottingActual()
+    self.display = (self.entity.slots)
 end
 
 CButtonSlotSpotting = CButtonSlot:extend()
@@ -867,8 +879,8 @@ end
 --
 CButtonSpottingSpot = CButtonCheck:extend() -- generic spottingspot check button
 CButtonSpottingSpot.BEHAVIOUR = function(self)
-    self.checked = Tic:isSpottingSpot()
     IButtonPlayer.BEHAVIOUR(self)
+    self.checked = Tic:isSpottingSpot()
 end
 function CButtonSpottingSpot:new(_argt)
     CButtonSpottingSpot.super.new(self, _argt)
@@ -887,8 +899,8 @@ end
 --
 CButtonSpottingLock = CButtonCheck:extend() -- generic spottinglock check button
 CButtonSpottingLock.BEHAVIOUR = function(self)
-    self.checked = Tic:isSpottingLock()
     IButtonPlayer.BEHAVIOUR(self)
+    self.checked = Tic:isSpottingLock()
 end
 function CButtonSpottingLock:new(_argt)
     CButtonSpottingLock.super.new(self, _argt)
@@ -907,8 +919,8 @@ end
 --
 CButtonSpottingPick = CButtonCheck:extend() -- generic spottingpick check button
 CButtonSpottingPick.BEHAVIOUR = function(self)
-    self.checked = Tic:isSpottingPick()
     IButtonPlayer.BEHAVIOUR(self)
+    self.checked = Tic:isSpottingPick()
 end
 function CButtonSpottingPick:new(_argt)
     CButtonSpottingPick.super.new(self, _argt)
@@ -927,13 +939,11 @@ end
 --
 IButtonSpottingMove = Classic:extend() -- spotting buttons implementation
 IButtonSpottingMove.BEHAVIOUR = function(self)
-    IButton.BEHAVIOUR(self)
-    self.display = (Tic:entitySpotting()) and true or false
+    IButtonSpotting.BEHAVIOUR(self)
     if not self.display then return end -- no spotting
     local _playerregionworld = Tic:playerActual():regionWorld()
-    local _entityregionworld = Tic:spottingActual():regionWorld()
+    local _entityregionworld = self.entity:regionWorld()
     local _direction         = _playerregionworld:directionRegion(_entityregionworld)
-    self.hovertextlf = CText{text = Tic.TEXTMOVE}
     self.enabled     = false
     self.actived     = false
     if _direction == self.direction then
@@ -948,6 +958,7 @@ function CButtonSpotting000:new(_argt)
     self.sprite.palette = IButton.PALETTEKEY
     self.behaviour      = IButtonSpottingMove.BEHAVIOUR
     self.clicklf        = function() Tic:moveDirection000() end
+    self.hovertextlf    = CText{text = Tic.TEXTMOVE}
     self:argt(_argt) -- override if any
 end
 
@@ -957,6 +968,7 @@ function CButtonSpotting045:new(_argt)
     self.sprite.palette = IButton.PALETTEKEY
     self.behaviour      = IButtonSpottingMove.BEHAVIOUR
     self.clicklf        = function() Tic:moveDirection045() end
+    self.hovertextlf    = CText{text = Tic.TEXTMOVE}
     self:argt(_argt) -- override if any
 end
 
@@ -966,6 +978,7 @@ function CButtonSpotting090:new(_argt)
     self.sprite.palette = IButton.PALETTEKEY
     self.behaviour      = IButtonSpottingMove.BEHAVIOUR
     self.clicklf        = function() Tic:moveDirection090() end
+    self.hovertextlf    = CText{text = Tic.TEXTMOVE}
     self:argt(_argt) -- override if any
 end
 
@@ -975,6 +988,7 @@ function CButtonSpotting135:new(_argt)
     self.sprite.palette = IButton.PALETTEKEY
     self.behaviour      = IButtonSpottingMove.BEHAVIOUR
     self.clicklf        = function() Tic:moveDirection135() end
+    self.hovertextlf    = CText{text = Tic.TEXTMOVE}
     self:argt(_argt) -- override if any
 end
 
@@ -984,6 +998,7 @@ function CButtonSpotting180:new(_argt)
     self.sprite.palette = IButton.PALETTEKEY
     self.behaviour      = IButtonSpottingMove.BEHAVIOUR
     self.clicklf        = function() Tic:moveDirection180() end
+    self.hovertextlf    = CText{text = Tic.TEXTMOVE}
     self:argt(_argt) -- override if any
 end
 
@@ -993,6 +1008,7 @@ function CButtonSpotting225:new(_argt)
     self.sprite.palette = IButton.PALETTEKEY
     self.behaviour      = IButtonSpottingMove.BEHAVIOUR
     self.clicklf        = function() Tic:moveDirection225() end
+    self.hovertextlf    = CText{text = Tic.TEXTMOVE}
     self:argt(_argt) -- override if any
 end
 
@@ -1002,6 +1018,7 @@ function CButtonSpotting270:new(_argt)
     self.sprite.palette = IButton.PALETTEKEY
     self.behaviour      = IButtonSpottingMove.BEHAVIOUR
     self.clicklf        = function() Tic:moveDirection270() end
+    self.hovertextlf    = CText{text = Tic.TEXTMOVE}
     self:argt(_argt) -- override if any
 end
 
@@ -1011,6 +1028,7 @@ function CButtonSpotting315:new(_argt)
     self.sprite.palette = IButton.PALETTEKEY
     self.behaviour      = IButtonSpottingMove.BEHAVIOUR
     self.clicklf        = function() Tic:moveDirection315() end
+    self.hovertextlf    = CText{text = Tic.TEXTMOVE}
     self:argt(_argt) -- override if any
 end
 
@@ -1104,7 +1122,7 @@ end
 --
 IButtonMessage = Classic:extend() -- messages buttons implementation
 IButtonMessage.BEHAVIOUR = function(self) -- need at least one message
-    self.display = (Tic:messageActual()) and true or false
+    self.display = (Tic:messageActual())
     if not self.display then return end -- no message
     IButton.BEHAVIOUR(self)
 end

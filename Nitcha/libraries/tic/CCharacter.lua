@@ -357,7 +357,7 @@ function CCharacter:dropObject(_object, _withmessage)
     local _direction = self.direction -- prepare the trials for dropping
     Tic.DIRSCYCLER:at(Tables:valFind(Tic.DIRSCYCLER.acttable, _direction))
     local _actindex = Tic.DIRSCYCLER.actindex
-    local _next = (self.dirx == Tic.DIRXRG) and true or false -- rotating direction -- next or prev
+    local _next = (self.dirx == Tic.DIRXRG)  -- rotating direction -- next or prev
     local _trials = {}
     repeat
         _direction = Tic.DIRSCYCLER.actvalue
@@ -969,7 +969,7 @@ end
 function CCharacter:ifPickObject(_argt)
     local _object = self.interactto
     if not _object then return false end
-    return (_object:findFreeInventory(self.inventories)) and true or false
+    return (_object:findFreeInventory(self.inventories)) 
 end
 
 function CCharacter:doPickObject(_argt)
