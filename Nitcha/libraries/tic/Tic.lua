@@ -3856,6 +3856,7 @@ Wylfie = _playerclass{classed = _playerclass,
     -- ["slots.handlf"] = CSlotHand{object = CObjectSpellLarge{used = CObject.USEDNONE}},
     ["slots.head"]   = CSlotHead{object = CClothesCapLarge{}},
     ["slots.back"]   = CSlotBack{object = CClothesScrollCaseLarge{}},
+    ["inventories.any"] = CInventoryAny{objects = {CClothesCapLarge{}}},
 }
 end
 end
@@ -4110,7 +4111,7 @@ function Tic:logWorld()
     local _kindnames = {}
     Tic:logAppend(_world.name, Tables:size(_world.entitieslocations.entities))
     for _, _entity in pairs(_world.entitieslocations.entities) do
-        table.insert(_kindnames, _entity.kind.."\t".._entity.name)
+        Tables:valInsert(_kindnames, _entity.kind.."\t".._entity.name)
     end
     table.sort(_kindnames)
     for _, _kindname in ipairs(_kindnames) do

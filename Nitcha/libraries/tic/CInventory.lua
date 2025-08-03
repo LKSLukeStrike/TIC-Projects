@@ -69,6 +69,15 @@ function CInventory:movetoInventory(_inventory)
     return _garbage
 end
 
+function CInventory:objectsofSlotType(_slottype)
+    if not CSlot:isSlot(_slottype) then return end -- mandatory
+    local _result = {}
+    for _, _object in ipairs(self.objects or {}) do
+        if _object.slottype and _object.slottype == _slottype then Tables:valInsert(_result, _object, true) end
+    end
+    return _result
+end
+
 CInventoryAny = CInventory:extend() -- generic any inventory
 Classic.KINDINVENTORYANY = "InventoryAny" -- InventoryAny kind
 Classic.NAMEINVENTORYANY = "InventoryAny" -- InventoryAny name

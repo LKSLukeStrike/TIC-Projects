@@ -41,6 +41,16 @@ function CSlot:removeObject(_object, _sameonly)
     return _object -- done
 end
 
+function CSlot:objectsinInventories(_inventories)
+    local _result = {}
+    for _, _inventory in pairs(_inventories or {}) do
+        if CInventory:isInventory(_inventory) then
+            Tables:imerge(_result, _inventory:objectsofSlotType(self.slottype))
+        end
+    end
+    return _result
+end
+
 CSlotHead = CSlot:extend() -- generic head slot
 Classic.KINDSLOTHEAD = "SlotHead" -- SlotHead kind
 Classic.NAMESLOTHEAD = "SlotHead" -- SlotHead name

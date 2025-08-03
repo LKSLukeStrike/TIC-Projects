@@ -661,17 +661,15 @@ end
 -- IButtonSlot
 --
 IButtonSlot = Classic:extend() -- slots buttons implementation
+IButtonSlot.PALETTEDISABLED = {[Tic.COLORWHITE] = Tic.COLORGREYL, [Tic.COLORGREYL] = Tic.COLORGREYD}
 IButtonSlot.GROUNDSPRITEHEAD = CSpriteBG{
     sprite  = CSpriteBG.SIGNSLHEAD,
-    palette = {[Tic.COLORWHITE] = Tic.COLORGREYL, [Tic.COLORGREYL] = Tic.COLORGREYD},
 }
 IButtonSlot.GROUNDSPRITEBACK = CSpriteBG{
     sprite  = CSpriteBG.SIGNSLBACK,
-    palette = {[Tic.COLORWHITE] = Tic.COLORGREYL, [Tic.COLORGREYL] = Tic.COLORGREYD},
 }
 IButtonSlot.GROUNDSPRITEHAND = CSpriteBG{
     sprite  = CSpriteBG.SIGNSLHAND,
-    palette = {[Tic.COLORWHITE] = Tic.COLORGREYL, [Tic.COLORGREYL] = Tic.COLORGREYD},
     rotate  = CSprite.ROTATE270,
 }
 IButtonSlot.BEHAVIOUR = function(self) -- enable if has an object
@@ -730,6 +728,9 @@ function CButtonSlot:drawGround()
         _groundsprite.screenx = self.screenx
         _groundsprite.screeny = self.screeny
         _groundsprite.flip    = _entitydirx
+        _groundsprite.palette = (self.enabled)
+            and _groundsprite.palette
+            or  Tables:merge(_groundsprite.palette, IButtonSlot.PALETTEDISABLED)
         _groundsprite:draw()
         _groundsprite:load()
     end
@@ -737,10 +738,10 @@ end
 
 
 --
--- IButtonPlayerSlot
+-- IButtonSlotPlayer
 --
-IButtonPlayerSlot = Classic:extend() -- players buttons implementation
-IButtonPlayerSlot.BEHAVIOUR = function(self) -- need at least one player with slots
+IButtonSlotPlayer = Classic:extend() -- players buttons implementation
+IButtonSlotPlayer.BEHAVIOUR = function(self) -- need at least one player with slots
     IButtonPlayer.BEHAVIOUR(self)
     if not self.display then return end -- no player
     self.display = (self.entity.slots)
@@ -750,7 +751,7 @@ end
 CButtonSlotPlayer = CButtonSlot:extend()
 function CButtonSlotPlayer:new(_argt)
     CButtonSlotPlayer.super.new(self, _argt)
-    self.behaviour   = IButtonPlayerSlot.BEHAVIOUR
+    self.behaviour   = IButtonSlotPlayer.BEHAVIOUR
     self.clicklf     = function() Tic:logAppend(Tic.TEXTPICK) end
     self.hovertextlf = CText{text = Tic.TEXTPICK}
     self.clickrg     = nil -- override per slot
@@ -758,12 +759,28 @@ function CButtonSlotPlayer:new(_argt)
     self:argt(_argt) -- override if any
 end
 
+function CButtonSlotPlayer:objectsinInventories(_inventories)
+    local _result = {}
+    for _, _inventory in pairs(_inventories or {}) do
+        if CInventory:isInventory(_inventory) then
+            local _objectsofslottype = _inventory:objectsofSlotType(self.slottype)
+            _result = Tables:imerge(_result, _objectsofslottype)
+        end
+    end
+    return _result
+end
+
 function CButtonSlotPlayer:canPick()
+    if self:canDrop() then return true end -- object in slot -- can be replaced by an empty one
+    local _inventories = self.entity.inventories
+    if not _inventories then return false end -- cannot pick in no inventories
+    local _objectsininventories = self:objectsinInventories(_inventories)
+    if Tables:size(_objectsininventories) > 0 then return true end --has other objects of same slottype
     return false
 end
 
 function CButtonSlotPlayer:canDrop()
-    return (self.getslotobject and self:getslotobject())
+    return (self.getslotobject and self:getslotobject()) -- has object in slot
 end
 
 function CButtonSlotPlayer:drawHovertextLF()
@@ -779,36 +796,40 @@ end
 CButtonSlotPlayerHead = CButtonSlotPlayer:extend()
 function CButtonSlotPlayerHead:new(_argt)
     CButtonSlotPlayerHead.super.new(self, _argt)
-    self.getslotobject = Tic.FUNCTIONSLOTGETHEAD
     self.clickrg       = Tic.FUNCTIONSLOTDROPHEAD
+    self.getslotobject = function() return Tic:playerActual().slots.head.object end
     self.groundsprite  = IButtonSlot.GROUNDSPRITEHEAD
+    self.slottype      = CSlotHead
     self:argt(_argt) -- override if any
 end
 
 CButtonSlotPlayerBack = CButtonSlotPlayer:extend()
 function CButtonSlotPlayerBack:new(_argt)
     CButtonSlotPlayerBack.super.new(self, _argt)
-    self.getslotobject = Tic.FUNCTIONSLOTGETBACK
     self.clickrg       = Tic.FUNCTIONSLOTDROPBACK
+    self.getslotobject = function() return Tic:playerActual().slots.back.object end
     self.groundsprite  = IButtonSlot.GROUNDSPRITEBACK
+    self.slottype      = CSlotBack
     self:argt(_argt) -- override if any
 end
 
 CButtonSlotPlayerHandLF = CButtonSlotPlayer:extend()
 function CButtonSlotPlayerHandLF:new(_argt)
     CButtonSlotPlayerHandLF.super.new(self, _argt)
-    self.getslotobject = Tic.FUNCTIONSLOTGETHANDLF
     self.clickrg       = Tic.FUNCTIONSLOTDROPHANDLF
+    self.getslotobject = function() return Tic:playerActual().slots.handlf.object end
     self.groundsprite  = IButtonSlot.GROUNDSPRITEHAND
+    self.slottype      = CSlotHand
     self:argt(_argt) -- override if any
 end
 
 CButtonSlotPlayerHandRG = CButtonSlotPlayer:extend()
 function CButtonSlotPlayerHandRG:new(_argt)
     CButtonSlotPlayerHandRG.super.new(self, _argt)
-    self.getslotobject = Tic.FUNCTIONSLOTGETHANDRG
     self.clickrg       = Tic.FUNCTIONSLOTDROPHANDRG
+    self.getslotobject = function() return Tic:playerActual().slots.handrg.object end
     self.groundsprite  = IButtonSlot.GROUNDSPRITEHAND
+    self.slottype      = CSlotHand
     self:argt(_argt) -- override if any
 end
 
@@ -825,10 +846,10 @@ end
 
 
 --
--- IButtonSpottingSlot
+-- IButtonSlotSpotting
 --
-IButtonSpottingSlot = Classic:extend() -- spotting buttons implementation
-IButtonSpottingSlot.BEHAVIOUR = function(self) -- need at least one spotting with slots
+IButtonSlotSpotting = Classic:extend() -- spotting buttons implementation
+IButtonSlotSpotting.BEHAVIOUR = function(self) -- need at least one spotting with slots
     IButtonSpotting.BEHAVIOUR(self)
     if not self.display then return end -- no spotting
     self.display = (self.entity.slots)
@@ -837,7 +858,7 @@ end
 CButtonSlotSpotting = CButtonSlot:extend()
 function CButtonSlotSpotting:new(_argt)
     CButtonSlotSpotting.super.new(self, _argt)
-    self.behaviour           = IButtonSpottingSlot.BEHAVIOUR
+    self.behaviour = IButtonSlotSpotting.BEHAVIOUR
     self:argt(_argt) -- override if any
 end
 
@@ -846,6 +867,7 @@ function CButtonSlotSpottingHead:new(_argt)
     CButtonSlotSpottingHead.super.new(self, _argt)
     self.getslotobject = function() return Tic:spottingActual().slots.head.object end
     self.groundsprite  = IButtonSlot.GROUNDSPRITEHEAD
+    self.slottype      = CSlotHead
     self:argt(_argt) -- override if any
 end
 
@@ -854,6 +876,7 @@ function CButtonSlotSpottingBack:new(_argt)
     CButtonSlotSpottingBack.super.new(self, _argt)
     self.getslotobject = function() return Tic:spottingActual().slots.back.object end
     self.groundsprite  = IButtonSlot.GROUNDSPRITEBACK
+    self.slottype      = CSlotBack
     self:argt(_argt) -- override if any
 end
 
@@ -862,6 +885,7 @@ function CButtonSlotSpottingHandLF:new(_argt)
     CButtonSlotSpottingHandLF.super.new(self, _argt)
     self.getslotobject = function() return Tic:spottingActual().slots.handlf.object end
     self.groundsprite  = IButtonSlot.GROUNDSPRITEHAND
+    self.slottype      = CSlotHand
     self:argt(_argt) -- override if any
 end
 
@@ -870,6 +894,7 @@ function CButtonSlotSpottingHandRG:new(_argt)
     CButtonSlotSpottingHandRG.super.new(self, _argt)
     self.getslotobject = function() return Tic:spottingActual().slots.handrg.object end
     self.groundsprite  = IButtonSlot.GROUNDSPRITEHAND
+    self.slottype      = CSlotHand
     self:argt(_argt) -- override if any
 end
 
