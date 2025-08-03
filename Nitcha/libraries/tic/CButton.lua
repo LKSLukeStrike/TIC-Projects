@@ -752,11 +752,32 @@ CButtonSlotPlayer = CButtonSlot:extend()
 function CButtonSlotPlayer:new(_argt)
     CButtonSlotPlayer.super.new(self, _argt)
     self.behaviour   = IButtonSlotPlayer.BEHAVIOUR
-    self.clicklf     = function() Tic:logAppend(Tic.TEXTPICK) end
+    self.clicklf     = function() CButtonSlotPlayer:menuPick() end
     self.hovertextlf = CText{text = Tic.TEXTPICK}
     self.clickrg     = nil -- override per slot
     self.hovertextrg = CText{text = Tic.TEXTDROP}
     self:argt(_argt) -- override if any
+end
+
+function CButtonSlotPlayer:menuPick(_screenx, _screeny)
+    _screenx = 50
+    _screeny = 50
+    Tic:logAppend(Tic.TEXTPICK)
+    -- if true then return end
+    local _screen = CScreen{}
+    local _windowmenu = CWindowScreen{
+        screenx = _screenx, screeny = _screeny, screenw = 100, screenh = 40,
+        rounded = true, drawframes = true,
+        separatory = -1,
+        -- drawground = true, colorground = Tic.COLORRED,
+        -- stretch = true,
+    }
+    _screen:appendElement(_windowmenu)
+    local _buttonslot = CButtonSlot{
+        screenx = _screenx, screeny = _screeny,
+    }
+    _windowmenu:appendElement(_buttonslot)
+    Tic:screenAppend(_screen)
 end
 
 function CButtonSlotPlayer:objectsinInventories(_inventories)

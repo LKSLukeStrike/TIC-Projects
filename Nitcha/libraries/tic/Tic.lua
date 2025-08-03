@@ -3397,7 +3397,9 @@ if true then
 ScreenMenus = CScreen{name = "Menus", keysfunctions = Tic.KEYSFUNCTIONSMENUS}
 ScreenMenus:appendElements{
     CWindowMenu{
-        colorground = Tic.COLORGREEND, screenx = 50, screeny = 50, screenw = 24, screenh = 40, rounded = true, drawframes = true,
+        colorground = Tic.COLORGREEND,
+        screenx = 50, screeny = 50, screenw = 24, screenh = 40,
+        rounded = true, drawframes = true,
         -- marginup = 2, margindw = 2, marginlf = 2, marginrg = 2,
         separatory = -1,
         stretch = true,
