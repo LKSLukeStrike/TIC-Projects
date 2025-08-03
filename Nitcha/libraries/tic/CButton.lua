@@ -765,18 +765,22 @@ function CButtonSlotPlayer:menuPick(_screenx, _screeny)
     Tic:logAppend(Tic.TEXTPICK)
     -- if true then return end
     local _screen = CScreen{}
-    local _windowmenu = CWindowScreen{
-        screenx = _screenx, screeny = _screeny, screenw = 100, screenh = 40,
-        rounded = true, drawframes = true,
-        separatory = -1,
-        -- drawground = true, colorground = Tic.COLORRED,
-        -- stretch = true,
-    }
-    _screen:appendElement(_windowmenu)
-    local _buttonslot = CButtonSlot{
+
+    local _windowmenu = CWindowMenu{
         screenx = _screenx, screeny = _screeny,
+        separatory = 1,
+        stretch = true,
     }
-    _windowmenu:appendElement(_buttonslot)
+    _screen:appendElements{_windowmenu}
+
+    local _buttonslot1 = CButtonSlotPlayerHead{
+        clicklf = function() Tic:screenRemove(_screen) end,
+    }
+    local _buttonslot2 = CButtonSlot{
+        clicklf = function() Tic:screenRemove(_screen) end,
+    }
+    _windowmenu:appendElements{_buttonslot1, _buttonslot2}
+
     Tic:screenAppend(_screen)
 end
 

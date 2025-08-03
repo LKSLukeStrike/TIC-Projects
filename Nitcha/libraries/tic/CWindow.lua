@@ -48,6 +48,7 @@ function CWindowMenu:adjustWH()
     local _content = self:content()
     self.screenw   = _content.sizew
     self.screenh   = _content.sizeh
+    return _content
 end
 
 function CWindowMenu:content()
@@ -79,7 +80,7 @@ function CWindowMenu:content()
 end
 
 function CWindowMenu:drawInside()
-    local _content = self:content()
+    local _content = self:adjustWH()
     local _screenx = self.screenx + self.marginlf
     local _screeny = self.screeny + self.marginup
     for _, _element in ipairs(_content.elements or {}) do
@@ -92,7 +93,7 @@ function CWindowMenu:drawInside()
         _screeny = _screeny + _element.screenh + self.separatory
         _element:draw()
     end
-    self.parent:appendElements(_content.elements)
+    -- self.parent:appendElements(_content.elements)
 end
 
 
