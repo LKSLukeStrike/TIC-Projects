@@ -319,26 +319,42 @@ function CCharacter:slotDropAll()
     self:slotDropHandLF()
 end
 
+function CCharacter:slotHead()
+    return self.slots.head
+end
+
+function CCharacter:slotBack()
+    return self.slots.back
+end
+
+function CCharacter:slotHandRG()
+    return self.slots.handrg
+end
+
+function CCharacter:slotHandLF()
+    return self.slots.handlf
+end
+
 function CCharacter:slotDropHead()
-    local _object = self.slots.head.object
+    local _object = self:slotHead().object
     if not _object then return end
 	return self:dropObject(_object)
 end
 
 function CCharacter:slotDropBack()
-    local _object = self.slots.back.object
+    local _object = self:slotBack().object
     if not _object then return end
 	return self:dropObject(_object)
 end
 
 function CCharacter:slotDropHandRG()
-    local _object = self.slots.handrg.object
+    local _object = self:slotHandRG().object
     if not _object then return end
 	return self:dropObject(_object)
 end
 
 function CCharacter:slotDropHandLF()
-    local _object = self.slots.handlf.object
+    local _object = self:slotHandLF().object
     if not _object then return end
 	return self:dropObject(_object)
 end

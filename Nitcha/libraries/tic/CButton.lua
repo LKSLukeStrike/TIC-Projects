@@ -765,7 +765,6 @@ function CButtonSlotPlayer:menuPick()
     local _classic = self.classic
     local _entity  = self.entity
 
-    -- if true then return end
     local _screen = CScreen{}
 
     local _windowmenu = CWindowMenu{
@@ -775,7 +774,7 @@ function CButtonSlotPlayer:menuPick()
     }
     _screen:appendElements{_windowmenu}
 
-    local _buttonslot1 = _classic{
+    local _buttonslotempty = _classic{
         getslotobject = function() end, -- returns nil
         clicklf = function()
             _entity.slots.head.object = nil
@@ -783,12 +782,13 @@ function CButtonSlotPlayer:menuPick()
             Tic:mouseDelay()
         end,
     }
-    local _truc = 'truc'
-    local _buttonslot2 = _classic{
-        -- clicklf = function() Tic:screenRemove(_screen) end,
-        clicklf = function() Tic:logAppend(_truc) end,
-    }
-    _windowmenu:appendElements{_buttonslot1, _buttonslot2}
+    _windowmenu:appendElements{_buttonslotempty}
+
+    -- local _truc = 'truc'
+    -- local _buttonslot2 = _classic{
+    --     -- clicklf = function() Tic:screenRemove(_screen) end,
+    --     clicklf = function() Tic:logAppend(_truc) end,
+    -- }
 
     Tic:screenAppend(_screen)
 end
