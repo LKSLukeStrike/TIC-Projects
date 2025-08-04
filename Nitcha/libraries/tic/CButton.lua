@@ -752,17 +752,19 @@ CButtonSlotPlayer = CButtonSlot:extend()
 function CButtonSlotPlayer:new(_argt)
     CButtonSlotPlayer.super.new(self, _argt)
     self.behaviour   = IButtonSlotPlayer.BEHAVIOUR
-    self.clicklf     = function() CButtonSlotPlayer:menuPick() end
+    self.clicklf     = function() self:menuPick() end
     self.hovertextlf = CText{text = Tic.TEXTPICK}
     self.clickrg     = nil -- override per slot
     self.hovertextrg = CText{text = Tic.TEXTDROP}
     self:argt(_argt) -- override if any
 end
 
-function CButtonSlotPlayer:menuPick(_screenx, _screeny)
-    _screenx = 50
-    _screeny = 50
-    Tic:logAppend(Tic.TEXTPICK)
+function CButtonSlotPlayer:menuPick()
+    local _screenx = self.screenx + 9
+    local _screeny = self.screeny
+    local _classic = self.classic
+    local _entity  = self.entity
+
     -- if true then return end
     local _screen = CScreen{}
 
@@ -773,12 +775,18 @@ function CButtonSlotPlayer:menuPick(_screenx, _screeny)
     }
     _screen:appendElements{_windowmenu}
 
-    local _buttonslot1 = CButtonSlotPlayerHead{
-        getslotobject = function() end,
-        clicklf = function() Tic:playerActual().slots.head.object = nil ; Tic:screenRemove(_screen) end,
+    local _buttonslot1 = _classic{
+        getslotobject = function() end, -- returns nil
+        clicklf = function()
+            _entity.slots.head.object = nil
+            Tic:screenRemove(_screen)
+            Tic:mouseDelay()
+        end,
     }
-    local _buttonslot2 = CButtonSlot{
-        clicklf = function() Tic:screenRemove(_screen) end,
+    local _truc = 'truc'
+    local _buttonslot2 = _classic{
+        -- clicklf = function() Tic:screenRemove(_screen) end,
+        clicklf = function() Tic:logAppend(_truc) end,
     }
     _windowmenu:appendElements{_buttonslot1, _buttonslot2}
 
@@ -822,6 +830,7 @@ end
 CButtonSlotPlayerHead = CButtonSlotPlayer:extend()
 function CButtonSlotPlayerHead:new(_argt)
     CButtonSlotPlayerHead.super.new(self, _argt)
+    self.classic       = CButtonSlotPlayerHead
     self.clickrg       = Tic.FUNCTIONSLOTDROPHEAD
     self.getslotobject = function() return Tic:playerActual().slots.head.object end
     self.groundsprite  = IButtonSlot.GROUNDSPRITEHEAD
@@ -832,6 +841,7 @@ end
 CButtonSlotPlayerBack = CButtonSlotPlayer:extend()
 function CButtonSlotPlayerBack:new(_argt)
     CButtonSlotPlayerBack.super.new(self, _argt)
+    self.classic       = CButtonSlotPlayerBack
     self.clickrg       = Tic.FUNCTIONSLOTDROPBACK
     self.getslotobject = function() return Tic:playerActual().slots.back.object end
     self.groundsprite  = IButtonSlot.GROUNDSPRITEBACK
@@ -842,6 +852,7 @@ end
 CButtonSlotPlayerHandLF = CButtonSlotPlayer:extend()
 function CButtonSlotPlayerHandLF:new(_argt)
     CButtonSlotPlayerHandLF.super.new(self, _argt)
+    self.classic       = CButtonSlotPlayerHandLF
     self.clickrg       = Tic.FUNCTIONSLOTDROPHANDLF
     self.getslotobject = function() return Tic:playerActual().slots.handlf.object end
     self.groundsprite  = IButtonSlot.GROUNDSPRITEHAND
@@ -852,6 +863,7 @@ end
 CButtonSlotPlayerHandRG = CButtonSlotPlayer:extend()
 function CButtonSlotPlayerHandRG:new(_argt)
     CButtonSlotPlayerHandRG.super.new(self, _argt)
+    self.classic       = CButtonSlotPlayerHandRG
     self.clickrg       = Tic.FUNCTIONSLOTDROPHANDRG
     self.getslotobject = function() return Tic:playerActual().slots.handrg.object end
     self.groundsprite  = IButtonSlot.GROUNDSPRITEHAND

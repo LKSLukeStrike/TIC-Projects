@@ -575,6 +575,15 @@ Tic.MOUSEOFFSETY   = 2
 Tic.MOUSEDIRX      = Tic.DIRXLF
 Tic.MOUSECYCLER    = CCyclerInt{} -- delay cycler
 Tic.MOUSEDELAY     = 10 -- default delay ticks
+Tic.MOUSERESET     = {
+    screenx = 0,
+    screeny = 0,
+    clicklf = false,
+    clickmd = false,
+    clickrg = false,
+    scrollx = 0,
+    scrolly = 0,
+}
 Tic.MOUSE          = {
     screenx = 0,
     screeny = 0,
@@ -587,7 +596,8 @@ Tic.MOUSE          = {
 
 function Tic:mouseDelay(_delay) -- set a refresh mouse delay
     _delay = _delay or Tic.MOUSEDELAY
-    Tic.MOUSECYCLER = CCyclerInt{maxindex = _delay} -- delay cycler
+    Tic.MOUSECYCLER:argt{maxindex = _delay} -- delay cycler
+    Tic.MOUSE = Tables:merge(Tic.MOUSE, Tic.MOUSERESET) -- clear old mouse infos
 end
 
 function Tic:mouseReset(_delay) -- reset refresh mouse delay
