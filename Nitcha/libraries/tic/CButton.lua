@@ -774,7 +774,8 @@ function CButtonSlotPlayer:menuPick(_screenx, _screeny)
     _screen:appendElements{_windowmenu}
 
     local _buttonslot1 = CButtonSlotPlayerHead{
-        clicklf = function() Tic:screenRemove(_screen) end,
+        getslotobject = function() end,
+        clicklf = function() Tic:playerActual().slots.head.object = nil ; Tic:screenRemove(_screen) end,
     }
     local _buttonslot2 = CButtonSlot{
         clicklf = function() Tic:screenRemove(_screen) end,
