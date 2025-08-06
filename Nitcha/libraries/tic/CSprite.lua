@@ -9,10 +9,6 @@ CSprite.SPRITEBANK = 0
 CSprite.FRAMEOF    = 16 -- sprites frames offset multiplier
 CSprite.FRAME00    = 00 -- sprites frames -- [!] start at 0, used to compute the offset
 CSprite.FRAME01    = 01
-CSprite.ROTATE000  = 0 -- sprite rotations
-CSprite.ROTATE090  = 1
-CSprite.ROTATE180  = 2
-CSprite.ROTATE270  = 3
 CSprite.SPRITEBOARD = 256
 function CSprite:new(_argt)
     CSprite.super.new(self, _argt)
@@ -25,8 +21,8 @@ function CSprite:new(_argt)
     self.frame     = CSprite.FRAME00
     self.colorkey  = Tic.COLORKEY -- default colorkey
     self.scale     = Tic.SCALE01 -- default scale
-    self.flip      = Tic.DIRXLF -- all sprites are dir x left by default
-    self.rotate    = CSprite.ROTATE000 -- no rotation by default
+    self.flip      = Tic.FLIPNONE -- all sprites are dir x left by default
+    self.rotate    = Tic.ROTATE000 -- no rotation by default
     self.width     = 1 -- sprite 1x1 by default
     self.height    = 1
     self.palette   = {} -- empty by default, can be filled later

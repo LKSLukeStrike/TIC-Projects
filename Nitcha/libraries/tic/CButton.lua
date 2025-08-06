@@ -294,7 +294,7 @@ CButtonArrow000 = CButtonArrowLine:extend() -- generic arrow 000 click button
 function CButtonArrow000:new(_argt)
     CButtonArrow000.super.new(self, _argt)
     self.direction     = Tic.DIR000
-	self.sprite.rotate = CSprite.ROTATE000
+	self.sprite.rotate = Tic.ROTATE000
     self:argt(_argt) -- override if any
 end
 
@@ -306,7 +306,7 @@ CButtonArrow045 = CButtonArrowDiag:extend() -- generic arrow 045 click button
 function CButtonArrow045:new(_argt)
     CButtonArrow045.super.new(self, _argt)
     self.direction     = Tic.DIR045
-	self.sprite.rotate = CSprite.ROTATE090
+	self.sprite.rotate = Tic.ROTATE090
     self:argt(_argt) -- override if any
 end
 
@@ -318,7 +318,7 @@ CButtonArrow090 = CButtonArrowLine:extend() -- generic arrow 090 click button
 function CButtonArrow090:new(_argt)
     CButtonArrow090.super.new(self, _argt)
     self.direction     = Tic.DIR090
-	self.sprite.rotate = CSprite.ROTATE090
+	self.sprite.rotate = Tic.ROTATE090
     self:argt(_argt) -- override if any
 end
 
@@ -330,7 +330,7 @@ CButtonArrow135 = CButtonArrowDiag:extend() -- generic arrow 135 click button
 function CButtonArrow135:new(_argt)
     CButtonArrow135.super.new(self, _argt)
     self.direction     = Tic.DIR135
-	self.sprite.rotate = CSprite.ROTATE180
+	self.sprite.rotate = Tic.ROTATE180
     self:argt(_argt) -- override if any
 end
 
@@ -342,7 +342,7 @@ CButtonArrow180 = CButtonArrowLine:extend() -- generic arrow 180 click button
 function CButtonArrow180:new(_argt)
     CButtonArrow180.super.new(self, _argt)
     self.direction     = Tic.DIR180
-	self.sprite.rotate = CSprite.ROTATE180
+	self.sprite.rotate = Tic.ROTATE180
     self:argt(_argt) -- override if any
 end
 
@@ -354,7 +354,7 @@ CButtonArrow225 = CButtonArrowDiag:extend() -- generic arrow 225 click button
 function CButtonArrow225:new(_argt)
     CButtonArrow225.super.new(self, _argt)
     self.direction     = Tic.DIR225
-	self.sprite.rotate = CSprite.ROTATE270
+	self.sprite.rotate = Tic.ROTATE270
     self:argt(_argt) -- override if any
 end
 
@@ -366,7 +366,7 @@ CButtonArrow270 = CButtonArrowLine:extend() -- generic arrow 270 click button
 function CButtonArrow270:new(_argt)
     CButtonArrow270.super.new(self, _argt)
     self.direction     = Tic.DIR270
-	self.sprite.rotate = CSprite.ROTATE270
+	self.sprite.rotate = Tic.ROTATE270
     self:argt(_argt) -- override if any
 end
 
@@ -378,7 +378,7 @@ CButtonArrow315 = CButtonArrowDiag:extend() -- generic arrow 315 click button
 function CButtonArrow315:new(_argt)
     CButtonArrow315.super.new(self, _argt)
     self.direction     = Tic.DIR315
-	self.sprite.rotate = CSprite.ROTATE000
+	self.sprite.rotate = Tic.ROTATE000
     self:argt(_argt) -- override if any
 end
 
@@ -670,7 +670,7 @@ IButtonSlot.GROUNDSPRITEBACK = CSpriteBG{
 }
 IButtonSlot.GROUNDSPRITEHAND = CSpriteBG{
     sprite  = CSpriteBG.SIGNSLHAND,
-    rotate  = CSprite.ROTATE270,
+    rotate  = Tic.ROTATE270,
 }
 IButtonSlot.BEHAVIOUR = function(self) -- enable if has an object
     IButton.BEHAVIOUR(self)
@@ -760,10 +760,12 @@ function CButtonSlotPlayer:new(_argt)
 end
 
 function CButtonSlotPlayer:menuPick()
-    local _screenx = self.screenx + 9
-    local _screeny = self.screeny
-    local _classic = self.classic
-    local _entity  = self.entity
+    local _screenx       = self.screenx + 9
+    local _screeny       = self.screeny
+    local _classic       = self.classic
+    local _entity        = self.entity
+    local _slottype      = self.slottype
+    local _setslotobject = self.setslotobject
 
     local _screen = CScreen{}
 
@@ -775,20 +777,31 @@ function CButtonSlotPlayer:menuPick()
     _screen:appendElements{_windowmenu}
 
     local _buttonslotempty = _classic{
-        getslotobject = function() end, -- returns nil
+        getslotobject = function() return nil end, -- returns nil
         clicklf = function()
-            _entity.slots.head.object = nil
+            _setslotobject()
             Tic:screenRemove(_screen)
             Tic:mouseDelay()
         end,
     }
     _windowmenu:appendElements{_buttonslotempty}
 
-    -- local _truc = 'truc'
-    -- local _buttonslot2 = _classic{
-    --     -- clicklf = function() Tic:screenRemove(_screen) end,
-    --     clicklf = function() Tic:logAppend(_truc) end,
-    -- }
+    for _, _object in ipairs(_entity:objectsofSlotType(_slottype)) do
+        Tic:logAppend(_object.name)
+        _windowmenu:appendElements{
+            _classic{
+                getslotobject = function() return _object end, -- returns object
+                clicklf = function()
+                    local _whatslot = _object:findWhatSlot(_entity.slots)
+                    -- if _whatslot then _whatslot:removeObject(_object) end
+                    if _whatslot then _whatslot:appendObject(self.getslotobject()) end
+                    _setslotobject(_object)
+                    Tic:screenRemove(_screen)
+                    Tic:mouseDelay()
+                end,
+            }
+        }
+    end
 
     Tic:screenAppend(_screen)
 end
@@ -798,7 +811,7 @@ function CButtonSlotPlayer:objectsinInventories(_inventories)
     for _, _inventory in pairs(_inventories or {}) do
         if CInventory:isInventory(_inventory) then
             local _objectsofslottype = _inventory:objectsofSlotType(self.slottype)
-            _result = Tables:imerge(_result, _objectsofslottype)
+            _result = Tables:imerge(_result, _objectsofslottype, true)
         end
     end
     return _result
@@ -832,7 +845,8 @@ function CButtonSlotPlayerHead:new(_argt)
     CButtonSlotPlayerHead.super.new(self, _argt)
     self.classic       = CButtonSlotPlayerHead
     self.clickrg       = Tic.FUNCTIONSLOTDROPHEAD
-    self.getslotobject = function() return Tic:playerActual().slots.head.object end
+    self.setslotobject = function(_object) return self.entity:slotSetHeadObject(_object) end
+    self.getslotobject = function() return self.entity:slotGetHeadObject() end
     self.groundsprite  = IButtonSlot.GROUNDSPRITEHEAD
     self.slottype      = CSlotHead
     self:argt(_argt) -- override if any
@@ -843,7 +857,8 @@ function CButtonSlotPlayerBack:new(_argt)
     CButtonSlotPlayerBack.super.new(self, _argt)
     self.classic       = CButtonSlotPlayerBack
     self.clickrg       = Tic.FUNCTIONSLOTDROPBACK
-    self.getslotobject = function() return Tic:playerActual().slots.back.object end
+    self.setslotobject = function(_object) return self.entity:slotSetBackObject(_object) end
+    self.getslotobject = function() return self.entity:slotGetBackObject() end
     self.groundsprite  = IButtonSlot.GROUNDSPRITEBACK
     self.slottype      = CSlotBack
     self:argt(_argt) -- override if any
@@ -854,7 +869,8 @@ function CButtonSlotPlayerHandLF:new(_argt)
     CButtonSlotPlayerHandLF.super.new(self, _argt)
     self.classic       = CButtonSlotPlayerHandLF
     self.clickrg       = Tic.FUNCTIONSLOTDROPHANDLF
-    self.getslotobject = function() return Tic:playerActual().slots.handlf.object end
+    self.setslotobject = function(_object) return self.entity:slotSetHandLFObject(_object) end
+    self.getslotobject = function() return self.entity:slotGetHandLFObject() end
     self.groundsprite  = IButtonSlot.GROUNDSPRITEHAND
     self.slottype      = CSlotHand
     self:argt(_argt) -- override if any
@@ -865,7 +881,8 @@ function CButtonSlotPlayerHandRG:new(_argt)
     CButtonSlotPlayerHandRG.super.new(self, _argt)
     self.classic       = CButtonSlotPlayerHandRG
     self.clickrg       = Tic.FUNCTIONSLOTDROPHANDRG
-    self.getslotobject = function() return Tic:playerActual().slots.handrg.object end
+    self.setslotobject = function(_object) return self.entity:slotSetHandRGObject(_object) end
+    self.getslotobject = function() return self.entity:slotGetHandRGObject() end
     self.groundsprite  = IButtonSlot.GROUNDSPRITEHAND
     self.slottype      = CSlotHand
     self:argt(_argt) -- override if any

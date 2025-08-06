@@ -236,6 +236,19 @@ Tic.COLORPSYLT    = Tic.COLORBLUEL
 -- Palette colors for buttons
 Tic.COLORHOVER    = Tic.COLORBLUEL -- hovertext color
 
+-- Flips
+Tic.FLIPNONE = 0 -- none
+Tic.FLIPHORI = 1 -- horizontal
+Tic.FLIPVERT = 2 -- vertical
+Tic.FLIPBOTH = 3 -- both
+
+-- Rotations
+Tic.ROTATE000  = 0 -- sprite rotations
+Tic.ROTATE090  = 1
+Tic.ROTATE180  = 2
+Tic.ROTATE270  = 3
+
+
 -- Directions
 Tic.DIRXLF = 0 -- x directions -- also the sprite flip
 Tic.DIRXRG = 1
@@ -448,10 +461,10 @@ Tic.FUNCTIONMOVETOGGLEDRAW      = function() Tic:moveToggleDraw() end
 Tic.FUNCTIONSCALENEXT           = function() Tic:scaleNext() end
 Tic.FUNCTIONSCREENPREV          = function() Tic:screenPrev() end
 Tic.FUNCTIONSCREENNEXT          = function() Tic:screenNext() end
-Tic.FUNCTIONSLOTGETHEAD         = function() return Tic:slotGetHead() end
-Tic.FUNCTIONSLOTGETBACK         = function() return Tic:slotGetBack() end
-Tic.FUNCTIONSLOTGETHANDLF       = function() return Tic:slotGetHandLF() end
-Tic.FUNCTIONSLOTGETHANDRG       = function() return Tic:slotGetHandRG() end
+Tic.FUNCTIONSLOTGETHEAD         = function() return Tic:slotGetHeadObject() end
+Tic.FUNCTIONSLOTGETBACK         = function() return Tic:slotGetBackObject() end
+Tic.FUNCTIONSLOTGETHANDLF       = function() return Tic:slotGetHandLFObject() end
+Tic.FUNCTIONSLOTGETHANDRG       = function() return Tic:slotGetHandRGObject() end
 Tic.FUNCTIONSLOTDROPHEAD        = function() return Tic:slotDropHead() end
 Tic.FUNCTIONSLOTDROPBACK        = function() return Tic:slotDropBack() end
 Tic.FUNCTIONSLOTDROPHANDLF      = function() return Tic:slotDropHandLF() end
@@ -1183,28 +1196,28 @@ end
 
 
 -- Slot System
-function Tic:slotGetHead(_character)
+function Tic:slotGetHeadObject(_character)
     _character = _character or Tic:playerActual()
     if not _character then return end
-	return _character.slots.head.object
+	return _character:slotGetHeadObject()
 end
 
-function Tic:slotGetBack(_character)
+function Tic:slotGetBackObject(_character)
     _character = _character or Tic:playerActual()
     if not _character then return end
-	return _character.slots.back.object
+	return _character:slotGetBackObject()
 end
 
-function Tic:slotGetHandLF(_character)
+function Tic:slotGetHandLFObject(_character)
     _character = _character or Tic:playerActual()
     if not _character then return end
-	return _character.slots.handlf.object
+	return _character:slotGetHandLFObject()
 end
 
-function Tic:slotGetHandRG(_character)
+function Tic:slotGetHandRGObject(_character)
     _character = _character or Tic:playerActual()
     if not _character then return end
-	return _character.slots.handrg.object
+	return _character:slotGetHandRGObject()
 end
 
 function Tic:slotDropAll(_character)
@@ -2712,7 +2725,7 @@ function CCharacterHumanoid:drawHead()
     local _heady  = _handlesoffsets.heady
     self:drawHandle(_headx, _heady, Tic.COLORORANGE)
 
-    local _object = self.slots.head.object
+    local _object = self:slotGetHeadObject()
     if not _object then return end
 
     local _handleoffsets = _object:handleOffsets(_handlesoffsets.state) -- determine the object handle offsets
@@ -3868,7 +3881,7 @@ Wylfie = _playerclass{classed = _playerclass,
     -- ["slots.handlf"] = CSlotHand{object = CObjectSpellLarge{used = CObject.USEDNONE}},
     ["slots.head"]   = CSlotHead{object = CClothesCapLarge{}},
     ["slots.back"]   = CSlotBack{object = CClothesScrollCaseLarge{}},
-    ["inventories.any"] = CInventoryAny{objects = {CClothesCapLarge{}}},
+    ["inventories.any"] = CInventoryAny{objects = {CClothesHelmetLarge{}}},
 }
 end
 end
@@ -3943,7 +3956,7 @@ SpriteWeapon = CSpriteFG{
     sprite = 388,
     screenx = 30,
     screeny = 100,
-    -- rotate = 0, --CSprite.ROTATE270,
+    -- rotate = 0, --Tic.ROTATE270,
     -- flip = 0, --Tic.DIRXRG,
 }
 SpriteWeapon.rotate = 3

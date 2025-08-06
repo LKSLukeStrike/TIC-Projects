@@ -95,7 +95,7 @@ Tic.POSTURESETTINGS = { -- postures settings
         headoffsetx = 0,
         headoffsety = 0,
         headusesize = true,
-        rotate = CSprite.ROTATE000,
+        rotate = Tic.ROTATE000,
         frame = nil, -- nil use self.frame
     },
     [Tic.POSTUREKNEEL] = {
@@ -105,7 +105,7 @@ Tic.POSTURESETTINGS = { -- postures settings
         headoffsetx = 0,
         headoffsety = 1,
         headusesize = true,
-        rotate = CSprite.ROTATE000,
+        rotate = Tic.ROTATE000,
         frame = nil, -- nil use self.frame
     },
     [Tic.POSTUREFLOOR] = {
@@ -115,7 +115,7 @@ Tic.POSTURESETTINGS = { -- postures settings
         headoffsetx = 0,
         headoffsety = 2,
         headusesize = false,
-        rotate = CSprite.ROTATE090,
+        rotate = Tic.ROTATE090,
         frame = CSprite.FRAME01, -- fix frame
     },
 }
@@ -319,42 +319,78 @@ function CCharacter:slotDropAll()
     self:slotDropHandLF()
 end
 
-function CCharacter:slotHead()
+function CCharacter:slotGetHead()
     return self.slots.head
 end
 
-function CCharacter:slotBack()
+function CCharacter:slotGetBack()
     return self.slots.back
 end
 
-function CCharacter:slotHandRG()
+function CCharacter:slotGetHandRG()
     return self.slots.handrg
 end
 
-function CCharacter:slotHandLF()
+function CCharacter:slotGetHandLF()
     return self.slots.handlf
 end
 
+function CCharacter:slotGetHeadObject()
+    return self:slotGetHead().object
+end
+
+function CCharacter:slotGetBackObject()
+    return self:slotGetBack().object
+end
+
+function CCharacter:slotGetHandRGObject()
+    return self:slotGetHandRG().object
+end
+
+function CCharacter:slotGetHandLFObject()
+    return self:slotGetHandLF().object
+end
+
+function CCharacter:slotSetHeadObject(_object)
+    self:slotGetHead().object = _object
+	return _object
+end
+
+function CCharacter:slotSetBackObject(_object)
+    self:slotGetBack().object = _object
+	return _object
+end
+
+function CCharacter:slotSetHandRGObject(_object)
+    self:slotGetHandRG().object = _object
+	return _object
+end
+
+function CCharacter:slotSetHandLFObject(_object)
+    self:slotGetHandLF().object = _object
+	return _object
+end
+
 function CCharacter:slotDropHead()
-    local _object = self:slotHead().object
+    local _object = self:slotGetHeadObject()
     if not _object then return end
 	return self:dropObject(_object)
 end
 
 function CCharacter:slotDropBack()
-    local _object = self:slotBack().object
+    local _object = self:slotGetBackObject()
     if not _object then return end
 	return self:dropObject(_object)
 end
 
 function CCharacter:slotDropHandRG()
-    local _object = self:slotHandRG().object
+    local _object = self:slotGetHandRGObject()
     if not _object then return end
 	return self:dropObject(_object)
 end
 
 function CCharacter:slotDropHandLF()
-    local _object = self:slotHandLF().object
+    local _object = self:slotGetHandLFObject()
     if not _object then return end
 	return self:dropObject(_object)
 end
@@ -391,6 +427,17 @@ function CCharacter:dropObject(_object, _withmessage)
     if _withmessage then Tic:messageAppend(self.name.." "..Tic.TEXTRIDS..": ".._object.kind.." ".._object.name) end
 
     return _object
+end
+
+function CCharacter:objectsofSlotType(_slottype)
+    local _result = {}
+    for _, _inventory in pairs(self.inventories or {}) do
+        if CInventory:isInventory(_inventory) then
+            local _objectsofslottype = _inventory:objectsofSlotType(_slottype)
+            _result = Tables:imerge(_result, _objectsofslottype, true)
+        end
+    end
+    return _result
 end
 
 function CCharacter:pickObject(_object, _withmessage)
@@ -625,10 +672,10 @@ function CCharacter:draw() -- set animations and draw layers
     self:drawDirs()
 
     self:drawHandBG()
-    self:drawBackBG()
-    self:drawBody()
-    self:drawBackFG()
-    self:drawHead()
+    -- self:drawBackBG()
+    -- self:drawBody()
+    -- self:drawBackFG()
+    -- self:drawHead()
     self:drawHandFG()
     self:drawEffect()
 
@@ -886,7 +933,7 @@ function CCharacter:drawBack(_bgfg)
     local _backy  = _handlesoffsets.backy
     self:drawHandle(_backx, _backy, Tic.COLORYELLOW)
 
-    local _object = self.slots.back.object
+    local _object = self:slotGetBackObject()
     if not _object then return end -- nothing in back
 
     if self:postureGet() == Tic.POSTUREFLOOR then

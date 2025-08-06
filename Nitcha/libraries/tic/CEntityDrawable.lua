@@ -16,7 +16,7 @@ function CEntityDrawable:new(_argt)
     self.screeny      = 0
     self.dirx         = Nums:random01() -- random flip lf/rg
     self.scale        = Tic.SCALE01
-    self.rotate       = CSprite.ROTATE000
+    self.rotate       = Tic.ROTATE000
     self.portraitmode = false -- is for drawing portrait ?
     self.animations   = nil -- override if any
     self.hovered      = false -- use hovered to draw a border

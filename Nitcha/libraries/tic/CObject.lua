@@ -392,20 +392,20 @@ end
 --
 IObjectHandAttack = Classic:extend{ -- hand attack objects implementation
     stateshandles = {
-        [Tic.STATEIDLELF]  = {rotate = CSprite.ROTATE270, flip = Tic.DIRXLF},
-        [Tic.STATEIDLERG]  = {rotate = CSprite.ROTATE270, flip = Tic.DIRXRG},
-        [Tic.STATEMOVELF]  = {rotate = CSprite.ROTATE000, flip = Tic.DIRXLF},
-        [Tic.STATEMOVERG]  = {rotate = CSprite.ROTATE000, flip = Tic.DIRXRG},
-        [Tic.STATEWORKLF]  = {rotate = CSprite.ROTATE270, flip = Tic.DIRXLF},
-        [Tic.STATEWORKRG]  = {rotate = CSprite.ROTATE270, flip = Tic.DIRXRG},
-        [Tic.STATEFLOORLF] = {rotate = CSprite.ROTATE270, flip = Tic.DIRXLF},
-        [Tic.STATEFLOORRG] = {rotate = CSprite.ROTATE270, flip = Tic.DIRXRG},
+        [Tic.STATEIDLELF]  = {rotate = Tic.ROTATE270, flip = Tic.DIRXLF},
+        [Tic.STATEIDLERG]  = {rotate = Tic.ROTATE270, flip = Tic.DIRXRG},
+        [Tic.STATEMOVELF]  = {rotate = Tic.ROTATE000, flip = Tic.DIRXLF},
+        [Tic.STATEMOVERG]  = {rotate = Tic.ROTATE000, flip = Tic.DIRXRG},
+        [Tic.STATEWORKLF]  = {rotate = Tic.ROTATE270, flip = Tic.DIRXLF},
+        [Tic.STATEWORKRG]  = {rotate = Tic.ROTATE270, flip = Tic.DIRXRG},
+        [Tic.STATEFLOORLF] = {rotate = Tic.ROTATE270, flip = Tic.DIRXLF},
+        [Tic.STATEFLOORRG] = {rotate = Tic.ROTATE270, flip = Tic.DIRXRG},
     },
     handleoffsets = {
-        [CSprite.ROTATE000] = {handlex = 3, handley = 5},
-        [CSprite.ROTATE090] = {handlex = 2, handley = 3},
-        [CSprite.ROTATE180] = {handlex = 4, handley = 2},
-        [CSprite.ROTATE270] = {handlex = 5, handley = 4},
+        [Tic.ROTATE000] = {handlex = 3, handley = 5},
+        [Tic.ROTATE090] = {handlex = 2, handley = 3},
+        [Tic.ROTATE180] = {handlex = 4, handley = 2},
+        [Tic.ROTATE270] = {handlex = 5, handley = 4},
     },
     palettefg = {
         [CObject.HANDLE] = CObject.HANDLE,
@@ -426,20 +426,20 @@ IObjectHandAttack = Classic:extend{ -- hand attack objects implementation
 --
 IObjectHandDefense = Classic:extend{ -- hand defense objects implementation
     stateshandles = {
-        [Tic.STATEIDLELF]  = {rotate = CSprite.ROTATE000, flip = Tic.DIRXLF},
-        [Tic.STATEIDLERG]  = {rotate = CSprite.ROTATE000, flip = Tic.DIRXRG},
-        [Tic.STATEMOVELF]  = {rotate = CSprite.ROTATE270, flip = Tic.DIRXLF},
-        [Tic.STATEMOVERG]  = {rotate = CSprite.ROTATE270, flip = Tic.DIRXRG},
-        [Tic.STATEWORKLF]  = {rotate = CSprite.ROTATE000, flip = Tic.DIRXLF},
-        [Tic.STATEWORKRG]  = {rotate = CSprite.ROTATE000, flip = Tic.DIRXRG},
-        [Tic.STATEFLOORLF] = {rotate = CSprite.ROTATE000, flip = Tic.DIRXLF},
-        [Tic.STATEFLOORRG] = {rotate = CSprite.ROTATE000, flip = Tic.DIRXRG},
+        [Tic.STATEIDLELF]  = {rotate = Tic.ROTATE000, flip = Tic.DIRXLF},
+        [Tic.STATEIDLERG]  = {rotate = Tic.ROTATE000, flip = Tic.DIRXRG},
+        [Tic.STATEMOVELF]  = {rotate = Tic.ROTATE270, flip = Tic.DIRXLF},
+        [Tic.STATEMOVERG]  = {rotate = Tic.ROTATE090, flip = Tic.DIRXLF},
+        [Tic.STATEWORKLF]  = {rotate = Tic.ROTATE000, flip = Tic.DIRXLF},
+        [Tic.STATEWORKRG]  = {rotate = Tic.ROTATE000, flip = Tic.DIRXRG},
+        [Tic.STATEFLOORLF] = {rotate = Tic.ROTATE000, flip = Tic.DIRXLF},
+        [Tic.STATEFLOORRG] = {rotate = Tic.ROTATE000, flip = Tic.DIRXRG},
     },
     handleoffsets = {
-        [CSprite.ROTATE000] = {handlex = 3, handley = 3},
-        [CSprite.ROTATE090] = {handlex = 4, handley = 3},
-        [CSprite.ROTATE180] = {handlex = 4, handley = 4},
-        [CSprite.ROTATE270] = {handlex = 3, handley = 4},
+        [Tic.ROTATE000] = {handlex = 3, handley = 3},
+        [Tic.ROTATE090] = {handlex = 4, handley = 3},
+        [Tic.ROTATE180] = {handlex = 4, handley = 4},
+        [Tic.ROTATE270] = {handlex = 3, handley = 4},
     },
     palettefg = {
         [CObject.HANDLE] = CObject.HANDLE,
@@ -460,20 +460,20 @@ IObjectHandDefense = Classic:extend{ -- hand defense objects implementation
 --
 IObjectHead = Classic:extend{ -- head objects implementation
     stateshandles = {
-        [Tic.STATEIDLELF]  = {rotate = CSprite.ROTATE000, flip = Tic.DIRXLF},
-        [Tic.STATEIDLERG]  = {rotate = CSprite.ROTATE000, flip = Tic.DIRXRG},
-        [Tic.STATEMOVELF]  = {rotate = CSprite.ROTATE000, flip = Tic.DIRXLF},
-        [Tic.STATEMOVERG]  = {rotate = CSprite.ROTATE000, flip = Tic.DIRXRG},
-        [Tic.STATEWORKLF]  = {rotate = CSprite.ROTATE000, flip = Tic.DIRXLF},
-        [Tic.STATEWORKRG]  = {rotate = CSprite.ROTATE000, flip = Tic.DIRXRG},
-        [Tic.STATEFLOORLF] = {rotate = CSprite.ROTATE090, flip = Tic.DIRXLF},
-        [Tic.STATEFLOORRG] = {rotate = CSprite.ROTATE090, flip = Tic.DIRXRG},
+        [Tic.STATEIDLELF]  = {rotate = Tic.ROTATE000, flip = Tic.DIRXLF},
+        [Tic.STATEIDLERG]  = {rotate = Tic.ROTATE000, flip = Tic.DIRXRG},
+        [Tic.STATEMOVELF]  = {rotate = Tic.ROTATE000, flip = Tic.DIRXLF},
+        [Tic.STATEMOVERG]  = {rotate = Tic.ROTATE000, flip = Tic.DIRXRG},
+        [Tic.STATEWORKLF]  = {rotate = Tic.ROTATE000, flip = Tic.DIRXLF},
+        [Tic.STATEWORKRG]  = {rotate = Tic.ROTATE000, flip = Tic.DIRXRG},
+        [Tic.STATEFLOORLF] = {rotate = Tic.ROTATE090, flip = Tic.DIRXLF},
+        [Tic.STATEFLOORRG] = {rotate = Tic.ROTATE090, flip = Tic.DIRXRG},
     },
     handleoffsets = {
-        [CSprite.ROTATE000] = {handlex = 4, handley = 4},
-        [CSprite.ROTATE090] = {handlex = 3, handley = 4},
-        [CSprite.ROTATE180] = {handlex = 3, handley = 3},
-        [CSprite.ROTATE270] = {handlex = 4, handley = 3},
+        [Tic.ROTATE000] = {handlex = 4, handley = 4},
+        [Tic.ROTATE090] = {handlex = 3, handley = 4},
+        [Tic.ROTATE180] = {handlex = 3, handley = 3},
+        [Tic.ROTATE270] = {handlex = 4, handley = 3},
     },
     palettefg = {
         [CObject.HANDLE] = Tic.COLORKEY,
@@ -488,20 +488,20 @@ IObjectHead = Classic:extend{ -- head objects implementation
 --
 IObjectBack = Classic:extend{ -- back objects implementation
     stateshandles = {
-        [Tic.STATEIDLELF]  = {rotate = CSprite.ROTATE000, flip = Tic.DIRXLF},
-        [Tic.STATEIDLERG]  = {rotate = CSprite.ROTATE000, flip = Tic.DIRXRG},
-        [Tic.STATEMOVELF]  = {rotate = CSprite.ROTATE000, flip = Tic.DIRXLF},
-        [Tic.STATEMOVERG]  = {rotate = CSprite.ROTATE000, flip = Tic.DIRXRG},
-        [Tic.STATEWORKLF]  = {rotate = CSprite.ROTATE000, flip = Tic.DIRXLF},
-        [Tic.STATEWORKRG]  = {rotate = CSprite.ROTATE000, flip = Tic.DIRXRG},
-        [Tic.STATEFLOORLF] = {rotate = CSprite.ROTATE000, flip = Tic.DIRXLF},
-        [Tic.STATEFLOORRG] = {rotate = CSprite.ROTATE000, flip = Tic.DIRXRG},
+        [Tic.STATEIDLELF]  = {rotate = Tic.ROTATE000, flip = Tic.DIRXLF},
+        [Tic.STATEIDLERG]  = {rotate = Tic.ROTATE000, flip = Tic.DIRXRG},
+        [Tic.STATEMOVELF]  = {rotate = Tic.ROTATE000, flip = Tic.DIRXLF},
+        [Tic.STATEMOVERG]  = {rotate = Tic.ROTATE000, flip = Tic.DIRXRG},
+        [Tic.STATEWORKLF]  = {rotate = Tic.ROTATE000, flip = Tic.DIRXLF},
+        [Tic.STATEWORKRG]  = {rotate = Tic.ROTATE000, flip = Tic.DIRXRG},
+        [Tic.STATEFLOORLF] = {rotate = Tic.ROTATE000, flip = Tic.DIRXLF},
+        [Tic.STATEFLOORRG] = {rotate = Tic.ROTATE000, flip = Tic.DIRXRG},
     },
     handleoffsets = {
-        [CSprite.ROTATE000] = {handlex = 1, handley = 3},
-        [CSprite.ROTATE090] = {handlex = 4, handley = 1},
-        [CSprite.ROTATE180] = {handlex = 6, handley = 4},
-        [CSprite.ROTATE270] = {handlex = 3, handley = 6},
+        [Tic.ROTATE000] = {handlex = 1, handley = 3},
+        [Tic.ROTATE090] = {handlex = 4, handley = 1},
+        [Tic.ROTATE180] = {handlex = 6, handley = 4},
+        [Tic.ROTATE270] = {handlex = 3, handley = 6},
     },
     palettefg = {
         [CObject.HANDLE] = Tic.COLORKEY,
@@ -517,14 +517,14 @@ IObjectBack = Classic:extend{ -- back objects implementation
 --
 IObjectUsable = Classic:extend{ -- usable objects implementation
     stateshandles = {
-        [Tic.STATEIDLELF]  = {rotate = CSprite.ROTATE000, flip = Tic.DIRXLF},
-        [Tic.STATEIDLERG]  = {rotate = CSprite.ROTATE000, flip = Tic.DIRXRG},
-        [Tic.STATEMOVELF]  = {rotate = CSprite.ROTATE270, flip = Tic.DIRXLF},
-        [Tic.STATEMOVERG]  = {rotate = CSprite.ROTATE270, flip = Tic.DIRXRG},
-        [Tic.STATEWORKLF]  = {rotate = CSprite.ROTATE000, flip = Tic.DIRXLF},
-        [Tic.STATEWORKRG]  = {rotate = CSprite.ROTATE000, flip = Tic.DIRXRG},
-        [Tic.STATEFLOORLF] = {rotate = CSprite.ROTATE000, flip = Tic.DIRXLF},
-        [Tic.STATEFLOORRG] = {rotate = CSprite.ROTATE000, flip = Tic.DIRXRG},
+        [Tic.STATEIDLELF]  = {rotate = Tic.ROTATE000, flip = Tic.DIRXLF},
+        [Tic.STATEIDLERG]  = {rotate = Tic.ROTATE000, flip = Tic.DIRXRG},
+        [Tic.STATEMOVELF]  = {rotate = Tic.ROTATE270, flip = Tic.DIRXLF},
+        [Tic.STATEMOVERG]  = {rotate = Tic.ROTATE270, flip = Tic.DIRXRG},
+        [Tic.STATEWORKLF]  = {rotate = Tic.ROTATE000, flip = Tic.DIRXLF},
+        [Tic.STATEWORKRG]  = {rotate = Tic.ROTATE000, flip = Tic.DIRXRG},
+        [Tic.STATEFLOORLF] = {rotate = Tic.ROTATE000, flip = Tic.DIRXLF},
+        [Tic.STATEFLOORRG] = {rotate = Tic.ROTATE000, flip = Tic.DIRXRG},
     },
 }
 function IObjectUsable:draw()
@@ -584,10 +584,10 @@ function CWeaponHammer:new(_argt)
     self.name = Classic.NAMEDWEAPONHAMMR
     self.sprite  = CSpriteFG.WEAPONMHAMR
     self.handleoffsets = {
-        [CSprite.ROTATE000] = {handlex = 4, handley = 5},
-        [CSprite.ROTATE090] = {handlex = 2, handley = 4},
-        [CSprite.ROTATE180] = {handlex = 3, handley = 2},
-        [CSprite.ROTATE270] = {handlex = 5, handley = 3},
+        [Tic.ROTATE000] = {handlex = 4, handley = 5},
+        [Tic.ROTATE090] = {handlex = 2, handley = 4},
+        [Tic.ROTATE180] = {handlex = 3, handley = 2},
+        [Tic.ROTATE270] = {handlex = 5, handley = 3},
     }
     self:argt(_argt) -- override if any
 end
@@ -785,10 +785,10 @@ function CObjectBomb:new(_argt)
     self.name = Classic.NAMEDOBJECTBOMB
     self.sprite  = CSpriteFG.OBJECTBOMBB
     self.handleoffsets = {
-        [CSprite.ROTATE000] = {handlex = 4, handley = 2},
-        [CSprite.ROTATE090] = {handlex = 5, handley = 4},
-        [CSprite.ROTATE180] = {handlex = 3, handley = 5},
-        [CSprite.ROTATE270] = {handlex = 2, handley = 3},
+        [Tic.ROTATE000] = {handlex = 4, handley = 2},
+        [Tic.ROTATE090] = {handlex = 5, handley = 4},
+        [Tic.ROTATE180] = {handlex = 3, handley = 5},
+        [Tic.ROTATE270] = {handlex = 2, handley = 3},
     }
     self.palettefg = {
         [CObject.HANDLE] = CObject.HANDLE,
@@ -856,20 +856,20 @@ function CWeaponRange:new(_argt)
     self.name = Classic.NAMEDWEAPONRANGE
     self.sprite  = CSpriteFG.WEAPONRANGE
     self.stateshandles = {
-        [Tic.STATEIDLELF]  = {rotate = CSprite.ROTATE270, flip = Tic.DIRXLF},
-        [Tic.STATEIDLERG]  = {rotate = CSprite.ROTATE270, flip = Tic.DIRXRG},
-        [Tic.STATEMOVELF]  = {rotate = CSprite.ROTATE000, flip = Tic.DIRXLF},
-        [Tic.STATEMOVERG]  = {rotate = CSprite.ROTATE000, flip = Tic.DIRXRG},
-        [Tic.STATEWORKLF]  = {rotate = CSprite.ROTATE000, flip = Tic.DIRXLF},
-        [Tic.STATEWORKRG]  = {rotate = CSprite.ROTATE000, flip = Tic.DIRXRG},
-        [Tic.STATEFLOORLF] = {rotate = CSprite.ROTATE000, flip = Tic.DIRXLF},
-        [Tic.STATEFLOORRG] = {rotate = CSprite.ROTATE000, flip = Tic.DIRXRG},
+        [Tic.STATEIDLELF]  = {rotate = Tic.ROTATE270, flip = Tic.DIRXLF},
+        [Tic.STATEIDLERG]  = {rotate = Tic.ROTATE270, flip = Tic.DIRXRG},
+        [Tic.STATEMOVELF]  = {rotate = Tic.ROTATE000, flip = Tic.DIRXLF},
+        [Tic.STATEMOVERG]  = {rotate = Tic.ROTATE000, flip = Tic.DIRXRG},
+        [Tic.STATEWORKLF]  = {rotate = Tic.ROTATE000, flip = Tic.DIRXLF},
+        [Tic.STATEWORKRG]  = {rotate = Tic.ROTATE000, flip = Tic.DIRXRG},
+        [Tic.STATEFLOORLF] = {rotate = Tic.ROTATE000, flip = Tic.DIRXLF},
+        [Tic.STATEFLOORRG] = {rotate = Tic.ROTATE000, flip = Tic.DIRXRG},
     }
     self.handleoffsets = {
-        [CSprite.ROTATE000] = {handlex = 4, handley = 3},
-        [CSprite.ROTATE090] = {handlex = 4, handley = 4},
-        [CSprite.ROTATE180] = {handlex = 3, handley = 4},
-        [CSprite.ROTATE270] = {handlex = 3, handley = 3},
+        [Tic.ROTATE000] = {handlex = 4, handley = 3},
+        [Tic.ROTATE090] = {handlex = 4, handley = 4},
+        [Tic.ROTATE180] = {handlex = 3, handley = 4},
+        [Tic.ROTATE270] = {handlex = 3, handley = 3},
     }
     self.palettefg = {
         [CObject.HANDLE] = CObject.HANDLE,
@@ -932,20 +932,20 @@ function CWeaponBook:new(_argt)
     self.name = Classic.NAMEDWEAPONBOOK
     self.sprite  = CSpriteFG.WEAPONBOOKB
     self.stateshandles = {
-        [Tic.STATEIDLELF]  = {rotate = CSprite.ROTATE270, flip = Tic.DIRXLF},
-        [Tic.STATEIDLERG]  = {rotate = CSprite.ROTATE270, flip = Tic.DIRXRG},
-        [Tic.STATEMOVELF]  = {rotate = CSprite.ROTATE000, flip = Tic.DIRXLF},
-        [Tic.STATEMOVERG]  = {rotate = CSprite.ROTATE000, flip = Tic.DIRXRG},
-        [Tic.STATEWORKLF]  = {rotate = CSprite.ROTATE000, flip = Tic.DIRXLF},
-        [Tic.STATEWORKRG]  = {rotate = CSprite.ROTATE000, flip = Tic.DIRXRG},
-        [Tic.STATEFLOORLF] = {rotate = CSprite.ROTATE000, flip = Tic.DIRXLF},
-        [Tic.STATEFLOORRG] = {rotate = CSprite.ROTATE000, flip = Tic.DIRXRG},
+        [Tic.STATEIDLELF]  = {rotate = Tic.ROTATE270, flip = Tic.DIRXLF},
+        [Tic.STATEIDLERG]  = {rotate = Tic.ROTATE270, flip = Tic.DIRXRG},
+        [Tic.STATEMOVELF]  = {rotate = Tic.ROTATE000, flip = Tic.DIRXLF},
+        [Tic.STATEMOVERG]  = {rotate = Tic.ROTATE000, flip = Tic.DIRXRG},
+        [Tic.STATEWORKLF]  = {rotate = Tic.ROTATE000, flip = Tic.DIRXLF},
+        [Tic.STATEWORKRG]  = {rotate = Tic.ROTATE000, flip = Tic.DIRXRG},
+        [Tic.STATEFLOORLF] = {rotate = Tic.ROTATE000, flip = Tic.DIRXLF},
+        [Tic.STATEFLOORRG] = {rotate = Tic.ROTATE000, flip = Tic.DIRXRG},
     }
     self.handleoffsets = {
-        [CSprite.ROTATE000] = {handlex = 6, handley = 2},
-        [CSprite.ROTATE090] = {handlex = 5, handley = 6},
-        [CSprite.ROTATE180] = {handlex = 1, handley = 5},
-        [CSprite.ROTATE270] = {handlex = 2, handley = 1},
+        [Tic.ROTATE000] = {handlex = 6, handley = 2},
+        [Tic.ROTATE090] = {handlex = 5, handley = 6},
+        [Tic.ROTATE180] = {handlex = 1, handley = 5},
+        [Tic.ROTATE270] = {handlex = 2, handley = 1},
     }
     self.palettefg = {
         [CObject.HANDLE] = CObject.COLORIRONFG,
@@ -1126,10 +1126,10 @@ function CObjectFlask:new(_argt)
     self.name = Classic.NAMEDOBJECTFLASK
     self.sprite  = CSpriteFG.OBJECTFLASB
     self.handleoffsets = {
-        [CSprite.ROTATE000] = {handlex = 3, handley = 1},
-        [CSprite.ROTATE090] = {handlex = 6, handley = 3},
-        [CSprite.ROTATE180] = {handlex = 4, handley = 6},
-        [CSprite.ROTATE270] = {handlex = 1, handley = 4},
+        [Tic.ROTATE000] = {handlex = 3, handley = 1},
+        [Tic.ROTATE090] = {handlex = 6, handley = 3},
+        [Tic.ROTATE180] = {handlex = 4, handley = 6},
+        [Tic.ROTATE270] = {handlex = 1, handley = 4},
     }
     self.palettefg = {
         [CObject.HANDLE] = CObject.HANDLE,
@@ -1431,10 +1431,10 @@ function CObjectSpell:new(_argt)
     self.name = Classic.NAMEDOBJECTSPELL
     self.sprite  = CSpriteFG.OBJECTSPELB
     self.handleoffsets = {
-        [CSprite.ROTATE000] = {handlex = 5, handley = 1},
-        [CSprite.ROTATE090] = {handlex = 6, handley = 5},
-        [CSprite.ROTATE180] = {handlex = 2, handley = 6},
-        [CSprite.ROTATE270] = {handlex = 1, handley = 2},
+        [Tic.ROTATE000] = {handlex = 5, handley = 1},
+        [Tic.ROTATE090] = {handlex = 6, handley = 5},
+        [Tic.ROTATE180] = {handlex = 2, handley = 6},
+        [Tic.ROTATE270] = {handlex = 1, handley = 2},
     }
     self.palettefg = {
         [CObject.HANDLE] = CObject.COLORONYXFG,
