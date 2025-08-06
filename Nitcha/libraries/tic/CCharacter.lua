@@ -673,10 +673,11 @@ function CCharacter:draw() -- set animations and draw layers
 
     self:drawHandBG()
     -- self:drawBackBG()
-    -- self:drawBody()
+    self:drawHandFG()
+    self:drawBody()
     -- self:drawBackFG()
     -- self:drawHead()
-    self:drawHandFG()
+    -- self:drawHandFG()
     self:drawEffect()
 
     self:drawSpotted()

@@ -75,9 +75,12 @@ function CObjectInventory:handleOffsets(_state)
     local _result   = Tables:merge(self.handleoffsets[self.stateshandles[_state].rotate])
     _result.rotate  = self.stateshandles[_state].rotate
     _result.flip    = self.stateshandles[_state].flip
-    _result.handlex = (_result.flip == Tic.DIRXLF) -- flip the handlex if any
-        and _result.handlex
-        or  Tic.SPRITESIZE - 1 - _result.handlex
+    _result.handlex = ((_result.flip == Tic.FLIPHORI) or (_result.flip == Tic.FLIPBOTH)) -- flip the handlex if any
+        and Tic.SPRITESIZE - 1 - _result.handlex
+        or  _result.handlex
+    _result.handley = ((_result.flip == Tic.FLIPVERT) or (_result.flip == Tic.FLIPBOTH)) -- flip the handlex if any
+        and Tic.SPRITESIZE - 1 - _result.handley
+        or  _result.handley
     return _result
 end
 
@@ -392,14 +395,14 @@ end
 --
 IObjectHandAttack = Classic:extend{ -- hand attack objects implementation
     stateshandles = {
-        [Tic.STATEIDLELF]  = {rotate = Tic.ROTATE270, flip = Tic.DIRXLF},
-        [Tic.STATEIDLERG]  = {rotate = Tic.ROTATE270, flip = Tic.DIRXRG},
-        [Tic.STATEMOVELF]  = {rotate = Tic.ROTATE000, flip = Tic.DIRXLF},
-        [Tic.STATEMOVERG]  = {rotate = Tic.ROTATE000, flip = Tic.DIRXRG},
-        [Tic.STATEWORKLF]  = {rotate = Tic.ROTATE270, flip = Tic.DIRXLF},
-        [Tic.STATEWORKRG]  = {rotate = Tic.ROTATE270, flip = Tic.DIRXRG},
-        [Tic.STATEFLOORLF] = {rotate = Tic.ROTATE270, flip = Tic.DIRXLF},
-        [Tic.STATEFLOORRG] = {rotate = Tic.ROTATE270, flip = Tic.DIRXRG},
+        [Tic.STATEIDLELF]  = {rotate = Tic.ROTATE270, flip = Tic.FLIPNONE},
+        [Tic.STATEIDLERG]  = {rotate = Tic.ROTATE270, flip = Tic.FLIPHORI},
+        [Tic.STATEMOVELF]  = {rotate = Tic.ROTATE000, flip = Tic.FLIPNONE},
+        [Tic.STATEMOVERG]  = {rotate = Tic.ROTATE000, flip = Tic.FLIPHORI},
+        [Tic.STATEWORKLF]  = {rotate = Tic.ROTATE270, flip = Tic.FLIPNONE},
+        [Tic.STATEWORKRG]  = {rotate = Tic.ROTATE270, flip = Tic.FLIPHORI},
+        [Tic.STATEFLOORLF] = {rotate = Tic.ROTATE270, flip = Tic.FLIPNONE},
+        [Tic.STATEFLOORRG] = {rotate = Tic.ROTATE270, flip = Tic.FLIPHORI},
     },
     handleoffsets = {
         [Tic.ROTATE000] = {handlex = 3, handley = 5},
@@ -426,14 +429,14 @@ IObjectHandAttack = Classic:extend{ -- hand attack objects implementation
 --
 IObjectHandDefense = Classic:extend{ -- hand defense objects implementation
     stateshandles = {
-        [Tic.STATEIDLELF]  = {rotate = Tic.ROTATE000, flip = Tic.DIRXLF},
-        [Tic.STATEIDLERG]  = {rotate = Tic.ROTATE000, flip = Tic.DIRXRG},
-        [Tic.STATEMOVELF]  = {rotate = Tic.ROTATE270, flip = Tic.DIRXLF},
-        [Tic.STATEMOVERG]  = {rotate = Tic.ROTATE090, flip = Tic.DIRXLF},
-        [Tic.STATEWORKLF]  = {rotate = Tic.ROTATE000, flip = Tic.DIRXLF},
-        [Tic.STATEWORKRG]  = {rotate = Tic.ROTATE000, flip = Tic.DIRXRG},
-        [Tic.STATEFLOORLF] = {rotate = Tic.ROTATE000, flip = Tic.DIRXLF},
-        [Tic.STATEFLOORRG] = {rotate = Tic.ROTATE000, flip = Tic.DIRXRG},
+        [Tic.STATEIDLELF]  = {rotate = Tic.ROTATE000, flip = Tic.FLIPNONE},
+        [Tic.STATEIDLERG]  = {rotate = Tic.ROTATE000, flip = Tic.FLIPHORI},
+        [Tic.STATEMOVELF]  = {rotate = Tic.ROTATE270, flip = Tic.FLIPNONE},
+        [Tic.STATEMOVERG]  = {rotate = Tic.ROTATE090, flip = Tic.FLIPNONE},
+        [Tic.STATEWORKLF]  = {rotate = Tic.ROTATE000, flip = Tic.FLIPNONE},
+        [Tic.STATEWORKRG]  = {rotate = Tic.ROTATE000, flip = Tic.FLIPHORI},
+        [Tic.STATEFLOORLF] = {rotate = Tic.ROTATE000, flip = Tic.FLIPNONE},
+        [Tic.STATEFLOORRG] = {rotate = Tic.ROTATE000, flip = Tic.FLIPHORI},
     },
     handleoffsets = {
         [Tic.ROTATE000] = {handlex = 3, handley = 3},
@@ -460,14 +463,14 @@ IObjectHandDefense = Classic:extend{ -- hand defense objects implementation
 --
 IObjectHead = Classic:extend{ -- head objects implementation
     stateshandles = {
-        [Tic.STATEIDLELF]  = {rotate = Tic.ROTATE000, flip = Tic.DIRXLF},
-        [Tic.STATEIDLERG]  = {rotate = Tic.ROTATE000, flip = Tic.DIRXRG},
-        [Tic.STATEMOVELF]  = {rotate = Tic.ROTATE000, flip = Tic.DIRXLF},
-        [Tic.STATEMOVERG]  = {rotate = Tic.ROTATE000, flip = Tic.DIRXRG},
-        [Tic.STATEWORKLF]  = {rotate = Tic.ROTATE000, flip = Tic.DIRXLF},
-        [Tic.STATEWORKRG]  = {rotate = Tic.ROTATE000, flip = Tic.DIRXRG},
-        [Tic.STATEFLOORLF] = {rotate = Tic.ROTATE090, flip = Tic.DIRXLF},
-        [Tic.STATEFLOORRG] = {rotate = Tic.ROTATE090, flip = Tic.DIRXRG},
+        [Tic.STATEIDLELF]  = {rotate = Tic.ROTATE000, flip = Tic.FLIPNONE},
+        [Tic.STATEIDLERG]  = {rotate = Tic.ROTATE000, flip = Tic.FLIPHORI},
+        [Tic.STATEMOVELF]  = {rotate = Tic.ROTATE000, flip = Tic.FLIPNONE},
+        [Tic.STATEMOVERG]  = {rotate = Tic.ROTATE000, flip = Tic.FLIPHORI},
+        [Tic.STATEWORKLF]  = {rotate = Tic.ROTATE000, flip = Tic.FLIPNONE},
+        [Tic.STATEWORKRG]  = {rotate = Tic.ROTATE000, flip = Tic.FLIPHORI},
+        [Tic.STATEFLOORLF] = {rotate = Tic.ROTATE090, flip = Tic.FLIPNONE},
+        [Tic.STATEFLOORRG] = {rotate = Tic.ROTATE090, flip = Tic.FLIPHORI},
     },
     handleoffsets = {
         [Tic.ROTATE000] = {handlex = 4, handley = 4},
@@ -488,14 +491,14 @@ IObjectHead = Classic:extend{ -- head objects implementation
 --
 IObjectBack = Classic:extend{ -- back objects implementation
     stateshandles = {
-        [Tic.STATEIDLELF]  = {rotate = Tic.ROTATE000, flip = Tic.DIRXLF},
-        [Tic.STATEIDLERG]  = {rotate = Tic.ROTATE000, flip = Tic.DIRXRG},
-        [Tic.STATEMOVELF]  = {rotate = Tic.ROTATE000, flip = Tic.DIRXLF},
-        [Tic.STATEMOVERG]  = {rotate = Tic.ROTATE000, flip = Tic.DIRXRG},
-        [Tic.STATEWORKLF]  = {rotate = Tic.ROTATE000, flip = Tic.DIRXLF},
-        [Tic.STATEWORKRG]  = {rotate = Tic.ROTATE000, flip = Tic.DIRXRG},
-        [Tic.STATEFLOORLF] = {rotate = Tic.ROTATE000, flip = Tic.DIRXLF},
-        [Tic.STATEFLOORRG] = {rotate = Tic.ROTATE000, flip = Tic.DIRXRG},
+        [Tic.STATEIDLELF]  = {rotate = Tic.ROTATE000, flip = Tic.FLIPNONE},
+        [Tic.STATEIDLERG]  = {rotate = Tic.ROTATE000, flip = Tic.FLIPHORI},
+        [Tic.STATEMOVELF]  = {rotate = Tic.ROTATE000, flip = Tic.FLIPNONE},
+        [Tic.STATEMOVERG]  = {rotate = Tic.ROTATE000, flip = Tic.FLIPHORI},
+        [Tic.STATEWORKLF]  = {rotate = Tic.ROTATE000, flip = Tic.FLIPNONE},
+        [Tic.STATEWORKRG]  = {rotate = Tic.ROTATE000, flip = Tic.FLIPHORI},
+        [Tic.STATEFLOORLF] = {rotate = Tic.ROTATE000, flip = Tic.FLIPNONE},
+        [Tic.STATEFLOORRG] = {rotate = Tic.ROTATE000, flip = Tic.FLIPHORI},
     },
     handleoffsets = {
         [Tic.ROTATE000] = {handlex = 1, handley = 3},
@@ -517,14 +520,14 @@ IObjectBack = Classic:extend{ -- back objects implementation
 --
 IObjectUsable = Classic:extend{ -- usable objects implementation
     stateshandles = {
-        [Tic.STATEIDLELF]  = {rotate = Tic.ROTATE000, flip = Tic.DIRXLF},
-        [Tic.STATEIDLERG]  = {rotate = Tic.ROTATE000, flip = Tic.DIRXRG},
-        [Tic.STATEMOVELF]  = {rotate = Tic.ROTATE270, flip = Tic.DIRXLF},
-        [Tic.STATEMOVERG]  = {rotate = Tic.ROTATE270, flip = Tic.DIRXRG},
-        [Tic.STATEWORKLF]  = {rotate = Tic.ROTATE000, flip = Tic.DIRXLF},
-        [Tic.STATEWORKRG]  = {rotate = Tic.ROTATE000, flip = Tic.DIRXRG},
-        [Tic.STATEFLOORLF] = {rotate = Tic.ROTATE000, flip = Tic.DIRXLF},
-        [Tic.STATEFLOORRG] = {rotate = Tic.ROTATE000, flip = Tic.DIRXRG},
+        [Tic.STATEIDLELF]  = {rotate = Tic.ROTATE000, flip = Tic.FLIPNONE},
+        [Tic.STATEIDLERG]  = {rotate = Tic.ROTATE000, flip = Tic.FLIPHORI},
+        [Tic.STATEMOVELF]  = {rotate = Tic.ROTATE270, flip = Tic.FLIPNONE},
+        [Tic.STATEMOVERG]  = {rotate = Tic.ROTATE270, flip = Tic.FLIPHORI},
+        [Tic.STATEWORKLF]  = {rotate = Tic.ROTATE000, flip = Tic.FLIPNONE},
+        [Tic.STATEWORKRG]  = {rotate = Tic.ROTATE000, flip = Tic.FLIPHORI},
+        [Tic.STATEFLOORLF] = {rotate = Tic.ROTATE000, flip = Tic.FLIPNONE},
+        [Tic.STATEFLOORRG] = {rotate = Tic.ROTATE000, flip = Tic.FLIPHORI},
     },
 }
 function IObjectUsable:draw()
@@ -856,14 +859,14 @@ function CWeaponRange:new(_argt)
     self.name = Classic.NAMEDWEAPONRANGE
     self.sprite  = CSpriteFG.WEAPONRANGE
     self.stateshandles = {
-        [Tic.STATEIDLELF]  = {rotate = Tic.ROTATE270, flip = Tic.DIRXLF},
-        [Tic.STATEIDLERG]  = {rotate = Tic.ROTATE270, flip = Tic.DIRXRG},
-        [Tic.STATEMOVELF]  = {rotate = Tic.ROTATE000, flip = Tic.DIRXLF},
-        [Tic.STATEMOVERG]  = {rotate = Tic.ROTATE000, flip = Tic.DIRXRG},
-        [Tic.STATEWORKLF]  = {rotate = Tic.ROTATE000, flip = Tic.DIRXLF},
-        [Tic.STATEWORKRG]  = {rotate = Tic.ROTATE000, flip = Tic.DIRXRG},
-        [Tic.STATEFLOORLF] = {rotate = Tic.ROTATE000, flip = Tic.DIRXLF},
-        [Tic.STATEFLOORRG] = {rotate = Tic.ROTATE000, flip = Tic.DIRXRG},
+        [Tic.STATEIDLELF]  = {rotate = Tic.ROTATE270, flip = Tic.FLIPNONE},
+        [Tic.STATEIDLERG]  = {rotate = Tic.ROTATE270, flip = Tic.FLIPHORI},
+        [Tic.STATEMOVELF]  = {rotate = Tic.ROTATE000, flip = Tic.FLIPNONE},
+        [Tic.STATEMOVERG]  = {rotate = Tic.ROTATE000, flip = Tic.FLIPHORI},
+        [Tic.STATEWORKLF]  = {rotate = Tic.ROTATE000, flip = Tic.FLIPNONE},
+        [Tic.STATEWORKRG]  = {rotate = Tic.ROTATE000, flip = Tic.FLIPHORI},
+        [Tic.STATEFLOORLF] = {rotate = Tic.ROTATE000, flip = Tic.FLIPNONE},
+        [Tic.STATEFLOORRG] = {rotate = Tic.ROTATE000, flip = Tic.FLIPHORI},
     }
     self.handleoffsets = {
         [Tic.ROTATE000] = {handlex = 4, handley = 3},
@@ -932,14 +935,14 @@ function CWeaponBook:new(_argt)
     self.name = Classic.NAMEDWEAPONBOOK
     self.sprite  = CSpriteFG.WEAPONBOOKB
     self.stateshandles = {
-        [Tic.STATEIDLELF]  = {rotate = Tic.ROTATE270, flip = Tic.DIRXLF},
-        [Tic.STATEIDLERG]  = {rotate = Tic.ROTATE270, flip = Tic.DIRXRG},
-        [Tic.STATEMOVELF]  = {rotate = Tic.ROTATE000, flip = Tic.DIRXLF},
-        [Tic.STATEMOVERG]  = {rotate = Tic.ROTATE000, flip = Tic.DIRXRG},
-        [Tic.STATEWORKLF]  = {rotate = Tic.ROTATE000, flip = Tic.DIRXLF},
-        [Tic.STATEWORKRG]  = {rotate = Tic.ROTATE000, flip = Tic.DIRXRG},
-        [Tic.STATEFLOORLF] = {rotate = Tic.ROTATE000, flip = Tic.DIRXLF},
-        [Tic.STATEFLOORRG] = {rotate = Tic.ROTATE000, flip = Tic.DIRXRG},
+        [Tic.STATEIDLELF]  = {rotate = Tic.ROTATE270, flip = Tic.FLIPNONE},
+        [Tic.STATEIDLERG]  = {rotate = Tic.ROTATE270, flip = Tic.FLIPHORI},
+        [Tic.STATEMOVELF]  = {rotate = Tic.ROTATE000, flip = Tic.FLIPNONE},
+        [Tic.STATEMOVERG]  = {rotate = Tic.ROTATE000, flip = Tic.FLIPHORI},
+        [Tic.STATEWORKLF]  = {rotate = Tic.ROTATE000, flip = Tic.FLIPNONE},
+        [Tic.STATEWORKRG]  = {rotate = Tic.ROTATE000, flip = Tic.FLIPHORI},
+        [Tic.STATEFLOORLF] = {rotate = Tic.ROTATE000, flip = Tic.FLIPNONE},
+        [Tic.STATEFLOORRG] = {rotate = Tic.ROTATE000, flip = Tic.FLIPHORI},
     }
     self.handleoffsets = {
         [Tic.ROTATE000] = {handlex = 6, handley = 2},
