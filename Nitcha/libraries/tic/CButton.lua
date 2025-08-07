@@ -793,10 +793,16 @@ function CButtonSlotPlayer:menuPick()
                 clicklf = function()
                     local _whatslot = _object:findWhatSlot(_entity.slots) -- is object in another slot ?
                     if _whatslot then _whatslot:removeObject(_object) end
+                    -- if _whatslot then _whatslot:appendObject(self.getslotobject()) end
                     _setslotobject(_object)
                     Tic:screenRemove(_screen)
                     Tic:mouseDelay()
                 end,
+                clickrg = function()
+                    _entity:dropObject(_object)
+                    Tic:screenRemove(_screen)
+                    Tic:mouseDelay()
+                end
             }
         }
     end
