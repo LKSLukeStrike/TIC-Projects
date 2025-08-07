@@ -787,14 +787,12 @@ function CButtonSlotPlayer:menuPick()
     _windowmenu:appendElements{_buttonslotempty}
 
     for _, _object in ipairs(_entity:objectsofSlotType(_slottype)) do
-        Tic:logAppend(_object.name)
         _windowmenu:appendElements{
             _classic{
                 getslotobject = function() return _object end, -- returns object
                 clicklf = function()
-                    local _whatslot = _object:findWhatSlot(_entity.slots)
-                    -- if _whatslot then _whatslot:removeObject(_object) end
-                    if _whatslot then _whatslot:appendObject(self.getslotobject()) end
+                    local _whatslot = _object:findWhatSlot(_entity.slots) -- is object in another slot ?
+                    if _whatslot then _whatslot:removeObject(_object) end
                     _setslotobject(_object)
                     Tic:screenRemove(_screen)
                     Tic:mouseDelay()

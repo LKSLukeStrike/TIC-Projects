@@ -432,7 +432,7 @@ IObjectHandDefense = Classic:extend{ -- hand defense objects implementation
         [Tic.STATEIDLELF]  = {rotate = Tic.ROTATE000, flip = Tic.FLIPNONE},
         [Tic.STATEIDLERG]  = {rotate = Tic.ROTATE000, flip = Tic.FLIPHORI},
         [Tic.STATEMOVELF]  = {rotate = Tic.ROTATE270, flip = Tic.FLIPNONE},
-        [Tic.STATEMOVERG]  = {rotate = Tic.ROTATE090, flip = Tic.FLIPNONE},
+        [Tic.STATEMOVERG]  = {rotate = Tic.ROTATE090, flip = Tic.FLIPVERT},
         [Tic.STATEWORKLF]  = {rotate = Tic.ROTATE000, flip = Tic.FLIPNONE},
         [Tic.STATEWORKRG]  = {rotate = Tic.ROTATE000, flip = Tic.FLIPHORI},
         [Tic.STATEFLOORLF] = {rotate = Tic.ROTATE000, flip = Tic.FLIPNONE},
