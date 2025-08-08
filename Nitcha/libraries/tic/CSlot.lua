@@ -83,3 +83,23 @@ function CSlotHand:new(_argt)
     self.slottype = CSlotHand
     self:argt(_argt) -- override if any
 end
+
+CSlotHandLF = CSlotHand:extend() -- generic hand lf slot
+Classic.KINDSLOTHANDLF = "SlotHandLF" -- SlotHandLF kind
+Classic.NAMESLOTHANDLF = "SlotHandLF" -- SlotHandLF name
+function CSlotHandLF:new(_argt)
+    CSlotHandLF.super.new(self, _argt)
+    self.kind = Classic.KINDSLOTHANDLF
+    self.name = Classic.NAMESLOTHANDLF
+    self:argt(_argt) -- override if any
+end
+
+CSlotHandRG = CSlotHand:extend() -- generic hand rg slot
+Classic.KINDSLOTHANDRG = "SlotHandRG" -- SlotHandRG kind
+Classic.NAMESLOTHANDRG = "SlotHandRG" -- SlotHandRG name
+function CSlotHandRG:new(_argt)
+    CSlotHandRG.super.new(self, _argt)
+    self.kind = Classic.KINDSLOTHANDRG
+    self.name = Classic.NAMESLOTHANDRG
+    self:argt(_argt) -- override if any
+end

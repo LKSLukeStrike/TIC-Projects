@@ -791,10 +791,13 @@ function CButtonSlotPlayer:menuPick()
             _classic{
                 getslotobject = function() return _object end, -- returns object
                 clicklf = function()
+                    Tic:messageAppend("...", _object.name)
                     local _whatslot = _object:findWhatSlot(_entity.slots) -- is object in another slot ?
-                    if _whatslot then _whatslot:removeObject(_object) end
-                    -- if _whatslot then _whatslot:appendObject(self.getslotobject()) end
-                    _setslotobject(_object)
+                    local _message = (_whatslot) and "> ".._whatslot.name or "? None"
+                    Tic:messageAppend(_message)
+                    if _whatslot and not (_whatslot == self) then
+                        Tic:messageAppend("+", _whatslot.name)
+                    end
                     Tic:screenRemove(_screen)
                     Tic:mouseDelay()
                 end,

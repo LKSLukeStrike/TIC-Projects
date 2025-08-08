@@ -246,8 +246,8 @@ function CCharacter:new(_argt)
                          exists = true, -- to check if already implemented
                          head = CSlotHead{},
                          back = CSlotBack{},
-                         handlf = CSlotHand{},
-                         handrg = CSlotHand{},
+                         handlf = CSlotHandLF{},
+                         handrg = CSlotHandRG{},
     }
     self.inventories  = { -- character standard inventories
                          exists = true, -- to check if already implemented

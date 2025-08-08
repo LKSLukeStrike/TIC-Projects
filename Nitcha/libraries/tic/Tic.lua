@@ -893,9 +893,9 @@ function Tic:messageMessages() -- all messages in the stack
     return Tic.MESSAGES.acttable
 end
 
-function Tic:messageAppend(_message) -- stack a new message
-	if not _message then return end -- mandatory
-    return Tic.MESSAGES:insert(_message)
+function Tic:messageAppend(...) -- stack a new message
+    local _line = Tic:args2line(...)
+    Tic.MESSAGES:insert(_line)
 end
 
 function Tic:messagePrev() -- prev message in the stack
@@ -1360,11 +1360,7 @@ function Tic:logClearRecord() -- clear the log record
 end
 
 function Tic:logAppend(...) -- add line to the log buffer
-    local _args = {...}
-    local _line = ""
-    for _, _val in ipairs(_args) do
-        _line = _line..Tic:val2string(_val).." "
-    end
+    local _line = Tic:args2line(...)
     Tables:valInsert(Tic.LOGBUFFER, _line)
 end
 
@@ -1374,11 +1370,7 @@ end
 
 function Tic:logRecord(...) -- add line to the log record
     if not Tic.LOGRECORDACTIVE then return end -- log record not active -- do nothing
-    local _args = {...}
-    local _line = ""
-    for _, _val in ipairs(_args) do
-        _line = _line..Tic:val2string(_val).." "
-    end
+    local _line = Tic:args2line(...)
     Tables:valInsert(Tic.LOGRECORD, _line, true)
 end
 
@@ -1420,16 +1412,20 @@ function Tic:val2string(_val) -- return val or it's type if any for concat
     return _val
 end
 
+function Tic:args2line(...) -- args into a single line
+    local _args = {...}
+    local _result = ""
+    for _, _val in ipairs(_args) do
+        _result = _result..Tic:val2string(_val).." "
+    end
+    return _result
+end
+
 function Tic:print(_screenx, _screeny, ...) -- print with multiple args
     _screenx = _screenx or 0
     _screeny = _screeny or 0
-    local _args = {...}
-    local _output = ""
-    for _, _val in ipairs(_args) do
-        _val = Tic:val2string(_val)
-        _output = _output.._val.." "
-    end
-    print( _output, _screenx, _screeny, Tic.COLORCYAN, true, 1, true)
+    local _line = Tic:args2line(...)
+    print( _line, _screenx, _screeny, Tic.COLORCYAN, true, 1, true)
 end
 
 
@@ -1446,13 +1442,8 @@ end
 
 function Tic:trace(...) -- trace with multiple args
     if not Tic.TRACE then return end
-    local _args = {...}
-    local _output = ""
-    for _, _val in ipairs(_args) do
-        _val = Tic:val2string(_val)
-        _output = _output.._val.." "
-    end
-    trace(_output)
+    local _line = Tic:args2line(...)
+    trace(_line)
 end
 
 function Tic:traceTable(_table, _argt) -- trace a table  -- SORTED -- RECURSIVE -- INDENT -- DEPTH
@@ -3598,8 +3589,8 @@ Kaptan = CPlayerMeduz{
     worldx = 20,
     worldy = 0,
     ["slots.head"] = CSlotHead{object = CClothesHatMedium{}},
-    ["slots.handlf"] = CSlotHand{object = CObjectFlaskSmall{used = CObject.USEDHALF}},
-    ["slots.handrg"] = CSlotHand{object = CObjectFlaskSmall{used = CObject.USEDNONE}},
+    ["slots.handlf"] = CSlotHandLF{object = CObjectFlaskSmall{used = CObject.USEDHALF}},
+    ["slots.handrg"] = CSlotHandRG{object = CObjectFlaskSmall{used = CObject.USEDNONE}},
     statmenact = 10,
 }
 Kaptan.slots.head.object.palettefg = {
@@ -3635,7 +3626,7 @@ Nitcha = CPlayerDrowe{
     worldx = 10,
     worldy = 20,
     ["slots.head"] = CSlotHead{object = CClothesHatMedium{}},
-    ["slots.handlf"] = CSlotHand{object = CObjectFlaskLarge{used = CObject.USEDHALF}},
+    ["slots.handlf"] = CSlotHandLF{object = CObjectFlaskLarge{used = CObject.USEDHALF}},
     statmenact = 10,
 }
 Azarel = CPlayerAngel{
@@ -3683,8 +3674,8 @@ if false then
 Globth = CPlayerGolth{name = "Globth",
     ["slots.head"] = CSlotHead{object = CClothesHatMedium{}},
     ["slots.back"] = CSlotBack{object = CClothesBackPackSmall{}},
-    ["slots.handrg"] = CSlotHand{object = CWeaponBowMedium{}},
-    ["slots.handlf"] = CSlotHand{object = CWeaponShieldMedium{name = "ecu_1"}},
+    ["slots.handrg"] = CSlotHandRG{object = CWeaponBowMedium{}},
+    ["slots.handlf"] = CSlotHandLF{object = CWeaponShieldMedium{name = "ecu_1"}},
     -- ["inventories.any"] = CInventoryAny{objects = {Sword, Flask}},
     statmenact = 10,
 }
@@ -3718,9 +3709,9 @@ Walfie = _playerclass{classed = _playerclass,
     worldy = -20,
     -- spottingspot = true,
     spottingpick = true,
-    ["slots.handrg"] = CSlotHand{object = CWeaponSword{}},
-    ["slots.handlf"] = CSlotHand{object = CWeaponShieldSmall{}},
-    -- ["slots.handlf"] = CSlotHand{object = CObjectBombSmall{used = CObject.USEDFULL}},
+    ["slots.handrg"] = CSlotHandRG{object = CWeaponSword{}},
+    ["slots.handlf"] = CSlotHandLF{object = CWeaponShieldSmall{}},
+    -- ["slots.handlf"] = CSlotHandLF{object = CObjectBombSmall{used = CObject.USEDFULL}},
     ["slots.head"]   = CSlotHead{object = CClothesHelmetSmall{}},
     ["slots.back"]   = CSlotBack{object = CClothesBackPackSmall{}},
 }
@@ -3737,9 +3728,9 @@ Welfie = _playerclass{classed = _playerclass,
     worldy = -20,
     -- spottingspot = true,
     spottingpick = true,
-    ["slots.handrg"] = CSlotHand{object = CWeaponHammer{}},
-    ["slots.handlf"] = CSlotHand{object = CWeaponShieldMedium{}},
-    -- ["slots.handlf"] = CSlotHand{object = CObjectBombMedium{used = CObject.USEDHALF}},
+    ["slots.handrg"] = CSlotHandRG{object = CWeaponHammer{}},
+    ["slots.handlf"] = CSlotHandLF{object = CWeaponShieldMedium{}},
+    -- ["slots.handlf"] = CSlotHandLF{object = CObjectBombMedium{used = CObject.USEDHALF}},
     ["slots.head"]   = CSlotHead{object = CClothesHelmetMedium{}},
     ["slots.back"]   = CSlotBack{object = CClothesBackPackMedium{}},
 }
@@ -3756,9 +3747,9 @@ Wilfie = _playerclass{classed = _playerclass,
     worldy = -20,
     -- spottingspot = true,
     spottingpick = true,
-    ["slots.handrg"] = CSlotHand{object = CWeaponLance{}},
-    ["slots.handlf"] = CSlotHand{object = CWeaponShieldLarge{}},
-    -- ["slots.handlf"] = CSlotHand{object = CObjectBombLarge{used = CObject.USEDNONE}},
+    ["slots.handrg"] = CSlotHandRG{object = CWeaponLance{}},
+    ["slots.handlf"] = CSlotHandLF{object = CWeaponShieldLarge{}},
+    -- ["slots.handlf"] = CSlotHandLF{object = CObjectBombLarge{used = CObject.USEDNONE}},
     ["slots.head"]   = CSlotHead{object = CClothesHelmetLarge{}},
     ["slots.back"]   = CSlotBack{object = CClothesBackPackLarge{}},
 }
@@ -3778,9 +3769,9 @@ Wolfie = _playerclass{classed = _playerclass,
     worldy = 0,
     -- spottingspot = true,
     spottingpick = true,
-    ["slots.handrg"] = CSlotHand{object = CWeaponBowSmall{}},
-    ["slots.handlf"] = CSlotHand{object = CWeaponBookSmall{}},
-    -- ["slots.handlf"] = CSlotHand{object = CObjectFlaskSmall{used = CObject.USEDFULL}},
+    ["slots.handrg"] = CSlotHandRG{object = CWeaponBowSmall{}},
+    ["slots.handlf"] = CSlotHandLF{object = CWeaponBookSmall{}},
+    -- ["slots.handlf"] = CSlotHandLF{object = CObjectFlaskSmall{used = CObject.USEDFULL}},
     ["slots.head"]   = CSlotHead{object = CClothesHatSmall{}},
     ["slots.back"]   = CSlotBack{object = CClothesToolBoxSmall{}},
 }
@@ -3797,9 +3788,9 @@ Wulfie = _playerclass{classed = _playerclass,
     worldy = 0,
     -- spottingspot = true,
     spottingpick = true,
-    ["slots.handrg"] = CSlotHand{object = CWeaponBowMedium{}},
-    ["slots.handlf"] = CSlotHand{object = CWeaponBookMedium{}},
-    -- ["slots.handlf"] = CSlotHand{object = CObjectFlaskMedium{used = CObject.USEDHALF}},
+    ["slots.handrg"] = CSlotHandRG{object = CWeaponBowMedium{}},
+    ["slots.handlf"] = CSlotHandLF{object = CWeaponBookMedium{}},
+    -- ["slots.handlf"] = CSlotHandLF{object = CObjectFlaskMedium{used = CObject.USEDHALF}},
     ["slots.head"]   = CSlotHead{object = CClothesHatMedium{}},
     ["slots.back"]   = CSlotBack{object = CClothesToolBoxMedium{}},
 }
@@ -3816,9 +3807,9 @@ Wylfie = _playerclass{classed = _playerclass,
     worldy = 0,
     -- spottingspot = true,
     spottingpick = true,
-    ["slots.handrg"] = CSlotHand{object = CWeaponBowLarge{}},
-    ["slots.handlf"] = CSlotHand{object = CWeaponBookLarge{}},
-    -- ["slots.handlf"] = CSlotHand{object = CObjectFlaskLarge{used = CObject.USEDNONE}},
+    ["slots.handrg"] = CSlotHandRG{object = CWeaponBowLarge{}},
+    ["slots.handlf"] = CSlotHandLF{object = CWeaponBookLarge{}},
+    -- ["slots.handlf"] = CSlotHandLF{object = CObjectFlaskLarge{used = CObject.USEDNONE}},
     ["slots.head"]   = CSlotHead{object = CClothesHatLarge{}},
     ["slots.back"]   = CSlotBack{object = CClothesToolBoxLarge{}},
 }
@@ -3838,9 +3829,9 @@ Wolfie = _playerclass{classed = _playerclass,
     worldy = 20,
     -- spottingspot = true,
     spottingpick = true,
-    ["slots.handrg"] = CSlotHand{object = CWeaponWandSmall{}},
-    ["slots.handlf"] = CSlotHand{object = CWeaponRuneSmall{}},
-    -- ["slots.handlf"] = CSlotHand{object = CObjectSpellSmall{used = CObject.USEDFULL}},
+    ["slots.handrg"] = CSlotHandRG{object = CWeaponWandSmall{}},
+    ["slots.handlf"] = CSlotHandLF{object = CWeaponRuneSmall{}},
+    -- ["slots.handlf"] = CSlotHandLF{object = CObjectSpellSmall{used = CObject.USEDFULL}},
     ["slots.head"]   = CSlotHead{object = CClothesCapSmall{}},
     ["slots.back"]   = CSlotBack{object = CClothesScrollCaseSmall{}},
 }
@@ -3857,9 +3848,9 @@ Wulfie = _playerclass{classed = _playerclass,
     worldy = 20,
     -- spottingspot = true,
     spottingpick = true,
-    ["slots.handrg"] = CSlotHand{object = CWeaponWandMedium{}},
-    ["slots.handlf"] = CSlotHand{object = CWeaponRuneMedium{}},
-    -- ["slots.handlf"] = CSlotHand{object = CObjectSpellMedium{used = CObject.USEDHALF}},
+    ["slots.handrg"] = CSlotHandRG{object = CWeaponWandMedium{}},
+    ["slots.handlf"] = CSlotHandLF{object = CWeaponRuneMedium{}},
+    -- ["slots.handlf"] = CSlotHandLF{object = CObjectSpellMedium{used = CObject.USEDHALF}},
     ["slots.head"]   = CSlotHead{object = CClothesCapMedium{}},
     ["slots.back"]   = CSlotBack{object = CClothesScrollCaseMedium{}},
 }
@@ -3876,9 +3867,9 @@ Wylfie = _playerclass{classed = _playerclass,
     worldy = 20,
     -- spottingspot = true,
     spottingpick = true,
-    ["slots.handrg"] = CSlotHand{object = CWeaponWandLarge{}},
-    ["slots.handlf"] = CSlotHand{object = CWeaponRuneLarge{}},
-    -- ["slots.handlf"] = CSlotHand{object = CObjectSpellLarge{used = CObject.USEDNONE}},
+    ["slots.handrg"] = CSlotHandRG{object = CWeaponWandLarge{}},
+    ["slots.handlf"] = CSlotHandLF{object = CWeaponRuneLarge{}},
+    -- ["slots.handlf"] = CSlotHandLF{object = CObjectSpellLarge{used = CObject.USEDNONE}},
     ["slots.head"]   = CSlotHead{object = CClothesCapLarge{}},
     ["slots.back"]   = CSlotBack{object = CClothesScrollCaseLarge{}},
     ["inventories.any"] = CInventoryAny{objects = {CClothesHelmetLarge{}}},
@@ -3898,8 +3889,8 @@ Oxboow = CPlayerGhost{classed = CPlayerGhost,
     spottinglock = true,
     hitbox = Classic.NIL,
     -- slots = Classic.NIL,
-    ["slots.handrg"] = CSlotHand{object = CWeaponLance{}},
-    ["slots.handlf"] = CSlotHand{object = CWeaponShieldLarge{}},
+    ["slots.handrg"] = CSlotHandRG{object = CWeaponLance{}},
+    ["slots.handlf"] = CSlotHandLF{object = CWeaponShieldLarge{}},
     ["slots.head"]   = CSlotHead{object = CClothesHatLarge{}},
     ["slots.back"]   = CSlotBack{object = CClothesBackPackLarge{}},
 }
