@@ -17,6 +17,22 @@ IButton.PALETTEKEY = {[Tic.COLORGREYD] = Tic.COLORKEY}
 CButton = CElement:extend() -- generic button
 Classic.KINDBUTTON = "Button" -- Button kind
 Classic.NAMEBUTTON = "Button" -- Button name
+CButton.CLICKLF = "clicklf" -- mouse function keys
+CButton.CLICKMD = "clickmd"
+CButton.CLICKRG = "clickrg"
+CButton.WHEELUP = "wheelup"
+CButton.WHEELDW = "wheeldw"
+CButton.WHEELLF = "wheellf"
+CButton.WHEELRG = "wheelrg"
+CButton.FUNCTIONS = { -- all of them
+    CButton.CLICKLF,
+    CButton.CLICKMD,
+    CButton.CLICKRG,
+    CButton.WHEELUP,
+    CButton.WHEELDW,
+    CButton.WHEELLF,
+    CButton.WHEELRG,
+}
 function CButton:new(_argt)
     CButton.super.new(self, _argt)
     self.kind = Classic.KINDBUTTON
@@ -28,14 +44,22 @@ function CButton:new(_argt)
     self.hovered       = false -- hovered by the mouse ?
     self.actived       = false -- function triggered ?
     self.activedcycler = CCyclerInt{maxindex =  10, mode = CCycler.MODEBLOCK} -- cycler to maintain the actived effect a little bit 
-	self.clicklf       = nil   -- function to trigger on click lf
+    self.modifierkey   = Tic.KEY_SHIFT -- modifier key to switch functions
+    self.clicklf       = nil   -- function to trigger on click lf
 	self.clickmd       = nil   -- function to trigger on click md
 	self.clickrg       = nil   -- function to trigger on click rg
-	self.scrollx       = nil   -- function to trigger on scroll x
-	self.scrolly       = nil   -- function to trigger on scroll y
-	self.behaviour     = IButton.BEHAVIOUR  -- function to trigger at first
+	self.wheelup       = nil   -- function to trigger on wheel up
+	self.wheeldw       = nil   -- function to trigger on wheel dw
+	self.wheellf       = nil   -- function to trigger on wheel lf
+	self.wheelrg       = nil   -- function to trigger on wheel rg
     self.hovertextlf   = nil   -- hover CText for clicklf if any
+    self.hovertextmd   = nil   -- hover CText for clickmd if any
     self.hovertextrg   = nil   -- hover CText for clickrg if any
+    self.hovertextup   = nil   -- hover CText for wheelup if any
+    self.hovertextdw   = nil   -- hover CText for wheeldw if any
+    self.hovertextlf   = nil   -- hover CText for wheellf if any
+    self.hovertextrg   = nil   -- hover CText for wheelrg if any
+	self.behaviour     = IButton.BEHAVIOUR  -- function to trigger at first
     self.drawground    = true  -- draw beheviors
     self.drawguides    = false
     self.drawinside    = true
@@ -52,7 +76,7 @@ function CButton:new(_argt)
     self:argt(_argt) -- override if any
 end
 
-function CButton:draw() -- button drawing
+function CButton:draw() -- button drawing --TODO hover with wheel ?
     CButton.super.draw(self)
     if self.hovered then
         if self.clicklf and (self.hovertextlf and self.hovertextlf:is(CText)) then self:drawHovertextLF() end
@@ -98,7 +122,7 @@ end
 function CButton:functionsDefined() -- defined functions of a button
     local _result = {}
 
-    for _, _key in ipairs({Tic.BUTTONCLICKLF, Tic.BUTTONCLICKMD, Tic.BUTTONCLICKRG, Tic.BUTTONSCROLLX, Tic.BUTTONSCROLLY}) do
+    for _, _key in ipairs(CButton.FUNCTIONS) do
         if type(self[_key]) == "function" then Tables:valInsert(_result, self[_key], true) end
     end
 
@@ -108,20 +132,30 @@ end
 function CButton:functionsActived() -- actived functions (in a key table) of a button
     local _result = {}
 
-    if Tic.MOUSE.clicklf and type(self[Tic.BUTTONCLICKLF]) == "function" then
-        Tables:valInsert(_result, self[Tic.BUTTONCLICKLF], true)
+    if Tic.MOUSE.clicklf
+        and type(self[CButton.CLICKLF]) == "function"
+    then
+        Tables:valInsert(_result, self[CButton.CLICKLF], true)
     end
-    if Tic.MOUSE.clickmd and type(self[Tic.BUTTONCLICKMD]) == "function" then
-        Tables:valInsert(_result, self[Tic.BUTTONCLICKMD], true)
+    if Tic.MOUSE.clickmd
+        and type(self[CButton.CLICKMD]) == "function"
+    then
+        Tables:valInsert(_result, self[CButton.CLICKMD], true)
     end
-    if Tic.MOUSE.clickrg and type(self[Tic.BUTTONCLICKRG]) == "function" then
-        Tables:valInsert(_result, self[Tic.BUTTONCLICKRG], true)
+    if Tic.MOUSE.clickrg
+        and type(self[CButton.CLICKRG]) == "function"
+    then
+        Tables:valInsert(_result, self[CButton.CLICKRG], true)
     end
-    if not (Tic.MOUSE.scrollx == 0) and type(self[Tic.BUTTONSCROLLX]) == "function" then
-        Tables:valInsert(_result, self[Tic.BUTTONSCROLLX], true)
+    if Tic.MOUSE.scrolly > 0
+        and type(self[CButton.WHEELUP]) == "function"
+    then
+        Tables:valInsert(_result, self[CButton.WHEELUP], true)
     end
-    if not (Tic.MOUSE.scrolly == 0) and type(self[Tic.BUTTONSCROLLY]) == "function" then
-        Tables:valInsert(_result, self[Tic.BUTTONSCROLLY], true)
+    if Tic.MOUSE.scrolly < 0
+        and type(self[CButton.WHEELDW]) == "function"
+    then
+        Tables:valInsert(_result, self[CButton.WHEELDW], true)
     end
 
     return _result

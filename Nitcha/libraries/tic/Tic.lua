@@ -656,11 +656,6 @@ end
 
 
 -- Buttons System -- handle buttons stack
-Tic.BUTTONCLICKLF = "clicklf" -- buttons function keys
-Tic.BUTTONCLICKMD = "clickmd"
-Tic.BUTTONCLICKRG = "clickrg"
-Tic.BUTTONSCROLLX = "scrollx"
-Tic.BUTTONSCROLLY = "scrolly"
 Tic.BUTTONS = {}
 
 function Tic:buttonsHandleInput()
@@ -1113,6 +1108,10 @@ Tic.BIOMES = CCyclerTable{acttable = { -- biomes cycler
     Tic.COLORBIOMEGREEN,
     Tic.COLORBIOMEROCKY,
 }}
+
+function Tic:biomePrev() -- prev biome in the stack
+    return Tic.BIOMES:prev()
+end
 
 function Tic:biomeNext() -- next biome in the stack
     return Tic.BIOMES:next()
@@ -3056,6 +3055,8 @@ Button1 = CButtonMenuM2{
     text = CText{text = "Op"},
     clicklf = _function,
     clickrg = function() _function{text = "Plip"} end,
+    wheelup = function() Tic:biomePrev() ; _function{text = "wheelup"} end,
+    wheeldw = function() Tic:biomeNext() ; _function{text = "wheeldw"} end,
 }
 Button2 = CButtonTextM2{
     name = "B2",
@@ -3124,7 +3125,12 @@ ScreenIntro:elementsDistributeH({Button11, Button12, Button15, Button13, Button1
 ScreenIntro:elementsDistributeV({Button1, Button2, Button3}, 10, 10, 2)
 
 ScreenIntro:appendElements{
-    CWindowScreen{name = "Intro", colorground = Tic.COLORRED},
+    CWindowScreen{name = "Intro",
+        colorground = Tic:biomeActual(),
+        behaviour = function(self)
+            self.colorground = Tic:biomeActual()
+        end
+    },
     CWindowInfos{
         name = "PressKey",
         drawground = false,
@@ -3424,8 +3430,8 @@ end
 
 
 -- SCREENS
--- if true then Tic:screenAppend(ScreenIntro) end
-if true then Tic:screenAppend(ScreenWorld) end
+if true then Tic:screenAppend(ScreenIntro) end
+-- if true then Tic:screenAppend(ScreenWorld) end
 -- if true then Tic:screenAppend(ScreenMenus) end
 Tic:screenMin()
 if true then Tic.INVENTORYSCREEN = ScreenMenus end
