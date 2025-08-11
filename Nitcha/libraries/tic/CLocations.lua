@@ -3,8 +3,8 @@ require("libraries/ext/Classic")
 -- CLocations
 --
 CLocations = Classic:extend() -- generic entities locations -- {worldy {worldx {entity = entity}}} -- FIXME change entity by true ?
-Classic.KINDLOCATIONS = "Locations" -- Locations kind
-Classic.NAMELOCATIONS = "Locations" -- Locations name
+Classic.KINDLOCATIONS = "Locations"
+Classic.NAMELOCATIONS = "Locations"
 function CLocations:new(_argt)
     CLocations.super.new(self, _argt)
     self.kind = Classic.KINDLOCATIONS

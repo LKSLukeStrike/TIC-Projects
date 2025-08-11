@@ -3,8 +3,8 @@ require("libraries/ext/Classic")
 -- CRegion
 --
 CRegion = Classic:extend() -- generic region -- lf rg up dw around a point
-Classic.KINDREGION = "Region" -- Region kind
-Classic.NAMEREGION = "Region" -- Region name
+Classic.KINDREGION = "Region"
+Classic.NAMEREGION = "Region"
 function CRegion:new(_argt)
     CRegion.super.new(self, _argt)
     self.kind = Classic.KINDREGION

@@ -3,8 +3,8 @@ require("libraries/tic/CRegion")
 -- CHitbox
 --
 CHitbox = CRegion:extend() -- generic hitbox region
-Classic.KINDHITBOX = "Hitbox" -- Hitbox kind
-Classic.NAMEHITBOX = "Hitbox" -- Hitbox name
+Classic.KINDHITBOX = "Hitbox"
+Classic.NAMEHITBOX = "Hitbox"
 CHitbox.LF = 0 -- hitbox region sizes
 CHitbox.RG = Tic.SPRITESIZE - 1
 CHitbox.UP = 0

@@ -3,8 +3,8 @@ require("libraries/tic/CEntityDrawable")
 -- CCharacter
 --
 CCharacter = CEntityDrawable:extend() -- characters
-Classic.KINDCHARACTER = "Character" -- Character kind
-Classic.NAMECHARACTER = "Character" -- Character name
+Classic.KINDCHARACTER = "Character"
+Classic.NAMECHARACTER = "Character"
 Tic.STATESETTINGS = { -- states settings
     [Tic.STATESTANDIDLE] = {
         posture = Tic.POSTURESTAND,

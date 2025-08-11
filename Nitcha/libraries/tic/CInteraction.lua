@@ -3,8 +3,8 @@ require("libraries/ext/Classic")
 -- CInteraction
 --
 CInteraction = Classic:extend() -- generic interaction for entities
-Classic.KINDINTERACTION = "Interaction" -- Interaction kind
-Classic.NAMEINTERACTION = "Interaction" -- Interaction name
+Classic.KINDINTERACTION = "Interaction"
+Classic.NAMEINTERACTION = "Interaction"
 CInteraction.NTERACTIFDEFAULT = function(self, _by, _to) return true end
 CInteraction.NTERACTDODEFAULT = function() return end
 function CInteraction:new(_argt)

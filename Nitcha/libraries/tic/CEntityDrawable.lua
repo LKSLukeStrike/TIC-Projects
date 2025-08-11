@@ -3,8 +3,8 @@ require("libraries/tic/CEntity")
 -- CEntityDrawable
 --
 CEntityDrawable = CEntity:extend() -- generic entities with a sprite representation
-Classic.KINDENTITYDRAWABLE = "EntityDrawable" -- EntityDrawable kind
-Classic.NAMEENTITYDRAWABLE = "EntityDrawable" -- EntityDrawable name
+Classic.KINDENTITYDRAWABLE = "EntityDrawable"
+Classic.NAMEENTITYDRAWABLE = "EntityDrawable"
 function CEntityDrawable:new(_argt)
     CEntityDrawable.super.new(self, _argt)
     self.classic = CEntityDrawable

@@ -3,8 +3,8 @@ require("libraries/ext/Classic")
 -- CInventory
 --
 CInventory = Classic:extend() -- generic inventory
-Classic.KINDINVENTORY = "Inventory" -- Inventory kind
-Classic.NAMEINVENTORY = "Inventory" -- Inventory name
+Classic.KINDINVENTORY = "Inventory"
+Classic.NAMEINVENTORY = "Inventory"
 function CInventory:new(_argt)
     CInventory.super.new(self, _argt)
     self.kind = Classic.KINDINVENTORY
@@ -79,8 +79,8 @@ function CInventory:objectsofSlotType(_slottype)
 end
 
 CInventoryAny = CInventory:extend() -- generic any inventory
-Classic.KINDINVENTORYANY = "InventoryAny" -- InventoryAny kind
-Classic.NAMEINVENTORYANY = "InventoryAny" -- InventoryAny name
+Classic.KINDINVENTORYANY = "InventoryAny"
+Classic.NAMEINVENTORYANY = "InventoryAny"
 function CInventoryAny:new(_argt)
     CInventoryAny.super.new(self, _argt)
     self.kind = Classic.KINDINVENTORYANY
@@ -89,8 +89,8 @@ function CInventoryAny:new(_argt)
 end
 
 CInventoryPhy = CInventory:extend() -- generic phy inventory
-Classic.KINDINVENTORYPHY = "InventoryPhy" -- InventoryPhy kind
-Classic.NAMEINVENTORYPHY = "InventoryPhy" -- InventoryPhy name
+Classic.KINDINVENTORYPHY = "InventoryPhy"
+Classic.NAMEINVENTORYPHY = "InventoryPhy"
 function CInventoryPhy:new(_argt)
     CInventoryPhy.super.new(self, _argt)
     self.kind = Classic.KINDINVENTORYPHY
@@ -100,8 +100,8 @@ function CInventoryPhy:new(_argt)
 end
 
 CInventoryMen = CInventory:extend() -- generic men inventory
-Classic.KINDINVENTORYMEN = "InventoryMen" -- InventoryMen kind
-Classic.NAMEINVENTORYMEN = "InventoryMen" -- InventoryMen name
+Classic.KINDINVENTORYMEN = "InventoryMen"
+Classic.NAMEINVENTORYMEN = "InventoryMen"
 function CInventoryMen:new(_argt)
     CInventoryMen.super.new(self, _argt)
     self.kind = Classic.KINDINVENTORYMEN
@@ -111,8 +111,8 @@ function CInventoryMen:new(_argt)
 end
 
 CInventoryPsy = CInventory:extend() -- generic psy inventory
-Classic.KINDINVENTORYPSY = "InventoryPsy" -- InventoryPsy kind
-Classic.NAMEINVENTORYPSY = "InventoryPsy" -- InventoryPsy name
+Classic.KINDINVENTORYPSY = "InventoryPsy"
+Classic.NAMEINVENTORYPSY = "InventoryPsy"
 function CInventoryPsy:new(_argt)
     CInventoryPsy.super.new(self, _argt)
     self.kind = Classic.KINDINVENTORYPSY
@@ -122,8 +122,8 @@ function CInventoryPsy:new(_argt)
 end
 
 CInventoryAny2 = CInventoryAny:extend() -- generic any inventory 2
-Classic.KINDINVENTORYANY2 = "InventoryAny2" -- InventoryAny2 kind
-Classic.NAMEINVENTORYANY2 = "InventoryAny2" -- InventoryAny2 name
+Classic.KINDINVENTORYANY2 = "InventoryAny2"
+Classic.NAMEINVENTORYANY2 = "InventoryAny2"
 function CInventoryAny2:new(_argt)
     CInventoryAny2.super.new(self, _argt)
     self.kind = Classic.KINDINVENTORYANY2
@@ -133,8 +133,8 @@ function CInventoryAny2:new(_argt)
 end
 
 CInventoryAny4 = CInventoryAny:extend() -- generic any inventory 4
-Classic.KINDINVENTORYANY4 = "InventoryAny4" -- InventoryAny4 kind
-Classic.NAMEINVENTORYANY4 = "InventoryAny4" -- InventoryAny4 name
+Classic.KINDINVENTORYANY4 = "InventoryAny4"
+Classic.NAMEINVENTORYANY4 = "InventoryAny4"
 function CInventoryAny4:new(_argt)
     CInventoryAny4.super.new(self, _argt)
     self.kind = Classic.KINDINVENTORYANY4
@@ -144,8 +144,8 @@ function CInventoryAny4:new(_argt)
 end
 
 CInventoryAny6 = CInventoryAny:extend() -- generic any inventory 6
-Classic.KINDINVENTORYANY6 = "InventoryAny6" -- InventoryAny6 kind
-Classic.NAMEINVENTORYANY6 = "InventoryAny6" -- InventoryAny6 name
+Classic.KINDINVENTORYANY6 = "InventoryAny6"
+Classic.NAMEINVENTORYANY6 = "InventoryAny6"
 function CInventoryAny6:new(_argt)
     CInventoryAny6.super.new(self, _argt)
     self.kind = Classic.KINDINVENTORYANY6
@@ -155,8 +155,8 @@ function CInventoryAny6:new(_argt)
 end
 
 CInventoryAny8 = CInventoryAny:extend() -- generic any inventory 8
-Classic.KINDINVENTORYANY8 = "InventoryAny8" -- InventoryAny8 kind
-Classic.NAMEINVENTORYANY8 = "InventoryAny8" -- InventoryAny8 name
+Classic.KINDINVENTORYANY8 = "InventoryAny8"
+Classic.NAMEINVENTORYANY8 = "InventoryAny8"
 function CInventoryAny8:new(_argt)
     CInventoryAny8.super.new(self, _argt)
     self.kind = Classic.KINDINVENTORYANY8
@@ -166,8 +166,8 @@ function CInventoryAny8:new(_argt)
 end
 
 CInventoryAny10 = CInventoryAny:extend() -- generic any inventory 10
-Classic.KINDINVENTORYANY10 = "InventoryAny10" -- InventoryAny10 kind
-Classic.NAMEINVENTORYANY10 = "InventoryAny10" -- InventoryAny10 name
+Classic.KINDINVENTORYANY10 = "InventoryAny10"
+Classic.NAMEINVENTORYANY10 = "InventoryAny10"
 function CInventoryAny10:new(_argt)
     CInventoryAny10.super.new(self, _argt)
     self.kind = Classic.KINDINVENTORYANY10

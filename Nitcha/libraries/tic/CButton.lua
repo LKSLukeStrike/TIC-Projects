@@ -13,8 +13,8 @@ IButton.PALETTEKEY = {[Tic.COLORGREYD] = Tic.COLORKEY}
 -- CButton
 --
 CButton = CElement:extend() -- generic button
-Classic.KINDBUTTON = "Button" -- Button kind
-Classic.NAMEBUTTON = "Button" -- Button name
+Classic.KINDBUTTON = "Button"
+Classic.NAMEBUTTON = "Button"
 function CButton:new(_argt)
     CButton.super.new(self, _argt)
     self.kind = Classic.KINDBUTTON
@@ -22,9 +22,6 @@ function CButton:new(_argt)
     self.clickable     = true -- act as a button ?
     self.screenw       = Tic.SPRITESIZE -- sizes
     self.screenh       = Tic.SPRITESIZE
-    self.enabled       = true  -- can be clicked ?
-    self.hovered       = false -- hovered by the mouse ?
-    self.actived       = false -- function triggered ?
 	self.behaviour     = IButton.BEHAVIOUR  -- function to trigger at first
     self.drawground    = true  -- draw beheviors
     self.drawguides    = false
@@ -90,8 +87,10 @@ end
 -- CButtonText
 --
 CButtonText = CButton:extend() -- generic text button
+Classic.NAMEBUTTONTEXT = "ButtonText"
 function CButtonText:new(_argt)
     CButtonText.super.new(self, _argt)
+    self.name = Classic.NAMEBUTTONTEXT
 	self.text = CText{} -- override with CText if any
     self.rounded = true
     self.colorinside = self.colorborder
@@ -120,8 +119,10 @@ end
 -- CButtonTextM2
 --
 CButtonTextM2 = CButtonText:extend() -- generic text button with margins 2
+Classic.NAMEBUTTONTEXTM2 = "ButtonTextM2"
 function CButtonTextM2:new(_argt)
     CButtonTextM2.super.new(self, _argt)
+    self.name = Classic.NAMEBUTTONTEXTM2
     self:argt(_argt) -- override if any
     self.text.marginup = 2
     self.text.margindw = 2
@@ -857,6 +858,7 @@ CButtonSlotSpotting = CButtonSlot:extend()
 function CButtonSlotSpotting:new(_argt)
     CButtonSlotSpotting.super.new(self, _argt)
     self.behaviour = IButtonSlotSpotting.BEHAVIOUR
+    self.enabled   = false
     self:argt(_argt) -- override if any
 end
 

@@ -3,8 +3,8 @@ require("libraries/ext/Classic")
 -- CSprite
 --
 CSprite = Classic:extend() -- generic sprite
-Classic.KINDSPRITE = "Sprite" -- Sprite kind
-Classic.NAMESPRITE = "Sprite" -- Sprite name
+Classic.KINDSPRITE = "Sprite"
+Classic.NAMESPRITE = "Sprite"
 CSprite.SPRITEBANK = 0
 CSprite.FRAMEOF    = 16 -- sprites frames offset multiplier
 CSprite.FRAME00    = 00 -- sprites frames -- [!] start at 0, used to compute the offset
@@ -51,8 +51,8 @@ end
 -- CSpriteBG
 --
 CSpriteBG = CSprite:extend() -- bg sprites aka tic tiles
-Classic.KINDSPRITEBG = "SpriteBG" -- SpriteBG kind
-Classic.NAMESPRITEBG = "SpriteBG" -- SpriteBG name
+Classic.KINDSPRITEBG = "SpriteBG"
+Classic.NAMESPRITEBG = "SpriteBG"
 CSpriteBG.SPRITEBANK  = 0
 CSpriteBG.SIGNBANK1   = 0  -- signs
 CSpriteBG.SIGNEMPTYS  = CSpriteBG.SIGNBANK1 + 00 -- empty sprite
@@ -118,8 +118,8 @@ end
 -- CSpriteFG
 --
 CSpriteFG = CSprite:extend() -- fg sprites aka tic sprites
-Classic.KINDSPRITEFG = "SpriteFG" -- SpriteFG kind
-Classic.NAMESPRITEFG = "SpriteFG" -- SpriteFG name
+Classic.KINDSPRITEFG = "SpriteFG"
+Classic.NAMESPRITEFG = "SpriteFG"
 CSpriteFG.SPRITEBANK  = 256
 CSpriteFG.SPRITEBOARD = CSpriteFG.SPRITEBANK + 0 -- board sprite -- for creating a sprite by code
 CSpriteFG.SPRITEPIXEL = CSpriteFG.SPRITEBANK + 1 -- pixel sprite
@@ -223,8 +223,8 @@ end
 -- CSpriteFGEmpty
 --
 CSpriteFGEmpty = CSpriteFG:extend() -- empty sprites
-Classic.KINDSPRITEFGEMPTY = "SpriteFGEmpty" -- SpriteFGEmpty kind
-Classic.NAMESPRITEFGEMPTY = "SpriteFGEmpty" -- SpriteFGEmpty name
+Classic.KINDSPRITEFGEMPTY = "SpriteFGEmpty"
+Classic.NAMESPRITEFGEMPTY = "SpriteFGEmpty"
 function CSpriteFGEmpty:new(_argt)
     CSpriteFGEmpty.super.new(self, _argt)
     self.kind = Classic.KINDSPRITEFGEMPTY
@@ -238,8 +238,8 @@ end
 -- CSpriteFGPixel
 --
 CSpriteFGPixel = CSpriteFG:extend() -- pixel sprites
-Classic.KINDSPRITEFGPIXEL = "SpriteFGPixel" -- SpriteFGPixel kind
-Classic.NAMESPRITEFGPIXEL = "SpriteFGPixel" -- SpriteFGPixel name
+Classic.KINDSPRITEFGPIXEL = "SpriteFGPixel"
+Classic.NAMESPRITEFGPIXEL = "SpriteFGPixel"
 function CSpriteFGPixel:new(_argt)
     CSpriteFGPixel.super.new(self, _argt)
     self.kind = Classic.KINDSPRITEFGPIXEL
@@ -253,8 +253,8 @@ end
 -- CSpriteFGBoard
 --
 CSpriteFGBoard = CSpriteFG:extend() -- board sprites
-Classic.KINDSPRITEFGBOARD = "SpriteFGBoard" -- SpriteFGBoard kind
-Classic.NAMESPRITEFGBOARD = "SpriteFGBoard" -- SpriteFGBoard name
+Classic.KINDSPRITEFGBOARD = "SpriteFGBoard"
+Classic.NAMESPRITEFGBOARD = "SpriteFGBoard"
 function CSpriteFGBoard:new(_argt)
     CSpriteFGBoard.super.new(self, _argt)
     self.kind = Classic.KINDSPRITEFGBOARD

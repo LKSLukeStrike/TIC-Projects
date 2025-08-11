@@ -3,8 +3,8 @@ require("libraries/tic/CElement")
 -- CWindow
 --
 CWindow = CElement:extend() -- generic window element
-Classic.KINDWINDOW = "Window" -- Window kind
-Classic.NAMEWINDOW = "Window" -- Window name
+Classic.KINDWINDOW = "Window"
+Classic.NAMEWINDOW = "Window"
 function CWindow:new(_argt)
     CWindow.super.new(self, _argt)
     self.kind = Classic.KINDWINDOW
@@ -18,8 +18,8 @@ end
 -- CWindowScreen
 --
 CWindowScreen = CWindow:extend() -- window screen
-Classic.KINDWINDOWSCREEN = "WindowScreen" -- Window kind
-Classic.NAMEWINDOWSCREEN = "WindowScreen" -- Window name
+Classic.KINDWINDOWSCREEN = "WindowScreen"
+Classic.NAMEWINDOWSCREEN = "WindowScreen"
 function CWindowScreen:new(_argt)
     CWindowScreen.super.new(self, _argt)
     self.kind = Classic.KINDWINDOWSCREEN
@@ -34,8 +34,8 @@ end
 -- CWindowMenu
 --
 CWindowMenu = CWindowScreen:extend() -- window menu
-Classic.KINDWINDOWMENU = "WindowMenu" -- Window kind
-Classic.NAMEWINDOWMENU = "WindowMenu" -- Window name
+Classic.KINDWINDOWMENU = "WindowMenu"
+Classic.NAMEWINDOWMENU = "WindowMenu"
 function CWindowMenu:new(_argt)
     CWindowMenu.super.new(self, _argt)
     self.kind = Classic.KINDWINDOWMENU
@@ -101,8 +101,8 @@ end
 -- CWindowMenuInteractions
 --
 CWindowMenuInteractions = CWindowMenu:extend() -- window menu interactions
-Classic.KINDWINDOWMENUINTERACTIONS = "WindowMenuInteractions" -- Window kind
-Classic.NAMEWINDOWMENUINTERACTIONS = "WindowMenuInteractions" -- Window name
+Classic.KINDWINDOWMENUINTERACTIONS = "WindowMenuInteractions"
+Classic.NAMEWINDOWMENUINTERACTIONS = "WindowMenuInteractions"
 CWindowMenuInteractions.BEHAVIOUR = function(self)
     local function _removeElements()
         self.parent:removeElements(self.elements) -- FIXME why parent ???
@@ -183,8 +183,8 @@ end
 -- CWindowInfos
 --
 CWindowInfos = CWindow:extend() -- window infos
-Classic.KINDWINDOWINFOS = "WindowInfos" -- Window kind
-Classic.NAMEWINDOWINFOS = "WindowInfos" -- Window name
+Classic.KINDWINDOWINFOS = "WindowInfos"
+Classic.NAMEWINDOWINFOS = "WindowInfos"
 function CWindowInfos:new(_argt)
     CWindowInfos.super.new(self, _argt)
     self.kind = Classic.KINDWINDOWINFOS
@@ -495,7 +495,7 @@ end
 -- CWindowSpottingInfos
 --
 CWindowSpottingInfos = CWindowInfosEntity:extend() -- window infos for spotting
-Classic.KINDWINDOWSPOTTINGINFOS = "WindowSpottingInfos" -- WindowSpottingInfos kind
+Classic.KINDWINDOWSPOTTINGINFOS = "WindowSpottingInfos"
 function CWindowSpottingInfos:new(_argt)
     CWindowSpottingInfos.super.new(self, _argt)
     self.kind = Classic.KINDWINDOWSPOTTINGINFOS
@@ -512,7 +512,7 @@ end
 -- CWindowSpottingPortrait
 --
 CWindowSpottingPortrait = CWindowPortraitDrawable:extend() -- window portrait for spotting
-Classic.KINDWINDOWSPOTTINGPORTRAIT = "WindowSpottingPortrait" -- WindowSpottingPortrait kind
+Classic.KINDWINDOWSPOTTINGPORTRAIT = "WindowSpottingPortrait"
 function CWindowSpottingPortrait:new(_argt)
     CWindowSpottingPortrait.super.new(self, _argt)
     self.kind = Classic.KINDWINDOWSPOTTINGPORTRAIT
@@ -679,8 +679,12 @@ end
 -- CWindowMessagesWorld
 --
 CWindowMessagesWorld = CWindowInfos:extend() -- window messages for world
+Classic.KINDWINDOWMESSAGESWORLD = "WindowMessagesWorld"
+Classic.NAMEWINDOWMESSAGESWORLD = "WindowMessagesWorld"
 function CWindowMessagesWorld:new(_argt)
     CWindowMessagesWorld.super.new(self, _argt)
+    self.kind = Classic.KINDWINDOWMESSAGESWORLD
+    self.name = Classic.NAMEWINDOWMESSAGESWORLD
     self.screenx    = Tic.WORLDMESSAGESWX
     self.screeny    = Tic.WORLDMESSAGESWY
 	self.screenw    = Tic.WORLDMESSAGESWW
@@ -688,6 +692,8 @@ function CWindowMessagesWorld:new(_argt)
     self.drawborder = true
 	self.align      = Tic.DIR270
     self.clickable  = true
+    self.wheelup    = Tic.FUNCTIONMESSAGEPREV
+    self.wheeldw    = Tic.FUNCTIONMESSAGENEXT
     self:argt(_argt) -- override if any
 end
 
@@ -696,4 +702,9 @@ function CWindowMessagesWorld:drawInside() -- window messages content for world
     local _text    = CText{text = _message, small = true, marginlf = 2}
     self.elements  = {_text}
     CWindowMessagesWorld.super.drawInside(self)
+end
+
+function CWindowMessagesWorld:drawBorder()
+    self.colorborder = (self.hovered) and Tic.COLORGREYD or Tic.COLORGREYM
+    self.super.drawBorder(self)
 end

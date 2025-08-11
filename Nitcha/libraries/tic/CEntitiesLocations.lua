@@ -3,8 +3,8 @@ require("libraries/ext/Classic")
 -- CEntitiesLocations
 --
 CEntitiesLocations = Classic:extend() -- generic locations for entities
-Classic.KINDENTITIESLOCATIONS = "EntitiesLocations" -- EntitiesLocations kind
-Classic.NAMEENTITIESLOCATIONS = "EntitiesLocations" -- EntitiesLocations name
+Classic.KINDENTITIESLOCATIONS = "EntitiesLocations"
+Classic.NAMEENTITIESLOCATIONS = "EntitiesLocations"
 function CEntitiesLocations:new(_argt)
     CEntitiesLocations.super.new(self, _argt)
     self.kind = Classic.KINDENTITIESLOCATIONS

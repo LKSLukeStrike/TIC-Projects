@@ -14,8 +14,8 @@ end
 -- CElement
 --
 CElement = Classic:extend() -- generic screen element -- TODO build this class
-Classic.KINDELEMENT = "Element" -- Element kind
-Classic.NAMEELEMENT = "Element" -- Element name
+Classic.KINDELEMENT = "Element"
+Classic.NAMEELEMENT = "Element"
 CElement.CLICKLF = "clicklf" -- mouse function keys
 CElement.CLICKMD = "clickmd"
 CElement.CLICKRG = "clickrg"
@@ -68,6 +68,9 @@ function CElement:new(_argt)
     self.hovertextdw = nil   -- hover CText for wheeldw if any
     self.hovertextlf = nil   -- hover CText for wheellf if any
     self.hovertextrg = nil   -- hover CText for wheelrg if any
+    self.enabled     = true  -- can be clicked ?
+    self.hovered     = false -- hovered by the mouse ?
+    self.actived     = false -- function triggered ?
     self.behaviour   = IElement.BEHAVIOUR   -- behaviour function if any
     self.display     = true  -- display or not ?
     self.drawground  = true  -- draw beheviors

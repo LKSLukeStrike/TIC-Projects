@@ -3,8 +3,8 @@ require("libraries/tic/CEntityDrawable")
 -- CObject
 --
 CObject = CEntityDrawable:extend() -- generic objects
-Classic.KINDOBJECT = "Object" -- Object kind
-Classic.NAMEOBJECT = "Object" -- Object name
+Classic.KINDOBJECT = "Object"
+Classic.NAMEOBJECT = "Object"
 CObject.HANDLE         = Tic.COLORWHITE
 CObject.BORDER         = Tic.COLORGREYD
 CObject.INSIDE         = Tic.COLORGREYM
@@ -57,8 +57,8 @@ end
 -- CObjectInventory
 --
 CObjectInventory = CObject:extend() -- generic inventory objects
-Classic.KINDOBJECTPHY = "ObjectPhy" -- ObjectPhy kind
-Classic.NAMEOBJECTPHY = "ObjectPhy" -- ObjectPhy name
+Classic.KINDOBJECTPHY = "ObjectPhy"
+Classic.NAMEOBJECTPHY = "ObjectPhy"
 function CObjectInventory:new(_argt)
     CObjectInventory.super.new(self, _argt)
     self.kind = Classic.KINDOBJECTPHY
@@ -125,8 +125,8 @@ end
 -- CObjectPhy
 --
 CObjectPhy = CObjectInventory:extend() -- generic phy objects
-Classic.KINDOBJECTPHY = "ObjectPhy" -- ObjectPhy kind
-Classic.NAMEOBJECTPHY = "ObjectPhy" -- ObjectPhy name
+Classic.KINDOBJECTPHY = "ObjectPhy"
+Classic.NAMEOBJECTPHY = "ObjectPhy"
 function CObjectPhy:new(_argt)
     CObjectPhy.super.new(self, _argt)
     self.kind = Classic.KINDOBJECTPHY
@@ -136,8 +136,8 @@ function CObjectPhy:new(_argt)
 end
 
 CObjectPhyHand = CObjectPhy:extend() -- generic phy hand objects
-Classic.KINDOBJECPHYHAND = "ObjectPhyHand" -- ObjectPhyHand kind
-Classic.NAMEOBJECPHYHAND = "ObjectPhyHand" -- ObjectPhyHand name
+Classic.KINDOBJECPHYHAND = "ObjectPhyHand"
+Classic.NAMEOBJECPHYHAND = "ObjectPhyHand"
 function CObjectPhyHand:new(_argt)
     CObjectPhyHand.super.new(self, _argt)
     self.kind = Classic.KINDOBJECPHYHAND
@@ -147,8 +147,8 @@ function CObjectPhyHand:new(_argt)
 end
 
 CObjectPhyHead = CObjectPhy:extend() -- generic phy head objects
-Classic.KINDOBJECTPHYHEAD = "ObjectPhyHead" -- ObjectPhyHead kind
-Classic.NAMEOBJECTPHYHEAD = "ObjectPhyHead" -- ObjectPhyHead name
+Classic.KINDOBJECTPHYHEAD = "ObjectPhyHead"
+Classic.NAMEOBJECTPHYHEAD = "ObjectPhyHead"
 function CObjectPhyHead:new(_argt)
     CObjectPhyHead.super.new(self, _argt)
     self.kind = Classic.KINDOBJECTPHYHEAD
@@ -158,8 +158,8 @@ function CObjectPhyHead:new(_argt)
 end
 
 CObjectPhyBack = CObjectPhy:extend() -- generic phy back objects
-Classic.KINDOBJECTPHYBACK = "ObjectPhyBack" -- ObjectPhyBack kind
-Classic.NAMEOBJECTPHYBACK = "ObjectPhyBack" -- ObjectPhyBack name
+Classic.KINDOBJECTPHYBACK = "ObjectPhyBack"
+Classic.NAMEOBJECTPHYBACK = "ObjectPhyBack"
 function CObjectPhyBack:new(_argt)
     CObjectPhyBack.super.new(self, _argt)
     self.kind = Classic.KINDOBJECTPHYBACK
@@ -169,8 +169,8 @@ function CObjectPhyBack:new(_argt)
 end
 
 CObjectPhyNone = CObjectPhy:extend() -- generic phy none objects
-Classic.KINDOBJECTPHYNONE = "ObjectPhyNone" -- ObjectPhyNone kind
-Classic.NAMEOBJECTPHYNONE = "ObjectPhyNone" -- ObjectPhyNone name
+Classic.KINDOBJECTPHYNONE = "ObjectPhyNone"
+Classic.NAMEOBJECTPHYNONE = "ObjectPhyNone"
 function CObjectPhyNone:new(_argt)
     CObjectPhyNone.super.new(self, _argt)
     self.kind = Classic.KINDOBJECTPHYNONE
@@ -184,8 +184,8 @@ end
 -- CObjectMen
 --
 CObjectMen = CObjectInventory:extend() -- generic men objects
-Classic.KINDOBJECTMEN = "ObjectMen" -- ObjectMen kind
-Classic.NAMEOBJECTMEN = "ObjectMen" -- ObjectMen name
+Classic.KINDOBJECTMEN = "ObjectMen"
+Classic.NAMEOBJECTMEN = "ObjectMen"
 function CObjectMen:new(_argt)
     CObjectMen.super.new(self, _argt)
     self.kind = Classic.KINDOBJECTMEN
@@ -195,8 +195,8 @@ function CObjectMen:new(_argt)
 end
 
 CObjectMenHand = CObjectMen:extend() -- generic men hand objects
-Classic.KINDOBJECMENHAND = "ObjectMenHand" -- ObjectMenHand kind
-Classic.NAMEOBJECMENHAND = "ObjectMenHand" -- ObjectMenHand name
+Classic.KINDOBJECMENHAND = "ObjectMenHand"
+Classic.NAMEOBJECMENHAND = "ObjectMenHand"
 function CObjectMenHand:new(_argt)
     CObjectMenHand.super.new(self, _argt)
     self.kind = Classic.KINDOBJECMENHAND
@@ -206,8 +206,8 @@ function CObjectMenHand:new(_argt)
 end
 
 CObjectMenHand = CObjectMen:extend() -- generic men hand objects
-Classic.KINDOBJECMENHAND = "ObjectMenHand" -- ObjectMenHand kind
-Classic.NAMEOBJECMENHAND = "ObjectMenHand" -- ObjectMenHand name
+Classic.KINDOBJECMENHAND = "ObjectMenHand"
+Classic.NAMEOBJECMENHAND = "ObjectMenHand"
 function CObjectMenHand:new(_argt)
     CObjectMenHand.super.new(self, _argt)
     self.kind = Classic.KINDOBJECMENHAND
@@ -217,8 +217,8 @@ function CObjectMenHand:new(_argt)
 end
 
 CObjectMenHead = CObjectMen:extend() -- generic men head objects
-Classic.KINDOBJECTMENHEAD = "ObjectMenHead" -- ObjectMenHead kind
-Classic.NAMEOBJECTMENHEAD = "ObjectMenHead" -- ObjectMenHead name
+Classic.KINDOBJECTMENHEAD = "ObjectMenHead"
+Classic.NAMEOBJECTMENHEAD = "ObjectMenHead"
 function CObjectMenHead:new(_argt)
     CObjectMenHead.super.new(self, _argt)
     self.kind = Classic.KINDOBJECTMENHEAD
@@ -228,8 +228,8 @@ function CObjectMenHead:new(_argt)
 end
 
 CObjectMenBack = CObjectMen:extend() -- generic men back objects
-Classic.KINDOBJECTMENBACK = "ObjectMenBack" -- ObjectMenBack kind
-Classic.NAMEOBJECTMENBACK = "ObjectMenBack" -- ObjectMenBack name
+Classic.KINDOBJECTMENBACK = "ObjectMenBack"
+Classic.NAMEOBJECTMENBACK = "ObjectMenBack"
 function CObjectMenBack:new(_argt)
     CObjectMenBack.super.new(self, _argt)
     self.kind = Classic.KINDOBJECTMENBACK
@@ -239,8 +239,8 @@ function CObjectMenBack:new(_argt)
 end
 
 CObjectMenNone = CObjectMen:extend() -- generic men none objects
-Classic.KINDOBJECTMENNONE = "ObjectMenNone" -- ObjectMenNone kind
-Classic.NAMEOBJECTMENNONE = "ObjectMenNone" -- ObjectMenNone name
+Classic.KINDOBJECTMENNONE = "ObjectMenNone"
+Classic.NAMEOBJECTMENNONE = "ObjectMenNone"
 function CObjectMenNone:new(_argt)
     CObjectMenNone.super.new(self, _argt)
     self.kind = Classic.KINDOBJECTMENNONE
@@ -254,8 +254,8 @@ end
 -- CObjectPsy
 --
 CObjectPsy = CObjectInventory:extend() -- generic psy objects
-Classic.KINDOBJECTPSY = "ObjectPsy" -- ObjectPsy kind
-Classic.NAMEOBJECTPSY = "ObjectPsy" -- ObjectPsy name
+Classic.KINDOBJECTPSY = "ObjectPsy"
+Classic.NAMEOBJECTPSY = "ObjectPsy"
 function CObjectPsy:new(_argt)
     CObjectPsy.super.new(self, _argt)
     self.kind = Classic.KINDOBJECTPSY
@@ -265,8 +265,8 @@ function CObjectPsy:new(_argt)
 end
 
 CObjectPsyHand = CObjectPsy:extend() -- generic psy hand objects
-Classic.KINDOBJECPSYHAND = "ObjectPsyHand" -- ObjectPsyHand kind
-Classic.NAMEOBJECPSYHAND = "ObjectPsyHand" -- ObjectPsyHand name
+Classic.KINDOBJECPSYHAND = "ObjectPsyHand"
+Classic.NAMEOBJECPSYHAND = "ObjectPsyHand"
 function CObjectPsyHand:new(_argt)
     CObjectPsyHand.super.new(self, _argt)
     self.kind = Classic.KINDOBJECPSYHAND
@@ -276,8 +276,8 @@ function CObjectPsyHand:new(_argt)
 end
 
 CObjectPsyHand = CObjectPsy:extend() -- generic psy hand objects
-Classic.KINDOBJECPSYHAND = "ObjectPsyHand" -- ObjectPsyHand kind
-Classic.NAMEOBJECPSYHAND = "ObjectPsyHand" -- ObjectPsyHand name
+Classic.KINDOBJECPSYHAND = "ObjectPsyHand"
+Classic.NAMEOBJECPSYHAND = "ObjectPsyHand"
 function CObjectPsyHand:new(_argt)
     CObjectPsyHand.super.new(self, _argt)
     self.kind = Classic.KINDOBJECPSYHAND
@@ -287,8 +287,8 @@ function CObjectPsyHand:new(_argt)
 end
 
 CObjectPsyHead = CObjectPsy:extend() -- generic psy head objects
-Classic.KINDOBJECTPSYHEAD = "ObjectPsyHead" -- ObjectPsyHead kind
-Classic.NAMEOBJECTPSYHEAD = "ObjectPsyHead" -- ObjectPsyHead name
+Classic.KINDOBJECTPSYHEAD = "ObjectPsyHead"
+Classic.NAMEOBJECTPSYHEAD = "ObjectPsyHead"
 function CObjectPsyHead:new(_argt)
     CObjectPsyHead.super.new(self, _argt)
     self.kind = Classic.KINDOBJECTPSYHEAD
@@ -298,8 +298,8 @@ function CObjectPsyHead:new(_argt)
 end
 
 CObjectPsyBack = CObjectPsy:extend() -- generic psy back objects
-Classic.KINDOBJECTPSYBACK = "ObjectPsyBack" -- ObjectPsyBack kind
-Classic.NAMEOBJECTPSYBACK = "ObjectPsyBack" -- ObjectPsyBack name
+Classic.KINDOBJECTPSYBACK = "ObjectPsyBack"
+Classic.NAMEOBJECTPSYBACK = "ObjectPsyBack"
 function CObjectPsyBack:new(_argt)
     CObjectPsyBack.super.new(self, _argt)
     self.kind = Classic.KINDOBJECTPSYBACK
@@ -309,8 +309,8 @@ function CObjectPsyBack:new(_argt)
 end
 
 CObjectPsyNone = CObjectPsy:extend() -- generic psy none objects
-Classic.KINDOBJECTPSYNONE = "ObjectPsyNone" -- ObjectPsyNone kind
-Classic.NAMEOBJECTPSYNONE = "ObjectPsyNone" -- ObjectPsyNone name
+Classic.KINDOBJECTPSYNONE = "ObjectPsyNone"
+Classic.NAMEOBJECTPSYNONE = "ObjectPsyNone"
 function CObjectPsyNone:new(_argt)
     CObjectPsyNone.super.new(self, _argt)
     self.kind = Classic.KINDOBJECTPSYNONE
@@ -324,8 +324,8 @@ end
 -- CObjectAny
 --
 CObjectAny = CObjectInventory:extend() -- generic any objects
-Classic.KINDOBJECTANY = "ObjectAny" -- ObjectAny kind
-Classic.NAMEOBJECTANY = "ObjectAny" -- ObjectAny name
+Classic.KINDOBJECTANY = "ObjectAny"
+Classic.NAMEOBJECTANY = "ObjectAny"
 function CObjectAny:new(_argt)
     CObjectAny.super.new(self, _argt)
     self.kind = Classic.KINDOBJECTANY
@@ -335,8 +335,8 @@ function CObjectAny:new(_argt)
 end
 
 CObjectAnyHand = CObjectAny:extend() -- generic any hand objects
-Classic.KINDOBJECANYHAND = "ObjectAnyHand" -- ObjectAnyHand kind
-Classic.NAMEOBJECANYHAND = "ObjectAnyHand" -- ObjectAnyHand name
+Classic.KINDOBJECANYHAND = "ObjectAnyHand"
+Classic.NAMEOBJECANYHAND = "ObjectAnyHand"
 function CObjectAnyHand:new(_argt)
     CObjectAnyHand.super.new(self, _argt)
     self.kind = Classic.KINDOBJECANYHAND
@@ -346,8 +346,8 @@ function CObjectAnyHand:new(_argt)
 end
 
 CObjectAnyHand = CObjectAny:extend() -- generic any hand objects
-Classic.KINDOBJECANYHAND = "ObjectAnyHand" -- ObjectAnyHand kind
-Classic.NAMEOBJECANYHAND = "ObjectAnyHand" -- ObjectAnyHand name
+Classic.KINDOBJECANYHAND = "ObjectAnyHand"
+Classic.NAMEOBJECANYHAND = "ObjectAnyHand"
 function CObjectAnyHand:new(_argt)
     CObjectAnyHand.super.new(self, _argt)
     self.kind = Classic.KINDOBJECANYHAND
@@ -357,8 +357,8 @@ function CObjectAnyHand:new(_argt)
 end
 
 CObjectAnyHead = CObjectAny:extend() -- generic any head objects
-Classic.KINDOBJECTANYHEAD = "ObjectAnyHead" -- ObjectAnyHead kind
-Classic.NAMEOBJECTANYHEAD = "ObjectAnyHead" -- ObjectAnyHead name
+Classic.KINDOBJECTANYHEAD = "ObjectAnyHead"
+Classic.NAMEOBJECTANYHEAD = "ObjectAnyHead"
 function CObjectAnyHead:new(_argt)
     CObjectAnyHead.super.new(self, _argt)
     self.kind = Classic.KINDOBJECTANYHEAD
@@ -368,8 +368,8 @@ function CObjectAnyHead:new(_argt)
 end
 
 CObjectAnyBack = CObjectAny:extend() -- generic any back objects
-Classic.KINDOBJECTANYBACK = "ObjectAnyBack" -- ObjectAnyBack kind
-Classic.NAMEOBJECTANYBACK = "ObjectAnyBack" -- ObjectAnyBack name
+Classic.KINDOBJECTANYBACK = "ObjectAnyBack"
+Classic.NAMEOBJECTANYBACK = "ObjectAnyBack"
 function CObjectAnyBack:new(_argt)
     CObjectAnyBack.super.new(self, _argt)
     self.kind = Classic.KINDOBJECTANYBACK
@@ -379,8 +379,8 @@ function CObjectAnyBack:new(_argt)
 end
 
 CObjectAnyNone = CObjectAny:extend() -- generic any none objects
-Classic.KINDOBJECTANYNONE = "ObjectAnyNone" -- ObjectAnyNone kind
-Classic.NAMEOBJECTANYNONE = "ObjectAnyNone" -- ObjectAnyNone name
+Classic.KINDOBJECTANYNONE = "ObjectAnyNone"
+Classic.NAMEOBJECTANYNONE = "ObjectAnyNone"
 function CObjectAnyNone:new(_argt)
     CObjectAnyNone.super.new(self, _argt)
     self.kind = Classic.KINDOBJECTANYNONE
@@ -556,8 +556,8 @@ end
 -- CWeaponMelee PHY HAND
 --
 CWeaponMelee = CObjectPhyHand:extend() -- Melee weapons
-Classic.KINDDWEAPONMELEE = "Melee" -- Melee kind
-Classic.NAMEDWEAPONMELEE = "Melee" -- Melee name
+Classic.KINDDWEAPONMELEE = "Melee"
+Classic.NAMEDWEAPONMELEE = "Melee"
 function CWeaponMelee:new(_argt)
     CWeaponMelee.super.new(self, _argt)
     self.kind = Classic.KINDDWEAPONMELEE
@@ -568,8 +568,8 @@ function CWeaponMelee:new(_argt)
 end
 
 CWeaponSword = CWeaponMelee:extend() -- Sword weapons
-Classic.KINDDWEAPONSWORD = "Sword" -- Sword kind
-Classic.NAMEDWEAPONSWORD = "Sword" -- Sword name
+Classic.KINDDWEAPONSWORD = "Sword"
+Classic.NAMEDWEAPONSWORD = "Sword"
 function CWeaponSword:new(_argt)
     CWeaponSword.super.new(self, _argt)
     self.kind = Classic.KINDDWEAPONSWORD
@@ -579,8 +579,8 @@ function CWeaponSword:new(_argt)
 end
 
 CWeaponHammer = CWeaponMelee:extend() -- Hammer weapons
-Classic.KINDDWEAPONHAMMR= "Hammer" -- Hammer kind
-Classic.NAMEDWEAPONHAMMR= "Hammer" -- Hammer name
+Classic.KINDDWEAPONHAMMR= "Hammer"
+Classic.NAMEDWEAPONHAMMR= "Hammer"
 function CWeaponHammer:new(_argt)
     CWeaponHammer.super.new(self, _argt)
     self.kind = Classic.KINDDWEAPONHAMMR
@@ -596,8 +596,8 @@ function CWeaponHammer:new(_argt)
 end
 
 CWeaponLance = CWeaponMelee:extend() -- Lance weapons
-Classic.KINDDWEAPONLANCE = "Lance" -- Lance kind
-Classic.NAMEDWEAPONLANCE = "Lance" -- Lance name
+Classic.KINDDWEAPONLANCE = "Lance"
+Classic.NAMEDWEAPONLANCE = "Lance"
 function CWeaponLance:new(_argt)
     CWeaponLance.super.new(self, _argt)
     self.kind = Classic.KINDDWEAPONLANCE
@@ -623,8 +623,8 @@ end
 -- CWeaponShield PHY HAND
 --
 CWeaponShield = CObjectPhyHand:extend() -- Shield weapons
-Classic.KINDDWEAPONSHIELD = "Shield" -- Shield kind
-Classic.NAMEDWEAPONSHIELD = "Shield" -- Shield name
+Classic.KINDDWEAPONSHIELD = "Shield"
+Classic.NAMEDWEAPONSHIELD = "Shield"
 function CWeaponShield:new(_argt)
     CWeaponShield.super.new(self, _argt)
     self.kind = Classic.KINDDWEAPONSHIELD
@@ -635,8 +635,8 @@ function CWeaponShield:new(_argt)
 end
 
 CWeaponShieldSmall = CWeaponShield:extend() -- ShieldSmall weapons
-Classic.KINDWEAPONSHIELDSMALL = "Ecu.S" -- ShieldSmall kind
-Classic.NAMEWEAPONSHIELDSMALL = "Ecu.S" -- ShieldSmall name
+Classic.KINDWEAPONSHIELDSMALL = "Ecu.S"
+Classic.NAMEWEAPONSHIELDSMALL = "Ecu.S"
 function CWeaponShieldSmall:new(_argt)
     CWeaponShieldSmall.super.new(self, _argt)
     self.kind = Classic.KINDWEAPONSHIELDSMALL
@@ -646,8 +646,8 @@ function CWeaponShieldSmall:new(_argt)
 end
 
 CWeaponShieldMedium = CWeaponShield:extend() -- ShieldMedium weapons
-Classic.KINDWEAPONSHIELDMEDIUM= "Ecu.M" -- ShieldMedium kind
-Classic.NAMEWEAPONSHIELDMEDIUM= "Ecu.M" -- ShieldMedium name
+Classic.KINDWEAPONSHIELDMEDIUM= "Ecu.M"
+Classic.NAMEWEAPONSHIELDMEDIUM= "Ecu.M"
 function CWeaponShieldMedium:new(_argt)
     CWeaponShieldMedium.super.new(self, _argt)
     self.kind = Classic.KINDWEAPONSHIELDMEDIUM
@@ -657,8 +657,8 @@ function CWeaponShieldMedium:new(_argt)
 end
 
 CWeaponShieldLarge = CWeaponShield:extend() -- ShieldLarge weapons
-Classic.KINDWEAPONSHIELDLARGE= "Ecu.L" -- ShieldLarge kind
-Classic.NAMEWEAPONSHIELDLARGE= "Ecu.L" -- ShieldLarge name
+Classic.KINDWEAPONSHIELDLARGE= "Ecu.L"
+Classic.NAMEWEAPONSHIELDLARGE= "Ecu.L"
 function CWeaponShieldLarge:new(_argt)
     CWeaponShieldLarge.super.new(self, _argt)
     self.kind = Classic.KINDWEAPONSHIELDLARGE
@@ -672,8 +672,8 @@ end
 -- CClothesHelmet PHY HEAD
 --
 CClothesHelmet = CObjectPhyHead:extend() -- Helmet objects
-Classic.KINDCLOTHESHELMET = "Helmet" -- ClothesHelmet kind
-Classic.NAMECLOTHESHELMET = "Helmet" -- ClothesHelmet name
+Classic.KINDCLOTHESHELMET = "Helmet"
+Classic.NAMECLOTHESHELMET = "Helmet"
 function CClothesHelmet:new(_argt)
     CClothesHelmet.super.new(self, _argt)
     self.kind = Classic.KINDCLOTHESHELMET
@@ -690,8 +690,8 @@ function CClothesHelmet:new(_argt)
 end
 
 CClothesHelmetSmall = CClothesHelmet:extend() -- HelmetSmall objects
-Classic.KINDCLOTHESHELMETSMALL = "Helm.S" -- ClothesHelmetSmall kind
-Classic.NAMECLOTHESHELMETSMALL = "Helm.S" -- ClothesHelmetSmall name
+Classic.KINDCLOTHESHELMETSMALL = "Helm.S"
+Classic.NAMECLOTHESHELMETSMALL = "Helm.S"
 function CClothesHelmetSmall:new(_argt)
     CClothesHelmetSmall.super.new(self, _argt)
     self.kind = Classic.KINDCLOTHESHELMETSMALL
@@ -701,8 +701,8 @@ function CClothesHelmetSmall:new(_argt)
 end
 
 CClothesHelmetMedium = CClothesHelmet:extend() -- HelmetMedium objects
-Classic.KINDCLOTHESHELMETMEDIUM = "Helm.M" -- ClothesHelmetMedium kind
-Classic.NAMECLOTHESHELMETMEDIUM = "Helm.M" -- ClothesHelmetMedium name
+Classic.KINDCLOTHESHELMETMEDIUM = "Helm.M"
+Classic.NAMECLOTHESHELMETMEDIUM = "Helm.M"
 function CClothesHelmetMedium:new(_argt)
     CClothesHelmetMedium.super.new(self, _argt)
     self.kind = Classic.KINDCLOTHESHELMETMEDIUM
@@ -712,8 +712,8 @@ function CClothesHelmetMedium:new(_argt)
 end
 
 CClothesHelmetLarge = CClothesHelmet:extend() -- HelmetLarge objects
-Classic.KINDCLOTHESHELMETLARGE = "Helm.L" -- ClothesHelmetLarge kind
-Classic.NAMECLOTHESHELMETLARGE = "Helm.L" -- ClothesHelmetLarge name
+Classic.KINDCLOTHESHELMETLARGE = "Helm.L"
+Classic.NAMECLOTHESHELMETLARGE = "Helm.L"
 function CClothesHelmetLarge:new(_argt)
     CClothesHelmetLarge.super.new(self, _argt)
     self.kind = Classic.KINDCLOTHESHELMETLARGE
@@ -727,8 +727,8 @@ end
 -- CClothesBackPack PHY BACK
 --
 CClothesBackPack = CObjectPhyBack:extend() -- BackPack objects
-Classic.KINDCLOTHESBACKPACK = "Bag" -- ClothesBackPack kind
-Classic.NAMECLOTHESBACKPACK = "Bag" -- ClothesBackPack name
+Classic.KINDCLOTHESBACKPACK = "Bag"
+Classic.NAMECLOTHESBACKPACK = "Bag"
 function CClothesBackPack:new(_argt)
     CClothesBackPack.super.new(self, _argt)
     self.kind = Classic.KINDCLOTHESBACKPACK
@@ -740,8 +740,8 @@ function CClothesBackPack:new(_argt)
 end
 
 CClothesBackPackSmall = CClothesBackPack:extend() -- BackPackSmall objects
-Classic.KINDCLOTHESBACKPACKSMALL = "Bag.S" -- ClothesBackPackSmall kind
-Classic.NAMECLOTHESBACKPACKSMALL = "Bag.S" -- ClothesBackPackSmall name
+Classic.KINDCLOTHESBACKPACKSMALL = "Bag.S"
+Classic.NAMECLOTHESBACKPACKSMALL = "Bag.S"
 function CClothesBackPackSmall:new(_argt)
     CClothesBackPackSmall.super.new(self, _argt)
     self.kind = Classic.KINDCLOTHESBACKPACKSMALL
@@ -752,8 +752,8 @@ function CClothesBackPackSmall:new(_argt)
 end
 
 CClothesBackPackMedium = CClothesBackPack:extend() -- BackPackMedium objects
-Classic.KINDCLOTHESBACKPACKMEDIUM = "Bag.M" -- ClothesBackPackMedium kind
-Classic.NAMECLOTHESBACKPACKMEDIUM = "Bag.M" -- ClothesBackPackMedium name
+Classic.KINDCLOTHESBACKPACKMEDIUM = "Bag.M"
+Classic.NAMECLOTHESBACKPACKMEDIUM = "Bag.M"
 function CClothesBackPackMedium:new(_argt)
     CClothesBackPackMedium.super.new(self, _argt)
     self.kind = Classic.KINDCLOTHESBACKPACKMEDIUM
@@ -764,8 +764,8 @@ function CClothesBackPackMedium:new(_argt)
 end
 
 CClothesBackPackLarge = CClothesBackPack:extend() -- BackPackLarge objects
-Classic.KINDCLOTHESBACKPACKLARGE = "Bag.L" -- ClothesBackPackLarge kind
-Classic.NAMECLOTHESBACKPACKLARGE = "Bag.L" -- ClothesBackPackLarge name
+Classic.KINDCLOTHESBACKPACKLARGE = "Bag.L"
+Classic.NAMECLOTHESBACKPACKLARGE = "Bag.L"
 function CClothesBackPackLarge:new(_argt)
     CClothesBackPackLarge.super.new(self, _argt)
     self.kind = Classic.KINDCLOTHESBACKPACKLARGE
@@ -780,8 +780,8 @@ end
 -- CObjectBomb PHY HAND
 --
 CObjectBomb = CObjectPhyHand:extend() -- Bomb objects
-Classic.KINDDOBJECTBOMB = "Bomb" -- Bomb kind
-Classic.NAMEDOBJECTBOMB = "Bomb" -- Bomb name
+Classic.KINDDOBJECTBOMB = "Bomb"
+Classic.NAMEDOBJECTBOMB = "Bomb"
 function CObjectBomb:new(_argt)
     CObjectBomb.super.new(self, _argt)
     self.kind = Classic.KINDDOBJECTBOMB
@@ -814,8 +814,8 @@ function CObjectBomb:new(_argt)
 end
 
 CObjectBombSmall = CObjectBomb:extend() -- BombSmall objects
-Classic.KINDOBJECTBOMBSMALL = "Bomb.S" -- BombSmall kind
-Classic.NAMEOBJECTBOMBSMALL = "Bomb.S" -- BombSmall name
+Classic.KINDOBJECTBOMBSMALL = "Bomb.S"
+Classic.NAMEOBJECTBOMBSMALL = "Bomb.S"
 function CObjectBombSmall:new(_argt)
     CObjectBombSmall.super.new(self, _argt)
     self.kind = Classic.KINDOBJECTBOMBSMALL
@@ -825,8 +825,8 @@ function CObjectBombSmall:new(_argt)
 end
 
 CObjectBombMedium = CObjectBomb:extend() -- BombMedium objects
-Classic.KINDOBJECTBOMBMEDIUM = "Bomb.M" -- BombMedium kind
-Classic.NAMEOBJECTBOMBMEDIUM = "Bomb.M" -- BombMedium name
+Classic.KINDOBJECTBOMBMEDIUM = "Bomb.M"
+Classic.NAMEOBJECTBOMBMEDIUM = "Bomb.M"
 function CObjectBombMedium:new(_argt)
     CObjectBombMedium.super.new(self, _argt)
     self.kind = Classic.KINDOBJECTBOMBMEDIUM
@@ -836,8 +836,8 @@ function CObjectBombMedium:new(_argt)
 end
 
 CObjectBombLarge = CObjectBomb:extend() -- BombLarge objects
-Classic.KINDOBJECTBOMBLARGE = "Bomb.L" -- BombLarge kind
-Classic.NAMEOBJECTBOMBLARGE = "Bomb.L" -- BombLarge name
+Classic.KINDOBJECTBOMBLARGE = "Bomb.L"
+Classic.NAMEOBJECTBOMBLARGE = "Bomb.L"
 function CObjectBombLarge:new(_argt)
     CObjectBombLarge.super.new(self, _argt)
     self.kind = Classic.KINDOBJECTBOMBLARGE
@@ -851,8 +851,8 @@ end
 -- CWeaponRange MEN HAND
 --
 CWeaponRange = CObjectMenHand:extend() -- Range weapons
-Classic.KINDDWEAPONRANGE = "Range" -- Range kind
-Classic.NAMEDWEAPONRANGE = "Range" -- Range name
+Classic.KINDDWEAPONRANGE = "Range"
+Classic.NAMEDWEAPONRANGE = "Range"
 function CWeaponRange:new(_argt)
     CWeaponRange.super.new(self, _argt)
     self.kind = Classic.KINDDWEAPONRANGE
@@ -890,8 +890,8 @@ function CWeaponRange:new(_argt)
 end
 
 CWeaponBowSmall = CWeaponRange:extend() -- BowSmall weapons
-Classic.KINDDWEAPONBOWSMALL = "Bow.S" -- BowSmall kind
-Classic.NAMEDWEAPONBOWSMALL = "Bow.S" -- BowSmall name
+Classic.KINDDWEAPONBOWSMALL = "Bow.S"
+Classic.NAMEDWEAPONBOWSMALL = "Bow.S"
 function CWeaponBowSmall:new(_argt)
     CWeaponBowSmall.super.new(self, _argt)
     self.kind = Classic.KINDDWEAPONBOWSMALL
@@ -901,8 +901,8 @@ function CWeaponBowSmall:new(_argt)
 end
 
 CWeaponBowMedium = CWeaponRange:extend() -- BowMedium weapons
-Classic.KINDDWEAPONBOWMEDIUM = "Bow.M" -- BowMedium kind
-Classic.NAMEDWEAPONBOWMEDIUM = "Bow.M" -- BowMedium name
+Classic.KINDDWEAPONBOWMEDIUM = "Bow.M"
+Classic.NAMEDWEAPONBOWMEDIUM = "Bow.M"
 function CWeaponBowMedium:new(_argt)
     CWeaponBowMedium.super.new(self, _argt)
     self.kind = Classic.KINDDWEAPONBOWMEDIUM
@@ -912,8 +912,8 @@ function CWeaponBowMedium:new(_argt)
 end
 
 CWeaponBowLarge = CWeaponRange:extend() -- BowLarge weapons
-Classic.KINDDWEAPONBOWLARGE = "Bow.L" -- BowLarge kind
-Classic.NAMEDWEAPONBOWLARGE = "Bow.L" -- BowLarge name
+Classic.KINDDWEAPONBOWLARGE = "Bow.L"
+Classic.NAMEDWEAPONBOWLARGE = "Bow.L"
 function CWeaponBowLarge:new(_argt)
     CWeaponBowLarge.super.new(self, _argt)
     self.kind = Classic.KINDDWEAPONBOWLARGE
@@ -927,8 +927,8 @@ end
 -- CWeaponBook MEN HAND
 --
 CWeaponBook = CObjectMenHand:extend() -- Book weapons
-Classic.KINDDWEAPONBOOK = "Book" -- Book kind
-Classic.NAMEDWEAPONBOOK = "Book" -- Book name
+Classic.KINDDWEAPONBOOK = "Book"
+Classic.NAMEDWEAPONBOOK = "Book"
 function CWeaponBook:new(_argt)
     CWeaponBook.super.new(self, _argt)
     self.kind = Classic.KINDDWEAPONBOOK
@@ -969,8 +969,8 @@ function CWeaponBook:new(_argt)
 end
 
 CWeaponBookSmall = CWeaponBook:extend() -- BookSmall weapons
-Classic.KINDWEAPONBOOKSMALL = "Book.S" -- BookSmall kind
-Classic.NAMEWEAPONBOOKSMALL = "Book.S" -- BookSmall name
+Classic.KINDWEAPONBOOKSMALL = "Book.S"
+Classic.NAMEWEAPONBOOKSMALL = "Book.S"
 function CWeaponBookSmall:new(_argt)
     CWeaponBookSmall.super.new(self, _argt)
     self.kind = Classic.KINDWEAPONBOOKSMALL
@@ -980,8 +980,8 @@ function CWeaponBookSmall:new(_argt)
 end
 
 CWeaponBookMedium = CWeaponBook:extend() -- BookMedium weapons
-Classic.KINDWEAPONBOOKMEDIUM= "Book.M" -- BookMedium kind
-Classic.NAMEWEAPONBOOKMEDIUM= "Book.M" -- BookMedium name
+Classic.KINDWEAPONBOOKMEDIUM= "Book.M"
+Classic.NAMEWEAPONBOOKMEDIUM= "Book.M"
 function CWeaponBookMedium:new(_argt)
     CWeaponBookMedium.super.new(self, _argt)
     self.kind = Classic.KINDWEAPONBOOKMEDIUM
@@ -991,8 +991,8 @@ function CWeaponBookMedium:new(_argt)
 end
 
 CWeaponBookLarge = CWeaponBook:extend() -- BookLarge weapons
-Classic.KINDWEAPONBOOKLARGE= "Book.L" -- BookLarge kind
-Classic.NAMEWEAPONBOOKLARGE= "Book.L" -- BookLarge name
+Classic.KINDWEAPONBOOKLARGE= "Book.L"
+Classic.NAMEWEAPONBOOKLARGE= "Book.L"
 function CWeaponBookLarge:new(_argt)
     CWeaponBookLarge.super.new(self, _argt)
     self.kind = Classic.KINDWEAPONBOOKLARGE
@@ -1006,8 +1006,8 @@ end
 -- CClothesHat MEN HEAD
 --
 CClothesHat = CObjectMenHead:extend() -- Hat objects
-Classic.KINDCLOTHESHAT = "Hat" -- ClothesHat kind
-Classic.NAMECLOTHESHAT = "Hat" -- ClothesHat name
+Classic.KINDCLOTHESHAT = "Hat"
+Classic.NAMECLOTHESHAT = "Hat"
 function CClothesHat:new(_argt)
     CClothesHat.super.new(self, _argt)
     self.kind = Classic.KINDCLOTHESHAT
@@ -1024,8 +1024,8 @@ function CClothesHat:new(_argt)
 end
 
 CClothesHatSmall = CClothesHat:extend() -- HatSmall objects
-Classic.KINDCLOTHESHATSMALL = "Hat.S" -- ClothesHatSmall kind
-Classic.NAMECLOTHESHATSMALL = "Hat.S" -- ClothesHatSmall name
+Classic.KINDCLOTHESHATSMALL = "Hat.S"
+Classic.NAMECLOTHESHATSMALL = "Hat.S"
 function CClothesHatSmall:new(_argt)
     CClothesHatSmall.super.new(self, _argt)
     self.kind = Classic.KINDCLOTHESHATSMALL
@@ -1035,8 +1035,8 @@ function CClothesHatSmall:new(_argt)
 end
 
 CClothesHatMedium = CClothesHat:extend() -- HatMedium objects
-Classic.KINDCLOTHESHATMEDIUM = "Hat.M" -- ClothesHatMedium kind
-Classic.NAMECLOTHESHATMEDIUM = "Hat.M" -- ClothesHatMedium name
+Classic.KINDCLOTHESHATMEDIUM = "Hat.M"
+Classic.NAMECLOTHESHATMEDIUM = "Hat.M"
 function CClothesHatMedium:new(_argt)
     CClothesHatMedium.super.new(self, _argt)
     self.kind = Classic.KINDCLOTHESHATMEDIUM
@@ -1046,8 +1046,8 @@ function CClothesHatMedium:new(_argt)
 end
 
 CClothesHatLarge = CClothesHat:extend() -- HatLarge objects
-Classic.KINDCLOTHESHATLARGE = "Hat.L" -- ClothesHatLarge kind
-Classic.NAMECLOTHESHATLARGE = "Hat.L" -- ClothesHatLarge name
+Classic.KINDCLOTHESHATLARGE = "Hat.L"
+Classic.NAMECLOTHESHATLARGE = "Hat.L"
 function CClothesHatLarge:new(_argt)
     CClothesHatLarge.super.new(self, _argt)
     self.kind = Classic.KINDCLOTHESHATLARGE
@@ -1061,8 +1061,8 @@ end
 -- CClothesToolBox MEN BACK
 --
 CClothesToolBox = CObjectMenBack:extend() -- ToolBox objects
-Classic.KINDCLOTHESTOOLBOX = "Box" -- ClothesToolBox kind
-Classic.NAMECLOTHESTOOLBOX = "Box" -- ClothesToolBox name
+Classic.KINDCLOTHESTOOLBOX = "Box"
+Classic.NAMECLOTHESTOOLBOX = "Box"
 function CClothesToolBox:new(_argt)
     CClothesToolBox.super.new(self, _argt)
     self.kind = Classic.KINDCLOTHESTOOLBOX
@@ -1081,8 +1081,8 @@ function CClothesToolBox:new(_argt)
 end
 
 CClothesToolBoxSmall = CClothesToolBox:extend() -- ToolBoxSmall objects
-Classic.KINDCLOTHESTOOLBOXSMALL = "Box.S" -- ClothesToolBoxSmall kind
-Classic.NAMECLOTHESTOOLBOXSMALL = "Box.S" -- ClothesToolBoxSmall name
+Classic.KINDCLOTHESTOOLBOXSMALL = "Box.S"
+Classic.NAMECLOTHESTOOLBOXSMALL = "Box.S"
 function CClothesToolBoxSmall:new(_argt)
     CClothesToolBoxSmall.super.new(self, _argt)
     self.kind = Classic.KINDCLOTHESTOOLBOXSMALL
@@ -1093,8 +1093,8 @@ function CClothesToolBoxSmall:new(_argt)
 end
 
 CClothesToolBoxMedium = CClothesToolBox:extend() -- ToolBoxMedium objects
-Classic.KINDCLOTHESTOOLBOXMEDIUM = "Box.M" -- ClothesToolBoxMedium kind
-Classic.NAMECLOTHESTOOLBOXMEDIUM = "Box.M" -- ClothesToolBoxMedium name
+Classic.KINDCLOTHESTOOLBOXMEDIUM = "Box.M"
+Classic.NAMECLOTHESTOOLBOXMEDIUM = "Box.M"
 function CClothesToolBoxMedium:new(_argt)
     CClothesToolBoxMedium.super.new(self, _argt)
     self.kind = Classic.KINDCLOTHESTOOLBOXMEDIUM
@@ -1105,8 +1105,8 @@ function CClothesToolBoxMedium:new(_argt)
 end
 
 CClothesToolBoxLarge = CClothesToolBox:extend() -- ToolBoxLarge objects
-Classic.KINDCLOTHESTOOLBOXLARGE = "Box.L" -- ClothesToolBoxLarge kind
-Classic.NAMECLOTHESTOOLBOXLARGE = "Box.L" -- ClothesToolBoxLarge name
+Classic.KINDCLOTHESTOOLBOXLARGE = "Box.L"
+Classic.NAMECLOTHESTOOLBOXLARGE = "Box.L"
 function CClothesToolBoxLarge:new(_argt)
     CClothesToolBoxLarge.super.new(self, _argt)
     self.kind = Classic.KINDCLOTHESTOOLBOXLARGE
@@ -1121,8 +1121,8 @@ end
 -- CObjectFlask MEN HAND
 --
 CObjectFlask = CObjectMenHand:extend() -- Flask objects
-Classic.KINDDOBJECTFLASK = "Flask" -- Flask kind
-Classic.NAMEDOBJECTFLASK = "Flask" -- Flask name
+Classic.KINDDOBJECTFLASK = "Flask"
+Classic.NAMEDOBJECTFLASK = "Flask"
 function CObjectFlask:new(_argt)
     CObjectFlask.super.new(self, _argt)
     self.kind = Classic.KINDDOBJECTFLASK
@@ -1151,8 +1151,8 @@ function CObjectFlask:new(_argt)
 end
 
 CObjectFlaskSmall = CObjectFlask:extend() -- FlaskSmall objects
-Classic.KINDOBJECTFLASKSMALL = "Flask.S" -- FlaskSmall kind
-Classic.NAMEOBJECTFLASKSMALL = "Flask.S" -- FlaskSmall name
+Classic.KINDOBJECTFLASKSMALL = "Flask.S"
+Classic.NAMEOBJECTFLASKSMALL = "Flask.S"
 function CObjectFlaskSmall:new(_argt)
     CObjectFlaskSmall.super.new(self, _argt)
     self.kind = Classic.KINDOBJECTFLASKSMALL
@@ -1162,8 +1162,8 @@ function CObjectFlaskSmall:new(_argt)
 end
 
 CObjectFlaskMedium = CObjectFlask:extend() -- FlaskMedium objects
-Classic.KINDOBJECTFLASKMEDIUM = "Flask.M" -- FlaskMedium kind
-Classic.NAMEOBJECTFLASKMEDIUM = "Flask.M" -- FlaskMedium name
+Classic.KINDOBJECTFLASKMEDIUM = "Flask.M"
+Classic.NAMEOBJECTFLASKMEDIUM = "Flask.M"
 function CObjectFlaskMedium:new(_argt)
     CObjectFlaskMedium.super.new(self, _argt)
     self.kind = Classic.KINDOBJECTFLASKMEDIUM
@@ -1173,8 +1173,8 @@ function CObjectFlaskMedium:new(_argt)
 end
 
 CObjectFlaskLarge = CObjectFlask:extend() -- FlaskLarge objects
-Classic.KINDOBJECTFLASKLARGE = "Flask.L" -- FlaskLarge kind
-Classic.NAMEOBJECTFLASKLARGE = "Flask.L" -- FlaskLarge name
+Classic.KINDOBJECTFLASKLARGE = "Flask.L"
+Classic.NAMEOBJECTFLASKLARGE = "Flask.L"
 function CObjectFlaskLarge:new(_argt)
     CObjectFlaskLarge.super.new(self, _argt)
     self.kind = Classic.KINDOBJECTFLASKLARGE
@@ -1188,8 +1188,8 @@ end
 -- CWeaponMagic PSY HAND
 --
 CWeaponMagic = CObjectPsyHand:extend() -- Magic weapons
-Classic.KINDDWEAPONMAGIC = "Magic" -- Magic kind
-Classic.NAMEDWEAPONMAGIC = "Magic" -- Magic name
+Classic.KINDDWEAPONMAGIC = "Magic"
+Classic.NAMEDWEAPONMAGIC = "Magic"
 function CWeaponMagic:new(_argt)
     CWeaponMagic.super.new(self, _argt)
     self.kind = Classic.KINDDWEAPONMAGIC
@@ -1212,8 +1212,8 @@ function CWeaponMagic:new(_argt)
 end
 
 CWeaponWandSmall = CWeaponMagic:extend() -- WandSmall weapons
-Classic.KINDDWEAPONWANDSMALL = "Wand.S" -- WandSmall kind
-Classic.NAMEDWEAPONWANDSMALL = "Wand.S" -- WandSmall name
+Classic.KINDDWEAPONWANDSMALL = "Wand.S"
+Classic.NAMEDWEAPONWANDSMALL = "Wand.S"
 function CWeaponWandSmall:new(_argt)
     CWeaponWandSmall.super.new(self, _argt)
     self.kind = Classic.KINDDWEAPONWANDSMALL
@@ -1223,8 +1223,8 @@ function CWeaponWandSmall:new(_argt)
 end
 
 CWeaponWandMedium = CWeaponMagic:extend() -- WandMedium weapons
-Classic.KINDDWEAPONWANDMEDIUM = "Wand.M" -- WandMedium kind
-Classic.NAMEDWEAPONWANDMEDIUM = "Wand.M" -- WandMedium name
+Classic.KINDDWEAPONWANDMEDIUM = "Wand.M"
+Classic.NAMEDWEAPONWANDMEDIUM = "Wand.M"
 function CWeaponWandMedium:new(_argt)
     CWeaponWandMedium.super.new(self, _argt)
     self.kind = Classic.KINDDWEAPONWANDMEDIUM
@@ -1234,8 +1234,8 @@ function CWeaponWandMedium:new(_argt)
 end
 
 CWeaponWandLarge = CWeaponMagic:extend() -- WandLarge weapons
-Classic.KINDDWEAPONWANDLARGE = "Wand.L" -- WandLarge kind
-Classic.NAMEDWEAPONWANDLARGE = "Wand.L" -- WandLarge name
+Classic.KINDDWEAPONWANDLARGE = "Wand.L"
+Classic.NAMEDWEAPONWANDLARGE = "Wand.L"
 function CWeaponWandLarge:new(_argt)
     CWeaponWandLarge.super.new(self, _argt)
     self.kind = Classic.KINDDWEAPONWANDLARGE
@@ -1249,8 +1249,8 @@ end
 -- CWeaponRune PSY HAND
 --
 CWeaponRune = CObjectPsyHand:extend() -- Rune weapons
-Classic.KINDDWEAPONRUNE = "Rune" -- Rune kind
-Classic.NAMEDWEAPONRUNE = "Rune" -- Rune name
+Classic.KINDDWEAPONRUNE = "Rune"
+Classic.NAMEDWEAPONRUNE = "Rune"
 function CWeaponRune:new(_argt)
     CWeaponRune.super.new(self, _argt)
     self.kind = Classic.KINDDWEAPONRUNE
@@ -1273,8 +1273,8 @@ function CWeaponRune:new(_argt)
 end
 
 CWeaponRuneSmall = CWeaponRune:extend() -- RuneSmall weapons
-Classic.KINDWEAPONRUNESMALL = "Rune.S" -- RuneSmall kind
-Classic.NAMEWEAPONRUNESMALL = "Rune.S" -- RuneSmall name
+Classic.KINDWEAPONRUNESMALL = "Rune.S"
+Classic.NAMEWEAPONRUNESMALL = "Rune.S"
 function CWeaponRuneSmall:new(_argt)
     CWeaponRuneSmall.super.new(self, _argt)
     self.kind = Classic.KINDWEAPONRUNESMALL
@@ -1284,8 +1284,8 @@ function CWeaponRuneSmall:new(_argt)
 end
 
 CWeaponRuneMedium = CWeaponRune:extend() -- RuneMedium weapons
-Classic.KINDWEAPONRUNEMEDIUM= "Rune.M" -- RuneMedium kind
-Classic.NAMEWEAPONRUNEMEDIUM= "Rune.M" -- RuneMedium name
+Classic.KINDWEAPONRUNEMEDIUM= "Rune.M"
+Classic.NAMEWEAPONRUNEMEDIUM= "Rune.M"
 function CWeaponRuneMedium:new(_argt)
     CWeaponRuneMedium.super.new(self, _argt)
     self.kind = Classic.KINDWEAPONRUNEMEDIUM
@@ -1295,8 +1295,8 @@ function CWeaponRuneMedium:new(_argt)
 end
 
 CWeaponRuneLarge = CWeaponRune:extend() -- RuneLarge weapons
-Classic.KINDWEAPONRUNELARGE= "Rune.L" -- RuneLarge kind
-Classic.NAMEWEAPONRUNELARGE= "Rune.L" -- RuneLarge name
+Classic.KINDWEAPONRUNELARGE= "Rune.L"
+Classic.NAMEWEAPONRUNELARGE= "Rune.L"
 function CWeaponRuneLarge:new(_argt)
     CWeaponRuneLarge.super.new(self, _argt)
     self.kind = Classic.KINDWEAPONRUNELARGE
@@ -1310,8 +1310,8 @@ end
 -- CClothesCap PSY HEAD
 --
 CClothesCap = CObjectPsyHead:extend() -- Cap objects
-Classic.KINDCLOTHESCAP = "Cap" -- ClothesCap kind
-Classic.NAMECLOTHESCAP = "Cap" -- ClothesCap name
+Classic.KINDCLOTHESCAP = "Cap"
+Classic.NAMECLOTHESCAP = "Cap"
 function CClothesCap:new(_argt)
     CClothesCap.super.new(self, _argt)
     self.kind = Classic.KINDCLOTHESCAP
@@ -1329,8 +1329,8 @@ function CClothesCap:new(_argt)
 end
 
 CClothesCapSmall = CClothesCap:extend() -- CapSmall objects
-Classic.KINDCLOTHESCAPSMALL = "Cap.S" -- ClothesCapSmall kind
-Classic.NAMECLOTHESCAPSMALL = "Cap.S" -- ClothesCapSmall name
+Classic.KINDCLOTHESCAPSMALL = "Cap.S"
+Classic.NAMECLOTHESCAPSMALL = "Cap.S"
 function CClothesCapSmall:new(_argt)
     CClothesCapSmall.super.new(self, _argt)
     self.kind = Classic.KINDCLOTHESCAPSMALL
@@ -1340,8 +1340,8 @@ function CClothesCapSmall:new(_argt)
 end
 
 CClothesCapMedium = CClothesCap:extend() -- CapMedium objects
-Classic.KINDCLOTHESCAPMEDIUM = "Cap.M" -- ClothesCapMedium kind
-Classic.NAMECLOTHESCAPMEDIUM = "Cap.M" -- ClothesCapMedium name
+Classic.KINDCLOTHESCAPMEDIUM = "Cap.M"
+Classic.NAMECLOTHESCAPMEDIUM = "Cap.M"
 function CClothesCapMedium:new(_argt)
     CClothesCapMedium.super.new(self, _argt)
     self.kind = Classic.KINDCLOTHESCAPMEDIUM
@@ -1351,8 +1351,8 @@ function CClothesCapMedium:new(_argt)
 end
 
 CClothesCapLarge = CClothesCap:extend() -- CapLarge objects
-Classic.KINDCLOTHESCAPLARGE = "Cap.L" -- ClothesCapLarge kind
-Classic.NAMECLOTHESCAPLARGE = "Cap.L" -- ClothesCapLarge name
+Classic.KINDCLOTHESCAPLARGE = "Cap.L"
+Classic.NAMECLOTHESCAPLARGE = "Cap.L"
 function CClothesCapLarge:new(_argt)
     CClothesCapLarge.super.new(self, _argt)
     self.kind = Classic.KINDCLOTHESCAPLARGE
@@ -1366,8 +1366,8 @@ end
 -- CClothesScrollCase PSY BACK
 --
 CClothesScrollCase = CObjectPsyBack:extend() -- ScrollCase objects
-Classic.KINDCLOTHESSCROLLCASE = "Case" -- ClothesScrollCase kind
-Classic.NAMECLOTHESSCROLLCASE = "Case" -- ClothesScrollCase name
+Classic.KINDCLOTHESSCROLLCASE = "Case"
+Classic.NAMECLOTHESSCROLLCASE = "Case"
 function CClothesScrollCase:new(_argt)
     CClothesScrollCase.super.new(self, _argt)
     self.kind = Classic.KINDCLOTHESSCROLLCASE
@@ -1386,8 +1386,8 @@ function CClothesScrollCase:new(_argt)
 end
 
 CClothesScrollCaseSmall = CClothesScrollCase:extend() -- ScrollCaseSmall objects
-Classic.KINDCLOTHESSCROLLCASESMALL = "Case.S" -- ClothesScrollCaseSmall kind
-Classic.NAMECLOTHESSCROLLCASESMALL = "Case.S" -- ClothesScrollCaseSmall name
+Classic.KINDCLOTHESSCROLLCASESMALL = "Case.S"
+Classic.NAMECLOTHESSCROLLCASESMALL = "Case.S"
 function CClothesScrollCaseSmall:new(_argt)
     CClothesScrollCaseSmall.super.new(self, _argt)
     self.kind = Classic.KINDCLOTHESSCROLLCASESMALL
@@ -1398,8 +1398,8 @@ function CClothesScrollCaseSmall:new(_argt)
 end
 
 CClothesScrollCaseMedium = CClothesScrollCase:extend() -- ScrollCaseMedium objects
-Classic.KINDCLOTHESSCROLLCASEMEDIUM = "Case.M" -- ClothesScrollCaseMedium kind
-Classic.NAMECLOTHESSCROLLCASEMEDIUM = "Case.M" -- ClothesScrollCaseMedium name
+Classic.KINDCLOTHESSCROLLCASEMEDIUM = "Case.M"
+Classic.NAMECLOTHESSCROLLCASEMEDIUM = "Case.M"
 function CClothesScrollCaseMedium:new(_argt)
     CClothesScrollCaseMedium.super.new(self, _argt)
     self.kind = Classic.KINDCLOTHESSCROLLCASEMEDIUM
@@ -1410,8 +1410,8 @@ function CClothesScrollCaseMedium:new(_argt)
 end
 
 CClothesScrollCaseLarge = CClothesScrollCase:extend() -- ScrollCaseLarge objects
-Classic.KINDCLOTHESSCROLLCASELARGE = "Case.L" -- ClothesScrollCaseLarge kind
-Classic.NAMECLOTHESSCROLLCASELARGE = "Case.L" -- ClothesScrollCaseLarge name
+Classic.KINDCLOTHESSCROLLCASELARGE = "Case.L"
+Classic.NAMECLOTHESSCROLLCASELARGE = "Case.L"
 function CClothesScrollCaseLarge:new(_argt)
     CClothesScrollCaseLarge.super.new(self, _argt)
     self.kind = Classic.KINDCLOTHESSCROLLCASELARGE
@@ -1426,8 +1426,8 @@ end
 -- CObjectSpell PSY HAND
 --
 CObjectSpell = CObjectPsyHand:extend() -- Spell objects
-Classic.KINDDOBJECTSPELL = "Spell" -- Spell kind
-Classic.NAMEDOBJECTSPELL = "Spell" -- Spell name
+Classic.KINDDOBJECTSPELL = "Spell"
+Classic.NAMEDOBJECTSPELL = "Spell"
 function CObjectSpell:new(_argt)
     CObjectSpell.super.new(self, _argt)
     self.kind = Classic.KINDDOBJECTSPELL
@@ -1460,8 +1460,8 @@ function CObjectSpell:new(_argt)
 end
 
 CObjectSpellSmall = CObjectSpell:extend() -- SpellSmall objects
-Classic.KINDOBJECTSPELLSMALL = "Spell.S" -- SpellSmall kind
-Classic.NAMEOBJECTSPELLSMALL = "Spell.S" -- SpellSmall name
+Classic.KINDOBJECTSPELLSMALL = "Spell.S"
+Classic.NAMEOBJECTSPELLSMALL = "Spell.S"
 function CObjectSpellSmall:new(_argt)
     CObjectSpellSmall.super.new(self, _argt)
     self.kind = Classic.KINDOBJECTSPELLSMALL
@@ -1471,8 +1471,8 @@ function CObjectSpellSmall:new(_argt)
 end
 
 CObjectSpellMedium = CObjectSpell:extend() -- SpellMedium objects
-Classic.KINDOBJECTSPELLMEDIUM = "Spell.M" -- SpellMedium kind
-Classic.NAMEOBJECTSPELLMEDIUM = "Spell.M" -- SpellMedium name
+Classic.KINDOBJECTSPELLMEDIUM = "Spell.M"
+Classic.NAMEOBJECTSPELLMEDIUM = "Spell.M"
 function CObjectSpellMedium:new(_argt)
     CObjectSpellMedium.super.new(self, _argt)
     self.kind = Classic.KINDOBJECTSPELLMEDIUM
@@ -1482,8 +1482,8 @@ function CObjectSpellMedium:new(_argt)
 end
 
 CObjectSpellLarge = CObjectSpell:extend() -- SpellLarge objects
-Classic.KINDOBJECTSPELLLARGE = "Spell.L" -- SpellLarge kind
-Classic.NAMEOBJECTSPELLLARGE = "Spell.L" -- SpellLarge name
+Classic.KINDOBJECTSPELLLARGE = "Spell.L"
+Classic.NAMEOBJECTSPELLLARGE = "Spell.L"
 function CObjectSpellLarge:new(_argt)
     CObjectSpellLarge.super.new(self, _argt)
     self.kind = Classic.KINDOBJECTSPELLLARGE

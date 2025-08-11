@@ -3,14 +3,14 @@ require("libraries/ext/Classic")
 -- CEntity
 --
 CEntity = Classic:extend() -- generic entities like worlds, places, objects, characters, cameras ...
-Classic.KINDENTITY = "Entity" -- Entity kind
-Classic.NAMEENTITY = "Entity" -- Entity name
-Classic.NAMEEMPTY  = "Empty"  -- Empty name
-Classic.NAMEDYING  = "Dying"   -- Dying name
-Classic.NAMESILENT = "Silent" -- Silent name
-Classic.NAMELIVING = "Living" -- Living name
-Classic.NAMEANIMED = "Animed" -- Animed name
-Classic.NAMEFITFUL = "Fitful" -- Fitful name
+Classic.KINDENTITY = "Entity"
+Classic.NAMEENTITY = "Entity"
+Classic.NAMEEMPTY  = "Empty" 
+Classic.NAMEDYING  = "Dying"  
+Classic.NAMESILENT = "Silent"
+Classic.NAMELIVING = "Living"
+Classic.NAMEANIMED = "Animed"
+Classic.NAMEFITFUL = "Fitful"
 CEntity.WORLDX = 0
 CEntity.WORLDY = 0
 function CEntity:new(_argt)

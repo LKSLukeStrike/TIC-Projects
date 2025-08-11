@@ -13,8 +13,8 @@ _template = [[
 -- _cclassic
 --
 _cclassic = _cextend:extend() -- _comment
-_kclassic = "_classic" -- _classic kind
-_nclassic = "_classic" -- _classic name
+_kclassic = "_classic"
+_nclassic = "_classic"
 function _cclassic:new(_argt)
     _cclassic.super.new(self, _argt)
     self.kind = _kclassic

@@ -3,8 +3,8 @@ require("libraries/ext/Classic")
 -- CSlot
 --
 CSlot = Classic:extend() -- generic slot
-Classic.KINDSLOT = "Slot" -- Slot kind
-Classic.NAMESLOT = "Slot" -- Slot name
+Classic.KINDSLOT = "Slot"
+Classic.NAMESLOT = "Slot"
 function CSlot:new(_argt)
     CSlot.super.new(self, _argt)
     self.kind = Classic.KINDSLOT
@@ -52,8 +52,8 @@ function CSlot:objectsinInventories(_inventories)
 end
 
 CSlotHead = CSlot:extend() -- generic head slot
-Classic.KINDSLOTHEAD = "SlotHead" -- SlotHead kind
-Classic.NAMESLOTHEAD = "SlotHead" -- SlotHead name
+Classic.KINDSLOTHEAD = "SlotHead"
+Classic.NAMESLOTHEAD = "SlotHead"
 function CSlotHead:new(_argt)
     CSlotHead.super.new(self, _argt)
     self.kind = Classic.KINDSLOTHEAD
@@ -63,8 +63,8 @@ function CSlotHead:new(_argt)
 end
 
 CSlotBack = CSlot:extend() -- generic back slot
-Classic.KINDSLOTBACK = "SlotBack" -- SlotBack kind
-Classic.NAMESLOTBACK = "SlotBack" -- SlotBack name
+Classic.KINDSLOTBACK = "SlotBack"
+Classic.NAMESLOTBACK = "SlotBack"
 function CSlotBack:new(_argt)
     CSlotBack.super.new(self, _argt)
     self.kind = Classic.KINDSLOTBACK
@@ -74,8 +74,8 @@ function CSlotBack:new(_argt)
 end
 
 CSlotHand = CSlot:extend() -- generic hand slot
-Classic.KINDSLOTHAND = "SlotHand" -- SlotHand kind
-Classic.NAMESLOTHAND = "SlotHand" -- SlotHand name
+Classic.KINDSLOTHAND = "SlotHand"
+Classic.NAMESLOTHAND = "SlotHand"
 function CSlotHand:new(_argt)
     CSlotHand.super.new(self, _argt)
     self.kind = Classic.KINDSLOTHAND
@@ -85,8 +85,8 @@ function CSlotHand:new(_argt)
 end
 
 CSlotHandLF = CSlotHand:extend() -- generic hand lf slot
-Classic.KINDSLOTHANDLF = "SlotHandLF" -- SlotHandLF kind
-Classic.NAMESLOTHANDLF = "SlotHandLF" -- SlotHandLF name
+Classic.KINDSLOTHANDLF = "SlotHandLF"
+Classic.NAMESLOTHANDLF = "SlotHandLF"
 function CSlotHandLF:new(_argt)
     CSlotHandLF.super.new(self, _argt)
     self.kind = Classic.KINDSLOTHANDLF
@@ -95,8 +95,8 @@ function CSlotHandLF:new(_argt)
 end
 
 CSlotHandRG = CSlotHand:extend() -- generic hand rg slot
-Classic.KINDSLOTHANDRG = "SlotHandRG" -- SlotHandRG kind
-Classic.NAMESLOTHANDRG = "SlotHandRG" -- SlotHandRG name
+Classic.KINDSLOTHANDRG = "SlotHandRG"
+Classic.NAMESLOTHANDRG = "SlotHandRG"
 function CSlotHandRG:new(_argt)
     CSlotHandRG.super.new(self, _argt)
     self.kind = Classic.KINDSLOTHANDRG

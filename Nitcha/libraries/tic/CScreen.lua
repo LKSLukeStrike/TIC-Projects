@@ -3,8 +3,8 @@ require("libraries/tic/CElement")
 -- CScreen
 --
 CScreen = CElement:extend() -- generic screen -- use it as an empty box
-Classic.KINDSCREEN = "Screen" -- Screen kind
-Classic.NAMESCREEN = "Screen" -- Screen name
+Classic.KINDSCREEN = "Screen"
+Classic.NAMESCREEN = "Screen"
 function CScreen:new(_argt)
     CScreen.super.new(self, _argt)
     self.kind = Classic.KINDSCREEN

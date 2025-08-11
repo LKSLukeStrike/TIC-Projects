@@ -3,8 +3,8 @@ require("libraries/tic/CElement")
 -- CText
 --
 CText = CElement:extend() -- generic text element
-Classic.KINDTEXT = "Text" -- Text kind
-Classic.NAMETEXT = "Text" -- Text name
+Classic.KINDTEXT = "Text"
+Classic.NAMETEXT = "Text"
 function CText:new(_argt)
     CText.super.new(self, _argt)
     self.kind = Classic.KINDTEXT

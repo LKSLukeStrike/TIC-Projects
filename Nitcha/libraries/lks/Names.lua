@@ -92,7 +92,7 @@ function Names:fupper(_string) -- uppercase first letter, lowercase the rest
 end
 
 
-function Names:random(_minlen, _maxlen, _vowels, _consos, _prbvow) -- random name of a random length from 2 letters sets
+function Names:random(_minlen, _maxlen, _vowels, _consos, _prbvow)
 	_minlen = _minlen or 2
 	_maxlen = _maxlen or 6
 	_vowels = _vowels or Names.VOWELS

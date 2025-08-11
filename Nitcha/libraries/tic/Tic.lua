@@ -962,7 +962,7 @@ Tic.STATES = CCyclerTable{acttable = { -- all available states
     Tic.STATEKNEELIDLE,
     Tic.STATEKNEELWORK,
     Tic.STATEKNEELMOVE,
-    Tic.STATEFLOORSLEEP, -- S -- TODO find better names ?
+    Tic.STATEFLOORSLEEP, -- S
     Tic.STATEFLOORBLEED, -- B
     Tic.STATEFLOORMAGIC, -- M
     Tic.STATEFLOORALCHE, -- A
@@ -1546,8 +1546,8 @@ require("libraries/tic/CEntity")
 -- CWorld
 --
 CWorld = CEntity:extend() -- generic world that contains entities
-Classic.KINDWORLD = "World" -- World kind
-Classic.NAMEWORLD = "World" -- World name
+Classic.KINDWORLD = "World"
+Classic.NAMEWORLD = "World"
 function CWorld:new(_argt)
     CWorld.super.new(self, _argt)
     self.classic = CWorld -- instance of
@@ -1610,8 +1610,8 @@ end
 -- CCamera
 --
 CCamera = CEntity:extend() -- camera
-Classic.KINDCAMERA = "Camera" -- Camera kind
-Classic.NAMECAMERA = "Camera" -- Camera name
+Classic.KINDCAMERA = "Camera"
+Classic.NAMECAMERA = "Camera"
 CCamera.RANGEX = Tic.WORLDWW / 2
 CCamera.RANGEY = Tic.WORLDWH / 2
 function CCamera:new(_argt)
@@ -1652,8 +1652,8 @@ require("libraries/tic/CEntityDrawable")
 -- CPlace
 --
 CPlace = CEntityDrawable:extend() -- places
-Classic.KINDPLACE = "Place" -- Place kind
-Classic.NAMEPLACE = "Place" -- Place name
+Classic.KINDPLACE = "Place"
+Classic.NAMEPLACE = "Place"
 CPlace.EMPTY    = Tic.COLORKEY -- anims
 CPlace.ANIM01   = Tic.COLORWHITE
 CPlace.ANIM02   = Tic.COLORYELLOW
@@ -1713,7 +1713,7 @@ end
 -- CPlaceBuild
 --
 CPlaceBuild = CPlace:extend() -- builds
-Classic.KINDPLACEBUILD = "Build" -- Build kind
+Classic.KINDPLACEBUILD = "Build"
 CPlaceBuild.PALETTEIDLE  = {
     [CPlace.SMOKE]    = CPlace.EMPTY,
     [CPlace.WINDOW01] = CPlace.WALLS,
@@ -1745,7 +1745,7 @@ end
 -- CPlaceHouse
 --
 CPlaceHouse = CPlaceBuild:extend() -- houses
-Classic.KINDPLACEHOUSE = "House" -- House kind
+Classic.KINDPLACEHOUSE = "House"
 function CPlaceHouse:new(_argt)
     CPlaceHouse.super.new(self, _argt)
     self.classic = CPlaceHouse
@@ -1789,7 +1789,7 @@ end
 -- CPlaceTower
 --
 CPlaceTower = CPlaceBuild:extend() -- towers
-Classic.KINDPLACETOWER = "Tower" -- Tower kind
+Classic.KINDPLACETOWER = "Tower"
 function CPlaceTower:new(_argt)
     CPlaceTower.super.new(self, _argt)
     self.kind = Classic.KINDPLACETOWER
@@ -1830,7 +1830,7 @@ end
 -- CPlaceManor
 --
 CPlaceManor = CPlaceBuild:extend() -- manors
-Classic.KINDPLACEMANOR = "Manor" -- Manor kind
+Classic.KINDPLACEMANOR = "Manor"
 function CPlaceManor:new(_argt)
     CPlaceManor.super.new(self, _argt)
     self.kind = Classic.KINDPLACEMANOR
@@ -1878,7 +1878,7 @@ end
 -- CPlaceKirke
 --
 CPlaceKirke = CPlaceBuild:extend() -- kirkes
-Classic.KINDPLACEKIRKE = "Kirke" -- Kirke kind
+Classic.KINDPLACEKIRKE = "Kirke"
 function CPlaceKirke:new(_argt)
     CPlaceKirke.super.new(self, _argt)
     self.kind = Classic.KINDPLACEKIRKE
@@ -1920,7 +1920,7 @@ end
 -- CPlaceWater
 --
 CPlaceWater = CPlaceBuild:extend() -- waters
-Classic.KINDPLACEWATER = "Water" -- Water kind
+Classic.KINDPLACEWATER = "Water"
 function CPlaceWater:new(_argt)
     CPlaceWater.super.new(self, _argt)
     self.kind = Classic.KINDPLACEWATER
@@ -1962,7 +1962,7 @@ end
 -- CPlaceStall
 --
 CPlaceStall = CPlaceBuild:extend() -- stalls
-Classic.KINDPLACESTALL = "Stall" -- Stall kind
+Classic.KINDPLACESTALL = "Stall"
 function CPlaceStall:new(_argt)
     CPlaceStall.super.new(self, _argt)
     self.kind = Classic.KINDPLACESTALL
@@ -2010,7 +2010,7 @@ end
 -- CPlaceTrees
 --
 CPlaceTrees = CPlace:extend() -- trees
-Classic.KINDPLACETREES = "Trees" -- Trees kind
+Classic.KINDPLACETREES = "Trees"
 CPlaceTrees.PALETTEIDLE   = {
     [CPlace.NEST]    = CPlace.EMPTY,
     [CPlace.FLOOR01] = CPlace.BARK,
@@ -2101,7 +2101,7 @@ end
 -- CPlaceStone
 --
 CPlaceStone = CPlace:extend() -- stones
-Classic.KINDPLACESTONE = "Stone" -- Stone kind
+Classic.KINDPLACESTONE = "Stone"
 CPlaceStone.PALETTEIDLE   = {
     [CPlace.MOON]    = CPlace.EMPTY,
     [CPlace.FLOOR01] = CPlace.STONEBG,
@@ -2130,7 +2130,7 @@ end
 -- CPlaceMenhr
 --
 CPlaceMenhr = CPlaceStone:extend() -- menhrs
-Classic.KINDPLACEMENHR = "Menhr" -- Menhr kind
+Classic.KINDPLACEMENHR = "Menhr"
 function CPlaceMenhr:new(_argt)
     CPlaceMenhr.super.new(self, _argt)
     self.kind = Classic.KINDPLACEMENHR
@@ -2205,7 +2205,7 @@ end
 -- CPlaceDolmn
 --
 CPlaceDolmn = CPlaceStone:extend() -- dolmns
-Classic.KINDPLACEDOLMN = "Dolmn" -- Dolmn kind
+Classic.KINDPLACEDOLMN = "Dolmn"
 function CPlaceDolmn:new(_argt)
     CPlaceDolmn.super.new(self, _argt)
     self.kind = Classic.KINDPLACEDOLMN
@@ -2281,7 +2281,7 @@ end
 -- CPlaceCirkl
 --
 CPlaceCirkl = CPlaceStone:extend() -- cirkls
-Classic.KINDPLACECIRKL = "Cirkl" -- Cirkl kind
+Classic.KINDPLACECIRKL = "Cirkl"
 function CPlaceCirkl:new(_argt)
     CPlaceCirkl.super.new(self, _argt)
     self.kind = Classic.KINDPLACECIRKL
@@ -2357,7 +2357,7 @@ end
 -- CPlaceRoads
 --
 CPlaceRoads = CPlaceStone:extend() -- roads
-Classic.KINDPLACEROADS = "Roads" -- Roads kind
+Classic.KINDPLACEROADS = "Roads"
 function CPlaceRoads:new(_argt)
     CPlaceRoads.super.new(self, _argt)
     self.kind = Classic.KINDPLACEROADS
@@ -2439,7 +2439,7 @@ require("libraries/tic/CCharacter")
 -- CCharacterHumanoid
 --
 CCharacterHumanoid = CCharacter:extend() -- humanoid characters
-Classic.KINDCHARACTERHUMANOID = "Humanoid" -- Humanoid kind
+Classic.KINDCHARACTERHUMANOID = "Humanoid"
 CCharacterHumanoid.HANDLESOFFSETS = { -- hands, head and back offsets
     [Tic.STATUSIDLE] = {
         [Tic.DIRXLF] = {
@@ -2762,7 +2762,7 @@ end
 
 
 CPlayerDwarf = CPlayerHumanoid:extend() -- Dwarf player characters
-Classic.KINDDWARF = "Dwarf" -- Dwarf kind
+Classic.KINDDWARF = "Dwarf"
 function CPlayerDwarf:new(_argt)
     CPlayerDwarf.super.new(self, _argt)
     self.classic = CPlayerDwarf
@@ -2782,7 +2782,7 @@ end
 
 
 CPlayerGnome = CPlayerHumanoid:extend() -- Gnome player characters
-Classic.KINDGNOME = "Gnome" -- Gnome kind
+Classic.KINDGNOME = "Gnome"
 function CPlayerGnome:new(_argt)
     CPlayerGnome.super.new(self, _argt)
     self.classic = CPlayerGnome
@@ -2803,7 +2803,7 @@ end
 
 
 CPlayerElvwe = CPlayerHumanoid:extend() -- Elvwe player characters
-Classic.KINDELVWE = "Elvwe" -- Elvwe kind
+Classic.KINDELVWE = "Elvwe"
 function CPlayerElvwe:new(_argt)
     CPlayerElvwe.super.new(self, _argt)
     self.classic = CPlayerElvwe
@@ -2825,7 +2825,7 @@ end
 
 
 CPlayerDrowe = CPlayerElvwe:extend() -- Drowe player characters
-Classic.KINDDROWE = "Drowe" -- Drowe kind
+Classic.KINDDROWE = "Drowe"
 function CPlayerDrowe:new(_argt)
     CPlayerDrowe.super.new(self, _argt)
     self.classic = CPlayerDrowe
@@ -2846,7 +2846,7 @@ end
 
 
 CPlayerAngel = CPlayerHumanoid:extend() -- Angel player characters
-Classic.KINDANGEL = "Angel" -- Angel kind
+Classic.KINDANGEL = "Angel"
 function CPlayerAngel:new(_argt)
     CPlayerAngel.super.new(self, _argt)
     self.classic = CPlayerAngel
@@ -2867,7 +2867,7 @@ end
 
 
 CPlayerGolth = CPlayerHumanoid:extend() -- Golth player characters
-Classic.KINDGOLTH = "Golth" -- Golth kind
+Classic.KINDGOLTH = "Golth"
 function CPlayerGolth:new(_argt)
     CPlayerGolth.super.new(self, _argt)
     self.classic = CPlayerGolth
@@ -2890,7 +2890,7 @@ end
 
 
 CPlayerHorne = CPlayerHumanoid:extend() -- Horne player characters
-Classic.KINDHORNE = "Horne" -- Horne kind
+Classic.KINDHORNE = "Horne"
 function CPlayerHorne:new(_argt)
     CPlayerHorne.super.new(self, _argt)
     self.classic = CPlayerHorne
@@ -2911,7 +2911,7 @@ end
 
 
 CPlayerDemon = CPlayerHorne:extend() -- Demon player characters
-Classic.KINDDEMON = "Demon" -- Demon kind
+Classic.KINDDEMON = "Demon"
 function CPlayerDemon:new(_argt)
     CPlayerDemon.super.new(self, _argt)
     self.classic = CPlayerDemon
@@ -2927,7 +2927,7 @@ end
 
 
 CPlayerTifel = CPlayerHorne:extend() -- Tifel player characters
-Classic.KINDTIFEL = "Tifel" -- Tifel kind
+Classic.KINDTIFEL = "Tifel"
 function CPlayerTifel:new(_argt)
     CPlayerTifel.super.new(self, _argt)
     self.classic = CPlayerTifel
@@ -2944,7 +2944,7 @@ end
 
 
 CPlayerMeduz = CPlayerHumanoid:extend() -- Meduz player characters
-Classic.KINDMEDUZ = "Meduz" -- Meduz kind
+Classic.KINDMEDUZ = "Meduz"
 function CPlayerMeduz:new(_argt)
     CPlayerMeduz.super.new(self, _argt)
     self.classic = CPlayerMeduz
@@ -2964,7 +2964,7 @@ end
 
 
 CPlayerGnoll = CPlayerHumanoid:extend() -- Gnoll player characters
-Classic.KINDGNOLL = "Gnoll" -- Gnoll kind
+Classic.KINDGNOLL = "Gnoll"
 function CPlayerGnoll:new(_argt)
     CPlayerGnoll.super.new(self, _argt)
     self.classic = CPlayerGnoll
@@ -2984,7 +2984,7 @@ end
 
 
 CPlayerWolfe = CPlayerGnoll:extend() -- Wolfe player characters
-Classic.KINDWOLFE = "Wolfe" -- Wolfe kind
+Classic.KINDWOLFE = "Wolfe"
 function CPlayerWolfe:new(_argt)
     CPlayerWolfe.super.new(self, _argt)
     self.classic = CPlayerWolfe
@@ -2994,7 +2994,7 @@ end
 
 
 CPlayerGhost = CPlayerHumanoid:extend() -- Ghost player characters
-Classic.KINDGHOST = "Ghost" -- Ghost kind
+Classic.KINDGHOST = "Ghost"
 function CPlayerGhost:new(_argt)
     CPlayerGhost.super.new(self, _argt)
     self.classic = CPlayerGhost
@@ -3462,17 +3462,17 @@ CPlace.PLACEKINDS = {  -- TODO val can contain parameters such as percent etc
     [CPlaceTree1Idle] = {},
 }
 
-function CPlace:generateRandomWorldWindow(_count, _kinds) -- random count of places of kinds in world window
+function CPlace:generateRandomWorldWindow(_count, _kinds)
     _count = _count or CPlace.PLACECOUNT
     _kinds = _kinds or CPlace.PLACEKINDS
     for _ = 1, _count do
-        local _kind = Tables:keyPickRandom(_kinds) -- random kind
+        local _kind = Tables:keyPickRandom(_kinds)
         _entity = _kind()
         _entity:randomWorldWindow() -- random position
     end
 end
 
-function CPlace:generateRandomRegionWorldCount(_count, _kinds, _regionworld) -- random number of places of kinds in region world
+function CPlace:generateRandomRegionWorldCount(_count, _kinds, _regionworld)
     _count        = _count       or CPlace.PLACECOUNT
     _kinds        = _kinds       or CPlace.PLACEKINDS
     _regionworld  = _regionworld or CRegionWorld{}
@@ -3484,16 +3484,16 @@ function CPlace:generateRandomRegionWorldCount(_count, _kinds, _regionworld) -- 
     }
 
     for _ = 1, _count do
-        local _kind = Tables:keyPickRandom(_kinds) -- random kind
+        local _kind = Tables:keyPickRandom(_kinds)
         while _kinds[_kind].percent and Nums:random(0, 100) >_kinds[_kind].percent do
-            _kind = Tables:keyPickRandom(_kinds) -- choose another kind
+            _kind = Tables:keyPickRandom(_kinds)
         end
         _entity = _kind()
         _entity:randomRegionWorld(_region) -- random position
     end
 end
 
-function CPlace:generateRandomRegionWorldPercent(_percent, _kinds, _regionworld) -- random percent of places of kinds in region world
+function CPlace:generateRandomRegionWorldPercent(_percent, _kinds, _regionworld)
     _percent      = _percent     or 100
     _kinds        = _kinds       or CPlace.PLACEKINDS
     _regionworld  = _regionworld or CRegionWorld{}
