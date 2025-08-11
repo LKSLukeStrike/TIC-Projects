@@ -3,7 +3,11 @@ require("libraries/ext/Classic")
 -- IElement
 --
 IElement = Classic:extend() -- generic screen element implementation
-IElement.BEHAVIOUR = nil
+IElement.BEHAVIOUR = function(self) -- need at least one function if clickable
+    if self.cliclable and (Tables:size(self:functionsDefined()) == 0) then
+        self.enabled = false
+    end
+end
 
 
 --
@@ -12,6 +16,22 @@ IElement.BEHAVIOUR = nil
 CElement = Classic:extend() -- generic screen element -- TODO build this class
 Classic.KINDELEMENT = "Element" -- Element kind
 Classic.NAMEELEMENT = "Element" -- Element name
+CElement.CLICKLF = "clicklf" -- mouse function keys
+CElement.CLICKMD = "clickmd"
+CElement.CLICKRG = "clickrg"
+CElement.WHEELUP = "wheelup"
+CElement.WHEELDW = "wheeldw"
+CElement.WHEELLF = "wheellf"
+CElement.WHEELRG = "wheelrg"
+CElement.FUNCTIONS = { -- all of them
+    CElement.CLICKLF,
+    CElement.CLICKMD,
+    CElement.CLICKRG,
+    CElement.WHEELUP,
+    CElement.WHEELDW,
+    CElement.WHEELLF,
+    CElement.WHEELRG,
+}
 function CElement:new(_argt)
     CElement.super.new(self, _argt)
     self.kind = Classic.KINDELEMENT
@@ -32,6 +52,22 @@ function CElement:new(_argt)
 	self.rounded     = false -- rounded border and frames ?
     self.parent      = nil   -- parent element
     self.elements    = {}    -- sub elements if any
+    self.activedcycler = CCyclerInt{maxindex =  10, mode = CCycler.MODEBLOCK} -- cycler to maintain the actived effect a little bit 
+    self.modifierkey = Tic.KEY_SHIFT -- modifier key to switch functions
+    self.clicklf     = nil   -- function to trigger on click lf
+	self.clickmd     = nil   -- function to trigger on click md
+	self.clickrg     = nil   -- function to trigger on click rg
+	self.wheelup     = nil   -- function to trigger on wheel up
+	self.wheeldw     = nil   -- function to trigger on wheel dw
+	self.wheellf     = nil   -- function to trigger on wheel lf
+	self.wheelrg     = nil   -- function to trigger on wheel rg
+    self.hovertextlf = nil   -- hover CText for clicklf if any
+    self.hovertextmd = nil   -- hover CText for clickmd if any
+    self.hovertextrg = nil   -- hover CText for clickrg if any
+    self.hovertextup = nil   -- hover CText for wheelup if any
+    self.hovertextdw = nil   -- hover CText for wheeldw if any
+    self.hovertextlf = nil   -- hover CText for wheellf if any
+    self.hovertextrg = nil   -- hover CText for wheelrg if any
     self.behaviour   = IElement.BEHAVIOUR   -- behaviour function if any
     self.display     = true  -- display or not ?
     self.drawground  = true  -- draw beheviors
@@ -309,5 +345,68 @@ function CElement:elementsDistributeV(_elements, _screenx, _screeny, _separator)
             _screeny = _element.screeny
         end
         _screeny = _screeny + _element.screenh + _separator
+    end
+end
+
+function CElement:functionsDefined() -- defined functions of a button
+    local _result = {}
+
+    for _, _key in ipairs(CElement.FUNCTIONS) do
+        if type(self[_key]) == "function" then Tables:valInsert(_result, self[_key], true) end
+    end
+
+    return _result
+end
+
+function CElement:functionsActived() -- actived functions (in a key table) of a button
+    local _result = {}
+
+    if Tic.MOUSE.clicklf
+        and type(self[CElement.CLICKLF]) == "function"
+    then
+        Tables:valInsert(_result, self[CElement.CLICKLF], true)
+    end
+    if Tic.MOUSE.clickmd
+        and type(self[CElement.CLICKMD]) == "function"
+    then
+        Tables:valInsert(_result, self[CElement.CLICKMD], true)
+    end
+    if Tic.MOUSE.clickrg
+        and type(self[CElement.CLICKRG]) == "function"
+    then
+        Tables:valInsert(_result, self[CElement.CLICKRG], true)
+    end
+    if Tic.MOUSE.scrolly > 0
+        and type(self[CElement.WHEELUP]) == "function"
+    then
+        Tables:valInsert(_result, self[CElement.WHEELUP], true)
+    end
+    if Tic.MOUSE.scrolly < 0
+        and type(self[CElement.WHEELDW]) == "function"
+    then
+        Tables:valInsert(_result, self[CElement.WHEELDW], true)
+    end
+
+    return _result
+end
+
+function CElement:functionsContains(_function) -- does the button contains a function ?
+    return (Tables:valFind(self:functionsDefined(), _function))
+end
+
+function CElement:activable() -- is the button activable ?
+    return self.display and self.enabled and Tables:size(self:functionsDefined()) > 0 and not self.actived
+end
+
+function CElement:activate() -- activate the button and start the effect cycler
+    self.hovered = false
+    self.actived = true
+    self.activedcycler:max()
+end
+
+function CElement:deactivate() -- dehover the button and stop the activate effect if any
+    self.hovered = false
+    if self.activedcycler:prev() == 0 then
+        self.actived = false
     end
 end

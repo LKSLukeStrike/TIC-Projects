@@ -687,12 +687,13 @@ function CWindowMessagesWorld:new(_argt)
 	self.screenh    = Tic.WORLDMESSAGESWH
     self.drawborder = true
 	self.align      = Tic.DIR270
+    self.clickable  = true
     self:argt(_argt) -- override if any
 end
 
 function CWindowMessagesWorld:drawInside() -- window messages content for world
-    local _message = (Tic:messageActual()) and Tic:messageActual() or ""
-    local _text   = CText{text = _message, small = true, marginlf = 2}
-    self.elements = {_text}
+    local _message = Tic:messageActual() or ""
+    local _text    = CText{text = _message, small = true, marginlf = 2}
+    self.elements  = {_text}
     CWindowMessagesWorld.super.drawInside(self)
 end

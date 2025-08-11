@@ -3,10 +3,8 @@ require("libraries/tic/CElement")
 -- IButton
 --
 IButton = Classic:extend() -- generic button implementation
-IButton.BEHAVIOUR = function(self) -- need at least one function
-    if Tables:size(self:functionsDefined()) == 0 then
-        self.enabled = false
-    end
+IButton.BEHAVIOUR = function(self)
+    IElement.BEHAVIOUR(self)
 end
 IButton.PALETTEKEY = {[Tic.COLORGREYD] = Tic.COLORKEY}
 
@@ -17,22 +15,6 @@ IButton.PALETTEKEY = {[Tic.COLORGREYD] = Tic.COLORKEY}
 CButton = CElement:extend() -- generic button
 Classic.KINDBUTTON = "Button" -- Button kind
 Classic.NAMEBUTTON = "Button" -- Button name
-CButton.CLICKLF = "clicklf" -- mouse function keys
-CButton.CLICKMD = "clickmd"
-CButton.CLICKRG = "clickrg"
-CButton.WHEELUP = "wheelup"
-CButton.WHEELDW = "wheeldw"
-CButton.WHEELLF = "wheellf"
-CButton.WHEELRG = "wheelrg"
-CButton.FUNCTIONS = { -- all of them
-    CButton.CLICKLF,
-    CButton.CLICKMD,
-    CButton.CLICKRG,
-    CButton.WHEELUP,
-    CButton.WHEELDW,
-    CButton.WHEELLF,
-    CButton.WHEELRG,
-}
 function CButton:new(_argt)
     CButton.super.new(self, _argt)
     self.kind = Classic.KINDBUTTON
@@ -43,22 +25,6 @@ function CButton:new(_argt)
     self.enabled       = true  -- can be clicked ?
     self.hovered       = false -- hovered by the mouse ?
     self.actived       = false -- function triggered ?
-    self.activedcycler = CCyclerInt{maxindex =  10, mode = CCycler.MODEBLOCK} -- cycler to maintain the actived effect a little bit 
-    self.modifierkey   = Tic.KEY_SHIFT -- modifier key to switch functions
-    self.clicklf       = nil   -- function to trigger on click lf
-	self.clickmd       = nil   -- function to trigger on click md
-	self.clickrg       = nil   -- function to trigger on click rg
-	self.wheelup       = nil   -- function to trigger on wheel up
-	self.wheeldw       = nil   -- function to trigger on wheel dw
-	self.wheellf       = nil   -- function to trigger on wheel lf
-	self.wheelrg       = nil   -- function to trigger on wheel rg
-    self.hovertextlf   = nil   -- hover CText for clicklf if any
-    self.hovertextmd   = nil   -- hover CText for clickmd if any
-    self.hovertextrg   = nil   -- hover CText for clickrg if any
-    self.hovertextup   = nil   -- hover CText for wheelup if any
-    self.hovertextdw   = nil   -- hover CText for wheeldw if any
-    self.hovertextlf   = nil   -- hover CText for wheellf if any
-    self.hovertextrg   = nil   -- hover CText for wheelrg if any
 	self.behaviour     = IButton.BEHAVIOUR  -- function to trigger at first
     self.drawground    = true  -- draw beheviors
     self.drawguides    = false
@@ -117,69 +83,6 @@ function CButton:drawHovertextRG()
     self.hovertextrg.screenx = self.screenx - ((self.hovertextrg.screenw - self.screenw) // 2) + 1
     self.hovertextrg.screeny = self.screeny + self.screenh
     self.hovertextrg:draw()
-end
-
-function CButton:functionsDefined() -- defined functions of a button
-    local _result = {}
-
-    for _, _key in ipairs(CButton.FUNCTIONS) do
-        if type(self[_key]) == "function" then Tables:valInsert(_result, self[_key], true) end
-    end
-
-    return _result
-end
-
-function CButton:functionsActived() -- actived functions (in a key table) of a button
-    local _result = {}
-
-    if Tic.MOUSE.clicklf
-        and type(self[CButton.CLICKLF]) == "function"
-    then
-        Tables:valInsert(_result, self[CButton.CLICKLF], true)
-    end
-    if Tic.MOUSE.clickmd
-        and type(self[CButton.CLICKMD]) == "function"
-    then
-        Tables:valInsert(_result, self[CButton.CLICKMD], true)
-    end
-    if Tic.MOUSE.clickrg
-        and type(self[CButton.CLICKRG]) == "function"
-    then
-        Tables:valInsert(_result, self[CButton.CLICKRG], true)
-    end
-    if Tic.MOUSE.scrolly > 0
-        and type(self[CButton.WHEELUP]) == "function"
-    then
-        Tables:valInsert(_result, self[CButton.WHEELUP], true)
-    end
-    if Tic.MOUSE.scrolly < 0
-        and type(self[CButton.WHEELDW]) == "function"
-    then
-        Tables:valInsert(_result, self[CButton.WHEELDW], true)
-    end
-
-    return _result
-end
-
-function CButton:functionsContains(_function) -- does the button contains a function ?
-    return (Tables:valFind(self:functionsDefined(), _function))
-end
-
-function CButton:activable() -- is the button activable ?
-    return self.display and self.enabled and Tables:size(self:functionsDefined()) > 0 and not self.actived
-end
-
-function CButton:activate() -- activate the button and start the effect cycler
-    self.hovered = false
-    self.actived = true
-    self.activedcycler:max()
-end
-
-function CButton:deactivate() -- dehover the button and stop the activate effect if any
-    self.hovered = false
-    if self.activedcycler:prev() == 0 then
-        self.actived = false
-    end
 end
 
 

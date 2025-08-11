@@ -3430,8 +3430,8 @@ end
 
 
 -- SCREENS
-if true then Tic:screenAppend(ScreenIntro) end
--- if true then Tic:screenAppend(ScreenWorld) end
+-- if true then Tic:screenAppend(ScreenIntro) end
+if true then Tic:screenAppend(ScreenWorld) end
 -- if true then Tic:screenAppend(ScreenMenus) end
 Tic:screenMin()
 if true then Tic.INVENTORYSCREEN = ScreenMenus end
