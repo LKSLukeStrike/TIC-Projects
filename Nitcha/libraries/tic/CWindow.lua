@@ -529,8 +529,12 @@ end
 -- CWindowWorld
 --
 CWindowWorld = CWindow:extend() -- window world
+Classic.KINDWINDOWWORLD = "WindowWorld"
+Classic.NAMEWINDOWWORLD = "WindowWorld"
 function CWindowWorld:new(_argt)
     CWindowWorld.super.new(self, _argt)
+    self.kind = Classic.KINDWINDOWWORLD
+    self.name = Classic.NAMEWINDOWWORLD
     self.screenx         = Tic.WORLDWX -- positions
     self.screeny         = Tic.WORLDWY
     self.screenw         = Tic.WORLDWW -- sizes
@@ -676,9 +680,27 @@ end
 
 
 --
+-- CWindowInfosUPTRDW
+--
+CWindowInfosUPTRDW = CWindowInfos:extend() -- window infos with up, trash, dw
+Classic.KINDWINDOWINFOSUPTRDW = "WindowInfosUPTRDW"
+Classic.NAMEWINDOWINFOSUPTRDW = "WindowInfosUPTRDW"
+function CWindowInfosUPTRDW:new(_argt)
+    CWindowInfosUPTRDW.super.new(self, _argt)
+    self.kind = Classic.KINDWINDOWINFOSUPTRDW
+    self.name = Classic.NAMEWINDOWINFOSUPTRDW
+    self.text   = CText{name = "WindowMessageWorldText", text = "", small = true, marginlf = 2}
+    self.textlf = CText{name = "T1", text = "T1", small = true, screenx = 10, screeny = 50}
+    self.textrg = CText{name = "T2", text = "T2", small = true}
+    self.elements = {self.text, self.textlf, self.textrg}
+    self:argt(_argt) -- override if any
+end
+
+
+--
 -- CWindowMessagesWorld
 --
-CWindowMessagesWorld = CWindowInfos:extend() -- window messages for world
+CWindowMessagesWorld = CWindowInfosUPTRDW:extend() -- window messages for world
 Classic.KINDWINDOWMESSAGESWORLD = "WindowMessagesWorld"
 Classic.NAMEWINDOWMESSAGESWORLD = "WindowMessagesWorld"
 function CWindowMessagesWorld:new(_argt)
@@ -699,8 +721,7 @@ end
 
 function CWindowMessagesWorld:drawInside() -- window messages content for world
     local _message = Tic:messageActual() or ""
-    local _text    = CText{text = _message, small = true, marginlf = 2}
-    self.elements  = {_text}
+    self.text.text = _message
     CWindowMessagesWorld.super.drawInside(self)
 end
 

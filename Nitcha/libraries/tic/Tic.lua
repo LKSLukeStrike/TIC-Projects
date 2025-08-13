@@ -3292,20 +3292,20 @@ WindowInfosWorld    = CWindowInfosWorld{}
 WindowWorld         = CWindowWorld{}
 WindowMessagesWorld = CWindowMessagesWorld{}
 ButtonMessagePrev   = CButtonMessagePrev{}
-ButtonMessageDelete = CButtonMessageDelete{}
+ButtonMessageTrash  = CButtonMessageTrash{}
 ButtonMessageNext   = CButtonMessageNext{}
 ScreenWorldLF:elementsDistributeH(
-    {ButtonMessagePrev, ButtonMessageDelete, ButtonMessageNext},
+    {ButtonMessagePrev, ButtonMessageTrash, ButtonMessageNext},
     WindowMessagesWorld.screenx + (
-        (WindowMessagesWorld.screenw - CScreen:elementsTotalW({ButtonMessagePrev, ButtonMessageDelete, ButtonMessageNext})) // 2),
+        (WindowMessagesWorld.screenw - CScreen:elementsTotalW({ButtonMessagePrev, ButtonMessageTrash, ButtonMessageNext})) // 2),
     WindowMessagesWorld.screeny - Tic.SPRITESIZE + 1
 )
 ScreenWorldMD:appendElements{
-    WindowWorld,
-    WindowInfosWorld,
+    -- WindowWorld,
+    -- WindowInfosWorld,
     WindowMessagesWorld,
     ButtonMessagePrev,
-    ButtonMessageDelete,
+    ButtonMessageTrash,
     ButtonMessageNext,
 }
 
@@ -3406,10 +3406,10 @@ ScreenWorldRG:appendElements{
 }
 
 ScreenWorld:appendElements{
-    CWindowScreen{},
+    CWindowScreen{name = "ScreenWorld"},
     ScreenWorldMD,
-    ScreenWorldLF,
-    ScreenWorldRG,
+    -- ScreenWorldLF,
+    -- ScreenWorldRG,
 }
 end
 

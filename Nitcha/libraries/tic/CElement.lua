@@ -92,6 +92,13 @@ function CElement:new(_argt)
     self:argt(_argt) -- override if any
 end
 
+function CElement:argt(_argt)
+    CElement.super.argt(self, _argt)
+    for _, _element in ipairs(self.elements or {}) do -- set sub elements parent
+        _element.parent = self
+    end
+end
+
 function CElement:draw() -- element drawing
     if not self:behave() then return end -- nothing to draw
     if self.drawground then self:drawGround() end
@@ -103,6 +110,7 @@ function CElement:draw() -- element drawing
     Tic:keyboardAppendKeysFunctions(self.keysfunctions)
     if self.clickable then Tic:buttonsInsertButton(self) end
     for _, _element in ipairs(self.elements or {}) do -- sub elements if any
+        Tic:logAppend(_element.name, _element.screenx, _element.screeny)
         _element:draw()
     end
 end

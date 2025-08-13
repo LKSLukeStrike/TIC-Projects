@@ -265,8 +265,8 @@ end
 
 function CCharacter:argt(_argt)
     CCharacter.super.argt(self, _argt)
-    if self.classic and self.classed and not (self.classic == self.classed) then return end -- limit to one classic ?
-   self:adjustInventoriesSlots() -- adjust standard inventories sizes and contents + slots
+    if self.classic and self.classed and not (self.classic == self.classed) then return end -- limit to one classic if any
+    self:adjustInventoriesSlots() -- adjust standard inventories sizes and contents + slots
 end
 
 function CCharacter:adjustInventoriesSlots()

@@ -1168,8 +1168,12 @@ end
 -- CButtonMessagePrev
 --
 CButtonMessagePrev = CButtonArrow000:extend() -- generic message prev button
+Classic.KINDBUTTONMESSAGEPREV = "ButtonMessagePrev"
+Classic.NAMEBUTTONMESSAGEPREV = "ButtonMessagePrev"
 function CButtonMessagePrev:new(_argt)
     CButtonMessagePrev.super.new(self, _argt)
+    self.kind = Classic.KINDBUTTONMESSAGEPREV
+    self.name = Classic.NAMEBUTTONMESSAGEPREV
     self.sprite.palette = IButton.PALETTEKEY
 	self.behaviour      = IButtonMessageChange.BEHAVIOUR  -- function to trigger at first
     self.clicklf        = Tic.FUNCTIONMESSAGEPREV
@@ -1184,8 +1188,12 @@ end
 -- CButtonMessageNext
 --
 CButtonMessageNext = CButtonArrow180:extend() -- generic message next button
+Classic.KINDBUTTONMESSAGENEXT = "ButtonMessageNext"
+Classic.NAMEBUTTONMESSAGENEXT = "ButtonMessageNext"
 function CButtonMessageNext:new(_argt)
     CButtonMessageNext.super.new(self, _argt)
+    self.kind = Classic.KINDBUTTONMESSAGENEXT
+    self.name = Classic.NAMEBUTTONMESSAGENEXT
     self.sprite.palette = IButton.PALETTEKEY
 	self.behaviour      = IButtonMessageChange.BEHAVIOUR  -- function to trigger at first
     self.clicklf        = Tic.FUNCTIONMESSAGENEXT
@@ -1197,11 +1205,15 @@ end
 
 
 --
--- CButtonMessageDelete
+-- CButtonMessageTrash
 --
-CButtonMessageDelete = CButtonClick:extend() -- generic message delete button
-function CButtonMessageDelete:new(_argt)
-    CButtonMessageDelete.super.new(self, _argt)
+CButtonMessageTrash = CButtonClick:extend() -- generic message trash button
+Classic.KINDBUTTONMESSAGETRASH = "ButtonMessageTrash"
+Classic.NAMEBUTTONMESSAGETRASH = "ButtonMessageTrash"
+function CButtonMessageTrash:new(_argt)
+    CButtonMessageTrash.super.new(self, _argt)
+    self.kind = Classic.KINDBUTTONMESSAGETRASH
+    self.name = Classic.NAMEBUTTONMESSAGETRASH
     self.drawborder     = false
 	self.sprite.sprite  = CSpriteBG.SIGNDELETE
     self.sprite.palette = IButton.PALETTEKEY
