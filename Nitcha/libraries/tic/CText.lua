@@ -27,6 +27,12 @@ function CText:new(_argt)
     self:adjustWH()
 end
 
+function CText:setText(_text)
+    _text = _text or ""
+    self.text = _text
+    self:adjustWH()
+end
+
 function CText:adjustWH() -- adjust screenw, screenh
     self.screenw = print(self.text, Nums.MININTEGER, Nums.MININTEGER, self.colorinside, self.fixed, self.scale, self.small)
     self.screenw = self.screenw + (self.marginlf * self.scale) + (self.marginrg * self.scale)

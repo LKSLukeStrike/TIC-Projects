@@ -3302,7 +3302,7 @@ ScreenWorldLF:elementsDistributeH(
 )
 ScreenWorldMD:appendElements{
     -- WindowWorld,
-    -- WindowInfosWorld,
+    WindowInfosWorld,
     WindowMessagesWorld,
     ButtonMessagePrev,
     ButtonMessageTrash,

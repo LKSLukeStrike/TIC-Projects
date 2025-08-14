@@ -667,14 +667,16 @@ function CWindowInfosWorld:new(_argt)
 	self.screenh    = Tic.WORLDINFOSWH
     self.drawborder = true
 	self.align      = Tic.DIRHIT
+    self.text       = CText{name = "WindowInfosWorldText", text = "", small = false}
+    self.elements   = {self.text}
     self:argt(_argt) -- override if any
 end
 
 function CWindowInfosWorld:drawInside() -- window infos content for world
     local _world  = Tic:worldActual()
     if not _world then return end
-    local _text   = CText{text = _world.kind.." : ".._world.name, small = false}
-    self.elements = {_text}
+    local _text = _world.kind.." : ".._world.name
+    self.text:setText(_text)
     CWindowInfosWorld.super.drawInside(self)
 end
 
@@ -692,7 +694,7 @@ function CWindowInfosUPTRDW:new(_argt)
     self.text   = CText{name = "WindowMessageWorldText", text = "", small = true, marginlf = 2}
     self.textlf = CText{name = "T1", text = "T1", small = true, screenx = 10, screeny = 50}
     self.textrg = CText{name = "T2", text = "T2", small = true}
-    self.elements = {self.text, self.textlf, self.textrg}
+    self.elements = {self.text}
     self:argt(_argt) -- override if any
 end
 
@@ -720,8 +722,8 @@ function CWindowMessagesWorld:new(_argt)
 end
 
 function CWindowMessagesWorld:drawInside() -- window messages content for world
-    local _message = Tic:messageActual() or ""
-    self.text.text = _message
+    local _text = Tic:messageActual() or ""
+    self.text:setText(_text)
     CWindowMessagesWorld.super.drawInside(self)
 end
 
