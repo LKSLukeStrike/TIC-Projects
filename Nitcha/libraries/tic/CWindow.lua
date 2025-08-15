@@ -197,12 +197,14 @@ end
 
 function CWindowInfos:drawInside()
     local _offsety = 0
-    for _, _text in pairs(self.elements) do
-        self:alignElementDirection(_text, self.align)
-        _text.screeny = _text.screeny + _offsety
-        _text:draw()
-        _offsety = _offsety + _text.screenh
+    for _, _element in ipairs(self.elements) do
+        if _element:is(CTextLine) then
+            self:alignElementDirection(_element, self.align)
+            _element.screeny = _element.screeny + _offsety
+            _offsety = _offsety + _element.screenh
+        end
     end
+    CWindowInfos.super.drawInside(self)
 end
 
 
@@ -667,16 +669,15 @@ function CWindowInfosWorld:new(_argt)
 	self.screenh    = Tic.WORLDINFOSWH
     self.drawborder = true
 	self.align      = Tic.DIRHIT
-    self.text       = CText{name = "WindowInfosWorldText", text = "", small = false}
-    self.elements   = {self.text}
+    self.textline   = CTextLine{name = "WindowInfosWorldText", text = "", small = false}
+    self.elements   = {self.textline}
     self:argt(_argt) -- override if any
 end
 
 function CWindowInfosWorld:drawInside() -- window infos content for world
     local _world  = Tic:worldActual()
-    if not _world then return end
-    local _text = _world.kind.." : ".._world.name
-    self.text:setText(_text)
+    local _textline = (_world) and _world.kind.." : ".._world.name or ""
+    self.textline:setText(_textline)
     CWindowInfosWorld.super.drawInside(self)
 end
 
@@ -691,10 +692,8 @@ function CWindowInfosUPTRDW:new(_argt)
     CWindowInfosUPTRDW.super.new(self, _argt)
     self.kind = Classic.KINDWINDOWINFOSUPTRDW
     self.name = Classic.NAMEWINDOWINFOSUPTRDW
-    self.text   = CText{name = "WindowMessageWorldText", text = "", small = true, marginlf = 2}
-    -- self.textlf = CText{name = "T1", text = "T1", small = true, screenx = 10, screeny = 50}
-    -- self.textrg = CText{name = "T2", text = "T2", small = true}
-    self.elements = {self.text}
+    self.textline = CTextLine{name = "WindowMessageWorldText", text = "", small = true, marginlf = 2}
+    self.elements = {self.textline}
     self:argt(_argt) -- override if any
 end
 
@@ -718,12 +717,35 @@ function CWindowMessagesWorld:new(_argt)
     self.clickable  = true
     self.wheelup    = Tic.FUNCTIONMESSAGEPREV
     self.wheeldw    = Tic.FUNCTIONMESSAGENEXT
+    self.textlf     = CText{
+                name = "WindowMessagesWorldTextLF",
+                text = "",
+                small = true,
+                screenx = 150,
+                screeny = 50,
+                screenw = 100,
+                screenh = 50,
+                drawground = true,
+                colorground = self.colorground,
+                -- drawborder = true,
+            }
+    self.textrg     = CText{
+                name = "WindowMessagesWorldTextRG",
+                text = "",
+                small = true,
+                screenx = 150,
+                screeny = 70,
+                drawground = true,
+                colorground = self.colorground,
+            }
+    self.elements   = {self.textline, self.textlf, self.textrg}
     self:argt(_argt) -- override if any
 end
 
 function CWindowMessagesWorld:drawInside() -- window messages content for world
-    local _text = Tic:messageActual() or ""
-    self.text:setText(_text)
+    local _messageactual = Tic:messageActual()
+    local _textline = (_messageactual) and _messageactual or ""
+    self.textline:setText(_textline)
     CWindowMessagesWorld.super.drawInside(self)
 end
 

@@ -63,3 +63,18 @@ function CText:drawInside()
         self.small
     )
 end
+
+
+--
+-- CTextLine
+--
+CTextLine = CText:extend() -- generic text line element
+Classic.KINDTEXTLINE = "TextLine"
+Classic.NAMETEXTLINE = "TextLine"
+function CTextLine:new(_argt)
+    CTextLine.super.new(self, _argt)
+    self.kind = Classic.KINDTEXTLINE
+    self.name = Classic.NAMETEXTLINE
+    self:argt(_argt) -- override if any
+end
+
