@@ -3294,7 +3294,7 @@ WindowMessagesWorld = CWindowMessagesWorld{}
 ButtonMessagePrev   = CButtonMessagePrev{}
 ButtonMessageTrash  = CButtonMessageTrash{}
 ButtonMessageNext   = CButtonMessageNext{}
-ScreenWorldLF:elementsDistributeH(
+ScreenWorldMD:elementsDistributeH(
     {ButtonMessagePrev, ButtonMessageTrash, ButtonMessageNext},
     WindowMessagesWorld.screenx + (
         (WindowMessagesWorld.screenw - CScreen:elementsTotalW({ButtonMessagePrev, ButtonMessageTrash, ButtonMessageNext})) // 2),

@@ -692,8 +692,8 @@ function CWindowInfosUPTRDW:new(_argt)
     self.kind = Classic.KINDWINDOWINFOSUPTRDW
     self.name = Classic.NAMEWINDOWINFOSUPTRDW
     self.text   = CText{name = "WindowMessageWorldText", text = "", small = true, marginlf = 2}
-    self.textlf = CText{name = "T1", text = "T1", small = true, screenx = 10, screeny = 50}
-    self.textrg = CText{name = "T2", text = "T2", small = true}
+    -- self.textlf = CText{name = "T1", text = "T1", small = true, screenx = 10, screeny = 50}
+    -- self.textrg = CText{name = "T2", text = "T2", small = true}
     self.elements = {self.text}
     self:argt(_argt) -- override if any
 end
