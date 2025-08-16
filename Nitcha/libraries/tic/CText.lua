@@ -9,6 +9,7 @@ function CText:new(_argt)
     CText.super.new(self, _argt)
     self.kind = Classic.KINDTEXT
     self.name = Classic.NAMETEXT
+    self.stretch     = true
     self.screenh     = Tic.FONTH
     self.drawground  = false -- draw beheviors
     self.drawguides  = false
@@ -34,9 +35,11 @@ function CText:setText(_text)
 end
 
 function CText:adjustWH() -- adjust screenw, screenh
-    self.screenw = print(self.text, Nums.MININTEGER, Nums.MININTEGER, self.colorinside, self.fixed, self.scale, self.small)
+    if self.stretch then
+        self.screenw = print(self.text, Nums.MININTEGER, Nums.MININTEGER, self.colorinside, self.fixed, self.scale, self.small)
+        self.screenh = Tic.FONTH * self.scale
+    end
     self.screenw = self.screenw + (self.marginlf * self.scale) + (self.marginrg * self.scale)
-    self.screenh = Tic.FONTH * self.scale
     self.screenh = self.screenh + (self.marginup * self.scale) + (self.margindw * self.scale)
 end
 

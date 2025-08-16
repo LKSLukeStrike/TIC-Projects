@@ -719,24 +719,25 @@ function CWindowMessagesWorld:new(_argt)
     self.wheeldw    = Tic.FUNCTIONMESSAGENEXT
     self.textlf     = CText{
                 name = "WindowMessagesWorldTextLF",
-                text = "",
+                text = "0000",
                 small = true,
+                stretch = false,
                 screenx = 150,
                 screeny = 50,
-                screenw = 100,
-                screenh = 50,
+                screenw = 30,
+                screenh = 8,
                 drawground = true,
                 colorground = self.colorground,
                 -- drawborder = true,
             }
     self.textrg     = CText{
                 name = "WindowMessagesWorldTextRG",
-                text = "",
+                text = "0000",
                 small = true,
                 screenx = 150,
                 screeny = 70,
                 drawground = true,
-                colorground = self.colorground,
+                colorground = Tic.COLORRED, -- self.colorground,
             }
     self.elements   = {self.textline, self.textlf, self.textrg}
     self:argt(_argt) -- override if any
