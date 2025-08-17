@@ -230,8 +230,8 @@ end
 
 function CWindowInfosEntity:drawInside() -- window infos content for entities
     if not self.entity then return end -- nothing to draw
-    local _name = CText{text = self.entity.name, case = Names.CASECAMEL, shadow = true, marginup = 1}
-    local _kind = CText{text = self.entity.kind, case = Names.CASECAMEL, shadow = true, marginup = 2}
+    local _name = CTextLine{text = self.entity.name, case = Names.CASECAMEL, shadow = true, marginup = 1}
+    local _kind = CTextLine{text = self.entity.kind, case = Names.CASECAMEL, shadow = true, marginup = 2}
     self.elements = {_name, _kind}
     CWindowInfosEntity.super.drawInside(self)
 end
@@ -466,8 +466,8 @@ end
 
 function CWindowPlayerState:drawInside() -- window state content for player
     if not self.entity then return end -- nothing to draw
-    local _posture = CText{text = self.entity:postureGet(), case = Names.CASECAMEL, shadow = true, marginup = 1}
-    local _status  = CText{text = self.entity:statusGet(), case = Names.CASECAMEL, shadow = true, marginup = 2}
+    local _posture = CTextLine{text = self.entity:postureGet(), case = Names.CASECAMEL, shadow = true, marginup = 1}
+    local _status  = CTextLine{text = self.entity:statusGet(), case = Names.CASECAMEL, shadow = true, marginup = 2}
     self.elements = {_posture, _status}
     CWindowPlayerState.super.drawInside(self)
 end
@@ -719,30 +719,54 @@ function CWindowMessagesWorld:new(_argt)
     self.wheeldw    = Tic.FUNCTIONMESSAGENEXT
     self.textlf     = CText{
                 name = "WindowMessagesWorldTextLF",
-                text = "0000",
+                text = "",
                 stretch = false,
                 align = Tic.DIR090,
-                screenx = 150,
-                screeny = 50,
+                screenx = self.screenx,
+                screeny = self.screeny - 6,
                 screenw = 18,
-                screenh = 8,
+                screenh = 6,
                 marginup = 1,
                 marginrg = 1,
                 drawground  = true,
                 colorground = self.colorground,
                 drawborder  = true,
-                colorborder = self.colorframe1,
+                colorborder = Tic.COLORGREYM, --self.colorframe1,
+                behaviour = function(self)
+                    self.display = self.hovered
+                    self.text = Tic.MESSAGES.actindex
+                end,
             }
     self.textrg     = CText{
                 name = "WindowMessagesWorldTextRG",
-                text = "0000",
-                small = true,
-                screenx = 150,
-                screeny = 70,
-                drawground = true,
-                colorground = Tic.COLORRED, -- self.colorground,
+                text = "",
+                stretch = false,
+                align = Tic.DIR090,
+                screenx = self.screenx + self.screenw - 18,
+                screeny = self.screeny - 6,
+                screenw = 18,
+                screenh = 6,
+                marginup = 1,
+                marginrg = 1,
+                drawground  = true,
+                colorground = self.colorground,
+                drawborder  = true,
+                colorborder = Tic.COLORGREYM, --self.colorframe1,
+                behaviour = function(self)
+                    self.display = self.hovered
+                    self.text = Tic.MESSAGES.maxindex
+                end,
             }
     self.elements   = {self.textline, self.textlf, self.textrg}
+    self.behaviour = function(self)
+        if not (Tic.MESSAGES.maxindex > 1) then
+            self.hovered = false
+            return
+        end
+        for _, _element in ipairs(self.elements or {}) do
+            _element.hovered = self.hovered
+        end
+    end
     self:argt(_argt) -- override if any
 end
 

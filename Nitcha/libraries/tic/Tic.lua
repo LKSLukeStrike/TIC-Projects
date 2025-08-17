@@ -3301,7 +3301,7 @@ ScreenWorldMD:elementsDistributeH(
     WindowMessagesWorld.screeny - Tic.SPRITESIZE + 1
 )
 ScreenWorldMD:appendElements{
-    -- WindowWorld,
+    WindowWorld,
     WindowInfosWorld,
     WindowMessagesWorld,
     ButtonMessagePrev,
@@ -3408,8 +3408,8 @@ ScreenWorldRG:appendElements{
 ScreenWorld:appendElements{
     CWindowScreen{name = "ScreenWorld"},
     ScreenWorldMD,
-    -- ScreenWorldLF,
-    -- ScreenWorldRG,
+    ScreenWorldLF,
+    ScreenWorldRG,
 }
 end
 
