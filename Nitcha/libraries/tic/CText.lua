@@ -39,17 +39,32 @@ function CText:adjustWH() -- adjust screenw, screenh
         self.screenw = print(self.text, Nums.MININTEGER, Nums.MININTEGER, self.colorinside, self.fixed, self.scale, self.small)
         self.screenh = Tic.FONTH * self.scale
     end
-    self.screenw = self.screenw + (self.marginlf * self.scale) + (self.marginrg * self.scale)
-    self.screenh = self.screenh + (self.marginup * self.scale) + (self.margindw * self.scale)
+    self.screenw = (self.marginlf * self.scale) + self.screenw + (self.marginrg * self.scale)
+    self.screenh = (self.marginup * self.scale) + self.screenh + (self.margindw * self.scale)
 end
 
 function CText:drawInside()
     self.text = Names:case(self.text, self.case)
+
+    local _selfelement = CElement{
+        screenx = self.screenx + (self.marginlf * self.scale),
+        screeny = self.screeny + (self.marginup * self.scale),
+        screenw = self.screenw - (self.marginlf * self.scale) - (self.marginrg * self.scale),
+        screenh = self.screenh - (self.marginup * self.scale) - (self.margindw * self.scale),
+    }
+    local _textelement = CElement{
+        screenx = 0,
+        screeny = 0,
+        screenw = print(self.text, Nums.MININTEGER, Nums.MININTEGER, self.colorinside, self.fixed, self.scale, self.small),
+        screenh = Tic.FONTH * self.scale,
+    }
+    _selfelement:alignElementDirection(_textelement, self.align)
+
     if self.shadow then
         print(
             self.text,
-            self.screenx + (self.marginlf * self.scale) + self.scale,
-            self.screeny + (self.marginup * self.scale) + self.scale,
+            _textelement.screenx + self.scale,
+            _textelement.screeny + self.scale,
             self.colorshadow,
             self.fixed,
             self.scale,
@@ -58,8 +73,8 @@ function CText:drawInside()
     end
     print(
         self.text,
-        self.screenx + (self.marginlf * self.scale),
-        self.screeny + (self.marginup * self.scale),
+        _textelement.screenx,
+        _textelement.screeny,
         self.colorinside,
         self.fixed,
         self.scale,

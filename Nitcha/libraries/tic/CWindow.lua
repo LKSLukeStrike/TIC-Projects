@@ -720,15 +720,18 @@ function CWindowMessagesWorld:new(_argt)
     self.textlf     = CText{
                 name = "WindowMessagesWorldTextLF",
                 text = "0000",
-                small = true,
                 stretch = false,
+                align = Tic.DIR090,
                 screenx = 150,
                 screeny = 50,
-                screenw = 30,
+                screenw = 18,
                 screenh = 8,
-                drawground = true,
+                marginup = 1,
+                marginrg = 1,
+                drawground  = true,
                 colorground = self.colorground,
-                -- drawborder = true,
+                drawborder  = true,
+                colorborder = self.colorframe1,
             }
     self.textrg     = CText{
                 name = "WindowMessagesWorldTextRG",
