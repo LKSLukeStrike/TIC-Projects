@@ -683,41 +683,26 @@ end
 
 
 --
--- CWindowInfosUPTRDW
---
-CWindowInfosUPTRDW = CWindowInfos:extend() -- window infos with up, trash, dw
-Classic.KINDWINDOWINFOSUPTRDW = "WindowInfosUPTRDW"
-Classic.NAMEWINDOWINFOSUPTRDW = "WindowInfosUPTRDW"
-function CWindowInfosUPTRDW:new(_argt)
-    CWindowInfosUPTRDW.super.new(self, _argt)
-    self.kind = Classic.KINDWINDOWINFOSUPTRDW
-    self.name = Classic.NAMEWINDOWINFOSUPTRDW
-    self.textline = CTextLine{name = "WindowMessageWorldText", text = "", small = true, marginlf = 2}
-    self.elements = {self.textline}
-    self:argt(_argt) -- override if any
-end
-
-
---
 -- CWindowMessagesWorld
 --
-CWindowMessagesWorld = CWindowInfosUPTRDW:extend() -- window messages for world
+CWindowMessagesWorld = CWindowInfos:extend() -- window messages for world
 Classic.KINDWINDOWMESSAGESWORLD = "WindowMessagesWorld"
 Classic.NAMEWINDOWMESSAGESWORLD = "WindowMessagesWorld"
 function CWindowMessagesWorld:new(_argt)
     CWindowMessagesWorld.super.new(self, _argt)
     self.kind = Classic.KINDWINDOWMESSAGESWORLD
     self.name = Classic.NAMEWINDOWMESSAGESWORLD
-    self.screenx    = Tic.WORLDMESSAGESWX
-    self.screeny    = Tic.WORLDMESSAGESWY
-	self.screenw    = Tic.WORLDMESSAGESWW
-	self.screenh    = Tic.WORLDMESSAGESWH
-    self.drawborder = true
-	self.align      = Tic.DIR270
-    self.clickable  = true
-    self.wheelup    = Tic.FUNCTIONMESSAGEPREV
-    self.wheeldw    = Tic.FUNCTIONMESSAGENEXT
-    self.textlf     = CText{
+    self.screenx     = Tic.WORLDMESSAGESWX
+    self.screeny     = Tic.WORLDMESSAGESWY
+	self.screenw     = Tic.WORLDMESSAGESWW
+	self.screenh     = Tic.WORLDMESSAGESWH
+    self.drawborder  = true
+	self.align       = Tic.DIR270
+    self.clickable   = true
+    self.wheelup     = Tic.FUNCTIONMESSAGEPREV
+    self.wheeldw     = Tic.FUNCTIONMESSAGENEXT
+    self.textline    = CTextLine{name = "WindowMessageWorldText", text = "", small = true, marginlf = 2}
+    self.textlf      = CText{
                 name = "WindowMessagesWorldTextLF",
                 text = "",
                 stretch = false,
@@ -737,7 +722,7 @@ function CWindowMessagesWorld:new(_argt)
                     self.text = Tic.MESSAGES.actindex
                 end,
             }
-    self.textrg     = CText{
+    self.textrg      = CText{
                 name = "WindowMessagesWorldTextRG",
                 text = "",
                 stretch = false,
@@ -757,8 +742,11 @@ function CWindowMessagesWorld:new(_argt)
                     self.text = Tic.MESSAGES.maxindex
                 end,
             }
-    self.elements   = {self.textline, self.textlf, self.textrg}
-    self.behaviour = function(self)
+    self.buttonprev  = CButtonMessagePrev{}
+    self.buttontrash = CButtonMessageTrash{}
+    self.buttonnext  = CButtonMessageNext{}
+    self.elements    = {self.textline, self.textlf, self.textrg, self.buttonprev, self.buttontrash, self.buttonnext}
+    self.behaviour   = function(self)
         if not (Tic.MESSAGES.maxindex > 1) then
             self.hovered = false
             return
@@ -768,6 +756,12 @@ function CWindowMessagesWorld:new(_argt)
         end
     end
     self:argt(_argt) -- override if any
+    self:elementsDistributeH(
+        {self.buttonprev, self.buttontrash, self.buttonnext},
+        self.screenx + (
+            (self.screenw - CScreen:elementsTotalW({self.buttonprev, self.buttontrash, self.buttonnext})) // 2),
+        self.screeny - Tic.SPRITESIZE + 1
+    )
 end
 
 function CWindowMessagesWorld:drawInside() -- window messages content for world

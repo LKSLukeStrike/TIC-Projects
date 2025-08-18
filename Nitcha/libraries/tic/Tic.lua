@@ -3291,22 +3291,10 @@ ScreenWorldMD = CScreen{name = "ScreenWorldMD"}
 WindowInfosWorld    = CWindowInfosWorld{}
 WindowWorld         = CWindowWorld{}
 WindowMessagesWorld = CWindowMessagesWorld{}
-ButtonMessagePrev   = CButtonMessagePrev{}
-ButtonMessageTrash  = CButtonMessageTrash{}
-ButtonMessageNext   = CButtonMessageNext{}
-ScreenWorldMD:elementsDistributeH(
-    {ButtonMessagePrev, ButtonMessageTrash, ButtonMessageNext},
-    WindowMessagesWorld.screenx + (
-        (WindowMessagesWorld.screenw - CScreen:elementsTotalW({ButtonMessagePrev, ButtonMessageTrash, ButtonMessageNext})) // 2),
-    WindowMessagesWorld.screeny - Tic.SPRITESIZE + 1
-)
 ScreenWorldMD:appendElements{
     WindowWorld,
     WindowInfosWorld,
     WindowMessagesWorld,
-    ButtonMessagePrev,
-    ButtonMessageTrash,
-    ButtonMessageNext,
 }
 
 -- rg panel
