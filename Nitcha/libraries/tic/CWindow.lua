@@ -708,7 +708,7 @@ function CWindowMessagesWorld:new(_argt)
                 stretch = false,
                 align = Tic.DIR090,
                 screenx = self.screenx,
-                screeny = self.screeny - 6,
+                screeny = self.screeny - 7,
                 screenw = 18,
                 screenh = 6,
                 marginup = 1,
@@ -728,7 +728,7 @@ function CWindowMessagesWorld:new(_argt)
                 stretch = false,
                 align = Tic.DIR090,
                 screenx = self.screenx + self.screenw - 18,
-                screeny = self.screeny - 6,
+                screeny = self.screeny - 7,
                 screenw = 18,
                 screenh = 6,
                 marginup = 1,
@@ -751,7 +751,7 @@ function CWindowMessagesWorld:new(_argt)
             self.hovered = false
             return
         end
-        for _, _element in ipairs(self.elements or {}) do
+        for _, _element in ipairs({self.textline, self.textlf, self.textrg, self.buttonprev, self.buttonnext}) do
             _element.hovered = self.hovered
         end
     end
