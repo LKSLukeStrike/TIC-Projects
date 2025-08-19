@@ -1161,7 +1161,6 @@ IButtonMessageChange.BEHAVIOUR = function(self) -- need at least more than one m
     IButtonMessage.BEHAVIOUR(self)
     if not self.display then return end -- no message
     self.enabled = Tables:size(Tic:messageMessages()) > 1
-    Tic:logAppend("hover", self.hovered)
     for _, _element in ipairs({self.parent.textline, self.parent.textlf, self.parent.textrg}) do
         _element.hovered = self.hovered
     end

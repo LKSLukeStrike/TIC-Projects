@@ -699,24 +699,34 @@ function CWindowMessagesWorld:new(_argt)
     self.drawborder  = true
 	self.align       = Tic.DIR270
     self.clickable   = true
-    self.wheelup     = Tic.FUNCTIONMESSAGEPREV
-    self.wheeldw     = Tic.FUNCTIONMESSAGENEXT
+    self.wheelup     = function()
+                            if Tic.MODIFIERKEYS[self.modifierkey] then
+                                Tic.FUNCTIONMESSAGEMIN()
+                            else
+                                Tic.FUNCTIONMESSAGEPREV()
+                            end
+                        end
+    self.wheeldw     = function()
+                            if Tic.MODIFIERKEYS[self.modifierkey] then
+                                Tic.FUNCTIONMESSAGEMAX()
+                            else
+                                Tic.FUNCTIONMESSAGENEXT()
+                            end
+                        end
     self.textline    = CTextLine{name = "WindowMessageWorldText", text = "", small = true, marginlf = 2}
     self.textlf      = CText{
                 name = "WindowMessagesWorldTextLF",
                 text = "",
                 stretch = false,
                 align = Tic.DIR090,
-                screenx = self.screenx,
-                screeny = self.screeny - 7,
+                screenx = self.screenx - 1,
+                screeny = self.screeny - 6,
                 screenw = 18,
-                screenh = 6,
+                screenh = 4,
                 marginup = 1,
                 marginrg = 1,
                 drawground  = true,
                 colorground = self.colorground,
-                drawborder  = true,
-                colorborder = Tic.COLORGREYM, --self.colorframe1,
                 behaviour = function(self)
                     self.display = self.hovered
                     self.text = Tic.MESSAGES.actindex
@@ -728,15 +738,13 @@ function CWindowMessagesWorld:new(_argt)
                 stretch = false,
                 align = Tic.DIR090,
                 screenx = self.screenx + self.screenw - 18,
-                screeny = self.screeny - 7,
+                screeny = self.screeny - 6,
                 screenw = 18,
-                screenh = 6,
+                screenh = 4,
                 marginup = 1,
                 marginrg = 1,
                 drawground  = true,
                 colorground = self.colorground,
-                drawborder  = true,
-                colorborder = Tic.COLORGREYM, --self.colorframe1,
                 behaviour = function(self)
                     self.display = self.hovered
                     self.text = Tic.MESSAGES.maxindex
@@ -754,6 +762,14 @@ function CWindowMessagesWorld:new(_argt)
         for _, _element in ipairs({self.textline, self.textlf, self.textrg, self.buttonprev, self.buttonnext}) do
             _element.hovered = self.hovered
         end
+        self.colorborder = (self.actived)
+            and Tic.COLORHOVER
+            or  (self.hovered)
+                and Tic.COLORGREYD
+                or  Tic.COLORGREYM
+        local _messageactual = Tic:messageActual()
+        local _textline = (_messageactual) and _messageactual or ""
+        self.textline:setText(_textline)
     end
     self:argt(_argt) -- override if any
     self:elementsDistributeH(
@@ -762,16 +778,4 @@ function CWindowMessagesWorld:new(_argt)
             (self.screenw - CScreen:elementsTotalW({self.buttonprev, self.buttontrash, self.buttonnext})) // 2),
         self.screeny - Tic.SPRITESIZE + 1
     )
-end
-
-function CWindowMessagesWorld:drawInside() -- window messages content for world
-    local _messageactual = Tic:messageActual()
-    local _textline = (_messageactual) and _messageactual or ""
-    self.textline:setText(_textline)
-    CWindowMessagesWorld.super.drawInside(self)
-end
-
-function CWindowMessagesWorld:drawBorder()
-    self.colorborder = (self.hovered) and Tic.COLORGREYD or Tic.COLORGREYM
-    self.super.drawBorder(self)
 end

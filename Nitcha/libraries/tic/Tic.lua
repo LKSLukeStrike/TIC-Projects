@@ -47,8 +47,8 @@ Tic.TEXTWORK    = "Work"
 Tic.TEXTSLEEP   = "Sleep"
 Tic.TEXTDEFAULT = "Default"
 Tic.TEXTSAY     = "Say"
-Tic.TEXTMIN     = "First"
-Tic.TEXTMAX     = "Last"
+Tic.TEXTMIN     = "Fst"
+Tic.TEXTMAX     = "Lst"
 Tic.TEXTTRASH   = "Trash"
 Tic.TEXTALL     = "All"
 
@@ -874,7 +874,7 @@ Tic.MESSAGES    = CCyclerTable{}
 
 function Tic:messageInit() -- initial message in the stack
     if Tic.MESSAGES.actindex == 0 then
-        Tic.MESSAGES:argt{acttable = {Tic.TEXTWELCOME}}
+        Tic.MESSAGES:argt{acttable = {Tic.TEXTWELCOME, "text a", "text b"}}
     end
     return Tic.MESSAGES.actvalue
 end
