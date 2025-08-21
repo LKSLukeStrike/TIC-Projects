@@ -162,6 +162,24 @@ function Tables:eachDoIf(_table, _do, _if)
 end
 
 
+-- IfAny and IfAll
+function Tables:ifAny(_table, _if)
+    if not _if or not (type(_if) == "function") then return false end -- mandatory
+    for _key, _val in pairs(_table or {}) do
+        if _if(_key, _val) then return true end
+    end
+	return false
+end
+
+function Tables:ifAll(_table, _if)
+    if not _if or not (type(_if) == "function") then return false end -- mandatory
+    for _key, _val in pairs(_table or {}) do
+        if not _if(_key, _val) then return false end
+    end
+	return true
+end
+
+
 -- Clone and Merge
 function Tables:clone(_table) -- clone a dic table -- SORTED -- only first level -- FIXME ?
     local _result = {}

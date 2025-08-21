@@ -1147,9 +1147,9 @@ end
 --
 IButtonMessage = Classic:extend() -- messages buttons implementation
 IButtonMessage.BEHAVIOUR = function(self) -- need at least one message
-    self.display = (Tic:messageActual())
-    if not self.display then return end -- no message
     IButton.BEHAVIOUR(self)
+    if not self.display then return end -- no message
+    self.enabled = (Tic:messageCount() > 0)
 end
 
 
@@ -1160,10 +1160,7 @@ IButtonMessageChange = Classic:extend() -- message change buttons implementation
 IButtonMessageChange.BEHAVIOUR = function(self) -- need at least more than one message
     IButtonMessage.BEHAVIOUR(self)
     if not self.display then return end -- no message
-    self.enabled = Tables:size(Tic:messageMessages()) > 1
-    for _, _element in ipairs({self.parent.textline, self.parent.textlf, self.parent.textrg}) do
-        _element.hovered = self.hovered
-    end
+    self.enabled = (Tic:messageCount() > 1)
 end
 
 
@@ -1220,7 +1217,7 @@ function CButtonMessageTrash:new(_argt)
     self.drawborder     = false
 	self.sprite.sprite  = CSpriteBG.SIGNDELETE
     self.sprite.palette = IButton.PALETTEKEY
-	self.behaviour      = IButtonMessageChange.BEHAVIOUR  -- function to trigger at first
+	self.behaviour      = IButtonMessage.BEHAVIOUR  -- function to trigger at first
     self.clicklf        = function() Tic:messageDeleteOne() end
     self.hovertextlf    = CText{text = Tic.TEXTTRASH}
     self.clickrg        = function() Tic:messageDeleteAll() end

@@ -110,7 +110,6 @@ function CElement:draw() -- element drawing
     Tic:keyboardAppendKeysFunctions(self.keysfunctions)
     if self.clickable then Tic:buttonsInsertButton(self) end
     for _, _element in ipairs(self.elements or {}) do -- sub elements if any
-        -- Tic:logAppend(_element.name, _element.screenx, _element.screeny)
         _element:draw()
     end
 end

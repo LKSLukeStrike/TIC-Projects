@@ -870,11 +870,16 @@ end
 
 
 -- Messages System -- handle a messages stack
-Tic.MESSAGES    = CCyclerTable{}
+Tic.MESSAGES    = CCyclerTable{acttable = {Tic.TEXTWELCOME}}
+
+function Tic:messageCount() -- number of messages
+    return Tic.MESSAGES.maxindex
+end
 
 function Tic:messageInit() -- initial message in the stack
-    if Tic.MESSAGES.actindex == 0 then
-        Tic.MESSAGES:argt{acttable = {Tic.TEXTWELCOME, "text a", "text b"}}
+    if Tic:messageCount() == 0 then
+        -- Tic.MESSAGES:argt{acttable = {Tic.TEXTWELCOME}}
+        -- Tic.MESSAGES:argt{acttable = {Tic.TEXTWELCOME, "line 2"}}
     end
     return Tic.MESSAGES.actvalue
 end

@@ -127,7 +127,6 @@ CWindowMenuInteractions.BEHAVIOUR = function(self)
     -- _debug()
     local _playerinteractto = _playeractual.interactto
     if (self.interactto) and self.interactto == _playerinteractto then return end -- same interactto -- no new menu
-    -- Tic:logAppend("new")
     _removeElements() -- brand new menu
     self.interactto     = _playerinteractto
 
@@ -728,7 +727,6 @@ function CWindowMessagesWorld:new(_argt)
                 drawground  = true,
                 colorground = self.colorground,
                 behaviour = function(self)
-                    self.display = self.hovered
                     self.text = Tic.MESSAGES.actindex
                 end,
             }
@@ -746,7 +744,6 @@ function CWindowMessagesWorld:new(_argt)
                 drawground  = true,
                 colorground = self.colorground,
                 behaviour = function(self)
-                    self.display = self.hovered
                     self.text = Tic.MESSAGES.maxindex
                 end,
             }
@@ -755,21 +752,52 @@ function CWindowMessagesWorld:new(_argt)
     self.buttonnext  = CButtonMessageNext{}
     self.elements    = {self.textline, self.textlf, self.textrg, self.buttonprev, self.buttontrash, self.buttonnext}
     self.behaviour   = function(self)
-        if not (Tic.MESSAGES.maxindex > 1) then
-            self.hovered = false
-            return
+        local function _showTextLFRG()
+            Tables:eachDo({self.textlf, self.textrg}, function(_, _element) _element.display = true end)
         end
-        for _, _element in ipairs({self.textline, self.textlf, self.textrg, self.buttonprev, self.buttonnext}) do
-            _element.hovered = self.hovered
+        local function _hideTextLFRG()
+            Tables:eachDo({self.textlf, self.textrg}, function(_, _element) _element.display = false end)
         end
-        self.colorborder = (self.actived)
-            and Tic.COLORHOVER
-            or  (self.hovered)
-                and Tic.COLORGREYD
-                or  Tic.COLORGREYM
+
         local _messageactual = Tic:messageActual()
         local _textline = (_messageactual) and _messageactual or ""
         self.textline:setText(_textline)
+        self.colorborder = Tic.COLORGREYM
+        _hideTextLFRG()
+        if Tic:messageCount() == 0 then return end
+
+        -- if     Tables:ifAny({self.buttonprev}, function(_, _element) return _element.hovered end) then
+        --     Tables:eachDo({self, self.buttonprev, self.textlf, self.textrg}, function(_, _element) _element.hovered = true end)
+        -- elseif Tables:ifAny({self.buttontrash}, function(_, _element) return _element.hovered end) then
+        --     Tables:eachDo({self, self.buttontrash, self.textlf, self.textrg}, function(_, _element) _element.hovered = true end)
+        -- elseif Tables:ifAny({self.buttonnext}, function(_, _element) return _element.hovered end) then
+        --     Tables:eachDo({self, self.buttonnext, self.textlf, self.textrg}, function(_, _element) _element.hovered = true end)
+        -- elseif Tables:ifAny({self}, function(_, _element) return _element.hovered end) then
+        --     Tables:eachDo({self, self.buttonprev, self.buttonnext, self.textlf, self.textrg}, function(_, _element) _element.hovered = true end)
+        -- else
+        --     Tables:eachDo({self, self.textlf, self.textrg, self.buttonprev, self.buttonnext}, function(_, _element)
+        --         _element.hovered = false
+        --     end)
+        -- end
+        -- if     Tables:ifAny({self.buttonprev}, function(_, _element) return _element.actived end) then
+        --     Tables:eachDo({self, self.buttonprev, self.textlf, self.textrg}, function(_, _element) _element.actived = true end)
+        -- elseif Tables:ifAny({self.buttontrash}, function(_, _element) return _element.actived end) then
+        --     Tables:eachDo({self, self.buttontrash, self.textlf, self.textrg}, function(_, _element) _element.actived = true end)
+        -- elseif Tables:ifAny({self.buttonnext}, function(_, _element) return _element.actived end) then
+        --     Tables:eachDo({self, self.buttonnext, self.textlf, self.textrg}, function(_, _element) _element.actived = true end)
+        -- elseif Tables:ifAny({self}, function(_, _element) return _element.actived end) then
+        --     Tables:eachDo({self, self.buttonprev, self.buttonnext, self.textlf, self.textrg}, function(_, _element) _element.actived = true end)
+        -- else
+        --     Tables:eachDo({self, self.textlf, self.textrg, self.buttonprev, self.buttonnext}, function(_, _element)
+        --         _element.actived = false
+        --     end)
+        -- end
+
+        -- self.colorborder = (self.actived)
+        --     and Tic.COLORHOVER
+        --     or  (self.hovered)
+        --         and Tic.COLORGREYD
+        --         or  Tic.COLORGREYM
     end
     self:argt(_argt) -- override if any
     self:elementsDistributeH(
