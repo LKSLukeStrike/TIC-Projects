@@ -34,7 +34,7 @@ function CButton:new(_argt)
     self.colorhover          = Tic.COLORHUDSCREEN
     self.colorgrounddisabled = Tic.COLORGREYL
     self.colorborderdisabled = Tic.COLORGREYM
-    self.colorgroundactived  = Tic.COLORHOVER
+    self.colorgroundactived  = Tic.COLORHOVERTEXT
     self.colorhoverground    = Tic.COLORBIOMENIGHT
     self:argt(_argt) -- override if any
 end

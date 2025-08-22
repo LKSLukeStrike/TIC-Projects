@@ -614,7 +614,7 @@ function CWindowWorld:drawPlayerActual()
 
                             local _playerfind = Tic:playerFind(_entity)
                             if _playerfind then
-                                local _picktext = CText{text = Tic.TEXTPICK, colorinside = Tic.COLORHOVER}
+                                local _picktext = CText{text = Tic.TEXTPICK, colorinside = Tic.COLORHOVERTEXT}
                                 _picktext.screenx = _entity.screenx - ((_picktext.screenw - Tic.SPRITESIZE) // 2)
                                 _picktext.screeny = _entity.screeny - _picktext.screenh
                                 _picktext:draw()
@@ -629,8 +629,8 @@ function CWindowWorld:drawPlayerActual()
 
                             local _locking  = (_playeractual.spottinglock and _playeractual.spotting == _entity) -- already locking ?
                             local _locktext = (_locking)
-                                and CText{text = Tic.TEXTUNLOCK, colorinside = Tic.COLORHOVER}
-                                or  CText{text = Tic.TEXTLOCK, colorinside = Tic.COLORHOVER}
+                                and CText{text = Tic.TEXTUNLOCK, colorinside = Tic.COLORHOVERTEXT}
+                                or  CText{text = Tic.TEXTLOCK, colorinside = Tic.COLORHOVERTEXT}
                             _locktext.screenx = _entity.screenx - ((_locktext.screenw - Tic.SPRITESIZE) // 2)
                             _locktext.screeny = _entity.screeny + Tic.SPRITESIZE
                             _locktext:draw()
@@ -698,12 +698,17 @@ function CWindowMessagesWorld:new(_argt)
     self.drawborder  = true
 	self.align       = Tic.DIR270
     self.clickable   = true
+    self.buttonprev  = CButtonMessagePrev{}
+    self.buttontrash = CButtonMessageTrash{}
+    self.buttonnext  = CButtonMessageNext{}
+    self.wheelbutton = nil -- button related to the wheel move if any
     self.wheelup     = function()
                             if Tic.MODIFIERKEYS[self.modifierkey] then
                                 Tic.FUNCTIONMESSAGEMIN()
                             else
                                 Tic.FUNCTIONMESSAGEPREV()
                             end
+                            self.wheelbutton = self.buttonprev
                         end
     self.wheeldw     = function()
                             if Tic.MODIFIERKEYS[self.modifierkey] then
@@ -711,6 +716,7 @@ function CWindowMessagesWorld:new(_argt)
                             else
                                 Tic.FUNCTIONMESSAGENEXT()
                             end
+                            self.wheelbutton = self.buttonnext
                         end
     self.textline    = CTextLine{name = "WindowMessageWorldText", text = "", small = true, marginlf = 2}
     self.textlf      = CText{
@@ -747,9 +753,6 @@ function CWindowMessagesWorld:new(_argt)
                     self.text = Tic.MESSAGES.maxindex
                 end,
             }
-    self.buttonprev  = CButtonMessagePrev{}
-    self.buttontrash = CButtonMessageTrash{}
-    self.buttonnext  = CButtonMessageNext{}
     self.elements    = {self.textline, self.textlf, self.textrg, self.buttonprev, self.buttontrash, self.buttonnext}
     self.behaviour   = function(self)
         local function _showTextLFRG()
@@ -757,6 +760,22 @@ function CWindowMessagesWorld:new(_argt)
         end
         local function _hideTextLFRG()
             Tables:eachDo({self.textlf, self.textrg}, function(_, _element) _element.display = false end)
+        end
+        local function _anyHovered(_elements)
+            return Tables:ifAny(_elements, function(_, _element) return _element.hovered end)
+        end
+        local function _hoveredElements(_elements)
+            Tables:eachDo(_elements, function(_, _element) _element.hovered = true end)
+            _showTextLFRG()
+            self.colorborder = Tic.COLORGREYD
+        end
+        local function _anyActived(_elements)
+            return Tables:ifAny(_elements, function(_, _element) return _element.actived end)
+        end
+        local function _activedElements(_elements)
+            Tables:eachDo(_elements, function(_, _element) _element.actived = true end)
+            _showTextLFRG()
+            self.colorborder = Tic.COLORHOVERTEXT
         end
 
         local _messageactual = Tic:messageActual()
@@ -766,38 +785,29 @@ function CWindowMessagesWorld:new(_argt)
         _hideTextLFRG()
         if Tic:messageCount() == 0 then return end
 
-        -- if     Tables:ifAny({self.buttonprev}, function(_, _element) return _element.hovered end) then
-        --     Tables:eachDo({self, self.buttonprev, self.textlf, self.textrg}, function(_, _element) _element.hovered = true end)
-        -- elseif Tables:ifAny({self.buttontrash}, function(_, _element) return _element.hovered end) then
-        --     Tables:eachDo({self, self.buttontrash, self.textlf, self.textrg}, function(_, _element) _element.hovered = true end)
-        -- elseif Tables:ifAny({self.buttonnext}, function(_, _element) return _element.hovered end) then
-        --     Tables:eachDo({self, self.buttonnext, self.textlf, self.textrg}, function(_, _element) _element.hovered = true end)
-        -- elseif Tables:ifAny({self}, function(_, _element) return _element.hovered end) then
-        --     Tables:eachDo({self, self.buttonprev, self.buttonnext, self.textlf, self.textrg}, function(_, _element) _element.hovered = true end)
-        -- else
-        --     Tables:eachDo({self, self.textlf, self.textrg, self.buttonprev, self.buttonnext}, function(_, _element)
-        --         _element.hovered = false
-        --     end)
-        -- end
-        -- if     Tables:ifAny({self.buttonprev}, function(_, _element) return _element.actived end) then
-        --     Tables:eachDo({self, self.buttonprev, self.textlf, self.textrg}, function(_, _element) _element.actived = true end)
-        -- elseif Tables:ifAny({self.buttontrash}, function(_, _element) return _element.actived end) then
-        --     Tables:eachDo({self, self.buttontrash, self.textlf, self.textrg}, function(_, _element) _element.actived = true end)
-        -- elseif Tables:ifAny({self.buttonnext}, function(_, _element) return _element.actived end) then
-        --     Tables:eachDo({self, self.buttonnext, self.textlf, self.textrg}, function(_, _element) _element.actived = true end)
-        -- elseif Tables:ifAny({self}, function(_, _element) return _element.actived end) then
-        --     Tables:eachDo({self, self.buttonprev, self.buttonnext, self.textlf, self.textrg}, function(_, _element) _element.actived = true end)
-        -- else
-        --     Tables:eachDo({self, self.textlf, self.textrg, self.buttonprev, self.buttonnext}, function(_, _element)
-        --         _element.actived = false
-        --     end)
-        -- end
+        if     _anyHovered{self} and Tic:messageCount() == 1 then
+            _showTextLFRG()
+        elseif _anyHovered{self} and Tic:messageCount() >= 2 then
+            _hoveredElements{self, self.buttonprev, self.buttonnext}
+        elseif _anyHovered{self, self.buttonprev} then
+            _hoveredElements{self, self.buttonprev}
+        elseif _anyHovered{self, self.buttontrash} then
+            _hoveredElements{self, self.buttontrash}
+        elseif _anyHovered{self, self.buttonnext} then
+            _hoveredElements{self, self.buttonnext}
+        end
 
-        -- self.colorborder = (self.actived)
-        --     and Tic.COLORHOVER
-        --     or  (self.hovered)
-        --         and Tic.COLORGREYD
-        --         or  Tic.COLORGREYM
+        if     _anyActived{self} and Tic:messageCount() == 1 then
+            _showTextLFRG()
+        elseif _anyActived{self} and Tic:messageCount() >= 2 then
+            _activedElements{self, self.wheelbutton}
+        elseif _anyActived{self, self.buttonprev} then
+            _activedElements{self, self.buttonprev}
+        elseif _anyActived{self, self.buttontrash} then
+            _activedElements{self, self.buttontrash}
+        elseif _anyActived{self, self.buttonnext} then
+            _activedElements{self, self.buttonnext}
+        end
     end
     self:argt(_argt) -- override if any
     self:elementsDistributeH(

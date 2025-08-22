@@ -234,7 +234,7 @@ Tic.COLORPSYEQ    = Tic.COLORBLUEM
 Tic.COLORPSYLT    = Tic.COLORBLUEL
 
 -- Palette colors for buttons
-Tic.COLORHOVER    = Tic.COLORBLUEL -- hovertext color
+Tic.COLORHOVERTEXT    = Tic.COLORBLUEL -- hovertext color
 
 -- Flips
 Tic.FLIPNONE = 0 -- none
@@ -870,7 +870,7 @@ end
 
 
 -- Messages System -- handle a messages stack
-Tic.MESSAGES    = CCyclerTable{acttable = {Tic.TEXTWELCOME}}
+Tic.MESSAGES    = CCyclerTable{}
 
 function Tic:messageCount() -- number of messages
     return Tic.MESSAGES.maxindex
@@ -878,8 +878,7 @@ end
 
 function Tic:messageInit() -- initial message in the stack
     if Tic:messageCount() == 0 then
-        -- Tic.MESSAGES:argt{acttable = {Tic.TEXTWELCOME}}
-        -- Tic.MESSAGES:argt{acttable = {Tic.TEXTWELCOME, "line 2"}}
+        Tic.MESSAGES:argt{acttable = {Tic.TEXTWELCOME}}
     end
     return Tic.MESSAGES.actvalue
 end
