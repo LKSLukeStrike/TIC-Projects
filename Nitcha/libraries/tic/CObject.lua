@@ -1321,7 +1321,6 @@ function CClothesCap:new(_argt)
         [CObject.HANDLE] = Tic.COLORKEY,
         [CObject.BORDER] = CObject.COLORPSYM,
         [CObject.INSIDE] = CObject.COLORLEATHERFG,
-        -- [CObject.EFFECT] = CObject.COLORPSYM,
         [CObject.EFFECT] = CObject.COLORLEATHERFG,
     }
     self:argt(_argt) -- override if any
