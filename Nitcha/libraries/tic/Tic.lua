@@ -212,8 +212,8 @@ Tic.COLORARMOR    = Tic.COLORGREYD -- 4 colors for the bodies
 Tic.COLORSHIRT    = Tic.COLORGREYM
 Tic.COLORPANTS    = Tic.COLORGREYL
 Tic.COLORHANDS    = Tic.COLORWHITE
-Tic.COLORHAIRSFG  = Tic.COLORGREYD -- 4 colors for the heads
-Tic.COLORHAIRSBG  = Tic.COLORGREYM
+Tic.COLORHAIRSBG  = Tic.COLORGREYD -- 4 colors for the heads
+Tic.COLORHAIRSFG  = Tic.COLORGREYM
 Tic.COLOREXTRA    = Tic.COLORGREYL
 Tic.COLORSKIN     = Tic.COLORWHITE
 Tic.COLOREYESFG   = Tic.COLORWHITE -- 4 colors for the eyes
@@ -3409,7 +3409,7 @@ end
 -- exit()
 
 
-local _playerclass = CPlayerHuman
+local _playerclass = CPlayerGolth
 if true then
 --
 -- phy
