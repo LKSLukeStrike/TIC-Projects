@@ -424,7 +424,7 @@ function CCharacter:dropObject(_object, _withmessage)
     _object.dirx = self.dirx
     self.world:appendEntity(_object, Tic.SPRITESIZE, _trials)
  
-    if _withmessage then Tic:messageAppend(self.name.." "..Tic.TEXTRIDS..": ".._object.kind.." ".._object.name) end
+    if _withmessage then Tic:messageAppend(self.name.." "..Tic.TEXTDROP..": ".._object.kind.." ".._object.name) end
 
     return _object
 end
@@ -453,7 +453,7 @@ function CCharacter:pickObject(_object, _withmessage)
 
     self.world:deleteEntity(_object)
 
-    if _withmessage then Tic:messageAppend(self.name.." "..Tic.TEXTGETS..": ".._object.kind.." ".._object.name) end
+    if _withmessage then Tic:messageAppend(self.name.." "..Tic.TEXTPICK..": ".._object.kind.." ".._object.name) end
 
     return _object
 end
@@ -1026,7 +1026,7 @@ end
 
 function CCharacter:doSayMessage(_argt)
     local _message = _argt.message or "Hello"
-    Tic:messageAppend(self.name.." "..Tic.TEXTSAYS..": '".._message.." "..self.interactto.name.."'")
+    Tic:messageAppend(self.name.." "..Tic.TEXTSAY..": '".._message.." "..self.interactto.name.."'")
 end
 
 function CCharacter:ifPickObject(_argt)

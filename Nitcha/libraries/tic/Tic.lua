@@ -53,9 +53,6 @@ Tic.TEXTTRASH   = "Trash"
 Tic.TEXTALL     = "All"
 
 Tic.TEXTWELCOME = "Welcome ..."
-Tic.TEXTSAYS    = "says"
-Tic.TEXTGETS    = "gets"
-Tic.TEXTRIDS    = "rids"
 
 
 -- Fonts sizes
