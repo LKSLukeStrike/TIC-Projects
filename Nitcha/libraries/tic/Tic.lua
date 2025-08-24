@@ -51,6 +51,7 @@ Tic.TEXTMIN     = "Fst"
 Tic.TEXTMAX     = "Lst"
 Tic.TEXTTRASH   = "Trash"
 Tic.TEXTALL     = "All"
+Tic.TEXTJOIN    = "Join"
 
 Tic.TEXTWELCOME = "Welcome ..."
 

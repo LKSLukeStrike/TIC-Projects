@@ -6,6 +6,10 @@ IPlayer = Classic:extend() -- players characters implementation
 function IPlayer:playerAppend()
     Tic:playerAppend(self) -- record the new player on tic
 end
+IPlayer.interactions = {
+    CInteractionSayMessage{},
+    CInteractionJoinTroop{},
+}
 
 
 --
