@@ -2435,7 +2435,7 @@ require("libraries/tic/CObject")
 
 require("libraries/tic/CCharacter")
 
-require("libraries/tic/CCharacterHumanoid")
+require("libraries/tic/ICharacterHumanoid")
 
 require("libraries/tic/CPlayer")
 

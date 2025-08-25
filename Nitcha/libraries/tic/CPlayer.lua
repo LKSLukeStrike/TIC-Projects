@@ -1,28 +1,35 @@
-require("libraries/tic/CCharacterHumanoid")
+require("libraries/tic/ICharacterHumanoid")
 --
--- IPlayer
+-- CPlayer
 --
-IPlayer = Classic:extend() -- players characters implementation
-function IPlayer:playerAppend()
+CPlayer = CCharacter:extend() -- player characters
+function CPlayer:new(_argt)
+    CPlayer.super.new(self, _argt)
+    self.classic = CPlayer
+    self.discovered = true -- FIXME remove ?
+    self.interactions = {
+        CInteractionSayMessage{},
+        CInteractionJoinTroop{},
+    }
+    self:argt(_argt) -- override if any
+    self:implementall(ICharacterHumanoid)
+    self:playerAppend()
+end
+
+function CPlayer:playerAppend()
     Tic:playerAppend(self) -- record the new player on tic
 end
-IPlayer.interactions = {
-    CInteractionSayMessage{},
-    CInteractionJoinTroop{},
-}
 
 
 --
 -- CPlayerHumanoid
 --
-CPlayerHumanoid = CCharacterHumanoid:extend() -- humanoid player characters
+CPlayerHumanoid = CPlayer:extend() -- humanoid player characters
 function CPlayerHumanoid:new(_argt)
     CPlayerHumanoid.super.new(self, _argt)
     self.classic = CPlayerHumanoid
-    self.discovered = true
     self:argt(_argt) -- override if any
-    self:implementall(IPlayer)
-    self:playerAppend()
+    self:implementall(ICharacterHumanoid)
 end
 
 

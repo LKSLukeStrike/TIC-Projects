@@ -43,7 +43,7 @@ CInteraction.INTERACTDOJOINTROOP = function() return Tic:characterFunction(nil, 
 function CInteractionJoinTroop:new(_argt)
     CInteractionJoinTroop.super.new(self, _argt)
     self.text = Tic.TEXTJOIN
-    self.interactiflf = CInteraction.INTERACTIFJOINTROOP
+    -- self.interactiflf = CInteraction.INTERACTIFJOINTROOP
     self.interactdolf = CInteraction.INTERACTDOJOINTROOP
     self:argt(_argt) -- override if any
 end
