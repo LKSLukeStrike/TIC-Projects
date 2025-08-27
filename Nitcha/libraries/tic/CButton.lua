@@ -730,6 +730,7 @@ function CButtonSlotPlayer:new(_argt)
     self.hovertextup = CText{text = Tic.TEXTPICK}
     self.clickrg     = nil -- override per slot
     self.hovertextdw = CText{text = Tic.TEXTDROP}
+    self.hovertextrg = CText{}
     self:argt(_argt) -- override if any
 end
 
@@ -810,14 +811,24 @@ function CButtonSlotPlayer:canDrop()
     return (self.getslotobject and self:getslotobject()) -- has object in slot
 end
 
-function CButtonSlotPlayer:drawHovertextLF()
+function CButtonSlotPlayer:drawHovertextUP()
     if not self:canPick() then return end
-    CButtonSlotPlayer.super.drawHovertextLF(self)
+    CButtonSlotPlayer.super.drawHovertextUP(self)
+end
+
+function CButtonSlotPlayer:drawHovertextDW()
+    if not self:canDrop() then return end
+    CButtonSlotPlayer.super.drawHovertextDW(self)
 end
 
 function CButtonSlotPlayer:drawHovertextRG()
     if not self:canDrop() then return end
+    local _slotobject = self:getslotobject()
+    self.hovertextrg.text = _slotobject.kind.." ".._slotobject.name
+    self:save()
+    self.colorgroundactived = Tic.COLORBLUEM
     CButtonSlotPlayer.super.drawHovertextRG(self)
+    self:load()
 end
 
 CButtonSlotPlayerHead = CButtonSlotPlayer:extend()
