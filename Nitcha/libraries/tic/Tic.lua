@@ -47,8 +47,8 @@ Tic.TEXTWORK    = "Work"
 Tic.TEXTSLEEP   = "Sleep"
 Tic.TEXTDEFAULT = "Default"
 Tic.TEXTSAY     = "Say"
-Tic.TEXTMIN     = "Fst"
-Tic.TEXTMAX     = "Lst"
+Tic.TEXTFST     = "Fst"
+Tic.TEXTLST     = "Lst"
 Tic.TEXTTRASH   = "Trash"
 Tic.TEXTALL     = "All"
 Tic.TEXTJOIN    = "Join"
@@ -717,7 +717,7 @@ end
 
 
 -- Inputs System -- handle mouse and keyboard inputs
-Tic.FUNCTIONS = {}
+Tic.FUNCTIONS  = {}
 
 function Tic:inputsDo()
     Tic:inputsClearFunctions() -- start recording functions
@@ -750,6 +750,27 @@ function Tic:inputsRemoveFunctions(_functions)
 end
 
 
+-- Hovertexts System -- handle hoveetexts stack
+Tic.HOVERTEXTS = {}
+
+function Tic:hovertextsClearHovertexts() -- clear the hovertexts table
+    Tic.HOVERTEXTS = {}
+end
+
+function Tic:hovertextsAppend(_hovertext) -- append an hovertext for later drawing
+    if not _hovertext then return end -- mandatory
+    local _hovertextclone = CText{} -- make a clone of it
+    _hovertextclone:implementall(_hovertext)
+    Tables:valInsert(Tic.HOVERTEXTS, _hovertextclone, true)
+end
+
+function Tic:hovertextsDrawAll() -- draw all hovertexts
+    for _, _hovertext in ipairs(Tic.HOVERTEXTS) do
+        _hovertext:draw()
+    end
+end
+
+
 -- Screens System -- handle screens stack
 Tic.SCREENS = CCyclerTable()
 
@@ -758,10 +779,14 @@ function Tic:screenDraw() -- draw screen(s)
     Tic.SCREENS:min()
     Tic:keyboardClearKeysFunctions()
     Tic:buttonsClearButtons()
+    Tic:hovertextsClearHovertexts()
+
     while Tic.SCREENS.actindex <= _actindex do -- pile each screen
         if Tic:screenActual() then Tic:screenActual():draw() end
         if Tic.SCREENS.actindex == _actindex then break else Tic:screenNext() end
     end
+
+    Tic:hovertextsDrawAll() -- draw all hovertexts at the very end
 end
 
 function Tic:screenActual() -- actual screen in the stack
@@ -2801,9 +2826,9 @@ ScreenWorldRG:appendElements{
     WindowSpottingPortrait,
     WindowSpottingInfos,
     WindowMenuInteractions,
-    ButtonSpottingSpot,
-    ButtonSpottingLock,
     ButtonSpottingPick,
+    ButtonSpottingLock,
+    ButtonSpottingSpot,
     ButtonSlotSpottingHead,
     ButtonSlotSpottingBack,
     ButtonSlotSpottingHandLF,

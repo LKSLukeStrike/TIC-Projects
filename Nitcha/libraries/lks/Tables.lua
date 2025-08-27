@@ -180,7 +180,7 @@ function Tables:ifAll(_table, _if)
 end
 
 
--- Clone and Merge
+-- Clone, Merge and Fusion
 function Tables:clone(_table) -- clone a dic table -- SORTED -- only first level -- FIXME ?
     local _result = {}
     local _keys = Tables:keys(_table) -- sorted keys

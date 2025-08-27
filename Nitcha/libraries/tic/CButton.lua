@@ -42,8 +42,10 @@ end
 function CButton:draw() -- button drawing --TODO hover with wheel ?
     CButton.super.draw(self)
     if self.hovered then
-        if self.clicklf and (self.hovertextlf and self.hovertextlf:is(CText)) then self:drawHovertextLF() end
-        if self.clickrg and (self.hovertextrg and self.hovertextrg:is(CText)) then self:drawHovertextRG() end
+        if self.hovertextlf then self:drawHovertextLF() end
+        if self.hovertextrg then self:drawHovertextRG() end
+        if self.hovertextup then self:drawHovertextUP() end
+        if self.hovertextdw then self:drawHovertextDW() end
     end
 end
 
@@ -65,21 +67,55 @@ function CButton:drawBorder()
 end
 
 function CButton:drawHovertextLF()
+    self.hovertextlf:save()
+    self.hovertextlf.marginlf = 1
+    self.hovertextlf:adjustWH()
     self.hovertextlf.drawground = true
     self.hovertextlf.colorground = (self.colorhoverground) and self.colorhoverground or self.hovertextlf.colorground
     self.hovertextlf.colorinside = self.colorgroundactived
-    self.hovertextlf.screenx = self.screenx - ((self.hovertextlf.screenw - self.screenw) // 2) + 1
-    self.hovertextlf.screeny = self.screeny - self.hovertextlf.screenh
-    self.hovertextlf:draw()
+    self.hovertextlf.screenx = self.screenx - self.hovertextlf.screenw
+    self.hovertextlf.screeny = self.screeny + ((self.screenh - self.hovertextlf.screenh) // 2)
+    Tic:hovertextsAppend(self.hovertextlf)
+    self.hovertextlf:load()
 end
 
 function CButton:drawHovertextRG()
+    self.hovertextrg:save()
+    self.hovertextrg.marginlf = 1
+    self.hovertextrg:adjustWH()
     self.hovertextrg.drawground = true
     self.hovertextrg.colorground = (self.colorhoverground) and self.colorhoverground or self.hovertextrg.colorground
     self.hovertextrg.colorinside = self.colorgroundactived
-    self.hovertextrg.screenx = self.screenx - ((self.hovertextrg.screenw - self.screenw) // 2) + 1
-    self.hovertextrg.screeny = self.screeny + self.screenh
-    self.hovertextrg:draw()
+    self.hovertextrg.screenx = self.screenx + self.screenw
+    self.hovertextrg.screeny = self.screeny + ((self.screenh - self.hovertextrg.screenh) // 2)
+    Tic:hovertextsAppend(self.hovertextrg)
+    self.hovertextrg:load()
+end
+
+function CButton:drawHovertextUP()
+    self.hovertextup:save()
+    self.hovertextup.marginlf = 1
+    self.hovertextup:adjustWH()
+    self.hovertextup.drawground = true
+    self.hovertextup.colorground = (self.colorhoverground) and self.colorhoverground or self.hovertextup.colorground
+    self.hovertextup.colorinside = self.colorgroundactived
+    self.hovertextup.screenx = self.screenx - ((self.hovertextup.screenw - self.screenw) // 2) + 1
+    self.hovertextup.screeny = self.screeny - self.hovertextup.screenh
+    Tic:hovertextsAppend(self.hovertextup)
+    self.hovertextup:load()
+end
+
+function CButton:drawHovertextDW()
+    self.hovertextdw:save()
+    self.hovertextdw.marginlf = 1
+    self.hovertextdw:adjustWH()
+    self.hovertextdw.drawground = true
+    self.hovertextdw.colorground = (self.colorhoverground) and self.colorhoverground or self.hovertextdw.colorground
+    self.hovertextdw.colorinside = self.colorgroundactived
+    self.hovertextdw.screenx = self.screenx - ((self.hovertextdw.screenw - self.screenw) // 2) + 1
+    self.hovertextdw.screeny = self.screeny + self.screenh
+    Tic:hovertextsAppend(self.hovertextdw)
+    self.hovertextdw:load()
 end
 
 
@@ -396,9 +432,9 @@ function CButtonPlayerPrev:new(_argt)
     self.sprite.palette = IButton.PALETTEKEY
 	self.behaviour      = IButtonPlayerChange.BEHAVIOUR  -- function to trigger at first
     self.clicklf        = Tic.FUNCTIONPLAYERPREV
-    self.hovertextlf    = CText{text = Tic.TEXTPREV}
+    self.hovertextup    = CText{text = Tic.TEXTPREV}
     self.clickrg        = Tic.FUNCTIONPLAYERMIN
-    self.hovertextrg    = CText{text = Tic.TEXTMIN}
+    self.hovertextdw    = CText{text = Tic.TEXTFST}
     self:argt(_argt) -- override if any
 end
 
@@ -412,9 +448,9 @@ function CButtonPlayerNext:new(_argt)
     self.sprite.palette = IButton.PALETTEKEY
 	self.behaviour      = IButtonPlayerChange.BEHAVIOUR  -- function to trigger at first
     self.clicklf        = Tic.FUNCTIONPLAYERNEXT
-    self.hovertextlf    = CText{text = Tic.TEXTNEXT}
+    self.hovertextup    = CText{text = Tic.TEXTNEXT}
     self.clickrg        = Tic.FUNCTIONPLAYERMAX
-    self.hovertextrg    = CText{text = Tic.TEXTMAX}
+    self.hovertextdw    = CText{text = Tic.TEXTLST}
     self:argt(_argt) -- override if any
 end
 
@@ -430,7 +466,7 @@ function CButtonPlayerPick:new(_argt)
     self.sprite.palette = IButton.PALETTEKEY
 	self.behaviour      = IButtonPlayerChange.BEHAVIOUR  -- function to trigger at first
     self.clicklf        = function() Tic:logAppend(Tic.TEXTPICK) end
-    self.hovertextlf    = CText{text = Tic.TEXTPICK}
+    self.hovertextup    = CText{text = Tic.TEXTPICK}
     self:argt(_argt) -- override if any
 end
 
@@ -454,7 +490,7 @@ function CButtonPlayerStand:new(_argt)
 	self.sprite.sprite  = CSpriteBG.SIGNSTAIDL
 	self.behaviour      = CButtonPlayerStand.BEHAVIOUR  -- function to trigger at first
     self.clicklf        = function() Tic:toggleKneel() end
-    self.hovertextlf    = CText{text = Tic.TEXTSTAND}
+    self.hovertextup    = CText{text = Tic.TEXTSTAND}
     self:argt(_argt) -- override if any
 end
 
@@ -478,7 +514,7 @@ function CButtonPlayerKneel:new(_argt)
 	self.sprite.sprite  = CSpriteBG.SIGNKNEIDL
 	self.behaviour      = CButtonPlayerKneel.BEHAVIOUR  -- function to trigger at first
     self.clicklf        = function() Tic:toggleKneel() end
-    self.hovertextlf    = CText{text = Tic.TEXTKNEEL}
+    self.hovertextup    = CText{text = Tic.TEXTKNEEL}
     self:argt(_argt) -- override if any
 end
 
@@ -499,7 +535,7 @@ function CButtonPlayerWork:new(_argt)
 	self.sprite.sprite  = CSpriteBG.SIGNDOWORK
 	self.behaviour      = CButtonPlayerWork.BEHAVIOUR  -- function to trigger at first
     self.clicklf        = function() Tic:toggleWork() end
-    self.hovertextlf    = CText{text = Tic.TEXTWORK}
+    self.hovertextup    = CText{text = Tic.TEXTWORK}
     self:argt(_argt) -- override if any
 end
 
@@ -520,7 +556,7 @@ function CButtonPlayerSleep:new(_argt)
 	self.sprite.sprite  = CSpriteBG.SIGNDOSLEE
 	self.behaviour      = CButtonPlayerSleep.BEHAVIOUR  -- function to trigger at first
     self.clicklf        = function() Tic:toggleSleep() end
-    self.hovertextlf    = CText{text = Tic.TEXTSLEEP}
+    self.hovertextup    = CText{text = Tic.TEXTSLEEP}
     self:argt(_argt) -- override if any
 end
 
@@ -691,9 +727,9 @@ function CButtonSlotPlayer:new(_argt)
     CButtonSlotPlayer.super.new(self, _argt)
     self.behaviour   = IButtonSlotPlayer.BEHAVIOUR
     self.clicklf     = function() self:menuPick() end
-    self.hovertextlf = CText{text = Tic.TEXTPICK}
+    self.hovertextup = CText{text = Tic.TEXTPICK}
     self.clickrg     = nil -- override per slot
-    self.hovertextrg = CText{text = Tic.TEXTDROP}
+    self.hovertextdw = CText{text = Tic.TEXTDROP}
     self:argt(_argt) -- override if any
 end
 
@@ -914,7 +950,7 @@ function CButtonSpottingSpot:new(_argt)
     self.sprite.palette = IButton.PALETTEKEY
 	self.behaviour      = CButtonSpottingSpot.BEHAVIOUR  -- function to trigger at first
     self.clicklf        = function() Tic:spottingToggleSpot() end
-    self.hovertextlf    = CText{text = Tic.TEXTSPOT}
+    self.hovertextup    = CText{text = Tic.TEXTSPOT}
     self:argt(_argt) -- override if any
 end
 
@@ -934,7 +970,7 @@ function CButtonSpottingLock:new(_argt)
     self.sprite.palette = IButton.PALETTEKEY
 	self.behaviour      = CButtonSpottingLock.BEHAVIOUR  -- function to trigger at first
     self.clicklf        = function() Tic:spottingToggleLock() end
-    self.hovertextlf    = CText{text = Tic.TEXTLOCK}
+    self.hovertextup    = CText{text = Tic.TEXTLOCK}
     self:argt(_argt) -- override if any
 end
 
@@ -954,7 +990,7 @@ function CButtonSpottingPick:new(_argt)
     self.sprite.palette = IButton.PALETTEKEY
 	self.behaviour      = CButtonSpottingPick.BEHAVIOUR  -- function to trigger at first
     self.clicklf        = function() Tic:spottingTogglePick() end
-    self.hovertextlf    = CText{text = Tic.TEXTPICK}
+    self.hovertextup    = CText{text = Tic.TEXTPICK}
     self:argt(_argt) -- override if any
 end
 
@@ -983,7 +1019,7 @@ function CButtonSpotting000:new(_argt)
     self.sprite.palette = IButton.PALETTEKEY
     self.behaviour      = IButtonSpottingMove.BEHAVIOUR
     self.clicklf        = function() Tic:moveDirection000() end
-    self.hovertextlf    = CText{text = Tic.TEXTMOVE}
+    self.hovertextup    = CText{text = Tic.TEXTMOVE}
     self:argt(_argt) -- override if any
 end
 
@@ -993,7 +1029,7 @@ function CButtonSpotting045:new(_argt)
     self.sprite.palette = IButton.PALETTEKEY
     self.behaviour      = IButtonSpottingMove.BEHAVIOUR
     self.clicklf        = function() Tic:moveDirection045() end
-    self.hovertextlf    = CText{text = Tic.TEXTMOVE}
+    self.hovertextup    = CText{text = Tic.TEXTMOVE}
     self:argt(_argt) -- override if any
 end
 
@@ -1003,7 +1039,7 @@ function CButtonSpotting090:new(_argt)
     self.sprite.palette = IButton.PALETTEKEY
     self.behaviour      = IButtonSpottingMove.BEHAVIOUR
     self.clicklf        = function() Tic:moveDirection090() end
-    self.hovertextlf    = CText{text = Tic.TEXTMOVE}
+    self.hovertextup    = CText{text = Tic.TEXTMOVE}
     self:argt(_argt) -- override if any
 end
 
@@ -1013,7 +1049,7 @@ function CButtonSpotting135:new(_argt)
     self.sprite.palette = IButton.PALETTEKEY
     self.behaviour      = IButtonSpottingMove.BEHAVIOUR
     self.clicklf        = function() Tic:moveDirection135() end
-    self.hovertextlf    = CText{text = Tic.TEXTMOVE}
+    self.hovertextup    = CText{text = Tic.TEXTMOVE}
     self:argt(_argt) -- override if any
 end
 
@@ -1023,7 +1059,7 @@ function CButtonSpotting180:new(_argt)
     self.sprite.palette = IButton.PALETTEKEY
     self.behaviour      = IButtonSpottingMove.BEHAVIOUR
     self.clicklf        = function() Tic:moveDirection180() end
-    self.hovertextlf    = CText{text = Tic.TEXTMOVE}
+    self.hovertextup    = CText{text = Tic.TEXTMOVE}
     self:argt(_argt) -- override if any
 end
 
@@ -1033,7 +1069,7 @@ function CButtonSpotting225:new(_argt)
     self.sprite.palette = IButton.PALETTEKEY
     self.behaviour      = IButtonSpottingMove.BEHAVIOUR
     self.clicklf        = function() Tic:moveDirection225() end
-    self.hovertextlf    = CText{text = Tic.TEXTMOVE}
+    self.hovertextup    = CText{text = Tic.TEXTMOVE}
     self:argt(_argt) -- override if any
 end
 
@@ -1043,7 +1079,7 @@ function CButtonSpotting270:new(_argt)
     self.sprite.palette = IButton.PALETTEKEY
     self.behaviour      = IButtonSpottingMove.BEHAVIOUR
     self.clicklf        = function() Tic:moveDirection270() end
-    self.hovertextlf    = CText{text = Tic.TEXTMOVE}
+    self.hovertextup    = CText{text = Tic.TEXTMOVE}
     self:argt(_argt) -- override if any
 end
 
@@ -1053,7 +1089,7 @@ function CButtonSpotting315:new(_argt)
     self.sprite.palette = IButton.PALETTEKEY
     self.behaviour      = IButtonSpottingMove.BEHAVIOUR
     self.clicklf        = function() Tic:moveDirection315() end
-    self.hovertextlf    = CText{text = Tic.TEXTMOVE}
+    self.hovertextup    = CText{text = Tic.TEXTMOVE}
     self:argt(_argt) -- override if any
 end
 
@@ -1066,7 +1102,7 @@ IButtonPlayerMove.BEHAVIOUR = function(self)
     IButtonPlayer.BEHAVIOUR(self)
     if not self.display then return end -- no move
     self.actived     = Tic:playerActual().direction == self.direction
-    self.hovertextlf = CText{text = Tic.TEXTMOVE}
+    self.hovertextup = CText{text = Tic.TEXTMOVE}
 end
 
 CButtonPlayerMove000 = CButtonArrow000:extend() -- generic player move 000 button
@@ -1177,9 +1213,9 @@ function CButtonMessagePrev:new(_argt)
     self.sprite.palette = IButton.PALETTEKEY
 	self.behaviour      = IButtonMessageChange.BEHAVIOUR  -- function to trigger at first
     self.clicklf        = Tic.FUNCTIONMESSAGEPREV
-    self.hovertextlf    = CText{text = Tic.TEXTPREV}
+    self.hovertextup    = CText{text = Tic.TEXTPREV}
     self.clickrg        = Tic.FUNCTIONMESSAGEMIN
-    self.hovertextrg    = CText{text = Tic.TEXTMIN}
+    self.hovertextdw    = CText{text = Tic.TEXTFST}
     self:argt(_argt) -- override if any
 end
 
@@ -1197,9 +1233,9 @@ function CButtonMessageNext:new(_argt)
     self.sprite.palette = IButton.PALETTEKEY
 	self.behaviour      = IButtonMessageChange.BEHAVIOUR  -- function to trigger at first
     self.clicklf        = Tic.FUNCTIONMESSAGENEXT
-    self.hovertextlf    = CText{text = Tic.TEXTNEXT}
+    self.hovertextup    = CText{text = Tic.TEXTNEXT}
     self.clickrg        = Tic.FUNCTIONMESSAGEMAX
-    self.hovertextrg    = CText{text = Tic.TEXTMAX}
+    self.hovertextdw    = CText{text = Tic.TEXTLST}
     self:argt(_argt) -- override if any
 end
 
@@ -1219,8 +1255,8 @@ function CButtonMessageTrash:new(_argt)
     self.sprite.palette = IButton.PALETTEKEY
 	self.behaviour      = IButtonMessage.BEHAVIOUR  -- function to trigger at first
     self.clicklf        = function() Tic:messageDeleteOne() end
-    self.hovertextlf    = CText{text = Tic.TEXTTRASH}
+    self.hovertextup    = CText{text = Tic.TEXTTRASH}
     self.clickrg        = function() Tic:messageDeleteAll() end
-    self.hovertextrg    = CText{text = Tic.TEXTALL}
+    self.hovertextdw    = CText{text = Tic.TEXTALL}
     self:argt(_argt) -- override if any
 end
