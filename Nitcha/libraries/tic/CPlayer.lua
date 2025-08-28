@@ -6,7 +6,6 @@ CPlayer = CCharacter:extend() -- player characters
 function CPlayer:new(_argt)
     CPlayer.super.new(self, _argt)
     self.classic = CPlayer
-    self.discovered = true -- FIXME remove ?
     self.interactions = {
         CInteractionSayMessage{},
         CInteractionJoinTroop{},

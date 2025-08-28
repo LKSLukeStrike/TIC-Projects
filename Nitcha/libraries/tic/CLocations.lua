@@ -2,7 +2,7 @@ require("libraries/ext/Classic")
 --
 -- CLocations
 --
-CLocations = Classic:extend() -- generic entities locations -- {worldy {worldx {entity = entity}}} -- FIXME change entity by true ?
+CLocations = Classic:extend() -- generic entities locations -- {worldy {worldx {entity = entity}}}
 Classic.KINDLOCATIONS = "Locations"
 Classic.NAMELOCATIONS = "Locations"
 function CLocations:new(_argt)
@@ -38,7 +38,7 @@ function CLocations:findEmpty(_trials) -- find an empty location in a list of tr
     return -- nil
 end
 
-function CLocations:appendEntity(_entity, _range, _trials) -- append a new entity -- [!] allows doublons
+function CLocations:appendEntity(_entity, _range, _trials) -- append a new entity -- allows mutiple entities on same location
     if not _entity then return end -- mandatory
     self:spreadEntity(_entity, _range, _trials)
     local _worldx = _entity.worldx
