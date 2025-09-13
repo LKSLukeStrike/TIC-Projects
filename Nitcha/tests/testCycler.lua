@@ -1,8 +1,8 @@
 --
 -- Packages
 package.path  = package.path..";G:/TIC80 1.1/TICProjects/Nitcha/?.lua"
-local CCycler = require("libraries/lks/CCycler")                
-local Tables  = require("libraries/lks/Tables")                
+local CCycler = require("lib/lks/CCycler")                
+local Tables  = require("lib/lks/Tables")                
 
 
 if false then

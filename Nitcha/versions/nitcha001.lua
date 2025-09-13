@@ -7,7 +7,7 @@
 -- sprites & animations
 
 
--- Libraries
+-- lib
 package.path = package.path..";G:/TIC80 1.1/TICProjects/Nitcha/?.lua"
 Classic = require("libs/Classic")
 

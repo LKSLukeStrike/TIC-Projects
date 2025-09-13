@@ -1,4 +1,4 @@
-require("libraries/tic/CRegion")                
+require("lib/tic/CRegion")                
 --
 -- CHitbox
 --

@@ -1,4 +1,4 @@
-require("libraries/tic/ICharacterHumanoid")
+require("lib/tic/ICharacterHumanoid")
 --
 -- CPlayer
 --

@@ -1,6 +1,6 @@
 -- Packages
 package.path = package.path..";G:/TIC80 1.1/TICProjects/Nitcha/?.lua"
-local Tables = require("libraries/lks/Tables")
+local Tables = require("lib/lks/Tables")
 
 if false then
 local _tbl = {a = 10, b = 100, c = 1000, d = 10000, e = {e1 = "hello", e2 = "world",},}

@@ -5,11 +5,12 @@
 --
 -- Packages
 package.path  = package.path..";G:/TIC80 1.1/TICProjects/Nitcha/?.lua"
-Classic = require("libraries/ext/Classic")
-Nums    = require("libraries/lks/Nums")
-Tables  = require("libraries/lks/Tables")
-Names   = require("libraries/lks/Names")
-CCycler = require("libraries/lks/CCycler")
+Classic = require("lib/ext/Classic")
+
+CCycler = require("lib/lks/CCycler")
+Names   = require("lib/lks/Names")
+Nums    = require("lib/lks/Nums")
+Tables  = require("lib/lks/Tables")
 
 
 --
@@ -1545,27 +1546,28 @@ function Tic:boardDirectives(_sprite, _palette, _colorkey) -- returns the direct
 end
 
 
-
-require("libraries/tic/CSprite")
-
-require("libraries/tic/CAnimation")
-
-require("libraries/tic/CInteraction")
-
-require("libraries/tic/CSlot")
-
-require("libraries/tic/CInventory")
-
-require("libraries/tic/CRegion")
-
-require("libraries/tic/CHitbox")
-
-require("libraries/tic/CLocations")
-
-require("libraries/tic/CEntitiesLocations")
-
-require("libraries/tic/CEntity")
-
+-- Requires
+require("lib/tic/CAnimation")
+require("lib/tic/CSprite")
+require("lib/tic/CInteraction")
+require("lib/tic/CSlot")
+require("lib/tic/CInventory")
+require("lib/tic/CRegion")
+require("lib/tic/CHitbox")
+require("lib/tic/CLocations")
+require("lib/tic/CEntitiesLocations")
+require("lib/tic/CEntity")
+require("lib/tic/CDirective")
+require("lib/tic/CEntityDrawable")
+require("lib/tic/CObject")
+require("lib/tic/CCharacter")
+require("lib/tic/ICharacterHumanoid")
+require("lib/tic/CPlayer")
+require("lib/tic/CElement")
+require("lib/tic/CText")
+require("lib/tic/CButton")
+require("lib/tic/CWindow")
+require("lib/tic/CScreen")
 
 
 
@@ -1670,9 +1672,6 @@ end
 function CCamera:locationsAround() -- locations in a camera ranges
     return self.world:locationsEntityRangeXY(self, self.rangex, self.rangey)
 end
-
-
-require("libraries/tic/CEntityDrawable")
 
 
 --
@@ -2456,31 +2455,10 @@ function CPlaceRoad1Idle:new(_argt)
 end
 
 
-require("libraries/tic/CObject")
-
-require("libraries/tic/CCharacter")
-
-require("libraries/tic/ICharacterHumanoid")
-
-require("libraries/tic/CPlayer")
-
-
 CNeutral= CCharacter:extend() -- neutral characters
 
 
 CEnnemy = CCharacter:extend() -- ennemy characters
-
-
-require("libraries/tic/CElement")
-
-require("libraries/tic/CText")
-
-require("libraries/tic/CButton")
-
-require("libraries/tic/CWindow")
-
-require("libraries/tic/CScreen")
-
 
 
 --
@@ -3372,22 +3350,22 @@ SpriteSFX = CSpriteFGBoard{
     screenx = 30,
     screeny = 120,
     directives = {
-        {x = 2, y = 1, color = Tic.COLORORANGE,},
-        {x = 1, y = 2, color = Tic.COLORORANGE,},
-        {x = 2, y = 3, color = Tic.COLORORANGE,},
-        {x = 2, y = 5, color = Tic.COLORORANGE,},
-        {x = 3, y = 1, color = Tic.COLORYELLOW,},
-        {x = 1, y = 5, color = Tic.COLORYELLOW,},
-        {x = 5, y = 1, color = Tic.COLORRED,},
-        {x = 6, y = 1, color = Tic.COLORRED,},
-        {x = 4, y = 2, color = Tic.COLORRED,},
-        {x = 4, y = 3, color = Tic.COLORRED,},
-        {x = 5, y = 3, color = Tic.COLORRED,},
-        {x = 3, y = 4, color = Tic.COLORRED,},
-        {x = 7, y = 1, color = Tic.COLORPURPLE,},
-        {x = 6, y = 3, color = Tic.COLORPURPLE,},
-        {x = 4, y = 4, color = Tic.COLORPURPLE,},
-        {x = 3, y = 5, color = Tic.COLORPURPLE,},
+        CDirective{boardx = 2, boardy = 1, color = Tic.COLORORANGE,},
+        CDirective{boardx = 1, boardy = 2, color = Tic.COLORORANGE,},
+        CDirective{boardx = 2, boardy = 3, color = Tic.COLORORANGE,},
+        CDirective{boardx = 2, boardy = 5, color = Tic.COLORORANGE,},
+        CDirective{boardx = 3, boardy = 1, color = Tic.COLORYELLOW,},
+        CDirective{boardx = 1, boardy = 5, color = Tic.COLORYELLOW,},
+        CDirective{boardx = 5, boardy = 1, color = Tic.COLORRED,},
+        CDirective{boardx = 6, boardy = 1, color = Tic.COLORRED,},
+        CDirective{boardx = 4, boardy = 2, color = Tic.COLORRED,},
+        CDirective{boardx = 4, boardy = 3, color = Tic.COLORRED,},
+        CDirective{boardx = 5, boardy = 3, color = Tic.COLORRED,},
+        CDirective{boardx = 3, boardy = 4, color = Tic.COLORRED,},
+        CDirective{boardx = 7, boardy = 1, color = Tic.COLORPURPLE,},
+        CDirective{boardx = 6, boardy = 3, color = Tic.COLORPURPLE,},
+        CDirective{boardx = 4, boardy = 4, color = Tic.COLORPURPLE,},
+        CDirective{boardx = 3, boardy = 5, color = Tic.COLORPURPLE,},
     },
 }
 SpriteHTG = CSpriteFG{

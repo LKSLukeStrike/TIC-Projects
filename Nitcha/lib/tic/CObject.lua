@@ -1,4 +1,4 @@
-require("libraries/tic/CEntityDrawable")
+require("lib/tic/CEntityDrawable")
 --
 -- CObject
 --

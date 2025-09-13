@@ -5,9 +5,9 @@
 --
 -- Packages
 package.path  = package.path..";G:/TIC80 1.1/TICProjects/Nitcha/?.lua"
-local Classic = require("libraries/ext/Classic")                
-local Nums    = require("libraries/lks/Nums")
-local Tables  = require("libraries/lks/Tables")
+local Classic = require("lib/ext/Classic")                
+local Nums    = require("lib/lks/Nums")
+local Tables  = require("lib/lks/Tables")
 
 
 --

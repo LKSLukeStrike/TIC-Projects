@@ -1,4 +1,4 @@
-require("libraries/tic/CEntity")
+require("lib/tic/CEntity")
 --
 -- CEntityDrawable
 --

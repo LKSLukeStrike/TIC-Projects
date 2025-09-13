@@ -49,7 +49,7 @@ if not TIC80 then
 
 --
 -- Packages
-local Tic = require("libraries/tic/Tic")
+local Tic = require("lib/tic/Tic")
 
 
 --

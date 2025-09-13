@@ -5,7 +5,7 @@
 --
 -- Packages
 package.path  = package.path..";G:/TIC80 1.1/TICProjects/Nitcha/?.lua"
-local Nums    = require("libraries/lks/Nums")
+local Nums    = require("lib/lks/Nums")
 
 
 --

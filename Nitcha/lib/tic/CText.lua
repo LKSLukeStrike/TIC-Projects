@@ -1,4 +1,4 @@
-require("libraries/tic/CElement")
+require("lib/tic/CElement")
 --
 -- CText
 --

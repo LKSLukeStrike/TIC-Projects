@@ -1,6 +1,6 @@
 -- Packages
 package.path = package.path..";G:/TIC80 1.1/TICProjects/Nitcha/?.lua"
-local Names  = require("libraries/lks/Names")
+local Names  = require("lib/lks/Names")
 
 
 -- for _ = 1, 20 do

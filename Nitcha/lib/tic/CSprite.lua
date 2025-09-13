@@ -1,4 +1,4 @@
-require("libraries/ext/Classic")
+require("lib/ext/Classic")
 --
 -- CSprite
 --
