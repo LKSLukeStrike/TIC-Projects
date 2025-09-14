@@ -1,5 +1,3 @@
-require("lib/ext/Classic")
-require("lib/tic/CDirective")
 require("lib/tic/CRegion")
 --
 -- CBoard
