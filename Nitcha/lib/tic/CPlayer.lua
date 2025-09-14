@@ -1,4 +1,4 @@
-require("lib/tic/ICharacterHumanoid")
+require("lib/tic/CCharacter")
 --
 -- CPlayer
 --
@@ -11,7 +11,6 @@ function CPlayer:new(_argt)
         CInteractionJoinTroop{},
     }
     self:argt(_argt) -- override if any
-    self:implementall(ICharacterHumanoid)
     self:playerAppend()
 end
 

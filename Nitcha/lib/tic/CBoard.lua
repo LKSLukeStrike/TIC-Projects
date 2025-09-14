@@ -1,4 +1,3 @@
-require("lib/tic/CRegion")
 --
 -- CBoard
 --
