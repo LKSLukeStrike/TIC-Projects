@@ -10,7 +10,7 @@ function CEntityDrawable:new(_argt)
     self.classic = CEntityDrawable
     self.kind = Classic.KINDENTITYDRAWABLE
     self.name = Classic.NAMEENTITYDRAWABLE
-    self.world        = World
+    self.world        = Tic:worldActual()
     self.sprite       = CSpriteBG.SIGNEMPTYS
     self.screenx      = 0 -- screen positions -- used to draw the sprite
     self.screeny      = 0
