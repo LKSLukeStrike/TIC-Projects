@@ -15,7 +15,7 @@ function CInventory:new(_argt)
 end
 
 function CInventory:isInventory(_inventory)
-    return _inventory and type(_inventory) == "table" and _inventory.is and _inventory:is(CInventory)
+    return Classic:thatis(_inventory, CInventory)
 end
 
 function CInventory:canAppendObject(_object)

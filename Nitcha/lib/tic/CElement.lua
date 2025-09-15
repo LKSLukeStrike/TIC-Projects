@@ -266,8 +266,7 @@ function CElement:alignElementDirection(_element, _direction) -- align a sub ele
 end
 
 function CElement:appendElement(_element) -- append element -- unique
-    if not _element then return end -- mandarory
-    if not _element:is(CElement) then return end -- only elements
+    if not Classic:thatis(_element, CElement) then return end -- mandatory
     _element.parent = self -- record parent
     Tables:valInsert(self.elements, _element, true)
 end
@@ -279,8 +278,7 @@ function CElement:appendElements(_elements) -- append elements -- unique
 end
 
 function CElement:removeElement(_element) -- remove element -- all
-    if not _element then return end -- mandarory
-    if not _element:is(CElement) then return end -- only elements
+    if not Classic:thatis(_element, CElement) then return end -- mandatory
     _element.parent = nil -- remove parent
     Tables:valRemove(self.elements, _element, false)
 end

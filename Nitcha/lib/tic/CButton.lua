@@ -141,7 +141,7 @@ function CButtonText:adjustWH() -- adjust screenw, screenh
 end
 
 function CButtonText:draw() -- button drawing
-    self.drawinside = (self.text and self.text:is(CText))
+    self.drawinside = Classic:thatis(self.text, CText)
     CButtonText.super.draw(self)
 end
 

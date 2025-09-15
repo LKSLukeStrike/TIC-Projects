@@ -17,17 +17,27 @@ function CBoard:isEmpty(_boardx, _boardy) -- check if a point on board is empty
     return not self.board[_boardx] or not self.board[_boardx][_boardy]
 end
 
-function CBoard:appendDirectives(_directives, _region, _palette)
-    _directives = _directives or {}
-    _region     = _region or CRegion{}
-    _palette    = _palette or {}
-    for _, _directive in ipairs(_directives) do
-        local _boardx = _directive.boardx
-        local _boardy = _directive.boardy
-        local _color  = (_palette[_directive.color])
-            and _palette[_directive.color]
-            or  _directive.color
+function CBoard:appendDirective(_directive, _region, _palette, _colorkey)
+    if not Classic:thatis(_directive, CDirective) then return end -- mandatory
+    _region       = (Classic:thatis(_region, CRegion)) and _region or CRegion{}
+    _palette      = _palette or {}
+    local _boardx = _directive.boardx
+    local _boardy = _directive.boardy
+    local _color  = (_palette[_directive.color])
+        and _palette[_directive.color]
+        or  _directive.color
+    if  Nums:isBW(_boardx, _region.lf, _region.rg)
+    and Nums:isBW(_boardy, _region.up, _region.dw)
+    and _colorkey and not (_color == _colorkey)
+    then
         if not self.board[_boardx] then self.board[_boardx] = {} end
+        self.board[_boardx][_boardy] = _color
+    end
+end
+
+function CBoard:appendDirectives(_directives, _region, _palette, _colorkey)
+    for _, _directive in ipairs(_directives) do
+        self:appendDirective(_directive, _region, _palette, _colorkey)
     end
 end
 

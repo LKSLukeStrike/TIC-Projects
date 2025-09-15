@@ -14,7 +14,7 @@ function CSlot:new(_argt)
 end
 
 function CSlot:isSlot(_slot)
-    return _slot and type(_slot) == "table" and _slot.is and _slot:is(CSlot)
+    return Classic:thatis(_slot, CSlot)
 end
 
 function CSlot:canAppendObject(_object, _emptyonly)

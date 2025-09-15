@@ -48,10 +48,10 @@ function Classic:implement(...) -- implement (only) new functions -- original ve
 end
 
 
-function Classic:is(_type)
+function Classic:is(_classic)
   local _metatable = getmetatable(self)
   while _metatable do
-    if _metatable == _type then
+    if _metatable == _classic then
       return true
     end
     _metatable = getmetatable(_metatable)
@@ -194,6 +194,10 @@ function Classic:string() -- classic as a string
   return self.kind.." "..self.name
 end
 
+function Classic:thatis(_that, _classic) -- check if that is of a classic type
+    return (_classic and type(_classic) == "table" and _classic.is and _classic:is(Classic))
+    and    (_that and type(_that) == "table" and _that.is and _that:is(_classic))
+end
 
 -- END
 return Classic

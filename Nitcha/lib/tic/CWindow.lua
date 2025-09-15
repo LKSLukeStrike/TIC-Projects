@@ -197,7 +197,7 @@ end
 function CWindowInfos:drawInside()
     local _offsety = 0
     for _, _element in ipairs(self.elements) do
-        if _element:is(CTextLine) then
+        if Classic:thatis(_element, CTextLine) then
             self:alignElementDirection(_element, self.align)
             _element.screeny = _element.screeny + _offsety
             _offsety = _offsety + _element.screenh
