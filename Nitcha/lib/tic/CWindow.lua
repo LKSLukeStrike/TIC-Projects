@@ -273,6 +273,7 @@ function CWindowPortrait:new(_argt)
     self.colorground = Tic.COLORBIOMENIGHT
     self.drawborder  = false
     self.cachestick  = Tic.SPRITESIZE * Tic.SCALE02 -- caches thickness
+    self.drawcaches  = false -- HH
     self:argt(_argt) -- override if any
 end
 

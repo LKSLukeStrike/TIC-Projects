@@ -22,10 +22,24 @@ Board:appendDirectives(
         -- rg = -1,
     },
     { -- palette
-        [1] = 11,
-        [2] = 12,
+        -- [1] = 11,
+        -- [2] = 12,
     },
     nil -- colorkey
 )
 
 Tables:print(Board, {indent = " "})
+
+_directives = Board:directives(
+    CRegion{
+        lf = 0,
+        rg = -1,
+    },
+    { -- palette
+        [1] = 11,
+        [2] = 12,
+    },
+    0 -- colorkey
+)
+
+Tables:print(_directives, {indent = " "})
