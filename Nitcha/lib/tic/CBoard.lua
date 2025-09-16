@@ -1,3 +1,6 @@
+local Classic = require("lib/ext/Classic")
+require("lib/tic/CDirective")
+require("lib/tic/CRegion")
 --
 -- CBoard
 --
@@ -17,10 +20,15 @@ function CBoard:isEmpty(_boardx, _boardy) -- check if a point on board is empty
     return not self.board[_boardx] or not self.board[_boardx][_boardy]
 end
 
+function CBoard:clear() -- clear the board
+    self.board = {}
+end
+
 function CBoard:appendDirective(_directive, _region, _palette, _colorkey)
     if not Classic:thatis(_directive, CDirective) then return end -- mandatory
     _region       = (Classic:thatis(_region, CRegion)) and _region or CRegion{}
-    _palette      = _palette or {}
+    _palette      = _palette  or {}
+    _colorkey     = _colorkey or self.colorkey
     local _boardx = _directive.boardx
     local _boardy = _directive.boardy
     local _color  = (_palette[_directive.color])
@@ -28,7 +36,7 @@ function CBoard:appendDirective(_directive, _region, _palette, _colorkey)
         or  _directive.color
     if  Nums:isBW(_boardx, _region.lf, _region.rg)
     and Nums:isBW(_boardy, _region.up, _region.dw)
-    and _colorkey and not (_color == _colorkey)
+    and (((not self.colorkey) and (not _colorkey)) or (not (_color == _colorkey)))
     then
         if not self.board[_boardx] then self.board[_boardx] = {} end
         self.board[_boardx][_boardy] = _color

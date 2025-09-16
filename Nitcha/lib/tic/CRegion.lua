@@ -1,3 +1,4 @@
+local Classic = require("lib/ext/Classic")
 --
 -- CRegion
 --
