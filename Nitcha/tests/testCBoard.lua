@@ -39,7 +39,7 @@ _directives = Board:directives(
         [1] = 11,
         [2] = 12,
     },
-    0 -- colorkey
+    nil -- colorkey
 )
 
 Tables:print(_directives, {indent = " "})

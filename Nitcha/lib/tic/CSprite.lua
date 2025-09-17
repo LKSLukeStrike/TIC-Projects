@@ -4,11 +4,12 @@
 CSprite = Classic:extend() -- generic sprite
 Classic.KINDSPRITE = "Sprite"
 Classic.NAMESPRITE = "Sprite"
-CSprite.SPRITEBANK = 0
-CSprite.FRAMEOF    = 16 -- sprites frames offset multiplier
-CSprite.FRAME00    = 00 -- sprites frames -- [!] start at 0, used to compute the offset
-CSprite.FRAME01    = 01
+CSprite.SPRITEBANK  = 0
+CSprite.FRAMEOF     = 16 -- sprites frames offset multiplier
+CSprite.FRAME00     = 00 -- sprites frames -- [!] start at 0, used to compute the offset
+CSprite.FRAME01     = 01
 CSprite.SPRITEBOARD = 256
+CSprite.COLORKEY    = Tic.COLORKEY
 function CSprite:new(_argt)
     CSprite.super.new(self, _argt)
     self.kind = Classic.KINDSPRITE
@@ -28,9 +29,35 @@ function CSprite:new(_argt)
     self:argt(_argt) -- override if any
 end
 
+function CSprite:directivesFetch(_palette, _colorkey) -- directives of a sprite -- optional palette/colorkey modifications
+    _palette  = _palette or {}
+    _colorkey = _colorkey or CSprite.COLORKEY
+    local _result = {}
+
+    for _y = 0, 7 do
+        for _x = 0, 7 do
+            local _color = peek4(((Tic.SPRITEBANK + (32 * self.sprite)) * 2) + ((_y * Tic.SPRITESIZE) + _x))
+            _color = (_palette[_color])
+                and _palette[_color]
+                or  _color
+            if not (_color == _colorkey) then -- skip empty pixels
+                Tables:valInsert(_result, CDirective{
+                    boardx = _x,
+                    boardy = _y,
+                    color = _color,
+                }, true)
+            end
+        end
+    end
+
+    return _result
+end
+
 function CSprite:draw() -- draw a sprite -- SCREEN -- DEFAULT
-    local _sprite = self.sprite + (self.frame *  CSprite.FRAMEOF)
-    local _directives = Tic:boardDirectives(_sprite, self.palette, self.colorkey)
+    self:save()
+    self.sprite = self.sprite + (self.frame *  CSprite.FRAMEOF)
+    local _directives = self:directivesFetch(self.palette, self.colorkey)
+    self:load()
     Tic:boardPaint(CSprite.SPRITEBOARD, _directives)
     spr(
         CSprite.SPRITEBOARD,
@@ -260,11 +287,12 @@ function CSpriteFGBoard:new(_argt)
     self.kind = Classic.KINDSPRITEFGBOARD
     self.name = Classic.NAMESPRITEFGBOARD
     self.sprite = CSpriteFG.SPRITEBOARD
-    self.directives = {} -- table of painting directives {{x = 0-7, y = 0-7, color = 0-15,}, ...}
+    self.directives = {} -- table of painting directives {{boardx = 0-7, boardy = 0-7, color = 0-15}, ...}
     self:argt(_argt) -- override if any
+    self.directives = self:directivesFetch(self.palette)
 end
 
 function CSpriteFGBoard:draw()
-    Tic:boardPaint(self.sprite, self.directives) -- FIXME ? only here not in tic
+    Tic:boardPaint(self.sprite, self.directives)
     CSpriteFGBoard.super.draw(self)
 end

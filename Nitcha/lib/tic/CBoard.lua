@@ -34,6 +34,7 @@ function CBoard:appendDirective(_directive, _region, _palette, _colorkey)
     local _color  = (_palette[_directive.color])
         and _palette[_directive.color]
         or  _directive.color
+
     if  Nums:isBW(_boardx, _region.lf, _region.rg)
     and Nums:isBW(_boardy, _region.up, _region.dw)
     and (((not self.colorkey) and (not _colorkey)) or (not (_color == _colorkey)))
@@ -54,6 +55,7 @@ function CBoard:directives(_region, _palette, _colorkey)
     _palette      = _palette  or {}
     _colorkey     = _colorkey or self.colorkey
     local _result = {}
+
     for _boardx, _boardys in pairs(self.board) do
         if  Nums:isBW(_boardx, _region.lf, _region.rg) then
             for _boardy, _color in pairs(_boardys) do
@@ -69,5 +71,6 @@ function CBoard:directives(_region, _palette, _colorkey)
             end
         end
     end
+
     return _result
 end

@@ -1519,7 +1519,7 @@ function Tic:boardPixel(_sprite, _x, _y, _color) -- paint a pixel to a board spr
     poke4(((Tic.SPRITEBANK + (32 * _sprite)) * 2) + ((_y * Tic.SPRITESIZE) + _x), _color)
 end
 
-function Tic:boardClean(_sprite) -- clean a board sprite
+function Tic:boardClear(_sprite) -- clear a board sprite
     if not _sprite then return end -- mandatory
     for _y = 0, 7 do
         for _x = 0, 7 do
@@ -1528,38 +1528,13 @@ function Tic:boardClean(_sprite) -- clean a board sprite
     end
 end
 
-function Tic:boardPaint(_sprite, _directives, _clean) -- paint a board sprite
+function Tic:boardPaint(_sprite, _directives, _clear) -- paint a board sprite
     if not _sprite or not _directives then return end -- mandatory
-    _clean = (_clean == nil or _clean == true) 
-    if _clean then Tic:boardClean(_sprite) end -- clean by default
+    _clear = (_clear == nil or _clear == true) 
+    if _clear then Tic:boardClear(_sprite) end -- clear by default
     for _, _directive in pairs(_directives) do
-        Tic:boardPixel(_sprite, _directive.x, _directive.y, _directive.color) -- paint each pixel
+        Tic:boardPixel(_sprite, _directive.boardx, _directive.boardy, _directive.color) -- paint each pixel
     end
-end
-
-function Tic:boardDirectives(_sprite, _palette, _colorkey) -- returns the directive of a sprite -- optional palette modification
-    if not _sprite then return end -- mandatory
-    _palette  = _palette or {}
-    _colorkey = _colorkey or Tic.COLORKEY
-    local _result = {}
-
-    for _y = 0, 7 do
-        for _x = 0, 7 do
-            local _color = peek4(((Tic.SPRITEBANK + (32 * _sprite)) * 2) + ((_y * Tic.SPRITESIZE) + _x))
-            if _palette[_color] then
-                _color = _palette[_color]
-            end
-            if not (_color == _colorkey) then -- skip empty pixels
-                Tables:valInsert(_result, {
-                    x = _x,
-                    y = _y,
-                    color = _color,
-                })
-            end
-        end
-    end
-
-    return _result
 end
 
 
@@ -2494,7 +2469,7 @@ end
 -- Sprites -- TESTING
 --
 SpriteSFX = CSpriteFGBoard{
-    screenx = 30,
+    screenx = 200,
     screeny = 120,
     directives = {
         CDirective{boardx = 2, boardy = 1, color = Tic.COLORORANGE,},
@@ -2516,19 +2491,20 @@ SpriteSFX = CSpriteFGBoard{
     },
 }
 SpriteHTG = CSpriteFG{
-    sprite = 458,
-    screenx = 30,
+    sprite  = 511,
+    screenx = 200,
     screeny = 100,
 }
 SpriteBIS = CSpriteFGBoard{
-    screenx = 30,
+    sprite  = 511,
+    screenx = 200,
     screeny = 110,
-    directives = Tic:boardDirectives(458, {
+    palette = {
         [Tic.COLORBLUEL] = Tic.COLORKEY,
         [Tic.COLORGREENM] = Tic.COLORKEY,
         [Tic.COLORORANGE] = Tic.COLORKEY,
         [Tic.COLORRED] = Tic.COLORKEY,
-    }),
+    },
 }
 SpriteWeapon = CSpriteFG{
     sprite = 388,
@@ -2692,9 +2668,9 @@ function Tic:draw()
     -- Text02:draw()
     -- Text03:draw()
 
-    -- SpriteSFX:draw()
-    -- SpriteHTG:draw()
-    -- SpriteBIS:draw()
+    SpriteSFX:draw()
+    SpriteHTG:draw()
+    SpriteBIS:draw()
     -- SpriteWeapon:draw()
 
     Tic:tick() -- [!] required in the draw function
