@@ -95,6 +95,7 @@ print()
 print(Nums:invert(-10))
 print(Nums:invert(0))
 print(Nums:invert(10))
+end
 
 print()
 print(Nums:btw(10, 10, 20))
@@ -102,7 +103,6 @@ print(Nums:btw(20, 10, 20))
 print(Nums:btw(15, 10, 20))
 print(Nums:btw(9, 10, 20))
 print(Nums:btw(21, 10, 20))
-end
 
 function printPoints(_points)
     print(#_points)

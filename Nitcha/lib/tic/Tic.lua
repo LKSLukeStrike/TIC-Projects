@@ -149,11 +149,11 @@ Tic.INTERACTIONSWY = Tic.SPOTTINGPORTRAITWY + 28 -- interactions window y positi
 Tic.INTERACTIONSWW = Tic.SCREENW - Tic.INTERACTIONSWX -- interactions window width
 Tic.INTERACTIONSWH = Tic.SCREENH - Tic.INTERACTIONSWY -- interactions window height
 
--- Palette map
-Tic.PALETTEMAP = 0x3FF0 * 2 -- vram bank 1
+-- Palette vram
+Tic.PALETTEVRAM = 0x3FF0 * 2 -- vram bank 1
 
--- Sprites bank
-Tic.SPRITEBANK = 0x4000 -- start at tiles sprites
+-- Sprites vram
+Tic.SPRITESVRAM = 0x4000 -- start at tiles sprites
 
 -- Sprites size
 Tic.SPRITESIZE  = 8 -- sprites size in pixels
@@ -588,7 +588,6 @@ Tic.MOUSEDIRX      = Tic.DIRXLF
 Tic.MOUSECYCLER    = CCyclerInt{} -- delay cycler
 Tic.MOUSEDELAY     = 10 -- default delay ticks
 Tic.MOUSERESET     = {
-    screenx = 0,
     screeny = 0,
     clicklf = false,
     clickmd = false,
@@ -1499,13 +1498,13 @@ end
 -- Palette System -- handle the palette switching
 function Tic:paletteChange(_palette) -- change palette colors if any
     for _key, _val in pairs(_palette or {}) do
-        poke4(Tic.PALETTEMAP + _key, _val)
+        poke4(Tic.PALETTEVRAM + _key, _val)
     end
 end
 
 function Tic:paletteReset() -- reset palette colors
     for _key = 0, 15 do
-        poke4(Tic.PALETTEMAP + _key, _key)
+        poke4(Tic.PALETTEVRAM + _key, _key)
     end
 end
 
@@ -1516,7 +1515,7 @@ function Tic:boardPixel(_sprite, _x, _y, _color) -- paint a pixel to a board spr
     _x = _x or 0
     _y = _y or 0
     _color = _color or Tic.COLORKEY -- transparent by default
-    poke4(((Tic.SPRITEBANK + (32 * _sprite)) * 2) + ((_y * Tic.SPRITESIZE) + _x), _color)
+    poke4(((Tic.SPRITESVRAM + (32 * _sprite)) * 2) + ((_y * Tic.SPRITESIZE) + _x), _color)
 end
 
 function Tic:boardClear(_sprite) -- clear a board sprite
@@ -2076,9 +2075,9 @@ CPlace:generateRandomRegionWorldPercent(
     {
         [CPlaceHouseAnim] = {},
         [CPlaceHouseIdle] = {},
-        [CPlaceTowerAnim] = {percent = 10,},
-        [CPlaceTowerIdle] = {percent = 10,},
-        [CPlaceWaterAnim] = {percent = 10,},
+        [CPlaceTowerAnim] = {percent = 10},
+        [CPlaceTowerIdle] = {percent = 10},
+        [CPlaceWaterAnim] = {percent = 10},
     },
     RegionWorldTown0
 )
@@ -2468,44 +2467,61 @@ end
 --
 -- Sprites -- TESTING
 --
-SpriteSFX = CSpriteFGBoard{
+SpriteSFX = CSpriteBoard{
     screenx = 200,
-    screeny = 120,
+    screeny = 90,
     directives = {
-        CDirective{boardx = 2, boardy = 1, color = Tic.COLORORANGE,},
-        CDirective{boardx = 1, boardy = 2, color = Tic.COLORORANGE,},
-        CDirective{boardx = 2, boardy = 3, color = Tic.COLORORANGE,},
-        CDirective{boardx = 2, boardy = 5, color = Tic.COLORORANGE,},
-        CDirective{boardx = 3, boardy = 1, color = Tic.COLORYELLOW,},
-        CDirective{boardx = 1, boardy = 5, color = Tic.COLORYELLOW,},
-        CDirective{boardx = 5, boardy = 1, color = Tic.COLORRED,},
-        CDirective{boardx = 6, boardy = 1, color = Tic.COLORRED,},
-        CDirective{boardx = 4, boardy = 2, color = Tic.COLORRED,},
-        CDirective{boardx = 4, boardy = 3, color = Tic.COLORRED,},
-        CDirective{boardx = 5, boardy = 3, color = Tic.COLORRED,},
-        CDirective{boardx = 3, boardy = 4, color = Tic.COLORRED,},
-        CDirective{boardx = 7, boardy = 1, color = Tic.COLORPURPLE,},
-        CDirective{boardx = 6, boardy = 3, color = Tic.COLORPURPLE,},
-        CDirective{boardx = 4, boardy = 4, color = Tic.COLORPURPLE,},
-        CDirective{boardx = 3, boardy = 5, color = Tic.COLORPURPLE,},
+        CDirective{boardx = 2, boardy = 1, color = Tic.COLORORANGE},
+        CDirective{boardx = 1, boardy = 2, color = Tic.COLORORANGE},
+        CDirective{boardx = 2, boardy = 3, color = Tic.COLORORANGE},
+        CDirective{boardx = 2, boardy = 5, color = Tic.COLORORANGE},
+        CDirective{boardx = 3, boardy = 1, color = Tic.COLORYELLOW},
+        CDirective{boardx = 1, boardy = 5, color = Tic.COLORYELLOW},
+        CDirective{boardx = 5, boardy = 1, color = Tic.COLORRED},
+        CDirective{boardx = 6, boardy = 1, color = Tic.COLORRED},
+        CDirective{boardx = 4, boardy = 2, color = Tic.COLORRED},
+        CDirective{boardx = 4, boardy = 3, color = Tic.COLORRED},
+        CDirective{boardx = 5, boardy = 3, color = Tic.COLORRED},
+        CDirective{boardx = 3, boardy = 4, color = Tic.COLORRED},
+        CDirective{boardx = 7, boardy = 1, color = Tic.COLORPURPLE},
+        CDirective{boardx = 6, boardy = 3, color = Tic.COLORPURPLE},
+        CDirective{boardx = 4, boardy = 4, color = Tic.COLORPURPLE},
+        CDirective{boardx = 3, boardy = 5, color = Tic.COLORPURPLE},
     },
+    palette = {
+        [Tic.COLORORANGE] = Tic.COLORGREENM,
+        [Tic.COLORPURPLE] = Tic.COLORGREEND,
+        [Tic.COLORRED]    = Tic.COLORGREENM,
+    }
 }
 SpriteHTG = CSpriteFG{
     sprite  = 511,
     screenx = 200,
     screeny = 100,
 }
-SpriteBIS = CSpriteFGBoard{
-    sprite  = 511,
+SpriteBIS = CSpriteBoard{
     screenx = 200,
     screeny = 110,
-    palette = {
+    palette = {},
+    directives = SpriteHTG:directivesFetch({
         [Tic.COLORBLUEL] = Tic.COLORKEY,
         [Tic.COLORGREENM] = Tic.COLORKEY,
         [Tic.COLORORANGE] = Tic.COLORKEY,
         [Tic.COLORRED] = Tic.COLORKEY,
-    },
+    })
 }
+SpriteNUM = CSpriteBoard{
+    screenx = 200,
+    screeny = 120,
+    palette = {
+        [Tic.COLORBLUEL] = Tic.COLORBLUEM,
+        [Tic.COLORGREENM] = Tic.COLORGREEND,
+        [Tic.COLORORANGE] = Tic.COLORRED,
+        [Tic.COLORRED] = Tic.COLORPURPLE,
+    },
+    directives = SpriteHTG:directivesFetch(),
+}
+
 SpriteWeapon = CSpriteFG{
     sprite = 388,
     screenx = 30,
@@ -2671,6 +2687,7 @@ function Tic:draw()
     SpriteSFX:draw()
     SpriteHTG:draw()
     SpriteBIS:draw()
+    SpriteNUM:draw()
     -- SpriteWeapon:draw()
 
     Tic:tick() -- [!] required in the draw function
