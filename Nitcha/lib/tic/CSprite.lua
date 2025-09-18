@@ -9,7 +9,7 @@ CSprite.FRAMEOF     = 16 -- sprites frames offset multiplier
 CSprite.FRAME00     = 00 -- sprites frames -- [!] start at 0, used to compute the offset
 CSprite.FRAME01     = 01
 CSprite.SPRITEBOARD = 256
-CSprite.COLORKEY    = Tic.COLORKEY
+CSprite.COLORKEYS   = {Tic.COLORKEY}
 function CSprite:new(_argt)
     CSprite.super.new(self, _argt)
     self.kind = Classic.KINDSPRITE
@@ -19,14 +19,14 @@ function CSprite:new(_argt)
     self.screenx    = 0 -- screen positions
     self.screeny    = 0
     self.frame      = CSprite.FRAME00
-    self.colorkey   = Tic.COLORKEY -- default colorkey
     self.scale      = Tic.SCALE01 -- default scale
     self.flip       = Tic.FLIPNONE -- all sprites are dir x left by default
     self.rotate     = Tic.ROTATE000 -- no rotation by default
     self.width      = 1 -- sprite 1x1 by default
     self.height     = 1
-    self.palette    = {} -- empty by default, can be filled later
-    self.directives = {} -- table of painting directives {{boardx = 0-Tic.SPRITESIZE - 1, boardy = 0-Tic.SPRITESIZE - 1, color = 0-15}, ...}
+    self.palette    = {} -- used to palettize if any
+    self.colorkeys  = CSprite.COLORKEYS -- default colorkeys
+    self.directives = {} -- painting directives {{boardx = 0-Tic.SPRITESIZE - 1, boardy = 0-Tic.SPRITESIZE - 1, color = 0-15}, ...}
     self:argt(_argt) -- override if any
 end
 
@@ -42,9 +42,9 @@ function CSprite:paint(_x, _y, _color) -- paint a sprite pixel
     poke4(((Tic.SPRITESVRAM + (32 * _sprite)) * 2) + ((_y * Tic.SPRITESIZE) + _x), _color)
 end
 
-function CSprite:directivesPalette(_palette, _colorkey) -- palettize directives
-    _palette  = _palette or self.palette
-    _colorkey = _colorkey or CSprite.COLORKEY
+function CSprite:directivesPalette(_palette, _colorkeys) -- palettize directives
+    _palette   = Utils:defaultOneTwo(_palette, self.palette, {})
+    _colorkeys = Utils:defaultOneTwo(_colorkeys, self.colorkeys, {})
     local _result = {}
 
     for _, _directive in ipairs(self.directives) do
@@ -52,7 +52,7 @@ function CSprite:directivesPalette(_palette, _colorkey) -- palettize directives
         _color = (_palette[_color])
             and _palette[_color]
             or  _color
-        if not (_color == _colorkey) then -- skip empty directives
+        if not (_colorkeys[_color]) then -- skip empty directives
             Tables:valInsert(_result, CDirective{
                 boardx = _directive.boardx,
                 boardy = _directive.boardy,
@@ -64,10 +64,10 @@ function CSprite:directivesPalette(_palette, _colorkey) -- palettize directives
     return _result
 end
 
-function CSprite:directivesFetch(_palette, _colorkey) -- directives of a sprite -- optional palette/colorkey modifications
-    if not self.sprite then return self:directivesPalette(_palette, _colorkey) end -- mandatory
-    _palette  = _palette or self.palette
-    _colorkey = _colorkey or CSprite.COLORKEY
+function CSprite:directivesFetch(_palette, _colorkeys) -- directives of a sprite -- optional palette/colorkey modifications
+    if not self.sprite then return self:directivesPalette(_palette, _colorkeys) end -- mandatory
+    _palette   = Utils:defaultOneTwo(_palette, self.palette, {})
+    _colorkeys = Utils:defaultOneTwo(_colorkeys, self.colorkeys, {})
     local _result = {}
 
     for _y = 0, Tic.SPRITESIZE - 1 do
@@ -76,7 +76,7 @@ function CSprite:directivesFetch(_palette, _colorkey) -- directives of a sprite 
             _color = (_palette[_color])
                 and _palette[_color]
                 or  _color
-            if not (_color == _colorkey) then -- skip empty pixels
+            if not Tables:valFind(_colorkeys, _color) then -- skip empty pixels
                 Tables:valInsert(_result, CDirective{
                     boardx = _x,
                     boardy = _y,
@@ -102,7 +102,7 @@ function CSprite:draw() -- draw a sprite -- SCREEN -- DEFAULT
         CSprite.SPRITEBOARD,
         self.screenx,
         self.screeny,
-        self.colorkey,
+        self.colorkeys,
         self.scale,
         self.flip,
         self.rotate,

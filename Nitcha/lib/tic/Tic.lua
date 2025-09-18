@@ -11,6 +11,7 @@ CCycler = require("lib/lks/CCycler")
 Names   = require("lib/lks/Names")
 Nums    = require("lib/lks/Nums")
 Tables  = require("lib/lks/Tables")
+Utils   = require("lib/lks/Utils")
 
 
 --
@@ -1670,7 +1671,7 @@ ScreenIntro:appendElements{
     CWindowScreen{name = "Intro",
         colorground = Tic:biomeActual(),
         behaviour = function(self)
-            self.colorground = Tic:biomeActual()
+            self.colorground = Tic.COLORWHITE --Tic:biomeActual()
         end
     },
     CWindowInfos{
@@ -1961,8 +1962,8 @@ end
 
 --
 -- SCREENS
--- if true then Tic:screenAppend(ScreenIntro) end
-if true then Tic:screenAppend(ScreenWorld) end
+if true then Tic:screenAppend(ScreenIntro) end
+-- if true then Tic:screenAppend(ScreenWorld) end
 -- if true then Tic:screenAppend(ScreenMenus) end
 Tic:screenMin()
 if true then Tic.INVENTORYSCREEN = ScreenMenus end
@@ -2498,7 +2499,12 @@ SpriteHTG = CSpriteFG{
     sprite  = 511,
     screenx = 200,
     screeny = 100,
+    colorkeys = {},
 }
+-- Tic:traceTable(SpriteHTG.colorkeys)
+-- Tic:traceTable(SpriteHTG:directivesFetch())
+-- exit()
+
 SpriteBIS = CSpriteBoard{
     screenx = 200,
     screeny = 110,
@@ -2508,7 +2514,8 @@ SpriteBIS = CSpriteBoard{
         [Tic.COLORGREENM] = Tic.COLORKEY,
         [Tic.COLORORANGE] = Tic.COLORKEY,
         [Tic.COLORRED] = Tic.COLORKEY,
-    })
+    }),
+    colorkeys = {},
 }
 SpriteNUM = CSpriteBoard{
     screenx = 200,
@@ -2519,8 +2526,11 @@ SpriteNUM = CSpriteBoard{
         [Tic.COLORORANGE] = Tic.COLORRED,
         [Tic.COLORRED] = Tic.COLORPURPLE,
     },
+    -- colorkeys = {},
     directives = SpriteHTG:directivesFetch(),
 }
+-- Tic:traceTable(SpriteNUM:directivesFetch())
+-- exit()
 
 SpriteWeapon = CSpriteFG{
     sprite = 388,
