@@ -1593,8 +1593,8 @@ Button1 = CButtonMenuM2{
     screenw = 16,
     screenh = 8,
     name = "plop 1",
-    hovertextlf = CText{text = "Plop"},
-    hovertextrg = CText{text = "Plip"},
+    hovertextup = CText{text = "Plop"},
+    hovertextdw = CText{text = "Plip"},
     text = CText{text = "Op"},
     clicklf = _function,
     clickrg = function() _function{text = "Plip"} end,
@@ -1671,14 +1671,18 @@ ScreenIntro:appendElements{
     CWindowScreen{name = "Intro",
         colorground = Tic:biomeActual(),
         behaviour = function(self)
-            self.colorground = Tic.COLORWHITE --Tic:biomeActual()
+            self.colorground = Tic:biomeActual()
         end
     },
     CWindowInfos{
         name = "PressKey",
         drawground = false,
         drawframes = false,
-        elements = {CText{text = "Press"}, CText{text = "a"}, CText{text = "Key"}},
+        elements = {
+            CTextLine{text = "Press", colorinside = Tic.COLORORANGE},
+            CTextLine{text = "a"},
+            CTextLine{text = "Key"},
+        },
     },
     Button1,
     -- Button2,

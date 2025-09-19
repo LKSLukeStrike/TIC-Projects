@@ -49,9 +49,7 @@ function CSprite:directivesPalette(_palette, _colorkeys) -- palettize directives
 
     for _, _directive in ipairs(self.directives) do
         local _color = _directive.color
-        _color = (_palette[_color])
-            and _palette[_color]
-            or  _color
+        _color = Utils:defaultOne(_palette[_color], _color)
         if not (_colorkeys[_color]) then -- skip empty directives
             Tables:valInsert(_result, CDirective{
                 boardx = _directive.boardx,
