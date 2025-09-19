@@ -199,5 +199,6 @@ function Classic:thatis(_that, _classic) -- check if that is of a classic type
     and    (_that and type(_that) == "table" and _that.is and _that:is(_classic))
 end
 
+
 -- END
 return Classic
