@@ -6,6 +6,7 @@ CCycler = require("lib/lks/CCycler")
 Names   = require("lib/lks/Names")
 Nums    = require("lib/lks/Nums")
 Tables  = require("lib/lks/Tables")
+Utils   = require("lib/lks/Utils")
 
 require("lib/tic/CBoard")
 
@@ -13,33 +14,35 @@ Board = CBoard{}
 
 Board:appendDirectives(
     {
-        CDirective{boardx = -1, boardy = 0, color = 1},
-        CDirective{boardx =  0, boardy = 0, color = 0},
-        CDirective{boardx =  1, boardy = 0, color = 2},
+        CDirective{boardx = -1, boardy = 0, color = -1},
+        CDirective{boardx =  0, boardy = 0, color =  0},
+        CDirective{boardx =  1, boardy = 0, color =  1},
     },
     CRegion{
         -- lf = 0,
         -- rg = -1,
     },
     { -- palette
-        -- [1] = 11,
-        -- [2] = 12,
+        [-1] = -11,
+        [ 1] =  11,
     },
-    nil -- colorkey
+    {0} -- nil -- colorkeys
 )
 
+print("---")
 Tables:print(Board, {indent = " "})
 
 _directives = Board:directives(
     CRegion{
-        lf = 0,
-        rg = -1,
+        -- lf = 0,
+        -- rg = -1,
     },
     { -- palette
-        [1] = 11,
-        [2] = 12,
+        [-11] = -111,
+        [ 11] =  111,
     },
-    nil -- colorkey
+    {-111, 111} -- nil -- colorkeys
 )
 
+print("---")
 Tables:print(_directives, {indent = " "})

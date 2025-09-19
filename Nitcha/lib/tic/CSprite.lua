@@ -64,7 +64,7 @@ function CSprite:directivesPalette(_palette, _colorkeys) -- palettize directives
     return _result
 end
 
-function CSprite:directivesFetch(_palette, _colorkeys) -- directives of a sprite -- optional palette/colorkey modifications
+function CSprite:directivesFetch(_palette, _colorkeys) -- directives of a sprite -- optional palette/colorkeys modifications
     if not self.sprite then return self:directivesPalette(_palette, _colorkeys) end -- mandatory
     _palette   = Utils:defaultOneTwo(_palette, self.palette, {})
     _colorkeys = Utils:defaultOneTwo(_colorkeys, self.colorkeys, {})
@@ -90,11 +90,11 @@ function CSprite:directivesFetch(_palette, _colorkeys) -- directives of a sprite
 end
 
 function CSprite:draw() -- draw a sprite -- SCREEN -- DEFAULT
-    local _directives = self:directivesFetch(self.palette, self.colorkey)
+    local _directives = self:directivesFetch(self.palette, self.colorkeys)
     if self.sprite then
         self:save()
         self.sprite = self.sprite + (self.frame *  CSprite.FRAMEOF)
-        _directives = self:directivesFetch(self.palette, self.colorkey)
+        _directives = self:directivesFetch(self.palette, self.colorkeys)
         self:load()
     end
     Tic:boardPaint(CSprite.SPRITEBOARD, _directives)
