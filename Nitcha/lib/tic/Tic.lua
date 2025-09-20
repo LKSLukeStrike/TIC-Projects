@@ -1680,8 +1680,8 @@ ScreenIntro:appendElements{
         drawframes = false,
         elements = {
             CTextLine{text = "Press", colorinside = Tic.COLORORANGE},
-            CTextLine{text = "a"},
-            CTextLine{text = "Key"},
+            CTextLine{text = "a", colorinside = Tic.COLORGREYM},
+            CTextLine{text = "Key", colorinside = Tic.COLORGREYM},
         },
     },
     Button1,

@@ -1,15 +1,24 @@
+local Classic = require("lib/ext/Classic")
+require("lib/tic/CBoard")
+require("lib/tic/CDirective")
 --
 -- CSprite
 --
 CSprite = Classic:extend() -- generic sprite
 Classic.KINDSPRITE = "Sprite"
 Classic.NAMESPRITE = "Sprite"
-CSprite.SPRITEBANK  = 0
-CSprite.FRAMEOF     = 16 -- sprites frames offset multiplier
-CSprite.FRAME00     = 00 -- sprites frames -- [!] start at 0, used to compute the offset
-CSprite.FRAME01     = 01
-CSprite.SPRITEBOARD = 256
-CSprite.COLORKEYS   = {Tic.COLORKEY}
+CSprite.SPRITEBANK   = 0
+CSprite.FRAMEOFFSET  = 16 -- sprites frames offset multiplier
+CSprite.FRAME00      = 00 -- sprites frames -- [!] start at 0, used to compute the offset
+CSprite.FRAME01      = 01
+CSprite.SPRITEBOARD  = 256
+CSprite.COLORKEYS    = {Tic.COLORKEY}
+CSprite.BOARD        = CBoard{}
+CSprite.TARGETSCREEN = "screen"
+CSprite.TARGETSPRITE = "sprite"
+CSprite.TARGETBOARD  = "board"
+CSprite.SPRITESRC    = CSprite.TARGETSPRITE -- sprite source
+CSprite.SPRITEDST    = CSprite.TARGETSCREEN -- sprite destination
 function CSprite:new(_argt)
     CSprite.super.new(self, _argt)
     self.kind = Classic.KINDSPRITE
@@ -30,16 +39,32 @@ function CSprite:new(_argt)
     self:argt(_argt) -- override if any
 end
 
-function CSprite:paint(_x, _y, _color) -- paint a sprite pixel
-    if not _sprite then return end -- mandatory
-    _x = _x or 0
-    _x = Nums:btw(_x, 0, Tic.SPRITESIZE - 1)
-    _y = _y or 0
-    _y = Nums:btw(_y, 0, Tic.SPRITESIZE - 1)
-    _color = _color or CSprite.COLORKEY -- transparent by default
-    _color = Nums:btw(_color, 0, 15)
+function CSprite:boardClear() -- clear the board
+    CSprite.BOARD:clear()
+end
 
-    poke4(((Tic.SPRITESVRAM + (32 * _sprite)) * 2) + ((_y * Tic.SPRITESIZE) + _x), _color)
+function CSprite:srcScreen() -- screen source
+    CSprite.SPRITESRC = CSprite.TARGETSCREEN
+end
+
+function CSprite:srcSprite() -- sprite source
+    CSprite.SPRITESRC = CSprite.TARGETSPRITE
+end
+
+function CSprite:srcBoard() -- board source
+    CSprite.SPRITESRC = CSprite.TARGETBOARD
+end
+
+function CSprite:dstScreen() -- screen destination
+    CSprite.SPRITEDST = CSprite.TARGETSCREEN
+end
+
+function CSprite:dstSprite() -- sprite destination
+    CSprite.SPRITEDST = CSprite.TARGETSPRITE
+end
+
+function CSprite:dstBoard() -- board destination
+    CSprite.SPRITEDST = CSprite.TARGETBOARD
 end
 
 function CSprite:directivesPalette(_palette, _colorkeys) -- palettize directives
@@ -91,7 +116,7 @@ function CSprite:draw() -- draw a sprite -- SCREEN -- DEFAULT
     local _directives = self:directivesFetch(self.palette, self.colorkeys)
     if self.sprite then
         self:save()
-        self.sprite = self.sprite + (self.frame *  CSprite.FRAMEOF)
+        self.sprite = self.sprite + (self.frame *  CSprite.FRAMEOFFSET)
         _directives = self:directivesFetch(self.palette, self.colorkeys)
         self:load()
     end
