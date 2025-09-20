@@ -67,6 +67,46 @@ function CSprite:dstBoard() -- board destination
     CSprite.SPRITEDST = CSprite.TARGETBOARD
 end
 
+function CSprite:modeSpriteScreen() -- sprite source -- screen destination
+    CSprite:srcSprite()
+    CSprite:dstScreen()
+end
+
+function CSprite:modeSpriteBoard() -- sprite source -- board destination
+    CSprite:srcSprite()
+    CSprite:dstBoard()
+end
+
+function CSprite:modeBoardScreen() -- board source -- screen destination
+    CSprite:srcBoard()
+    CSprite:dstScreen()
+end
+
+function CSprite:spriteDirectives() -- directives of a sprite
+    local _result = {}
+
+    if not self.sprite then -- CSpriteBoard has no sprite
+        _result = self.directives
+    else
+        for _y = 0, Tic.SPRITESIZE - 1 do
+            for _x = 0, Tic.SPRITESIZE - 1 do
+                local _color = peek4(((Tic.SPRITESVRAM + (32 * self.sprite)) * 2) + ((_y * Tic.SPRITESIZE) + _x))
+                Tables:valInsert(_result, CDirective{
+                    boardx = _x,
+                    boardy = _y,
+                    color = _color,
+                }, true)
+            end
+        end
+    end
+
+    return _result
+end
+
+function CSprite:boardDirectives() -- directives from the board
+    return CSprite.BOARD:directives(CRegion{lf = 0, rg = Tic.SPRITESIZE - 1, up = 0, dw = Tic.SPRITESIZE - 1})
+end
+
 function CSprite:directivesPalette(_palette, _colorkeys) -- palettize directives
     _palette   = Utils:defaultOneTwo(_palette, self.palette, {})
     _colorkeys = Utils:defaultOneTwo(_colorkeys, self.colorkeys, {})
