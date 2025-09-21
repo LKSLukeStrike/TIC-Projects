@@ -167,9 +167,24 @@ function CSprite:directivesFetch(_palette, _colorkeys) -- directives of a sprite
 end
 
 function CSprite:draw() -- draw a sprite -- SCREEN -- DEFAULT
-    self:directivesSrc() -- source directives
-    self:directivesPalette() -- palettize directives
-    self:directivesColorkeys() -- colorkeys directives
+    local _spriteboard = CSprite{
+        sprite      = CSprite.SPRITEBOARD,
+        screenx     = self.screenx,
+        screeny     = self.screeny,
+        frame       = self.frame
+        frameoffset = self.frameoffset
+        scale       = self.scale,
+        flip        = self.flip,
+        rotate      = self.rotate,
+        width       = self.width,
+        height      = self.height,
+        palette     = self.palette,
+        colorkeys   = self.colorkeys,
+        directives  = self:directivesSrc(),
+    }
+
+    _spriteboard:directivesPalette() -- palettize directives
+    _spriteboard:directivesColorkeys() -- colorkeys directives
     Tic:boardPaint(CSprite.SPRITEBOARD, self.directives)
     spr(
         CSprite.SPRITEBOARD,
