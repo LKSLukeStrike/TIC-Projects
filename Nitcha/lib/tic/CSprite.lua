@@ -115,24 +115,30 @@ function CSprite:directivesSrc() -- directives from sprite or board
         or  self:directivesSrcBoard()
 end
 
-function CSprite:directivesPalette(_region, _palette, _colorkeys) -- palettize directives
-    _palette   = Utils:defaultOneTwo(_palette, self.palette, {})
-    _colorkeys = Utils:defaultOneTwo(_colorkeys, self.colorkeys, {})
-    local _result = {}
+function CSprite:directivesPalette(_palette) -- palettize directives
+    _palette = Utils:defaultOneTwo(_palette, self.palette, {})
 
+    local _directives = {}
     for _, _directive in ipairs(self.directives) do
-        local _color = _directive.color
-        _color = Utils:defaultOne(_palette[_color], _color)
-        if not (_colorkeys[_color]) then -- skip empty directives
-            Tables:valInsert(_result, CDirective{
-                boardx = _directive.boardx,
-                boardy = _directive.boardy,
-                color = _color,
-            }, true)
-        end
+        _directive:applyPalette(_palette)
+        Tables:valInsert(_directives, _directive, true)
     end
+    self.directives = _directives
 
-    return _result
+    return self
+end
+
+function CSprite:directivesColorkeys(_colorkeys) -- colorkeys directives
+    _colorkeys = Utils:defaultOneTwo(_colorkeys, self.colorkeys, {})
+
+    local _directives = {}
+    for _, _directive in ipairs(self.directives) do
+        _directive:checkColorkeys(_colorkeys)
+        Tables:valInsert(_directives, _directive, true)
+    end
+    self.directives = _directives
+
+    return self
 end
 
 function CSprite:directivesFetch(_palette, _colorkeys) -- directives of a sprite -- optional palette/colorkeys modifications
@@ -161,14 +167,10 @@ function CSprite:directivesFetch(_palette, _colorkeys) -- directives of a sprite
 end
 
 function CSprite:draw() -- draw a sprite -- SCREEN -- DEFAULT
-    local _directives = self:directivesFetch(self.palette, self.colorkeys)
-    if self.sprite then
-        self:save()
-        self.sprite = self.sprite + (self.frame *  CSprite.FRAMEOFFSET)
-        _directives = self:directivesFetch(self.palette, self.colorkeys)
-        self:load()
-    end
-    Tic:boardPaint(CSprite.SPRITEBOARD, _directives)
+    self:directivesSrc() -- source directives
+    self:directivesPalette() -- palettize directives
+    self:directivesColorkeys() -- colorkeys directives
+    Tic:boardPaint(CSprite.SPRITEBOARD, self.directives)
     spr(
         CSprite.SPRITEBOARD,
         self.screenx,

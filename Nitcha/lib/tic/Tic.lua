@@ -1681,7 +1681,7 @@ ScreenIntro:appendElements{
         elements = {
             CTextLine{text = "Press", colorinside = Tic.COLORORANGE},
             CTextLine{text = "a", colorinside = Tic.COLORGREYM},
-            CTextLine{text = "Key", colorinside = Tic.COLORGREYM},
+            CTextLine{text = "Key", colorinside = Tic.COLORORANGE},
         },
     },
     Button1,
@@ -2519,9 +2519,9 @@ SpriteBIS = CSpriteBoard{
         [Tic.COLORORANGE] = Tic.COLORKEY,
         [Tic.COLORRED] = Tic.COLORKEY,
     }),
-    colorkeys = {},
+    colorkeys = {Tic.COLORKEY},
 }
-SpriteNUM = CSpriteBoard{
+SpriteTER = CSpriteBoard{
     screenx = 200,
     screeny = 120,
     palette = {
@@ -2531,9 +2531,9 @@ SpriteNUM = CSpriteBoard{
         [Tic.COLORRED] = Tic.COLORPURPLE,
     },
     -- colorkeys = {},
-    directives = SpriteHTG:directivesFetch(),
+    directives = SpriteHTG.directives,
 }
--- Tic:traceTable(SpriteNUM:directivesFetch())
+-- Tic:traceTable(SpriteTER:directivesFetch())
 -- exit()
 
 SpriteWeapon = CSpriteFG{
@@ -2701,7 +2701,7 @@ function Tic:draw()
     SpriteSFX:draw()
     SpriteHTG:draw()
     SpriteBIS:draw()
-    SpriteNUM:draw()
+    SpriteTER:draw()
     -- SpriteWeapon:draw()
 
     Tic:tick() -- [!] required in the draw function
