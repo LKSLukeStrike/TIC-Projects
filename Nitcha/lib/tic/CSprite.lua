@@ -23,20 +23,22 @@ function CSprite:new(_argt)
     CSprite.super.new(self, _argt)
     self.kind = Classic.KINDSPRITE
     self.name = Classic.NAMESPRITE
-    self.spritebank = CSprite.SPRITEBANK
-    self.sprite     = self.spritebank -- initial sprite number -- set to nil to act as a spriteboard
-    self.screenx    = 0 -- screen positions
-    self.screeny    = 0
-    self.frame      = CSprite.FRAME00
-    self.scale      = Tic.SCALE01 -- default scale
-    self.flip       = Tic.FLIPNONE -- all sprites are dir x left by default
-    self.rotate     = Tic.ROTATE000 -- no rotation by default
-    self.width      = 1 -- sprite 1x1 by default
-    self.height     = 1
-    self.palette    = {} -- used to palettize if any
-    self.colorkeys  = CSprite.COLORKEYS -- default colorkeys
-    self.directives = {} -- painting directives {{boardx = 0-Tic.SPRITESIZE - 1, boardy = 0-Tic.SPRITESIZE - 1, color = 0-15}, ...}
+    self.spritebank  = CSprite.SPRITEBANK
+    self.sprite      = self.spritebank -- initial sprite number -- set to nil to act as a spriteboard
+    self.screenx     = 0 -- screen positions
+    self.screeny     = 0
+    self.frame       = CSprite.FRAME00
+    self.frameoffset = CSprite.FRAMEOFFSET
+    self.scale       = Tic.SCALE01 -- default scale
+    self.flip        = Tic.FLIPNONE -- all sprites are dir x left by default
+    self.rotate      = Tic.ROTATE000 -- no rotation by default
+    self.width       = 1 -- sprite 1x1 by default
+    self.height      = 1
+    self.palette     = {} -- used to palettize if any
+    self.colorkeys   = CSprite.COLORKEYS -- default colorkeys
+    self.directives  = {} -- painting directives {{boardx = 0-Tic.SPRITESIZE - 1, boardy = 0-Tic.SPRITESIZE - 1, color = 0-15}, ...}
     self:argt(_argt) -- override if any
+    self:directivesSrcSprite()
 end
 
 function CSprite:boardClear() -- clear the board
@@ -82,16 +84,14 @@ function CSprite:modeBoardScreen() -- board source -- screen destination
     CSprite:dstScreen()
 end
 
-function CSprite:spriteDirectives() -- directives of a sprite
-    local _result = {}
-
-    if not self.sprite then -- CSpriteBoard has no sprite
-        _result = self.directives
-    else
+function CSprite:directivesSrcSprite() -- directives from its sprite/frame
+    if self.sprite then -- CSpriteBoard has no sprite
+        local _sprite = self.sprite + (self.frame * self.frameoffset)
+        self.directives = {}
         for _y = 0, Tic.SPRITESIZE - 1 do
             for _x = 0, Tic.SPRITESIZE - 1 do
-                local _color = peek4(((Tic.SPRITESVRAM + (32 * self.sprite)) * 2) + ((_y * Tic.SPRITESIZE) + _x))
-                Tables:valInsert(_result, CDirective{
+                local _color = peek4(((Tic.SPRITESVRAM + (32 * _sprite)) * 2) + ((_y * Tic.SPRITESIZE) + _x))
+                Tables:valInsert(self.directives, CDirective{
                     boardx = _x,
                     boardy = _y,
                     color = _color,
@@ -100,14 +100,22 @@ function CSprite:spriteDirectives() -- directives of a sprite
         end
     end
 
-    return _result
+    return self.directives
 end
 
-function CSprite:boardDirectives() -- directives from the board
-    return CSprite.BOARD:directives(CRegion{lf = 0, rg = Tic.SPRITESIZE - 1, up = 0, dw = Tic.SPRITESIZE - 1})
+function CSprite:directivesSrcBoard() -- directives from the board
+    self.directives = CSprite.BOARD:directives(CRegion{lf = 0, rg = Tic.SPRITESIZE - 1, up = 0, dw = Tic.SPRITESIZE - 1})
+
+    return self.directives
 end
 
-function CSprite:directivesPalette(_palette, _colorkeys) -- palettize directives
+function CSprite:directivesSrc() -- directives from sprite or board
+    return (CSprite.SPRITESRC == CSprite.TARGETSPRITE)
+        and self:directivesSrcSprite()
+        or  self:directivesSrcBoard()
+end
+
+function CSprite:directivesPalette(_region, _palette, _colorkeys) -- palettize directives
     _palette   = Utils:defaultOneTwo(_palette, self.palette, {})
     _colorkeys = Utils:defaultOneTwo(_colorkeys, self.colorkeys, {})
     local _result = {}
@@ -128,7 +136,7 @@ function CSprite:directivesPalette(_palette, _colorkeys) -- palettize directives
 end
 
 function CSprite:directivesFetch(_palette, _colorkeys) -- directives of a sprite -- optional palette/colorkeys modifications
-    if not self.sprite then return self:directivesPalette(_palette, _colorkeys) end -- mandatory
+    if not self.sprite then return self:directivesPalette(nil, _palette, _colorkeys) end -- mandatory
     _palette   = Utils:defaultOneTwo(_palette, self.palette, {})
     _colorkeys = Utils:defaultOneTwo(_colorkeys, self.colorkeys, {})
     local _result = {}

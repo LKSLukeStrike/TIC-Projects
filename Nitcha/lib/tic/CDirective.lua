@@ -14,3 +14,9 @@ function CDirective:new(_argt)
     self.color  = 0
     self:argt(_argt) -- override if any
 end
+
+function CDirective:applyOffsetsXY(_offsetx, _offsety)
+    _offsetx = _offsetx or 0
+    _offsety = _offsety or 0
+    return CDirective{boardx = self.boardx + _offsetx, boardy = self.boardy + _offsety, color = self.color}
+end
