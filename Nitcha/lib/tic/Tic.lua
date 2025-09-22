@@ -17,14 +17,32 @@ Utils   = require("lib/lks/Utils")
 --
 -- Strings -- for debugging
 --
+A = "A:"
+B = "B:"
+C = "C:"
 D = "D:"
 E = "E:"
 F = "F:"
+G = "G:"
+H = "H:"
+I = "I:"
+J = "J:"
+K = "K:"
+L = "L:"
+M = "M:"
 N = "N:"
+O = "O:"
+P = "P:"
+Q = "Q:"
 R = "R:"
 S = "S:"
+T = "T:"
+U = "U:"
+V = "V:"
+W = "W:"
 X = "X:"
 Y = "Y:"
+Z = "Z:"
 
 
 --
@@ -2480,21 +2498,21 @@ SpriteSFX = CSpriteBoard{
     screeny = 90,
     directives = {
         CDirective{boardx = 2, boardy = 1, color = Tic.COLORORANGE},
-        -- CDirective{boardx = 1, boardy = 2, color = Tic.COLORORANGE},
-        -- CDirective{boardx = 2, boardy = 3, color = Tic.COLORORANGE},
-        -- CDirective{boardx = 2, boardy = 5, color = Tic.COLORORANGE},
-        -- CDirective{boardx = 3, boardy = 1, color = Tic.COLORYELLOW},
-        -- CDirective{boardx = 1, boardy = 5, color = Tic.COLORYELLOW},
-        -- CDirective{boardx = 5, boardy = 1, color = Tic.COLORRED},
-        -- CDirective{boardx = 6, boardy = 1, color = Tic.COLORRED},
-        -- CDirective{boardx = 4, boardy = 2, color = Tic.COLORRED},
-        -- CDirective{boardx = 4, boardy = 3, color = Tic.COLORRED},
-        -- CDirective{boardx = 5, boardy = 3, color = Tic.COLORRED},
-        -- CDirective{boardx = 3, boardy = 4, color = Tic.COLORRED},
-        -- CDirective{boardx = 7, boardy = 1, color = Tic.COLORPURPLE},
-        -- CDirective{boardx = 6, boardy = 3, color = Tic.COLORPURPLE},
-        -- CDirective{boardx = 4, boardy = 4, color = Tic.COLORPURPLE},
-        -- CDirective{boardx = 3, boardy = 5, color = Tic.COLORPURPLE},
+        CDirective{boardx = 1, boardy = 2, color = Tic.COLORORANGE},
+        CDirective{boardx = 2, boardy = 3, color = Tic.COLORORANGE},
+        CDirective{boardx = 2, boardy = 5, color = Tic.COLORORANGE},
+        CDirective{boardx = 3, boardy = 1, color = Tic.COLORYELLOW},
+        CDirective{boardx = 1, boardy = 5, color = Tic.COLORYELLOW},
+        CDirective{boardx = 5, boardy = 1, color = Tic.COLORRED},
+        CDirective{boardx = 6, boardy = 1, color = Tic.COLORRED},
+        CDirective{boardx = 4, boardy = 2, color = Tic.COLORRED},
+        CDirective{boardx = 4, boardy = 3, color = Tic.COLORRED},
+        CDirective{boardx = 5, boardy = 3, color = Tic.COLORRED},
+        CDirective{boardx = 3, boardy = 4, color = Tic.COLORRED},
+        CDirective{boardx = 7, boardy = 1, color = Tic.COLORPURPLE},
+        CDirective{boardx = 6, boardy = 3, color = Tic.COLORPURPLE},
+        CDirective{boardx = 4, boardy = 4, color = Tic.COLORPURPLE},
+        CDirective{boardx = 3, boardy = 5, color = Tic.COLORPURPLE},
     },
     palette = {
         [Tic.COLORORANGE] = Tic.COLORGREENM,
@@ -2502,8 +2520,6 @@ SpriteSFX = CSpriteBoard{
         [Tic.COLORRED]    = Tic.COLORGREENM,
     },
 }
--- Tic:traceTable(SpriteSFX.directives)
--- exit()
 
 SpriteHTG = CSpriteFG{
     sprite  = 511,
@@ -2521,21 +2537,22 @@ SpriteBIS = CSpriteBoard{
         [Tic.COLORORANGE] = Tic.COLORKEY,
         [Tic.COLORRED] = Tic.COLORKEY,
     },
-    colorkeys = {Tic.COLORKEY},
-    directives = SpriteHTG.directives,
+    -- colorkeys = {Tic.COLORKEY},
+    directives = SpriteHTG:directivesSrcSprite(),
 }
 
 SpriteTER = CSpriteBoard{
     screenx = 200,
     screeny = 120,
     palette = {
-        [Tic.COLORBLUEL] = Tic.COLORBLUEM,
+        [Tic.COLORBLUEL]  = Tic.COLORBLUEM,
         [Tic.COLORGREENM] = Tic.COLORGREEND,
+        [Tic.COLORRED]    = Tic.COLORPURPLE,
         [Tic.COLORORANGE] = Tic.COLORRED,
-        [Tic.COLORRED] = Tic.COLORPURPLE,
+        [Tic.COLORWHITE]  = Tic.COLORGREYL,
     },
     -- colorkeys = {},
-    directives = SpriteHTG.directives,
+    directives = SpriteHTG:directivesSrcSprite(),
 }
 -- Tic:traceTable(SpriteTER:directivesFetch())
 -- exit()
@@ -2702,11 +2719,11 @@ function Tic:draw()
     -- Text02:draw()
     -- Text03:draw()
 
-    -- SpriteSFX:draw()
-    -- exit()
+    SpriteSFX:draw()
     SpriteHTG:draw()
-    -- SpriteBIS:draw()
-    -- SpriteTER:draw()
+    SpriteBIS:draw()
+    SpriteTER:draw()
+
     -- SpriteWeapon:draw()
 
     Tic:tick() -- [!] required in the draw function
@@ -2715,7 +2732,7 @@ end
 
 function Tic:drawLog()
     -- Tic:logWorld()
-    Tic:logInventories()
+    -- Tic:logInventories()
     -- Tic:logScreens()
 end
 
@@ -2778,13 +2795,24 @@ function Tic:logScreens()
 end
 
 function Tic:logRegion(_pfx, _region)
-    Tic:logAppend(_pfx, "u:".._region.up, "d:".._region.dw, "l:".._region.lf, "r:".._region.rg)
+    Tic:logAppend(_pfx, U.._region.up, D.._region.dw, L.._region.lf, R.._region.rg)
 end
 
 function Tic:logEntity(_pfx, _entity)
     Tic:logAppend(_pfx, _entity.name, _entity.screenx, _entity.screeny)
 end
 
+function Tic:logDirective(_key, _directive, _colorkey)
+    if not _colorkey or not (_directive.color == _colorkey) then
+        Tic:logAppend(_key..")", X.._directive.boardx, Y.._directive.boardy, C.._directive.color)
+    end
+end
+
+function Tic:logDirectives(_directives, _colorkey)
+    for _key, _directive in ipair(_directives) do
+        Tic:logDirective(_key, _directive, _colorkey)
+    end
+end
 
 function Tic:drawLine(_pointx0, _pointy0, _pointx1, _pointy1, _nobounds) -- TESTING
     local _points = Nums:pointsLine(_pointx0, _pointy0, _pointx1, _pointy1, _nobounds)

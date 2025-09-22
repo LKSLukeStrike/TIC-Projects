@@ -38,7 +38,6 @@ function CSprite:new(_argt)
     self.colorkeys   = CSprite.COLORKEYS -- default colorkeys
     self.directives  = {} -- painting directives {{boardx = 0-Tic.SPRITESIZE - 1, boardy = 0-Tic.SPRITESIZE - 1, color = 0-15}, ...}
     self:argt(_argt) -- override if any
-    self:directivesSrcSprite()
 end
 
 function CSprite:boardClear() -- clear the board
@@ -123,8 +122,15 @@ function CSprite:directivesPalette(_palette) -- palettize directives
 
     local _directives = {}
     for _, _directive in ipairs(self.directives) do
-        _directive:applyPalette(_palette)
-        Tables:valInsert(_directives, _directive, true)
+        local _directiveclone = CDirective{
+            boardx = _directive.boardx,
+            boardy = _directive.boardy,
+            color  = _directive.color,
+        }
+        -- Tic:logDirective("A", _directiveclone, Tic.COLORKEY)
+        _directiveclone:applyPalette(_palette)
+        -- Tic:logDirective("B", _directiveclone, Tic.COLORKEY)
+        Tables:valInsert(_directives, _directiveclone, true)
     end
     self.directives = _directives
 
@@ -153,7 +159,7 @@ function CSprite:drawPixel(_x, _y, _color) -- draw a sprite pixel
     if not Nums:isBW(_y, 0, Tic.SPRITESIZE - 1) then return end -- mandatory
     _color = _color or Tic.COLORKEY -- transparent by default
     if not Nums:isBW(_color, 0, Tic.PALETTESIZE - 1) then return end -- mandatory
-    Tic:trace("pixel", _x, _y, _color)
+    -- Tic:trace("pixel", _x, _y, _color)
     poke4(((Tic.SPRITESVRAM + (32 * self.sprite)) * 2) + ((_y * Tic.SPRITESIZE) + _x), _color)
 end
 
@@ -179,10 +185,6 @@ function CSprite:drawDstScreen() -- draw a sprite to screen
 
     self:drawClear()
     for _, _directive in ipairs(self.directives) do
-        if not (_directive.color == 0) then
-            Tic:trace("---")
-            Tic:trace(_directive.boardx, _directive.boardy, _directive.color)
-        end
         self:drawPixel(_directive.boardx, _directive.boardy, _directive.color)
     end
 
@@ -190,7 +192,7 @@ function CSprite:drawDstScreen() -- draw a sprite to screen
         self.sprite,
         self.screenx,
         self.screeny,
-        {}, -- self.colorkeys,
+        self.colorkeys,
         self.scale,
         self.flip,
         self.rotate,
@@ -222,8 +224,8 @@ function CSprite:draw() -- draw a sprite -- SCREEN -- DEFAULT
         directives  = self:directivesSrc(),
     }
 
-    -- _spriteboard:directivesPalette() -- palettize directives
-    -- _spriteboard:directivesColorkeys() -- colorkeys directives
+    _spriteboard:directivesPalette() -- palettize directives
+    _spriteboard:directivesColorkeys() -- colorkeys directives
 
     _spriteboard:drawDst()
 end
