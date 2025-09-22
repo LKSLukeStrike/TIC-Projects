@@ -160,6 +160,9 @@ Tic.SPRITESVRAM = 0x4000 -- start at tiles sprites
 Tic.SPRITESIZE  = 8 -- sprites size in pixels
 Tic.SPRITESIZE2 = Tic.SPRITESIZE // 2 -- half sprites size in pixels
 
+-- Palette size
+Tic.PALETTESIZE  = 16 -- number of colors
+
 -- Palette colors
 Tic.COLOR00 = 00
 Tic.COLOR01 = 01
@@ -2477,50 +2480,51 @@ SpriteSFX = CSpriteBoard{
     screeny = 90,
     directives = {
         CDirective{boardx = 2, boardy = 1, color = Tic.COLORORANGE},
-        CDirective{boardx = 1, boardy = 2, color = Tic.COLORORANGE},
-        CDirective{boardx = 2, boardy = 3, color = Tic.COLORORANGE},
-        CDirective{boardx = 2, boardy = 5, color = Tic.COLORORANGE},
-        CDirective{boardx = 3, boardy = 1, color = Tic.COLORYELLOW},
-        CDirective{boardx = 1, boardy = 5, color = Tic.COLORYELLOW},
-        CDirective{boardx = 5, boardy = 1, color = Tic.COLORRED},
-        CDirective{boardx = 6, boardy = 1, color = Tic.COLORRED},
-        CDirective{boardx = 4, boardy = 2, color = Tic.COLORRED},
-        CDirective{boardx = 4, boardy = 3, color = Tic.COLORRED},
-        CDirective{boardx = 5, boardy = 3, color = Tic.COLORRED},
-        CDirective{boardx = 3, boardy = 4, color = Tic.COLORRED},
-        CDirective{boardx = 7, boardy = 1, color = Tic.COLORPURPLE},
-        CDirective{boardx = 6, boardy = 3, color = Tic.COLORPURPLE},
-        CDirective{boardx = 4, boardy = 4, color = Tic.COLORPURPLE},
-        CDirective{boardx = 3, boardy = 5, color = Tic.COLORPURPLE},
+        -- CDirective{boardx = 1, boardy = 2, color = Tic.COLORORANGE},
+        -- CDirective{boardx = 2, boardy = 3, color = Tic.COLORORANGE},
+        -- CDirective{boardx = 2, boardy = 5, color = Tic.COLORORANGE},
+        -- CDirective{boardx = 3, boardy = 1, color = Tic.COLORYELLOW},
+        -- CDirective{boardx = 1, boardy = 5, color = Tic.COLORYELLOW},
+        -- CDirective{boardx = 5, boardy = 1, color = Tic.COLORRED},
+        -- CDirective{boardx = 6, boardy = 1, color = Tic.COLORRED},
+        -- CDirective{boardx = 4, boardy = 2, color = Tic.COLORRED},
+        -- CDirective{boardx = 4, boardy = 3, color = Tic.COLORRED},
+        -- CDirective{boardx = 5, boardy = 3, color = Tic.COLORRED},
+        -- CDirective{boardx = 3, boardy = 4, color = Tic.COLORRED},
+        -- CDirective{boardx = 7, boardy = 1, color = Tic.COLORPURPLE},
+        -- CDirective{boardx = 6, boardy = 3, color = Tic.COLORPURPLE},
+        -- CDirective{boardx = 4, boardy = 4, color = Tic.COLORPURPLE},
+        -- CDirective{boardx = 3, boardy = 5, color = Tic.COLORPURPLE},
     },
     palette = {
         [Tic.COLORORANGE] = Tic.COLORGREENM,
         [Tic.COLORPURPLE] = Tic.COLORGREEND,
         [Tic.COLORRED]    = Tic.COLORGREENM,
-    }
+    },
 }
+-- Tic:traceTable(SpriteSFX.directives)
+-- exit()
+
 SpriteHTG = CSpriteFG{
     sprite  = 511,
     screenx = 200,
     screeny = 100,
-    colorkeys = {},
+    -- colorkeys = {},
 }
--- Tic:traceTable(SpriteHTG.colorkeys)
--- Tic:traceTable(SpriteHTG:directivesFetch())
--- exit()
 
 SpriteBIS = CSpriteBoard{
     screenx = 200,
     screeny = 110,
-    palette = {},
-    directives = SpriteHTG:directivesFetch({
+    palette = {
         [Tic.COLORBLUEL] = Tic.COLORKEY,
         [Tic.COLORGREENM] = Tic.COLORKEY,
         [Tic.COLORORANGE] = Tic.COLORKEY,
         [Tic.COLORRED] = Tic.COLORKEY,
-    }),
+    },
     colorkeys = {Tic.COLORKEY},
+    directives = SpriteHTG.directives,
 }
+
 SpriteTER = CSpriteBoard{
     screenx = 200,
     screeny = 120,
@@ -2698,10 +2702,11 @@ function Tic:draw()
     -- Text02:draw()
     -- Text03:draw()
 
-    SpriteSFX:draw()
+    -- SpriteSFX:draw()
+    -- exit()
     SpriteHTG:draw()
-    SpriteBIS:draw()
-    SpriteTER:draw()
+    -- SpriteBIS:draw()
+    -- SpriteTER:draw()
     -- SpriteWeapon:draw()
 
     Tic:tick() -- [!] required in the draw function
