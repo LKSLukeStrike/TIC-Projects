@@ -1987,8 +1987,8 @@ end
 
 --
 -- SCREENS
-if true then Tic:screenAppend(ScreenIntro) end
--- if true then Tic:screenAppend(ScreenWorld) end
+-- if true then Tic:screenAppend(ScreenIntro) end
+if true then Tic:screenAppend(ScreenWorld) end
 -- if true then Tic:screenAppend(ScreenMenus) end
 Tic:screenMin()
 if true then Tic.INVENTORYSCREEN = ScreenMenus end
@@ -2551,7 +2551,7 @@ SpriteTER = CSpriteBoard{
         [Tic.COLORORANGE] = Tic.COLORRED,
         [Tic.COLORWHITE]  = Tic.COLORGREYL,
     },
-    -- colorkeys = {},
+    colorkeys = {Tic.COLORKEY, Tic.COLORRED},
     directives = SpriteHTG:directivesSrcSprite(),
 }
 -- Tic:traceTable(SpriteTER:directivesFetch())
@@ -2706,12 +2706,10 @@ end
 --
 function Tic:draw()
     if true then
+    local _timebeg = time()
     Tic.inputsDo()
 
     Tic:screenDraw()
-
-    Tic:drawLog()
-    Tic:logPrint()
 
     -- WeaponMelee:draw()
 
@@ -2725,6 +2723,15 @@ function Tic:draw()
     SpriteTER:draw()
 
     -- SpriteWeapon:draw()
+
+    Tic:drawLog()
+
+    local _timeend = time()
+    local _timedif = _timeend - _timebeg
+    Tic:logAppend(_timebeg)
+    Tic:logAppend(_timeend)
+    Tic:logAppend(_timedif)
+    Tic:logPrint()
 
     Tic:tick() -- [!] required in the draw function
     end

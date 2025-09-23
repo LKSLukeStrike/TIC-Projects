@@ -92,62 +92,44 @@ function CSprite:directivesSrc() -- directives from sprite or board
 end
 
 function CSprite:directivesSrcSprite() -- directives from its sprite/frame
+    local _directives = {}
+
     if self.sprite then -- CSpriteBoard has no sprite
         local _sprite = self.sprite + (self.frame * self.frameoffset)
-        self.directives = {}
         for _y = 0, Tic.SPRITESIZE - 1 do
             for _x = 0, Tic.SPRITESIZE - 1 do
                 local _color = peek4(((Tic.SPRITESVRAM + (32 * _sprite)) * 2) + ((_y * Tic.SPRITESIZE) + _x))
-                Tables:valInsert(self.directives, CDirective{
-                    boardx = _x,
-                    boardy = _y,
-                    color = _color,
+                _color = self.palette[_color] or _color
+                if not Tables:valFind(self.colorkeys, _color) then
+                    Tables:valInsert(_directives, CDirective{
+                        boardx = _x,
+                        boardy = _y,
+                        color  = _color,
+                    }, true)
+                end
+            end
+        end
+    else
+        for _, _directive in ipairs(self.directives) do
+            local _color = _directive.color
+            _color = self.palette[_color] or _color
+            if not Tables:valFind(self.colorkeys, _color) then
+                Tables:valInsert(_directives, CDirective{
+                    boardx = _directive.boardx,
+                    boardy = _directive.boardy,
+                    color  = _color,
                 }, true)
             end
         end
     end
 
-    return self.directives
+    return _directives
 end
 
 function CSprite:directivesSrcBoard() -- directives from the board
     self.directives = CSprite.BOARD:directives(CRegion{lf = 0, rg = Tic.SPRITESIZE - 1, up = 0, dw = Tic.SPRITESIZE - 1})
 
     return self.directives
-end
-
-
-function CSprite:directivesPalette(_palette) -- palettize directives
-    _palette = Utils:defaultOneTwo(_palette, self.palette, {})
-
-    local _directives = {}
-    for _, _directive in ipairs(self.directives) do
-        local _directiveclone = CDirective{
-            boardx = _directive.boardx,
-            boardy = _directive.boardy,
-            color  = _directive.color,
-        }
-        -- Tic:logDirective("A", _directiveclone, Tic.COLORKEY)
-        _directiveclone:applyPalette(_palette)
-        -- Tic:logDirective("B", _directiveclone, Tic.COLORKEY)
-        Tables:valInsert(_directives, _directiveclone, true)
-    end
-    self.directives = _directives
-
-    return self
-end
-
-function CSprite:directivesColorkeys(_colorkeys) -- colorkeys directives
-    _colorkeys = Utils:defaultOneTwo(_colorkeys, self.colorkeys, {})
-
-    local _directives = {}
-    for _, _directive in ipairs(self.directives) do
-        _directive:checkColorkeys(_colorkeys)
-        Tables:valInsert(_directives, _directive, true)
-    end
-    self.directives = _directives
-
-    return self
 end
 
 
@@ -159,7 +141,6 @@ function CSprite:drawPixel(_x, _y, _color) -- draw a sprite pixel
     if not Nums:isBW(_y, 0, Tic.SPRITESIZE - 1) then return end -- mandatory
     _color = _color or Tic.COLORKEY -- transparent by default
     if not Nums:isBW(_color, 0, Tic.PALETTESIZE - 1) then return end -- mandatory
-    -- Tic:trace("pixel", _x, _y, _color)
     poke4(((Tic.SPRITESVRAM + (32 * self.sprite)) * 2) + ((_y * Tic.SPRITESIZE) + _x), _color)
 end
 
@@ -223,9 +204,6 @@ function CSprite:draw() -- draw a sprite -- SCREEN -- DEFAULT
         colorkeys   = self.colorkeys,
         directives  = self:directivesSrc(),
     }
-
-    _spriteboard:directivesPalette() -- palettize directives
-    _spriteboard:directivesColorkeys() -- colorkeys directives
 
     _spriteboard:drawDst()
 end
