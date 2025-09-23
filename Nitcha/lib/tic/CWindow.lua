@@ -299,22 +299,25 @@ function CWindowPortraitDrawable:drawInside() -- window portrait content for -- 
     local _tichitboxdraw     = Tic.HITBOXDRAW
     Tic.HITBOXDRAW           = false -- FIXME remove tic master at one point
     self.entity:save()
-    self.entity.screenx      = self.screenx -- force entity attributes
-    self.entity.screeny      = self.screeny
-    self.entity.scale        = Tic.SCALE02
-    self.entity.drawdirs     = false
-    self.entity.drawview     = false
-    self.entity.interactto   = nil -- dont draw interactto in window
-    self.entity.interactby   = {}  -- dont draw interactby in window
-    self.entity.portraitmode = true -- avoid some drawings in portraitmode
-    self.entity.spotted      = false -- dont draw spotted frame in window
-    self.entity.hovered      = false -- dont draw hovered frame in window
+    -- self.entity.screenx      = self.screenx -- force entity attributes
+    -- self.entity.screeny      = self.screeny
+    -- self.entity.scale        = Tic.SCALE02
+    self.entity.drawdirs     = false -- dont draw dirs in portrait window
+    self.entity.drawview     = false -- dont draw view in portrait window
+    self.entity.interactto   = nil   -- dont draw interactto in portrait window
+    self.entity.interactby   = {}    -- dont draw interactby in portrait window
+    self.entity.spotted      = false -- dont draw spotted frame in portrait window
+    self.entity.hovered      = false -- dont draw hovered frame in portrait window
+    self.entity.cyclemode    = false -- dont cycle in portrait window
     if self.idle then
-        self.entity.dirx       = Tic.DIRXRG --Tic.DIRXLF
+        self.entity.dirx       = Tic.DIRXLF
         self.entity.frame      = CSprite.FRAME00
         self.entity.animations = {}
     end
+    CSprite:boardClear()
+    CSprite:modeSpriteBoard()
     self.entity:draw()
+    CSprite:modeSpriteScreen()
     self.entity:load()
     Tic.HITBOXDRAW = _tichitboxdraw
 end

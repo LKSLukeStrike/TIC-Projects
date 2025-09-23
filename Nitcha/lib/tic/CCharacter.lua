@@ -690,7 +690,7 @@ function CCharacter:draw() -- set animations and draw layers
 end
 
 function CCharacter:cycle() -- cycle the cyclers
-    if self.portraitmode then return end -- no cycling in portraits
+    if not self.cyclemode then return end -- no cycling in portraits etc
     self:cycleMove()
     self:cycleWork()
     self:cycleIdle()

@@ -127,9 +127,9 @@ function CSprite:directivesSrcSprite() -- directives from its sprite/frame
 end
 
 function CSprite:directivesSrcBoard() -- directives from the board
-    self.directives = CSprite.BOARD:directives(CRegion{lf = 0, rg = Tic.SPRITESIZE - 1, up = 0, dw = Tic.SPRITESIZE - 1})
+    local _directives = CSprite.BOARD:directives(CRegion{lf = 0, rg = Tic.SPRITESIZE - 1, up = 0, dw = Tic.SPRITESIZE - 1})
 
-    return self.directives
+    return _directives
 end
 
 
@@ -183,8 +183,8 @@ function CSprite:drawDstScreen() -- draw a sprite to screen
 end
 
 function CSprite:drawDstBoard() -- draw a sprite to board
-    trace"board"
-    exit()
+    Tic:logAppend("board")
+    CSprite.BOARD:appendDirectives(self.directives, nil, nil, nil, self.screenx, self.screeny)
 end
 
 
