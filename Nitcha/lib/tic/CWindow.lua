@@ -296,8 +296,10 @@ end
 
 function CWindowPortraitDrawable:drawInside() -- window portrait content for -- [!] drawable entities
     if not self.entity then return end -- nothing to draw
+
     local _tichitboxdraw     = Tic.HITBOXDRAW
     Tic.HITBOXDRAW           = false -- FIXME remove tic master at one point
+
     self.entity:save()
     -- self.entity.screenx      = self.screenx -- force entity attributes
     -- self.entity.screeny      = self.screeny
@@ -317,8 +319,19 @@ function CWindowPortraitDrawable:drawInside() -- window portrait content for -- 
     CSprite:boardClear()
     CSprite:modeSpriteBoard()
     self.entity:draw()
-    CSprite:modeSpriteScreen()
     self.entity:load()
+
+    CSprite:modeBoardScreen()
+    local _musprite = CSpriteBoard{
+        screenx    = self.screenx,
+        screeny    = self.screeny,
+        scale      = Tic.SCALE02,
+        -- directives = self:directivesSrc(),
+    }
+    _musprite:draw()
+
+    CSprite:modeSpriteScreen()
+
     Tic.HITBOXDRAW = _tichitboxdraw
 end
 
