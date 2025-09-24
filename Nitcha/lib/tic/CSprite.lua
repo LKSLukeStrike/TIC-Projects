@@ -40,6 +40,12 @@ function CSprite:new(_argt)
     self:argt(_argt) -- override if any
 end
 
+function Tic:logSprite(_pfx, _sprite)
+    if Tic.LOGSPRITE then
+        Tic:logAppend(_pfx, _sprite.sprite, _sprite.screenx, _sprite.screeny)
+    end
+end
+
 function CSprite:boardClear() -- clear the board
     CSprite.BOARD:clear()
 end
@@ -95,6 +101,7 @@ function CSprite:directivesSrcSprite() -- directives from its sprite/frame
     local _directives = {}
 
     if self.sprite then -- CSpriteBoard has no sprite
+        Tic:logSprite("sprite", self)
         local _sprite = self.sprite + (self.frame * self.frameoffset)
         for _y = 0, Tic.SPRITESIZE - 1 do
             for _x = 0, Tic.SPRITESIZE - 1 do
@@ -183,7 +190,7 @@ function CSprite:drawDstScreen() -- draw a sprite to screen
 end
 
 function CSprite:drawDstBoard() -- draw a sprite to board
-    Tic:logAppend("board")
+    Tic:logSprite("board", self)
     CSprite.BOARD:appendDirectives(self.directives, nil, nil, nil, self.screenx, self.screeny)
 end
 

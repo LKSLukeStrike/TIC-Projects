@@ -668,6 +668,7 @@ function CCharacter:nearestEntityViewWorld() -- nearest entity in itself view wo
 end
 
 function CCharacter:draw() -- set animations and draw layers
+    Tic.LOGSPRITE = false
     self:cycle()
     self:drawDirs()
 
@@ -687,6 +688,7 @@ function CCharacter:draw() -- set animations and draw layers
     self:drawMind()
     self:drawMove()
     self:drawInteract()
+    Tic.LOGSPRITE = false
 end
 
 function CCharacter:cycle() -- cycle the cyclers

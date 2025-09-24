@@ -2647,7 +2647,7 @@ function CPlace:generateRoad(_worldx0, _worldy0, _worldx1, _worldy1, _percent, _
 end
 
 
-if true then
+if false then
 House1 = CPlaceHouseAnim{
     name = "House1",
     worldx = -20,
@@ -2717,10 +2717,10 @@ function Tic:draw()
     -- Text02:draw()
     -- Text03:draw()
 
-    SpriteSFX:draw()
-    SpriteHTG:draw()
-    SpriteBIS:draw()
-    SpriteTER:draw()
+    -- SpriteSFX:draw()
+    -- SpriteHTG:draw()
+    -- SpriteBIS:draw()
+    -- SpriteTER:draw()
 
     -- SpriteWeapon:draw()
 

@@ -301,9 +301,8 @@ function CWindowPortraitDrawable:drawInside() -- window portrait content for -- 
     Tic.HITBOXDRAW           = false -- FIXME remove tic master at one point
 
     self.entity:save()
-    -- self.entity.screenx      = self.screenx -- force entity attributes
-    -- self.entity.screeny      = self.screeny
-    -- self.entity.scale        = Tic.SCALE02
+    self.entity.screenx      = 0 -- force entity attributes
+    self.entity.screeny      = 0
     self.entity.drawdirs     = false -- dont draw dirs in portrait window
     self.entity.drawview     = false -- dont draw view in portrait window
     self.entity.interactto   = nil   -- dont draw interactto in portrait window
@@ -326,6 +325,7 @@ function CWindowPortraitDrawable:drawInside() -- window portrait content for -- 
         screenx    = self.screenx,
         screeny    = self.screeny,
         scale      = Tic.SCALE02,
+        flip       = self.entity.dirx
         -- directives = self:directivesSrc(),
     }
     _musprite:draw()
