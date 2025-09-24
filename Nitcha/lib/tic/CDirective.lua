@@ -16,8 +16,17 @@ function CDirective:new(_argt)
     self:argt(_argt) -- override if any
 end
 
+function CDirective:clone()
+    return CDirective{
+        boardx = self.boardx,
+        boardy = self.boardy,
+        color  = self.color,
+    }
+end
+
 function CDirective:applyFlip(_flip)
     _flip = _flip or Tic.FLIPNONE
+    local _clone = self:clone()
 
     if _flip == Tic.FLIPHORI then
         self.boardx = Tic.SPRITESIZE - 1 - self.boardx
@@ -49,17 +58,19 @@ end
 function CDirective:applyOffsetXY(_offsetx, _offsety)
     _offsetx = _offsetx or 0
     _offsety = _offsety or 0
+    local _clone = self:clone()
 
-    self.boardx = self.boardx + _offsetx
-    self.boardy = self.boardy + _offsety
+    _clone.boardx = _clone.boardx + _offsetx
+    _clone.boardy = _clone.boardy + _offsety
 
-    return self
+    return _clone
 end
 
 function CDirective:applyPalette(_palette)
     _palette = _palette or {}
+    local _clone = self:clone()
 
-    self.color = _palette[self.color] or self.color
+    _clone.color = _palette[_clone.color] or _clone.color
 
-    return self
+    return _clone
 end

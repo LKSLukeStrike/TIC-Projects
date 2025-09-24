@@ -2322,12 +2322,12 @@ Wilfie = _playerclass{classed = _playerclass,
     -- spottingspot = true,
     spottingpick = true,
     ["slots.handrg"] = CSlotHandRG{object = CWeaponLance{}},
-    ["slots.handlf"] = CSlotHandLF{object = CWeaponShieldLarge{}},
-    ["slots.head"]   = CSlotHead{object = CClothesHelmetLarge{}},
-    ["slots.back"]   = CSlotBack{object = CClothesBackPackLarge{}},
-    ["inventories.any"] = CInventoryAny{objects = {
-        CObjectBombLarge{used = CObject.USEDNONE},
-    }},
+    -- ["slots.handlf"] = CSlotHandLF{object = CWeaponShieldLarge{}},
+    -- ["slots.head"]   = CSlotHead{object = CClothesHelmetLarge{}},
+    -- ["slots.back"]   = CSlotBack{object = CClothesBackPackLarge{}},
+    -- ["inventories.any"] = CInventoryAny{objects = {
+    --     CObjectBombLarge{used = CObject.USEDNONE},
+    -- }},
 }
 end
 --

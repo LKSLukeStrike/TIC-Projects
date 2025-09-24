@@ -910,6 +910,7 @@ function CCharacter:drawHand(_bgfg)
     local _handy   = _handy - _objecthandley
 
     _object:save()
+    Tic.LOGSPRITE = true
     _object.screenx  = self.screenx + (_handx * self.scale)
     _object.screeny  = self.screeny + (_handy * self.scale)
     _object.scale    = self.scale
@@ -917,6 +918,7 @@ function CCharacter:drawHand(_bgfg)
     _object.dirx     = _objectflip
     _object.drawbgfg = _bgfg
     _object:draw()
+    Tic.LOGSPRITE = false
     _object:load()
 end
 

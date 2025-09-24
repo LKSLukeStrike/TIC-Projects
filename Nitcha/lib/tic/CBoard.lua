@@ -39,7 +39,9 @@ function CBoard:appendDirective(_directive, _region, _palette, _colorkeys, _offs
     -- local _boardy = _directive.boardy + _offsety
     -- local _color  = Utils:defaultOne(_palette[_directive.color], _directive.color)
 
-    _directive:applyPalette(_palette):applyOffsetXY(_offsetx, _offsety):applyFlip(_flip):applyRotate(_rotate)
+    -- _directive:applyPalette(_palette):applyOffsetXY(_offsetx, _offsety):applyFlip(_flip):applyRotate(_rotate)
+    _directive = _directive:applyOffsetXY(_offsetx, _offsety)
+    -- _directive:applyRotate(_rotate)
 
     local _boardx = _directive.boardx
     local _boardy = _directive.boardy

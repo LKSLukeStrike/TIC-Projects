@@ -42,7 +42,7 @@ end
 
 function Tic:logSprite(_pfx, _sprite)
     if Tic.LOGSPRITE then
-        Tic:logAppend(_pfx, _sprite.sprite, _sprite.screenx, _sprite.screeny)
+        Tic:logAppend(_pfx, _sprite.sprite, _sprite.screenx, _sprite.screeny, _sprite.flip, _sprite.rotate)
     end
 end
 
@@ -190,8 +190,8 @@ function CSprite:drawDstScreen() -- draw a sprite to screen
 end
 
 function CSprite:drawDstBoard() -- draw a sprite to board
-    Tic:logSprite("board", self)
-    CSprite.BOARD:appendDirectives(self.directives, nil, nil, nil, self.screenx, self.screeny, self.flip, nil)
+    Tic:logSprite("board ", self)
+    CSprite.BOARD:appendDirectives(self.directives, nil, nil, nil, self.screenx, self.screeny, self.flip, self.rotate)
 end
 
 
