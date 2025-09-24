@@ -25,17 +25,25 @@ function CBoard:clear() -- clear the board
     self.board = {}
 end
 
-function CBoard:appendDirective(_directive, _region, _palette, _colorkeys, _offsetboardx, _offsetboardy)
+function CBoard:appendDirective(_directive, _region, _palette, _colorkeys, _offsetx, _offsety, _flip, _rotate)
     if not Classic:thatis(_directive, CDirective) then return end -- mandatory
-    _region       = (Classic:thatis(_region, CRegion)) and _region or CRegion{}
-    _palette      = Utils:defaultOneTwo(_palette, self.palette, {})
-    _colorkeys    = Utils:defaultOneTwo(_colorkeys, self.colorkeys, {})
-    _offsetboardx = _offsetboardx or 0
-    _offsetboardy = _offsetboardy or 0
+    _region    = (Classic:thatis(_region, CRegion)) and _region or CRegion{}
+    _palette   = Utils:defaultOneTwo(_palette, self.palette, {})
+    _colorkeys = Utils:defaultOneTwo(_colorkeys, self.colorkeys, {})
+    _offsetx   = _offsetx or 0
+    _offsety   = _offsety or 0
+    _flip      = _flip or Tic.FLIPNONE
+    _rotate    = _rotate or Tic.ROTATE000
 
-    local _boardx = _directive.boardx + _offsetboardx
-    local _boardy = _directive.boardy + _offsetboardy
-    local _color  = Utils:defaultOne(_palette[_directive.color], _directive.color)
+    -- local _boardx = _directive.boardx + _offsetx
+    -- local _boardy = _directive.boardy + _offsety
+    -- local _color  = Utils:defaultOne(_palette[_directive.color], _directive.color)
+
+    _directive:applyPalette(_palette):applyOffsetXY(_offsetx, _offsety):applyFlip(_flip):applyRotate(_rotate)
+
+    local _boardx = _directive.boardx
+    local _boardy = _directive.boardy
+    local _color  = _directive.color
 
     if  Nums:isBW(_boardx, _region.lf, _region.rg)
     and Nums:isBW(_boardy, _region.up, _region.dw)
@@ -46,9 +54,9 @@ function CBoard:appendDirective(_directive, _region, _palette, _colorkeys, _offs
     end
 end
 
-function CBoard:appendDirectives(_directives, _region, _palette, _colorkeys, _offsetboardx, _offsetboardy)
+function CBoard:appendDirectives(_directives, _region, _palette, _colorkeys, _offsetx, _offsety, _flip, _rotate)
     for _, _directive in ipairs(_directives) do
-        self:appendDirective(_directive, _region, _palette, _colorkeys, _offsetboardx, _offsetboardy)
+        self:appendDirective(_directive, _region, _palette, _colorkeys, _offsetx, _offsety, _flip, _rotate)
     end
 end
 

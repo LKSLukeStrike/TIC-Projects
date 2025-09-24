@@ -939,7 +939,7 @@ function CCharacter:drawBack(_bgfg)
     if not _object then return end -- nothing in back
 
     if self:postureGet() == Tic.POSTUREFLOOR then
-        if _bgfg == Tic.DRAWFG then return end -- alwayq draw in bg
+        if _bgfg == Tic.DRAWFG then return end -- always draw in bg
     else
         if self.dirx == Tic.DIRXLF and _bgfg == Tic.DRAWFG then return end -- draw bg/fg or not when not floor
         if self.dirx == Tic.DIRXRG and _bgfg == Tic.DRAWBG then return end

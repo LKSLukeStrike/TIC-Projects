@@ -2267,7 +2267,7 @@ if true then
 --
 -- phy
 --
-if true then
+if false then
 Walfie = _playerclass{classed = _playerclass,
     name = "Walfie",
     size = Tic.SIZES,
@@ -2288,7 +2288,7 @@ Walfie = _playerclass{classed = _playerclass,
     }},
 }
 end
-if true then
+if false then
 Welfie = _playerclass{classed = _playerclass,
     name = "Welfie",
     size = Tic.SIZEM,
@@ -2333,6 +2333,7 @@ end
 --
 -- men
 --
+if false then
 if true then
 Wolfie = _playerclass{classed = _playerclass,
     name = "Wolfie",
@@ -2396,9 +2397,11 @@ Wylfie = _playerclass{classed = _playerclass,
     }},
 }
 end
+end
 --
 -- psy
 --
+if false then
 if true then
 Wolfie = _playerclass{classed = _playerclass,
     name = "W1lfie",
@@ -2461,6 +2464,7 @@ Wylfie = _playerclass{classed = _playerclass,
         CObjectSpellLarge{used = CObject.USEDNONE},
     }},
 }
+end
 end
 end
 -- exit()

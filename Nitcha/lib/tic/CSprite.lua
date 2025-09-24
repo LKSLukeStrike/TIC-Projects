@@ -191,7 +191,7 @@ end
 
 function CSprite:drawDstBoard() -- draw a sprite to board
     Tic:logSprite("board", self)
-    CSprite.BOARD:appendDirectives(self.directives, nil, nil, nil, self.screenx, self.screeny)
+    CSprite.BOARD:appendDirectives(self.directives, nil, nil, nil, self.screenx, self.screeny, self.flip, nil)
 end
 
 
