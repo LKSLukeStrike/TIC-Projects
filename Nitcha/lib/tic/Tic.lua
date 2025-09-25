@@ -205,17 +205,37 @@ Tic.COLORPURPLE = Tic.COLOR01 -- purple
 Tic.COLORRED    = Tic.COLOR02 -- red
 Tic.COLORORANGE = Tic.COLOR03 -- orange
 Tic.COLORYELLOW = Tic.COLOR04 -- yellow
-Tic.COLORGREENL = Tic.COLOR05 -- l green
-Tic.COLORGREENM = Tic.COLOR06 -- m green
-Tic.COLORGREEND = Tic.COLOR07 -- d green
-Tic.COLORBLUEL  = Tic.COLOR10 -- l blue
-Tic.COLORBLUEM  = Tic.COLOR09 -- m blue
-Tic.COLORBLUED  = Tic.COLOR08 -- d blue
+Tic.COLORGREENL = Tic.COLOR05 -- greenl
+Tic.COLORGREENM = Tic.COLOR06 -- greenm
+Tic.COLORGREEND = Tic.COLOR07 -- greend
+Tic.COLORBLUEL  = Tic.COLOR10 -- bluel
+Tic.COLORBLUEM  = Tic.COLOR09 -- bluem
+Tic.COLORBLUED  = Tic.COLOR08 -- blued
 Tic.COLORCYAN   = Tic.COLOR11 -- cyan
 Tic.COLORWHITE  = Tic.COLOR12 -- white
-Tic.COLORGREYL  = Tic.COLOR13 -- l grey
-Tic.COLORGREYM  = Tic.COLOR14 -- m grey
-Tic.COLORGREYD  = Tic.COLOR15 -- d grey
+Tic.COLORGREYL  = Tic.COLOR13 -- greyl
+Tic.COLORGREYM  = Tic.COLOR14 -- greym
+Tic.COLORGREYD  = Tic.COLOR15 -- greyd
+
+-- Palette colors names
+Tic.COLORNAMES = {
+    [Tic.COLOR00] = "black",
+    [Tic.COLOR01] = "purple",
+    [Tic.COLOR02] = "red",
+    [Tic.COLOR03] = "orange",
+    [Tic.COLOR04] = "yellow",
+    [Tic.COLOR05] = "greenl",
+    [Tic.COLOR06] = "greenm",
+    [Tic.COLOR07] = "greend",
+    [Tic.COLOR08] = "bluel",
+    [Tic.COLOR09] = "bluem",
+    [Tic.COLOR10] = "blued",
+    [Tic.COLOR11] = "cyan",
+    [Tic.COLOR12] = "white",
+    [Tic.COLOR13] = "greyl",
+    [Tic.COLOR14] = "greym",
+    [Tic.COLOR15] = "greyd",
+}
 
 -- Palette colors for hud
 Tic.COLORHUDSCREEN = Tic.COLORBLUED
@@ -1987,8 +2007,8 @@ end
 
 --
 -- SCREENS
--- if true then Tic:screenAppend(ScreenIntro) end
-if true then Tic:screenAppend(ScreenWorld) end
+if true then Tic:screenAppend(ScreenIntro) end
+-- if true then Tic:screenAppend(ScreenWorld) end
 -- if true then Tic:screenAppend(ScreenMenus) end
 Tic:screenMin()
 if true then Tic.INVENTORYSCREEN = ScreenMenus end
@@ -2561,15 +2581,16 @@ SpriteTER = CSpriteBoard{
 -- Tic:traceTable(SpriteTER:directivesFetch())
 -- exit()
 
-SpriteWeapon = CSpriteFG{
-    sprite = 388,
-    screenx = 30,
+Lance01 = CWeaponLance{
+    screenx = 100,
     screeny = 100,
-    -- rotate = 0, --Tic.ROTATE270,
-    -- flip = 0, --Tic.DIRXRG,
 }
-SpriteWeapon.rotate = 3
-SpriteWeapon.flip = 0
+Lance02 = CWeaponLance{
+    screenx = 110,
+    screeny = 100,
+    flip       = Tic.FLIPNONE,
+    rotate     = Tic.ROTATE270,
+}
 
 
 --
@@ -2721,12 +2742,32 @@ function Tic:draw()
     -- Text02:draw()
     -- Text03:draw()
 
-    -- SpriteSFX:draw()
-    -- SpriteHTG:draw()
-    -- SpriteBIS:draw()
-    -- SpriteTER:draw()
+    SpriteSFX:draw()
+    SpriteHTG:draw()
+    SpriteBIS:draw()
+    SpriteTER:draw()
 
-    -- SpriteWeapon:draw()
+    Lance01:draw()
+
+    CSprite:boardClear()
+    CSprite:modeSpriteBoard()
+    Lance02:save()
+    Lance02.screenx = 0
+    Lance02.screeny = 0
+    Lance02:draw()
+    Lance02:load()
+
+    CSprite:modeBoardScreen()
+    local _musprite = CSpriteBoard{
+        screenx    = Lance02.screenx,
+        screeny    = Lance02.screeny,
+        flip       = Lance02.flip,
+        rotate     = Lance02.rotate,
+    }
+    _musprite:draw()
+
+    CSprite:modeSpriteScreen()
+
 
     Tic:drawLog()
 

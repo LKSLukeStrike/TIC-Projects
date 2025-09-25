@@ -11,6 +11,8 @@ function CBoard:new(_argt)
     CBoard.super.new(self, _argt)
     self.kind = Classic.KINDBOARD
     self.name = Classic.NAMEBOARD
+    self.screenx   = 0
+    self.screeny   = 0
     self.board     = {}
     self.palette   = {} -- palette if any
     self.colorkeys = {} -- colorkeys if any
@@ -35,13 +37,7 @@ function CBoard:appendDirective(_directive, _region, _palette, _colorkeys, _offs
     _flip      = _flip or Tic.FLIPNONE
     _rotate    = _rotate or Tic.ROTATE000
 
-    -- local _boardx = _directive.boardx + _offsetx
-    -- local _boardy = _directive.boardy + _offsety
-    -- local _color  = Utils:defaultOne(_palette[_directive.color], _directive.color)
-
-    -- _directive:applyPalette(_palette):applyOffsetXY(_offsetx, _offsety):applyFlip(_flip):applyRotate(_rotate)
-    _directive = _directive:applyOffsetXY(_offsetx, _offsety)
-    -- _directive:applyRotate(_rotate)
+    _directive:applyPalette(_palette):applyOffsetXY(_offsetx, _offsety):applyFlip(_flip):applyRotate(_rotate)
 
     local _boardx = _directive.boardx
     local _boardy = _directive.boardy
@@ -53,6 +49,7 @@ function CBoard:appendDirective(_directive, _region, _palette, _colorkeys, _offs
     then
         if not self.board[_boardx] then self.board[_boardx] = {} end
         self.board[_boardx][_boardy] = _color
+        Tic:logAppend(Y.._boardy, X.._boardx, C..Tic.COLORNAMES[_color])
     end
 end
 
@@ -83,4 +80,15 @@ function CBoard:directives(_region, _palette, _colorkeys)
     end
 
     return _result
+end
+
+function CBoard:drawScreen(_screenx, _screeny)
+    _screenx = _screenx or self.screenx
+    _screeny = _screeny or self.screeny
+
+    for _boardx, _boardys in pairs(self.board) do
+        for _boardy, _color in pairs(_boardys) do
+            pix(_screenx + _boardx, _screeny + _boardy, _color)
+        end
+    end
 end
