@@ -14,6 +14,8 @@ function CEntityDrawable:new(_argt)
     self.sprite       = CSpriteBG.SIGNEMPTYS
     self.screenx      = 0 -- screen positions -- used to draw the sprite
     self.screeny      = 0
+    self.offsetx      = 0
+    self.offsety      = 0
     self.dirx         = Nums:random01() -- random flip lf/rg
     self.scale        = Tic.SCALE01
     self.rotate       = Tic.ROTATE000
@@ -58,6 +60,8 @@ function CEntityDrawable:draw() -- default draw for drawable entities -- overrid
     _musprite.sprite  = self.sprite
     _musprite.screenx = self.screenx
     _musprite.screeny = self.screeny
+    _musprite.offsetx = self.offsetx
+    _musprite.offsety = self.offsety
     _musprite.flip    = self.dirx
     _musprite.scale   = self.scale
     _musprite.rotate  = self.rotate
@@ -75,6 +79,8 @@ function CEntityDrawable:drawSpotted() -- draw spotted if any
     local _musprite = CSpriteBG() -- multi usage unique sprite
     _musprite.sprite  = CSpriteBG.SIGNSPOTSQ
     _musprite.screenx = self.screenx
+    _musprite.offsetx = self.offsetx
+    _musprite.offsety = self.offsety
     _musprite.screeny = self.screeny
     _musprite.scale   = self.scale
     _musprite.palette = {[Tic.COLORGREYM] = Tic.COLORWHITE,}
@@ -87,6 +93,8 @@ function CEntityDrawable:drawHovered() -- draw hovered if any
     _musprite.sprite  = CSpriteBG.SIGNBORDSQ
     _musprite.screenx = self.screenx
     _musprite.screeny = self.screeny
+    _musprite.offsetx = self.offsetx
+    _musprite.offsety = self.offsety
     _musprite.scale   = self.scale
     _musprite.palette = {[Tic.COLORGREYM] = Tic.COLORGREYL,}
     _musprite:draw()
@@ -99,6 +107,8 @@ function CEntityDrawable:drawBorders() -- draw borders if any
     _musprite.sprite  = CSpriteBG.SIGNBORDSQ
     _musprite.screenx = self.screenx
     _musprite.screeny = self.screeny
+    _musprite.offsetx = self.offsetx
+    _musprite.offsety = self.offsety
     _musprite.scale   = self.scale
     _musprite.palette = {[Tic.COLORGREYM] = Tic.COLORGREYL,}
     _musprite:draw()

@@ -911,8 +911,10 @@ function CCharacter:drawHand(_bgfg)
 
     _object:save()
     Tic.LOGSPRITE = true
-    _object.screenx  = self.screenx + (_handx * self.scale)
-    _object.screeny  = self.screeny + (_handy * self.scale)
+    _object.screenx  = self.screenx
+    _object.screeny  = self.screeny
+    _object.offsetx  = _handx * self.scale
+    _object.offsety  = _handy * self.scale
     _object.scale    = self.scale
     _object.rotate   = _objectrotate
     _object.dirx     = _objectflip
@@ -957,8 +959,10 @@ function CCharacter:drawBack(_bgfg)
     local _backy   = _backy - _objecthandley
 
     _object:save()
-    _object.screenx  = self.screenx + (_backx * self.scale)
-    _object.screeny  = self.screeny + (_backy * self.scale)
+    _object.screenx  = self.screenx
+    _object.screeny  = self.screeny
+    _object.offsetx  = _backx * self.scale
+    _object.offsety  = _backy * self.scale
     _object.scale    = self.scale
     _object.rotate   = _objectrotate
     _object.dirx     = _objectflip
@@ -999,15 +1003,17 @@ function CCharacter:drawInteract()
         and _headoffsetx - 3
         or  _headoffsetx + 3
     local _headoffsety     = _posturesettings.headoffsety - Tic.SPRITESIZE + 1
-    _headoffsety               = (_posturesettings.headusesize)
+    _headoffsety           = (_posturesettings.headusesize)
         and _headoffsety + self.size
         or  _headoffsety
 
 
     local _musprite = CSpriteFG() -- multi usage unique sprite
     _musprite.sprite  = CSpriteBG.SIGNINTMRK -- apply the corresponding attributes
-    _musprite.screenx = self.screenx + (_headoffsetx * self.scale)
-    _musprite.screeny = self.screeny + (_headoffsety * self.scale)
+    _musprite.screenx = self.screenx
+    _musprite.screeny = self.screeny
+    _musprite.offsetx = _headoffsetx * self.scale
+    _musprite.offsety = _headoffsety * self.scale
     _musprite.scale   = self.scale
     _musprite.flip    = self.dirx
     _musprite.palette = {[Tic.COLORGREYD] = Tic.COLORKEY}

@@ -179,8 +179,10 @@ function ICharacterHumanoid:drawBody()
 
     local _musprite = CSpriteFG() -- multi usage unique sprite
     _musprite.sprite  = self.bodysprite + _bodyspriteoffset -- apply the corresponding attributes
-    _musprite.screenx = self.screenx + (_bodyoffsetx * self.scale)
-    _musprite.screeny = self.screeny + (_bodyoffsety * self.scale)
+    _musprite.screenx = self.screenx
+    _musprite.screeny = self.screeny
+    _musprite.offsetx = _bodyoffsetx * self.scale
+    _musprite.offsety = _bodyoffsety * self.scale
     _musprite.rotate  = _bodyrotate
     _musprite.frame   = _bodyframe
     _musprite.scale   = self.scale
@@ -210,8 +212,10 @@ function ICharacterHumanoid:drawHead()
 
     -- draw head
     _musprite.sprite  = self.headsprite -- apply the corresponding attributes
-    _musprite.screenx = self.screenx + (_headoffsetx * self.scale)
-    _musprite.screeny = self.screeny + (_headoffsety * self.scale)
+    _musprite.screenx = self.screenx
+    _musprite.screeny = self.screeny
+    _musprite.offsetx = _headoffsetx * self.scale
+    _musprite.offsety = _headoffsety * self.scale
     _musprite.rotate  = _headrotate
     _musprite.scale   = self.scale
     _musprite.flip    = self.dirx
@@ -274,8 +278,10 @@ function ICharacterHumanoid:drawHead()
     local _heady   = _heady - _objecthandley
 
     _object:save()
-    _object.screenx  = self.screenx + (_headx * self.scale)
-    _object.screeny  = self.screeny + (_heady * self.scale)
+    _object.screenx  = self.screenx
+    _object.screeny  = self.screeny
+    _object.offsetx  = _headx * self.scale
+    _object.offsety  = _heady * self.scale
     _object.scale    = self.scale
     _object.rotate   = _objectrotate
     _object.dirx     = _objectflip

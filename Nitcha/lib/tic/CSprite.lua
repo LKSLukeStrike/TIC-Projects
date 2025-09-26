@@ -184,7 +184,6 @@ function CSprite:drawDstScreen() -- draw a sprite to screen
         self:drawPixel(_directive.boardx, _directive.boardy, _directive.color)
     end
 
-    Tic:logAppend(self.name, self.offsetx)
     spr(
         self.sprite,
         self.screenx + self.offsetx,

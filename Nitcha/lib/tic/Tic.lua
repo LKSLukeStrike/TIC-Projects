@@ -2007,8 +2007,8 @@ end
 
 --
 -- SCREENS
-if true then Tic:screenAppend(ScreenIntro) end
--- if true then Tic:screenAppend(ScreenWorld) end
+-- if true then Tic:screenAppend(ScreenIntro) end
+if true then Tic:screenAppend(ScreenWorld) end
 -- if true then Tic:screenAppend(ScreenMenus) end
 Tic:screenMin()
 if true then Tic.INVENTORYSCREEN = ScreenMenus end
@@ -2341,13 +2341,15 @@ Wilfie = _playerclass{classed = _playerclass,
     worldy = -20,
     -- spottingspot = true,
     spottingpick = true,
-    ["slots.handrg"] = CSlotHandRG{object = CWeaponLance{}},
+    ["slots.handrg"] = CSlotHandRG{object = CWeaponSword{}},
     -- ["slots.handlf"] = CSlotHandLF{object = CWeaponShieldLarge{}},
-    -- ["slots.head"]   = CSlotHead{object = CClothesHelmetLarge{}},
+    ["slots.head"]   = CSlotHead{object = CClothesHelmetLarge{}},
     -- ["slots.back"]   = CSlotBack{object = CClothesBackPackLarge{}},
-    -- ["inventories.any"] = CInventoryAny{objects = {
-    --     CObjectBombLarge{used = CObject.USEDNONE},
-    -- }},
+    ["inventories.any"] = CInventoryAny{objects = {
+        CObjectBombLarge{used = CObject.USEDNONE},
+        CWeaponHammer{},
+        CWeaponLance{},
+    }},
 }
 end
 --
@@ -2556,7 +2558,7 @@ SpriteHTG = CSpriteFG{
     sprite  = 511,
     screenx = 200,
     screeny = 100,
-    rotate = Tic.ROTATE180,
+    -- rotate = Tic.ROTATE180,
     -- offsetx = -100,
     -- colorkeys = {},
 }
@@ -2586,6 +2588,7 @@ SpriteTER = CSpriteBoard{
     },
     colorkeys = {Tic.COLORKEY, Tic.COLORRED},
     directives = SpriteHTG:directivesSrcSprite(),
+    rotate = Tic.ROTATE180,
 }
 -- Tic:traceTable(SpriteTER:directivesFetch())
 -- exit()
@@ -2760,30 +2763,30 @@ function Tic:draw()
     SpriteSFX:load()
 
     SpriteHTG:draw()
-    -- SpriteBIS:draw()
-    -- SpriteTER:draw()
+    SpriteBIS:draw()
+    SpriteTER:draw()
 
-    -- Lance01:draw()
+    Lance01:draw()
 
-    -- CSprite:boardClear()
-    -- CSprite:modeSpriteBoard()
-    -- Lance02:save()
-    -- Lance02.screenx = 0
-    -- Lance02.screeny = 0
-    -- Lance02:draw()
-    -- Lance02:load()
-    -- CSprite.BOARD:drawScreen(nil, 30)
+    CSprite:boardClear()
+    CSprite:modeSpriteBoard()
+    Lance02:save()
+    Lance02.screenx = 0
+    Lance02.screeny = 0
+    Lance02:draw()
+    Lance02:load()
+    CSprite.BOARD:drawScreen(nil, 30)
 
-    -- CSprite:modeBoardScreen()
-    -- local _musprite = CSpriteBoard{
-    --     screenx    = Lance02.screenx,
-    --     screeny    = Lance02.screeny,
-    --     flip       = Lance02.flip,
-    --     rotate     = Lance02.rotate,
-    -- }
-    -- _musprite:draw()
+    CSprite:modeBoardScreen()
+    local _musprite = CSpriteBoard{
+        screenx    = Lance02.screenx,
+        screeny    = Lance02.screeny,
+        flip       = Lance02.flip,
+        rotate     = Lance02.rotate,
+    }
+    _musprite:draw()
 
-    -- CSprite:modeSpriteScreen()
+    CSprite:modeSpriteScreen()
 
 
     Tic:drawLog()
@@ -2873,7 +2876,7 @@ end
 
 function Tic:logDirective(_key, _directive, _colorkey)
     if not _colorkey or not (_directive.color == _colorkey) then
-        Tic:logAppend(_key..")", X.._directive.boardx, Y.._directive.boardy, C.._directive.color)
+        Tic:logAppend(_key..")", Y.._directive.boardy, X.._directive.boardx, C..Tic.COLORNAMES[_directive.color])
     end
 end
 

@@ -49,7 +49,6 @@ function CBoard:appendDirective(_directive, _region, _palette, _colorkeys, _offs
     then
         if not self.board[_boardx] then self.board[_boardx] = {} end
         self.board[_boardx][_boardy] = _color
-        Tic:logAppend(Y.._boardy, X.._boardx, C..Tic.COLORNAMES[_color])
     end
 end
 
