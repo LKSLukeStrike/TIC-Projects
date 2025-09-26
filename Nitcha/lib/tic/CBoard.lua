@@ -11,8 +11,8 @@ function CBoard:new(_argt)
     CBoard.super.new(self, _argt)
     self.kind = Classic.KINDBOARD
     self.name = Classic.NAMEBOARD
-    self.screenx   = 0
-    self.screeny   = 0
+    self.screenx   = Tic.SCREENW2
+    self.screeny   = Tic.SCREENH2
     self.board     = {}
     self.palette   = {} -- palette if any
     self.colorkeys = {} -- colorkeys if any

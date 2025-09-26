@@ -27,6 +27,8 @@ function CSprite:new(_argt)
     self.sprite      = self.spritebank -- initial sprite number -- set to nil to act as a spriteboard
     self.screenx     = 0 -- screen positions
     self.screeny     = 0
+    self.offsetx     = 0 -- screen/board positions offsets
+    self.offsety     = 0
     self.frame       = CSprite.FRAME00
     self.frameoffset = CSprite.FRAMEOFFSET
     self.scale       = Tic.SCALE01 -- default scale
@@ -97,7 +99,7 @@ function CSprite:directivesSrc() -- directives from sprite or board
     end
 end
 
-function CSprite:directivesSrcSprite() -- directives from its sprite/frame
+function CSprite:directivesSrcSprite() -- directives from its sprite/frame -- apply palette, flip, rotate and filter colorkeys
     local _directives = {}
 
     if self.sprite then -- CSpriteBoard has no sprite
@@ -106,26 +108,32 @@ function CSprite:directivesSrcSprite() -- directives from its sprite/frame
         for _y = 0, Tic.SPRITESIZE - 1 do
             for _x = 0, Tic.SPRITESIZE - 1 do
                 local _color = peek4(((Tic.SPRITESVRAM + (32 * _sprite)) * 2) + ((_y * Tic.SPRITESIZE) + _x))
-                _color = self.palette[_color] or _color
-                if not Tables:valFind(self.colorkeys, _color) then
-                    Tables:valInsert(_directives, CDirective{
-                        boardx = _x,
-                        boardy = _y,
-                        color  = _color,
-                    }, true)
+                _color = self.palette[_color] or _color --palette
+                if not Tables:valFind(self.colorkeys, _color) then -- colorkeys
+                    Tables:valInsert(_directives,
+                        CDirective{
+                            boardx = _x,
+                            boardy = _y,
+                            color  = _color,
+                        }:applyFlip(self.flip):applyRotate(self.rotate),
+                        true
+                    )
                 end
             end
         end
     else
         for _, _directive in ipairs(self.directives) do
             local _color = _directive.color
-            _color = self.palette[_color] or _color
-            if not Tables:valFind(self.colorkeys, _color) then
-                Tables:valInsert(_directives, CDirective{
-                    boardx = _directive.boardx,
-                    boardy = _directive.boardy,
-                    color  = _color,
-                }, true)
+            _color = self.palette[_color] or _color -- palette
+            if not Tables:valFind(self.colorkeys, _color) then -- colorkeys
+                Tables:valInsert(_directives,
+                    CDirective{
+                        boardx = _directive.boardx,
+                        boardy = _directive.boardy,
+                        color  = _color,
+                    }:applyFlip(self.flip):applyRotate(self.rotate),
+                    true
+                )
             end
         end
     end
@@ -176,14 +184,15 @@ function CSprite:drawDstScreen() -- draw a sprite to screen
         self:drawPixel(_directive.boardx, _directive.boardy, _directive.color)
     end
 
+    Tic:logAppend(self.name, self.offsetx)
     spr(
         self.sprite,
-        self.screenx,
-        self.screeny,
+        self.screenx + self.offsetx,
+        self.screeny + self.offsety,
         self.colorkeys,
         self.scale,
-        self.flip,
-        self.rotate,
+        Tic.FLIPNONE,
+        Tic.ROTATE000,
         self.width,
         self.height
     )
@@ -191,15 +200,18 @@ end
 
 function CSprite:drawDstBoard() -- draw a sprite to board
     Tic:logSprite("board ", self)
-    CSprite.BOARD:appendDirectives(self.directives, nil, nil, nil, self.screenx, self.screeny, self.flip, self.rotate)
+    CSprite.BOARD:appendDirectives(self.directives, nil, nil, nil, self.offsetx, self.offsety, nil, nil)
 end
 
 
 function CSprite:draw() -- draw a sprite -- SCREEN -- DEFAULT
-    local _spriteboard = CSprite{
+    local _spriteboard = CSprite{ -- FIXME find a way to clone -- in Classic ? here ?
         sprite      = CSprite.SPRITEBOARD,
+        name        = self.name,
         screenx     = self.screenx,
         screeny     = self.screeny,
+        offsetx     = self.offsetx,
+        offsety     = self.offsety,
         frame       = self.frame,
         frameoffset = self.frameoffset,
         scale       = self.scale,

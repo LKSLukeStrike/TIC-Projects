@@ -2518,6 +2518,7 @@ end
 -- Sprites -- TESTING
 --
 SpriteSFX = CSpriteBoard{
+    name = "SFX",
     screenx = 200,
     screeny = 90,
     directives = {
@@ -2543,12 +2544,20 @@ SpriteSFX = CSpriteBoard{
         [Tic.COLORPURPLE] = Tic.COLORGREEND,
         [Tic.COLORRED]    = Tic.COLORGREENM,
     },
+    -- flip = Tic.FLIPNONE,
+    -- flip = Tic.FLIPHORI,
+    -- flip = Tic.FLIPVERT,
+    -- flip = Tic.FLIPBOTH,
+    -- rotate = Tic.ROTATE090,
 }
 
 SpriteHTG = CSpriteFG{
+    name = "HTG",
     sprite  = 511,
     screenx = 200,
     screeny = 100,
+    rotate = Tic.ROTATE180,
+    -- offsetx = -100,
     -- colorkeys = {},
 }
 
@@ -2743,30 +2752,38 @@ function Tic:draw()
     -- Text03:draw()
 
     SpriteSFX:draw()
+    SpriteSFX:save()
+    SpriteSFX.offsetx = 10
+    -- SpriteSFX.flip  = Tic.FLIPBOTH
+    SpriteSFX.rotate  = Tic.ROTATE270
+    SpriteSFX:draw()
+    SpriteSFX:load()
+
     SpriteHTG:draw()
-    SpriteBIS:draw()
-    SpriteTER:draw()
+    -- SpriteBIS:draw()
+    -- SpriteTER:draw()
 
-    Lance01:draw()
+    -- Lance01:draw()
 
-    CSprite:boardClear()
-    CSprite:modeSpriteBoard()
-    Lance02:save()
-    Lance02.screenx = 0
-    Lance02.screeny = 0
-    Lance02:draw()
-    Lance02:load()
+    -- CSprite:boardClear()
+    -- CSprite:modeSpriteBoard()
+    -- Lance02:save()
+    -- Lance02.screenx = 0
+    -- Lance02.screeny = 0
+    -- Lance02:draw()
+    -- Lance02:load()
+    -- CSprite.BOARD:drawScreen(nil, 30)
 
-    CSprite:modeBoardScreen()
-    local _musprite = CSpriteBoard{
-        screenx    = Lance02.screenx,
-        screeny    = Lance02.screeny,
-        flip       = Lance02.flip,
-        rotate     = Lance02.rotate,
-    }
-    _musprite:draw()
+    -- CSprite:modeBoardScreen()
+    -- local _musprite = CSpriteBoard{
+    --     screenx    = Lance02.screenx,
+    --     screeny    = Lance02.screeny,
+    --     flip       = Lance02.flip,
+    --     rotate     = Lance02.rotate,
+    -- }
+    -- _musprite:draw()
 
-    CSprite:modeSpriteScreen()
+    -- CSprite:modeSpriteScreen()
 
 
     Tic:drawLog()
