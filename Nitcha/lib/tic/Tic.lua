@@ -2744,7 +2744,8 @@ end
 --
 -- Drawing
 --
-local _timemax = 0
+local _timemin = Nums.MAXINTEGER
+local _timemax = Nums.MININTEGER
 function Tic:draw()
     if true then
     local _timebeg = time()
@@ -2811,11 +2812,13 @@ function Tic:draw()
 
     local _timeend = time()
     local _timedif = math.floor(_timeend - _timebeg)
+    if _timedif < _timemin then _timemin = _timedif end
     if _timedif > _timemax then _timemax = _timedif end
-    Tic:logAppend(_timebeg)
-    Tic:logAppend(_timeend)
-    Tic:logAppend(_timedif)
-    Tic:logAppend(_timemax)
+    -- Tic:logAppend(_timebeg)
+    -- Tic:logAppend(_timeend)
+    -- Tic:logAppend(_timedif)
+    -- Tic:logAppend(_timemax)
+    Tic:print(195, 0, _timemin.."/".._timedif.."/".._timemax)
     Tic:logPrint()
 
     Tic:tick() -- [!] required in the draw function
