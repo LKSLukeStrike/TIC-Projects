@@ -44,7 +44,7 @@ end
 
 function Tic:logSprite(_pfx, _sprite)
     if Tic.LOGSPRITE then
-        Tic:logAppend(_pfx, _sprite.sprite, _sprite.screenx, _sprite.screeny, _sprite.flip, _sprite.rotate)
+        Tic:logAppend(_pfx, _sprite.sprite, _sprite.name, _sprite.screenx, _sprite.screeny, _sprite.flip, _sprite.rotate)
     end
 end
 
@@ -115,7 +115,7 @@ function CSprite:directivesSrcSprite() -- directives from its sprite/frame -- ap
                             boardx = _x,
                             boardy = _y,
                             color  = _color,
-                        }:applyFlip(self.flip):applyRotate(self.rotate),
+                        }:applyRotate(self.rotate):applyFlip(self.flip),
                         true
                     )
                 end
@@ -131,7 +131,7 @@ function CSprite:directivesSrcSprite() -- directives from its sprite/frame -- ap
                         boardx = _directive.boardx,
                         boardy = _directive.boardy,
                         color  = _color,
-                    }:applyFlip(self.flip):applyRotate(self.rotate),
+                    }:applyRotate(self.rotate):applyFlip(self.flip),
                     true
                 )
             end
@@ -184,6 +184,8 @@ function CSprite:drawDstScreen() -- draw a sprite to screen
         self:drawPixel(_directive.boardx, _directive.boardy, _directive.color)
     end
 
+    Tic.LOGSPRITE = false
+    Tic:logSprite("spr  ", self)
     spr(
         self.sprite,
         self.screenx + self.offsetx,
@@ -195,6 +197,7 @@ function CSprite:drawDstScreen() -- draw a sprite to screen
         self.width,
         self.height
     )
+    Tic.LOGSPRITE = false
 end
 
 function CSprite:drawDstBoard() -- draw a sprite to board

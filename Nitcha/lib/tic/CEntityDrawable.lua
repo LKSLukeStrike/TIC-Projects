@@ -58,6 +58,7 @@ function CEntityDrawable:draw() -- default draw for drawable entities -- overrid
 
     local _musprite = CSpriteBG() -- multi usage unique sprite
     _musprite.sprite  = self.sprite
+    _musprite.name    = self.name
     _musprite.screenx = self.screenx
     _musprite.screeny = self.screeny
     _musprite.offsetx = self.offsetx

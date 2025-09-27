@@ -2287,7 +2287,7 @@ if true then
 --
 -- phy
 --
-if false then
+if true then
 Walfie = _playerclass{classed = _playerclass,
     name = "Walfie",
     size = Tic.SIZES,
@@ -2308,7 +2308,7 @@ Walfie = _playerclass{classed = _playerclass,
     }},
 }
 end
-if false then
+if true then
 Welfie = _playerclass{classed = _playerclass,
     name = "Welfie",
     size = Tic.SIZEM,
@@ -2355,7 +2355,7 @@ end
 --
 -- men
 --
-if false then
+if true then
 if true then
 Wolfie = _playerclass{classed = _playerclass,
     name = "Wolfie",
@@ -2423,7 +2423,7 @@ end
 --
 -- psy
 --
-if false then
+if true then
 if true then
 Wolfie = _playerclass{classed = _playerclass,
     name = "W1lfie",
@@ -2519,6 +2519,7 @@ end
 --
 -- Sprites -- TESTING
 --
+if false then
 SpriteSFX = CSpriteBoard{
     name = "SFX",
     screenx = 200,
@@ -2593,17 +2594,19 @@ SpriteTER = CSpriteBoard{
 -- Tic:traceTable(SpriteTER:directivesFetch())
 -- exit()
 
-Lance01 = CWeaponLance{
+Lance01 = CWeaponHammer{
+    name = "Lance01",
     screenx = 100,
     screeny = 100,
+    dirx       = Tic.DIRXLF,
 }
-Lance02 = CWeaponLance{
+Lance02 = CWeaponHammer{
+    name = "Lance02",
     screenx = 110,
     screeny = 100,
-    flip       = Tic.FLIPNONE,
-    rotate     = Tic.ROTATE270,
+    -- rotate     = Tic.ROTATE270,
 }
-
+end
 
 --
 -- Regions -- TESTING
@@ -2741,6 +2744,7 @@ end
 --
 -- Drawing
 --
+local _timemax = 0
 function Tic:draw()
     if true then
     local _timebeg = time()
@@ -2748,24 +2752,38 @@ function Tic:draw()
 
     Tic:screenDraw()
 
+    if false then
     -- WeaponMelee:draw()
 
     -- Text01:draw()
     -- Text02:draw()
     -- Text03:draw()
 
-    SpriteSFX:draw()
-    SpriteSFX:save()
-    SpriteSFX.offsetx = 10
-    -- SpriteSFX.flip  = Tic.FLIPBOTH
-    SpriteSFX.rotate  = Tic.ROTATE270
-    SpriteSFX:draw()
-    SpriteSFX:load()
+    -- SpriteSFX:draw()
+    -- SpriteSFX:save()
+    -- SpriteSFX.offsetx = 10
+    -- -- SpriteSFX.flip  = Tic.FLIPBOTH
+    -- SpriteSFX.rotate  = Tic.ROTATE270
+    -- SpriteSFX:draw()
+    -- SpriteSFX:load()
 
-    SpriteHTG:draw()
-    SpriteBIS:draw()
-    SpriteTER:draw()
+    -- SpriteHTG:draw()
+    -- SpriteBIS:draw()
+    -- SpriteTER:draw()
 
+    spr(
+        368,
+        90,
+        100,
+        {},
+        1,
+        1, --flip,
+        3, --rotate,
+        1,
+        1
+    )
+    Lance01.dirx   = 1
+    Lance01.rotate = 3
     Lance01:draw()
 
     CSprite:boardClear()
@@ -2787,15 +2805,17 @@ function Tic:draw()
     _musprite:draw()
 
     CSprite:modeSpriteScreen()
-
+    end
 
     Tic:drawLog()
 
     local _timeend = time()
-    local _timedif = _timeend - _timebeg
+    local _timedif = math.floor(_timeend - _timebeg)
+    if _timedif > _timemax then _timemax = _timedif end
     Tic:logAppend(_timebeg)
     Tic:logAppend(_timeend)
     Tic:logAppend(_timedif)
+    Tic:logAppend(_timemax)
     Tic:logPrint()
 
     Tic:tick() -- [!] required in the draw function
