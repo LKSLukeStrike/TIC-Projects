@@ -2752,6 +2752,7 @@ function Tic:draw()
     Tic.inputsDo()
 
     Tic:screenDraw()
+    Tic:logAppend(Tic:screenActual())
 
     if false then
     -- WeaponMelee:draw()
@@ -2814,10 +2815,6 @@ function Tic:draw()
     local _timedif = math.floor(_timeend - _timebeg)
     if _timedif < _timemin then _timemin = _timedif end
     if _timedif > _timemax then _timemax = _timedif end
-    -- Tic:logAppend(_timebeg)
-    -- Tic:logAppend(_timeend)
-    -- Tic:logAppend(_timedif)
-    -- Tic:logAppend(_timemax)
     Tic:print(195, 0, _timemin.."/".._timedif.."/".._timemax)
     Tic:logPrint()
 

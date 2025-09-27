@@ -747,7 +747,8 @@ function CButtonSlotPlayer:menuPick()
     local _screen = CScreen{}
 
     local _windowmenu = CWindowMenu{
-        screenx = _screenx, screeny = _screeny,
+        screenx = _screenx,
+        screeny = _screeny,
         separatory = 1,
         stretch = true,
     }

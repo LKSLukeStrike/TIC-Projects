@@ -623,6 +623,8 @@ function CWindowWorld:drawPlayerActual()
 
                         _entity:draw()
 
+                        Tic:logAppend("world", Tic:screenActual())
+                        Tic:logAppend(self:hasParent(Tic:screenActual()))
                         if  _playeractual.spottingpick -- if in pick mode
                         and not (_entity == _playeractual) -- except itself
                         and _entityregionscreen:hasInsidePoint(Tic:mousePointX(), Tic:mousePointY()) -- hovering something ?

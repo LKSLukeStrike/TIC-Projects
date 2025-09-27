@@ -417,3 +417,15 @@ function CElement:deactivate() -- dehover the button and stop the activate effec
         self.actived = false
     end
 end
+
+function CElement:hasParent(_parent) -- check if is part of parents line
+    if not _parent then return false end -- mandatory
+
+    local _selfparent = self.parent
+    while _selfparent do
+        if _selfparent == _parent then return true end
+        _selfparent = _selfparent.parent
+    end
+
+    return false
+end
