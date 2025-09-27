@@ -835,6 +835,10 @@ function Tic:screenActual() -- actual screen in the stack
     return Tic.SCREENS.actvalue
 end
 
+function Tic:screenTop() -- top screen in the stack
+    return Tic.SCREENS:top()
+end
+
 function Tic:screenMin() -- first screen in the stack
     return Tic.SCREENS:min()
 end

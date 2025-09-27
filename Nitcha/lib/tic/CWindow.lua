@@ -623,47 +623,47 @@ function CWindowWorld:drawPlayerActual()
 
                         _entity:draw()
 
-                        Tic:logAppend("world", Tic:screenActual())
-                        Tic:logAppend(self:hasParent(Tic:screenActual()))
-                        if  _playeractual.spottingpick -- if in pick mode
-                        and not (_entity == _playeractual) -- except itself
-                        and _entityregionscreen:hasInsidePoint(Tic:mousePointX(), Tic:mousePointY()) -- hovering something ?
-                        and not _playeractual.hovering then -- hover only one
-                            _playeractual:hoverEntity(_entity)
+                        if Tic:screenActual() == Tic:screenTop() then -- allows interactions only if top screen (no menus)
+                            if  _playeractual.spottingpick -- if in pick mode
+                            and not (_entity == _playeractual) -- except itself
+                            and _entityregionscreen:hasInsidePoint(Tic:mousePointX(), Tic:mousePointY()) -- hovering something ?
+                            and not _playeractual.hovering then -- hover only one
+                                _playeractual:hoverEntity(_entity)
 
-                            local _playerfind = Tic:playerFind(_entity)
-                            if _playerfind then
-                                local _picktext = CText{text = Tic.TEXTPICK, colorinside = Tic.COLORHOVERTEXT}
-                                _picktext.screenx = _entity.screenx - ((_picktext.screenw - Tic.SPRITESIZE) // 2)
-                                _picktext.screeny = _entity.screeny - _picktext.screenh
-                                _picktext:draw()
+                                local _playerfind = Tic:playerFind(_entity)
+                                if _playerfind then
+                                    local _picktext = CText{text = Tic.TEXTPICK, colorinside = Tic.COLORHOVERTEXT}
+                                    _picktext.screenx = _entity.screenx - ((_picktext.screenw - Tic.SPRITESIZE) // 2)
+                                    _picktext.screeny = _entity.screeny - _picktext.screenh
+                                    _picktext:draw()
 
-                                if Tic.MOUSE.clicklf then
-                                    Tic.MOUSE.clicklf = false -- avoid bouncing
+                                    if Tic.MOUSE.clicklf then
+                                        Tic.MOUSE.clicklf = false -- avoid bouncing
+                                        Tic:mouseDelay()
+                                        
+                                        Tic:playerPick(_entity)
+                                    end
+                                end
+
+                                local _locking  = (_playeractual.spottinglock and _playeractual.spotting == _entity) -- already locking ?
+                                local _locktext = (_locking)
+                                    and CText{text = Tic.TEXTUNLOCK, colorinside = Tic.COLORHOVERTEXT}
+                                    or  CText{text = Tic.TEXTLOCK, colorinside = Tic.COLORHOVERTEXT}
+                                _locktext.screenx = _entity.screenx - ((_locktext.screenw - Tic.SPRITESIZE) // 2)
+                                _locktext.screeny = _entity.screeny + Tic.SPRITESIZE
+                                _locktext:draw()
+
+                                if Tic.MOUSE.clickrg then
+                                    Tic.MOUSE.clickrg = false -- avoid bouncing
                                     Tic:mouseDelay()
                                     
-                                    Tic:playerPick(_entity)
-                                end
-                            end
-
-                            local _locking  = (_playeractual.spottinglock and _playeractual.spotting == _entity) -- already locking ?
-                            local _locktext = (_locking)
-                                and CText{text = Tic.TEXTUNLOCK, colorinside = Tic.COLORHOVERTEXT}
-                                or  CText{text = Tic.TEXTLOCK, colorinside = Tic.COLORHOVERTEXT}
-                            _locktext.screenx = _entity.screenx - ((_locktext.screenw - Tic.SPRITESIZE) // 2)
-                            _locktext.screeny = _entity.screeny + Tic.SPRITESIZE
-                            _locktext:draw()
-
-                            if Tic.MOUSE.clickrg then
-                                Tic.MOUSE.clickrg = false -- avoid bouncing
-                                Tic:mouseDelay()
-                                
-                                if _locking then -- unspot
-                                    _playeractual:spotEntity()
-                                    _playeractual.spottinglock = false
-                                else -- spot
-                                    _playeractual:spotEntity(_entity)
-                                    _playeractual.spottinglock = true
+                                    if _locking then -- unspot
+                                        _playeractual:spotEntity()
+                                        _playeractual.spottinglock = false
+                                    else -- spot
+                                        _playeractual:spotEntity(_entity)
+                                        _playeractual.spottinglock = true
+                                    end
                                 end
                             end
                         end
