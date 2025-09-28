@@ -678,6 +678,12 @@ function CButtonSlot:drawBorder()
     self.screenh = self.screenh + 2
     CButtonSlot.super.drawBorder(self)
     self:load()
+
+    local _object = nil
+    if self.getslotobject then _object = self:getslotobject() end
+    if _object and _object.colortype then
+        rect(self.screenx - 1, self.screeny - 1, 2, 2, _object.colortype)
+    end
 end
 
 function CButtonSlot:drawGround()
@@ -685,9 +691,7 @@ function CButtonSlot:drawGround()
     rect(self.screenx, self.screeny, self.screenw, self.screenh, _colorground)
 
     local _object = nil
-    if self.getslotobject then
-       _object = self:getslotobject()
-    end
+    if self.getslotobject then _object = self:getslotobject() end
 
     local _groundsprite = self.groundsprite
     local _entitydirx = (self.entity and self.entity.dirx) and self.entity.dirx or Tic.DIRXLF

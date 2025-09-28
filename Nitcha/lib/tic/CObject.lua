@@ -132,6 +132,7 @@ function CObjectPhy:new(_argt)
     self.kind = Classic.KINDOBJECTPHY
     self.name = Classic.NAMEOBJECTPHY
     self.inventorytype = CInventoryPhy
+    self.colortype     = Tic.COLORPHYEQ
     self:argt(_argt) -- override if any
 end
 
@@ -191,6 +192,7 @@ function CObjectMen:new(_argt)
     self.kind = Classic.KINDOBJECTMEN
     self.name = Classic.NAMEOBJECTMEN
     self.inventorytype = CInventoryMen
+    self.colortype     = Tic.COLORMENEQ
     self:argt(_argt) -- override if any
 end
 
@@ -261,6 +263,7 @@ function CObjectPsy:new(_argt)
     self.kind = Classic.KINDOBJECTPSY
     self.name = Classic.NAMEOBJECTPSY
     self.inventorytype = CInventoryPsy
+    self.colortype     = Tic.COLORPSYEQ
     self:argt(_argt) -- override if any
 end
 

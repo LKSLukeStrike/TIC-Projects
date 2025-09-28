@@ -542,6 +542,12 @@ function CWindowSpottingPortrait:new(_argt)
     self:argt(_argt) -- override if any
 end
 
+function CWindowSpottingPortrait:drawFrames()
+    CWindowSpottingPortrait.super.drawFrames(self)
+    if self.entity and self.entity.colortype then
+        rect(self.screenx - 3, self.screeny - 3, 4, 4, self.entity.colortype)
+    end
+end
 
 --
 -- CWindowWorld
