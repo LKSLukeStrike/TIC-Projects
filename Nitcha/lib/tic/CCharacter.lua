@@ -1022,7 +1022,7 @@ function CCharacter:drawInteractTo()
 end
 
 function CCharacter:drawInteractBy()
-    if self:hasInteractBy() then Tic:logAppend(self.name, "by") end
+    Tic:logAppend(self.name, "by", Tables:size(self.interactby))
 end
 
 function CCharacter:canInteract()

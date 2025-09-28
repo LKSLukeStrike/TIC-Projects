@@ -99,27 +99,35 @@ end
 function CEntity:interacttoAppend(_entity) -- append an entity interactto
     if not _entity then return end -- mandatory
     if not _entity:hasInteractions() then return end -- no interaction possible
-    self.interactto = _entity
-    _entity:interactbyAppend(self)
+    if not (self.interactto == _entity) then -- change interactto
+        self:interacttoDelete()
+        self.interactto = _entity
+        _entity:interactbyInsert(self)
+    end
 end
 
 function CEntity:interacttoDelete() -- delete an entity interactto
-    if self.interactto then self.interactto:interactbyDelete(self) end
-    self.interactto = nil
+    if self.interactto then
+        self.interactto:interactbyRemove(self)
+        self.interactto = nil
+    end
 end
 
-function CEntity:interactbyAppend(_entity) -- append an entity interactby
+function CEntity:interactbyInsert(_entity) -- append an entity interactby
     if not _entity then return end -- mandatory
     if not self:hasInteractions() then return end -- no interaction possible
-    Tables:keyAppend(self.interactby, _entity)
+    Tables:valInsert(self.interactby, _entity, Tables.ONE)
 end
 
-function CEntity:interactbyDelete(_entity) -- delete an entity interactby
+function CEntity:interactbyRemove(_entity) -- remove an entity interactby
     if not _entity then return end -- mandatory
-    Tables:keyDelete(self.interactby, _entity)
+    Tables:valRemove(self.interactby, _entity, Tables.ALL)
 end
 
-function CEntity:interactbyDeleteAll() -- delete all entities interactby
+function CEntity:interactbyRemoveAll() -- remove all entities interactby
+    for _, _entity in ipairs(self.interactby) do
+        _entity.intetactto = nil
+    end
     self.interactby = {}
 end
 

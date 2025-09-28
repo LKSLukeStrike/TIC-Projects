@@ -12,6 +12,8 @@ local Nums    = require("lib/lks/Nums")
 -- Tables
 --
 local Tables = {}
+Tables.ONE = true
+Tables.ALL = false
 
 
 -- Size
@@ -121,9 +123,9 @@ function Tables:keyRemoveNAt(_table, _n, _at) -- remove N elements at key positi
     end
 end
 
-function Tables:valInsert(_table, _val, _once, _key) -- insert a val entry (ipaired tables) -- once of any (avoid doublons)
+function Tables:valInsert(_table, _val, _one, _key) -- insert a val entry (ipaired tables) -- once of any (avoid doublons)
     if not _table or not _val then return end -- mandatory
-    if _once and Tables:valFind(_table, _val) then return end -- avoid doublons
+    if _one and Tables:valFind(_table, _val) then return end -- avoid doublons
     if _key then
         table.insert(_table, _key, _val) -- at _key
     else
@@ -131,12 +133,12 @@ function Tables:valInsert(_table, _val, _once, _key) -- insert a val entry (ipai
     end
 end
 
-function Tables:valRemove(_table, _val, _once) -- remove a val entry (ipaired tables) -- only once (first) if any, else all
+function Tables:valRemove(_table, _val, _one) -- remove a val entry (ipaired tables) -- only once (first) if any, else all
     if not _table or not _val then return end -- mandatory
     local _key = Tables:valFind(_table, _val)
     while _key do
         Tables:keyRemove(_table, _key)
-        if _once then
+        if _one then
             _key = nil
         else
             _key = Tables:valFind(_table, _val)
@@ -190,10 +192,10 @@ function Tables:clone(_table) -- clone a dic table -- SORTED -- only first level
     return _result
 end
 
-function Tables:iclone(_table, _once) -- clone a seq table -- unique vals if any
+function Tables:iclone(_table, _one) -- clone a seq table -- unique vals if any
     local _result = {}
     for _, _val in ipairs(_table or {}) do
-        Tables:valInsert(_result, _val, _once)
+        Tables:valInsert(_result, _val, _one)
     end
     return _result
 end
@@ -205,10 +207,10 @@ function Tables:merge(_tablea, _tableb) -- merge two dic tables -- do not alter 
     return _result
 end
 
-function Tables:imerge(_tablea, _tableb, _once) -- merge two seq tables -- unique vals if any
-    local _result = Tables:iclone(_tablea, _once)
+function Tables:imerge(_tablea, _tableb, _one) -- merge two seq tables -- unique vals if any
+    local _result = Tables:iclone(_tablea, _one)
     for _, _val in ipairs(_tableb or {}) do
-        Tables:valInsert(_result, _val, _once)
+        Tables:valInsert(_result, _val, _one)
     end
     return _result
 end
