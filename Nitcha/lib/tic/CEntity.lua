@@ -100,9 +100,11 @@ function CEntity:interacttoAppend(_entity) -- append an entity interactto
     if not _entity then return end -- mandatory
     if not _entity:hasInteractions() then return end -- no interaction possible
     self.interactto = _entity
+    _entity:interactbyAppend(self)
 end
 
 function CEntity:interacttoDelete() -- delete an entity interactto
+    if self.interactto then self.interactto:interactbyDelete(self) end
     self.interactto = nil
 end
 

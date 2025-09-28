@@ -687,7 +687,8 @@ function CCharacter:draw() -- set animations and draw layers
     self:drawView()
     self:drawMind()
     self:drawMove()
-    self:drawInteract()
+    self:drawInteractTo()
+    self:drawInteractBy()
     Tic.LOGSPRITE = false
 end
 
@@ -994,7 +995,7 @@ function CCharacter:handlesOffsets()
     return _result
 end
 
-function CCharacter:drawInteract()
+function CCharacter:drawInteractTo()
     if not self:canInteract() then return end -- dont draw
     local _posture         = self:postureGet()
     local _posturesettings = Tic.POSTURESETTINGS[_posture]
@@ -1018,6 +1019,10 @@ function CCharacter:drawInteract()
     _musprite.flip    = self.dirx
     _musprite.palette = {[Tic.COLORGREYD] = Tic.COLORKEY}
     _musprite:draw()
+end
+
+function CCharacter:drawInteractBy()
+    if self:hasInteractBy() then Tic:logAppend(self.name, "by") end
 end
 
 function CCharacter:canInteract()

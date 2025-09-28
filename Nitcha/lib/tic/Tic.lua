@@ -2756,7 +2756,6 @@ function Tic:draw()
     Tic.inputsDo()
 
     Tic:screenDraw()
-    Tic:logAppend(Tic:screenActual())
 
     if false then
     -- WeaponMelee:draw()
