@@ -997,12 +997,30 @@ end
 
 function CCharacter:drawInteractTo()
     if not self:canInteract() then return end -- dont draw
+    self:drawInteractToBy(true)
+end
+
+function CCharacter:drawInteractBy()
+    if not self:hasInteractBy() then return end -- dont draw
+    local _entities = ""
+    for _, _entity in ipairs(self.interactby) do
+        _entities = _entities.._entity.name.." "
+    end
+    Tic:logAppend(self.name, "by", Tables:size(self.interactby), _entities)
+    self:drawInteractToBy(false)
+end
+
+function CCharacter:drawInteractToBy(_toby) -- true = to, false = by -- FIXME use constants ?
+    if not self:canInteract() then return end -- dont draw
     local _posture         = self:postureGet()
     local _posturesettings = Tic.POSTURESETTINGS[_posture]
     local _headoffsetx     = _posturesettings.headoffsetx
     _headoffsetx           = (self.dirx == Tic.DIRXLF)
         and _headoffsetx - 3
         or  _headoffsetx + 3
+    _headoffsetx           = (_toby)
+        and _headoffsetx
+        or  0 - _headoffsetx
     local _headoffsety     = _posturesettings.headoffsety - Tic.SPRITESIZE + 1
     _headoffsety           = (_posturesettings.headusesize)
         and _headoffsety + self.size
@@ -1016,27 +1034,40 @@ function CCharacter:drawInteractTo()
     _musprite.offsetx = _headoffsetx * self.scale
     _musprite.offsety = _headoffsety * self.scale
     _musprite.scale   = self.scale
-    _musprite.flip    = self.dirx
-    _musprite.palette = {[Tic.COLORGREYD] = Tic.COLORKEY}
+    _musprite.flip    = (_toby)
+        and self.dirx
+        or  Nums:toggle01(self.dirx)
+    _musprite.palette = (_toby)
+        and {[Tic.COLORGREYD] = Tic.COLORKEY}
+        or  {[Tic.COLORGREYD] = Tic.COLORKEY, [Tic.COLORWHITE] = Tic.COLORGREYL}
     _musprite:draw()
 end
 
-function CCharacter:drawInteractBy()
-    Tic:logAppend(self.name, "by", Tables:size(self.interactby))
-end
-
 function CCharacter:canInteract()
-    if not (self == Tic:playerActual()) then return false end -- cannot interact
+    -- if not (self == Tic:playerActual()) then return false end -- cannot interact
     if self:postureGet() == Tic.POSTUREFLOOR then return false end -- cannot interact
     if not self:hasInteractTo() then return false end -- cannot interact
     local _interactto   = self.interactto
     local _interactions = _interactto.interactions
-    if Tables:size(_interactions) == 0 then return false end -- cannot interact
+    -- if Tables:size(_interactions) == 0 then return false end -- cannot interact
     for _, _interaction in ipairs(_interactions) do
         if _interaction.interactiflf and _interaction:interactiflf(self, _interactto) then return true end
         if _interaction.interactifrg and _interaction:interactifrg(self, _interactto) then return true end
     end
     return false
+end
+
+function CCharacter:adjustInteract()
+    local _entityspotting = self:entitySpotting()
+    if  _entityspotting
+    and not (_entityspotting == Tic.playerActual())
+    and _entityspotting:hasInteractions()
+    and self:regionWorld():directionRegion(_entityspotting:regionWorld()) == Tic.DIRHIT
+    then
+        self:interacttoAppend(_entityspotting)
+    else
+        self:interacttoDelete()
+    end
 end
 
 function CCharacter:doSayMessage(_argt)

@@ -577,30 +577,30 @@ function CWindowWorld:drawInside() -- window world content
 end
 
 function CWindowWorld:drawPlayerActual()
-    local _playeractual     = Tic:playerActual()
+    local _playeractual          = Tic:playerActual()
     if not _playeractual then return end
     local _playerlocationsaround = _playeractual:locationsAround()
     local _playerregionviewworld = _playeractual:regionViewWorld()
     local _playerregionmindworld = _playeractual:regionMindWorld()
     local _playernearestentity   = _playeractual:nearestEntityViewWorld() -- nearest entity if any -- except itself
-    local _playerentityspotting  = _playeractual:entitySpotting()
 
     _playeractual:hoverEntity() -- unhover
 
-    if not _playerentityspotting -- spot the nearest entity if nothing else spotted
-    or not _playeractual:isSpottingLock()
+    if not _playeractual:isSpottingLock() -- spot the nearest entity if not spotting lock -- FIXME something weird here
+    or not _playeractual:entitySpotting() -- or nothing is spotted
     then
         _playeractual:spotEntity(_playernearestentity)
     end
 
-    if  _playerentityspotting -- interact
-    and _playerentityspotting:hasInteractions()
-    and _playeractual:regionWorld():directionRegion(_playerentityspotting:regionWorld()) == Tic.DIRHIT
-    then
-        _playeractual:interacttoAppend(_playerentityspotting)
-    else
-        _playeractual:interacttoDelete()
-    end
+    _playeractual:adjustInteract()
+    -- if  _playeractual:entitySpotting() -- interact
+    -- and _playeractual:entitySpotting():hasInteractions()
+    -- and _playeractual:regionWorld():directionRegion(_playeractual:entitySpotting():regionWorld()) == Tic.DIRHIT
+    -- then
+    --     _playeractual:interacttoAppend(_playeractual:entitySpotting())
+    -- else
+    --     _playeractual:interacttoDelete()
+    -- end
     
     for _, _keyy in pairs(Tables:keys(_playerlocationsaround)) do -- draw entities -- sorted by y first
         for _, _keyx in pairs(Tables:keys(_playerlocationsaround[_keyy])) do -- sorted by x next
@@ -610,7 +610,7 @@ function CWindowWorld:drawPlayerActual()
                 _entity.hovered = false -- unhover all entities
 
                 _entity.spotted = (_playeractual:isSpottingSpot() -- unspot all entities except spotting one if any
-                and _entity == _playerentityspotting)
+                and _entity == _playeractual:entitySpotting())
                     and true
                     or  false
 
@@ -620,6 +620,8 @@ function CWindowWorld:drawPlayerActual()
                 else -- not in view
                     _entity.drawfade = true
                 end
+
+                if _entity.adjustInteract then _entity:adjustInteract() end -- adjust interactions
 
                 if (_playerregionviewworld:hasInsideRegion(_entityregionworld)) -- draw entity ?
                 or (_playerregionmindworld:hasInsideRegion(_entityregionworld))
