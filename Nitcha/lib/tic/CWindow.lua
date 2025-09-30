@@ -592,15 +592,8 @@ function CWindowWorld:drawPlayerActual()
         _playeractual:spotEntity(_playernearestentity)
     end
 
+    _playeractual:interactbyRemoveAll()
     _playeractual:adjustInteract()
-    -- if  _playeractual:entitySpotting() -- interact
-    -- and _playeractual:entitySpotting():hasInteractions()
-    -- and _playeractual:regionWorld():directionRegion(_playeractual:entitySpotting():regionWorld()) == Tic.DIRHIT
-    -- then
-    --     _playeractual:interacttoAppend(_playeractual:entitySpotting())
-    -- else
-    --     _playeractual:interacttoDelete()
-    -- end
     
     for _, _keyy in pairs(Tables:keys(_playerlocationsaround)) do -- draw entities -- sorted by y first
         for _, _keyx in pairs(Tables:keys(_playerlocationsaround[_keyy])) do -- sorted by x next
@@ -620,8 +613,6 @@ function CWindowWorld:drawPlayerActual()
                 else -- not in view
                     _entity.drawfade = true
                 end
-
-                if _entity.adjustInteract then _entity:adjustInteract() end -- adjust interactions
 
                 if (_playerregionviewworld:hasInsideRegion(_entityregionworld)) -- draw entity ?
                 or (_playerregionmindworld:hasInsideRegion(_entityregionworld))

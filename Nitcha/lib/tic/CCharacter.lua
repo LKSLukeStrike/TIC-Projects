@@ -996,22 +996,16 @@ function CCharacter:handlesOffsets()
 end
 
 function CCharacter:drawInteractTo()
-    if not self:canInteract() then return end -- dont draw
+    if not self:hasInteractTo() then return end -- dont draw
     self:drawInteractToBy(true)
 end
 
 function CCharacter:drawInteractBy()
     if not self:hasInteractBy() then return end -- dont draw
-    local _entities = ""
-    for _, _entity in ipairs(self.interactby) do
-        _entities = _entities.._entity.name.." "
-    end
-    Tic:logAppend(self.name, "by", Tables:size(self.interactby), _entities)
     self:drawInteractToBy(false)
 end
 
 function CCharacter:drawInteractToBy(_toby) -- true = to, false = by -- FIXME use constants ?
-    if not self:canInteract() then return end -- dont draw
     local _posture         = self:postureGet()
     local _posturesettings = Tic.POSTURESETTINGS[_posture]
     local _headoffsetx     = _posturesettings.headoffsetx
@@ -1025,7 +1019,6 @@ function CCharacter:drawInteractToBy(_toby) -- true = to, false = by -- FIXME us
     _headoffsety           = (_posturesettings.headusesize)
         and _headoffsety + self.size
         or  _headoffsety
-
 
     local _musprite = CSpriteFG() -- multi usage unique sprite
     _musprite.sprite  = CSpriteBG.SIGNINTMRK -- apply the corresponding attributes
@@ -1059,14 +1052,15 @@ end
 
 function CCharacter:adjustInteract()
     local _entityspotting = self:entitySpotting()
+    self:interacttoDelete()
     if  _entityspotting
-    and not (_entityspotting == Tic.playerActual())
+    -- and not (_entityspotting == Tic.playerActual())
     and _entityspotting:hasInteractions()
     and self:regionWorld():directionRegion(_entityspotting:regionWorld()) == Tic.DIRHIT
     then
         self:interacttoAppend(_entityspotting)
-    else
-        self:interacttoDelete()
+    -- else
+    --     self:interacttoDelete()
     end
 end
 

@@ -126,7 +126,7 @@ end
 
 function CEntity:interactbyRemoveAll() -- remove all entities interactby
     for _, _entity in ipairs(self.interactby) do
-        _entity.intetactto = nil
+        _entity.interactto = nil
     end
     self.interactby = {}
 end
