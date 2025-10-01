@@ -238,10 +238,6 @@ function CCharacter:new(_argt)
     self.statphyact   = self.statphymax -- act stats -- 0-max
     self.statmenact   = self.statmenmax
     self.statpsyact   = self.statpsymax
-    self.drawdirs     = false -- draw behaviour
-    self.drawview     = false
-    self.drawmind     = false
-    self.drawmove     = false
     self.slots        = { -- character objects slots
                          exists = true, -- to check if already implemented
                          head = CSlotHead{},
@@ -787,51 +783,28 @@ function CCharacter:drawDirs() -- draw the directions and ranges around the char
 end
 
 function CCharacter:drawView() -- draw the view of a character
-    if self.portraitmode then return end -- not in portrait mode
-    if Tic.PLAYERONLY and not (self == Tic:playerActual()) then return end -- only actual player
-    self.drawview = Tic.VIEWDRAW -- use Tic as master
-    if not self.drawview then return end -- nothing to draw
-
-    local _drawcolor = Tic.COLORGREENL
-    local _regionviewscreen = self:regionViewScreen()
-    local _screenlf  = _regionviewscreen.lf
-    local _screenrg  = _regionviewscreen.rg
-    local _screenup  = _regionviewscreen.up
-    local _screendw  = _regionviewscreen.dw
-
-    rectb(_screenlf, _screenup, _screenrg - _screenlf, _screendw - _screenup, _drawcolor)
+    self:drawViewMindMove(Tic.DRAWVIEW, Tic.COLORGREENL, self:regionViewScreen())
 end
 
 function CCharacter:drawMind() -- draw the mind of a character
-    if self.portraitmode then return end -- not in portrait mode
-    if Tic.PLAYERONLY and not (self == Tic:playerActual()) then return end -- only actual player
-    self.drawmind = Tic.MINDDRAW -- use Tic as master
-    if not self.drawmind then return end -- nothing to draw
-
-    local _drawcolor = Tic.COLORGREENM
-    local _regionmindscreen = self:regionMindScreen()
-    local _screenlf  = _regionmindscreen.lf
-    local _screenrg  = _regionmindscreen.rg
-    local _screenup  = _regionmindscreen.up
-    local _screendw  = _regionmindscreen.dw
-
-    rectb(_screenlf, _screenup, _screenrg - _screenlf, _screendw - _screenup, _drawcolor)
+    self:drawViewMindMove(Tic.DRAWMIND, Tic.COLORGREENM, self:regionMindScreen())
 end
 
 function CCharacter:drawMove() -- draw the move of a character
+    self:drawViewMindMove(Tic.DRAWMOVE, Tic.COLORGREEND, self:regionMoveScreen())
+end
+
+function CCharacter:drawViewMindMove(_ticdrawmode, _drawcolor, _regionscreen) -- draw a specific region around player
     if self.portraitmode then return end -- not in portrait mode
+    if not _ticdrawmode  then return end -- nothing to draw
     if Tic.PLAYERONLY and not (self == Tic:playerActual()) then return end -- only actual player
-    self.drawmove = Tic.MOVEDRAW -- use Tic as master
-    if not self.drawmove then return end -- nothing to draw
 
-    local _drawcolor = Tic.COLORGREEND
-    local _regionmovescreen = self:regionMoveScreen()
-    local _screenlf  = _regionmovescreen.lf
-    local _screenrg  = _regionmovescreen.rg
-    local _screenup  = _regionmovescreen.up
-    local _screendw  = _regionmovescreen.dw
+    local _regionscreenlf  = _regionscreen.lf
+    local _regionscreenrg  = _regionscreen.rg
+    local _regionscreenup  = _regionscreen.up
+    local _regionscreendw  = _regionscreen.dw
 
-    rectb(_screenlf, _screenup, _screenrg - _screenlf, _screendw - _screenup, _drawcolor)
+    rectb(_regionscreenlf, _regionscreenup, _regionscreenrg - _regionscreenlf, _regionscreendw - _regionscreenup, _drawcolor)
 end
 
 function CCharacter:drawEffect()

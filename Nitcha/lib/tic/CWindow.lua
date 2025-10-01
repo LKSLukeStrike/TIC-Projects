@@ -303,8 +303,6 @@ function CWindowPortraitDrawable:drawInside() -- window portrait content for -- 
     self.entity:save()
     self.entity.screenx      = 0 -- force entity attributes
     self.entity.screeny      = 0
-    self.entity.drawdirs     = false -- dont draw dirs in portrait window
-    self.entity.drawview     = false -- dont draw view in portrait window
     self.entity.interactto   = nil   -- dont draw interactto in portrait window
     self.entity.interactby   = {}    -- dont draw interactby in portrait window
     self.entity.spotted      = false -- dont draw spotted frame in portrait window

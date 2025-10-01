@@ -1361,26 +1361,26 @@ end
 
 
 -- View System -- toggle view display
-Tic.VIEWDRAW = false
+Tic.DRAWVIEW = false
 
 function Tic:viewToggleDraw()
-	Tic.VIEWDRAW = Nums:toggleTF(Tic.VIEWDRAW)
+	Tic.DRAWVIEW = Nums:toggleTF(Tic.DRAWVIEW)
 end
 
 
 -- Mind System -- toggle mind display
-Tic.MINDDRAW = false
+Tic.DRAWMIND = false
 
 function Tic:mindToggleDraw()
-	Tic.MINDDRAW = Nums:toggleTF(Tic.MINDDRAW)
+	Tic.DRAWMIND = Nums:toggleTF(Tic.DRAWMIND)
 end
 
 
 -- Move System -- toggle move display
-Tic.MOVEDRAW = false
+Tic.DRAWMOVE = false
 
 function Tic:moveToggleDraw()
-	Tic.MOVEDRAW = Nums:toggleTF(Tic.MOVEDRAW)
+	Tic.DRAWMOVE = Nums:toggleTF(Tic.DRAWMOVE)
 end
 
 
@@ -2747,8 +2747,8 @@ end
 
 -- Tic.HITBOXDRAW  = true
 -- Tic.BORDERSDRAW = true
--- Tic.VIEWDRAW    = true
--- Tic.MOVEDRAW    = true
+-- Tic.DRAWVIEW    = true
+-- Tic.DRAWMOVE    = true
 
 
 --
