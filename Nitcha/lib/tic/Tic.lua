@@ -2435,7 +2435,7 @@ end -- men
 --
 if true then
 if false then
-Wolfie = _playerclass{classed = _playerclass,
+W1lfie = _playerclass{classed = _playerclass,
     name = "W1lfie",
     size = Tic.SIZES,
     statphyact = 10,
@@ -2455,8 +2455,8 @@ Wolfie = _playerclass{classed = _playerclass,
     }},
 }
 end
-if false then
-Wulfie = _playerclass{classed = _playerclass,
+if true then
+W2lfie = _playerclass{classed = _playerclass,
     name = "W2lfie",
     size = Tic.SIZEM,
     statphyact = 10,
@@ -2477,7 +2477,7 @@ Wulfie = _playerclass{classed = _playerclass,
 }
 end
 if true then
-Wylfie = _playerclass{classed = _playerclass,
+W3lfie = _playerclass{classed = _playerclass,
     name = "W3lfie",
     size = Tic.SIZEL,
     statphyact = 10,

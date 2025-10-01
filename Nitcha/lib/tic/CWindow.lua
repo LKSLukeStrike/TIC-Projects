@@ -315,6 +315,7 @@ function CWindowPortraitDrawable:drawInside() -- window portrait content for -- 
         self.entity.frame      = CSprite.FRAME00
         self.entity.animations = {}
     end
+    
     CSprite:boardClear()
     CSprite:modeSpriteBoard()
     self.entity:draw()
@@ -325,8 +326,6 @@ function CWindowPortraitDrawable:drawInside() -- window portrait content for -- 
         screenx    = self.screenx,
         screeny    = self.screeny,
         scale      = Tic.SCALE02,
-        -- flip       = self.entity.dirx
-        -- directives = self:directivesSrc(),
     }
     _musprite:draw()
 

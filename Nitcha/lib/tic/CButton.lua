@@ -200,10 +200,11 @@ function CButtonSprite:new(_argt)
     CButtonSprite.super.new(self, _argt)
 	self.sprite = CSpriteBG{}
     self.drawborder = false
+    self.drawground = false
     self:argt(_argt) -- override if any
 end
 
-function CButtonSprite:drawGround()
+function CButtonSprite:drawInside()
     local _palette = {[self.colorground] = self.colorground, [self.colorborder] = self.colorborder}
     _palette = (self.hovered)
         and {[self.colorground] = self.colorhover, [self.colorborder] = self.colorborder}
@@ -233,11 +234,6 @@ CButtonClick = CButtonSprite:extend() -- generic click button
 -- CButtonArrow
 --
 CButtonArrow = CButtonClick:extend() -- generic arrow click button
-function CButtonArrow:new(_argt)
-    CButtonArrow.super.new(self, _argt)
-    self.drawborder    = false
-    self:argt(_argt) -- override if any
-end
 
 
 --
@@ -380,7 +376,7 @@ function CButtonCheck:new(_argt)
     self:argt(_argt) -- override if any
 end
 
-function CButtonCheck:drawGround()
+function CButtonCheck:drawInside()
     local _palette = {[self.colorground] = self.colorground, [self.colorborder] = self.colorborder}
     _palette = (self.checked)
         and {[self.colorground] = self.colorground, [self.colorborder] = self.colorgroundactived}
@@ -504,7 +500,7 @@ function CButtonPlayerStat:new(_argt)
     self:argt(_argt) -- override if any
 end
 
-function CButtonPlayerStat:drawGround()
+function CButtonPlayerStat:drawInside()
     if self.getcolorstat then
        self.sprite.palette = Tables:merge(self.sprite.palette, {[Tic.COLORWHITE] = self:getcolorstat()})
     end
@@ -558,6 +554,7 @@ function CButtonInteractions:new(_argt)
     self.sprite.sprite  = CSpriteBG.SIGNINTMRK
     self.sprite.palette = IButton.PALETTEKEY
     self.behaviour      = IButtonInteractions.BEHAVIOUR
+    self.drawground     = false
     self:argt(_argt) -- override if any
 end
 
@@ -593,7 +590,7 @@ function CButtonSlot:new(_argt)
     self.behaviour           = IButtonSlot.BEHAVIOUR
     self.getslotobject       = nil -- getslotobject function if any
     self.drawborder          = true
-    self.colorground         = Tic.COLORBIOMENIGHT
+    self.colorground         = Tic.COLORRED --Tic.COLORBIOMENIGHT
     self.colorborder         = self.colorframe1
     self.colorborderdisabled = self.colorframe2
     self.rounded             = true
@@ -616,9 +613,8 @@ function CButtonSlot:drawBorder()
     end
 end
 
-function CButtonSlot:drawGround()
-    local _colorground = (self.hovered) and self.colorhover or self.colorground
-    rect(self.screenx, self.screeny, self.screenw, self.screenh, _colorground)
+function CButtonSlot:drawInside()
+    CButtonSlot.super.drawGround(self)
 
     local _object = nil
     if self.getslotobject then _object = self:getslotobject() end
@@ -706,19 +702,27 @@ end
 CButtonPlayerPick = CButtonSlot:extend() -- generic player pick button
 function CButtonPlayerPick:new(_argt)
     CButtonPlayerPick.super.new(self, _argt)
-	self.sprite.sprite  = CSpriteFG.SPRITEBOARD
-    -- self.sprite.palette = IButton.PALETTEKEY
 	self.behaviour      = IButtonPlayerChange.BEHAVIOUR  -- function to trigger at first
     self.clicklf        = function() Tic:logAppend(Tic.TEXTPICK) end
     self.hovertextup    = CText{text = Tic.TEXTPICK}
     self:argt(_argt) -- override if any
 end
 
-function CButtonPlayerPick:drawGround()
-    rect(self.screenx, self.screeny, Tic.SPRITESIZE, Tic.SPRITESIZE, self.colorground)
+function CButtonPlayerPick:drawInside()
+    CButtonPlayerPick.super.drawGround(self)
+
+    CSprite:boardClear()
     CSprite:modeSpriteBoard()
     Tic:playerActual():draw()
-    local _musprite = CSpriteBoard{}
+
+    CSprite:modeBoardScreen()
+    local _musprite = CSpriteBoard{
+        screenx    = self.screenx,
+        screeny    = self.screeny,
+    }
+    _musprite:draw()
+
+    CSprite:modeSpriteScreen()
 
     CSprite:modeSpriteScreen()
 end
@@ -1034,7 +1038,9 @@ IButtonSpottingMove.BEHAVIOUR = function(self)
     self.actived     = false
     if _direction == self.direction then
         self.enabled = true
-        self.actived = true
+        if not self.hovered then
+            self.actived = true
+        end
     end
 end
 
@@ -1126,7 +1132,9 @@ IButtonPlayerMove = Classic:extend() -- player move buttons implementation
 IButtonPlayerMove.BEHAVIOUR = function(self)
     IButtonPlayer.BEHAVIOUR(self)
     if not self.display then return end -- no move
-    self.actived     = Tic:playerActual().direction == self.direction
+    if not self.hovered then
+        self.actived     = Tic:playerActual().direction == self.direction
+    end
     self.hovertextup = CText{text = Tic.TEXTMOVE}
 end
 
@@ -1276,6 +1284,7 @@ function CButtonMessageTrash:new(_argt)
     self.kind = Classic.KINDBUTTONMESSAGETRASH
     self.name = Classic.NAMEBUTTONMESSAGETRASH
     self.drawborder     = false
+    self.drawground     = false
 	self.sprite.sprite  = CSpriteBG.SIGNDELETE
     self.sprite.palette = IButton.PALETTEKEY
 	self.behaviour      = IButtonMessage.BEHAVIOUR  -- function to trigger at first
