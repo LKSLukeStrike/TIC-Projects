@@ -590,7 +590,10 @@ function CButtonSlot:new(_argt)
     self.behaviour           = IButtonSlot.BEHAVIOUR
     self.getslotobject       = nil -- getslotobject function if any
     self.drawborder          = true
-    self.colorground         = Tic.COLORRED --Tic.COLORBIOMENIGHT
+    self.drawground          = true
+    self.colorground         = Tic.COLORBIOMENIGHT
+    -- self.colorhover          = Tic.COLORGREYL
+    -- self.colorgroundactived  = Tic.COLORGREYM
     self.colorborder         = self.colorframe1
     self.colorborderdisabled = self.colorframe2
     self.rounded             = true
@@ -613,9 +616,14 @@ function CButtonSlot:drawBorder()
     end
 end
 
-function CButtonSlot:drawInside()
-    CButtonSlot.super.drawGround(self)
+function CButtonSlot:drawGround()
+    local _colorground = self.colorground -- FIXME use self colors
+    _colorground = (self.hovered) and Tic.COLORGREYL or _colorground
+    _colorground = (self.actived) and Tic.COLORGREYM or _colorground
+    rect(self.screenx, self.screeny, self.screenw, self.screenh, _colorground)
+end
 
+function CButtonSlot:drawInside()
     local _object = nil
     if self.getslotobject then _object = self:getslotobject() end
 
@@ -634,7 +642,7 @@ function CButtonSlot:drawInside()
         _groundsprite.screeny = self.screeny
         _groundsprite.flip    = _entitydirx
         _groundsprite.palette = (self.enabled)
-            and _groundsprite.palette
+            and Tables:merge(_groundsprite.palette, {[Tic.COLORGREYD] = Tic.COLORKEY})
             or  Tables:merge(_groundsprite.palette, IButtonSlot.PALETTEDISABLED)
         _groundsprite:draw()
         _groundsprite:load()
@@ -709,11 +717,13 @@ function CButtonPlayerPick:new(_argt)
 end
 
 function CButtonPlayerPick:drawInside()
-    CButtonPlayerPick.super.drawGround(self)
-
+    local _playeractual = Tic.playerActual()
     CSprite:boardClear()
     CSprite:modeSpriteBoard()
-    Tic:playerActual():draw()
+    _playeractual:save()
+    _playeractual.portraitmode = true
+    _playeractual:draw()
+    _playeractual:load()
 
     CSprite:modeBoardScreen()
     local _musprite = CSpriteBoard{

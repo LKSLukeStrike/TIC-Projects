@@ -309,13 +309,13 @@ function CWindowPortraitDrawable:drawInside() -- window portrait content for -- 
     self.entity.interactby   = {}    -- dont draw interactby in portrait window
     self.entity.spotted      = false -- dont draw spotted frame in portrait window
     self.entity.hovered      = false -- dont draw hovered frame in portrait window
-    self.entity.cyclemode    = false -- dont cycle in portrait window
+    self.entity.portraitmode = true -- dont cycle in portrait window
     if self.idle then
         self.entity.dirx       = Tic.DIRXLF
         self.entity.frame      = CSprite.FRAME00
         self.entity.animations = {}
     end
-    
+
     CSprite:boardClear()
     CSprite:modeSpriteBoard()
     self.entity:draw()

@@ -19,7 +19,7 @@ function CEntityDrawable:new(_argt)
     self.dirx         = Nums:random01() -- random flip lf/rg
     self.scale        = Tic.SCALE01
     self.rotate       = Tic.ROTATE000
-    self.cyclemode    = true -- false to avoid to cycle in portraits etc
+    self.portraitmode = false -- true to avoid to cycle in portraits etc
     self.animations   = nil -- override if any
     self.hovered      = false -- use hovered to draw a border
     self.spotted      = false -- use spotted to draw a border

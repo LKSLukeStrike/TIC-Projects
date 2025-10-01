@@ -1353,10 +1353,10 @@ end
 
 
 -- Dirs System -- toggle dirs display
-Tic.DIRSDRAW = false
+Tic.DRAWDIRS = false
 
 function Tic:dirsToggleDraw()
-	Tic.DIRSDRAW = Nums:toggleTF(Tic.DIRSDRAW)
+	Tic.DRAWDIRS = Nums:toggleTF(Tic.DRAWDIRS)
 end
 
 

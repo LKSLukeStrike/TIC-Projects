@@ -693,7 +693,7 @@ function CCharacter:draw() -- set animations and draw layers
 end
 
 function CCharacter:cycle() -- cycle the cyclers
-    if not self.cyclemode then return end -- no cycling in portraits etc
+    if self.portraitmode then return end -- no cycling in portraits etc
     self:cycleMove()
     self:cycleWork()
     self:cycleIdle()
@@ -738,9 +738,10 @@ function CCharacter:cycleIdle() -- animate idle after a delay
 end
 
 function CCharacter:drawDirs() -- draw the directions and ranges around the character -- FIXME why actual player ???
+    if self.portraitmode then return end -- not in portrait mode
+    if not Tic.DRAWDIRS  then return end -- nothing to draw
     if Tic.PLAYERONLY and not (self == Tic:playerActual()) then return end -- only actual player
-    self.drawdirs = Tic.DIRSDRAW -- use Tic as master
-    if not self.drawdirs then return end -- nothing to draw
+
     local _drawcolor = Tic.COLORWHITE
     local _screenx   = Tic.WORLDWX + Tic.WORLDWW2 - (Tic:playerActual().worldx - self.worldx) - 1 --relative to actual player -- feet
     local _screeny   = Tic.WORLDWY + Tic.WORLDWH2 - (Tic:playerActual().worldy - self.worldy) + 2
@@ -786,6 +787,7 @@ function CCharacter:drawDirs() -- draw the directions and ranges around the char
 end
 
 function CCharacter:drawView() -- draw the view of a character
+    if self.portraitmode then return end -- not in portrait mode
     if Tic.PLAYERONLY and not (self == Tic:playerActual()) then return end -- only actual player
     self.drawview = Tic.VIEWDRAW -- use Tic as master
     if not self.drawview then return end -- nothing to draw
@@ -801,6 +803,7 @@ function CCharacter:drawView() -- draw the view of a character
 end
 
 function CCharacter:drawMind() -- draw the mind of a character
+    if self.portraitmode then return end -- not in portrait mode
     if Tic.PLAYERONLY and not (self == Tic:playerActual()) then return end -- only actual player
     self.drawmind = Tic.MINDDRAW -- use Tic as master
     if not self.drawmind then return end -- nothing to draw
@@ -816,6 +819,7 @@ function CCharacter:drawMind() -- draw the mind of a character
 end
 
 function CCharacter:drawMove() -- draw the move of a character
+    if self.portraitmode then return end -- not in portrait mode
     if Tic.PLAYERONLY and not (self == Tic:playerActual()) then return end -- only actual player
     self.drawmove = Tic.MOVEDRAW -- use Tic as master
     if not self.drawmove then return end -- nothing to draw
