@@ -1766,7 +1766,7 @@ ScreenWorldLF:elementsDistributeH(
     {ButtonPlayerPrev, ButtonPlayerPick, ButtonPlayerNext},
     WindowPlayerInfos.screenx + (
         (WindowPlayerInfos.screenw - CScreen:elementsTotalW({ButtonPlayerPrev, ButtonPlayerPick, ButtonPlayerNext})) // 2),
-    WindowPlayerInfos.screeny - Tic.SPRITESIZE + 1
+    WindowPlayerInfos.screeny - Tic.SPRITESIZE - 1
 )
 
 WindowPlayerPortrait = CWindowPlayerPortrait{}
@@ -2291,6 +2291,7 @@ if true then
 --
 -- phy
 --
+if false then
 if true then
 Walfie = _playerclass{classed = _playerclass,
     name = "Walfie",
@@ -2312,6 +2313,7 @@ Walfie = _playerclass{classed = _playerclass,
     }},
 }
 end
+
 if true then
 Welfie = _playerclass{classed = _playerclass,
     name = "Welfie",
@@ -2333,6 +2335,7 @@ Welfie = _playerclass{classed = _playerclass,
     }},
 }
 end
+
 if true then
 Wilfie = _playerclass{classed = _playerclass,
     name = "Wilfie",
@@ -2356,10 +2359,12 @@ Wilfie = _playerclass{classed = _playerclass,
     }},
 }
 end
+end -- phy
+
 --
 -- men
 --
-if true then
+if false then
 if true then
 Wolfie = _playerclass{classed = _playerclass,
     name = "Wolfie",
@@ -2423,12 +2428,13 @@ Wylfie = _playerclass{classed = _playerclass,
     }},
 }
 end
-end
+end -- men
+
 --
 -- psy
 --
 if true then
-if true then
+if false then
 Wolfie = _playerclass{classed = _playerclass,
     name = "W1lfie",
     size = Tic.SIZES,
@@ -2449,7 +2455,7 @@ Wolfie = _playerclass{classed = _playerclass,
     }},
 }
 end
-if true then
+if false then
 Wulfie = _playerclass{classed = _playerclass,
     name = "W2lfie",
     size = Tic.SIZEM,
@@ -2491,7 +2497,7 @@ Wylfie = _playerclass{classed = _playerclass,
     }},
 }
 end
-end
+end -- psy
 end
 -- exit()
 

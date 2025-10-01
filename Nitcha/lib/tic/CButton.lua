@@ -403,76 +403,6 @@ end
 
 
 --
--- IButtonPlayer
---
-IButtonPlayer = Classic:extend() -- players buttons implementation
-IButtonPlayer.BEHAVIOUR = function(self) -- need at least one player
-    IButton.BEHAVIOUR(self) -- enabled if at least one function
-    self.entity  = Tic:playerActual()
-    self.display = (self.entity)
-end
-
-
---
--- IButtonPlayerChange -- player change buttons implementation
---
-IButtonPlayerChange = Classic:extend() -- generic change player button
-IButtonPlayerChange.BEHAVIOUR = function(self) -- need at least more than one player
-    IButtonPlayer.BEHAVIOUR(self)
-    if not self.display then return end -- no player
-    self.enabled = Tables:size(Tic:playerPlayers()) > 1
-end
-
-
---
--- CButtonPlayerPrev
---
-CButtonPlayerPrev = CButtonArrow270:extend() -- generic player prev button
-function CButtonPlayerPrev:new(_argt)
-    CButtonPlayerPrev.super.new(self, _argt)
-    self.sprite.palette = IButton.PALETTEKEY
-	self.behaviour      = IButtonPlayerChange.BEHAVIOUR  -- function to trigger at first
-    self.clicklf        = Tic.FUNCTIONPLAYERPREV
-    self.hovertextup    = CText{text = Tic.TEXTPREV}
-    self.clickrg        = Tic.FUNCTIONPLAYERMIN
-    self.hovertextdw    = CText{text = Tic.TEXTFST}
-    self:argt(_argt) -- override if any
-end
-
-
---
--- CButtonPlayerNext
---
-CButtonPlayerNext = CButtonArrow090:extend() -- generic player next button
-function CButtonPlayerNext:new(_argt)
-    CButtonPlayerNext.super.new(self, _argt)
-    self.sprite.palette = IButton.PALETTEKEY
-	self.behaviour      = IButtonPlayerChange.BEHAVIOUR  -- function to trigger at first
-    self.clicklf        = Tic.FUNCTIONPLAYERNEXT
-    self.hovertextup    = CText{text = Tic.TEXTNEXT}
-    self.clickrg        = Tic.FUNCTIONPLAYERMAX
-    self.hovertextdw    = CText{text = Tic.TEXTLST}
-    self:argt(_argt) -- override if any
-end
-
-
---
--- CButtonPlayerPick
---
-CButtonPlayerPick = CButtonClick:extend() -- generic player pick button
-function CButtonPlayerPick:new(_argt)
-    CButtonPlayerPick.super.new(self, _argt)
-    self.drawborder     = false
-	self.sprite.sprite  = CSpriteBG.SIGNPLAYER
-    self.sprite.palette = IButton.PALETTEKEY
-	self.behaviour      = IButtonPlayerChange.BEHAVIOUR  -- function to trigger at first
-    self.clicklf        = function() Tic:logAppend(Tic.TEXTPICK) end
-    self.hovertextup    = CText{text = Tic.TEXTPICK}
-    self:argt(_argt) -- override if any
-end
-
-
---
 -- CButtonPlayerStand
 --
 CButtonPlayerStand = CButtonCheck:extend() -- generic player stand button
@@ -713,6 +643,84 @@ function CButtonSlot:drawGround()
         _groundsprite:draw()
         _groundsprite:load()
     end
+end
+
+
+--
+-- IButtonPlayer
+--
+IButtonPlayer = Classic:extend() -- players buttons implementation
+IButtonPlayer.BEHAVIOUR = function(self) -- need at least one player
+    IButton.BEHAVIOUR(self) -- enabled if at least one function
+    self.entity  = Tic:playerActual()
+    self.display = (self.entity)
+end
+
+
+--
+-- IButtonPlayerChange -- player change buttons implementation
+--
+IButtonPlayerChange = Classic:extend() -- generic change player button
+IButtonPlayerChange.BEHAVIOUR = function(self) -- need at least more than one player
+    IButtonPlayer.BEHAVIOUR(self)
+    if not self.display then return end -- no player
+    self.enabled = Tables:size(Tic:playerPlayers()) > 1
+end
+
+
+--
+-- CButtonPlayerPrev
+--
+CButtonPlayerPrev = CButtonArrow270:extend() -- generic player prev button
+function CButtonPlayerPrev:new(_argt)
+    CButtonPlayerPrev.super.new(self, _argt)
+    self.sprite.palette = IButton.PALETTEKEY
+	self.behaviour      = IButtonPlayerChange.BEHAVIOUR  -- function to trigger at first
+    self.clicklf        = Tic.FUNCTIONPLAYERPREV
+    self.hovertextup    = CText{text = Tic.TEXTPREV}
+    self.clickrg        = Tic.FUNCTIONPLAYERMIN
+    self.hovertextdw    = CText{text = Tic.TEXTFST}
+    self:argt(_argt) -- override if any
+end
+
+
+--
+-- CButtonPlayerNext
+--
+CButtonPlayerNext = CButtonArrow090:extend() -- generic player next button
+function CButtonPlayerNext:new(_argt)
+    CButtonPlayerNext.super.new(self, _argt)
+    self.sprite.palette = IButton.PALETTEKEY
+	self.behaviour      = IButtonPlayerChange.BEHAVIOUR  -- function to trigger at first
+    self.clicklf        = Tic.FUNCTIONPLAYERNEXT
+    self.hovertextup    = CText{text = Tic.TEXTNEXT}
+    self.clickrg        = Tic.FUNCTIONPLAYERMAX
+    self.hovertextdw    = CText{text = Tic.TEXTLST}
+    self:argt(_argt) -- override if any
+end
+
+
+--
+-- CButtonPlayerPick
+--
+CButtonPlayerPick = CButtonSlot:extend() -- generic player pick button
+function CButtonPlayerPick:new(_argt)
+    CButtonPlayerPick.super.new(self, _argt)
+	self.sprite.sprite  = CSpriteFG.SPRITEBOARD
+    -- self.sprite.palette = IButton.PALETTEKEY
+	self.behaviour      = IButtonPlayerChange.BEHAVIOUR  -- function to trigger at first
+    self.clicklf        = function() Tic:logAppend(Tic.TEXTPICK) end
+    self.hovertextup    = CText{text = Tic.TEXTPICK}
+    self:argt(_argt) -- override if any
+end
+
+function CButtonPlayerPick:drawGround()
+    rect(self.screenx, self.screeny, Tic.SPRITESIZE, Tic.SPRITESIZE, self.colorground)
+    CSprite:modeSpriteBoard()
+    Tic:playerActual():draw()
+    local _musprite = CSpriteBoard{}
+
+    CSprite:modeSpriteScreen()
 end
 
 
