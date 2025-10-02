@@ -195,7 +195,6 @@ function CWindowInfos:new(_argt)
 end
 
 function CWindowInfos:drawInside()
-    Tic:logAppend("infos", self.name)
     local _offsety = 0
     for _, _element in ipairs(self.elements) do
         if Classic:thatis(_element, CTextLine) then
@@ -213,6 +212,7 @@ end
 --
 IWindowEntity = Classic:extend() -- entities windows implementation
 IWindowEntity.BEHAVIOUR = function(self)
+    self.elements = {}
     self.drawinside = (self.entity) 
 end
 
@@ -234,7 +234,6 @@ end
 
 function CWindowInfosEntity:drawInside() -- window infos content for entities
     if not self.entity then return end -- nothing to draw
-    Tic:logAppend("entity", self.entity.name)
     local _name = CTextLine{text = self.entity.name, case = Names.CASECAMEL, shadow = true, marginup = 1}
     local _kind = CTextLine{text = self.entity.kind, case = Names.CASECAMEL, shadow = true, marginup = 2}
     self.elements = {_name, _kind}
@@ -307,39 +306,17 @@ end
 function CWindowPortraitDrawable:drawInside() -- window portrait content for -- [!] drawable entities
     if not self.entity then return end -- nothing to draw
 
-    local _tichitboxdraw     = Tic.HITBOXDRAW
-    Tic.HITBOXDRAW           = false -- FIXME remove tic master at one point
+    local _ticdrawhitbox     = Tic.DRAWHITBOX
+    Tic.DRAWHITBOX           = false -- FIXME remove tic master at one point
 
-    self.entity:save()
-    self.entity.screenx      = 0 -- force entity attributes
-    self.entity.screeny      = 0
-    -- self.entity.interactto   = nil   -- dont draw interactto in portrait window
-    -- self.entity.interactby   = {}    -- dont draw interactby in portrait window
-    -- self.entity.spotted      = false -- dont draw spotted frame in portrait window
-    self.entity.hovered      = false -- dont draw hovered frame in portrait window
-    self.entity.portraitmode = true -- dont cycle in portrait window
-    if self.idle then
-        self.entity.dirx       = Tic.DIRXLF
-        self.entity.frame      = CSprite.FRAME00
-        self.entity.animations = {}
-    end
+    self.entity:drawPortrait({
+            screenx    = self.screenx,
+            screeny    = self.screeny,
+            scale      = Tic.SCALE02,
+        }
+    )
 
-    CSprite:boardClear()
-    CSprite:modeSpriteBoard()
-    self.entity:draw()
-    self.entity:load()
-
-    CSprite:modeBoardScreen()
-    local _musprite = CSpriteBoard{
-        screenx    = self.screenx,
-        screeny    = self.screeny,
-        scale      = Tic.SCALE02,
-    }
-    _musprite:draw()
-
-    CSprite:modeSpriteScreen()
-
-    Tic.HITBOXDRAW = _tichitboxdraw
+    Tic.DRAWHITBOX = _ticdrawhitbox
 end
 
 
@@ -507,7 +484,6 @@ IWindowPlayer = Classic:extend() -- players windows implementation
 IWindowPlayer.BEHAVIOUR = function(self)
     self.entity = Tic:playerActual()
     IWindowEntity.BEHAVIOUR(self)
-    Tic:logAppend("IWindowPlayer", self.drawinside)
 end
 
 
@@ -518,7 +494,6 @@ IWindowSpotting = Classic:extend() -- spotting windows implementation
 IWindowSpotting.BEHAVIOUR = function(self)
     self.entity = Tic:spottingActual()
     IWindowEntity.BEHAVIOUR(self)
-    Tic:logAppend("IWindowSpotting", self.drawinside)
 end
 
 

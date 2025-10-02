@@ -116,7 +116,7 @@ function CEntityDrawable:drawBorders() -- draw borders if any
 end
 
 function CEntityDrawable:drawHitbox() -- draw hitbox if any
-    self.drawhitbox = Tic.HITBOXDRAW -- use Tic as master
+    self.drawhitbox = Tic.DRAWHITBOX -- use Tic as master
     if not self.drawhitbox or not self.hitbox then return end -- nothing to draw
     self.hitbox:draw()
 end
@@ -196,4 +196,30 @@ end
 function CEntityDrawable:hitboxRegionWorld() -- hitbox in world -- depends on dirx
 	if not self.hitbox then return end -- mandatory
 	return self.hitbox:regionAdjusted():offsetXY(self.worldx, self.worldy)
+end
+
+function CEntityDrawable:drawPortrait(_argt, _idle) -- draw entity to board then back to screen -- limit the drawing to sprite size
+    CSprite:boardClear()
+    CSprite:modeSpriteBoard()
+
+    self:save()
+    self.interactto   = nil   -- dont draw interactto in portrait window
+    self.interactby   = {}    -- dont draw interactby in portrait window
+    self.spotted      = false -- dont draw spotted frame in portrait window
+    self.hovered      = false -- dont draw hovered frame in portrait window
+    self.portraitmode = true  -- dont cycle in portrait window
+    if _idle then
+        self.dirx       = Tic.DIRXLF
+        self.frame      = CSprite.FRAME00
+        self.animations = {}
+    end
+    self:draw()
+    self:load()
+
+    CSprite:modeBoardScreen()
+    local _musprite = CSpriteBoard{}
+    _musprite:argt(_argt)
+    _musprite:draw()
+
+    CSprite:modeSpriteScreen()
 end

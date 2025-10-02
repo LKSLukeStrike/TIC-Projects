@@ -718,22 +718,11 @@ function CButtonPlayerPick:new(_argt)
 end
 
 function CButtonPlayerPick:drawInside()
-    local _playeractual = Tic.playerActual()
-    CSprite:boardClear()
-    CSprite:modeSpriteBoard()
-    _playeractual:save()
-    _playeractual.portraitmode = true
-    _playeractual:draw()
-    _playeractual:load()
-
-    CSprite:modeBoardScreen()
-    local _musprite = CSpriteBoard{
-        screenx    = self.screenx,
-        screeny    = self.screeny,
-    }
-    _musprite:draw()
-
-    CSprite:modeSpriteScreen()
+    Tic.playerActual():drawPortrait({
+            screenx    = self.screenx,
+            screeny    = self.screeny,
+        }
+    )
 end
 
 

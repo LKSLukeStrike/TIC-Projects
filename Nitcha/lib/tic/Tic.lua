@@ -1213,10 +1213,10 @@ end
 
 
 -- Hitbox System -- toggle hitbox display
-Tic.HITBOXDRAW = false
+Tic.DRAWHITBOX = false
 
 function Tic:hitboxToggleDraw()
-	Tic.HITBOXDRAW = Nums:toggleTF(Tic.HITBOXDRAW)
+	Tic.DRAWHITBOX = Nums:toggleTF(Tic.DRAWHITBOX)
 end
 
 
@@ -2483,6 +2483,7 @@ W3lfie = _playerclass{classed = _playerclass,
     statphyact = 10,
     statmenact = 10,
     statpsyact = 10,
+    dirx = Tic.DIRXRG,
     -- colorextra = Tic.COLORGREENL,
     worldx = 40,
     worldy = 20,
@@ -2632,7 +2633,7 @@ Region = CRegion{
 -- Places -- TESTING
 --
 if false then
-Tic.HITBOXDRAW = false
+Tic.DRAWHITBOX = false
 for _, _cplace in pairs({
     -- CPlaceTree0Anim,
     CPlaceTree0Idle,
@@ -2745,7 +2746,7 @@ CPlaceRoad0Idle{worldx = 10, worldy = -40}
 CPlaceRoad1Idle{worldx = 14, worldy = -40}
 end
 
--- Tic.HITBOXDRAW  = true
+-- Tic.DRAWHITBOX  = true
 -- Tic.DRAWBORDERS = true
 -- Tic.DRAWVIEW    = true
 -- Tic.DRAWMOVE    = true
