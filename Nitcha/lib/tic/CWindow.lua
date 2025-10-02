@@ -195,6 +195,7 @@ function CWindowInfos:new(_argt)
 end
 
 function CWindowInfos:drawInside()
+    Tic:logAppend("infos", self.name)
     local _offsety = 0
     for _, _element in ipairs(self.elements) do
         if Classic:thatis(_element, CTextLine) then
@@ -220,8 +221,12 @@ end
 -- CWindowInfosEntity
 --
 CWindowInfosEntity = CWindowInfos:extend() -- window infos for entities
+Classic.KINDWINDOWINFOSENTITY = "WindowInfosEntity"
+Classic.NAMEWINDOWINFOSENTITY = "WindowInfosEntity"
 function CWindowInfosEntity:new(_argt)
     CWindowInfosEntity.super.new(self, _argt)
+    self.kind = Classic.KINDWINDOWINFOSENTITY
+    self.name = Classic.NAMEWINDOWINFOSENTITY
     self.align  = Tic.DIR000
 	self.entity = nil -- override
     self:argt(_argt) -- override if any
@@ -229,6 +234,7 @@ end
 
 function CWindowInfosEntity:drawInside() -- window infos content for entities
     if not self.entity then return end -- nothing to draw
+    Tic:logAppend("entity", self.entity.name)
     local _name = CTextLine{text = self.entity.name, case = Names.CASECAMEL, shadow = true, marginup = 1}
     local _kind = CTextLine{text = self.entity.kind, case = Names.CASECAMEL, shadow = true, marginup = 2}
     self.elements = {_name, _kind}
@@ -250,8 +256,12 @@ end
 -- CWindowPlayerInfos
 --
 CWindowPlayerInfos = CWindowInfosEntity:extend() -- window infos for player
+Classic.KINDWINDOWPLAYERINFOS = "WindowPlayerInfos"
+Classic.NAMEWINDOWPLAYERINFOS = "WindowPlayerInfos"
 function CWindowPlayerInfos:new(_argt)
     CWindowPlayerInfos.super.new(self, _argt)
+    self.kind = Classic.KINDWINDOWPLAYERINFOS
+    self.name = Classic.NAMEWINDOWPLAYERINFOS
     self.screenx   = Tic.PLAYERINFOSWX
     self.screeny   = Tic.PLAYERINFOSWY
     self.screenw   = Tic.PLAYERINFOSWW
@@ -303,9 +313,9 @@ function CWindowPortraitDrawable:drawInside() -- window portrait content for -- 
     self.entity:save()
     self.entity.screenx      = 0 -- force entity attributes
     self.entity.screeny      = 0
-    self.entity.interactto   = nil   -- dont draw interactto in portrait window
-    self.entity.interactby   = {}    -- dont draw interactby in portrait window
-    self.entity.spotted      = false -- dont draw spotted frame in portrait window
+    -- self.entity.interactto   = nil   -- dont draw interactto in portrait window
+    -- self.entity.interactby   = {}    -- dont draw interactby in portrait window
+    -- self.entity.spotted      = false -- dont draw spotted frame in portrait window
     self.entity.hovered      = false -- dont draw hovered frame in portrait window
     self.entity.portraitmode = true -- dont cycle in portrait window
     if self.idle then
@@ -465,8 +475,12 @@ end
 -- CWindowPlayerState
 --
 CWindowPlayerState = CWindowInfos:extend() -- window state for player
+Classic.KINDWINDOWPLAYERSTATE = "WindowPlayerState"
+Classic.NAMEWINDOWPLAYERSTATE = "WindowPlayerState"
 function CWindowPlayerState:new(_argt)
     CWindowPlayerState.super.new(self, _argt)
+    self.kind = Classic.KINDWINDOWPLAYERSTATE
+    self.name = Classic.NAMEWINDOWPLAYERSTATE
     self.screenx   = Tic.PLAYERSTATEWX
     self.screeny   = Tic.PLAYERSTATEWY
     self.screenw   = Tic.PLAYERSTATEWW
@@ -493,6 +507,7 @@ IWindowPlayer = Classic:extend() -- players windows implementation
 IWindowPlayer.BEHAVIOUR = function(self)
     self.entity = Tic:playerActual()
     IWindowEntity.BEHAVIOUR(self)
+    Tic:logAppend("IWindowPlayer", self.drawinside)
 end
 
 
@@ -503,6 +518,7 @@ IWindowSpotting = Classic:extend() -- spotting windows implementation
 IWindowSpotting.BEHAVIOUR = function(self)
     self.entity = Tic:spottingActual()
     IWindowEntity.BEHAVIOUR(self)
+    Tic:logAppend("IWindowSpotting", self.drawinside)
 end
 
 
@@ -676,8 +692,12 @@ end
 -- CWindowInfosWorld
 --
 CWindowInfosWorld = CWindowInfos:extend() -- window infos for world
+Classic.KINDWINDOWINFOSWORLD = "WindowInfosWorld"
+Classic.NAMEWINDOWINFOSWORLD = "WindowInfosWorld"
 function CWindowInfosWorld:new(_argt)
     CWindowInfosWorld.super.new(self, _argt)
+    self.kind = Classic.KINDWINDOWINFOSWORLD
+    self.name = Classic.NAMEWINDOWINFOSWORLD
     self.screenx    = Tic.WORLDINFOSWX
     self.screeny    = Tic.WORLDINFOSWY
 	self.screenw    = Tic.WORLDINFOSWW

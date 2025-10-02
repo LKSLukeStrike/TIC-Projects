@@ -710,6 +710,7 @@ end
 CButtonPlayerPick = CButtonSlot:extend() -- generic player pick button
 function CButtonPlayerPick:new(_argt)
     CButtonPlayerPick.super.new(self, _argt)
+    self.classic        = CButtonPlayerPick
 	self.behaviour      = IButtonPlayerChange.BEHAVIOUR  -- function to trigger at first
     self.clicklf        = function() Tic:logAppend(Tic.TEXTPICK) end
     self.hovertextup    = CText{text = Tic.TEXTPICK}
@@ -731,8 +732,6 @@ function CButtonPlayerPick:drawInside()
         screeny    = self.screeny,
     }
     _musprite:draw()
-
-    CSprite:modeSpriteScreen()
 
     CSprite:modeSpriteScreen()
 end

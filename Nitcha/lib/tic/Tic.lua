@@ -1345,10 +1345,10 @@ end
 
 
 -- Borders System -- toggle borders display
-Tic.BORDERSDRAW = false
+Tic.DRAWBORDERS = false
 
 function Tic:bordersToggleDraw()
-	Tic.BORDERSDRAW = Nums:toggleTF(Tic.BORDERSDRAW)
+	Tic.DRAWBORDERS = Nums:toggleTF(Tic.DRAWBORDERS)
 end
 
 
@@ -2434,7 +2434,7 @@ end -- men
 -- psy
 --
 if true then
-if false then
+if true then
 W1lfie = _playerclass{classed = _playerclass,
     name = "W1lfie",
     size = Tic.SIZES,
@@ -2746,7 +2746,7 @@ CPlaceRoad1Idle{worldx = 14, worldy = -40}
 end
 
 -- Tic.HITBOXDRAW  = true
--- Tic.BORDERSDRAW = true
+-- Tic.DRAWBORDERS = true
 -- Tic.DRAWVIEW    = true
 -- Tic.DRAWMOVE    = true
 

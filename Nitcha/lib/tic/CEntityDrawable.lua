@@ -102,7 +102,7 @@ function CEntityDrawable:drawHovered() -- draw hovered if any
 end
 
 function CEntityDrawable:drawBorders() -- draw borders if any
-    self.drawborders = Tic.BORDERSDRAW -- use Tic as master
+    self.drawborders = Tic.DRAWBORDERS -- use Tic as master
     if not self.drawborders then return end -- nothing to draw
     local _musprite = CSpriteBG() -- multi usage unique sprite
     _musprite.sprite  = CSpriteBG.SIGNBORDSQ
