@@ -620,7 +620,7 @@ function CWindowWorld:drawPlayerActual()
 
                                 local _playerfind = Tic:playerFind(_entity)
                                 if _playerfind then
-                                    local _picktext = CText{text = Tic.TEXTPICK, colorinside = Tic.COLORHOVERTEXT}
+                                    local _picktext = CText{text = Tic.TEXTPICK, colorinside = Tic.COLORHOVERTEXTUP}
                                     _picktext.screenx = _entity.screenx - ((_picktext.screenw - Tic.SPRITESIZE) // 2)
                                     _picktext.screeny = _entity.screeny - _picktext.screenh
                                     _picktext:draw()
@@ -635,8 +635,8 @@ function CWindowWorld:drawPlayerActual()
 
                                 local _locking  = (_playeractual.spottinglock and _playeractual.spotting == _entity) -- already locking ?
                                 local _locktext = (_locking)
-                                    and CText{text = Tic.TEXTUNLOCK, colorinside = Tic.COLORHOVERTEXT}
-                                    or  CText{text = Tic.TEXTLOCK, colorinside = Tic.COLORHOVERTEXT}
+                                    and CText{text = Tic.TEXTUNLOCK, colorinside = Tic.COLORHOVERTEXTUP}
+                                    or  CText{text = Tic.TEXTLOCK, colorinside = Tic.COLORHOVERTEXTUP}
                                 _locktext.screenx = _entity.screenx - ((_locktext.screenw - Tic.SPRITESIZE) // 2)
                                 _locktext.screeny = _entity.screeny + Tic.SPRITESIZE
                                 _locktext:draw()
@@ -788,7 +788,7 @@ function CWindowMessagesWorld:new(_argt)
             self.buttonnext.hovered = true
             Tables:eachDo(_elements, function(_, _element) _element.actived = true end)
             _showTextLFRG()
-            self.colorborder = Tic.COLORHOVERTEXT
+            self.colorborder = Tic.COLORHOVERTEXTUP
         end
 
         local _messageactual = Tic:messageActual()

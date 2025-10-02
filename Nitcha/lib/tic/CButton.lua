@@ -35,7 +35,7 @@ function CButton:new(_argt)
     self.colorhover          = Tic.COLORHUDSCREEN
     self.colorgrounddisabled = Tic.COLORGREYL
     self.colorborderdisabled = Tic.COLORGREYM
-    self.colorgroundactived  = Tic.COLORHOVERTEXT
+    self.colorgroundactived  = Tic.COLORHOVERTEXTUP
     self.colorhoverground    = Tic.COLORBIOMENIGHT
     self:argt(_argt) -- override if any
 end
@@ -712,13 +712,19 @@ function CButtonPlayerPick:new(_argt)
     CButtonPlayerPick.super.new(self, _argt)
     self.classic        = CButtonPlayerPick
 	self.behaviour      = IButtonPlayerChange.BEHAVIOUR  -- function to trigger at first
-    self.clicklf        = function() Tic:logAppend(Tic.TEXTPICK) end
-    self.hovertextup    = CText{text = Tic.TEXTPICK}
+    self.clicklf        = function() self:menuPick() end
+    self.hovertextup    = CText{colorinside = Tic.COLORRED, text = Tic.TEXTPICK}
+    self.hovertextrg    = CText{}
+    self.getslotobject  = function() return Tic:playerActual() end
+    self.behaviour      = function(self)
+                            self.hovertextrg.text = self:getslotobject().name.." "..self:getslotobject().kind
+                            self.hovertextrg.colorground = Tic.COLORRED
+                          end
     self:argt(_argt) -- override if any
 end
 
 function CButtonPlayerPick:drawInside()
-    Tic.playerActual():drawPortrait({
+    self:getslotobject():drawPortrait({
             screenx    = self.screenx,
             screeny    = self.screeny,
         }
