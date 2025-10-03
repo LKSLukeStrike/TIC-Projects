@@ -2295,7 +2295,7 @@ if true then
 --
 -- phy
 --
-if false then
+if true then
 if true then
 Walfie = _playerclass{classed = _playerclass,
     name = "Walfie",
@@ -2353,9 +2353,9 @@ Wilfie = _playerclass{classed = _playerclass,
     -- spottingspot = true,
     spottingpick = true,
     ["slots.handrg"] = CSlotHandRG{object = CWeaponSword{}},
-    -- ["slots.handlf"] = CSlotHandLF{object = CWeaponShieldLarge{}},
+    ["slots.handlf"] = CSlotHandLF{object = CWeaponShieldLarge{}},
     ["slots.head"]   = CSlotHead{object = CClothesHelmetLarge{}},
-    -- ["slots.back"]   = CSlotBack{object = CClothesBackPackLarge{}},
+    ["slots.back"]   = CSlotBack{object = CClothesBackPackLarge{}},
     ["inventories.any"] = CInventoryAny{objects = {
         CObjectBombLarge{used = CObject.USEDNONE},
         CWeaponHammer{},
@@ -2368,7 +2368,7 @@ end -- phy
 --
 -- men
 --
-if false then
+if true then
 if true then
 Wolfie = _playerclass{classed = _playerclass,
     name = "Wolfie",
