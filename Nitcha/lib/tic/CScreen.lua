@@ -12,7 +12,6 @@ function CScreen:new(_argt)
     self.drawground  = false  -- draw beheviors
     self.drawguides  = false
     self.drawinside  = false
-    self.drawcaches  = false
     self.drawborder  = false
     self.drawframes  = false
     self:argt(_argt) -- override if any

@@ -75,10 +75,8 @@ function CElement:new(_argt)
     self.drawground  = true  -- draw beheviors
     self.drawguides  = true
     self.drawinside  = true
-    self.drawcaches  = true
     self.drawborder  = true
     self.drawframes  = true
-    self.cachestick  = Tic.SPRITESIZE     -- caches thickness
     self.colorground = Tic.COLORHUDSCREEN -- colors
     self.colorguides = Tic.COLORGREYM
     self.colorinside = Tic.COLORGREYM
@@ -103,7 +101,6 @@ function CElement:draw() -- element drawing
     if self.drawground then self:drawGround() end
     if self.drawguides then self:drawGuides() end
     if self.drawinside then self:drawInside() end
-    if self.drawcaches then self:drawCaches() end
     if self.drawborder then self:drawBorder() end
     if self.drawframes then self:drawFrames() end
     Tic:keyboardAppendKeysFunctions(self.keysfunctions)
@@ -164,37 +161,6 @@ end
 
 function CElement:drawInside() -- element inside
     -- override
-end
-
-function CElement:drawCaches() -- element caches
-    rect( -- lf cache
-		self.screenx - self.cachestick,
-		self.screeny,
-        self.cachestick,
-		self.screenh,
-        self.colorcaches
-    )
-    rect( -- rg cache
-		self.screenx + self.screenw,
-		self.screeny,
-        self.cachestick,
-		self.screenh,
-        self.colorcaches
-    )
-    rect( -- up cache
-		self.screenx - self.cachestick,
-		self.screeny - self.cachestick,
-        self.screenw + (self.cachestick * 2),
-		self.cachestick,
-        self.colorcaches
-    )
-    rect( -- dw cache
-		self.screenx - self.cachestick,
-		self.screeny + self.screenh,
-        self.screenw + (self.cachestick * 2),
-		self.cachestick,
-        self.colorcaches
-    )
 end
 
 function CElement:drawBorder() -- element single border

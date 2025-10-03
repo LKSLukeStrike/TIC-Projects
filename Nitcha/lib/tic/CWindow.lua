@@ -24,7 +24,6 @@ function CWindowScreen:new(_argt)
     CWindowScreen.super.new(self, _argt)
     self.kind = Classic.KINDWINDOWSCREEN
     self.name = Classic.NAMEWINDOWSCREEN
-    self.drawcaches = false
     self.drawframes = false
     self:argt(_argt) -- override if any
 end
@@ -188,7 +187,6 @@ function CWindowInfos:new(_argt)
     CWindowInfos.super.new(self, _argt)
     self.kind = Classic.KINDWINDOWINFOS
     self.name = Classic.NAMEWINDOWINFOS
-    self.drawcaches  = false
     self.drawborder  = false
     self.colorground = Tic.COLORBIOMENIGHT
     self:argt(_argt) -- override if any
@@ -281,8 +279,6 @@ function CWindowPortrait:new(_argt)
     self.screenh     = Tic.PLAYERPORTRAITWH
     self.colorground = Tic.COLORBIOMENIGHT
     self.drawborder  = false
-    self.cachestick  = Tic.SPRITESIZE * Tic.SCALE02 -- caches thickness
-    self.drawcaches  = false -- HH
     self:argt(_argt) -- override if any
 end
 
@@ -349,7 +345,6 @@ function CWindowStats:new(_argt)
     self.screenh     = Tic.PLAYERSTATSWH
     self.colorground = Tic.COLORBIOMENIGHT
     self.colorborder = Tic.COLORWHITE
-    self.drawcaches  = false
     self.drawborder  = false
     self:argt(_argt) -- override if any
 end
@@ -561,7 +556,9 @@ function CWindowWorld:drawGround() -- window world ground
 end
 
 function CWindowWorld:drawInside() -- window world content
+    clip(self.screenx, self.screeny, self.screenw, self.screenh)
     self:drawPlayerActual()
+    clip()
 end
 
 function CWindowWorld:drawPlayerActual()

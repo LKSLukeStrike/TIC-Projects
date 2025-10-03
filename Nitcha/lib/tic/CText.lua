@@ -14,7 +14,6 @@ function CText:new(_argt)
     self.drawground  = false -- draw beheviors
     self.drawguides  = false
     self.drawinside  = true
-    self.drawcaches  = false
     self.drawborder  = false
     self.drawframes  = false
     self.text        = ""

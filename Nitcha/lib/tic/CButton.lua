@@ -27,7 +27,6 @@ function CButton:new(_argt)
     self.drawground    = true  -- draw beheviors
     self.drawguides    = false
     self.drawinside    = true
-    self.drawcaches    = false
     self.drawborder    = true
     self.drawframes    = false
     self.colorground         = Tic.COLORWHITE -- colors
