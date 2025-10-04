@@ -675,6 +675,7 @@ function CCharacter:draw() -- set animations and draw layers
     self:drawHead()
     self:drawHandFG()
     self:drawEffect()
+    self:drawParty()
 
     self:drawSpotted()
     self:drawHovered()
@@ -683,6 +684,7 @@ function CCharacter:draw() -- set animations and draw layers
     self:drawView()
     self:drawMind()
     self:drawMove()
+
     self:drawInteractTo()
     self:drawInteractBy()
     Tic.LOGSPRITE = false
@@ -824,6 +826,17 @@ function CCharacter:drawEffect()
     _musprite.flip    = self.dirx
     _musprite.scale   = self.scale
     _musprite.palette = _palette
+    _musprite:draw()
+end
+
+function CCharacter:drawParty()
+    local _musprite = CSpriteFG() -- multi usage unique sprite
+    _musprite.sprite  = 203
+    _musprite.screenx = self.screenx
+    _musprite.screeny = self.screeny
+    _musprite.flip    = self.dirx
+    _musprite.scale   = self.scale
+    _musprite.frame   = self.frame
     _musprite:draw()
 end
 

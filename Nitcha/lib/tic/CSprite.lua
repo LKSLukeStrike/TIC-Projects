@@ -232,7 +232,7 @@ end
 function CSprite:draw() -- draw a sprite -- direct to screen
     self:paletteApply()
     spr(
-        self.sprite,
+        self.sprite + (self.frame * CSprite.FRAMEOFFSET),
         self.screenx + self.offsetx,
         self.screeny + self.offsety,
         self.colorkeys,
