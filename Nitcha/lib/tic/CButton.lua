@@ -599,6 +599,7 @@ function CButtonSlot:drawGround()
 end
 
 function CButtonSlot:drawInside()
+    clip(self.screenx, self.screeny, self.screenw, self.screenh) -- just to be sure
     local _object = nil
     if self.getslotobject then _object = self:getslotobject() end
 
@@ -622,6 +623,7 @@ function CButtonSlot:drawInside()
         _groundsprite:draw()
         _groundsprite:load()
     end
+    clip()
 end
 
 
@@ -698,11 +700,13 @@ function CButtonPlayerPick:new(_argt)
 end
 
 function CButtonPlayerPick:drawInside()
+    clip(self.screenx, self.screeny, self.screenw, self.screenh)
     self:getslotobject():drawPortrait({
             screenx    = self.screenx,
             screeny    = self.screeny,
         }
     )
+    clip()
 end
 
 function CButtonPlayerPick:menuPick()

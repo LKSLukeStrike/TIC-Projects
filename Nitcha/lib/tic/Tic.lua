@@ -1545,20 +1545,6 @@ function Tic:traceTable(_table, _argt) -- trace a table  -- SORTED -- RECURSIVE 
 end
 
 
--- Palette System -- handle the palette switching
-function Tic:paletteChange(_palette) -- change palette colors if any
-    for _key, _val in pairs(_palette or {}) do
-        poke4(Tic.PALETTEVRAM + _key, _val)
-    end
-end
-
-function Tic:paletteReset() -- reset palette colors
-    for _key = 0, 15 do
-        poke4(Tic.PALETTEVRAM + _key, _key)
-    end
-end
-
-
 -- Board System -- handle the board sprite
 function Tic:boardPixel(_sprite, _x, _y, _color) -- paint a pixel to a board sprite
     if not _sprite then return end -- mandatory
@@ -2481,7 +2467,7 @@ W2lfie = _playerclass{classed = _playerclass,
 }
 end
 if true then
-W3lfie = _playerclass{classed = _playerclass,
+W3lfie = CPlayerMeduz{classed = CPlayerMeduz,
     name = "W3lfie",
     size = Tic.SIZEL,
     statphyact = 10,
@@ -2493,13 +2479,13 @@ W3lfie = _playerclass{classed = _playerclass,
     worldy = 20,
     -- spottingspot = true,
     spottingpick = true,
-    ["slots.handrg"] = CSlotHandRG{object = CWeaponWandLarge{}},
-    ["slots.handlf"] = CSlotHandLF{object = CWeaponRuneLarge{}},
-    ["slots.head"]   = CSlotHead{object = CClothesCapLarge{}},
-    ["slots.back"]   = CSlotBack{object = CClothesScrollCaseLarge{}},
-    ["inventories.any"] = CInventoryAny{objects = {
-        CObjectSpellLarge{used = CObject.USEDNONE},
-    }},
+    -- ["slots.handrg"] = CSlotHandRG{object = CWeaponWandLarge{}},
+    -- ["slots.handlf"] = CSlotHandLF{object = CWeaponRuneLarge{}},
+    -- ["slots.head"]   = CSlotHead{object = CClothesCapLarge{}},
+    -- ["slots.back"]   = CSlotBack{object = CClothesScrollCaseLarge{}},
+    -- ["inventories.any"] = CInventoryAny{objects = {
+    --     CObjectSpellLarge{used = CObject.USEDNONE},
+    -- }},
 }
 end
 end -- psy
@@ -2829,7 +2815,7 @@ function Tic:draw()
     local _timedif = math.floor(_timeend - _timebeg)
     if _timedif < _timemin then _timemin = _timedif end
     if _timedif > _timemax then _timemax = _timedif end
-    Tic:print(195, 0, _timemin.."/".._timedif.."/".._timemax)
+    Tic:print(190, 0, Nums:pad0LF(_timemin, 3).."/"..Nums:pad0LF(_timedif, 3).."/"..Nums:pad0LF(_timemax, 3))
     Tic:logPrint()
 
     Tic:tick() -- [!] required in the draw function

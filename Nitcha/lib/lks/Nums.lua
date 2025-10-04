@@ -18,6 +18,15 @@ Nums.MAXINTEGER = 0 + 2^31 -- due to lua 5.3
 Nums.MININTEGER = 0 - 2^31
 
 
+-- Padding
+function Nums:pad0LF(_num, _size) -- pad with leading 0
+    local _result = "".._num
+    while #_result < _size do
+        _result = "0".._result
+    end
+    return _result
+end
+
 -- Conversions
 function Nums:yes2int(_yes) -- convert a boolean to integer 0|1
     return _yes and 1 or 0

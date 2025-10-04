@@ -256,7 +256,7 @@ function ICharacterHumanoid:drawHead()
         [Tic.COLOREYESBM] = _coloreyesbm,
         [Tic.COLOREYESBD] = _coloreyesbd,
     }
-    _musprite:draw()
+    _musprite:drawDirectives()
 
     -- draw head slot if any
     if not self.slots then return end -- mandatory

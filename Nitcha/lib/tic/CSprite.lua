@@ -206,7 +206,7 @@ function CSprite:drawDstBoard() -- draw a sprite to board
 end
 
 
-function CSprite:draw() -- draw a sprite -- SCREEN -- DEFAULT
+function CSprite:drawDirectives() -- draw a sprite -- from directives
     local _spriteboard = CSprite{ -- FIXME find a way to clone -- in Classic ? here ?
         sprite      = CSprite.SPRITEBOARD,
         name        = self.name,
@@ -229,6 +229,33 @@ function CSprite:draw() -- draw a sprite -- SCREEN -- DEFAULT
     _spriteboard:drawDst()
 end
 
+function CSprite:draw() -- draw a sprite -- direct to screen
+    self:paletteApply()
+    spr(
+        self.sprite,
+        self.screenx + self.offsetx,
+        self.screeny + self.offsety,
+        self.colorkeys,
+        self.scale,
+        self.flip,
+        self.rotate,
+        self.width,
+        self.height
+    )
+    self:paletteReset()
+end
+
+function CSprite:paletteApply() -- apply palette colors
+    for _key, _val in pairs(self.palette or {}) do
+        poke4(Tic.PALETTEVRAM + _key, _val)
+    end
+end
+
+function CSprite:paletteReset() -- reset palette colors
+    for _key = 0, 15 do
+        poke4(Tic.PALETTEVRAM + _key, _key)
+    end
+end
 
 --
 -- CSpriteBG

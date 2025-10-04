@@ -19,6 +19,7 @@ function CEntityDrawable:new(_argt)
     self.dirx         = Nums:random01() -- random flip lf/rg
     self.scale        = Tic.SCALE01
     self.rotate       = Tic.ROTATE000
+    self.idle         = false -- dont move ?
     self.portraitmode = false -- true to avoid to cycle in portraits etc
     self.animations   = nil -- override if any
     self.hovered      = false -- use hovered to draw a border
@@ -198,17 +199,18 @@ function CEntityDrawable:hitboxRegionWorld() -- hitbox in world -- depends on di
 	return self.hitbox:regionAdjusted():offsetXY(self.worldx, self.worldy)
 end
 
-function CEntityDrawable:drawPortrait(_argt, _idle) -- draw entity to board then back to screen -- limit the drawing to sprite size
-    CSprite:boardClear()
-    CSprite:modeSpriteBoard()
+function CEntityDrawable:drawPortrait(_argt) -- draw entity to board then back to screen -- limit the drawing to sprite size
+    -- CSprite:boardClear()
+    -- CSprite:modeSpriteBoard()
 
     self:save()
+    self:argt(_argt)
     self.interactto   = nil   -- dont draw interactto in portrait window
     self.interactby   = {}    -- dont draw interactby in portrait window
     self.spotted      = false -- dont draw spotted frame in portrait window
     self.hovered      = false -- dont draw hovered frame in portrait window
     self.portraitmode = true  -- dont cycle in portrait window
-    if _idle then
+    if self.idle then
         self.dirx       = Tic.DIRXLF
         self.frame      = CSprite.FRAME00
         self.animations = {}
@@ -216,10 +218,10 @@ function CEntityDrawable:drawPortrait(_argt, _idle) -- draw entity to board then
     self:draw()
     self:load()
 
-    CSprite:modeBoardScreen()
-    local _musprite = CSpriteBoard{}
-    _musprite:argt(_argt)
-    _musprite:draw()
+    -- CSprite:modeBoardScreen()
+    -- local _musprite = CSpriteBoard{}
+    -- _musprite:argt(_argt)
+    -- _musprite:draw()
 
-    CSprite:modeSpriteScreen()
+    -- CSprite:modeSpriteScreen()
 end
