@@ -232,9 +232,9 @@ end
 function CSprite:draw() -- draw a sprite -- direct to screen
     self:paletteApply()
     spr(
-        self.sprite + (self.frame * CSprite.FRAMEOFFSET),
-        self.screenx + self.offsetx,
-        self.screeny + self.offsety,
+        self.sprite + (self.frame * self.frameoffset),
+        self.screenx + (self.offsetx * self.scale),
+        self.screeny + (self.offsety * self.scale),
         self.colorkeys,
         self.scale,
         self.flip,
@@ -353,6 +353,7 @@ CSpriteFG.EFFECTEMPTY = CSpriteBG.SIGNEMPTYS
 CSpriteFG.EFFECTSLEEP = CSpriteFG.EFFECTBANK + 0
 CSpriteFG.EFFECTWOUND = CSpriteFG.EFFECTBANK + 1
 CSpriteFG.EFFECTDEATH = CSpriteFG.EFFECTBANK + 2
+CSpriteFG.EFFECTPARTY = CSpriteFG.EFFECTBANK + 3
 CSpriteFG.OBJECTBANK  = 352 -- objects bank
 
 CSpriteFG.OBJPHYBANK  = CSpriteFG.OBJECTBANK + 0 -- phy objects bank

@@ -254,6 +254,7 @@ function CCharacter:new(_argt)
     self.interactions = {
                          CInteractionSayMessage{},
                         }
+    self.party        = nil
     self:argt(_argt) -- override if any
     self.camera       = CCamera{name = self.name.." "..Classic.NAMECAMERA} -- one camera per character
     self:focus() -- focus its camera on itself
@@ -829,14 +830,29 @@ function CCharacter:drawEffect()
     _musprite:draw()
 end
 
+function CCharacter:isParty()
+    return (self.party)
+end
+
 function CCharacter:drawParty()
+    if not self:isParty() then return end -- not a party
+    
+    local _posture = self:postureGet()
+    local _offsety = 1
+    if _posture == Tic.POSTUREFLOOR then
+        _offsety = _offsety + 3
+    else
+        _offsety = _offsety + self.size + self.frame
+    end
+
     local _musprite = CSpriteFG() -- multi usage unique sprite
-    _musprite.sprite  = 203
+    _musprite.sprite  = CSpriteFG.EFFECTPARTY
     _musprite.screenx = self.screenx
     _musprite.screeny = self.screeny
+    _musprite.offsety = _offsety
     _musprite.flip    = self.dirx
     _musprite.scale   = self.scale
-    _musprite.frame   = self.frame
+    _musprite.palette = {[Tic.COLORGREYL] = self.colorhairsfg}
     _musprite:draw()
 end
 
