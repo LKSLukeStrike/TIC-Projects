@@ -184,12 +184,10 @@ function CSprite:drawDstScreen() -- draw a sprite to screen
         self:drawPixel(_directive.boardx, _directive.boardy, _directive.color)
     end
 
-    Tic.LOGSPRITE = false
-    Tic:logSprite("spr  ", self)
     spr(
-        self.sprite,
-        self.screenx + self.offsetx,
-        self.screeny + self.offsety,
+        self.sprite  + (self.frame * self.frameoffset),
+        self.screenx + (self.offsetx * self.scale),
+        self.screeny + (self.offsety * self.scale),
         self.colorkeys,
         self.scale,
         Tic.FLIPNONE,
@@ -197,7 +195,6 @@ function CSprite:drawDstScreen() -- draw a sprite to screen
         self.width,
         self.height
     )
-    Tic.LOGSPRITE = false
 end
 
 function CSprite:drawDstBoard() -- draw a sprite to board
@@ -232,7 +229,7 @@ end
 function CSprite:draw() -- draw a sprite -- direct to screen
     self:paletteApply()
     spr(
-        self.sprite + (self.frame * self.frameoffset),
+        self.sprite  + (self.frame * self.frameoffset),
         self.screenx + (self.offsetx * self.scale),
         self.screeny + (self.offsety * self.scale),
         self.colorkeys,
@@ -265,9 +262,7 @@ Classic.KINDSPRITEBG = "SpriteBG"
 Classic.NAMESPRITEBG = "SpriteBG"
 CSpriteBG.SPRITEBANK  = 0
 CSpriteBG.SIGNBANK1   = 0  -- signs
-CSpriteBG.SIGNEMPTYS  = CSpriteBG.SIGNBANK1 + 00 -- empty sprite
-CSpriteBG.SIGNQSTMRK  = CSpriteBG.SIGNBANK1 + 01 -- question mark
-CSpriteBG.SIGNINTMRK  = CSpriteBG.SIGNBANK1 + 02 -- interact mark
+CSpriteBG.SIGNEMPTYS  = CSpriteBG.SIGNBANK1 + 00 -- empty sprite -- FIXME move sprites
 CSpriteBG.SIGNBORDSQ  = CSpriteBG.SIGNBANK1 + 03 -- borders square
 CSpriteBG.SIGNSPOTSQ  = CSpriteBG.SIGNBANK1 + 04 -- spotting square
 CSpriteBG.SIGNCROSQU  = CSpriteBG.SIGNBANK1 + 05 -- crossed square
@@ -330,9 +325,11 @@ end
 CSpriteFG = CSprite:extend() -- fg sprites aka tic sprites
 Classic.KINDSPRITEFG = "SpriteFG"
 Classic.NAMESPRITEFG = "SpriteFG"
+
 CSpriteFG.SPRITEBANK  = 256
 CSpriteFG.SPRITEBOARD = CSpriteFG.SPRITEBANK + 0 -- board sprite -- for creating a sprite by code
 CSpriteFG.SPRITEPIXEL = CSpriteFG.SPRITEBANK + 1 -- pixel sprite
+
 CSpriteFG.HEADBANK    = 272 -- characters heads
 CSpriteFG.HEADHUMAN   = CSpriteFG.HEADBANK + 0
 CSpriteFG.HEADDWARF   = CSpriteFG.HEADBANK + 1
@@ -344,16 +341,23 @@ CSpriteFG.HEADHORNE   = CSpriteFG.HEADBANK + 6
 CSpriteFG.HEADMEDUZ   = CSpriteFG.HEADBANK + 7
 CSpriteFG.HEADGNOLL   = CSpriteFG.HEADBANK + 8
 CSpriteFG.HEADGHOST   = CSpriteFG.HEADBANK + 9
+
 CSpriteFG.BODYBANK    = 288 -- characters bodies
 CSpriteFG.BODYHUMAN   = CSpriteFG.BODYBANK + 0 -- humanoid bodies
+
 CSpriteFG.EYESBANK    = 320 -- characters eyes
 CSpriteFG.EYESHUMAN   = CSpriteFG.EYESBANK + 0 -- humanoid eyes
+
 CSpriteFG.EFFECTBANK  = 336 -- effects types
 CSpriteFG.EFFECTEMPTY = CSpriteBG.SIGNEMPTYS
 CSpriteFG.EFFECTSLEEP = CSpriteFG.EFFECTBANK + 0
 CSpriteFG.EFFECTWOUND = CSpriteFG.EFFECTBANK + 1
 CSpriteFG.EFFECTDEATH = CSpriteFG.EFFECTBANK + 2
 CSpriteFG.EFFECTPARTY = CSpriteFG.EFFECTBANK + 3
+CSpriteFG.EFFECTINTMK = CSpriteFG.EFFECTBANK + 4 -- interact mark
+CSpriteFG.EFFECTQSTMK = CSpriteFG.EFFECTBANK + 5 -- question mark
+CSpriteFG.EFFECTEXCMK = CSpriteFG.EFFECTBANK + 6 -- exclamation mark
+
 CSpriteFG.OBJECTBANK  = 352 -- objects bank
 
 CSpriteFG.OBJPHYBANK  = CSpriteFG.OBJECTBANK + 0 -- phy objects bank

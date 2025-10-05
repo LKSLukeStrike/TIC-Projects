@@ -835,10 +835,10 @@ function CCharacter:isParty()
 end
 
 function CCharacter:drawParty()
-    if not self:isParty() then return end -- not a party
-    
+    -- if not self:isParty() then return end -- not a party
+
     local _posture = self:postureGet()
-    local _offsety = 1
+    local _offsety = 3
     if _posture == Tic.POSTUREFLOOR then
         _offsety = _offsety + 3
     else
@@ -1021,13 +1021,13 @@ function CCharacter:drawInteractToBy(_toby) -- true = to, false = by -- FIXME us
     _headoffsetx           = (_toby)
         and _headoffsetx
         or  0 - _headoffsetx
-    local _headoffsety     = _posturesettings.headoffsety - Tic.SPRITESIZE + 1
+    local _headoffsety     = _posturesettings.headoffsety - Tic.SPRITESIZE + 2
     _headoffsety           = (_posturesettings.headusesize)
         and _headoffsety + self.size
         or  _headoffsety
 
     local _musprite = CSpriteFG() -- multi usage unique sprite
-    _musprite.sprite  = CSpriteBG.SIGNINTMRK -- apply the corresponding attributes
+    _musprite.sprite  = CSpriteFG.EFFECTINTMK -- apply the corresponding attributes
     _musprite.screenx = self.screenx
     _musprite.screeny = self.screeny
     _musprite.offsetx = _headoffsetx * self.scale
