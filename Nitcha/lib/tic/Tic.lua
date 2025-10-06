@@ -1291,7 +1291,7 @@ function Tic:entityHovering(_character)
 	return _character:entityHovering()
 end
 
-function Tic:spottingActual(_character)
+function Tic:spottingActual(_character) -- entity hovered first else entity spotted
     return (Tic:entityHovering(_character)) and Tic:entityHovering(_character) or Tic:entitySpotting(_character)
 end
 

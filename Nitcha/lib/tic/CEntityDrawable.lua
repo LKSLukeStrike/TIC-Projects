@@ -200,9 +200,6 @@ function CEntityDrawable:hitboxRegionWorld() -- hitbox in world -- depends on di
 end
 
 function CEntityDrawable:drawPortrait(_argt) -- draw entity to board then back to screen -- limit the drawing to sprite size
-    -- CSprite:boardClear()
-    -- CSprite:modeSpriteBoard()
-
     self:save()
     self:argt(_argt)
     self.interactto   = nil   -- dont draw interactto in portrait window
@@ -217,11 +214,9 @@ function CEntityDrawable:drawPortrait(_argt) -- draw entity to board then back t
     end
     self:draw()
     self:load()
-
-    -- CSprite:modeBoardScreen()
-    -- local _musprite = CSpriteBoard{}
-    -- _musprite:argt(_argt)
-    -- _musprite:draw()
-
-    -- CSprite:modeSpriteScreen()
 end
+
+function CEntityDrawable:isHovered() -- check if the mouse hovers the entity
+    return self:regionScreen():hasInsidePoint(Tic:mousePointX(), Tic:mousePointY())
+end
+
