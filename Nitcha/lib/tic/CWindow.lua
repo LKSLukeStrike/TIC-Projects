@@ -588,12 +588,11 @@ function CWindowWorld:drawPlayerActual()
             for _entity, _ in pairs(_playerlocationsaround[_keyy][_keyx]) do -- entities around actual player
                 local _entityregionworld = _entity:regionWorld()
 
-                -- _entity.hovered = true -- unhover all entities
-                if _entity:isHovered() then
-                    _playeractual:hoverEntity(_entity)
-                else
-                    _playeractual:hoverEntity()
-                end
+                _entity.hovered = false -- unhover all entities
+                -- if  not (_entity == _playeractual)
+                -- and _entity:isHovered() then
+                --     _playeractual:hoverEntity(_entity)
+                -- end
 
                 _entity.spotted = (_playeractual:isSpottingSpot() -- unspot all entities except spotting one if any
                 and _entity == _playeractual:entitySpotting())

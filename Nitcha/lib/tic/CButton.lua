@@ -965,7 +965,7 @@ end
 CButtonSlotSpottingHead = CButtonSlotSpotting:extend()
 function CButtonSlotSpottingHead:new(_argt)
     CButtonSlotSpottingHead.super.new(self, _argt)
-    self.getslotobject = function() return Tic:spottingActual().slots.head.object end
+    self.getslotobject = function() return self.entity.slots.head.object end
     self.groundsprite  = IButtonSlot.GROUNDSPRITEHEAD
     self.slottype      = CSlotHead
     self:argt(_argt) -- override if any
@@ -974,7 +974,7 @@ end
 CButtonSlotSpottingBack = CButtonSlotSpotting:extend()
 function CButtonSlotSpottingBack:new(_argt)
     CButtonSlotSpottingBack.super.new(self, _argt)
-    self.getslotobject = function() return Tic:spottingActual().slots.back.object end
+    self.getslotobject = function() return self.entity.slots.back.object end
     self.groundsprite  = IButtonSlot.GROUNDSPRITEBACK
     self.slottype      = CSlotBack
     self:argt(_argt) -- override if any
@@ -983,7 +983,7 @@ end
 CButtonSlotSpottingHandLF = CButtonSlotSpotting:extend()
 function CButtonSlotSpottingHandLF:new(_argt)
     CButtonSlotSpottingHandLF.super.new(self, _argt)
-    self.getslotobject = function() return Tic:spottingActual().slots.handlf.object end
+    self.getslotobject = function() return self.entity.slots.handlf.object end
     self.groundsprite  = IButtonSlot.GROUNDSPRITEHAND
     self.slottype      = CSlotHand
     self:argt(_argt) -- override if any
@@ -992,7 +992,7 @@ end
 CButtonSlotSpottingHandRG = CButtonSlotSpotting:extend()
 function CButtonSlotSpottingHandRG:new(_argt)
     CButtonSlotSpottingHandRG.super.new(self, _argt)
-    self.getslotobject = function() return Tic:spottingActual().slots.handrg.object end
+    self.getslotobject = function() return self.entity.slots.handrg.object end
     self.groundsprite  = IButtonSlot.GROUNDSPRITEHAND
     self.slottype      = CSlotHand
     self:argt(_argt) -- override if any
