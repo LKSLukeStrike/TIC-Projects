@@ -221,8 +221,8 @@ function CCharacter:new(_argt)
     self.spottingpick = false -- pick its spotting
     self.colorhairsfg = Tic.COLORHAIRSFG -- colors
     self.colorhairsbg = Tic.COLORHAIRSBG
-    self.colorextra   = Tic.COLOREXTRA
     self.colorskin    = Tic.COLORSKIN
+    self.colorextra   = self.colorskin --Tic.COLOREXTRA
     self.coloreyesfg  = Tic.COLORGREYL
     self.coloreyesbg  = Tic.COLORGREYM
     self.colorarmor   = Tic.COLORARMOR
@@ -845,6 +845,24 @@ function CCharacter:drawParty()
         _offsety = _offsety + self.size + self.frame
     end
 
+    local _coloreyesfg = Tic.COLORSKIN
+    local _coloreyesbu = Tic.COLORSKIN
+    local _coloreyesbm = Tic.COLORSKIN
+    local _coloreyesbd = Tic.COLORSKIN
+
+    if _posture == Tic.POSTUREFLOOR then
+        _coloreyesbm = self.coloreyesbg
+    else
+        _coloreyesfg = self.coloreyesfg
+        if self.diry == Tic.DIRYUP then -- up
+            _coloreyesbu = self.coloreyesbg
+        elseif self.diry == Tic.DIRYMD then -- md
+            _coloreyesbm = self.coloreyesbg
+        else -- dw
+            _coloreyesbd = self.coloreyesbg
+        end
+    end
+   
     local _musprite = CSpriteFG() -- multi usage unique sprite
     _musprite.sprite  = CSpriteFG.EFFECTPARTY
     _musprite.screenx = self.screenx
@@ -852,7 +870,13 @@ function CCharacter:drawParty()
     _musprite.offsety = _offsety
     _musprite.flip    = self.dirx
     _musprite.scale   = self.scale
-    _musprite.palette = {[Tic.COLORGREYL] = self.colorhairsfg}
+    _musprite.palette = {
+        [Tic.COLORGREYM]  = self.colorhairsbg,
+        [Tic.COLORPURPLE] = _coloreyesbu,
+        [Tic.COLORRED]    = _coloreyesbm,
+        [Tic.COLORORANGE] = _coloreyesbd,
+        [Tic.COLORYELLOW] = _coloreyesfg,
+    }
     _musprite:draw()
 end
 

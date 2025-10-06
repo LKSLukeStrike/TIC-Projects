@@ -57,8 +57,8 @@ Tic.TEXTPICK    = "Pick"
 Tic.TEXTLOCK    = "Lock"
 Tic.TEXTUNLOCK  = "Unlock"
 Tic.TEXTMOVE    = "Move"
-Tic.TEXTPREV    = "Prev"
-Tic.TEXTNEXT    = "Next"
+Tic.TEXTPREV    = "Prv"
+Tic.TEXTNEXT    = "Nxt"
 Tic.TEXTEDIT    = "Edit"
 Tic.TEXTDROP    = "Drop"
 Tic.TEXTSTAND   = "Stand"
@@ -69,7 +69,7 @@ Tic.TEXTDEFAULT = "Default"
 Tic.TEXTSAY     = "Say"
 Tic.TEXTFST     = "Fst"
 Tic.TEXTLST     = "Lst"
-Tic.TEXTTRASH   = "Trash"
+Tic.TEXTTRASH   = "Del"
 Tic.TEXTALL     = "All"
 Tic.TEXTJOIN    = "Join"
 
@@ -798,21 +798,29 @@ end
 
 -- Hovertexts System -- handle hoveetexts stack
 Tic.HOVERTEXTS = {}
+Tic.DRAWMOUSE  = true
+Tic.DRAWSHIFT  = true
 
 function Tic:hovertextsClearHovertexts() -- clear the hovertexts table
     Tic.HOVERTEXTS = {}
 end
 
-function Tic:hovertextsAppend(_hovertext) -- append an hovertext for later drawing
+function Tic:hovertextsAppend(_hovertext, _mousesprite, _shiftsprite) -- append an hovertext for later drawing
     if not _hovertext then return end -- mandatory
-    local _hovertextclone = CText{} -- make a clone of it
+    local _hovertextclone = CText{} -- make a clone of it --FIXME why ?
     _hovertextclone:implementall(_hovertext)
-    Tables:valInsert(Tic.HOVERTEXTS, _hovertextclone, true)
+    Tables:valInsert(Tic.HOVERTEXTS, {hovertext = _hovertextclone, mousesprite = _mousesprite, shiftsprite = _shiftsprite}, true)
 end
 
 function Tic:hovertextsDrawAll() -- draw all hovertexts
     for _, _hovertext in ipairs(Tic.HOVERTEXTS) do
-        _hovertext:draw()
+        if _hovertext.mousesprite then
+            _hovertext.hovertext.screenx   = _hovertext.hovertext.screenx + 6
+            _hovertext.mousesprite.screenx = _hovertext.hovertext.screenx - Tic.SPRITESIZE
+            _hovertext.mousesprite.screeny = _hovertext.hovertext.screeny - 2
+            _hovertext.mousesprite:draw()
+        end
+        _hovertext.hovertext:draw()
     end
 end
 
@@ -2815,8 +2823,8 @@ function Tic:draw()
     local _timedif = math.floor(_timeend - _timebeg)
     if _timedif < _timemin then _timemin = _timedif end
     if _timedif > _timemax then _timemax = _timedif end
-    Tic:print(190, 0, Nums:pad0LF(_timemin, 3).."/"..Nums:pad0LF(_timedif, 3).."/"..Nums:pad0LF(_timemax, 3))
-    Tic:print(200, 6, Nums:pad0LF(Tic.playerActual().worldx, 3).." "..Nums:pad0LF(Tic.playerActual().worldy, 3))
+    Tic:print(190, 120, Nums:pad0LF(_timemin, 3).."/"..Nums:pad0LF(_timedif, 3).."/"..Nums:pad0LF(_timemax, 3))
+    Tic:print(200, 126, Nums:pad0LF(Tic.playerActual().worldx, 3).." "..Nums:pad0LF(Tic.playerActual().worldy, 3))
     Tic:logPrint()
 
     Tic:tick() -- [!] required in the draw function

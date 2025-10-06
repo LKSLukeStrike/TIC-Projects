@@ -267,6 +267,8 @@ CSpriteBG.SIGNBORDSQ  = CSpriteBG.SIGNBANK1 + 03 -- borders square
 CSpriteBG.SIGNSPOTSQ  = CSpriteBG.SIGNBANK1 + 04 -- spotting square
 CSpriteBG.SIGNCROSQU  = CSpriteBG.SIGNBANK1 + 05 -- crossed square
 CSpriteBG.SIGNDOTSQU  = CSpriteBG.SIGNBANK1 + 06 -- dot square
+CSpriteBG.SIGNMOUSPR  = CSpriteBG.SIGNBANK1 + 09 -- mouse sprite
+CSpriteBG.SIGNSHFSPR  = CSpriteBG.SIGNBANK1 + 10 -- shift sprite
 CSpriteBG.SIGNSLHEAD  = CSpriteBG.SIGNBANK1 + 11 -- slot default head
 CSpriteBG.SIGNSLBACK  = CSpriteBG.SIGNBANK1 + 12 -- slot default back
 CSpriteBG.SIGNSLHAND  = CSpriteBG.SIGNBANK1 + 13 -- slot default hand
@@ -447,4 +449,32 @@ function CSpriteBoard:new(_argt)
     self.name = Classic.NAMESPRITEBOARD
     self.sprite = nil
     self:argt(_argt) -- override if any
+end
+
+
+--
+-- MUSprite Mouse
+--
+function CSprite:muspriteMouse()
+    return CSprite{
+        sprite  = CSpriteBG.SIGNMOUSPR,
+        palette = {
+            [Tic.COLORPURPLE] = Tic.COLORGREYL,
+            [Tic.COLORRED]    = Tic.COLORGREYL,
+            [Tic.COLORORANGE] = Tic.COLORGREYL,
+            [Tic.COLORYELLOW] = Tic.COLORGREYL,
+        },
+    }
+end
+
+function CSprite:muspriteMouseClickLF()
+    local _musprite = CSprite:muspriteMouse()
+    _musprite.palette[Tic.COLORORANGE] = Tic.COLORBLUEL
+    return _musprite
+end
+
+function CSprite:muspriteMouseClickRG()
+    local _musprite = CSprite:muspriteMouse()
+    _musprite.palette[Tic.COLORYELLOW] = Tic.COLORBLUEL
+    return _musprite
 end

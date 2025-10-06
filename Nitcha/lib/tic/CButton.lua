@@ -29,6 +29,8 @@ function CButton:new(_argt)
     self.drawinside    = true
     self.drawborder    = true
     self.drawframes    = false
+    self.drawmouse     = Tic.DRAWMOUSE
+    self.drawshift     = Tic.DRAWSHIFT
     self.colorground         = Tic.COLORWHITE -- colors
     self.colorborder         = Tic.COLORGREYM
     self.colorhover          = Tic.COLORHUDSCREEN
@@ -70,14 +72,22 @@ function CButton:drawHovertextUP()
     self.hovertextup:adjustWH()
     self.hovertextup.screenx = self.screenx - ((self.hovertextup.screenw - self.screenw) // 2) + 1
     self.hovertextup.screeny = self.screeny - self.hovertextup.screenh
-    Tic:hovertextsAppend(self.hovertextup)
+    local _mousesprite = (self.drawmouse)
+        and CSprite:muspriteMouseClickLF()
+        or  nil
+    local _shiftsprite = nil
+    Tic:hovertextsAppend(self.hovertextup, _mousesprite, _shiftsprite)
 end
 
 function CButton:drawHovertextDW()
     self.hovertextdw:adjustWH()
     self.hovertextdw.screenx = self.screenx - ((self.hovertextdw.screenw - self.screenw) // 2) + 1
     self.hovertextdw.screeny = self.screeny + self.screenh
-    Tic:hovertextsAppend(self.hovertextdw)
+    local _mousesprite = (self.drawmouse)
+        and CSprite:muspriteMouseClickRG()
+        or  nil
+    local _shiftsprite = nil
+    Tic:hovertextsAppend(self.hovertextdw, _mousesprite, _shiftsprite)
 end
 
 function CButton:drawHovertextLF()

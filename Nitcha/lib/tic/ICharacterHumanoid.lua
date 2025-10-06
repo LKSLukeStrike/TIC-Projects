@@ -235,18 +235,15 @@ function ICharacterHumanoid:drawHead()
 
     if _posture == Tic.POSTUREFLOOR then
         _coloreyesbm = self.coloreyesbg
-    end
-    if not (_posture == Tic.POSTUREFLOOR) and self.diry == Tic.DIRYUP then
+    else
         _coloreyesfg = self.coloreyesfg
-        _coloreyesbu = self.coloreyesbg
-    end
-    if not (_posture == Tic.POSTUREFLOOR) and self.diry == Tic.DIRYMD then
-        _coloreyesfg = self.coloreyesfg
-        _coloreyesbm = self.coloreyesbg
-    end
-    if not (_posture == Tic.POSTUREFLOOR) and self.diry == Tic.DIRYDW then
-        _coloreyesfg = self.coloreyesfg
-        _coloreyesbd = self.coloreyesbg
+        if self.diry == Tic.DIRYUP then -- up
+            _coloreyesbu = self.coloreyesbg
+        elseif self.diry == Tic.DIRYMD then -- md
+            _coloreyesbm = self.coloreyesbg
+        else -- dw
+            _coloreyesbd = self.coloreyesbg
+        end
     end
 
     _musprite.sprite  = self.eyessprite -- apply the corresponding attributes
