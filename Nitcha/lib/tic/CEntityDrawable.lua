@@ -57,7 +57,7 @@ function CEntityDrawable:draw() -- default draw for drawable entities -- overrid
             or  Tables:merge(_palette, _palette1)
     end
 
-    local _musprite = CSpriteBG() -- multi usage unique sprite
+    local _musprite = CSpriteBG() -- multi usage sprite
     _musprite.sprite  = self.sprite
     _musprite.name    = self.name
     _musprite.screenx = self.screenx
@@ -78,7 +78,7 @@ end
 
 function CEntityDrawable:drawSpotted() -- draw spotted if any
     if not self.spotted then return end -- nothing to draw
-    local _musprite = CSpriteBG() -- multi usage unique sprite
+    local _musprite = CSpriteBG() -- multi usage sprite
     _musprite.sprite  = CSpriteBG.SIGNSPOTSQ
     _musprite.screenx = self.screenx
     _musprite.offsetx = self.offsetx
@@ -91,21 +91,14 @@ end
 
 function CEntityDrawable:drawHovered() -- draw hovered if any
     if not self.hovered then return end -- nothing to draw
-    local _musprite = CSpriteBG() -- multi usage unique sprite
-    _musprite.sprite  = CSpriteBG.SIGNBORDSQ
-    _musprite.screenx = self.screenx
-    _musprite.screeny = self.screeny
-    _musprite.offsetx = self.offsetx
-    _musprite.offsety = self.offsety
-    _musprite.scale   = self.scale
-    _musprite.palette = {[Tic.COLORGREYM] = Tic.COLORGREYL,}
-    _musprite:draw()
+    local _mubutton = CButtonEntityHoverLock{entity = self} -- multi usage button
+    _mubutton:draw()
 end
 
 function CEntityDrawable:drawBorders() -- draw borders if any
     self.drawborders = Tic.DRAWBORDERS -- use Tic as master
     if not self.drawborders then return end -- nothing to draw
-    local _musprite = CSpriteBG() -- multi usage unique sprite
+    local _musprite = CSpriteBG() -- multi usage sprite
     _musprite.sprite  = CSpriteBG.SIGNBORDSQ
     _musprite.screenx = self.screenx
     _musprite.screeny = self.screeny

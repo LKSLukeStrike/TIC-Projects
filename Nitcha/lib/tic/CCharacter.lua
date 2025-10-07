@@ -820,7 +820,7 @@ function CCharacter:drawEffect()
         and _statussettings.palette0
         or  _statussettings.palette1
 
-    local _musprite = CSpriteFG() -- multi usage unique sprite
+    local _musprite = CSpriteFG() -- multi usage sprite
     _musprite.sprite  = _effectsprite
     _musprite.screenx = self.screenx
     _musprite.screeny = self.screeny
@@ -863,7 +863,7 @@ function CCharacter:drawParty()
         end
     end
    
-    local _musprite = CSpriteFG() -- multi usage unique sprite
+    local _musprite = CSpriteFG() -- multi usage sprite
     _musprite.sprite  = CSpriteFG.EFFECTPARTY
     _musprite.screenx = self.screenx
     _musprite.screeny = self.screeny
@@ -1050,7 +1050,7 @@ function CCharacter:drawInteractToBy(_toby) -- true = to, false = by -- FIXME us
         and _headoffsety + self.size
         or  _headoffsety
 
-    local _musprite = CSpriteFG() -- multi usage unique sprite
+    local _musprite = CSpriteFG() -- multi usage sprite
     _musprite.sprite  = CSpriteFG.EFFECTINTMK -- apply the corresponding attributes
     _musprite.screenx = self.screenx
     _musprite.screeny = self.screeny

@@ -177,7 +177,7 @@ function ICharacterHumanoid:drawBody()
         and _bodyframe -- fix frame
         or  self.frame
 
-    local _musprite = CSpriteFG() -- multi usage unique sprite
+    local _musprite = CSpriteFG() -- multi usage sprite
     _musprite.sprite  = self.bodysprite + _bodyspriteoffset -- apply the corresponding attributes
     _musprite.screenx = self.screenx
     _musprite.screeny = self.screeny
@@ -208,7 +208,7 @@ function ICharacterHumanoid:drawHead()
     local _headrotate      = _posturesettings.rotate
 
 
-    local _musprite = CSpriteFG() -- multi usage unique sprite
+    local _musprite = CSpriteFG() -- multi usage sprite
 
     -- draw head
     _musprite.sprite  = self.headsprite -- apply the corresponding attributes

@@ -191,6 +191,7 @@ end
 
 function CButtonSprite:drawInside()
     local _palette = {[self.colorground] = self.colorground, [self.colorborder] = self.colorborder}
+
     _palette = (self.hovered)
         and {[self.colorground] = self.colorhover, [self.colorborder] = self.colorborder}
         or  _palette
@@ -206,6 +207,49 @@ function CButtonSprite:drawInside()
     self.sprite.screeny = self.screeny
     self.sprite.palette = _palette
     self.sprite:draw()
+end
+
+
+--
+-- CButtonEntityHover
+--
+CButtonEntityHover = CButtonSprite:extend() -- generic entity hover button
+function CButtonEntityHover:new(_argt)
+    CButtonEntityHover.super.new(self, _argt)
+	self.sprite.sprite = CSpriteBG.SIGNBORDSQ
+    self.entity        = nil
+    self.colorborder   = Tic.COLORGREYM
+    self.hovered = true
+    self:argt(_argt) -- override if any
+end
+
+function CButtonEntityHover:drawInside()
+    if not self.entity then return end -- mandatory
+    self.screenx        = self.entity.screenx
+    self.screeny        = self.entity.screeny
+    self.sprite.screenx = self.entity.screenx
+    self.sprite.screeny = self.entity.screeny
+    self.sprite.palette = Tables:merge(self.sprite.palette, {[Tic.COLORGREYM] = self.colorborder})
+    self.sprite:draw()
+end
+
+
+--
+-- CButtonEntityHoverLock
+--
+CButtonEntityHoverLock = CButtonEntityHover:extend() -- generic entity hover lock button
+function CButtonEntityHoverLock:new(_argt)
+    CButtonEntityHoverLock.super.new(self, _argt)
+    self.hovertextdw = CHoverTextDW{text = Tic.TEXTLOCK}
+    self.behaviour   = function(self)
+                            local _playeractual = Tic:playerActual()
+                            if _playeractual.spottinglock and _playeractual.spotting == self.entity then -- already locking ?
+                                self.hovertextdw.text = Tic.TEXTUNLOCK
+                            else
+                                self.hovertextdw.text = Tic.TEXTLOCK
+                            end
+                       end
+    self:argt(_argt) -- override if any
 end
 
 
