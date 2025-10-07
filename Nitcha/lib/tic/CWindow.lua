@@ -567,8 +567,8 @@ end
 function CWindowWorld:drawPlayerActual()
     local _playeractual          = Tic:playerActual()
     if not _playeractual then return end
-    local _playerlocationsaround = _playeractual:locationsAround()
-    local _playerregionviewworld = _playeractual:regionViewWorld()
+    local _playerlocationsaround = _playeractual:locationsAround() -- entities in world window
+    local _playerregionviewworld = _playeractual:regionViewWorld() -- FIXME limity first ?
     local _playerregionmindworld = _playeractual:regionMindWorld()
     local _playernearestentity   = _playeractual:nearestEntityViewWorld() -- nearest entity if any -- except itself
 
@@ -583,88 +583,121 @@ function CWindowWorld:drawPlayerActual()
     _playeractual:interactbyRemoveAll()
     _playeractual:adjustInteract()
     
-    for _, _keyy in pairs(Tables:keys(_playerlocationsaround)) do -- draw entities -- sorted by y first
+    for _, _keyy in pairs(Tables:keys(_playerlocationsaround)) do -- draw entities -- sorted by y first -- FIXME limit first ?
         for _, _keyx in pairs(Tables:keys(_playerlocationsaround[_keyy])) do -- sorted by x next
             for _entity, _ in pairs(_playerlocationsaround[_keyy][_keyx]) do -- entities around actual player
                 local _entityregionworld = _entity:regionWorld()
+                local _entityinview      = _playerregionviewworld:hasInsideRegion(_entityregionworld)
+                local _entityinmind      = _playerregionmindworld:hasInsideRegion(_entityregionworld)
 
-                _entity.hovered = false -- unhover all entities
-                -- if  not (_entity == _playeractual)
-                -- and _entity:isHovered() then
-                --     _playeractual:hoverEntity(_entity)
-                -- end
+                if _entityinview -- handle entities in view/mind
+                or _entityinmind then
 
-                _entity.spotted = (_playeractual:isSpottingSpot() -- unspot all entities except spotting one if any
-                and _entity == _playeractual:entitySpotting())
-                    and true
-                    or  false
-
-                if _playerregionviewworld:hasInsideRegion(_entityregionworld) then -- draw mode -- in view
-                    _entity.discovered = true
-                    _entity.drawfade = false
-                else -- not in view
-                    _entity.drawfade = true
-                end
-
-                if (_playerregionviewworld:hasInsideRegion(_entityregionworld)) -- draw entity ?
-                or (_playerregionmindworld:hasInsideRegion(_entityregionworld))
-                then
-                    if _entity.discovered then -- only discovered entities
-                        _entity:adjustScreenXYRelativeToEntity(_playeractual)
-                        local _entityregionscreen = _entity:regionScreen()
-
-                        _entity:draw()
-
-                        if Tic:screenActual() == Tic:screenTop() then -- allows interactions only if top screen (no menus)
-                            if  _playeractual.spottingpick -- if in pick mode
-                            and not (_entity == _playeractual) -- except itself
-                            and _entityregionscreen:hasInsidePoint(Tic:mousePointX(), Tic:mousePointY()) -- hovering something ?
-                            and not _playeractual.hovering then -- hover only one
-                                _playeractual:hoverEntity(_entity)
-
-                                local _playerfind = Tic:playerFind(_entity)
-                                if _playerfind then
-                                    local _picktext = CText{text = Tic.TEXTPICK, colorinside = Tic.COLORHOVERTEXTUP}
-                                    _picktext.screenx = _entity.screenx - ((_picktext.screenw - Tic.SPRITESIZE) // 2)
-                                    _picktext.screeny = _entity.screeny - _picktext.screenh
-                                    _picktext:draw()
-
-                                    if Tic.MOUSE.clicklf then
-                                        Tic.MOUSE.clicklf = false -- avoid bouncing
-                                        Tic:mouseDelay()
-                                        
-                                        Tic:playerPick(_entity)
-                                    end
-                                end
-
-                                local _locking  = (_playeractual.spottinglock and _playeractual.spotting == _entity) -- already locking ?
-                                local _locktext = (_locking)
-                                    and CText{text = Tic.TEXTUNLOCK, colorinside = Tic.COLORHOVERTEXTUP}
-                                    or  CText{text = Tic.TEXTLOCK, colorinside = Tic.COLORHOVERTEXTUP}
-                                _locktext.screenx = _entity.screenx - ((_locktext.screenw - Tic.SPRITESIZE) // 2)
-                                _locktext.screeny = _entity.screeny + Tic.SPRITESIZE
-                                _locktext:draw()
-
-                                if Tic.MOUSE.clickrg then
-                                    Tic.MOUSE.clickrg = false -- avoid bouncing
-                                    Tic:mouseDelay()
-                                    
-                                    if _locking then -- unspot
-                                        _playeractual:spotEntity()
-                                        _playeractual.spottinglock = false
-                                    else -- spot
-                                        _playeractual:spotEntity(_entity)
-                                        _playeractual.spottinglock = true
-                                    end
-                                end
-                            end
-                        end
+                    if _entityinview then -- discovered ? (in view)
+                        _entity.discovered = true
                     end
+
+                    if _entity.discovered then -- handle only discovered entities
+
+                        if  _playeractual:isSpottingSpot() -- unspot all entities except spotting one if any
+                        and _playeractual:entitySpotting() == _entity then
+                            _entity.spotted = true
+                        else
+                            _entity.spotted = false
+                        end
+
+                        if _entityinview then -- fade mode -- in view
+                            _entity.drawfade = false
+                        else -- in mind
+                            _entity.drawfade = true
+                        end
+
+                        if  not (_entity == _playeractual) -- hover with mouse if any
+                        and _entity:isHovered() then
+                            _playeractual:hoverEntity(_entity) -- give the entity a priority in spotting windows
+                        end
+
+                        _entity:adjustScreenXYRelativeToEntity(_playeractual)
+                        _entity:draw()
+                    end
+
                 end
-            end
-        end
-    end
+
+            end -- entities loop
+        end -- x loop
+    end -- y loop
 end
+
+--                 _entity.hovered = false -- unhover all entities
+--                 if  not (_entity == _playeractual)
+--                 and _entity:isHovered() then
+--                     _entity.hovered = true
+--                     -- _playeractual:hoverEntity(_entity)
+--                 end
+
+--                 _entity.spotted = (_playeractual:isSpottingSpot() -- unspot all entities except spotting one if any
+--                 and _entity == _playeractual:entitySpotting())
+--                     and true
+--                     or  false
+
+
+--                 then
+--                     if _entity.discovered then -- only discovered entities
+--                         _entity:adjustScreenXYRelativeToEntity(_playeractual)
+--                         local _entityregionscreen = _entity:regionScreen()
+
+--                         _entity:draw()
+
+--                         if Tic:screenActual() == Tic:screenTop() then -- allows interactions only if top screen (no menus)
+--                             if  _playeractual.spottingpick -- if in pick mode
+--                             and not (_entity == _playeractual) -- except itself
+--                             and _entityregionscreen:hasInsidePoint(Tic:mousePointX(), Tic:mousePointY()) -- hovering something ?
+--                             and not _playeractual.hovering then -- hover only one
+--                                 _playeractual:hoverEntity(_entity)
+
+--                                 local _playerfind = Tic:playerFind(_entity)
+--                                 if _playerfind then
+--                                     local _picktext = CText{text = Tic.TEXTPICK, colorinside = Tic.COLORHOVERTEXTUP}
+--                                     _picktext.screenx = _entity.screenx - ((_picktext.screenw - Tic.SPRITESIZE) // 2)
+--                                     _picktext.screeny = _entity.screeny - _picktext.screenh
+--                                     _picktext:draw()
+
+--                                     if Tic.MOUSE.clicklf then
+--                                         Tic.MOUSE.clicklf = false -- avoid bouncing
+--                                         Tic:mouseDelay()
+                                        
+--                                         Tic:playerPick(_entity)
+--                                     end
+--                                 end
+
+--                                 local _locking  = (_playeractual.spottinglock and _playeractual.spotting == _entity) -- already locking ?
+--                                 local _locktext = (_locking)
+--                                     and CText{text = Tic.TEXTUNLOCK, colorinside = Tic.COLORHOVERTEXTUP}
+--                                     or  CText{text = Tic.TEXTLOCK, colorinside = Tic.COLORHOVERTEXTUP}
+--                                 _locktext.screenx = _entity.screenx - ((_locktext.screenw - Tic.SPRITESIZE) // 2)
+--                                 _locktext.screeny = _entity.screeny + Tic.SPRITESIZE
+--                                 _locktext:draw()
+
+--                                 if Tic.MOUSE.clickrg then
+--                                     Tic.MOUSE.clickrg = false -- avoid bouncing
+--                                     Tic:mouseDelay()
+                                    
+--                                     if _locking then -- unspot
+--                                         _playeractual:spotEntity()
+--                                         _playeractual.spottinglock = false
+--                                     else -- spot
+--                                         _playeractual:spotEntity(_entity)
+--                                         _playeractual.spottinglock = true
+--                                     end
+--                                 end
+--                             end
+--                         end
+--                     end
+--                 end
+--             end
+--         end
+--     end
+-- end
 
 
 --
