@@ -835,7 +835,7 @@ function CCharacter:isParty()
 end
 
 function CCharacter:drawParty()
-    -- if not self:isParty() then return end -- not a party
+    if not self:isParty() then return end -- not a party
 
     local _posture = self:postureGet()
     local _offsety = 3
