@@ -29,6 +29,7 @@ function CEntityDrawable:new(_argt)
     self.drawhitbox   = false
     self.drawfade     = false
     self.drawbgfg     = Tic.DRAWFG -- use bg/fg palette if any
+    self.hoverbutton  = CButtonEntityHoverLock{entity = self} -- hover button
     self:argt(_argt) -- override if any
     self.world:appendEntity(self)-- append itself to the world
 end
@@ -91,8 +92,7 @@ end
 
 function CEntityDrawable:drawHovered() -- draw hovered if any
     if not self.hovered then return end -- nothing to draw
-    local _mubutton = CButtonEntityHoverLock{entity = self} -- multi usage button
-    _mubutton:draw()
+    self.hoverbutton:draw()
 end
 
 function CEntityDrawable:drawBorders() -- draw borders if any

@@ -240,15 +240,50 @@ end
 CButtonEntityHoverLock = CButtonEntityHover:extend() -- generic entity hover lock button
 function CButtonEntityHoverLock:new(_argt)
     CButtonEntityHoverLock.super.new(self, _argt)
-    self.hovertextdw = CHoverTextDW{text = Tic.TEXTLOCK}
-    self.behaviour   = function(self)
-                            local _playeractual = Tic:playerActual()
-                            if _playeractual.spottinglock and _playeractual.spotting == self.entity then -- already locking ?
-                                self.hovertextdw.text = Tic.TEXTUNLOCK
-                            else
-                                self.hovertextdw.text = Tic.TEXTLOCK
-                            end
+    self.lock        = function()
+                        local _playeractual = Tic:playerActual()
+                        _playeractual:spotEntity(self.entity)
+                        _playeractual.spottinglock = true
+                        Tic:mouseDelay()
                        end
+    self.unlock      = function()
+                        local _playeractual = Tic:playerActual()
+                        _playeractual:spotEntity()
+                        _playeractual.spottinglock = false
+                        Tic:mouseDelay()
+                       end
+    self.clickrg     = self.lock
+    self.hovertextdw = CHoverTextDW{text = Tic.TEXTLOCK}
+    self.hovertextrg = CHoverTextRG{}
+    self.behaviour   = function(self)
+                        local _playeractual = Tic:playerActual()
+                        if _playeractual.spottinglock and _playeractual.spotting == self.entity then -- already locking ?
+                            self.hovertextdw.text = Tic.TEXTUNLOCK
+                            self.clickrg = self.unlock
+                        else
+                            self.hovertextdw.text = Tic.TEXTLOCK
+                            self.clickrg = self.lock
+                        end
+                        self.hovertextrg.text = self.entity.name.." "..self.entity.kind
+                       end
+    self:argt(_argt) -- override if any
+end
+
+
+--
+-- CButtonEntityHoverLockPick
+--
+CButtonEntityHoverLockPick = CButtonEntityHoverLock:extend() -- generic entity hover lock pick button
+function CButtonEntityHoverLockPick:new(_argt)
+    CButtonEntityHoverLockPick.super.new(self, _argt)
+    self.pick        = function()
+                        Tic:playerActual().hovered = false
+                        Tic:playerPick(self.entity)
+                        Tic:playerActual().hovered = false
+                        Tic:mouseDelay()
+                       end
+    self.clicklf     = self.pick
+    self.hovertextup = CHoverTextUP{text = Tic.TEXTPICK}
     self:argt(_argt) -- override if any
 end
 

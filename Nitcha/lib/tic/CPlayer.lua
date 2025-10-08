@@ -10,25 +10,13 @@ function CPlayer:new(_argt)
         CInteractionSayMessage{},
         CInteractionJoinTroop{},
     }
+    self.hoverbutton  = CButtonEntityHoverLockPick{entity = self, colorborder = Tic.COLORGREEND} -- hover lock pick button
     self:argt(_argt) -- override if any
     self:playerAppend()
 end
 
 function CPlayer:playerAppend()
     Tic:playerAppend(self) -- record the new player on tic
-end
-
-function CPlayer:drawHovered() -- draw hovered if any
-    if not self.hovered then return end -- nothing to draw
-    local _musprite = CSpriteBG() -- multi usage sprite
-    _musprite.sprite  = CSpriteBG.SIGNBORDSQ
-    _musprite.screenx = self.screenx
-    _musprite.screeny = self.screeny
-    _musprite.offsetx = self.offsetx
-    _musprite.offsety = self.offsety
-    _musprite.scale   = self.scale
-    _musprite.palette = {[Tic.COLORGREYM] = Tic.COLORRED,}
-    _musprite:draw()
 end
 
 
