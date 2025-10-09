@@ -17,8 +17,11 @@ _kclassic = "_classic"
 _nclassic = "_classic"
 function _cclassic:new(_argt)
     _cclassic.super.new(self, _argt)
-    self.kind = _kclassic
-    self.name = _nclassic
+    self.classic = _cclassic
+    self.kind    = _kclassic
+    self.name    = _nclassic
+    --
+    --
     self:argt(_argt) -- override if any
 end
 ]]

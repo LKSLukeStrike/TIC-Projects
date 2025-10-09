@@ -8,8 +8,9 @@ Classic.NAMEENTITYDRAWABLE = "EntityDrawable"
 function CEntityDrawable:new(_argt)
     CEntityDrawable.super.new(self, _argt)
     self.classic = CEntityDrawable
-    self.kind = Classic.KINDENTITYDRAWABLE
-    self.name = Classic.NAMEENTITYDRAWABLE
+    self.kind    = Classic.KINDENTITYDRAWABLE
+    self.name    = Classic.NAMEENTITYDRAWABLE
+    --
     self.world        = Tic:worldActual()
     self.sprite       = CSpriteBG.SIGNEMPTYS
     self.screenx      = 0 -- screen positions -- used to draw the sprite
@@ -30,6 +31,7 @@ function CEntityDrawable:new(_argt)
     self.drawfade     = false
     self.drawbgfg     = Tic.DRAWFG -- use bg/fg palette if any
     self.hoverbutton  = CButtonEntityHoverLock{entity = self} -- hover button
+    --
     self:argt(_argt) -- override if any
     self.world:appendEntity(self)-- append itself to the world
 end

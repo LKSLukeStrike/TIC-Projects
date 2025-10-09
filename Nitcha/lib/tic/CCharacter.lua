@@ -204,6 +204,7 @@ function CCharacter:new(_argt)
     self.classic = CCharacter -- instance of
     self.kind    = Classic.KINDCHARACTER
     self.name    = Classic.NAMECHARACTER
+    --
     self.size         = Tic.SIZEM -- size
     self.frame        = CSprite.FRAME00 -- frame
     self.dirx         = Tic.DIRXLF -- directions
@@ -239,22 +240,23 @@ function CCharacter:new(_argt)
     self.statmenact   = self.statmenmax
     self.statpsyact   = self.statpsymax
     self.slots        = { -- character objects slots
-                         exists = true, -- to check if already implemented
-                         head = CSlotHead{},
-                         back = CSlotBack{},
-                         handlf = CSlotHandLF{},
-                         handrg = CSlotHandRG{},
-    }
+                            exists = true, -- to check if already implemented
+                            head = CSlotHead{},
+                            back = CSlotBack{},
+                            handlf = CSlotHandLF{},
+                            handrg = CSlotHandRG{},
+                        }
     self.inventories  = { -- character standard inventories
-                         exists = true, -- to check if already implemented
-                         phy = CInventoryPhy{},
-                         men = CInventoryMen{},
-                         psy = CInventoryPsy{},
+                            exists = true, -- to check if already implemented
+                            phy = CInventoryPhy{},
+                            men = CInventoryMen{},
+                            psy = CInventoryPsy{},
                         }
     self.interactions = {
-                         CInteractionSayMessage{},
+                            CInteractionSayMessage{},
                         }
-    self.party        = nil
+    self.party        = nil -- behave to a party ?
+    --
     self:argt(_argt) -- override if any
     self.camera       = CCamera{name = self.name.." "..Classic.NAMECAMERA} -- one camera per character
     self:focus() -- focus its camera on itself
@@ -830,12 +832,8 @@ function CCharacter:drawEffect()
     _musprite:draw()
 end
 
-function CCharacter:isParty()
-    return (self.party)
-end
-
 function CCharacter:drawParty()
-    if not self:isParty() then return end -- not a party
+    if not self.isparty then return end -- not a party
 
     local _posture = self:postureGet()
     local _offsety = 3

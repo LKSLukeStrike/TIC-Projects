@@ -1,4 +1,5 @@
 require("lib/tic/CCharacter")
+require("lib/tic/ICharacterHumanoid")
 --
 -- CPlayer
 --
@@ -6,11 +7,13 @@ CPlayer = CCharacter:extend() -- player characters
 function CPlayer:new(_argt)
     CPlayer.super.new(self, _argt)
     self.classic = CPlayer
+    --
     self.interactions = {
         CInteractionSayMessage{},
         CInteractionJoinTroop{},
     }
     self.hoverbutton  = CButtonEntityHoverLockPick{entity = self, colorborder = Tic.COLORGREEND} -- hover lock pick button
+    --
     self:argt(_argt) -- override if any
     self:playerAppend()
 end
@@ -27,6 +30,8 @@ CPlayerHumanoid = CPlayer:extend() -- humanoid player characters
 function CPlayerHumanoid:new(_argt)
     CPlayerHumanoid.super.new(self, _argt)
     self.classic = CPlayerHumanoid
+    --
+    --
     self:argt(_argt) -- override if any
     self:implementall(ICharacterHumanoid)
 end
@@ -38,6 +43,7 @@ function CPlayerHuman:new(_argt)
     CPlayerHuman.super.new(self, _argt)
     self.classic = CPlayerHuman
     self.kind    = Classic.KINDHUMAN
+    --
     self.size         = Tic.SIZEM -- size
     self.colorhairsfg = Tic.COLORORANGE -- colors
     self.colorhairsbg = Tic.COLORRED
@@ -48,6 +54,7 @@ function CPlayerHuman:new(_argt)
     self.statmenact   = self.statmenmax
     self.statpsymax   = 5
     self.statpsyact   = self.statpsymax
+    --
     self:argt(_argt) -- override if any
 end
 
@@ -58,6 +65,7 @@ function CPlayerDwarf:new(_argt)
     CPlayerDwarf.super.new(self, _argt)
     self.classic = CPlayerDwarf
     self.kind    = Classic.KINDDWARF
+    --
     self.size         = Tic.SIZES -- size
     self.colorhairsfg = Tic.COLORRED -- colors
     self.colorhairsbg = Tic.COLORORANGE
@@ -68,6 +76,7 @@ function CPlayerDwarf:new(_argt)
     self.statmenact   = self.statmenmax
     self.statpsymax   = 2
     self.statpsyact   = self.statpsymax
+    --
     self:argt(_argt) -- override if any
 end
 
@@ -78,6 +87,7 @@ function CPlayerGnome:new(_argt)
     CPlayerGnome.super.new(self, _argt)
     self.classic = CPlayerGnome
     self.kind    = Classic.KINDGNOME
+    --
     self.size         = Tic.SIZES -- size
     self.colorhairsfg = Tic.COLORORANGE -- colors
     self.colorhairsbg = Tic.COLORYELLOW
@@ -89,6 +99,7 @@ function CPlayerGnome:new(_argt)
     self.statmenact   = self.statmenmax
     self.statpsymax   = 6
     self.statpsyact   = self.statpsymax
+    --
     self:argt(_argt) -- override if any
 end
 
@@ -99,6 +110,7 @@ function CPlayerElvwe:new(_argt)
     CPlayerElvwe.super.new(self, _argt)
     self.classic = CPlayerElvwe
     self.kind    = Classic.KINDELVWE
+    --
     self.size         = Tic.SIZEL -- size
     self.coloreyesfg  = Tic.COLORGREENM -- colors
     self.coloreyesbg  = Tic.COLORGREEND
@@ -111,6 +123,7 @@ function CPlayerElvwe:new(_argt)
     self.statmenact   = self.statmenmax
     self.statpsymax   = 5
     self.statpsyact   = self.statpsymax
+    --
     self:argt(_argt) -- override if any
 end
 
@@ -121,6 +134,7 @@ function CPlayerDrowe:new(_argt)
     CPlayerDrowe.super.new(self, _argt)
     self.classic = CPlayerDrowe
     self.kind    = Classic.KINDDROWE
+    --
     self.size         = Tic.SIZEM -- size
     self.coloreyesfg  = Tic.COLORRED -- colors
     self.coloreyesbg  = Tic.COLORPURPLE
@@ -132,6 +146,7 @@ function CPlayerDrowe:new(_argt)
     self.statmenact   = self.statmenmax
     self.statpsymax   = 4
     self.statpsyact   = self.statpsymax
+    --
     self:argt(_argt) -- override if any
 end
 
@@ -142,6 +157,7 @@ function CPlayerAngel:new(_argt)
     CPlayerAngel.super.new(self, _argt)
     self.classic = CPlayerAngel
     self.kind    = Classic.KINDANGEL
+    --
     self.size         = Tic.SIZEM -- size
     self.colorhairsfg = Tic.COLORGREYM -- colors
     self.colorhairsbg = Tic.COLORWHITE
@@ -153,6 +169,7 @@ function CPlayerAngel:new(_argt)
     self.statmenact   = self.statmenmax
     self.statpsymax   = 6
     self.statpsyact   = self.statpsymax
+    --
     self:argt(_argt) -- override if any
 end
 
@@ -163,6 +180,7 @@ function CPlayerGolth:new(_argt)
     CPlayerGolth.super.new(self, _argt)
     self.classic = CPlayerGolth
     self.kind    = Classic.KINDGOLTH
+    --
     self.size         = Tic.SIZEL -- size
     self.colorhairsfg = Tic.COLORWHITE -- colors
     self.colorhairsbg = Tic.COLORWHITE
@@ -176,6 +194,7 @@ function CPlayerGolth:new(_argt)
     self.statmenact   = self.statmenmax
     self.statpsymax   = 1
     self.statpsyact   = self.statpsymax
+    --
     self:argt(_argt) -- override if any
 end
 
@@ -186,6 +205,7 @@ function CPlayerHorne:new(_argt)
     CPlayerHorne.super.new(self, _argt)
     self.classic = CPlayerHorne
     self.kind    = Classic.KINDHORNE
+    --
     self.size         = Tic.SIZEL -- size
     self.colorhairsfg = Tic.COLORPURPLE -- colors
     self.colorhairsbg = Tic.COLORRED
@@ -197,6 +217,7 @@ function CPlayerHorne:new(_argt)
     self.statmenact   = self.statmenmax
     self.statpsymax   = 7
     self.statpsyact   = self.statpsymax
+    --
     self:argt(_argt) -- override if any
 end
 
@@ -207,12 +228,14 @@ function CPlayerDemon:new(_argt)
     CPlayerDemon.super.new(self, _argt)
     self.classic = CPlayerDemon
     self.kind    = Classic.KINDDEMON
+    --
     self.statphymax   = 3
     self.statphyact   = self.statphymax
     self.statmenmax   = 5
     self.statmenact   = self.statmenmax
     self.statpsymax   = 7
     self.statpsyact   = self.statpsymax
+    --
     self:argt(_argt) -- override if any
 end
 
@@ -223,6 +246,7 @@ function CPlayerTifel:new(_argt)
     CPlayerTifel.super.new(self, _argt)
     self.classic = CPlayerTifel
     self.kind    = Classic.KINDTIFEL
+    --
     self.size         = Tic.SIZEM -- size
     self.statphymax   = 4
     self.statphyact   = self.statphymax
@@ -230,6 +254,7 @@ function CPlayerTifel:new(_argt)
     self.statmenact   = self.statmenmax
     self.statpsymax   = 5
     self.statpsyact   = self.statpsymax
+    --
     self:argt(_argt) -- override if any
 end
 
@@ -240,6 +265,7 @@ function CPlayerMeduz:new(_argt)
     CPlayerMeduz.super.new(self, _argt)
     self.classic = CPlayerMeduz
     self.kind    = Classic.KINDMEDUZ
+    --
     self.size         = Tic.SIZES -- size
     self.colorhairsfg = Tic.COLORGREEND -- colors
     self.colorhairsbg = Tic.COLORGREENM
@@ -250,6 +276,7 @@ function CPlayerMeduz:new(_argt)
     self.statmenact   = self.statmenmax
     self.statpsymax   = 5
     self.statpsyact   = self.statpsymax
+    --
     self:argt(_argt) -- override if any
 end
 
@@ -260,6 +287,7 @@ function CPlayerGnoll:new(_argt)
     CPlayerGnoll.super.new(self, _argt)
     self.classic = CPlayerGnoll
     self.kind    = Classic.KINDGNOLL
+    --
     self.size         = Tic.SIZEL -- size
     self.coloreyesfg  = Tic.COLORRED -- colors
     self.coloreyesbg  = Tic.COLORPURPLE
@@ -270,6 +298,7 @@ function CPlayerGnoll:new(_argt)
     self.statmenact   = self.statmenmax
     self.statpsymax   = 2
     self.statpsyact   = self.statpsymax
+    --
     self:argt(_argt) -- override if any
 end
 
@@ -280,6 +309,8 @@ function CPlayerWolfe:new(_argt)
     CPlayerWolfe.super.new(self, _argt)
     self.classic = CPlayerWolfe
     self.kind    = Classic.KINDWOLFE
+    --
+    --
     self:argt(_argt) -- override if any
 end
 
@@ -290,6 +321,7 @@ function CPlayerGhost:new(_argt)
     CPlayerGhost.super.new(self, _argt)
     self.classic = CPlayerGhost
     self.kind    = Classic.KINDGHOST
+    --
     self.size         = Tic.SIZEL -- size
     self.coloreyesfg  = Tic.COLORRED -- colors
     self.coloreyesbg  = Tic.COLORPURPLE
@@ -301,5 +333,6 @@ function CPlayerGhost:new(_argt)
     self.statmenact   = self.statmenmax
     self.statpsymax   = 6
     self.statpsyact   = self.statpsymax
+    --
     self:argt(_argt) -- override if any
 end
