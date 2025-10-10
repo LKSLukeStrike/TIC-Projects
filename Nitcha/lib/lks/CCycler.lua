@@ -161,8 +161,13 @@ function CCyclerTable:at(_at) -- at cycler item
     return self:argt()
 end
 
-function CCyclerTable:insert(_item, _at) -- insert an _item into table _at (end by default) -- TODO add unique ?
+function CCyclerTable:find(_item)
+    return Tables:valFind(self.acttable, _item)
+end
+
+function CCyclerTable:insert(_item, _one, _at) -- insert an _item into table _at (end by default) -- TODO add unique ?
     if not _item then return self.actvalue end
+    if _one and self:find(_item) then return self.actvalue end
     if not _at then
         table.insert(self.acttable, _item)
         self.actindex = Tables:size(self.acttable) -- adjust actual index

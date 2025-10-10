@@ -861,8 +861,7 @@ end
 
 function Tic:screenAppend(_screen) -- append a screen to the stack
     if not _screen then return end -- mandatory
-    if Tic:screenActual() == _screen then return end -- already on stack
-    return Tic.SCREENS:insert(_screen)
+    return Tic.SCREENS:insert(_screen, Tables.ONE)
 end
 
 function Tic:screenRemove(_screen) -- remove last screen from the stack
@@ -907,8 +906,11 @@ function Tic:playerPlayers() -- all players in the stack
 end
 
 function Tic:playerAppend(_player) -- stack a new player
-    if Tables:valFind(Tic:playerPlayers(), _player) then return end -- avoid doublons
-    return Tic.PLAYERS:insert(_player)
+    return Tic.PLAYERS:insert(_player, Tables.ONE)
+end
+
+function Tic:playerRemove(_player) -- remove a player from the stack
+    return Tic.PLAYERS:insert(_player, Tables.ONE)
 end
 
 function Tic:playerPrev() -- prev player in the stack
@@ -2498,6 +2500,11 @@ W3lfie = CPlayerMeduz{classed = CPlayerMeduz,
 }
 end
 end -- psy
+end
+if false then
+Party = CCharacterParty{}
+Tic:playerAppend(Party)
+-- Tic:playerRem HH
 end
 -- exit()
 

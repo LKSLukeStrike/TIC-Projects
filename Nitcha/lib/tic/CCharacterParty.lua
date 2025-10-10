@@ -11,6 +11,14 @@ function CCharacterParty:new(_argt)
     self.kind    = Classic.KINDCHARACTERPARTY
     self.name    = Classic.NAMECHARACTERPARTY
     --
+    self.statphymax   = 10 -- max stats -- 0-Tic.STATSMAX
+    self.statmenmax   = 10
+    self.statpsymax   = 10
+    self.statphyact   = self.statphymax -- act stats -- 0-max
+    self.statmenact   = self.statmenmax
+    self.statpsyact   = self.statpsymax
+    self.leader       = nil
+    self.members      = {}
     --
     self:argt(_argt) -- override if any
 end
