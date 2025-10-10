@@ -16,8 +16,9 @@ function CEntity:new(_argt)
     CEntity.super.new(self, _argt)
     self.classic = CEntity -- instance of
     self.classed = nil -- override to limit argt
-    self.kind = Classic.KINDENTITY
-    self.name = Classic.NAMEENTITY
+    self.kind    = Classic.KINDENTITY
+    self.name    = Classic.NAMEENTITY
+    --
     self.world        = nil -- parent world if any
     self.worldx       = CEntity.WORLDX -- world positions
     self.worldy       = CEntity.WORLDY
@@ -26,6 +27,7 @@ function CEntity:new(_argt)
     self.interactto   = nil -- entity interactto -- single
     self.interactby   = {}  -- entities interactby -- table
     self.camera = nil -- optional camera that follows the entity -- to override if any
+    --
     self:argt(_argt) -- override if any
 end
 

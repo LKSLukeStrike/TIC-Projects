@@ -586,6 +586,7 @@ function CWindowWorld:drawPlayerActual()
     for _, _keyy in pairs(Tables:keys(_playerlocationsaround)) do -- draw entities -- sorted by y first -- FIXME limit first ?
         for _, _keyx in pairs(Tables:keys(_playerlocationsaround[_keyy])) do -- sorted by x next
             for _entity, _ in pairs(_playerlocationsaround[_keyy][_keyx]) do -- entities around actual player
+                Tic:trace(_entity.kind, _entity.name)
                 local _entityregionworld = _entity:regionWorld()
                 local _entityinview      = _playerregionviewworld:hasInsideRegion(_entityregionworld)
                 local _entityinmind      = _playerregionmindworld:hasInsideRegion(_entityregionworld)
@@ -624,7 +625,6 @@ function CWindowWorld:drawPlayerActual()
                     end
 
                 end
-
             end -- entities loop
         end -- x loop
     end -- y loop

@@ -867,7 +867,7 @@ end
 function Tic:screenRemove(_screen) -- remove last screen from the stack
     if not _screen then return end -- mandatory
     if not (Tic:screenActual() == _screen) then return end -- not on stack
-    return Tic.SCREENS:remove()
+    return Tic.SCREENS:removeAt()
 end
 
 function Tic:screenPrev() -- prev screen in the stack
@@ -910,7 +910,7 @@ function Tic:playerAppend(_player) -- stack a new player
 end
 
 function Tic:playerRemove(_player) -- remove a player from the stack
-    return Tic.PLAYERS:insert(_player, Tables.ONE)
+    return Tic.PLAYERS:remove(_player)
 end
 
 function Tic:playerPrev() -- prev player in the stack
@@ -997,7 +997,7 @@ function Tic:messageMax() -- last message in the stack
 end
 
 function Tic:messageDeleteOne() -- delete current message from the stack
-    Tic.MESSAGES:remove(Tic.MESSAGES.actindex)
+    Tic.MESSAGES:removeAt(Tic.MESSAGES.actindex)
     return Tic:messageInit()
 end
 
@@ -2292,7 +2292,7 @@ if true then
 --
 -- phy
 --
-if true then
+if false then
 if true then
 Walfie = _playerclass{classed = _playerclass,
     name = "Walfie",
@@ -2365,7 +2365,7 @@ end -- phy
 --
 -- men
 --
-if true then
+if false then
 if true then
 Wolfie = _playerclass{classed = _playerclass,
     name = "Wolfie",
@@ -2435,7 +2435,7 @@ end -- men
 -- psy
 --
 if true then
-if true then
+if false then
 W1lfie = _playerclass{classed = _playerclass,
     name = "W1lfie",
     size = Tic.SIZES,
@@ -2456,7 +2456,7 @@ W1lfie = _playerclass{classed = _playerclass,
     }},
 }
 end
-if true then
+if false then
 W2lfie = _playerclass{classed = _playerclass,
     name = "W2lfie",
     size = Tic.SIZEM,
@@ -2490,13 +2490,13 @@ W3lfie = CPlayerMeduz{classed = CPlayerMeduz,
     worldy = 20,
     -- spottingspot = true,
     spottingpick = true,
-    -- ["slots.handrg"] = CSlotHandRG{object = CWeaponWandLarge{}},
-    -- ["slots.handlf"] = CSlotHandLF{object = CWeaponRuneLarge{}},
-    -- ["slots.head"]   = CSlotHead{object = CClothesCapLarge{}},
-    -- ["slots.back"]   = CSlotBack{object = CClothesScrollCaseLarge{}},
-    -- ["inventories.any"] = CInventoryAny{objects = {
-    --     CObjectSpellLarge{used = CObject.USEDNONE},
-    -- }},
+    ["slots.handrg"] = CSlotHandRG{object = CWeaponWandLarge{}},
+    ["slots.handlf"] = CSlotHandLF{object = CWeaponRuneLarge{}},
+    ["slots.head"]   = CSlotHead{object = CClothesCapLarge{}},
+    ["slots.back"]   = CSlotBack{object = CClothesScrollCaseLarge{}},
+    ["inventories.any"] = CInventoryAny{objects = {
+        CObjectSpellLarge{used = CObject.USEDNONE},
+    }},
 }
 end
 end -- psy

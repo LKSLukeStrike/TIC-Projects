@@ -33,7 +33,30 @@ function CEntityDrawable:new(_argt)
     self.hoverbutton  = CButtonEntityHoverLock{entity = self} -- hover button
     --
     self:argt(_argt) -- override if any
-    self.world:appendEntity(self)-- append itself to the world
+    -- self.world:appendEntity(self)-- append itself to the world
+end
+
+function CEntityDrawable:argt(_argt) -- append an entity
+    CEntity.super.argt(self, _argt)
+    self:append()
+end
+
+function CEntityDrawable:append() -- append an entity
+    self:wordAppend()
+end
+
+function CEntityDrawable:delete() -- delete an entity
+    self:wordDelete()
+end
+
+function CEntityDrawable:wordAppend() -- append an entity to world
+    if not self.world then return end
+    self.world:appendEntity(self)
+end
+
+function CEntityDrawable:wordDelete() -- delete an entity from world
+    if not self.world then return end
+    self.world:deleteEntity(self)
 end
 
 function CEntityDrawable:draw() -- default draw for drawable entities -- override if any

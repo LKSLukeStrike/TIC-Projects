@@ -165,7 +165,7 @@ function CCyclerTable:find(_item)
     return Tables:valFind(self.acttable, _item)
 end
 
-function CCyclerTable:insert(_item, _one, _at) -- insert an _item into table _at (end by default) -- TODO add unique ?
+function CCyclerTable:insert(_item, _one, _at) -- insert an _item into table _at (end by default)
     if not _item then return self.actvalue end
     if _one and self:find(_item) then return self.actvalue end
     if not _at then
@@ -180,14 +180,21 @@ function CCyclerTable:insert(_item, _one, _at) -- insert an _item into table _at
     return self:argt()
 end
 
-function CCyclerTable:remove(_at) -- remove an item from table _at (end by default)
+function CCyclerTable:removeAt(_at) -- remove an item from table _at (end by default)
     _at = _at or self.maxindex
     _at = (Nums:isLT(_at, self.minindex)) and self.minindex or _at -- beg
     _at = (Nums:isGT(_at, self.maxindex)) and self.maxindex or _at -- end
     if _at == 0 then return end -- empty cycler
     table.remove(self.acttable, _at)
-    self.actindex = (_at <= self.actindex) and self.actindex - 1 or self.actindex
+    if _at <= self.actindex then self.actindex = self.actindex - 1 end -- adjust actindex if any
     return self:argt()
+end
+
+function CCyclerTable:remove(_item) -- remove an item from table
+    if not _item then return end
+    local _at = self:find(_item)
+    if not _at then return end
+    return self:removeAt(_at)
 end
 
 function CCyclerTable:prev() -- prev cycler value

@@ -8,10 +8,12 @@ Classic.NAMEWORLD = "World"
 function CWorld:new(_argt)
     CWorld.super.new(self, _argt)
     self.classic = CWorld -- instance of
-    self.kind = Classic.KINDWORLD
-    self.name = Classic.NAMEWORLD
+    self.kind    = Classic.KINDWORLD
+    self.name    = Classic.NAMEWORLD
+    --
     self.region            = CRegion{} -- world boundaries
     self.entitieslocations = CEntitiesLocations{} -- record world entities and their locations
+    --
     self:argt(_argt) -- override if any
 end
 
