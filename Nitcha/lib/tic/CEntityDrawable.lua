@@ -42,19 +42,19 @@ function CEntityDrawable:argt(_argt) -- append an entity
 end
 
 function CEntityDrawable:append() -- append an entity
-    self:wordAppend()
+    self:worldAppend()
 end
 
 function CEntityDrawable:delete() -- delete an entity
-    self:wordDelete()
+    self:worldDelete()
 end
 
-function CEntityDrawable:wordAppend() -- append an entity to world
+function CEntityDrawable:worldAppend() -- append an entity to world
     if not self.world then return end
     self.world:appendEntity(self)
 end
 
-function CEntityDrawable:wordDelete() -- delete an entity from world
+function CEntityDrawable:worldDelete() -- delete an entity from world
     if not self.world then return end
     self.world:deleteEntity(self)
 end

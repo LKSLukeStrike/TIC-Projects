@@ -25,6 +25,7 @@ end
 
 function CWorld:deleteEntity(_entity) -- delete an entity from the world
     if not _entity then return end -- mandatory
+    _entity.world = nil
     self.entitieslocations:deleteEntity(_entity)
 end
 

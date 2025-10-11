@@ -289,9 +289,12 @@ function CCharacter:adjustInventoriesSlots()
     _inventorymen:movetoInventory(_inventoryany)
     _inventorypsy:movetoInventory(_inventoryany)
 
-    for _, _object in ipairs(_inventoryany.objects) do -- delete from the world
+    for _, _object in ipairs(_inventoryany.objects) do -- delete objects from the world
         _object.discovered = true -- the object is discovered
-        self.world:deleteEntity(_object)
+        -- self.world:deleteEntity(_object)
+Tic:trace(_object.kind, _object.name, _object.world)
+        _object:worldDelete()
+Tic:trace(_object.kind, _object.name, _object.world)
     end
 
     _inventoryphy.objectsmax = self.statphymax -- adjust inventories limits
@@ -418,7 +421,8 @@ function CCharacter:dropObject(_object, _withmessage)
         if _next then Tic.DIRSCYCLER:next() else Tic.DIRSCYCLER:prev() end
     until Tic.DIRSCYCLER.actindex == _actindex
 
-    _object.worldx = self.worldx -- drop the object
+    _object.world  = self.world -- drop the object in the character world
+    _object.worldx = self.worldx
     _object.worldy = self.worldy
     _object.dirx = self.dirx
     self.world:appendEntity(_object, Tic.SPRITESIZE, _trials)
@@ -450,7 +454,7 @@ function CCharacter:pickObject(_object, _withmessage)
     local _slot = _object:findFreeSlot(self.slots)
     if _slot then _slot:appendObject(_object, true) end
 
-    self.world:deleteEntity(_object)
+    _object:worldDelete() -- delete object from the world
 
     if _withmessage then Tic:messageAppend(self.name.." "..Tic.TEXTPICK..": ".._object.kind.." ".._object.name) end
 

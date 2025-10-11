@@ -2491,21 +2491,24 @@ W3lfie = CPlayerMeduz{classed = CPlayerMeduz,
     -- spottingspot = true,
     spottingpick = true,
     ["slots.handrg"] = CSlotHandRG{object = CWeaponWandLarge{}},
-    ["slots.handlf"] = CSlotHandLF{object = CWeaponRuneLarge{}},
-    ["slots.head"]   = CSlotHead{object = CClothesCapLarge{}},
-    ["slots.back"]   = CSlotBack{object = CClothesScrollCaseLarge{}},
-    ["inventories.any"] = CInventoryAny{objects = {
-        CObjectSpellLarge{used = CObject.USEDNONE},
-    }},
+    -- ["slots.handlf"] = CSlotHandLF{object = CWeaponRuneLarge{}},
+    -- ["slots.head"]   = CSlotHead{object = CClothesCapLarge{}},
+    -- ["slots.back"]   = CSlotBack{object = CClothesScrollCaseLarge{}},
+    -- ["inventories.any"] = CInventoryAny{objects = {
+    --     CObjectSpellLarge{used = CObject.USEDNONE},
+    -- }},
 }
 end
 end -- psy
 end
+
 if false then
 Party = CCharacterParty{}
 Tic:playerAppend(Party)
 -- Tic:playerRem HH
 end
+
+Tic:traceTable(World.entitieslocations.locations.locations, {depth = 3, indent = "-"})
 -- exit()
 
 
@@ -2840,13 +2843,13 @@ function Tic:draw()
 end
 
 function Tic:drawLog()
-    -- Tic:logWorld()
+    Tic:logWorld()
     -- Tic:logInventories()
     -- Tic:logScreens()
 end
 
 function Tic:logWorld()
-    local _world = Tic:playerActual().world
+    local _world = Tic:worldActual()
     if not _world then return end
 
     local _kindnames = {}

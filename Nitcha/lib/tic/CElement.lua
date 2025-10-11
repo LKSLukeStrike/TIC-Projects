@@ -75,7 +75,6 @@ function CElement:new(_argt)
     self.colorground = Tic.COLORHUDSCREEN -- colors
     self.colorguides = Tic.COLORGREYM
     self.colorinside = Tic.COLORGREYM
-    self.colorcaches = Tic.COLORHUDSCREEN
     self.colorborder = Tic.COLORGREYM
     self.colorframe1 = Tic.COLORWHITE
     self.colorframe2 = Tic.COLORGREYL
