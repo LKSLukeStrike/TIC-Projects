@@ -218,8 +218,8 @@ function CCharacter:new(_argt)
     self.hovering     = nil -- hovering entity if any
     self.spotting     = nil -- spotting entity if any
     self.spottingspot = false -- spot its spotting
-    self.spottinglock = false -- lock its spotting
     self.spottingpick = false -- pick its spotting
+    self.spottinglock = false -- lock its spotting
     self.colorhairsfg = Tic.COLORHAIRSFG -- colors
     self.colorhairsbg = Tic.COLORHAIRSBG
     self.colorskin    = Tic.COLORSKIN
@@ -1202,6 +1202,10 @@ end
 
 function CCharacter:entityHovering()
 	return self.hovering
+end
+
+function CCharacter:lockSpotting(_tf)
+	self.spottinglock = _tf
 end
 
 function CCharacter:moveWorldXY(_worldx, _worldy) -- move character into world

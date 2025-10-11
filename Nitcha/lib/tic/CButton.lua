@@ -248,7 +248,7 @@ function CButtonEntityHoverLock:new(_argt)
                        end
     self.unlock      = function()
                         local _playeractual = Tic:playerActual()
-                        _playeractual:spotEntity()
+                        _playeractual:spotEntity(nil)
                         _playeractual.spottinglock = false
                         Tic:mouseDelay()
                        end

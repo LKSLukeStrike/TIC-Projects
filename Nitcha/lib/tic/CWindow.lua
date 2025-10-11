@@ -572,13 +572,20 @@ function CWindowWorld:drawPlayerActual()
     local _playerregionmindworld = _playeractual:regionMindWorld()
     local _playernearestentity   = _playeractual:nearestEntityViewWorld() -- nearest entity if any -- except itself
 
-    _playeractual:hoverEntity() -- unhover
+    if _playeractual:entitySpotting() -- unspot entity if not anymore in world
+    and not _playeractual:entitySpotting().world
+    then
+        _playeractual:spotEntity(nil)
+        _playeractual:lockSpotting(false)
+    end
 
     if not _playeractual:isSpottingLock() -- spot the nearest entity if not spotting lock -- FIXME something weird here
     or not _playeractual:entitySpotting() -- or nothing is spotted
     then
         _playeractual:spotEntity(_playernearestentity)
     end
+
+    _playeractual:hoverEntity(nil) -- unhover
 
     _playeractual:interactbyRemoveAll()
     _playeractual:adjustInteract()

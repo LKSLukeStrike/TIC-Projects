@@ -2456,7 +2456,7 @@ W1lfie = _playerclass{classed = _playerclass,
     }},
 }
 end
-if false then
+if true then
 W2lfie = _playerclass{classed = _playerclass,
     name = "W2lfie",
     size = Tic.SIZEM,
@@ -2466,15 +2466,15 @@ W2lfie = _playerclass{classed = _playerclass,
     -- colorextra = Tic.COLORGREENM,
     worldx = 20,
     worldy = 20,
-    -- spottingspot = true,
+    spottingspot = true,
     spottingpick = true,
     ["slots.handrg"] = CSlotHandRG{object = CWeaponWandMedium{}},
-    ["slots.handlf"] = CSlotHandLF{object = CWeaponRuneMedium{}},
-    ["slots.head"]   = CSlotHead{object = CClothesCapMedium{}},
-    ["slots.back"]   = CSlotBack{object = CClothesScrollCaseMedium{}},
-    ["inventories.any"] = CInventoryAny{objects = {
-        CObjectSpellMedium{used = CObject.USEDHALF},
-    }},
+    -- ["slots.handlf"] = CSlotHandLF{object = CWeaponRuneMedium{}},
+    -- ["slots.head"]   = CSlotHead{object = CClothesCapMedium{}},
+    -- ["slots.back"]   = CSlotBack{object = CClothesScrollCaseMedium{}},
+    -- ["inventories.any"] = CInventoryAny{objects = {
+    --     CObjectSpellMedium{used = CObject.USEDHALF},
+    -- }},
 }
 end
 if true then
@@ -2488,7 +2488,7 @@ W3lfie = CPlayerMeduz{classed = CPlayerMeduz,
     -- colorextra = Tic.COLORGREENL,
     worldx = 40,
     worldy = 20,
-    -- spottingspot = true,
+    spottingspot = true,
     spottingpick = true,
     ["slots.handrg"] = CSlotHandRG{object = CWeaponWandLarge{}},
     -- ["slots.handlf"] = CSlotHandLF{object = CWeaponRuneLarge{}},
@@ -2708,22 +2708,22 @@ end
 
 
 if true then
-House1 = CPlaceHouseAnim{
-    name = "House1",
-    worldx = -20,
-    worldy = 10,
-    -- hovered = true,
-}
+-- House1 = CPlaceHouseAnim{
+--     name = "House1",
+--     worldx = -20,
+--     worldy = 10,
+--     -- hovered = true,
+-- }
 House2 = CPlaceHouseAnim{
     name = "House2",
     worldx = 30,
     worldy = 40,
 }
-Kirke1 = CPlaceKirkeAnim{
-    name = "Kirke1",
-    worldx = -20,
-    worldy = 40,
-}
+-- Kirke1 = CPlaceKirkeAnim{
+--     name = "Kirke1",
+--     worldx = -20,
+--     worldy = 40,
+-- }
 -- CPlace:generateRoad(House1.worldx, House1.worldy, House2.worldx, House2.worldy, 15)
 -- CPlace:generateRoad(House1.worldx, House1.worldy, Kirke1.worldx, Kirke1.worldy, 20)
 -- CPlace:generateRoad(House2.worldx, House2.worldy, Kirke1.worldx, Kirke1.worldy, 10)
