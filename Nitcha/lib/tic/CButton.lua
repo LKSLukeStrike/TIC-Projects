@@ -561,6 +561,8 @@ function CButtonPlayerStat:new(_argt)
     self.sprite.palette = {[Tic.COLORGREYM] = Tic.COLORWHITE, [Tic.COLORGREYD] = Tic.COLORKEY}
     self.behaviour      = IButtonPlayer.BEHAVIOUR
     self.getcolorstat   = nil -- getcolorstat function if any
+    self.clicklf        = function() end
+    self.hovertextrg    = CHoverTextRG{text = ""}
     self:argt(_argt) -- override if any
 end
 
@@ -579,6 +581,11 @@ function CButtonPlayerStatPhy:new(_argt)
     CButtonPlayerStatPhy.super.new(self, _argt)
     self.sprite.sprite = CSpriteBG.SIGNACTPHY
     self.getcolorstat  = function() return Tic:playerActual():colorPhyAct() end
+    self.behaviour     = function(self)
+                            IButtonPlayer.BEHAVIOUR(self)
+                            local _playeractual = Tic:playerActual()
+                            self.hovertextrg.text = "Phy:".._playeractual.statphyact.."/".._playeractual.statphymax
+                         end
     self:argt(_argt) -- override if any
 end
 
@@ -587,6 +594,11 @@ function CButtonPlayerStatMen:new(_argt)
     CButtonPlayerStatMen.super.new(self, _argt)
     self.sprite.sprite = CSpriteBG.SIGNACTMEN
     self.getcolorstat  = function() return Tic:playerActual():colorMenAct() end
+    self.behaviour     = function(self)
+                            IButtonPlayer.BEHAVIOUR(self)
+                            local _playeractual = Tic:playerActual()
+                            self.hovertextrg.text = "Men:".._playeractual.statmenact.."/".._playeractual.statmenmax
+                         end
     self:argt(_argt) -- override if any
 end
 
@@ -595,6 +607,11 @@ function CButtonPlayerStatPsy:new(_argt)
     CButtonPlayerStatPsy.super.new(self, _argt)
     self.sprite.sprite = CSpriteBG.SIGNACTPSY
     self.getcolorstat  = function() return Tic:playerActual():colorPsyAct() end
+    self.behaviour     = function(self)
+                            IButtonPlayer.BEHAVIOUR(self)
+                            local _playeractual = Tic:playerActual()
+                            self.hovertextrg.text = "Psy:".._playeractual.statpsyact.."/".._playeractual.statpsymax
+                         end
     self:argt(_argt) -- override if any
 end
 

@@ -2508,7 +2508,7 @@ Tic:playerAppend(Party)
 -- Tic:playerRem HH
 end
 
-Tic:traceTable(World.entitieslocations.locations.locations, {depth = 3, indent = "-"})
+-- Tic:traceTable(World.entitieslocations.locations.locations, {depth = 3, indent = "-"})
 -- exit()
 
 

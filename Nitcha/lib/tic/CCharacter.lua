@@ -291,10 +291,7 @@ function CCharacter:adjustInventoriesSlots()
 
     for _, _object in ipairs(_inventoryany.objects) do -- delete objects from the world
         _object.discovered = true -- the object is discovered
-        -- self.world:deleteEntity(_object)
-Tic:trace(_object.kind, _object.name, _object.world)
         _object:worldDelete()
-Tic:trace(_object.kind, _object.name, _object.world)
     end
 
     _inventoryphy.objectsmax = self.statphymax -- adjust inventories limits
