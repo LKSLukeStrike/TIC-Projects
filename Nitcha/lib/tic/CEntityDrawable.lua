@@ -31,6 +31,7 @@ function CEntityDrawable:new(_argt)
     self.drawfade     = false
     self.drawbgfg     = Tic.DRAWFG -- use bg/fg palette if any
     self.hoverbutton  = CButtonEntityHoverLock{entity = self} -- hover button
+    self.musprite     = CSprite{} -- multi usage sprite
     --
     self:argt(_argt) -- override if any
     -- self.world:appendEntity(self)-- append itself to the world
@@ -83,7 +84,7 @@ function CEntityDrawable:draw() -- default draw for drawable entities -- overrid
             or  Tables:merge(_palette, _palette1)
     end
 
-    local _musprite = CSpriteBG() -- multi usage sprite
+    local _musprite   = self.musprite -- multi usage sprite
     _musprite.sprite  = self.sprite
     _musprite.name    = self.name
     _musprite.screenx = self.screenx
@@ -106,7 +107,7 @@ end
 
 function CEntityDrawable:drawSpotted() -- draw spotted if any
     if not self.spotted then return end -- dont draw
-    local _musprite = CSpriteBG() -- multi usage sprite
+    local _musprite   = self.musprite -- multi usage sprite
     _musprite.sprite  = CSpriteBG.SIGNSPOTSQ
     _musprite.screenx = self.screenx
     _musprite.offsetx = self.offsetx
@@ -125,7 +126,7 @@ end
 function CEntityDrawable:drawBorders() -- draw borders if any
     self.drawborders = Tic.DRAWBORDERS -- use Tic as master
     if not self.drawborders then return end -- dont draw
-    local _musprite = CSpriteBG() -- multi usage sprite
+    local _musprite   = self.musprite -- multi usage sprite
     _musprite.sprite  = CSpriteBG.SIGNBORDSQ
     _musprite.screenx = self.screenx
     _musprite.screeny = self.screeny
@@ -148,7 +149,7 @@ function CEntityDrawable:drawInteractBy()
     local _offsetx  = (self.dirx == Tic.DIRXLF)
         and -2
         or   2
-    local _musprite = CSpriteFG() -- multi usage sprite
+    local _musprite   = self.musprite -- multi usage sprite
     _musprite.sprite  = CSpriteFG.EFFECTOBIMK -- apply the corresponding attributes
     _musprite.screenx = self.screenx
     _musprite.screeny = self.screeny
