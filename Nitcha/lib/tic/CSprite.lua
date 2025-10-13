@@ -23,6 +23,13 @@ function CSprite:new(_argt)
     CSprite.super.new(self, _argt)
     self.kind = Classic.KINDSPRITE
     self.name = Classic.NAMESPRITE
+    --
+    self:init()
+    --
+    self:argt(_argt) -- override if any
+end
+
+function CSprite:init() -- init a sprite
     self.spritebank  = CSprite.SPRITEBANK
     self.sprite      = self.spritebank -- initial sprite number -- set to nil to act as a spriteboard
     self.screenx     = 0 -- screen positions
@@ -39,7 +46,6 @@ function CSprite:new(_argt)
     self.palette     = {} -- used to palettize if any
     self.colorkeys   = CSprite.COLORKEYS -- default colorkeys
     self.directives  = {} -- painting directives {{boardx = 0-Tic.SPRITESIZE - 1, boardy = 0-Tic.SPRITESIZE - 1, color = 0-15}, ...}
-    self:argt(_argt) -- override if any
 end
 
 function Tic:logSprite(_pfx, _sprite)
@@ -317,6 +323,8 @@ function CSpriteBG:new(_argt) -- FIXME can be removed ?
     CSpriteBG.super.new(self, _argt)
     self.kind = Classic.KINDSPRITEBG
     self.name = Classic.NAMESPRITEBG
+    --
+    --
     self:argt(_argt) -- override if any
 end
 
@@ -432,8 +440,10 @@ function CSpriteFG:new(_argt)
     CSpriteFG.super.new(self, _argt)
     self.kind = Classic.KINDSPRITEFG
     self.name = Classic.NAMESPRITEFG
+    --
     self.spritebank = CSpriteFG.SPRITEBANK
     self.sprite     = self.spritebank
+    --
     self:argt(_argt) -- override if any
 end
 
@@ -454,9 +464,9 @@ end
 
 
 --
--- MUSprite Mouse
+-- Sprite Mouse
 --
-function CSprite:muspriteMouse()
+function CSprite:spriteMouse()
     return CSprite{
         sprite  = CSpriteBG.SIGNMOUSPR,
         palette = {
@@ -468,14 +478,14 @@ function CSprite:muspriteMouse()
     }
 end
 
-function CSprite:muspriteMouseClickLF()
-    local _musprite = CSprite:muspriteMouse()
-    _musprite.palette[Tic.COLORORANGE] = Tic.COLORBLUEL
-    return _musprite
+function CSprite:spriteMouseClickLF()
+    local _spritemouse = CSprite:spriteMouse()
+    _spritemouse.palette[Tic.COLORORANGE] = Tic.COLORBLUEL
+    return _spritemouse
 end
 
-function CSprite:muspriteMouseClickRG()
-    local _musprite = CSprite:muspriteMouse()
-    _musprite.palette[Tic.COLORYELLOW] = Tic.COLORBLUEL
-    return _musprite
+function CSprite:spriteMouseClickRG()
+    local _spritemouse = CSprite:spriteMouse()
+    _spritemouse.palette[Tic.COLORYELLOW] = Tic.COLORBLUEL
+    return _spritemouse
 end

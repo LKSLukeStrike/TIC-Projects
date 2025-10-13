@@ -84,18 +84,18 @@ function CEntityDrawable:draw() -- default draw for drawable entities -- overrid
             or  Tables:merge(_palette, _palette1)
     end
 
-    local _musprite   = self.musprite -- multi usage sprite
-    _musprite.sprite  = self.sprite
-    _musprite.name    = self.name
-    _musprite.screenx = self.screenx
-    _musprite.screeny = self.screeny
-    _musprite.offsetx = self.offsetx
-    _musprite.offsety = self.offsety
-    _musprite.flip    = self.dirx
-    _musprite.scale   = self.scale
-    _musprite.rotate  = self.rotate
-    _musprite.palette = _palette
-    _musprite:draw()
+    self.musprite:init()
+    self.musprite.sprite  = self.sprite
+    self.musprite.name    = self.name
+    self.musprite.screenx = self.screenx
+    self.musprite.screeny = self.screeny
+    self.musprite.offsetx = self.offsetx
+    self.musprite.offsety = self.offsety
+    self.musprite.flip    = self.dirx
+    self.musprite.scale   = self.scale
+    self.musprite.rotate  = self.rotate
+    self.musprite.palette = _palette
+    self.musprite:draw()
 
     self:drawSpotted()
     self:drawHovered()
@@ -107,15 +107,16 @@ end
 
 function CEntityDrawable:drawSpotted() -- draw spotted if any
     if not self.spotted then return end -- dont draw
-    local _musprite   = self.musprite -- multi usage sprite
-    _musprite.sprite  = CSpriteBG.SIGNSPOTSQ
-    _musprite.screenx = self.screenx
-    _musprite.offsetx = self.offsetx
-    _musprite.offsety = self.offsety
-    _musprite.screeny = self.screeny
-    _musprite.scale   = self.scale
-    _musprite.palette = {[Tic.COLORGREYM] = Tic.COLORWHITE,}
-    _musprite:draw()
+
+    self.musprite:init()
+    self.musprite.sprite  = CSpriteBG.SIGNSPOTSQ
+    self.musprite.screenx = self.screenx
+    self.musprite.offsetx = self.offsetx
+    self.musprite.offsety = self.offsety
+    self.musprite.screeny = self.screeny
+    self.musprite.scale   = self.scale
+    self.musprite.palette = {[Tic.COLORGREYM] = Tic.COLORWHITE,}
+    self.musprite:draw()
 end
 
 function CEntityDrawable:drawHovered() -- draw hovered if any
@@ -126,15 +127,16 @@ end
 function CEntityDrawable:drawBorders() -- draw borders if any
     self.drawborders = Tic.DRAWBORDERS -- use Tic as master
     if not self.drawborders then return end -- dont draw
-    local _musprite   = self.musprite -- multi usage sprite
-    _musprite.sprite  = CSpriteBG.SIGNBORDSQ
-    _musprite.screenx = self.screenx
-    _musprite.screeny = self.screeny
-    _musprite.offsetx = self.offsetx
-    _musprite.offsety = self.offsety
-    _musprite.scale   = self.scale
-    _musprite.palette = {[Tic.COLORGREYM] = Tic.COLORGREYL,}
-    _musprite:draw()
+
+    self.musprite:init()
+    self.musprite.sprite  = CSpriteBG.SIGNBORDSQ
+    self.musprite.screenx = self.screenx
+    self.musprite.screeny = self.screeny
+    self.musprite.offsetx = self.offsetx
+    self.musprite.offsety = self.offsety
+    self.musprite.scale   = self.scale
+    self.musprite.palette = {[Tic.COLORGREYM] = Tic.COLORGREYL,}
+    self.musprite:draw()
 end
 
 function CEntityDrawable:drawHitbox() -- draw hitbox if any
@@ -149,16 +151,17 @@ function CEntityDrawable:drawInteractBy()
     local _offsetx  = (self.dirx == Tic.DIRXLF)
         and -2
         or   2
-    local _musprite   = self.musprite -- multi usage sprite
-    _musprite.sprite  = CSpriteFG.EFFECTOBIMK -- apply the corresponding attributes
-    _musprite.screenx = self.screenx
-    _musprite.screeny = self.screeny
-    _musprite.offsetx = _offsetx * self.scale
-    _musprite.offsety = Nums:neg(Tic.SPRITESIZE * self.scale)
-    _musprite.scale   = self.scale
-    _musprite.flip    = self.dirx
-    _musprite.palette = {[Tic.COLORGREYD] = Tic.COLORKEY, [Tic.COLORWHITE] = Tic.COLORGREYL}
-    _musprite:draw()
+    
+    self.musprite:init()
+    self.musprite.sprite  = CSpriteFG.EFFECTOBIMK -- apply the corresponding attributes
+    self.musprite.screenx = self.screenx
+    self.musprite.screeny = self.screeny
+    self.musprite.offsetx = _offsetx * self.scale
+    self.musprite.offsety = Nums:neg(Tic.SPRITESIZE * self.scale)
+    self.musprite.scale   = self.scale
+    self.musprite.flip    = self.dirx
+    self.musprite.palette = {[Tic.COLORGREYD] = Tic.COLORKEY, [Tic.COLORWHITE] = Tic.COLORGREYL}
+    self.musprite:draw()
 end
 
 function CEntityDrawable:adjustScreenXYRelativeToEntity(_entity) -- adjust an entity screen xy relative to an other one in world positions

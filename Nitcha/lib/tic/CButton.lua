@@ -73,7 +73,7 @@ function CButton:drawHovertextUP()
     self.hovertextup.screenx = self.screenx - ((self.hovertextup.screenw - self.screenw) // 2) + 1
     self.hovertextup.screeny = self.screeny - self.hovertextup.screenh
     local _mousesprite = (self.drawmouse)
-        and CSprite:muspriteMouseClickLF()
+        and CSprite:spriteMouseClickLF()
         or  nil
     local _shiftsprite = nil
     Tic:hovertextsAppend(self.hovertextup, _mousesprite, _shiftsprite)
@@ -84,7 +84,7 @@ function CButton:drawHovertextDW()
     self.hovertextdw.screenx = self.screenx - ((self.hovertextdw.screenw - self.screenw) // 2) + 1
     self.hovertextdw.screeny = self.screeny + self.screenh
     local _mousesprite = (self.drawmouse)
-        and CSprite:muspriteMouseClickRG()
+        and CSprite:spriteMouseClickRG()
         or  nil
     local _shiftsprite = nil
     Tic:hovertextsAppend(self.hovertextdw, _mousesprite, _shiftsprite)

@@ -2817,13 +2817,13 @@ function Tic:draw()
     CSprite.BOARD:drawScreen(nil, 30)
 
     CSprite:modeBoardScreen()
-    local _musprite = CSpriteBoard{
+    local _spritenoard = CSpriteBoard{
         screenx    = Lance02.screenx,
         screeny    = Lance02.screeny,
         flip       = Lance02.flip,
         rotate     = Lance02.rotate,
     }
-    _musprite:draw()
+    _spritenoard:draw()
 
     CSprite:modeSpriteScreen()
     end

@@ -177,23 +177,23 @@ function ICharacterHumanoid:drawBody()
         and _bodyframe -- fix frame
         or  self.frame
 
-    local _musprite = CSpriteFG() -- multi usage sprite
-    _musprite.sprite  = self.bodysprite + _bodyspriteoffset -- apply the corresponding attributes
-    _musprite.screenx = self.screenx
-    _musprite.screeny = self.screeny
-    _musprite.offsetx = _bodyoffsetx
-    _musprite.offsety = _bodyoffsety
-    _musprite.rotate  = _bodyrotate
-    _musprite.frame   = _bodyframe
-    _musprite.scale   = self.scale
-    _musprite.flip    = self.dirx
-    _musprite.palette = { -- apply body palette
+    self.musprite:init()
+    self.musprite.sprite  = self.bodysprite + _bodyspriteoffset -- apply the corresponding attributes
+    self.musprite.screenx = self.screenx
+    self.musprite.screeny = self.screeny
+    self.musprite.offsetx = _bodyoffsetx
+    self.musprite.offsety = _bodyoffsety
+    self.musprite.rotate  = _bodyrotate
+    self.musprite.frame   = _bodyframe
+    self.musprite.scale   = self.scale
+    self.musprite.flip    = self.dirx
+    self.musprite.palette = { -- apply body palette
         [Tic.COLORARMOR] = self.colorarmor,
         [Tic.COLORSHIRT] = self.colorshirt,
         [Tic.COLORPANTS] = self.colorpants,
         [Tic.COLORHANDS] = self.colorhands,
     }
-    _musprite:draw()
+    self.musprite:draw()
 end
 
 function ICharacterHumanoid:drawHead()
@@ -207,25 +207,23 @@ function ICharacterHumanoid:drawHead()
         or  _headoffsety
     local _headrotate      = _posturesettings.rotate
 
-
-    local _musprite = CSpriteFG() -- multi usage sprite
-
     -- draw head
-    _musprite.sprite  = self.headsprite -- apply the corresponding attributes
-    _musprite.screenx = self.screenx
-    _musprite.screeny = self.screeny
-    _musprite.offsetx = _headoffsetx
-    _musprite.offsety = _headoffsety
-    _musprite.rotate  = _headrotate
-    _musprite.scale   = self.scale
-    _musprite.flip    = self.dirx
-    _musprite.palette = { -- apply head palette
+    self.musprite:init()
+    self.musprite.sprite  = self.headsprite -- apply the corresponding attributes
+    self.musprite.screenx = self.screenx
+    self.musprite.screeny = self.screeny
+    self.musprite.offsetx = _headoffsetx
+    self.musprite.offsety = _headoffsety
+    self.musprite.rotate  = _headrotate
+    self.musprite.scale   = self.scale
+    self.musprite.flip    = self.dirx
+    self.musprite.palette = { -- apply head palette
         [Tic.COLORHAIRSFG] = self.colorhairsfg,
         [Tic.COLORHAIRSBG] = self.colorhairsbg,
         [Tic.COLOREXTRA]   = self.colorextra,
         [Tic.COLORSKIN]    = self.colorskin,
     }
-    _musprite:draw()
+    self.musprite:draw()
 
     -- draw head eyes
     local _coloreyesfg = Tic.COLORKEY
@@ -246,14 +244,14 @@ function ICharacterHumanoid:drawHead()
         end
     end
 
-    _musprite.sprite  = self.eyessprite -- apply the corresponding attributes
-    _musprite.palette = { -- apply eyes palette
+    self.musprite.sprite  = self.eyessprite -- apply the corresponding attributes
+    self.musprite.palette = { -- apply eyes palette
         [Tic.COLOREYESFG] = _coloreyesfg,
         [Tic.COLOREYESBU] = _coloreyesbu,
         [Tic.COLOREYESBM] = _coloreyesbm,
         [Tic.COLOREYESBD] = _coloreyesbd,
     }
-    _musprite:drawDirectives()
+    self.musprite:drawDirectives()
 
     -- draw head slot if any
     if not self.slots then return end -- mandatory

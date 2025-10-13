@@ -822,14 +822,14 @@ function CCharacter:drawEffect()
         and _statussettings.palette0
         or  _statussettings.palette1
 
-    local _musprite = CSpriteFG() -- multi usage sprite
-    _musprite.sprite  = _effectsprite
-    _musprite.screenx = self.screenx
-    _musprite.screeny = self.screeny
-    _musprite.flip    = self.dirx
-    _musprite.scale   = self.scale
-    _musprite.palette = _palette
-    _musprite:draw()
+    self.musprite:init()
+    self.musprite.sprite  = _effectsprite
+    self.musprite.screenx = self.screenx
+    self.musprite.screeny = self.screeny
+    self.musprite.flip    = self.dirx
+    self.musprite.scale   = self.scale
+    self.musprite.palette = _palette
+    self.musprite:draw()
 end
 
 function CCharacter:drawParty()
@@ -861,21 +861,21 @@ function CCharacter:drawParty()
         end
     end
    
-    local _musprite = CSpriteFG() -- multi usage sprite
-    _musprite.sprite  = CSpriteFG.EFFECTPARTY
-    _musprite.screenx = self.screenx
-    _musprite.screeny = self.screeny
-    _musprite.offsety = _offsety
-    _musprite.flip    = self.dirx
-    _musprite.scale   = self.scale
-    _musprite.palette = {
+    self.musprite:init()
+    self.musprite.sprite  = CSpriteFG.EFFECTPARTY
+    self.musprite.screenx = self.screenx
+    self.musprite.screeny = self.screeny
+    self.musprite.offsety = _offsety
+    self.musprite.flip    = self.dirx
+    self.musprite.scale   = self.scale
+    self.musprite.palette = {
         -- [Tic.COLORGREYM]  = self.colorhairsbg,
         [Tic.COLORPURPLE] = _coloreyesbu,
         [Tic.COLORRED]    = _coloreyesbm,
         [Tic.COLORORANGE] = _coloreyesbd,
         [Tic.COLORYELLOW] = _coloreyesfg,
     }
-    _musprite:draw()
+    self.musprite:draw()
 end
 
 function CCharacter:drawHandle(_screenx, _screeny, _color) -- for debug
@@ -1048,20 +1048,20 @@ function CCharacter:drawInteractToBy(_toby) -- true = to, false = by -- FIXME us
         and _headoffsety + self.size
         or  _headoffsety
 
-    local _musprite = CSpriteFG() -- multi usage sprite
-    _musprite.sprite  = CSpriteFG.EFFECTCHIMK -- apply the corresponding attributes
-    _musprite.screenx = self.screenx
-    _musprite.screeny = self.screeny
-    _musprite.offsetx = _headoffsetx * self.scale
-    _musprite.offsety = _headoffsety * self.scale
-    _musprite.scale   = self.scale
-    _musprite.flip    = (_toby)
+    self.musprite:init()
+    self.musprite.sprite  = CSpriteFG.EFFECTCHIMK -- apply the corresponding attributes
+    self.musprite.screenx = self.screenx
+    self.musprite.screeny = self.screeny
+    self.musprite.offsetx = _headoffsetx * self.scale
+    self.musprite.offsety = _headoffsety * self.scale
+    self.musprite.scale   = self.scale
+    self.musprite.flip    = (_toby)
         and self.dirx
         or  Nums:toggle01(self.dirx)
-    _musprite.palette = (_toby)
+    self.musprite.palette = (_toby)
         and {[Tic.COLORGREYD] = Tic.COLORKEY}
         or  {[Tic.COLORGREYD] = Tic.COLORKEY, [Tic.COLORWHITE] = Tic.COLORGREYL}
-    _musprite:draw()
+    self.musprite:draw()
 end
 
 function CCharacter:canInteract()
