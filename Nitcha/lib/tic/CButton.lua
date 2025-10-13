@@ -632,7 +632,7 @@ end
 CButtonInteractions = CButtonSprite:extend()
 function CButtonInteractions:new(_argt)
     CButtonInteractions.super.new(self, _argt)
-    self.sprite.sprite  = CSpriteFG.EFFECTINTMK
+    self.sprite.sprite  = CSpriteFG.EFFECTCHIMK
     self.sprite.palette = IButton.PALETTEKEY
     self.behaviour      = IButtonInteractions.BEHAVIOUR
     self.drawground     = false

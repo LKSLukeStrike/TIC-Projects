@@ -668,7 +668,6 @@ function CCharacter:nearestEntityViewWorld() -- nearest entity in itself view wo
 end
 
 function CCharacter:draw() -- set animations and draw layers
-    Tic.LOGSPRITE = false
     self:cycle()
     self:drawDirs()
 
@@ -685,13 +684,13 @@ function CCharacter:draw() -- set animations and draw layers
     self:drawHovered()
     self:drawBorders()
     self:drawHitbox()
+
     self:drawView()
     self:drawMind()
     self:drawMove()
 
     self:drawInteractTo()
     self:drawInteractBy()
-    Tic.LOGSPRITE = false
 end
 
 function CCharacter:cycle() -- cycle the cyclers
@@ -1050,7 +1049,7 @@ function CCharacter:drawInteractToBy(_toby) -- true = to, false = by -- FIXME us
         or  _headoffsety
 
     local _musprite = CSpriteFG() -- multi usage sprite
-    _musprite.sprite  = CSpriteFG.EFFECTINTMK -- apply the corresponding attributes
+    _musprite.sprite  = CSpriteFG.EFFECTCHIMK -- apply the corresponding attributes
     _musprite.screenx = self.screenx
     _musprite.screeny = self.screeny
     _musprite.offsetx = _headoffsetx * self.scale

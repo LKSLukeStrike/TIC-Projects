@@ -356,9 +356,10 @@ CSpriteFG.EFFECTSLEEP = CSpriteFG.EFFECTBANK + 0
 CSpriteFG.EFFECTWOUND = CSpriteFG.EFFECTBANK + 1
 CSpriteFG.EFFECTDEATH = CSpriteFG.EFFECTBANK + 2
 CSpriteFG.EFFECTPARTY = CSpriteFG.EFFECTBANK + 3
-CSpriteFG.EFFECTINTMK = CSpriteFG.EFFECTBANK + 4 -- interact mark
-CSpriteFG.EFFECTQSTMK = CSpriteFG.EFFECTBANK + 5 -- question mark
-CSpriteFG.EFFECTEXCMK = CSpriteFG.EFFECTBANK + 6 -- exclamation mark
+CSpriteFG.EFFECTCHIMK = CSpriteFG.EFFECTBANK + 4 -- character interaction mark
+CSpriteFG.EFFECTOBIMK = CSpriteFG.EFFECTBANK + 5 -- object interaction mark
+CSpriteFG.EFFECTQSTMK = CSpriteFG.EFFECTBANK + 6 -- question mark
+CSpriteFG.EFFECTEXCMK = CSpriteFG.EFFECTBANK + 7 -- exclamation mark
 
 CSpriteFG.OBJECTBANK  = 352 -- objects bank
 

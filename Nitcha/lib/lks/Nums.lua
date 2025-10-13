@@ -36,12 +36,12 @@ end
 -- Signs
 function Nums:neg(_num) -- negative num
     _num = _num or 0
-    return (_num <= 0) and _num or 0 - math.abs(_num)
+    return 0 - math.abs(_num)
 end
 
 function Nums:pos(_num) -- positive num
     _num = _num or 0
-    return (_num >= 0) and _num or 0 + math.abs(_num)
+    return 0 + math.abs(_num)
 end
 
 function Nums:invert(_num) -- invert positive/negative

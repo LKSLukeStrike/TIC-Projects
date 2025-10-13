@@ -100,10 +100,12 @@ function CEntityDrawable:draw() -- default draw for drawable entities -- overrid
     self:drawHovered()
     self:drawBorders()
     self:drawHitbox()
+
+    self:drawInteractBy()
 end
 
 function CEntityDrawable:drawSpotted() -- draw spotted if any
-    if not self.spotted then return end -- nothing to draw
+    if not self.spotted then return end -- dont draw
     local _musprite = CSpriteBG() -- multi usage sprite
     _musprite.sprite  = CSpriteBG.SIGNSPOTSQ
     _musprite.screenx = self.screenx
@@ -116,13 +118,13 @@ function CEntityDrawable:drawSpotted() -- draw spotted if any
 end
 
 function CEntityDrawable:drawHovered() -- draw hovered if any
-    if not self.hovered then return end -- nothing to draw
+    if not self.hovered then return end -- dont draw
     self.hoverbutton:draw()
 end
 
 function CEntityDrawable:drawBorders() -- draw borders if any
     self.drawborders = Tic.DRAWBORDERS -- use Tic as master
-    if not self.drawborders then return end -- nothing to draw
+    if not self.drawborders then return end -- dont draw
     local _musprite = CSpriteBG() -- multi usage sprite
     _musprite.sprite  = CSpriteBG.SIGNBORDSQ
     _musprite.screenx = self.screenx
@@ -136,8 +138,26 @@ end
 
 function CEntityDrawable:drawHitbox() -- draw hitbox if any
     self.drawhitbox = Tic.DRAWHITBOX -- use Tic as master
-    if not self.drawhitbox or not self.hitbox then return end -- nothing to draw
+    if not self.drawhitbox or not self.hitbox then return end -- dont draw
     self.hitbox:draw()
+end
+
+function CEntityDrawable:drawInteractBy()
+    if not self:hasInteractBy() then return end -- dont draw
+
+    local _offsetx  = (self.dirx == Tic.DIRXLF)
+        and -2
+        or   2
+    local _musprite = CSpriteFG() -- multi usage sprite
+    _musprite.sprite  = CSpriteFG.EFFECTOBIMK -- apply the corresponding attributes
+    _musprite.screenx = self.screenx
+    _musprite.screeny = self.screeny
+    _musprite.offsetx = _offsetx * self.scale
+    _musprite.offsety = Nums:neg(Tic.SPRITESIZE * self.scale)
+    _musprite.scale   = self.scale
+    _musprite.flip    = self.dirx
+    _musprite.palette = {[Tic.COLORGREYD] = Tic.COLORKEY, [Tic.COLORWHITE] = Tic.COLORGREYL}
+    _musprite:draw()
 end
 
 function CEntityDrawable:adjustScreenXYRelativeToEntity(_entity) -- adjust an entity screen xy relative to an other one in world positions
@@ -198,7 +218,7 @@ function CEntityDrawable:hitboxDetachSelf() -- detach itself from hitto entities
 end
 
 function CEntityDrawable:hitboxDetachAllTo() -- detach all hitto entities
-	if not self.hitbox then return end -- nothing to detach
+	if not self.hitbox then return end -- dont detach
 	self:hitboxDetachTo(self.hitbox.hitto)
 end
 
