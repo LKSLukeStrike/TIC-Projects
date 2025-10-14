@@ -205,57 +205,58 @@ function CCharacter:new(_argt)
     self.kind    = Classic.KINDCHARACTER
     self.name    = Classic.NAMECHARACTER
     --
-    self.size         = Tic.SIZEM -- size
-    self.frame        = CSprite.FRAME00 -- frame
-    self.dirx         = Tic.DIRXLF -- directions
-    self.diry         = Tic.DIRYMD
-    self.direction    = Tic.DIR270
-    self.state        = Tic.STATESTANDIDLE -- state
-    self.movecycler   = CCyclerInt{maxindex = 59}  -- cycler to get back to idle after move
-    self.workcycler   = CCyclerInt{maxindex = 179} -- cycler to animate work
-    self.idlecycler   = CCyclerInt{maxindex = 179} -- cycler to activate idle animation
-    self.hitbox       = CHitbox{entity = self, lf = 2, rg = 4, up = 5, dw = 7}
-    self.hovering     = nil -- hovering entity if any
-    self.spotting     = nil -- spotting entity if any
-    self.spottingspot = false -- spot its spotting
-    self.spottingpick = false -- pick its spotting
-    self.spottinglock = false -- lock its spotting
-    self.colorhairsfg = Tic.COLORHAIRSFG -- colors
-    self.colorhairsbg = Tic.COLORHAIRSBG
-    self.colorskin    = Tic.COLORSKIN
-    self.colorextra   = self.colorskin --Tic.COLOREXTRA
-    self.coloreyesfg  = Tic.COLORGREYL
-    self.coloreyesbg  = Tic.COLORGREYM
-    self.colorarmor   = Tic.COLORARMOR
-    self.colorshirt   = Tic.COLORSHIRT
-    self.colorpants   = Tic.COLORPANTS
-    self.colorhands   = Tic.COLORHANDS
-    self.bodysprite   = CSpriteFG.BODYHUMAN -- body
-    self.headsprite   = CSpriteFG.HEADELVWE -- head
-    self.eyessprite   = CSpriteFG.EYESHUMAN -- eyes
-    self.statphymax   = 5 -- max stats -- 0-Tic.STATSMAX
-    self.statmenmax   = 5
-    self.statpsymax   = 5
-    self.statphyact   = self.statphymax -- act stats -- 0-max
-    self.statmenact   = self.statmenmax
-    self.statpsyact   = self.statpsymax
-    self.slots        = { -- character objects slots
+    self.size           = Tic.SIZEM -- size
+    self.frame          = CSprite.FRAME00 -- frame
+    self.dirx           = Tic.DIRXLF -- directions
+    self.diry           = Tic.DIRYMD
+    self.direction      = Tic.DIR270
+    self.state          = Tic.STATESTANDIDLE -- state
+    self.movecycler     = CCyclerInt{maxindex = 59}  -- cycler to get back to idle after move
+    self.workcycler     = CCyclerInt{maxindex = 179} -- cycler to animate work
+    self.idlecycler     = CCyclerInt{maxindex = 179} -- cycler to activate idle animation
+    self.hitbox         = CHitbox{entity = self, lf = 2, rg = 4, up = 5, dw = 7}
+    self.hovering       = nil -- hovering entity if any
+    self.spotting       = nil -- spotting entity if any
+    self.spottingspot   = false -- spot its spotting
+    self.spottingpick   = false -- pick its spotting
+    self.spottinglock   = false -- lock its spotting
+    self.colorhairsfg   = Tic.COLORHAIRSFG -- colors
+    self.colorhairsbg   = Tic.COLORHAIRSBG
+    self.colorskin      = Tic.COLORSKIN
+    self.colorextra     = self.colorskin --Tic.COLOREXTRA
+    self.coloreyesfg    = Tic.COLORGREYL
+    self.coloreyesbg    = Tic.COLORGREYM
+    self.colorarmor     = Tic.COLORARMOR
+    self.colorshirt     = Tic.COLORSHIRT
+    self.colorpants     = Tic.COLORPANTS
+    self.colorhands     = Tic.COLORHANDS
+    self.bodysprite     = CSpriteFG.BODYHUMAN -- body
+    self.headsprite     = CSpriteFG.HEADELVWE -- head
+    self.eyessprite     = CSpriteFG.EYESHUMAN -- eyes
+    self.statphymax     = 5 -- max stats -- 0-Tic.STATSMAX
+    self.statmenmax     = 5
+    self.statpsymax     = 5
+    self.statphyact     = self.statphymax -- act stats -- 0-max
+    self.statmenact     = self.statmenmax
+    self.statpsyact     = self.statpsymax
+    self.slots          = { -- character objects slots
                             exists = true, -- to check if already implemented
                             head = CSlotHead{},
                             back = CSlotBack{},
                             handlf = CSlotHandLF{},
                             handrg = CSlotHandRG{},
-                        }
-    self.inventories  = { -- character standard inventories
+                          }
+    self.inventories    = { -- character standard inventories
                             exists = true, -- to check if already implemented
                             phy = CInventoryPhy{},
                             men = CInventoryMen{},
                             psy = CInventoryPsy{},
-                        }
-    self.interactions = {
+                          }
+    self.interactions   = {
                             CInteractionSayMessage{},
-                        }
-    self.party        = nil -- behave to a party ?
+                          }
+    self.party          = nil -- behave to a party ?
+    self.interactsprite = CSpriteFG.EFFECTCHIMK
     --
     self:argt(_argt) -- override if any
     self.camera       = CCamera{name = self.name.." "..Classic.NAMECAMERA} -- one camera per character
@@ -1036,6 +1037,7 @@ end
 function CCharacter:drawInteractToBy(_toby) -- true = to, false = by -- FIXME use constants ?
     local _posture         = self:postureGet()
     local _posturesettings = Tic.POSTURESETTINGS[_posture]
+
     local _headoffsetx     = _posturesettings.headoffsetx
     _headoffsetx           = (self.dirx == Tic.DIRXLF)
         and _headoffsetx - 3
@@ -1043,13 +1045,19 @@ function CCharacter:drawInteractToBy(_toby) -- true = to, false = by -- FIXME us
     _headoffsetx           = (_toby)
         and _headoffsetx
         or  0 - _headoffsetx
+    
     local _headoffsety     = _posturesettings.headoffsety - Tic.SPRITESIZE + 2
     _headoffsety           = (_posturesettings.headusesize)
         and _headoffsety + self.size
         or  _headoffsety
 
+    local _sprite          = self.interactsprite
+    _sprite                = (_toby)
+        and self.interactto.interactsprite
+        or  _sprite
+
     self.musprite:init()
-    self.musprite.sprite  = CSpriteFG.EFFECTCHIMK -- apply the corresponding attributes
+    self.musprite.sprite  = _sprite -- apply the corresponding attributes
     self.musprite.screenx = self.screenx
     self.musprite.screeny = self.screeny
     self.musprite.offsetx = _headoffsetx * self.scale
@@ -1059,8 +1067,8 @@ function CCharacter:drawInteractToBy(_toby) -- true = to, false = by -- FIXME us
         and self.dirx
         or  Nums:toggle01(self.dirx)
     self.musprite.palette = (_toby)
-        and {[Tic.COLORGREYD] = Tic.COLORKEY}
-        or  {[Tic.COLORGREYD] = Tic.COLORKEY, [Tic.COLORWHITE] = Tic.COLORGREYL}
+        and CEntityDrawable.PALETTEINTERACTTO
+        or  CEntityDrawable.PALETTEINTERACTBY
     self.musprite:draw()
 end
 

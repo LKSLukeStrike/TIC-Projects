@@ -5,36 +5,38 @@ require("lib/tic/CEntity")
 CEntityDrawable = CEntity:extend() -- generic entities with a sprite representation
 Classic.KINDENTITYDRAWABLE = "EntityDrawable"
 Classic.NAMEENTITYDRAWABLE = "EntityDrawable"
+CEntityDrawable.PALETTEINTERACTTO = {}
+CEntityDrawable.PALETTEINTERACTBY = {[Tic.COLORWHITE] = Tic.COLORGREYL}
 function CEntityDrawable:new(_argt)
     CEntityDrawable.super.new(self, _argt)
     self.classic = CEntityDrawable
     self.kind    = Classic.KINDENTITYDRAWABLE
     self.name    = Classic.NAMEENTITYDRAWABLE
     --
-    self.world        = Tic:worldActual()
-    self.sprite       = CSpriteBG.SIGNEMPTYS
-    self.screenx      = 0 -- screen positions -- used to draw the sprite
-    self.screeny      = 0
-    self.offsetx      = 0
-    self.offsety      = 0
-    self.dirx         = Nums:random01() -- random flip lf/rg
-    self.scale        = Tic.SCALE01
-    self.rotate       = Tic.ROTATE000
-    self.idle         = false -- dont move ?
-    self.portraitmode = false -- true to avoid to cycle in portraits etc
-    self.animations   = nil -- override if any
-    self.hovered      = false -- use hovered to draw a border
-    self.spotted      = false -- use spotted to draw a border
-    self.hitbox       = CHitbox{entity = self, lf = 0, rg = 7, up = 0, dw = 7}
-    self.drawborders  = false -- draw behaviour
-    self.drawhitbox   = false
-    self.drawfade     = false
-    self.drawbgfg     = Tic.DRAWFG -- use bg/fg palette if any
-    self.hoverbutton  = CButtonEntityHoverLock{entity = self} -- hover button
-    self.musprite     = CSprite{} -- multi usage sprite
+    self.world          = Tic:worldActual()
+    self.sprite         = CSpriteBG.SIGNEMPTYS
+    self.screenx        = 0 -- screen positions -- used to draw the sprite
+    self.screeny        = 0
+    self.offsetx        = 0
+    self.offsety        = 0
+    self.dirx           = Nums:random01() -- random flip lf/rg
+    self.scale          = Tic.SCALE01
+    self.rotate         = Tic.ROTATE000
+    self.idle           = false -- dont move ?
+    self.portraitmode   = false -- true to avoid to cycle in portraits etc
+    self.animations     = nil -- override if any
+    self.hovered        = false -- use hovered to draw a border
+    self.spotted        = false -- use spotted to draw a border
+    self.hitbox         = CHitbox{entity = self, lf = 0, rg = 7, up = 0, dw = 7}
+    self.drawborders    = false -- draw behaviour
+    self.drawhitbox     = false
+    self.drawfade       = false
+    self.drawbgfg       = Tic.DRAWFG -- use bg/fg palette if any
+    self.hoverbutton    = CButtonEntityHoverLock{entity = self} -- hover button
+    self.musprite       = CSprite{} -- multi usage sprite
+    self.interactsprite = CSpriteFG.EFFECTOBIMK
     --
     self:argt(_argt) -- override if any
-    -- self.world:appendEntity(self)-- append itself to the world
 end
 
 function CEntityDrawable:argt(_argt) -- append an entity
@@ -153,14 +155,14 @@ function CEntityDrawable:drawInteractBy()
         or   2
     
     self.musprite:init()
-    self.musprite.sprite  = CSpriteFG.EFFECTOBIMK -- apply the corresponding attributes
+    self.musprite.sprite  = self.interactsprite -- apply the corresponding attributes
     self.musprite.screenx = self.screenx
     self.musprite.screeny = self.screeny
     self.musprite.offsetx = _offsetx * self.scale
     self.musprite.offsety = Nums:neg(Tic.SPRITESIZE * self.scale)
     self.musprite.scale   = self.scale
     self.musprite.flip    = self.dirx
-    self.musprite.palette = {[Tic.COLORGREYD] = Tic.COLORKEY, [Tic.COLORWHITE] = Tic.COLORGREYL}
+    self.musprite.palette = CEntityDrawable.PALETTEINTERACTBY
     self.musprite:draw()
 end
 
