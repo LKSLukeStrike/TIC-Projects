@@ -1,4 +1,5 @@
 require("lib/tic/CElement")
+require("lib/tic/CEntityDrawable")
 require("lib/tic/CSprite")
 --
 -- IButton
@@ -183,14 +184,16 @@ end
 CButtonSprite = CButton:extend() -- generic sprite button
 function CButtonSprite:new(_argt)
     CButtonSprite.super.new(self, _argt)
-	self.sprite = CSpriteBG{}
+    --
+	self.sprite     = CSpriteBG{}
     self.drawborder = false
     self.drawground = false
+    --
     self:argt(_argt) -- override if any
 end
 
 function CButtonSprite:drawInside()
-    local _palette = {[self.colorground] = self.colorground, [self.colorborder] = self.colorborder}
+    local _palette = self.sprite.palette
 
     _palette = (self.hovered)
         and {[self.colorground] = self.colorhover, [self.colorborder] = self.colorborder}
@@ -626,14 +629,15 @@ IButtonInteractions.BEHAVIOUR = function(self) -- need at least one player
     self.display = self.entity:canInteract()
     if not self.display then return end -- no interaction
     self.enabled = true -- restore enabled
-    self.sprite.flip = self.entity.dirx
+    self.sprite.sprite  = self.entity.interactto.interactsprite
+    self.sprite.flip    = Nums:toggle01(self.entity.interactto.dirx)
+    Tic:logAppend(self.entity.interactto.dirx)
 end
 
 CButtonInteractions = CButtonSprite:extend()
 function CButtonInteractions:new(_argt)
     CButtonInteractions.super.new(self, _argt)
-    self.sprite.sprite  = CSpriteFG.EFFECTCHIMK
-    self.sprite.palette = IButton.PALETTEKEY
+    self.sprite.palette = CEntityDrawable.PALETTEINTERACTBY
     self.behaviour      = IButtonInteractions.BEHAVIOUR
     self.drawground     = false
     self:argt(_argt) -- override if any
