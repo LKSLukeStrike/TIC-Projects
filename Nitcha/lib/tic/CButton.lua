@@ -630,7 +630,7 @@ IButtonInteractions.BEHAVIOUR = function(self) -- need at least one player
     if not self.display then return end -- no interaction
     self.enabled = true -- restore enabled
     self.sprite.sprite  = self.entity.interactto.interactsprite
-    self.sprite.flip    = Nums:toggle01(self.entity.interactto.dirx)
+    self.sprite.flip    = self.entity.interactto.dirx
     Tic:logAppend(self.entity.interactto.dirx)
 end
 

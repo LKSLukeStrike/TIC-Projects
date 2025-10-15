@@ -48,18 +48,23 @@ function CEntityDrawable:append() -- append an entity
     self:worldAppend()
 end
 
-function CEntityDrawable:delete() -- delete an entity
-    self:worldDelete()
-end
-
 function CEntityDrawable:worldAppend() -- append an entity to world
     if not self.world then return end
     self.world:appendEntity(self)
 end
 
+function CEntityDrawable:delete() -- delete an entity
+    self:worldDelete()
+    self:interactDelete()
+end
+
 function CEntityDrawable:worldDelete() -- delete an entity from world
     if not self.world then return end
     self.world:deleteEntity(self)
+end
+
+function CEntityDrawable:interactDelete() -- delete all interactions
+    self:interactbyRemoveAll()
 end
 
 function CEntityDrawable:draw() -- default draw for drawable entities -- override if any
