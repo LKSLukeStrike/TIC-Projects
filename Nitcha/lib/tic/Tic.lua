@@ -1589,7 +1589,6 @@ require("lib/tic/CBoard")
 require("lib/tic/CButton")
 require("lib/tic/CCamera")
 require("lib/tic/CCharacter")
-require("lib/tic/CCharacterParty")
 require("lib/tic/CDirective")
 require("lib/tic/CElement")
 require("lib/tic/CEntitiesLocations")
@@ -1600,6 +1599,7 @@ require("lib/tic/CInteraction")
 require("lib/tic/CInventory")
 require("lib/tic/CLocations")
 require("lib/tic/CObject")
+require("lib/tic/CParty")
 require("lib/tic/CPlace")
 require("lib/tic/CPlaceBuild")
 require("lib/tic/CPlaceStone")
@@ -2505,10 +2505,7 @@ end
 
 -- PARTY
 if true then
-Party = CCharacterParty{}
-Tic:playerAppend(Party)
-Party.leader = W3lfie
--- W3lfie:delete()
+W3lfie.party = CParty{}
 end
 
 -- Tic:traceTable(World.entitieslocations.locations.locations, {depth = 3, indent = "-"})
@@ -2846,7 +2843,7 @@ function Tic:draw()
 end
 
 function Tic:drawLog()
-    Tic:logWorld()
+    -- Tic:logWorld()
     -- Tic:logInventories()
     -- Tic:logScreens()
 end
