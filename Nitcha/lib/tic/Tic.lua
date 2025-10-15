@@ -2502,10 +2502,13 @@ end
 end -- psy
 end
 
-if false then
+
+-- PARTY
+if true then
 Party = CCharacterParty{}
 Tic:playerAppend(Party)
--- Tic:playerRem HH
+Party.leader = W3lfie
+-- W3lfie:delete()
 end
 
 -- Tic:traceTable(World.entitieslocations.locations.locations, {depth = 3, indent = "-"})

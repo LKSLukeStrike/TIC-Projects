@@ -668,7 +668,7 @@ function CCharacter:nearestEntityViewWorld() -- nearest entity in itself view wo
     return _result
 end
 
-function CCharacter:draw() -- set animations and draw layers
+function CCharacter:draw() -- draw animations and layers
     self:cycle()
     self:drawDirs()
 
@@ -679,7 +679,6 @@ function CCharacter:draw() -- set animations and draw layers
     self:drawHead()
     self:drawHandFG()
     self:drawEffect()
-    self:drawParty()
 
     self:drawSpotted()
     self:drawHovered()
@@ -830,52 +829,6 @@ function CCharacter:drawEffect()
     self.musprite.flip    = self.dirx
     self.musprite.scale   = self.scale
     self.musprite.palette = _palette
-    self.musprite:draw()
-end
-
-function CCharacter:drawParty()
-    if not self.isparty then return end -- not a party
-
-    local _posture = self:postureGet()
-    local _offsety = 3
-    if _posture == Tic.POSTUREFLOOR then
-        _offsety = _offsety + 3
-    else
-        _offsety = _offsety + self.size + self.frame
-    end
-
-    local _coloreyesfg = Tic.COLORSKIN
-    local _coloreyesbu = Tic.COLORSKIN
-    local _coloreyesbm = Tic.COLORSKIN
-    local _coloreyesbd = Tic.COLORSKIN
-
-    if _posture == Tic.POSTUREFLOOR then
-        _coloreyesbm = self.coloreyesbg
-    else
-        _coloreyesfg = self.coloreyesfg
-        if self.diry == Tic.DIRYUP then -- up
-            _coloreyesbu = self.coloreyesbg
-        elseif self.diry == Tic.DIRYMD then -- md
-            _coloreyesbm = self.coloreyesbg
-        else -- dw
-            _coloreyesbd = self.coloreyesbg
-        end
-    end
-   
-    self.musprite:init()
-    self.musprite.sprite  = CSpriteFG.EFFECTPARTY
-    self.musprite.screenx = self.screenx
-    self.musprite.screeny = self.screeny
-    self.musprite.offsety = _offsety
-    self.musprite.flip    = self.dirx
-    self.musprite.scale   = self.scale
-    self.musprite.palette = {
-        -- [Tic.COLORGREYM]  = self.colorhairsbg,
-        [Tic.COLORPURPLE] = _coloreyesbu,
-        [Tic.COLORRED]    = _coloreyesbm,
-        [Tic.COLORORANGE] = _coloreyesbd,
-        [Tic.COLORYELLOW] = _coloreyesfg,
-    }
     self.musprite:draw()
 end
 
