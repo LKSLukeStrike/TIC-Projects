@@ -2499,8 +2499,9 @@ W3lfie = CPlayerMeduz{classed = CPlayerMeduz,
     spottingspot = true,
     spottingpick = true,
     ["slots.handrg"] = CSlotHandRG{object = CWeaponWandLarge{}},
+    ["slots.handlf"] = CSlotHandRG{object = CWeaponWandMedium{}},
     -- ["slots.handlf"] = CSlotHandLF{object = CWeaponRuneLarge{}},
-    -- ["slots.head"]   = CSlotHead{object = CClothesCapLarge{}},
+    ["slots.head"]   = CSlotHead{object = CClothesHelmetLarge{}},
     -- ["slots.back"]   = CSlotBack{object = CClothesScrollCaseLarge{}},
     -- ["inventories.any"] = CInventoryAny{objects = {
     --     CObjectSpellLarge{used = CObject.USEDNONE},
@@ -2512,7 +2513,7 @@ end
 
 
 -- PARTY
-if true then
+if false then
 W3lfie.party = CParty{}
 end
 

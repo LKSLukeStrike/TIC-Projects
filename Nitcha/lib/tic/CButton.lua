@@ -206,10 +206,12 @@ function CButtonSprite:drawInside()
         or  {[self.colorground] = self.colorgrounddisabled, [self.colorborder] = self.colorborderdisabled}
     _palette = Tables:merge(self.sprite.palette, _palette)
 
+    self.sprite:save()
     self.sprite.screenx = self.screenx
     self.sprite.screeny = self.screeny
     self.sprite.palette = _palette
     self.sprite:draw()
+    self.sprite:load()
 end
 
 
@@ -632,9 +634,11 @@ IButtonInteractions.BEHAVIOUR = function(self) -- need at least one player
     self.display = self.entity:canInteract()
     if not self.display then return end -- no interaction
     self.enabled = true -- restore enabled
-    self.sprite.sprite  = self.entity.interactto.interactsprite
-    self.sprite.flip    = self.entity.interactto.dirx
-    Tic:logAppend(self.entity.interactto.dirx)
+    local _interactto   = self.entity.interactto
+    self.sprite.sprite  = _interactto.interactsprite
+    self.sprite.flip    = (_interactto:is(CCharacter)) -- FIXME why ?
+        and Nums:toggle01(_interactto.dirx)
+        or  _interactto.dirx
 end
 
 CButtonInteractions = CButtonSprite:extend()
