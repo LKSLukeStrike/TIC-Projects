@@ -232,8 +232,8 @@ end
 
 function CWindowInfosEntity:drawInside() -- window infos content for entities
     if not self.entity then return end -- nothing to draw
-    local _name = CTextLine{text = self.entity.name, case = Names.CASECAMEL, shadow = true, marginup = 1}
-    local _kind = CTextLine{text = self.entity.kind, case = Names.CASECAMEL, shadow = true, marginup = 2}
+    local _name = CTextLine{text = self.entity:nameGet(), case = Names.CASECAMEL, shadow = true, marginup = 1}
+    local _kind = CTextLine{text = self.entity:kindGet(), case = Names.CASECAMEL, shadow = true, marginup = 2}
     self.elements = {_name, _kind}
     CWindowInfosEntity.super.drawInside(self)
 end
@@ -366,23 +366,23 @@ end
 function CWindowStatsCharacter:drawInside() -- window stats content for -- [!] characters
     rect ( -- phy act bar
         self.screenx + 02,
-        self.screeny + 02 + Tic.STATSMAX - self.entity.statphyact + 1,
+        self.screeny + 02 + Tic.STATSMAX - self.entity:statphyactGet() + 1,
         06,
-        self.entity.statphyact,
+        self.entity:statphyactGet(),
         self.entity:colorPhyAct()
     )
     rect ( -- men act bar
         self.screenx + 10,
-        self.screeny + 02 + Tic.STATSMAX - self.entity.statmenact + 1,
+        self.screeny + 02 + Tic.STATSMAX - self.entity:statmenactGet() + 1,
         06,
-        self.entity.statmenact,
+        self.entity:statmenactGet(),
         self.entity:colorMenAct()
     )
     rect ( -- psy act bar
         self.screenx + 18,
-        self.screeny + 02 + Tic.STATSMAX - self.entity.statpsyact + 1,
+        self.screeny + 02 + Tic.STATSMAX - self.entity:statpsyactGet() + 1,
         06,
-        self.entity.statpsyact,
+        self.entity:statpsyactGet(),
         self.entity:colorPsyAct()
     )
 
@@ -410,21 +410,21 @@ function CWindowStatsCharacter:drawInside() -- window stats content for -- [!] c
 
     rectb( -- phy max line
         self.screenx + 02,
-        self.screeny + 03 + Tic.STATSMAX - self.entity.statphymax,
+        self.screeny + 03 + Tic.STATSMAX - self.entity:statphymaxGet(),
         06,
         01,
         self.colorborder
     )
     rectb( -- men max line
         self.screenx + 10,
-        self.screeny + 03 + Tic.STATSMAX - self.entity.statmenmax,
+        self.screeny + 03 + Tic.STATSMAX - self.entity:statmenmaxGet(),
         06,
         01,
         self.colorborder
     )
     rectb( -- psy max line
         self.screenx + 18,
-        self.screeny + 03 + Tic.STATSMAX - self.entity.statpsymax,
+        self.screeny + 03 + Tic.STATSMAX - self.entity:statpsymaxGet(),
         06,
         01,
         self.colorborder

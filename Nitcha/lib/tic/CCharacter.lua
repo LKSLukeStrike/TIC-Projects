@@ -255,7 +255,6 @@ function CCharacter:new(_argt)
     self.interactions   = {
                             CInteractionSayMessage{},
                           }
-    self.party          = nil -- behave to a party ?
     self.interactsprite = CSpriteFG.EFFECTCHIMK
     --
     self:argt(_argt) -- override if any
@@ -267,6 +266,36 @@ function CCharacter:argt(_argt)
     CCharacter.super.argt(self, _argt)
     if self.classic and self.classed and not (self.classic == self.classed) then return end -- limit to one classic if any
     self:adjustInventoriesSlots() -- adjust standard inventories sizes and contents + slots
+end
+
+function CCharacter:statphymaxGet()
+    if self:isParty() then return self.party.statphymax end
+    return self.statphymax
+end
+
+function CCharacter:statphyactGet()
+    if self:isParty() then return self.party.statphyact end
+    return self.statphyact
+end
+
+function CCharacter:statmenmaxGet()
+    if self:isParty() then return self.party.statmenmax end
+    return self.statmenmax
+end
+
+function CCharacter:statmenactGet()
+    if self:isParty() then return self.party.statmenact end
+    return self.statmenact
+end
+
+function CCharacter:statpsymaxGet()
+    if self:isParty() then return self.party.statpsymax end
+    return self.statpsymax
+end
+
+function CCharacter:statpsyactGet()
+    if self:isParty() then return self.party.statpsyact end
+    return self.statpsyact
 end
 
 function CCharacter:adjustInventoriesSlots()
@@ -295,9 +324,9 @@ function CCharacter:adjustInventoriesSlots()
         _object:delete()
     end
 
-    _inventoryphy.objectsmax = self.statphymax -- adjust inventories limits
-    _inventorymen.objectsmax = self.statmenmax
-    _inventorypsy.objectsmax = self.statpsymax
+    _inventoryphy.objectsmax = self:statphymaxGet() -- adjust inventories limits
+    _inventorymen.objectsmax = self:statmenmaxGet()
+    _inventorypsy.objectsmax = self:statpsymaxGet()
 
     _inventoryany:movetoInventory(_inventoryphy) -- redispatch objects if possible
     _inventoryany:movetoInventory(_inventorymen)
@@ -460,23 +489,29 @@ function CCharacter:pickObject(_object, _withmessage)
 end
 
 function CCharacter:colorPhyAct()
-    if self.statphyact == 0              then return Tic.COLORSTAT0 end
-    if self.statphyact > self.statphymax then return Tic.COLORPHYGT end
-    if self.statphyact < self.statphymax then return Tic.COLORPHYLT end
+    local _statphyact = self:statphyactGet()
+    local _statphymax = self:statphymaxGet()
+    if _statphyact == 0             then return Tic.COLORSTAT0 end
+    if _statphyact > _statphymax    then return Tic.COLORPHYGT end
+    if _statphyact < _statphymax    then return Tic.COLORPHYLT end
     return Tic.COLORPHYEQ
 end
 
 function CCharacter:colorMenAct()
-    if self.statmenact == 0              then return Tic.COLORSTAT0 end
-    if self.statmenact > self.statmenmax then return Tic.COLORMENGT end
-    if self.statmenact < self.statmenmax then return Tic.COLORMENLT end
+    local _statmenact = self:statmenactGet()
+    local _statmenmax = self:statmenmaxGet()
+    if _statmenact == 0             then return Tic.COLORSTAT0 end
+    if _statmenact > _statmenmax    then return Tic.COLORMENGT end
+    if _statmenact < _statmenmax    then return Tic.COLORMENLT end
     return Tic.COLORMENEQ
 end
 
 function CCharacter:colorPsyAct()
-    if self.statpsyact == 0              then return Tic.COLORSTAT0 end
-    if self.statpsyact > self.statpsymax then return Tic.COLORPSYGT end
-    if self.statpsyact < self.statpsymax then return Tic.COLORPSYLT end
+    local _statpsyact = self:statpsyactGet()
+    local _statpsymax = self:statpsymaxGet()
+    if _statpsyact == 0             then return Tic.COLORSTAT0 end
+    if _statpsyact > _statpsymax    then return Tic.COLORPSYGT end
+    if _statpsyact < _statpsymax    then return Tic.COLORPSYLT end
     return Tic.COLORPSYEQ
 end
 
@@ -516,12 +551,12 @@ function CCharacter:stateSet(_posture, _status) -- set state from posture and st
 end
 
 function CCharacter:regionViewOffsets() -- view offsets region depending on dirx, diry, statphyact and posture
-    local _stat          = self.statphyact
+    local _statphyact    = self:statphyactGet()
     local _posture       = self:postureGet()
     local _posturekneel  = _posture == Tic.POSTUREKNEEL
     local _size          = Tic.SPRITESIZE * self.scale
     local _range         = (_posturekneel) and Tic.WORLDWH // 2 or Tic.WORLDWH -- use world window height as range -- TODO change that later ?
-    local _offsets       = Nums:roundint((((_range - _size) // 2) - 1) * (_stat / Tic.STATSMAX))
+    local _offsets       = Nums:roundint((((_range - _size) // 2) - 1) * (_statphyact / Tic.STATSMAX))
 
     return CRegion{
         lf  = (self.dirx == Tic.DIRXLF)
@@ -554,12 +589,12 @@ function CCharacter:regionViewWorld() -- view world region depending on dirx, di
 end
 
 function CCharacter:regionMindOffsets() -- mind offsets region depending on dirx, diry, statmenact
-    local _stat          = self.statmenact
+    local _statmenact    = self:statmenactGet()
     local _posture       = self:postureGet()
     local _posturekneel  = _posture == Tic.POSTUREKNEEL
     local _size          = Tic.SPRITESIZE * self.scale
     local _range         = Tic.WORLDWH -- use world window height as range -- TODO change that later ?
-    local _offsets       = Nums:roundint((((_range - _size) // 2) - 1) * (_stat / Tic.STATSMAX))
+    local _offsets       = Nums:roundint((((_range - _size) // 2) - 1) * (_statmenact / Tic.STATSMAX))
 
     return CRegion{
         lf  = Nums:neg(_offsets),
@@ -748,7 +783,7 @@ function CCharacter:drawDirs() -- draw the directions and ranges around the char
     local _screenx   = Tic.WORLDWX + Tic.WORLDWW2 - (Tic:playerActual().worldx - self.worldx) - 1 --relative to actual player -- feet
     local _screeny   = Tic.WORLDWY + Tic.WORLDWH2 - (Tic:playerActual().worldy - self.worldy) + 2
     local _posture   = self:postureGet()
-    local _range     = self.statphyact * self.scale
+    local _range     = self:statphyactGet() * self.scale
     _range           = (_posture == Tic.POSTUREKNEEL) and Nums:roundmax(_range / 2) or _range
 
     circb(_screenx, _screeny, _range, _drawcolor)
@@ -1026,10 +1061,6 @@ function CCharacter:drawInteractToBy(_toby) -- true = to, false = by -- FIXME us
     self.musprite:draw()
 end
 
-function CCharacter:isParty()
-    return (self.party)
-end
-
 function CCharacter:drawParty()
     if not self:isParty() then return end -- nothing to draw
 
@@ -1245,8 +1276,8 @@ function CCharacter:offsetsDirection(_direction, _movenone,  _moveslow, _movebac
         _result.offsetx = Nums:sign(_result.offsetx)
         _result.offsety = Nums:sign(_result.offsety)
     else -- normal move
-        _result.offsetx = _result.offsetx * (self.statphyact / Tic.STATSMAX) -- depends of phy act
-        _result.offsety = _result.offsety * (self.statphyact / Tic.STATSMAX)
+        _result.offsetx = _result.offsetx * (self:statphyactGet() / Tic.STATSMAX) -- depends of phy act
+        _result.offsety = _result.offsety * (self:statphyactGet() / Tic.STATSMAX)
         _result.offsetx = (_posture == Tic.POSTURESTAND) and _result.offsetx or _result.offsetx / 2 -- half if not stand
         _result.offsety = (_posture == Tic.POSTURESTAND) and _result.offsety or _result.offsety / 2 -- half if not stand
         _result.offsetx = Nums:roundmax(_result.offsetx) -- ensure solid values
@@ -1355,22 +1386,23 @@ end
 
 function CCharacter:statAct(_action, _stat, _value) -- modify a stat act -- set/dec/inc/max
     if not _action or not _stat then return end -- mandatory
-    if not self[_stat] then return end -- unknown stat
+    local _entity = (self:isParty()) and self.party or self
+    if not _entity[_stat] then return end -- unknown stat
     _value = _value or 0
 
     if _action == Tic.STATSET then
-        self[_stat] = _value
+        _entity[_stat] = _value
     elseif _action == Tic.STATDEC then
-        self[_stat] = self[_stat] - _value
+        _entity[_stat] = _entity[_stat] - _value
     elseif _action == Tic.STATINC then
-        self[_stat] = self[_stat] + _value
+        _entity[_stat] = _entity[_stat] + _value
     elseif _action == Tic.STATMAX then
-        self[_stat] = self[string.gsub(_stat, "act", "max")]
+        _entity[_stat] = _entity[string.gsub(_stat, "act", "max")]
     end
 
-    self[_stat] = math.max(self[_stat], Tic.STATSMIN) -- stay in range
-    self[_stat] = math.min(self[_stat], Tic.STATSMAX)
-    self[_stat] = Nums:roundint(self[_stat]) -- ensure an integer
+    _entity[_stat] = math.max(_entity[_stat], Tic.STATSMIN) -- stay in range
+    _entity[_stat] = math.min(_entity[_stat], Tic.STATSMAX)
+    _entity[_stat] = Nums:roundint(_entity[_stat]) -- ensure an integer
 
     self:hitboxRefresh() -- refresh the hitboxes
 end

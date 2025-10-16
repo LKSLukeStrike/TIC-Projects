@@ -27,8 +27,22 @@ function CEntity:new(_argt)
     self.interactto   = nil -- entity interactto -- single
     self.interactby   = {}  -- entities interactby -- table
     self.camera = nil -- optional camera that follows the entity -- to override if any
+    self.party        = nil -- behave to a party ?
     --
     self:argt(_argt) -- override if any
+end
+
+function CEntity:isParty()
+    return (self.party)
+end
+
+function CEntity:nameGet()
+    return self.name
+end
+
+function CEntity:kindGet()
+    if self:isParty() then return Tic.TEXTPARTY end
+    return self.kind
 end
 
 function CEntity:string() -- entity as a string

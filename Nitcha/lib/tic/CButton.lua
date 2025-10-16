@@ -267,7 +267,7 @@ function CButtonEntityHoverLock:new(_argt)
                             self.hovertextdw.text = Tic.TEXTLOCK
                             self.clickrg = self.lock
                         end
-                        self.hovertextrg.text = self.entity.name.." "..self.entity.kind
+                        self.hovertextrg.text = self.entity:nameGet().." "..self.entity:kindGet()
                        end
     self:argt(_argt) -- override if any
 end
@@ -587,7 +587,8 @@ function CButtonPlayerStatPhy:new(_argt)
     self.behaviour     = function(self)
                             IButtonPlayer.BEHAVIOUR(self)
                             local _playeractual = Tic:playerActual()
-                            self.hovertextrg.text = "Phy:".._playeractual.statphyact.."/".._playeractual.statphymax
+                            self.hovertextrg.text = Tic.TEXTPHY..":"
+                            .._playeractual:statphyactGet().."/".._playeractual:statphymaxGet()
                          end
     self:argt(_argt) -- override if any
 end
@@ -600,7 +601,8 @@ function CButtonPlayerStatMen:new(_argt)
     self.behaviour     = function(self)
                             IButtonPlayer.BEHAVIOUR(self)
                             local _playeractual = Tic:playerActual()
-                            self.hovertextrg.text = "Men:".._playeractual.statmenact.."/".._playeractual.statmenmax
+                            self.hovertextrg.text = Tic.TEXTMEN..":"
+                            .._playeractual:statmenactGet().."/".._playeractual:statmenmaxGet()
                          end
     self:argt(_argt) -- override if any
 end
@@ -613,7 +615,8 @@ function CButtonPlayerStatPsy:new(_argt)
     self.behaviour     = function(self)
                             IButtonPlayer.BEHAVIOUR(self)
                             local _playeractual = Tic:playerActual()
-                            self.hovertextrg.text = "Psy:".._playeractual.statpsyact.."/".._playeractual.statpsymax
+                            self.hovertextrg.text = Tic.TEXTPSY..":"
+                            .._playeractual:statpsyactGet().."/".._playeractual:statpsymaxGet()
                          end
     self:argt(_argt) -- override if any
 end
@@ -804,7 +807,7 @@ function CButtonPlayerPick:new(_argt)
     self.hovertextrg    = CHoverTextRG{}
     self.getslotobject  = function() return Tic:playerActual() end
     self.behaviour      = function(self)
-                            self.hovertextrg.text = self:getslotobject().name.." "..self:getslotobject().kind
+                            self.hovertextrg.text = self:getslotobject():nameGet().." "..self:getslotobject():kindGet()
                           end
     self:argt(_argt) -- override if any
 end
@@ -977,7 +980,7 @@ end
 function CButtonSlotPlayer:drawHovertextRG()
     if not self:canDrop() then return end
     local _slotobject = self:getslotobject()
-    self.hovertextrg.text = _slotobject.kind.." ".._slotobject.name
+    self.hovertextrg.text = _slotobject:kindGet().." ".._slotobject:nameGet()
     self:save()
     self.colorgroundactived = Tic.COLORBLUEM
     CButtonSlotPlayer.super.drawHovertextRG(self)
