@@ -932,8 +932,8 @@ function CCharacter:drawHand(_bgfg)
     Tic.LOGSPRITE = false
     _object.screenx  = self.screenx
     _object.screeny  = self.screeny
-    _object.offsetx  = _handx * self.scale
-    _object.offsety  = _handy * self.scale
+    _object.offsetx  = _handx
+    _object.offsety  = _handy
     _object.scale    = self.scale
     _object.rotate   = _objectrotate
     _object.dirx     = _objectflip

@@ -821,6 +821,7 @@ function CButtonPlayerPick:drawInside()
     self:getslotobject():drawPortrait({
             screenx    = self.screenx,
             screeny    = self.screeny,
+            scale      = Tic.SCALE01,
         }
     )
     clip()
