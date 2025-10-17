@@ -811,7 +811,19 @@ function CButtonPlayerPick:new(_argt)
     self.hovertextrg    = CHoverTextRG{}
     self.getslotobject  = function() return Tic:playerActual() end
     self.behaviour      = function(self)
-                            self.hovertextrg.text = self:getslotobject():nameGet().." "..self:getslotobject():kindGet()
+                            local _slotobject = self:getslotobject()
+                            self.hovertextrg.text = _slotobject:nameGet().." ".._slotobject:kindGet()
+                            if _slotobject:isParty() then
+                                if not self.clickrg then
+                                    self.clickrg     = function() self:menuPick() end
+                                end
+                                if not self.hovertextdw then
+                                    self.hovertextdw = CHoverTextDW{text = Tic.TEXTPARTY}
+                                end
+                            else
+                                self.clickrg     = nil
+                                self.hovertextdw = nil
+                            end
                           end
     self:argt(_argt) -- override if any
 end

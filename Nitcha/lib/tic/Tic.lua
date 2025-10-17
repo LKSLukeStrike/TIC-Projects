@@ -2513,7 +2513,7 @@ end
 
 
 -- PARTY
-if false then
+if true then
 W3lfie.party = CParty{}
 end
 
