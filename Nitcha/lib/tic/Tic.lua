@@ -2514,7 +2514,7 @@ end
 
 -- PARTY
 if true then
-W3lfie.party = CParty{}
+W3lfie.party = CParty{leader = W3lfie, members = {W3lfie}}
 end
 
 -- Tic:traceTable(World.entitieslocations.locations.locations, {depth = 3, indent = "-"})

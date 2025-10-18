@@ -812,7 +812,7 @@ IButtonPlayerPick.BEHAVIOUR = function(self) -- need at least more than one play
     local _slotobject = self:getslotobject()
     self.hovertextrg.text = _slotobject:nameGet().." ".._slotobject:kindGet()
     if _slotobject:isParty() then
-        self.clickrg = self.clickrg or function() self:menuPick() end
+        self.clickrg     = self.clickrg or function() self:menuParty() end
         self.hovertextdw = self.hovertextdw or CHoverTextDW{text = Tic.TEXTPARTY}
     else
         self.clickrg     = nil
@@ -891,34 +891,87 @@ function CButtonPlayerPick:menuPick()
     Tic:screenAppend(_screen)
 end
 
+function CButtonPlayerPick:menuParty()
+    Tic:logAppend("PARTY")
+    local _screen        = CScreen{}
+    local _screenx       = self.screenx - 9
+    local _screeny       = self.screeny
+    local _classic       = CButtonPlayerParty
+    local _playeractual  = Tic:playerActual()
+    local _party         = _playeractual.party
+    local _leader        = _party.leader
+    local _members       = _party.members
+
+
+    local _windowmenu = CWindowMenu{
+        screenx = _screenx,
+        screeny = _screeny,
+        separatory = 1,
+        stretch = true,
+    }
+    _screen:appendElements{_windowmenu}
+
+    local _buttonleader = _classic{
+        getslotobject = function() return _leader end, -- returns object
+        clicklf = function()
+                    Tic:playerPick(_leader)
+                    Tic:screenRemove(_screen)
+                    Tic:mouseDelay()
+        end,
+    }
+    _windowmenu:appendElements{_buttonleader}
+
+    -- for _, _player in ipairs(Tic:playerPlayers()) do
+    --     if not (_player == _leader) then
+    --         _windowmenu:appendElements{
+    --             _classic{
+    --                 getslotobject = function() return _player end, -- returns object
+    --                 clicklf = function()
+    --                             Tic:playerPick(_player)
+    --                             Tic:screenRemove(_screen)
+    --                             Tic:mouseDelay()
+    --                 end,
+    --             }
+    --         }
+    --     end
+    -- end
+
+    Tic:screenAppend(_screen)
+end
+
 
 --
--- CButtonPlayerParty HH
+-- IButtonPlayerParty -- player party buttons implementation
+--
+IButtonPlayerParty = Classic:extend() -- generic pick player button
+IButtonPlayerParty.BEHAVIOUR = function(self) -- need at least more than one player
+    IButtonPlayerChange.BEHAVIOUR(self)
+    if not self.display then return end -- no player
+    self.enabled = Tables:size(Tic:playerPlayers()) > 1
+    local _slotobject = self:getslotobject()
+    self.hovertextrg.text = _slotobject:nameGet().." ".._slotobject:kindGet()
+    if _slotobject:isParty() then
+        self.clickrg = self.clickrg or function() self:menuPick() end
+        self.hovertextdw = self.hovertextdw or CHoverTextDW{text = Tic.TEXTPARTY}
+    else
+        self.clickrg     = nil
+        self.hovertextdw = nil
+    end
+end
+
+
+--
+-- CButtonPlayerParty
 --
 CButtonPlayerParty = CButtonPlayerPick:extend() -- generic player pick button
 function CButtonPlayerParty:new(_argt)
     CButtonPlayerParty.super.new(self, _argt)
     self.classic        = CButtonPlayerParty
-	self.behaviour      = IButtonPlayerChange.BEHAVIOUR  -- function to trigger at first
+	self.behaviour      = IButtonPlayerParty.BEHAVIOUR  -- function to trigger at first
     self.clicklf        = function() self:menuPick() end
     self.hovertextup    = CHoverTextUP{text = Tic.TEXTPICK}
     self.hovertextrg    = CHoverTextRG{}
     self.getslotobject  = function() return Tic:playerActual() end
-    self.behaviour      = function(self)
-                            local _slotobject = self:getslotobject()
-                            self.hovertextrg.text = _slotobject:nameGet().." ".._slotobject:kindGet()
-                            if _slotobject:isParty() then
-                                if not self.clickrg then
-                                    self.clickrg     = function() self:menuPick() end
-                                end
-                                if not self.hovertextdw then
-                                    self.hovertextdw = CHoverTextDW{text = Tic.TEXTPARTY}
-                                end
-                            else
-                                self.clickrg     = nil
-                                self.hovertextdw = nil
-                            end
-                          end
     self:argt(_argt) -- override if any
 end
 
