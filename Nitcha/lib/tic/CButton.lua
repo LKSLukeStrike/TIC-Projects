@@ -588,6 +588,7 @@ function CButtonPlayerStatPhy:new(_argt)
     self.getcolorstat  = function() return Tic:playerActual():colorPhyAct() end
     self.behaviour     = function(self)
                             IButtonPlayer.BEHAVIOUR(self)
+                            if not self.display then return end
                             local _playeractual = Tic:playerActual()
                             self.hovertextrg.text = Tic.TEXTPHY..":"
                             .._playeractual:statphyactGet().."/".._playeractual:statphymaxGet()
@@ -602,6 +603,7 @@ function CButtonPlayerStatMen:new(_argt)
     self.getcolorstat  = function() return Tic:playerActual():colorMenAct() end
     self.behaviour     = function(self)
                             IButtonPlayer.BEHAVIOUR(self)
+                            if not self.display then return end
                             local _playeractual = Tic:playerActual()
                             self.hovertextrg.text = Tic.TEXTMEN..":"
                             .._playeractual:statmenactGet().."/".._playeractual:statmenmaxGet()
@@ -616,6 +618,7 @@ function CButtonPlayerStatPsy:new(_argt)
     self.getcolorstat  = function() return Tic:playerActual():colorPsyAct() end
     self.behaviour     = function(self)
                             IButtonPlayer.BEHAVIOUR(self)
+                            if not self.display then return end
                             local _playeractual = Tic:playerActual()
                             self.hovertextrg.text = Tic.TEXTPSY..":"
                             .._playeractual:statpsyactGet().."/".._playeractual:statpsymaxGet()
@@ -799,32 +802,37 @@ end
 
 
 --
+-- IButtonPlayerPick -- player pick buttons implementation
+--
+IButtonPlayerPick = Classic:extend() -- generic pick player button
+IButtonPlayerPick.BEHAVIOUR = function(self) -- need at least more than one player
+    IButtonPlayerChange.BEHAVIOUR(self)
+    if not self.display then return end -- no player
+    self.enabled = Tables:size(Tic:playerPlayers()) > 1
+    local _slotobject = self:getslotobject()
+    self.hovertextrg.text = _slotobject:nameGet().." ".._slotobject:kindGet()
+    if _slotobject:isParty() then
+        self.clickrg = self.clickrg or function() self:menuPick() end
+        self.hovertextdw = self.hovertextdw or CHoverTextDW{text = Tic.TEXTPARTY}
+    else
+        self.clickrg     = nil
+        self.hovertextdw = nil
+    end
+end
+
+
+--
 -- CButtonPlayerPick
 --
 CButtonPlayerPick = CButtonSlot:extend() -- generic player pick button
 function CButtonPlayerPick:new(_argt)
     CButtonPlayerPick.super.new(self, _argt)
     self.classic        = CButtonPlayerPick
-	self.behaviour      = IButtonPlayerChange.BEHAVIOUR  -- function to trigger at first
+	self.behaviour      = IButtonPlayerPick.BEHAVIOUR  -- function to trigger at first
     self.clicklf        = function() self:menuPick() end
     self.hovertextup    = CHoverTextUP{text = Tic.TEXTPICK}
     self.hovertextrg    = CHoverTextRG{}
     self.getslotobject  = function() return Tic:playerActual() end
-    self.behaviour      = function(self)
-                            local _slotobject = self:getslotobject()
-                            self.hovertextrg.text = _slotobject:nameGet().." ".._slotobject:kindGet()
-                            if _slotobject:isParty() then
-                                if not self.clickrg then
-                                    self.clickrg     = function() self:menuPick() end
-                                end
-                                if not self.hovertextdw then
-                                    self.hovertextdw = CHoverTextDW{text = Tic.TEXTPARTY}
-                                end
-                            else
-                                self.clickrg     = nil
-                                self.hovertextdw = nil
-                            end
-                          end
     self:argt(_argt) -- override if any
 end
 
@@ -881,6 +889,37 @@ function CButtonPlayerPick:menuPick()
     end
 
     Tic:screenAppend(_screen)
+end
+
+
+--
+-- CButtonPlayerParty HH
+--
+CButtonPlayerParty = CButtonPlayerPick:extend() -- generic player pick button
+function CButtonPlayerParty:new(_argt)
+    CButtonPlayerParty.super.new(self, _argt)
+    self.classic        = CButtonPlayerParty
+	self.behaviour      = IButtonPlayerChange.BEHAVIOUR  -- function to trigger at first
+    self.clicklf        = function() self:menuPick() end
+    self.hovertextup    = CHoverTextUP{text = Tic.TEXTPICK}
+    self.hovertextrg    = CHoverTextRG{}
+    self.getslotobject  = function() return Tic:playerActual() end
+    self.behaviour      = function(self)
+                            local _slotobject = self:getslotobject()
+                            self.hovertextrg.text = _slotobject:nameGet().." ".._slotobject:kindGet()
+                            if _slotobject:isParty() then
+                                if not self.clickrg then
+                                    self.clickrg     = function() self:menuPick() end
+                                end
+                                if not self.hovertextdw then
+                                    self.hovertextdw = CHoverTextDW{text = Tic.TEXTPARTY}
+                                end
+                            else
+                                self.clickrg     = nil
+                                self.hovertextdw = nil
+                            end
+                          end
+    self:argt(_argt) -- override if any
 end
 
 

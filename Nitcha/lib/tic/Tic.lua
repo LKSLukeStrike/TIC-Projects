@@ -2844,7 +2844,9 @@ function Tic:draw()
     if _timedif < _timemin then _timemin = _timedif end
     if _timedif > _timemax then _timemax = _timedif end
     Tic:print(190, 120, Nums:pad0LF(_timemin, 3).."/"..Nums:pad0LF(_timedif, 3).."/"..Nums:pad0LF(_timemax, 3))
-    Tic:print(200, 126, Nums:pad0LF(Tic.playerActual().worldx, 3).." "..Nums:pad0LF(Tic.playerActual().worldy, 3))
+    if Tic:playerActual() then
+        Tic:print(200, 126, Nums:pad0LF(Tic:playerActual().worldx, 3).." "..Nums:pad0LF(Tic:playerActual().worldy, 3))
+    end
     Tic:logPrint()
 
     Tic:tick() -- [!] required in the draw function
