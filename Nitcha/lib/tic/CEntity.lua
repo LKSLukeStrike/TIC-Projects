@@ -33,7 +33,7 @@ function CEntity:new(_argt)
 end
 
 function CEntity:isParty()
-    return (self.party)
+    return self.party and self == self.party.leader
 end
 
 function CEntity:nameGet()

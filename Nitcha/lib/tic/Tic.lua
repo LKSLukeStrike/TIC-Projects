@@ -2514,7 +2514,10 @@ end
 
 -- PARTY
 if true then
-W3lfie.party = CParty{leader = W3lfie, members = {W3lfie}}
+W3lfie.party = CParty{leader = W3lfie, members = {W3lfie, W2lfie}}
+-- W2lfie.party = W3lfie.party
+-- W2lfie:remove()
+-- W3lfie:remove()
 end
 
 -- Tic:traceTable(World.entitieslocations.locations.locations, {depth = 3, indent = "-"})
@@ -2854,7 +2857,7 @@ function Tic:draw()
 end
 
 function Tic:drawLog()
-    -- Tic:logWorld()
+    Tic:logWorld()
     -- Tic:logInventories()
     -- Tic:logScreens()
 end
@@ -2862,6 +2865,17 @@ end
 function Tic:logWorld()
     local _world = Tic:worldActual()
     if not _world then return end
+
+    Tic:logAppend()
+    Tic:logAppend()
+    Tic:logAppend()
+    Tic:logAppend()
+    Tic:logAppend()
+    Tic:logAppend()
+    Tic:logAppend()
+    Tic:logAppend()
+    Tic:logAppend()
+    Tic:logAppend()
 
     local _kindnames = {}
     Tic:logAppend(_world.name, Tables:size(_world.entitieslocations.entities))

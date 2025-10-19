@@ -811,11 +811,19 @@ IButtonPlayerPick.BEHAVIOUR = function(self) -- need at least more than one play
     local _slotobject = self:getslotobject()
     self.hovertextrg.text = _slotobject:nameGet().." ".._slotobject:kindGet()
     if _slotobject:isParty() then
-        self.clickrg     = self.clickrg or function() self:menuParty() end
+        self.enabled     = true -- restore enabled in case of party
         self.hovertextdw = self.hovertextdw or CHoverTextDW{text = Tic.TEXTPARTY}
+        self.clickrg     = self.clickrg or function() self:menuParty() end
     else
-        self.clickrg     = nil
         self.hovertextdw = nil
+        self.clickrg     = nil
+    end
+    if Tables:size(Tic:playerPlayers()) > 1 then
+        self.hovertextup = self.hovertextup or CHoverTextUP{text = Tic.TEXTPICK}
+        self.clicklf     = self.clicklf or function() self:menuPick() end
+    else
+        self.hovertextup = nil
+        self.clicklf     = nil
     end
 end
 
@@ -828,8 +836,8 @@ function CButtonPlayerPick:new(_argt)
     CButtonPlayerPick.super.new(self, _argt)
     self.classic        = CButtonPlayerPick
 	self.behaviour      = IButtonPlayerPick.BEHAVIOUR  -- function to trigger at first
-    self.clicklf        = function() self:menuPick() end
     self.hovertextup    = CHoverTextUP{text = Tic.TEXTPICK}
+    self.clicklf        = function() self:menuPick() end
     self.hovertextrg    = CHoverTextRG{}
     self.getslotobject  = function() return Tic:playerActual() end
     self:argt(_argt) -- override if any
@@ -884,7 +892,6 @@ function CButtonPlayerPick:menuPick()
 end
 
 function CButtonPlayerPick:menuParty()
-    Tic:logAppend("PARTY")
     local _screen        = CScreen{}
     local _screenx       = self.screenx - 9
     local _screeny       = self.screeny
