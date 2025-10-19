@@ -808,7 +808,6 @@ IButtonPlayerPick = Classic:extend() -- generic pick player button
 IButtonPlayerPick.BEHAVIOUR = function(self) -- need at least more than one player
     IButtonPlayerChange.BEHAVIOUR(self)
     if not self.display then return end -- no player
-    self.enabled = Tables:size(Tic:playerPlayers()) > 1
     local _slotobject = self:getslotobject()
     self.hovertextrg.text = _slotobject:nameGet().." ".._slotobject:kindGet()
     if _slotobject:isParty() then
@@ -851,8 +850,9 @@ function CButtonPlayerPick:menuPick()
     local _screen        = CScreen{}
     local _screenx       = self.screenx + 9
     local _screeny       = self.screeny
-    local _classic       = self.classic
+    local _classic       = CButtonPlayerPickMenu
     local _playeractual  = Tic:playerActual()
+    local _players       = Tic:playerPlayers()
 
 
     local _windowmenu = CWindowMenu{
@@ -863,28 +863,20 @@ function CButtonPlayerPick:menuPick()
     }
     _screen:appendElements{_windowmenu}
 
-    local _buttonplayeractual = _classic{
-        getslotobject = function() return _playeractual end, -- returns object
-        clicklf = function()
-                    Tic:playerPick(_playeractual)
-                    Tic:screenRemove(_screen)
-                    Tic:mouseDelay()
-        end,
-    }
-    _windowmenu:appendElements{_buttonplayeractual}
-
-    for _, _player in ipairs(Tic:playerPlayers()) do
-        if not (_player == _playeractual) then
-            _windowmenu:appendElements{
-                _classic{
-                    getslotobject = function() return _player end, -- returns object
-                    clicklf = function()
-                                Tic:playerPick(_player)
-                                Tic:screenRemove(_screen)
-                                Tic:mouseDelay()
-                    end,
-                }
+    local function _appendbutton(_slotobject)
+        _windowmenu:appendElements{
+            _classic{
+                screen = _screen,
+                getslotobject = function() return _slotobject end, -- returns slot object
             }
+        }
+    end
+
+    _appendbutton(_playeractual)
+
+    for _, _player in ipairs(_players) do
+        if not (_player == _playeractual) then
+            _appendbutton(_player)
         end
     end
 
@@ -896,7 +888,7 @@ function CButtonPlayerPick:menuParty()
     local _screen        = CScreen{}
     local _screenx       = self.screenx - 9
     local _screeny       = self.screeny
-    local _classic       = CButtonPlayerParty
+    local _classic       = CButtonPlayerPartyMenu
     local _playeractual  = Tic:playerActual()
     local _party         = _playeractual.party
     local _leader        = _party.leader
@@ -911,67 +903,83 @@ function CButtonPlayerPick:menuParty()
     }
     _screen:appendElements{_windowmenu}
 
-    local _buttonleader = _classic{
-        getslotobject = function() return _leader end, -- returns object
-        clicklf = function()
-                    Tic:playerPick(_leader)
-                    Tic:screenRemove(_screen)
-                    Tic:mouseDelay()
-        end,
-    }
-    _windowmenu:appendElements{_buttonleader}
+    local function _appendbutton(_slotobject)
+        _windowmenu:appendElements{
+            _classic{
+                screen = _screen,
+                getslotobject = function() return _slotobject end, -- returns slot object
+            }
+        }
+    end
 
-    -- for _, _player in ipairs(Tic:playerPlayers()) do
-    --     if not (_player == _leader) then
-    --         _windowmenu:appendElements{
-    --             _classic{
-    --                 getslotobject = function() return _player end, -- returns object
-    --                 clicklf = function()
-    --                             Tic:playerPick(_player)
-    --                             Tic:screenRemove(_screen)
-    --                             Tic:mouseDelay()
-    --                 end,
-    --             }
-    --         }
-    --     end
-    -- end
+    _appendbutton(_leader)
+
+    for _, _member in ipairs(_members) do
+        if not (_member == _leader) then
+            _appendbutton(_member)
+        end
+    end
 
     Tic:screenAppend(_screen)
 end
 
 
 --
--- IButtonPlayerParty -- player party buttons implementation
+-- IButtonPlayerMenu -- player pick/party button menus implementation
 --
-IButtonPlayerParty = Classic:extend() -- generic pick player button
-IButtonPlayerParty.BEHAVIOUR = function(self) -- need at least more than one player
+IButtonPlayerMenu = Classic:extend() -- generic pick player button
+IButtonPlayerMenu.BEHAVIOUR = function(self) -- need at least more than one player
     IButtonPlayerChange.BEHAVIOUR(self)
     if not self.display then return end -- no player
-    self.enabled = Tables:size(Tic:playerPlayers()) > 1
     local _slotobject = self:getslotobject()
     self.hovertextrg.text = _slotobject:nameGet().." ".._slotobject:kindGet()
-    if _slotobject:isParty() then
-        self.clickrg = self.clickrg or function() self:menuPick() end
-        self.hovertextdw = self.hovertextdw or CHoverTextDW{text = Tic.TEXTPARTY}
-    else
-        self.clickrg     = nil
-        self.hovertextdw = nil
-    end
 end
 
 
 --
--- CButtonPlayerParty
+-- CButtonPlayerPickMenu
 --
-CButtonPlayerParty = CButtonPlayerPick:extend() -- generic player pick button
-function CButtonPlayerParty:new(_argt)
-    CButtonPlayerParty.super.new(self, _argt)
-    self.classic        = CButtonPlayerParty
-	self.behaviour      = IButtonPlayerParty.BEHAVIOUR  -- function to trigger at first
-    self.clicklf        = function() self:menuPick() end
+CButtonPlayerPickMenu = CButtonPlayerPick:extend() -- generic player pick button
+function CButtonPlayerPickMenu:new(_argt)
+    CButtonPlayerPickMenu.super.new(self, _argt)
+    self.classic        = CButtonPlayerPickMenu
+	self.behaviour      = IButtonPlayerMenu.BEHAVIOUR  -- function to trigger at first
+    self.screen         = nil -- parent menu screen
     self.hovertextup    = CHoverTextUP{text = Tic.TEXTPICK}
+    self.clicklf        = function()
+                            Tic:playerPick(self:getslotobject())
+                            Tic:screenRemove(self.screen)
+                            Tic:mouseDelay()
+                          end
     self.hovertextrg    = CHoverTextRG{}
-    self.getslotobject  = function() return Tic:playerActual() end
+    self.clickrg        = nil
+    self.hovertextdw    = nil
+    self:argt(_argt) -- override if any
+end
+
+
+--
+-- CButtonPlayerPartyMenu
+--
+CButtonPlayerPartyMenu = CButtonPlayerPick:extend() -- generic player pick button
+function CButtonPlayerPartyMenu:new(_argt)
+    CButtonPlayerPartyMenu.super.new(self, _argt)
+    self.classic        = CButtonPlayerPartyMenu
+	self.behaviour      = IButtonPlayerMenu.BEHAVIOUR  -- function to trigger at first
+    self.screen         = nil -- parent menu screen
+    self.hovertextup    = CHoverTextUP{text = Tic.TEXTLEAD}
+    self.clicklf        = function()
+                            self:getslotobject():partyLead()
+                            Tic:screenRemove(self.screen)
+                            Tic:mouseDelay()
+                          end
+    self.hovertextrg    = CHoverTextRG{}
+    self.hovertextdw    = CHoverTextDW{text = Tic.TEXTQUIT}
+    self.clickrg        = function()
+                            self:getslotobject():partyQuit()
+                            Tic:screenRemove(self.screen)
+                            Tic:mouseDelay()
+                          end
     self:argt(_argt) -- override if any
 end
 

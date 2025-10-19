@@ -1406,3 +1406,11 @@ function CCharacter:statAct(_action, _stat, _value) -- modify a stat act -- set/
 
     self:hitboxRefresh() -- refresh the hitboxes
 end
+
+function CCharacter:partyLead()
+    Tic:logAppend("LEAD")
+end
+
+function CCharacter:partyQuit()
+    Tic:logAppend("QUIT")
+end
