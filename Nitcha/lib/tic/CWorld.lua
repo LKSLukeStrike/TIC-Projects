@@ -23,10 +23,10 @@ function CWorld:appendEntity(_entity, _range, _trials) -- append an entity in th
     self.entitieslocations:appendEntity(_entity, _range, _trials)
 end
 
-function CWorld:deleteEntity(_entity) -- delete an entity from the world
+function CWorld:removeEntity(_entity) -- remove an entity from the world
     if not _entity then return end -- mandatory
     _entity.world = nil
-    self.entitieslocations:deleteEntity(_entity)
+    self.entitieslocations:removeEntity(_entity)
 end
 
 function CWorld:moveEntityWorldXY(_entity, _worldx, _worldy, _range, _trials) -- move an entity into the world

@@ -319,9 +319,9 @@ function CCharacter:adjustInventoriesSlots()
     _inventorymen:movetoInventory(_inventoryany)
     _inventorypsy:movetoInventory(_inventoryany)
 
-    for _, _object in ipairs(_inventoryany.objects) do -- delete objects from the world
+    for _, _object in ipairs(_inventoryany.objects) do -- remove objects from the world
         _object.discovered = true -- the object is discovered
-        _object:delete()
+        _object:remove()
     end
 
     _inventoryphy.objectsmax = self:statphymaxGet() -- adjust inventories limits
@@ -481,7 +481,7 @@ function CCharacter:pickObject(_object, _withmessage)
     local _slot = _object:findFreeSlot(self.slots)
     if _slot then _slot:appendObject(_object, true) end
 
-    _object:delete() -- delete object from the world and remove interact
+    _object:remove() -- remove object from the world and remove interact
 
     if _withmessage then Tic:messageAppend(self.name.." "..Tic.TEXTPICK..": ".._object.kind.." ".._object.name) end
 

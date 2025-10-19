@@ -1004,12 +1004,12 @@ function Tic:messageMax() -- last message in the stack
     return Tic.MESSAGES:max()
 end
 
-function Tic:messageDeleteOne() -- delete current message from the stack
+function Tic:messageDeleteOne() -- remove current message from the stack
     Tic.MESSAGES:removeAt(Tic.MESSAGES.actindex)
     return Tic:messageInit()
 end
 
-function Tic:messageDeleteAll() -- delete all messages from the stack
+function Tic:messageDeleteAll() -- remove all messages from the stack
     Tic.MESSAGES:argt{acttable = {}}
     return Tic:messageInit()
 end
@@ -2474,7 +2474,7 @@ W2lfie = _playerclass{classed = _playerclass,
     -- colorextra = Tic.COLORGREENM,
     worldx = 20,
     worldy = 20,
-    spottingspot = true,
+    -- spottingspot = true,
     spottingpick = true,
     ["slots.handrg"] = CSlotHandRG{object = CWeaponWandMedium{}},
     -- ["slots.handlf"] = CSlotHandLF{object = CWeaponRuneMedium{}},
@@ -2492,11 +2492,11 @@ W3lfie = CPlayerMeduz{classed = CPlayerMeduz,
     statphyact = 10,
     statmenact = 10,
     statpsyact = 10,
-    dirx = Tic.DIRXRG,
+    -- dirx = Tic.DIRXRG,
     -- colorextra = Tic.COLORGREENL,
     worldx = 40,
     worldy = 20,
-    spottingspot = true,
+    -- spottingspot = true,
     spottingpick = true,
     ["slots.handrg"] = CSlotHandRG{object = CWeaponWandLarge{}},
     ["slots.handlf"] = CSlotHandRG{object = CWeaponWandMedium{}},

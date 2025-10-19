@@ -25,11 +25,11 @@ function CEntitiesLocations:appendEntity(_entity, _range, _trials) -- add a new 
     self.locations:appendEntity(_entity, _range, _trials)
 end
 
-function CEntitiesLocations:deleteEntity(_entity) -- delete an entity
+function CEntitiesLocations:removeEntity(_entity) -- remove an entity
     if not _entity then return end -- mandatory
     if not self:existsEntity(_entity) then return end -- doesnt exist
     self.entities[_entity] = nil
-    self.locations:deleteEntity(_entity)
+    self.locations:removeEntity(_entity)
 end
 
 function CEntitiesLocations:moveEntityWorldXY(_entity, _worldx, _worldy, _range, _trials) -- move an existing entity

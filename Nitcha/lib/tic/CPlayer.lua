@@ -15,11 +15,17 @@ function CPlayer:new(_argt)
     self.hoverbutton  = CButtonEntityHoverLockPick{entity = self, colorborder = Tic.COLORGREEND} -- hover lock pick button
     --
     self:argt(_argt) -- override if any
-    self:playerAppend()
+    self:append()
 end
 
-function CPlayer:playerAppend()
+function CPlayer:append()
+    CPlayer.super.append(self)
     Tic:playerAppend(self) -- record the new player on tic
+end
+
+function CPlayer:remove()
+    CPlayer.super.remove(self)
+    Tic:playerRemove(self) -- remove player from tic
 end
 
 

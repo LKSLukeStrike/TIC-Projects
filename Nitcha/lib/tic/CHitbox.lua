@@ -28,7 +28,7 @@ function CHitbox:hittoAppend(_entity) -- append an entity hitto
     Tables:keyAppend(self.hitto, _entity)
 end
 
-function CHitbox:hittoDelete(_entity) -- delete an entity hitto
+function CHitbox:hittoDelete(_entity) -- remove an entity hitto
     if not _entity then return end -- mandatory
     Tables:keyDelete(self.hitto, _entity)
 end
@@ -38,7 +38,7 @@ function CHitbox:hitbyAppend(_entity) -- append an entity hitby
     Tables:keyAppend(self.hitby, _entity)
 end
 
-function CHitbox:hitbyDelete(_entity) -- delete an entity hitby
+function CHitbox:hitbyDelete(_entity) -- remove an entity hitby
     if not _entity then return end -- mandatory
     Tables:keyDelete(self.hitby, _entity)
 end

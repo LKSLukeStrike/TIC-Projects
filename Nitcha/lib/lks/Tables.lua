@@ -107,7 +107,7 @@ function Tables:keyAppend(_table, _key, _val) -- append/replace a key val entry
     _table[_key] = _val
 end
 
-function Tables:keyDelete(_table, _key) -- delete a key val entry (paired tables)
+function Tables:keyDelete(_table, _key) -- remove a key val entry (paired tables)
     if not _table or not _key then return end -- mandatory
     _table[_key] = nil
 end

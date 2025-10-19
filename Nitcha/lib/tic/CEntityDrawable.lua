@@ -37,10 +37,6 @@ function CEntityDrawable:new(_argt)
     self.interactsprite = CSpriteFG.EFFECTOBIMK
     --
     self:argt(_argt) -- override if any
-end
-
-function CEntityDrawable:argt(_argt) -- append an entity
-    CEntity.super.argt(self, _argt)
     self:append()
 end
 
@@ -53,17 +49,17 @@ function CEntityDrawable:worldAppend() -- append an entity to world
     self.world:appendEntity(self)
 end
 
-function CEntityDrawable:delete() -- delete an entity
-    self:worldDelete()
-    self:interactDelete()
+function CEntityDrawable:remove() -- remove an entity
+    self:worldremove()
+    self:interactRemoveAll()
 end
 
-function CEntityDrawable:worldDelete() -- delete an entity from world
+function CEntityDrawable:worldremove() -- remove an entity from world
     if not self.world then return end
-    self.world:deleteEntity(self)
+    self.world:removeEntity(self)
 end
 
-function CEntityDrawable:interactDelete() -- delete all interactions
+function CEntityDrawable:interactRemoveAll() -- remove all interactions
     self:interactbyRemoveAll()
 end
 

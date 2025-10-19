@@ -78,7 +78,7 @@ function CLocations:spreadEntity(_entity, _range, _trials) -- try to find an emp
     _entity.worldx = Tables:keyPickRandom(_spreadlocations[_entity.worldy])
 end
 
-function CLocations:deleteEntity(_entity) -- delete an existing entity
+function CLocations:removeEntity(_entity) -- remove an existing entity
     if not _entity then return end -- mandatory
     local _worldx = _entity.worldx
     local _worldy = _entity.worldy
@@ -91,7 +91,7 @@ end
 function CLocations:moveEntityWorldXY(_entity, _worldx, _worldy, _range, _trials) -- move an existing entity
     if not _entity or not _worldx or not _worldy then return end -- mandatory
     if not self.locations[_entity.worldy][_entity.worldx][_entity] then return end -- doesnt exist
-    self:deleteEntity(_entity)
+    self:removeEntity(_entity)
     _entity.worldx = _worldx
     _entity.worldy = _worldy
     self:appendEntity(_entity, _range, _trials)

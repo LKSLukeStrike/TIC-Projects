@@ -87,7 +87,7 @@ end
 
 function CEntity:randomRegionWorld(_region) -- random worldx worldy in a region -- default min/max
     _region = _region or CRegion{}
-    self.world:deleteEntity(self) -- delete itself from its old position -- FIXME why remove/append here ?
+    self.world:removeEntity(self) -- remove itself from its old position -- FIXME why remove/append here ?
     self.worldx = Nums:random(_region.lf, _region.rg)
     self.worldy = Nums:random(_region.up, _region.dw)
     self.world:appendEntity(self) -- append itself from its new position
@@ -122,7 +122,7 @@ function CEntity:interacttoAppend(_entity) -- append an entity interactto
     end
 end
 
-function CEntity:interacttoDelete() -- delete an entity interactto
+function CEntity:interacttoDelete() -- remove an entity interactto
     if self.interactto then
         self.interactto:interactbyRemove(self)
         self.interactto = nil

@@ -24,7 +24,7 @@ end
 
 function CParty:lead(_)
     if not _ then return end -- mandatory
-    _:delete()
+    _:remove()
     self.leader.world = _
     self.leader:draw()
 end
