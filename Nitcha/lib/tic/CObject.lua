@@ -1321,7 +1321,7 @@ function CClothesCap:new(_argt)
     self.name = Classic.NAMECLOTHESCAP
     self.sprite = CSpriteFG.CLOTHESCAPB
     self.palettefg = {
-        [CObject.HANDLE] = Tic.COLORKEY,
+        [CObject.HANDLE] = CObject.COLORLEATHERFG,
         [CObject.BORDER] = CObject.COLORPSYM,
         [CObject.INSIDE] = CObject.COLORLEATHERFG,
         [CObject.EFFECT] = CObject.COLORLEATHERFG,

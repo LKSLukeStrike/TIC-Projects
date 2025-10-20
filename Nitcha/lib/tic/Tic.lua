@@ -2295,12 +2295,12 @@ end
 -- exit()
 
 
-local _playerclass = CPlayerGolth
+local _playerclass = CPlayerDrowe --CPlayerMeduz --CPlayerGolth
 if true then
 --
 -- phy
 --
-if false then
+if true then
 if true then
 Walfie = _playerclass{classed = _playerclass,
     name = "Walfie",
@@ -2313,10 +2313,10 @@ Walfie = _playerclass{classed = _playerclass,
     worldy = -20,
     -- spottingspot = true,
     spottingpick = true,
-    ["slots.handrg"] = CSlotHandRG{object = CWeaponSword{}},
-    ["slots.handlf"] = CSlotHandLF{object = CWeaponShieldSmall{}},
+    -- ["slots.handrg"] = CSlotHandRG{object = CWeaponSword{}},
+    -- ["slots.handlf"] = CSlotHandLF{object = CWeaponShieldSmall{}},
     ["slots.head"]   = CSlotHead{object = CClothesHelmetSmall{}},
-    ["slots.back"]   = CSlotBack{object = CClothesBackPackSmall{}},
+    -- ["slots.back"]   = CSlotBack{object = CClothesBackPackSmall{}},
     ["inventories.any"] = CInventoryAny{objects = {
         CObjectBombSmall{used = CObject.USEDFULL},
     }},
@@ -2335,10 +2335,10 @@ Welfie = _playerclass{classed = _playerclass,
     worldy = -20,
     -- spottingspot = true,
     spottingpick = true,
-    ["slots.handrg"] = CSlotHandRG{object = CWeaponHammer{}},
-    ["slots.handlf"] = CSlotHandLF{object = CWeaponShieldMedium{}},
+    -- ["slots.handrg"] = CSlotHandRG{object = CWeaponHammer{}},
+    -- ["slots.handlf"] = CSlotHandLF{object = CWeaponShieldMedium{}},
     ["slots.head"]   = CSlotHead{object = CClothesHelmetMedium{}},
-    ["slots.back"]   = CSlotBack{object = CClothesBackPackMedium{}},
+    -- ["slots.back"]   = CSlotBack{object = CClothesBackPackMedium{}},
     ["inventories.any"] = CInventoryAny{objects = {
         CObjectBombMedium{used = CObject.USEDHALF},
     }},
@@ -2357,14 +2357,14 @@ Wilfie = _playerclass{classed = _playerclass,
     worldy = -20,
     -- spottingspot = true,
     spottingpick = true,
-    ["slots.handrg"] = CSlotHandRG{object = CWeaponSword{}},
-    ["slots.handlf"] = CSlotHandLF{object = CWeaponShieldLarge{}},
+    -- ["slots.handrg"] = CSlotHandRG{object = CWeaponSword{}},
+    -- ["slots.handlf"] = CSlotHandLF{object = CWeaponShieldLarge{}},
     ["slots.head"]   = CSlotHead{object = CClothesHelmetLarge{}},
-    ["slots.back"]   = CSlotBack{object = CClothesBackPackLarge{}},
+    -- ["slots.back"]   = CSlotBack{object = CClothesBackPackLarge{}},
     ["inventories.any"] = CInventoryAny{objects = {
         CObjectBombLarge{used = CObject.USEDNONE},
-        CWeaponHammer{},
-        CWeaponLance{},
+        -- CWeaponHammer{},
+        -- CWeaponLance{},
     }},
 }
 end
@@ -2373,7 +2373,7 @@ end -- phy
 --
 -- men
 --
-if false then
+if true then
 if true then
 Wolfie = _playerclass{classed = _playerclass,
     name = "Wolfie",
@@ -2386,13 +2386,13 @@ Wolfie = _playerclass{classed = _playerclass,
     worldy = 0,
     -- spottingspot = true,
     spottingpick = true,
-    ["slots.handrg"] = CSlotHandRG{object = CWeaponBowSmall{}},
-    ["slots.handlf"] = CSlotHandLF{object = CWeaponBookSmall{}},
+    -- ["slots.handrg"] = CSlotHandRG{object = CWeaponBowSmall{}},
+    -- ["slots.handlf"] = CSlotHandLF{object = CWeaponBookSmall{}},
     ["slots.head"]   = CSlotHead{object = CClothesHatSmall{}},
-    ["slots.back"]   = CSlotBack{object = CClothesToolBoxSmall{}},
-    ["inventories.any"] = CInventoryAny{objects = {
-        CObjectFlaskSmall{used = CObject.USEDFULL},
-    }},
+    -- ["slots.back"]   = CSlotBack{object = CClothesToolBoxSmall{}},
+    -- ["inventories.any"] = CInventoryAny{objects = {
+    --     CObjectFlaskSmall{used = CObject.USEDFULL},
+    -- }},
 }
 end
 if true then
@@ -2407,13 +2407,13 @@ Wulfie = _playerclass{classed = _playerclass,
     worldy = 0,
     -- spottingspot = true,
     spottingpick = true,
-    ["slots.handrg"] = CSlotHandRG{object = CWeaponBowMedium{}},
-    ["slots.handlf"] = CSlotHandLF{object = CWeaponBookMedium{}},
+    -- ["slots.handrg"] = CSlotHandRG{object = CWeaponBowMedium{}},
+    -- ["slots.handlf"] = CSlotHandLF{object = CWeaponBookMedium{}},
     ["slots.head"]   = CSlotHead{object = CClothesHatMedium{}},
-    ["slots.back"]   = CSlotBack{object = CClothesToolBoxMedium{}},
-    ["inventories.any"] = CInventoryAny{objects = {
-        CObjectFlaskMedium{used = CObject.USEDHALF},
-    }},
+    -- ["slots.back"]   = CSlotBack{object = CClothesToolBoxMedium{}},
+    -- ["inventories.any"] = CInventoryAny{objects = {
+    --     CObjectFlaskMedium{used = CObject.USEDHALF},
+    -- }},
 }
 end
 if true then
@@ -2428,13 +2428,13 @@ Wylfie = _playerclass{classed = _playerclass,
     worldy = 0,
     -- spottingspot = true,
     spottingpick = true,
-    ["slots.handrg"] = CSlotHandRG{object = CWeaponBowLarge{}},
-    ["slots.handlf"] = CSlotHandLF{object = CWeaponBookLarge{}},
+    -- ["slots.handrg"] = CSlotHandRG{object = CWeaponBowLarge{}},
+    -- ["slots.handlf"] = CSlotHandLF{object = CWeaponBookLarge{}},
     ["slots.head"]   = CSlotHead{object = CClothesHatLarge{}},
-    ["slots.back"]   = CSlotBack{object = CClothesToolBoxLarge{}},
-    ["inventories.any"] = CInventoryAny{objects = {
-        CObjectFlaskLarge{used = CObject.USEDNONE},
-    }},
+    -- ["slots.back"]   = CSlotBack{object = CClothesToolBoxLarge{}},
+    -- ["inventories.any"] = CInventoryAny{objects = {
+    --     CObjectFlaskLarge{used = CObject.USEDNONE},
+    -- }},
 }
 end
 end -- men
@@ -2443,7 +2443,7 @@ end -- men
 -- psy
 --
 if true then
-if false then
+if true then
 W1lfie = _playerclass{classed = _playerclass,
     name = "W1lfie",
     size = Tic.SIZES,
@@ -2455,13 +2455,15 @@ W1lfie = _playerclass{classed = _playerclass,
     worldy = 20,
     -- spottingspot = true,
     spottingpick = true,
-    ["slots.handrg"] = CSlotHandRG{object = CWeaponWandSmall{}},
-    ["slots.handlf"] = CSlotHandLF{object = CWeaponRuneSmall{}},
+    -- ["slots.handrg"] = CSlotHandRG{object = CWeaponWandSmall{}},
+    -- ["slots.handlf"] = CSlotHandLF{object = CWeaponRuneSmall{}},
+    -- ["slots.head"]   = CSlotHead{object = CClothesHelmetSmall{}},
+    -- ["slots.head"]   = CSlotHead{object = CClothesHatSmall{}},
     ["slots.head"]   = CSlotHead{object = CClothesCapSmall{}},
-    ["slots.back"]   = CSlotBack{object = CClothesScrollCaseSmall{}},
-    ["inventories.any"] = CInventoryAny{objects = {
-        CObjectSpellSmall{used = CObject.USEDFULL},
-    }},
+    -- ["slots.back"]   = CSlotBack{object = CClothesScrollCaseSmall{}},
+    -- ["inventories.any"] = CInventoryAny{objects = {
+    --     CObjectSpellSmall{used = CObject.USEDFULL},
+    -- }},
 }
 end
 if true then
@@ -2476,9 +2478,11 @@ W2lfie = _playerclass{classed = _playerclass,
     worldy = 20,
     -- spottingspot = true,
     spottingpick = true,
-    ["slots.handrg"] = CSlotHandRG{object = CWeaponWandMedium{}},
+    -- ["slots.handrg"] = CSlotHandRG{object = CWeaponWandMedium{}},
     -- ["slots.handlf"] = CSlotHandLF{object = CWeaponRuneMedium{}},
-    -- ["slots.head"]   = CSlotHead{object = CClothesCapMedium{}},
+    -- ["slots.head"]   = CSlotHead{object = CClothesHelmetMedium{}},
+    -- ["slots.head"]   = CSlotHead{object = CClothesHatMedium{}},
+    ["slots.head"]   = CSlotHead{object = CClothesCapMedium{}},
     -- ["slots.back"]   = CSlotBack{object = CClothesScrollCaseMedium{}},
     -- ["inventories.any"] = CInventoryAny{objects = {
     --     CObjectSpellMedium{used = CObject.USEDHALF},
@@ -2486,7 +2490,7 @@ W2lfie = _playerclass{classed = _playerclass,
 }
 end
 if true then
-W3lfie = CPlayerMeduz{classed = CPlayerMeduz,
+W3lfie = _playerclass{classed = _playerclass,
     name = "W3lfie",
     size = Tic.SIZEL,
     statphyact = 10,
@@ -2498,10 +2502,12 @@ W3lfie = CPlayerMeduz{classed = CPlayerMeduz,
     worldy = 20,
     -- spottingspot = true,
     spottingpick = true,
-    ["slots.handrg"] = CSlotHandRG{object = CWeaponWandLarge{}},
-    ["slots.handlf"] = CSlotHandRG{object = CWeaponWandMedium{}},
+    -- ["slots.handrg"] = CSlotHandRG{object = CWeaponWandLarge{}},
+    -- ["slots.handlf"] = CSlotHandRG{object = CWeaponWandMedium{}},
     -- ["slots.handlf"] = CSlotHandLF{object = CWeaponRuneLarge{}},
-    ["slots.head"]   = CSlotHead{object = CClothesHelmetLarge{}},
+    -- ["slots.head"]   = CSlotHead{object = CClothesHelmetLarge{}},
+    -- ["slots.head"]   = CSlotHead{object = CClothesHatLarge{}},
+    ["slots.head"]   = CSlotHead{object = CClothesCapLarge{}},
     -- ["slots.back"]   = CSlotBack{object = CClothesScrollCaseLarge{}},
     -- ["inventories.any"] = CInventoryAny{objects = {
     --     CObjectSpellLarge{used = CObject.USEDNONE},
@@ -2513,10 +2519,16 @@ end
 
 
 -- PARTY
-if true then
-W3lfie.party = CParty{leader = W3lfie, members = {W3lfie, W2lfie}}
--- W2lfie.party = W3lfie.party
--- W2lfie:remove()
+if false then
+W3Party = CParty{}
+W3lfie.party = W3Party
+W2lfie.party = W3Party
+W1lfie.party = W3Party
+W3Party:argt{leader = W3lfie, members = {W3lfie, W2lfie, W1lfie}}
+-- W1lfie:worldRemove()
+-- W2lfie:worldRemove()
+-- Tic:playerRemove(W1lfie)
+-- Tic:playerRemove(W2lfie)
 -- W3lfie:remove()
 end
 

@@ -919,7 +919,7 @@ function CButtonPlayerPick:menuParty()
         }
     end
 
-    _appendbutton(_leader)
+    _appendbutton(_playeractual)
 
     for _, _member in ipairs(_members) do
         if not (_member == _leader) then

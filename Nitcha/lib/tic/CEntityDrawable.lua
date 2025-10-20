@@ -50,11 +50,11 @@ function CEntityDrawable:worldAppend() -- append an entity to world
 end
 
 function CEntityDrawable:remove() -- remove an entity
-    self:worldremove()
+    self:worldRemove()
     self:interactRemoveAll()
 end
 
-function CEntityDrawable:worldremove() -- remove an entity from world
+function CEntityDrawable:worldRemove() -- remove an entity from world
     if not self.world then return end
     self.world:removeEntity(self)
 end
@@ -98,7 +98,11 @@ function CEntityDrawable:draw() -- default draw for drawable entities -- overrid
     self.musprite.scale   = self.scale
     self.musprite.rotate  = self.rotate
     self.musprite.palette = _palette
-    self.musprite:draw()
+    if Tables:valFind(_palette, Tic.COLORKEY) then -- contains colorkey ?
+        self.musprite:drawDirectives()
+    else
+        self.musprite:draw()
+    end
 
     self:drawSpotted()
     self:drawHovered()
