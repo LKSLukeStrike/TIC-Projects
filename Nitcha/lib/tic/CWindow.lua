@@ -92,7 +92,6 @@ function CWindowMenu:drawInside()
         _screeny = _screeny + _element.screenh + self.separatory
         _element:draw()
     end
-    -- self.parent:appendElements(_content.elements)
 end
 
 

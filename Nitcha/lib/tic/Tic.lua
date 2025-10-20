@@ -2300,7 +2300,7 @@ if true then
 --
 -- phy
 --
-if true then
+if false then
 if true then
 Walfie = _playerclass{classed = _playerclass,
     name = "Walfie",
@@ -2373,7 +2373,7 @@ end -- phy
 --
 -- men
 --
-if true then
+if false then
 if true then
 Wolfie = _playerclass{classed = _playerclass,
     name = "Wolfie",
@@ -2443,7 +2443,7 @@ end -- men
 -- psy
 --
 if true then
-if true then
+if false then
 W1lfie = _playerclass{classed = _playerclass,
     name = "W1lfie",
     size = Tic.SIZES,
@@ -2519,17 +2519,22 @@ end
 
 
 -- PARTY
-if false then
-W3Party = CParty{}
+if true then
+W3Party = CParty{leader = W3lfie, members = {W3lfie, W2lfie}}
 W3lfie.party = W3Party
 W2lfie.party = W3Party
-W1lfie.party = W3Party
-W3Party:argt{leader = W3lfie, members = {W3lfie, W2lfie, W1lfie}}
+W2lfie:remove()
+
+-- W1lfie.party = W3Party
+-- W3Party:argt{leader = W3lfie, members = {W3lfie, W2lfie, W1lfie}}
 -- W1lfie:worldRemove()
 -- W2lfie:worldRemove()
+-- Tic:trace("1", Tic:playerActual().name)
 -- Tic:playerRemove(W1lfie)
+-- Tic:trace("2", Tic:playerActual().name)
 -- Tic:playerRemove(W2lfie)
--- W3lfie:remove()
+-- Tic:trace("3", Tic:playerActual().name)
+-- exit()
 end
 
 -- Tic:traceTable(World.entitieslocations.locations.locations, {depth = 3, indent = "-"})
@@ -2892,7 +2897,7 @@ function Tic:logWorld()
     local _kindnames = {}
     Tic:logAppend(_world.name, Tables:size(_world.entitieslocations.entities))
     for _, _entity in pairs(_world.entitieslocations.entities) do
-        Tables:valInsert(_kindnames, _entity.kind.."\t".._entity.name)
+        Tables:valInsert(_kindnames, _entity:kindGet().."\t".._entity:nameGet())
     end
     table.sort(_kindnames)
     for _, _kindname in ipairs(_kindnames) do

@@ -856,7 +856,7 @@ end
 
 function CButtonPlayerPick:menuPick()
     local _screen        = CScreen{}
-    local _screenx       = self.screenx + 9
+    local _screenx       = self.screenx - 9
     local _screeny       = self.screeny
     local _classic       = CButtonPlayerPickMenu
     local _playeractual  = Tic:playerActual()
@@ -893,14 +893,13 @@ end
 
 function CButtonPlayerPick:menuParty()
     local _screen        = CScreen{}
-    local _screenx       = self.screenx - 9
+    local _screenx       = self.screenx + 9
     local _screeny       = self.screeny
     local _classic       = CButtonPlayerPartyMenu
     local _playeractual  = Tic:playerActual()
     local _party         = _playeractual.party
     local _leader        = _party.leader
     local _members       = _party.members
-
 
     local _windowmenu = CWindowMenu{
         screenx = _screenx,
@@ -919,7 +918,7 @@ function CButtonPlayerPick:menuParty()
         }
     end
 
-    _appendbutton(_playeractual)
+    _appendbutton(_leader)
 
     for _, _member in ipairs(_members) do
         if not (_member == _leader) then
@@ -950,7 +949,7 @@ CButtonPlayerPickMenu = CButtonPlayerPick:extend() -- generic player pick button
 function CButtonPlayerPickMenu:new(_argt)
     CButtonPlayerPickMenu.super.new(self, _argt)
     self.classic        = CButtonPlayerPickMenu
-	self.behaviour      = IButtonPlayerMenu.BEHAVIOUR  -- function to trigger at first
+	self.behaviour      = nil -- function to trigger at first
     self.screen         = nil -- parent menu screen
     self.hovertextup    = CHoverTextUP{text = Tic.TEXTPICK}
     self.clicklf        = function()
@@ -972,7 +971,7 @@ CButtonPlayerPartyMenu = CButtonPlayerPick:extend() -- generic player pick butto
 function CButtonPlayerPartyMenu:new(_argt)
     CButtonPlayerPartyMenu.super.new(self, _argt)
     self.classic        = CButtonPlayerPartyMenu
-	self.behaviour      = IButtonPlayerMenu.BEHAVIOUR  -- function to trigger at first
+	self.behaviour      = nil -- function to trigger at first
     self.screen         = nil -- parent menu screen
     self.hovertextup    = CHoverTextUP{text = Tic.TEXTLEAD}
     self.clicklf        = function()
@@ -1006,11 +1005,11 @@ CButtonSlotPlayer = CButtonSlot:extend()
 function CButtonSlotPlayer:new(_argt)
     CButtonSlotPlayer.super.new(self, _argt)
     self.behaviour   = IButtonSlotPlayer.BEHAVIOUR
-    self.clicklf     = function() self:menuPick() end
     self.hovertextup = CHoverTextUP{text = Tic.TEXTPICK}
-    self.clickrg     = nil -- override per slot
-    self.hovertextdw = CHoverTextDW{text = Tic.TEXTDROP}
+    self.clicklf     = function() self:menuPick() end
     self.hovertextrg = CHoverTextRG{}
+    self.hovertextdw = CHoverTextDW{text = Tic.TEXTDROP}
+    self.clickrg     = nil -- override per slot
     self:argt(_argt) -- override if any
 end
 
