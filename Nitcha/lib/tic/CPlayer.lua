@@ -10,7 +10,7 @@ function CPlayer:new(_argt)
     --
     self.interactions = {
         CInteractionSayMessage{},
-        CInteractionJoinTroop{},
+        CInteractionJoinParty{},
     }
     self.hoverbutton  = CButtonEntityHoverLockPick{entity = self, colorborder = Tic.COLORGREEND} -- hover lock pick button
     --

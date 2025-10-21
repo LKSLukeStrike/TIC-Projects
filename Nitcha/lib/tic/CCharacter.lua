@@ -233,7 +233,7 @@ function CCharacter:new(_argt)
     self.bodysprite     = CSpriteFG.BODYHUMAN -- body
     self.headsprite     = CSpriteFG.HEADELVWE -- head
     self.eyessprite     = CSpriteFG.EYESHUMAN -- eyes
-    self.statphymax     = 5 -- max stats -- 0-Tic.STATSMAX
+    self.statphymax     = 5 -- max stats -- 0-Tic.STATMAX
     self.statmenmax     = 5
     self.statpsymax     = 5
     self.statphyact     = self.statphymax -- act stats -- 0-max
@@ -556,7 +556,7 @@ function CCharacter:regionViewOffsets() -- view offsets region depending on dirx
     local _posturekneel  = _posture == Tic.POSTUREKNEEL
     local _size          = Tic.SPRITESIZE * self.scale
     local _range         = (_posturekneel) and Tic.WORLDWH // 2 or Tic.WORLDWH -- use world window height as range -- TODO change that later ?
-    local _offsets       = Nums:roundint((((_range - _size) // 2) - 1) * (_statphyact / Tic.STATSMAX))
+    local _offsets       = Nums:roundint((((_range - _size) // 2) - 1) * (_statphyact / Tic.STATMAX))
 
     return CRegion{
         lf  = (self.dirx == Tic.DIRXLF)
@@ -594,7 +594,7 @@ function CCharacter:regionMindOffsets() -- mind offsets region depending on dirx
     local _posturekneel  = _posture == Tic.POSTUREKNEEL
     local _size          = Tic.SPRITESIZE * self.scale
     local _range         = Tic.WORLDWH -- use world window height as range -- TODO change that later ?
-    local _offsets       = Nums:roundint((((_range - _size) // 2) - 1) * (_statmenact / Tic.STATSMAX))
+    local _offsets       = Nums:roundint((((_range - _size) // 2) - 1) * (_statmenact / Tic.STATMAX))
 
     return CRegion{
         lf  = Nums:neg(_offsets),
@@ -768,7 +768,7 @@ function CCharacter:cycleIdle() -- animate idle after a delay
 
     self.idlecycler:next()
 	if self.idlecycler:isMAX() then -- trigger idlecycler
-		if Nums:random(Tic.STATSMAX) > self.statmenact then -- only if over statmenact
+		if Nums:random(Tic.STATMAX) > self.statmenact then -- only if over statmenact
             self:moveDirection(Tables:valPickRandom(Tic.DIRSCYCLER.acttable), true)
         end
 	end
@@ -1276,8 +1276,8 @@ function CCharacter:offsetsDirection(_direction, _movenone,  _moveslow, _movebac
         _result.offsetx = Nums:sign(_result.offsetx)
         _result.offsety = Nums:sign(_result.offsety)
     else -- normal move
-        _result.offsetx = _result.offsetx * (self:statphyactGet() / Tic.STATSMAX) -- depends of phy act
-        _result.offsety = _result.offsety * (self:statphyactGet() / Tic.STATSMAX)
+        _result.offsetx = _result.offsetx * (self:statphyactGet() / Tic.STATMAX) -- depends of phy act
+        _result.offsety = _result.offsety * (self:statphyactGet() / Tic.STATMAX)
         _result.offsetx = (_posture == Tic.POSTURESTAND) and _result.offsetx or _result.offsetx / 2 -- half if not stand
         _result.offsety = (_posture == Tic.POSTURESTAND) and _result.offsety or _result.offsety / 2 -- half if not stand
         _result.offsetx = Nums:roundmax(_result.offsetx) -- ensure solid values
@@ -1390,25 +1390,35 @@ function CCharacter:statAct(_action, _stat, _value) -- modify a stat act -- set/
     if not _entity[_stat] then return end -- unknown stat
     _value = _value or 0
 
-    if _action == Tic.STATSET then
+    if _action == Tic.STATACTIONSET then
         _entity[_stat] = _value
-    elseif _action == Tic.STATDEC then
+    elseif _action == Tic.STATACTIONDEC then
         _entity[_stat] = _entity[_stat] - _value
-    elseif _action == Tic.STATINC then
+    elseif _action == Tic.STATACTIONINC then
         _entity[_stat] = _entity[_stat] + _value
-    elseif _action == Tic.STATMAX then
+    elseif _action == Tic.STATACTIONMAX then
         _entity[_stat] = _entity[string.gsub(_stat, "act", "max")]
     end
 
-    _entity[_stat] = math.max(_entity[_stat], Tic.STATSMIN) -- stay in range
-    _entity[_stat] = math.min(_entity[_stat], Tic.STATSMAX)
+    _entity[_stat] = math.max(_entity[_stat], Tic.STATMIN) -- stay in range
+    _entity[_stat] = math.min(_entity[_stat], Tic.STATMAX)
     _entity[_stat] = Nums:roundint(_entity[_stat]) -- ensure an integer
 
     self:hitboxRefresh() -- refresh the hitboxes
 end
 
-function CCharacter:partyLead()
+--
+-- Party
+-- 
+function CCharacter:partyLead(_party)
     Tic:logAppend("LEAD")
+    _party = _party or self.party
+    if not _party then -- create a party
+        _party = CParty{leader = self}
+        self.party = _party
+    else
+    end
+    return _party
 end
 
 function CCharacter:partyQuit()

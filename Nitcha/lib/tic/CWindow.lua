@@ -365,21 +365,21 @@ end
 function CWindowStatsCharacter:drawInside() -- window stats content for -- [!] characters
     rect ( -- phy act bar
         self.screenx + 02,
-        self.screeny + 02 + Tic.STATSMAX - self.entity:statphyactGet() + 1,
+        self.screeny + 02 + Tic.STATMAX - self.entity:statphyactGet() + 1,
         06,
         self.entity:statphyactGet(),
         self.entity:colorPhyAct()
     )
     rect ( -- men act bar
         self.screenx + 10,
-        self.screeny + 02 + Tic.STATSMAX - self.entity:statmenactGet() + 1,
+        self.screeny + 02 + Tic.STATMAX - self.entity:statmenactGet() + 1,
         06,
         self.entity:statmenactGet(),
         self.entity:colorMenAct()
     )
     rect ( -- psy act bar
         self.screenx + 18,
-        self.screeny + 02 + Tic.STATSMAX - self.entity:statpsyactGet() + 1,
+        self.screeny + 02 + Tic.STATMAX - self.entity:statpsyactGet() + 1,
         06,
         self.entity:statpsyactGet(),
         self.entity:colorPsyAct()
@@ -409,21 +409,21 @@ function CWindowStatsCharacter:drawInside() -- window stats content for -- [!] c
 
     rectb( -- phy max line
         self.screenx + 02,
-        self.screeny + 03 + Tic.STATSMAX - self.entity:statphymaxGet(),
+        self.screeny + 03 + Tic.STATMAX - self.entity:statphymaxGet(),
         06,
         01,
         self.colorborder
     )
     rectb( -- men max line
         self.screenx + 10,
-        self.screeny + 03 + Tic.STATSMAX - self.entity:statmenmaxGet(),
+        self.screeny + 03 + Tic.STATMAX - self.entity:statmenmaxGet(),
         06,
         01,
         self.colorborder
     )
     rectb( -- psy max line
         self.screenx + 18,
-        self.screeny + 03 + Tic.STATSMAX - self.entity:statpsymaxGet(),
+        self.screeny + 03 + Tic.STATMAX - self.entity:statpsymaxGet(),
         06,
         01,
         self.colorborder

@@ -417,10 +417,6 @@ Tic.DIRSCYCLER = CCyclerTable{acttable = { -- 8 directions around
 Tic.DRAWBG = "drawbg"
 Tic.DRAWFG = "drawfg"
 
--- Stats
-Tic.STATSMIN  = 0 -- stats handling
-Tic.STATSMAX  = 10
-
 -- Frequences
 Tic.FREQUENCE0000 = 0000 -- each 0 second
 Tic.FREQUENCE0030 = 0030 -- each 0.5 second
@@ -499,9 +495,9 @@ Tic.FUNCTIONMOVEDIRECTION180    = function() Tic:moveDirection180() end
 Tic.FUNCTIONMOVEDIRECTION225    = function() Tic:moveDirection225() end
 Tic.FUNCTIONMOVEDIRECTION270    = function() Tic:moveDirection270() end
 Tic.FUNCTIONMOVEDIRECTION315    = function() Tic:moveDirection315() end
-Tic.FUNCTIONSTATACTPHY          = function() Tic:statActPhy() end
-Tic.FUNCTIONSTATACTMEN          = function() Tic:statActMen() end
-Tic.FUNCTIONSTATACTPSY          = function() Tic:statActPsy() end
+Tic.FUNCTIONSTATACTPHY          = function() Tic:statPhyAct() end
+Tic.FUNCTIONSTATACTMEN          = function() Tic:statMenAct() end
+Tic.FUNCTIONSTATACTPSY          = function() Tic:statPsyAct() end
 Tic.FUNCTIONBIOMENEXT           = function() Tic:biomeNext() end
 Tic.FUNCTIONHITBOXTOGGLEDRAW    = function() Tic:hitboxToggleDraw() end
 Tic.FUNCTIONINVENTORYTOGGLESHOW = function() Tic:inventoryToggleShow() end
@@ -1161,23 +1157,36 @@ function Tic:moveDirection(_direction, _character)
 end
 
 
--- Stats System -- change a stat value
-Tic.STATSET = "set"
-Tic.STATDEC = "dec"
-Tic.STATINC = "inc"
-Tic.STATMAX = "max"
-function Tic:statActPhy(_character)
-    local _stat = "statphyact"
+-- Stats System
+Tic.STATMIN  = 0 -- stats limits
+Tic.STATMAX  = 10
+
+Tic.STATACTIONSET = "set"
+Tic.STATACTIONDEC = "dec"
+Tic.STATACTIONINC = "inc"
+Tic.STATACTIONMAX = "max"
+Tic.STATPHYMAX    = "statphymax"
+Tic.STATMENMAX    = "statmenmax"
+Tic.STATPSYMAX    = "statpsymax"
+Tic.STATPHYACT    = "statphyact"
+Tic.STATMENACT    = "statmenact"
+Tic.STATPSYACT    = "statpsyact"
+Tic.STATSMAX      = {Tic.STATPHYMAX, Tic.STATMENMAX, Tic.STATPSYMAX}
+Tic.STATSACT      = {Tic.STATPHYACT, Tic.STATMENACT, Tic.STATPSYACT}
+Tic.STATS         = {Tic.STATPHYMAX, Tic.STATMENMAX, Tic.STATPSYMAX, Tic.STATPHYACT, Tic.STATMENACT, Tic.STATPSYACT}
+
+function Tic:statPhyAct(_character)
+    local _stat = Tic.STATPHYACT
     Tic:statAct(_stat, _character)
 end
 
-function Tic:statActMen(_character)
-    local _stat = "statmenact"
+function Tic:statMenAct(_character)
+    local _stat = Tic.STATMENACT
     Tic:statAct(_stat, _character)
 end
 
-function Tic:statActPsy(_character)
-    local _stat = "statpsyact"
+function Tic:statPsyAct(_character)
+    local _stat = Tic.STATPSYACT
     Tic:statAct(_stat, _character)
 end
 
@@ -1186,11 +1195,11 @@ function Tic:statAct(_stat, _character) -- modify an act stat -- set/dec/inc/max
     _character = _character or Tic:playerActual()
     if not _character then return end
     if Tic.MODIFIERKEYS[Tic.KEY_SHIFT] then
-        _character:statAct(Tic.STATINC, _stat, 1)
+        _character:statAct(Tic.STATACTIONINC, _stat, 1)
     elseif Tic.MODIFIERKEYS[Tic.KEY_CTRL] then
-        _character:statAct(Tic.STATDEC, _stat, 1)
+        _character:statAct(Tic.STATACTIONDEC, _stat, 1)
     else
-        _character:statAct(Tic.STATMAX, _stat)
+        _character:statAct(Tic.STATACTIONMAX, _stat)
     end
 end
 
@@ -2519,7 +2528,7 @@ end
 
 
 -- PARTY
-if true then
+if false then
 W3Party = CParty{leader = W3lfie, members = {W3lfie, W2lfie}}
 W3lfie.party = W3Party
 W2lfie.party = W3Party

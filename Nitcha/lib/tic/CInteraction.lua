@@ -36,13 +36,13 @@ function CInteractionPickObject:new(_argt)
     self:argt(_argt) -- override if any
 end
 
-CInteractionJoinTroop = CInteraction:extend() -- JoinTroop interaction
-CInteraction.INTERACTIFJOINTROOP = function() return Tic:characterFunction(nil, "ifJoinTroop") end
-CInteraction.INTERACTDOJOINTROOP = function() return Tic:characterFunction(nil, "doJoinTroop") end
-function CInteractionJoinTroop:new(_argt)
-    CInteractionJoinTroop.super.new(self, _argt)
+CInteractionJoinParty = CInteraction:extend() -- JoinParty interaction
+CInteraction.INTERACTIFJOINPARTY = function() return Tic:characterFunction(nil, "ifJoinParty") end
+CInteraction.INTERACTDOJOINPARTY = function() return Tic:characterFunction(nil, "doJoinParty") end
+function CInteractionJoinParty:new(_argt)
+    CInteractionJoinParty.super.new(self, _argt)
     self.text = Tic.TEXTJOIN
-    -- self.interactiflf = CInteraction.INTERACTIFJOINTROOP
-    self.interactdolf = CInteraction.INTERACTDOJOINTROOP
+    -- self.interactiflf = CInteraction.INTERACTIFJOINPARTY
+    self.interactdolf = CInteraction.INTERACTDOJOINPARTY
     self:argt(_argt) -- override if any
 end
