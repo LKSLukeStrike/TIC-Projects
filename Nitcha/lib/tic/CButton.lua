@@ -949,7 +949,10 @@ CButtonPlayerPickMenu = CButtonPlayerPick:extend() -- generic player pick button
 function CButtonPlayerPickMenu:new(_argt)
     CButtonPlayerPickMenu.super.new(self, _argt)
     self.classic        = CButtonPlayerPickMenu
-	self.behaviour      = nil -- function to trigger at first
+	self.behaviour      = function(self)
+                            local _slotobject = self:getslotobject()
+                            self.hovertextrg.text = _slotobject:nameGet().." ".._slotobject:kindGet()
+                          end
     self.screen         = nil -- parent menu screen
     self.hovertextup    = CHoverTextUP{text = Tic.TEXTPICK}
     self.clicklf        = function()

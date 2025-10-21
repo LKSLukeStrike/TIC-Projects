@@ -768,7 +768,7 @@ function CCharacter:cycleIdle() -- animate idle after a delay
 
     self.idlecycler:next()
 	if self.idlecycler:isMAX() then -- trigger idlecycler
-		if Nums:random(Tic.STATMAX) > self.statmenact then -- only if over statmenact
+		if Nums:random(Tic.STATMAX) > self:statmenactGet() then -- only if over statmenact
             self:moveDirection(Tables:valPickRandom(Tic.DIRSCYCLER.acttable), true)
         end
 	end

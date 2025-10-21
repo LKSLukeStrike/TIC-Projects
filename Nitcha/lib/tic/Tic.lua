@@ -2452,7 +2452,7 @@ end -- men
 -- psy
 --
 if true then
-if false then
+if true then
 W1lfie = _playerclass{classed = _playerclass,
     name = "W1lfie",
     size = Tic.SIZES,
@@ -2502,9 +2502,9 @@ if true then
 W3lfie = _playerclass{classed = _playerclass,
     name = "W3lfie",
     size = Tic.SIZEL,
-    statphyact = 10,
-    statmenact = 10,
-    statpsyact = 10,
+    -- statphyact = 10,
+    -- statmenact = 10,
+    -- statpsyact = 10,
     -- dirx = Tic.DIRXRG,
     -- colorextra = Tic.COLORGREENL,
     worldx = 40,
@@ -2528,11 +2528,13 @@ end
 
 
 -- PARTY
-if false then
-W3Party = CParty{leader = W3lfie, members = {W3lfie, W2lfie}}
-W3lfie.party = W3Party
-W2lfie.party = W3Party
-W2lfie:remove()
+if true then
+-- W3Party = CParty{leader = W3lfie}
+W3Party = CParty{members = {W3lfie, W2lfie}}
+-- W3Party = CParty{leader = W3lfie, members = {W3lfie, W2lfie}}
+-- W3lfie.party = W3Party
+-- W2lfie.party = W3Party
+-- W2lfie:remove()
 
 -- W1lfie.party = W3Party
 -- W3Party:argt{leader = W3lfie, members = {W3lfie, W2lfie, W1lfie}}

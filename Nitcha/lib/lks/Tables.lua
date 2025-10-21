@@ -123,11 +123,11 @@ function Tables:keyRemoveNAt(_table, _n, _at) -- remove N elements at key positi
     end
 end
 
-function Tables:valInsert(_table, _val, _one, _key) -- insert a val entry (ipaired tables) -- once of any (avoid doublons)
+function Tables:valInsert(_table, _val, _one, _at) -- insert a val entry (ipaired tables) -- once of any (avoid doublons)
     if not _table or not _val then return end -- mandatory
     if _one and Tables:valFind(_table, _val) then return end -- avoid doublons
-    if _key then
-        table.insert(_table, _key, _val) -- at _key
+    if _at then
+        table.insert(_table, _at, _val) -- at _at
     else
         table.insert(_table, _val) -- at end
     end
