@@ -48,12 +48,23 @@ function CParty:adjustStats() -- reset stats
     end
 end
 
-function CParty:leadByMember(_member)
+function CParty:leadMember(_member)
     if (not _member) or (_member == self.leader) then return end
     self:applyLeaderToMember(_member) -- useless ?
     self.leader:remove()
     _member:append()
     self.leader = _member
+    return self
+end
+
+function CParty:joinMember(_member)
+    if not _member then return end
+    if _member:isParty() then return self:joinParty(_member.party) end
+    Tables:valInsert(self.members, _member, Tables.ONE)
+    _member.party = self
+    _member:remove()
+    self:adjustStats()
+    return self
 end
 
 function CParty:applyLeaderToMember(_member)

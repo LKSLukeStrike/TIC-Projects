@@ -1410,15 +1410,17 @@ end
 --
 -- Party
 -- 
-function CCharacter:partyLead(_party)
+function CCharacter:leadParty(_party)
     _party = _party or self.party
-    if not _party then -- create a party
-        _party = CParty{leader = self}
-    end
-    _party:leadByMember(self)
-    return _party
+    if not _party then return CParty{leader = self} end -- create a party
+    return _party:leadMember(self)
 end
 
-function CCharacter:partyQuit()
+function CCharacter:joinParty(_party)
+    if not _party then return self:leadParty() end -- lead it's own party
+    return _party:joinMember(self)
+end
+
+function CCharacter:quitParty()
     Tic:logAppend("QUIT")
 end

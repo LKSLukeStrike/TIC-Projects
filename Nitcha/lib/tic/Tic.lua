@@ -2530,7 +2530,10 @@ end
 -- PARTY
 if true then
 -- W3Party = CParty{leader = W3lfie}
-W3Party = CParty{members = {W3lfie, W2lfie}}
+-- W3Party = CParty{members = {W3lfie}}
+W3Party = W3lfie:leadParty()
+W2lfie:joinParty(W3Party)
+W1lfie:joinParty()
 -- W3Party = CParty{leader = W3lfie, members = {W3lfie, W2lfie}}
 -- W3lfie.party = W3Party
 -- W2lfie.party = W3Party
