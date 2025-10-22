@@ -67,6 +67,16 @@ function CParty:joinMember(_member)
     return self
 end
 
+function CParty:joinParty(_party)
+    if not _party then return end
+    for _, _member in ipairs(_party.members) do
+        _member.party = nil
+        self:joinMember(_member)
+    end
+    _party = nil -- useless ?
+    return self
+end
+
 function CParty:applyLeaderToMember(_member)
     if not _member or not self.leader then return end -- mandatory
     _member.world     = self.leader.world

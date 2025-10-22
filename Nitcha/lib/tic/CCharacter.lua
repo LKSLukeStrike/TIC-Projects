@@ -1422,5 +1422,4 @@ function CCharacter:joinParty(_party)
 end
 
 function CCharacter:quitParty()
-    Tic:logAppend("QUIT")
 end
