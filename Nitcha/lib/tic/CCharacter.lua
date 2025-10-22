@@ -1411,13 +1411,11 @@ end
 -- Party
 -- 
 function CCharacter:partyLead(_party)
-    Tic:logAppend("LEAD")
     _party = _party or self.party
     if not _party then -- create a party
         _party = CParty{leader = self}
-        self.party = _party
-    else
     end
+    _party:leadByMember(self)
     return _party
 end
 

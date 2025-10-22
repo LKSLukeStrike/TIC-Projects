@@ -47,3 +47,23 @@ function CParty:adjustStats() -- reset stats
         end
     end
 end
+
+function CParty:leadByMember(_member)
+    if (not _member) or (_member == self.leader) then return end
+    self:applyLeaderToMember(_member) -- useless ?
+    self.leader:remove()
+    _member:append()
+    self.leader = _member
+end
+
+function CParty:applyLeaderToMember(_member)
+    if not _member or not self.leader then return end -- mandatory
+    _member.world     = self.leader.world
+    _member.worldx    = self.leader.worldx
+    _member.worldy    = self.leader.worldy
+    _member.frame     = self.leader.frame
+    _member.dirx      = self.leader.dirx
+    _member.diry      = self.leader.diry
+    _member.direction = self.leader.direction
+    _member.state     = self.leader.state
+end

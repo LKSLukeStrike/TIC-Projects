@@ -2885,7 +2885,7 @@ function Tic:draw()
 end
 
 function Tic:drawLog()
-    Tic:logWorld()
+    -- Tic:logWorld()
     -- Tic:logInventories()
     -- Tic:logScreens()
 end

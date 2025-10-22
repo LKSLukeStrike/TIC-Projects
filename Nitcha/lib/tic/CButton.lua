@@ -922,6 +922,7 @@ function CButtonPlayerPick:menuParty()
 
     for _, _member in ipairs(_members) do
         if not (_member == _leader) then
+            _party:applyLeaderToMember(_member)
             _appendbutton(_member)
         end
     end
@@ -935,8 +936,8 @@ end
 --
 IButtonPlayerMenu = Classic:extend() -- generic pick player button
 IButtonPlayerMenu.BEHAVIOUR = function(self) -- need at least more than one player
-    IButtonPlayerChange.BEHAVIOUR(self)
-    if not self.display then return end -- no player
+    -- IButtonPlayerChange.BEHAVIOUR(self)
+    -- if not self.display then return end -- no player
     local _slotobject = self:getslotobject()
     self.hovertextrg.text = _slotobject:nameGet().." ".._slotobject:kindGet()
 end
@@ -949,10 +950,7 @@ CButtonPlayerPickMenu = CButtonPlayerPick:extend() -- generic player pick button
 function CButtonPlayerPickMenu:new(_argt)
     CButtonPlayerPickMenu.super.new(self, _argt)
     self.classic        = CButtonPlayerPickMenu
-	self.behaviour      = function(self)
-                            local _slotobject = self:getslotobject()
-                            self.hovertextrg.text = _slotobject:nameGet().." ".._slotobject:kindGet()
-                          end
+	self.behaviour      = IButtonPlayerMenu.BEHAVIOUR
     self.screen         = nil -- parent menu screen
     self.hovertextup    = CHoverTextUP{text = Tic.TEXTPICK}
     self.clicklf        = function()
@@ -974,7 +972,7 @@ CButtonPlayerPartyMenu = CButtonPlayerPick:extend() -- generic player pick butto
 function CButtonPlayerPartyMenu:new(_argt)
     CButtonPlayerPartyMenu.super.new(self, _argt)
     self.classic        = CButtonPlayerPartyMenu
-	self.behaviour      = nil -- function to trigger at first
+	self.behaviour      = IButtonPlayerMenu.BEHAVIOUR
     self.screen         = nil -- parent menu screen
     self.hovertextup    = CHoverTextUP{text = Tic.TEXTLEAD}
     self.clicklf        = function()
