@@ -445,18 +445,7 @@ function CCharacter:dropObject(_object, _showmessage)
     local _whatslot = _object:findWhatSlot(self.slots)
     if _whatslot then _whatslot:removeObject(_object, true) end -- free a slot if any
 
-    local _direction = self.direction -- prepare the trials for dropping
-    Tic.DIRSCYCLER:at(Tables:valFind(Tic.DIRSCYCLER.acttable, _direction))
-    local _actindex = Tic.DIRSCYCLER.actindex
-    local _next = (self.dirx == Tic.DIRXRG)  -- rotating direction -- next or prev
-    local _trials = {}
-    repeat
-        _direction = Tic.DIRSCYCLER.actvalue
-        local _dropx = Tic.DIRSOFFSETS[_direction].dropx
-        local _dropy = Tic.DIRSOFFSETS[_direction].dropy
-        Tables:valInsert(_trials, {worldx = self.worldx + _dropx, worldy = self.worldy + _dropy})
-        if _next then Tic.DIRSCYCLER:next() else Tic.DIRSCYCLER:prev() end
-    until Tic.DIRSCYCLER.actindex == _actindex
+    local _trials = self:trialsDropping() -- prepare the trials for dropping
 
     _object.world  = self.world -- drop the object in the character world
     _object.worldx = self.worldx
@@ -467,6 +456,24 @@ function CCharacter:dropObject(_object, _showmessage)
     if _showmessage then Tic:messageAppend(self:nameGet().." "..Tic.TEXTDROP..": ".._object.kind.." ".._object:nameGet()) end
 
     return _object
+end
+
+function CCharacter:trialsDropping(_direction, _next)
+    _direction = _direction or self.direction or Tic.DIR000
+    _next = _next or (self.dirx == Tic.DIRXRG) or true
+    local _trials = {}
+
+    Tic.DIRSCYCLER:at(Tables:valFind(Tic.DIRSCYCLER.acttable, _direction))
+    local _actindex = Tic.DIRSCYCLER.actindex
+    repeat
+        _direction = Tic.DIRSCYCLER.actvalue
+        local _dropx = Tic.DIRSOFFSETS[_direction].dropx
+        local _dropy = Tic.DIRSOFFSETS[_direction].dropy
+        Tables:valInsert(_trials, {worldx = self.worldx + _dropx, worldy = self.worldy + _dropy})
+        if _next then Tic.DIRSCYCLER:next() else Tic.DIRSCYCLER:prev() end
+    until Tic.DIRSCYCLER.actindex == _actindex
+
+    return _trials
 end
 
 function CCharacter:objectsofSlotType(_slottype)
