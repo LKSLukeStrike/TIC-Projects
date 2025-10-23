@@ -254,11 +254,12 @@ function CCharacter:new(_argt)
                           }
     self.interactions   = {
                             CInteractionSayMessage{},
+                            CInteractionJoinParty{},
                           }
     self.interactsprite = CSpriteFG.EFFECTCHIMK
     --
     self:argt(_argt) -- override if any
-    self.camera       = CCamera{name = self.name.." "..Classic.NAMECAMERA} -- one camera per character
+    self.camera       = CCamera{name = self:nameGet().." "..Classic.NAMECAMERA} -- one camera per character
     self:focus() -- focus its camera on itself
 end
 
@@ -268,6 +269,9 @@ function CCharacter:argt(_argt)
     self:adjustInventoriesSlots() -- adjust standard inventories sizes and contents + slots
 end
 
+--
+-- Get
+--
 function CCharacter:statphymaxGet()
     if self:isParty() then return self.party.statphymax end
     return self.statphymax
@@ -298,6 +302,9 @@ function CCharacter:statpsyactGet()
     return self.statpsyact
 end
 
+--
+-- Inventories
+--
 function CCharacter:adjustInventoriesSlots()
     if not self.inventories then return end -- mandatory (argt)
     if not self.inventories.exists then return end -- ensure we already have inventories
@@ -341,6 +348,9 @@ function CCharacter:adjustInventoriesSlots()
     self.inventories.any = nil -- get rid of extra objects
 end
 
+--
+-- Slots
+--
 function CCharacter:slotDropAll()
     self:slotDropHead()
     self:slotDropBack()
@@ -424,9 +434,9 @@ function CCharacter:slotDropHandLF()
 	return self:dropObject(_object)
 end
 
-function CCharacter:dropObject(_object, _withmessage)
+function CCharacter:dropObject(_object, _showmessage)
     if not _object then return end
-    _withmessage = _withmessage or true
+    _showmessage = _showmessage or true
 
     local _whatinventory = _object:findWhatInventory(self.inventories)
     if not _whatinventory then return end -- does not have the object
@@ -454,7 +464,7 @@ function CCharacter:dropObject(_object, _withmessage)
     _object.dirx = self.dirx
     self.world:appendEntity(_object, Tic.SPRITESIZE, _trials)
  
-    if _withmessage then Tic:messageAppend(self.name.." "..Tic.TEXTDROP..": ".._object.kind.." ".._object.name) end
+    if _showmessage then Tic:messageAppend(self:nameGet().." "..Tic.TEXTDROP..": ".._object.kind.." ".._object:nameGet()) end
 
     return _object
 end
@@ -470,9 +480,9 @@ function CCharacter:objectsofSlotType(_slottype)
     return _result
 end
 
-function CCharacter:pickObject(_object, _withmessage)
+function CCharacter:pickObject(_object, _showmessage)
     if not _object then return end
-    _withmessage = _withmessage or true
+    _showmessage = _showmessage or true
 
     local _inventory = _object:findFreeInventory(self.inventories)
     if not _inventory then return end -- no inventory left
@@ -483,11 +493,14 @@ function CCharacter:pickObject(_object, _withmessage)
 
     _object:remove() -- remove object from the world and remove interact
 
-    if _withmessage then Tic:messageAppend(self.name.." "..Tic.TEXTPICK..": ".._object.kind.." ".._object.name) end
+    if _showmessage then Tic:messageAppend(self:nameGet().." "..Tic.TEXTPICK..": ".._object.kind.." ".._object:nameGet()) end
 
     return _object
 end
 
+--
+-- Stats Colors
+--
 function CCharacter:colorPhyAct()
     local _statphyact = self:statphyactGet()
     local _statphymax = self:statphymaxGet()
@@ -515,6 +528,9 @@ function CCharacter:colorPsyAct()
     return Tic.COLORPSYEQ
 end
 
+--
+-- Hover & Spot
+--
 function CCharacter:hoverEntity(_entity) -- hover an entity, use nil to unhover
     if _entity then
         if self.hovering then self.hovering.hovered = false end -- unhover previous if any
@@ -537,6 +553,9 @@ function CCharacter:spotEntity(_entity) -- spot an entity, use nil to unspot
     end
 end
 
+--
+-- Posture & Status
+--
 function CCharacter:postureGet() -- state posture
     return Tic.STATESETTINGS[self.state].posture
 end
@@ -550,6 +569,9 @@ function CCharacter:stateSet(_posture, _status) -- set state from posture and st
     self.state = _posture.._status -- simple concatenation
 end
 
+--
+-- Regions
+--
 function CCharacter:regionViewOffsets() -- view offsets region depending on dirx, diry, statphyact and posture
     local _statphyact    = self:statphyactGet()
     local _posture       = self:postureGet()
@@ -662,6 +684,9 @@ function CCharacter:regionMoveWorld(_direction, _movenone,  _moveslow, _moveback
     return _regionmoveoffsets:offsetXY(self.worldx, self.worldy)
 end
 
+--
+-- Locations & Entities
+--
 function CCharacter:locationsViewWorld() -- locations in itself view world
     return self.world:locationsRegion(self:regionViewWorld())
 end
@@ -703,6 +728,9 @@ function CCharacter:nearestEntityViewWorld() -- nearest entity in itself view wo
     return _result
 end
 
+--
+-- Draw
+--
 function CCharacter:draw() -- draw animations and layers
     self:cycle()
     self:drawDirs()
@@ -1107,6 +1135,9 @@ function CCharacter:drawParty()
     self.musprite:draw()
 end
 
+--
+-- Interactions
+--
 function CCharacter:canInteract()
     -- if not (self == Tic:playerActual()) then return false end -- cannot interact
     if self:postureGet() == Tic.POSTUREFLOOR then return false end -- cannot interact
@@ -1137,7 +1168,15 @@ end
 
 function CCharacter:doSayMessage(_argt)
     local _message = _argt.message or "Hello"
-    Tic:messageAppend(self.name.." "..Tic.TEXTSAY..": '".._message.." "..self.interactto.name.."'")
+    Tic:messageAppend(self:nameGet().." "..Tic.TEXTSAY..": '".._message.." "..self.interactto:nameGet().."'")
+end
+
+function CCharacter:doJoinParty(_argt)
+    local _object = self.interactto
+    if not _object then return end
+    _object:leadParty(nil, false)
+    self:joinParty(_object.party, true)
+    Tic:playerPick(_object)
 end
 
 function CCharacter:ifPickObject(_argt)
@@ -1152,6 +1191,9 @@ function CCharacter:doPickObject(_argt)
     return self:pickObject(_object, true)
 end
 
+--
+-- State
+--
 function CCharacter:statePrev() -- prev state in the stack
     self.state = Tic.STATES:prev()
 end
@@ -1247,6 +1289,9 @@ function CCharacter:lockSpotting(_tf)
 	self.spottinglock = _tf
 end
 
+--
+-- Move & Hitbox
+--
 function CCharacter:moveWorldXY(_worldx, _worldy) -- move character into world
     if not _worldx or not _worldy then return end -- mandatory
     self.world:moveEntityWorldXY(self, _worldx, _worldy)
@@ -1384,6 +1429,9 @@ function CCharacter:hitboxRefresh() -- refresh the attached hitboxes
     -- self:hitboxDetachSelf() -- not itself
 end
 
+--
+-- Stats Change
+--
 function CCharacter:statAct(_action, _stat, _value) -- modify a stat act -- set/dec/inc/max
     if not _action or not _stat then return end -- mandatory
     local _entity = (self:isParty()) and self.party or self
@@ -1410,15 +1458,15 @@ end
 --
 -- Party
 -- 
-function CCharacter:leadParty(_party)
+function CCharacter:leadParty(_party, _showmessage)
     _party = _party or self.party
     if not _party then return CParty{leader = self} end -- create a party
-    return _party:leadMember(self)
+    return _party:leadMember(self, _showmessage)
 end
 
-function CCharacter:joinParty(_party)
+function CCharacter:joinParty(_party, _showmessage)
     if not _party then return self:leadParty() end -- lead it's own party
-    return _party:joinMember(self)
+    return _party:joinMember(self, _showmessage)
 end
 
 function CCharacter:quitParty()

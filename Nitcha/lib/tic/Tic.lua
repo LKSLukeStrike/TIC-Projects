@@ -2528,28 +2528,13 @@ end
 
 
 -- PARTY
-if true then
+if false then
 -- W3Party = CParty{leader = W3lfie}
 -- W3Party = CParty{members = {W3lfie}}
 W3Party = W3lfie:leadParty()
-W2lfie:joinParty(W3Party)
+-- W2lfie:joinParty(W3Party)
 W1lfie:leadParty()
-W1lfie:joinParty(W3Party)
--- W3Party = CParty{leader = W3lfie, members = {W3lfie, W2lfie}}
--- W3lfie.party = W3Party
--- W2lfie.party = W3Party
--- W2lfie:remove()
-
--- W1lfie.party = W3Party
--- W3Party:argt{leader = W3lfie, members = {W3lfie, W2lfie, W1lfie}}
--- W1lfie:worldRemove()
--- W2lfie:worldRemove()
--- Tic:trace("1", Tic:playerActual().name)
--- Tic:playerRemove(W1lfie)
--- Tic:trace("2", Tic:playerActual().name)
--- Tic:playerRemove(W2lfie)
--- Tic:trace("3", Tic:playerActual().name)
--- exit()
+-- W1lfie:joinParty(W3Party)
 end
 
 -- Tic:traceTable(World.entitieslocations.locations.locations, {depth = 3, indent = "-"})

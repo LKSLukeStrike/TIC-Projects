@@ -8,10 +8,6 @@ function CPlayer:new(_argt)
     CPlayer.super.new(self, _argt)
     self.classic = CPlayer
     --
-    self.interactions = {
-        CInteractionSayMessage{},
-        CInteractionJoinParty{},
-    }
     self.hoverbutton  = CButtonEntityHoverLockPick{entity = self, colorborder = Tic.COLORGREEND} -- hover lock pick button
     --
     self:argt(_argt) -- override if any

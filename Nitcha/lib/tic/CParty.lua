@@ -48,30 +48,36 @@ function CParty:adjustStats() -- reset stats
     end
 end
 
-function CParty:leadMember(_member)
+function CParty:leadMember(_member, _showmessage)
     if (not _member) or (_member == self.leader) then return end
     self:applyLeaderToMember(_member) -- useless ?
     self.leader:remove()
     _member:append()
     self.leader = _member
+    if _showmessage then
+        Tic:messageAppend(_member:nameGet().." "..Tic.TEXTLEAD..": ".._member:nameGet().." ".._member:kindGet())
+    end
     return self
 end
 
-function CParty:joinMember(_member)
+function CParty:joinMember(_member, _showmessage)
     if not _member then return end
-    if _member:isParty() then return self:joinParty(_member.party) end
+    if _member:isParty() then return self:joinParty(_member.party, _showmessage) end
     Tables:valInsert(self.members, _member, Tables.ONE)
     _member.party = self
     _member:remove()
     self:adjustStats()
+    if _showmessage then
+        Tic:messageAppend(_member:nameGet().." "..Tic.TEXTJOIN..": "..self.leader:nameGet().." "..self.leader:kindGet())
+    end
     return self
 end
 
-function CParty:joinParty(_party)
+function CParty:joinParty(_party, _showmessage)
     if not _party then return end
     for _, _member in ipairs(_party.members) do
         _member.party = nil
-        self:joinMember(_member)
+        self:joinMember(_member, _showmessage)
     end
     _party = nil -- useless ?
     return self

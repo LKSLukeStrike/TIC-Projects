@@ -976,14 +976,14 @@ function CButtonPlayerPartyMenu:new(_argt)
     self.screen         = nil -- parent menu screen
     self.hovertextup    = CHoverTextUP{text = Tic.TEXTLEAD}
     self.clicklf        = function()
-                            self:getslotobject():leadParty()
+                            self:getslotobject():leadParty(nil, true)
                             Tic:screenRemove(self.screen)
                             Tic:mouseDelay()
                           end
     self.hovertextrg    = CHoverTextRG{}
     self.hovertextdw    = CHoverTextDW{text = Tic.TEXTQUIT}
     self.clickrg        = function()
-                            self:getslotobject():quitParty()
+                            self:getslotobject():quitParty(true)
                             Tic:screenRemove(self.screen)
                             Tic:mouseDelay()
                           end
