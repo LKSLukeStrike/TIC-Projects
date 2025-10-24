@@ -658,7 +658,8 @@ end
 -- IButtonSlot
 --
 IButtonSlot = Classic:extend() -- slots buttons implementation
-IButtonSlot.PALETTEDISABLED = {[Tic.COLORWHITE] = Tic.COLORGREYL, [Tic.COLORGREYL] = Tic.COLORGREYD}
+IButtonSlot.PALETTEENABLED   = {}
+IButtonSlot.PALETTEDISABLED  = {[Tic.COLORWHITE] = Tic.COLORGREYL, [Tic.COLORGREYL] = Tic.COLORGREYD}
 IButtonSlot.GROUNDSPRITEHEAD = CSpriteBG{
     sprite  = CSpriteBG.SIGNSLHEAD,
 }
@@ -720,30 +721,28 @@ end
 
 function CButtonSlot:drawInside()
     clip(self.screenx, self.screeny, self.screenw, self.screenh) -- just to be sure
-    local _object = nil
-    if self.getslotobject then _object = self:getslotobject() end
-
+    local _object = self:objectGet()
     local _groundsprite = self.groundsprite
     local _entitydirx = (self.entity and self.entity.dirx) and self.entity.dirx or Tic.DIRXLF
     if _object then -- not empty slot
-        _object:save()
         _object.screenx = self.screenx
         _object.screeny = self.screeny
         _object.dirx    = _entitydirx
         _object:draw()
-        _object:load()
     elseif _groundsprite then -- empty slot with default ground sprite
-        _groundsprite:save()
         _groundsprite.screenx = self.screenx
         _groundsprite.screeny = self.screeny
         _groundsprite.flip    = _entitydirx
         _groundsprite.palette = (self.enabled)
-            and Tables:merge(_groundsprite.palette, {[Tic.COLORGREYD] = Tic.COLORKEY})
-            or  Tables:merge(_groundsprite.palette, IButtonSlot.PALETTEDISABLED)
+            and IButtonSlot.PALETTEENABLED
+            or  IButtonSlot.PALETTEDISABLED
         _groundsprite:draw()
-        _groundsprite:load()
     end
     clip()
+end
+
+function CButtonSlot:objectGet() -- object in slot if any
+    return (self.getslotobject and self:getslotobject())
 end
 
 
@@ -1007,10 +1006,10 @@ function CButtonSlotPlayer:new(_argt)
     CButtonSlotPlayer.super.new(self, _argt)
     self.behaviour   = IButtonSlotPlayer.BEHAVIOUR
     self.hovertextup = CHoverTextUP{text = Tic.TEXTPICK}
-    self.clicklf     = function() self:menuPick() end
+    self.clickrg     = nil -- override per slot
     self.hovertextrg = CHoverTextRG{}
     self.hovertextdw = CHoverTextDW{text = Tic.TEXTDROP}
-    self.clickrg     = nil -- override per slot
+    self.clicklf     = function() self:menuPick() end
     self:argt(_argt) -- override if any
 end
 
@@ -1079,7 +1078,7 @@ function CButtonSlotPlayer:objectsinInventories(_inventories)
 end
 
 function CButtonSlotPlayer:canPick()
-    if self:canDrop() then return true end -- object in slot -- can be replaced by an empty one
+    if self:objectGet() then return true end -- has object in slot -- can be replaced by an empty one
     local _inventories = self.entity.inventories
     if not _inventories then return false end -- cannot pick in no inventories
     local _objectsininventories = self:objectsinInventories(_inventories)
@@ -1088,7 +1087,7 @@ function CButtonSlotPlayer:canPick()
 end
 
 function CButtonSlotPlayer:canDrop()
-    return (self.getslotobject and self:getslotobject()) -- has object in slot
+    return self:objectGet() -- has object in slot -- can drop it
 end
 
 function CButtonSlotPlayer:drawHovertextUP()
@@ -1097,12 +1096,12 @@ function CButtonSlotPlayer:drawHovertextUP()
 end
 
 function CButtonSlotPlayer:drawHovertextDW()
-    if not self:canDrop() then return end
+    if not self:objectGet() then return end
     CButtonSlotPlayer.super.drawHovertextDW(self)
 end
 
 function CButtonSlotPlayer:drawHovertextRG()
-    if not self:canDrop() then return end
+    if not self:objectGet() then return end
     local _slotobject = self:getslotobject()
     self.hovertextrg.text = _slotobject:kindGet().." ".._slotobject:nameGet()
     self:save()
