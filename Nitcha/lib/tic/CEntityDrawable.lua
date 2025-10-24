@@ -1,4 +1,6 @@
+require("lib/tic/CButton")
 require("lib/tic/CEntity")
+require("lib/tic/CSprite")
 --
 -- CEntityDrawable
 --

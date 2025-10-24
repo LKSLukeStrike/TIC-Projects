@@ -803,7 +803,6 @@ end
 -- Hovertexts System -- handle hoveetexts stack
 Tic.HOVERTEXTS = {}
 Tic.DRAWMOUSE  = true
-Tic.DRAWSHIFT  = true
 
 function Tic:hovertextsClearHovertexts() -- clear the hovertexts table
     Tic.HOVERTEXTS = {}
@@ -1603,7 +1602,7 @@ end
 -- Requires
 require("lib/tic/CAnimation")
 require("lib/tic/CBoard")
-require("lib/tic/CButton")
+-- require("lib/tic/CButton")
 require("lib/tic/CCamera")
 require("lib/tic/CCharacter")
 require("lib/tic/CDirective")
@@ -1642,7 +1641,7 @@ CEnnemy = CCharacter:extend() -- ennemy characters
 -- INTERFACE -- order is important !
 --
 
-if true then
+if false then
 _function = function(_argt) -- FIXME axecute functions with self
     _argt = _argt or {}
     local _text = _argt.text or "Plop"
@@ -1770,7 +1769,7 @@ end
 
 
 
-if true then
+if false then
 ScreenWorld = CScreen{name = "ScreenWorld", keysfunctions = Tic.KEYSFUNCTIONSWORLD}
 
 -- lf panel
@@ -2006,12 +2005,12 @@ ScreenWorldRG:appendElements{
 ScreenWorld:appendElements{
     CWindowScreen{name = "ScreenWorld"},
     ScreenWorldMD,
-    ScreenWorldLF,
-    ScreenWorldRG,
+    -- ScreenWorldLF,
+    -- ScreenWorldRG,
 }
 end
 
-if true then
+if false then
 ScreenMenus = CScreen{name = "Menus", keysfunctions = Tic.KEYSFUNCTIONSMENUS}
 ScreenMenus:appendElements{
     CWindowMenu{
@@ -2030,7 +2029,7 @@ end
 --
 -- SCREENS
 -- if true then Tic:screenAppend(ScreenIntro) end
-if true then Tic:screenAppend(ScreenWorld) end
+-- if true then Tic:screenAppend(ScreenWorld) end
 -- if true then Tic:screenAppend(ScreenMenus) end
 Tic:screenMin()
 if true then Tic.INVENTORYSCREEN = ScreenMenus end
@@ -2736,7 +2735,7 @@ function CPlace:generateRoad(_worldx0, _worldy0, _worldx1, _worldy1, _percent, _
 end
 
 
-if true then
+if false then
 -- House1 = CPlaceHouseAnim{
 --     name = "House1",
 --     worldx = -20,
@@ -2796,8 +2795,8 @@ end
 local _timemin = Nums.MAXINTEGER
 local _timemax = Nums.MININTEGER
 function Tic:draw()
-    if true then
     local _timebeg = time()
+    if false then
     Tic.inputsDo()
 
     Tic:screenDraw()

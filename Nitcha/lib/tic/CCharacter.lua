@@ -1,4 +1,5 @@
 require("lib/tic/CEntityDrawable")
+require("lib/tic/CSprite")
 --
 -- CCharacter
 --

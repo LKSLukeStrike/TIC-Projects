@@ -21,17 +21,17 @@ function CButton:new(_argt)
     CButton.super.new(self, _argt)
     self.kind = Classic.KINDBUTTON
     self.name = Classic.NAMEBUTTON
-    self.clickable     = true -- act as a button ?
-    self.screenw       = Tic.SPRITESIZE -- sizes
-    self.screenh       = Tic.SPRITESIZE
-	self.behaviour     = IButton.BEHAVIOUR  -- function to trigger at first
-    self.drawground    = true  -- draw beheviors
-    self.drawguides    = false
-    self.drawinside    = true
-    self.drawborder    = true
-    self.drawframes    = false
-    self.drawmouse     = Tic.DRAWMOUSE
-    self.drawshift     = Tic.DRAWSHIFT
+    --
+    self.clickable           = true -- act as a button ?
+    self.screenw             = Tic.SPRITESIZE -- sizes
+    self.screenh             = Tic.SPRITESIZE
+	self.behaviour           = IButton.BEHAVIOUR  -- function to trigger at first
+    self.drawground          = true  -- draw beheviors
+    self.drawguides          = false
+    self.drawinside          = true
+    self.drawborder          = true
+    self.drawframes          = false
+    self.drawmouse     = Tic.DRAWMOUSE -- FIXME should depend of game options irt
     self.colorground         = Tic.COLORWHITE -- colors
     self.colorborder         = Tic.COLORGREYM
     self.colorhover          = Tic.COLORHUDSCREEN
@@ -39,16 +39,17 @@ function CButton:new(_argt)
     self.colorborderdisabled = Tic.COLORGREYM
     self.colorgroundactived  = Tic.COLORHOVERTEXTUP
     self.colorhoverground    = Tic.COLORBIOMENIGHT
+    --
     self:argt(_argt) -- override if any
 end
 
 function CButton:draw() -- button drawing --TODO hover with wheel ?
     CButton.super.draw(self)
     if self.hovered then
-        if self.hovertextlf then self:drawHovertextLF() end
-        if self.hovertextrg then self:drawHovertextRG() end
-        if self.hovertextup then self:drawHovertextUP() end
-        if self.hovertextdw then self:drawHovertextDW() end
+        self:drawHovertextLF()
+        self:drawHovertextRG()
+        self:drawHovertextUP()
+        self:drawHovertextDW()
     end
 end
 
@@ -676,9 +677,11 @@ IButtonSlot.GROUNDSPRITEHAND = CSpriteBG{
 }
 IButtonSlot.BEHAVIOUR = function(self) -- enable if has an object
     IButton.BEHAVIOUR(self)
+    local _object = self:objectGet()
     if self.enabled and self.getslotobject then
        self.enabled = (self:getslotobject())
     end
+    self.hovertextrg.text = _object:nameGet().." ".._object:kindGet()
 end
 
 --
@@ -697,7 +700,9 @@ function CButtonSlot:new(_argt)
     self.colorborder         = self.colorframe1
     self.colorborderdisabled = self.colorframe2
     self.rounded             = true
-    self.hovertextrg         = CHoverTextRG{text = "hello"}
+    self.hovertextup         = CHoverTextRG{}
+    self.hovertextrg         = CHoverTextRG{}
+    self.hovertextdw         = CHoverTextRG{}
     self:argt(_argt) -- override if any
 end
 
@@ -813,7 +818,7 @@ IButtonPlayerPick.BEHAVIOUR = function(self) -- need at least more than one play
     IButtonPlayerChange.BEHAVIOUR(self)
     if not self.display then return end -- no player
     local _slotobject = self:getslotobject()
-    self.hovertextrg.text = _slotobject:nameGet().." ".._slotobject:kindGet()
+    -- self.hovertextrg.text = _slotobject:nameGet().." ".._slotobject:kindGet()
     if _slotobject:isParty() then
         self.enabled     = true -- restore enabled in case of party
         self.hovertextdw = self.hovertextdw or CHoverTextDW{text = Tic.TEXTPARTY}
@@ -842,7 +847,6 @@ function CButtonPlayerPick:new(_argt)
 	self.behaviour      = IButtonPlayerPick.BEHAVIOUR  -- function to trigger at first
     self.hovertextup    = CHoverTextUP{text = Tic.TEXTPICK}
     self.clicklf        = function() self:menuPick() end
-    self.hovertextrg    = CHoverTextRG{}
     self.getslotobject  = function() return Tic:playerActual() end
     self:argt(_argt) -- override if any
 end
@@ -940,10 +944,10 @@ end
 --
 IButtonPlayerMenu = Classic:extend() -- generic pick player button
 IButtonPlayerMenu.BEHAVIOUR = function(self) -- need at least more than one player
-    -- IButtonPlayerChange.BEHAVIOUR(self)
+    IButtonSlot.BEHAVIOUR(self)
     -- if not self.display then return end -- no player
-    local _slotobject = self:getslotobject()
-    self.hovertextrg.text = _slotobject:nameGet().." ".._slotobject:kindGet()
+    -- local _slotobject = self:getslotobject()
+    -- self.hovertextrg.text = _slotobject:nameGet().." ".._slotobject:kindGet()
 end
 
 
@@ -962,7 +966,7 @@ function CButtonPlayerPickMenu:new(_argt)
                             Tic:screenRemove(self.screen)
                             Tic:mouseDelay()
                           end
-    self.hovertextrg    = CHoverTextRG{}
+    -- self.hovertextrg    = CHoverTextRG{}
     self.clickrg        = nil
     self.hovertextdw    = nil
     self:argt(_argt) -- override if any
