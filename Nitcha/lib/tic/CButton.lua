@@ -105,6 +105,10 @@ function CButton:drawHovertextRG()
     Tic:hovertextsAppend(self.hovertextrg)
 end
 
+function CButton:activable() -- is the button activable ?
+    return self.display and not self.actived
+end
+
 
 --
 -- CButtonText
@@ -693,6 +697,7 @@ function CButtonSlot:new(_argt)
     self.colorborder         = self.colorframe1
     self.colorborderdisabled = self.colorframe2
     self.rounded             = true
+    self.hovertextrg         = CHoverTextRG{text = "hello"}
     self:argt(_argt) -- override if any
 end
 
