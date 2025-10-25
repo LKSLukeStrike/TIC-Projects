@@ -29,7 +29,6 @@ function CButton:new(_argt)
     self.drawinside          = true
     self.drawborder          = true
     self.drawframes          = false
-    self.drawmouse     = Tic.DRAWMOUSE -- FIXME should depend of game options irt
     self.colorground         = Tic.COLORWHITE -- colors
     self.colorborder         = Tic.COLORGREYM
     self.colorhover          = Tic.COLORHUDSCREEN
@@ -37,8 +36,7 @@ function CButton:new(_argt)
     self.colorborderdisabled = Tic.COLORGREYM
     self.colorgroundactived  = Tic.COLORHOVERTEXTUP
     self.colorhoverground    = Tic.COLORBIOMENIGHT
-    self.clickable           = true -- act as a button ?
-    self.modifierkey         = nil   -- modifier key to switch functions
+    self.clickable           = true -- act as a button
     self.clicklf             = nil   -- function to trigger on click lf
 	self.clickmd             = nil   -- function to trigger on click md
 	self.clickrg             = nil   -- function to trigger on click rg
@@ -48,10 +46,10 @@ function CButton:new(_argt)
     self.hovertextrg         = nil
     self.hovertextup         = nil
     self.hovertextdw         = nil
-    self.hovertextlfmk       = nil -- when modifier key
-    self.hovertextrgmk       = nil
-    self.hovertextupmk       = nil
-    self.hovertextdwmk       = nil
+    self.hovertextlfmdk      = nil -- when modifier key
+    self.hovertextrgmdk      = nil
+    self.hovertextupmdk      = nil
+    self.hovertextdwmdk      = nil
     --
     self:argt(_argt) -- override if any
 end
@@ -87,22 +85,22 @@ function CButton:drawHovertextUP()
     self.hovertextup:adjustWH()
     self.hovertextup.screenx = self.screenx - ((self.hovertextup.screenw - self.screenw) // 2) + 1
     self.hovertextup.screeny = self.screeny - self.hovertextup.screenh
-    local _mousesprite = (self.drawmouse)
+    local _htmousesprite = (Tic.DRAWHOVERTEXTMOUSE)
         and CSprite:spriteMouseClickLF()
         or  nil
-    local _shiftsprite = nil
-    Tic:hovertextsAppend(self.hovertextup, _mousesprite, _shiftsprite)
+    local _htmodkeysprite = nil
+    Tic:hovertextsAppend(self.hovertextup, _htmousesprite, _htmodkeysprite)
 end
 
 function CButton:drawHovertextDW()
     self.hovertextdw:adjustWH()
     self.hovertextdw.screenx = self.screenx - ((self.hovertextdw.screenw - self.screenw) // 2) + 1
     self.hovertextdw.screeny = self.screeny + self.screenh
-    local _mousesprite = (self.drawmouse)
+    local _htmousesprite = (Tic.DRAWHOVERTEXTMOUSE)
         and CSprite:spriteMouseClickRG()
         or  nil
-    local _shiftsprite = nil
-    Tic:hovertextsAppend(self.hovertextdw, _mousesprite, _shiftsprite)
+    local _htmodkeysprite = nil
+    Tic:hovertextsAppend(self.hovertextdw, _htmousesprite, _htmodkeysprite)
 end
 
 function CButton:drawHovertextLF()

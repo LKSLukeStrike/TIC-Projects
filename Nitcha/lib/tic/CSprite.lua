@@ -274,7 +274,7 @@ CSpriteBG.SIGNSPOTSQ  = CSpriteBG.SIGNBANK1 + 04 -- spotting square
 CSpriteBG.SIGNCROSQU  = CSpriteBG.SIGNBANK1 + 05 -- crossed square
 CSpriteBG.SIGNDOTSQU  = CSpriteBG.SIGNBANK1 + 06 -- dot square
 CSpriteBG.SIGNMOUSPR  = CSpriteBG.SIGNBANK1 + 09 -- mouse sprite
-CSpriteBG.SIGNSHFSPR  = CSpriteBG.SIGNBANK1 + 10 -- shift sprite
+CSpriteBG.SIGNMDKSPR  = CSpriteBG.SIGNBANK1 + 10 -- modifier key sprite
 CSpriteBG.SIGNSLHEAD  = CSpriteBG.SIGNBANK1 + 11 -- slot default head
 CSpriteBG.SIGNSLBACK  = CSpriteBG.SIGNBANK1 + 12 -- slot default back
 CSpriteBG.SIGNSLHAND  = CSpriteBG.SIGNBANK1 + 13 -- slot default hand
@@ -488,4 +488,14 @@ function CSprite:spriteMouseClickRG()
     local _spritemouse = CSprite:spriteMouse()
     _spritemouse.palette[Tic.COLORYELLOW] = Tic.COLORBLUEL
     return _spritemouse
+end
+
+
+--
+-- Sprite Modifier Key
+--
+function CSprite:spriteModifierKey()
+    return CSprite{
+        sprite  = CSpriteBG.SIGNMDKSPR,
+    }
 end
