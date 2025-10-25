@@ -21,7 +21,6 @@ function CButton:new(_argt)
     self.kind = Classic.KINDBUTTON
     self.name = Classic.NAMEBUTTON
     --
-    self.clickable           = true -- act as a button ?
     self.screenw             = Tic.SPRITESIZE -- sizes
     self.screenh             = Tic.SPRITESIZE
 	self.behaviour           = IButton.BEHAVIOUR  -- function to trigger at first
@@ -38,6 +37,21 @@ function CButton:new(_argt)
     self.colorborderdisabled = Tic.COLORGREYM
     self.colorgroundactived  = Tic.COLORHOVERTEXTUP
     self.colorhoverground    = Tic.COLORBIOMENIGHT
+    self.clickable           = true -- act as a button ?
+    self.modifierkey         = nil   -- modifier key to switch functions
+    self.clicklf             = nil   -- function to trigger on click lf
+	self.clickmd             = nil   -- function to trigger on click md
+	self.clickrg             = nil   -- function to trigger on click rg
+	self.wheelup             = nil   -- function to trigger on wheel up
+	self.wheeldw             = nil   -- function to trigger on wheel dw
+    self.hovertextlf         = nil -- FIXMEnadd more rotations ?
+    self.hovertextrg         = nil
+    self.hovertextup         = nil
+    self.hovertextdw         = nil
+    self.hovertextlfmk       = nil -- when modifier key
+    self.hovertextrgmk       = nil
+    self.hovertextupmk       = nil
+    self.hovertextdwmk       = nil
     --
     self:argt(_argt) -- override if any
 end
@@ -45,10 +59,10 @@ end
 function CButton:draw() -- button drawing --TODO hover with wheel ?
     CButton.super.draw(self)
     if self.hovered then
-        self:drawHovertextLF()
-        self:drawHovertextRG()
-        self:drawHovertextUP()
-        self:drawHovertextDW()
+        if self.hovertextlf then self:drawHovertextLF() end
+        if self.hovertextrg then self:drawHovertextRG() end
+        if self.hovertextup then self:drawHovertextUP() end
+        if self.hovertextdw then self:drawHovertextDW() end
     end
 end
 
