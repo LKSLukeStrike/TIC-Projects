@@ -1602,7 +1602,7 @@ end
 -- Requires
 require("lib/tic/CAnimation")
 require("lib/tic/CBoard")
--- require("lib/tic/CButton")
+require("lib/tic/CButton")
 require("lib/tic/CCamera")
 require("lib/tic/CCharacter")
 require("lib/tic/CDirective")
@@ -1641,15 +1641,17 @@ CEnnemy = CCharacter:extend() -- ennemy characters
 -- INTERFACE -- order is important !
 --
 
-if false then
+if true then
 _function = function(_argt) -- FIXME axecute functions with self
     _argt = _argt or {}
     local _text = _argt.text or "Plop"
     Tic:logAppend(_text)
 end
 
+trace"ok"
 ScreenIntro = CScreen{name = "Intro", keysfunctions = Tic.KEYSFUNCTIONSINTRO}
 
+trace"ok"
 Button1 = CButtonMenuM2{
     name = "B1",
     screenw = 16,
@@ -1663,6 +1665,8 @@ Button1 = CButtonMenuM2{
     wheelup = function() Tic:biomePrev() ; _function{text = "wheelup"} end,
     wheeldw = function() Tic:biomeNext() ; _function{text = "wheeldw"} end,
 }
+trace"ok"
+if false then
 Button2 = CButtonTextM2{
     name = "B2",
     screenw = 8,
@@ -1728,6 +1732,7 @@ Button15.clicklf = Tic.FUNCTIONSCREENNEXT
 
 ScreenIntro:elementsDistributeH({Button11, Button12, Button15, Button13, Button14}, 30, 10)
 ScreenIntro:elementsDistributeV({Button1, Button2, Button3}, 10, 10, 2)
+end
 
 ScreenIntro:appendElements{
     CWindowScreen{name = "Intro",
@@ -1765,7 +1770,7 @@ ScreenIntro:appendElements{
     -- ButtonPlayerPrev,
     -- ButtonPlayerNext,
 }
-end
+end -- ScreenIntro
 
 
 
@@ -2005,10 +2010,10 @@ ScreenWorldRG:appendElements{
 ScreenWorld:appendElements{
     CWindowScreen{name = "ScreenWorld"},
     ScreenWorldMD,
-    -- ScreenWorldLF,
-    -- ScreenWorldRG,
+    ScreenWorldLF,
+    ScreenWorldRG,
 }
-end
+end -- ScreenWorld
 
 if false then
 ScreenMenus = CScreen{name = "Menus", keysfunctions = Tic.KEYSFUNCTIONSMENUS}
@@ -2023,16 +2028,16 @@ ScreenMenus:appendElements{
         elements = {Button4, Button5, Button6},
     },
 }
-end
+end -- ScreenMenus
 
 
 --
 -- SCREENS
--- if true then Tic:screenAppend(ScreenIntro) end
+if true then Tic:screenAppend(ScreenIntro) end
 -- if true then Tic:screenAppend(ScreenWorld) end
 -- if true then Tic:screenAppend(ScreenMenus) end
 Tic:screenMin()
-if true then Tic.INVENTORYSCREEN = ScreenMenus end
+-- if true then Tic.INVENTORYSCREEN = ScreenMenus end
 
 
 --
@@ -2330,7 +2335,6 @@ Walfie = _playerclass{classed = _playerclass,
     }},
 }
 end
-
 if true then
 Welfie = _playerclass{classed = _playerclass,
     name = "Welfie",
@@ -2352,7 +2356,6 @@ Welfie = _playerclass{classed = _playerclass,
     }},
 }
 end
-
 if true then
 Wilfie = _playerclass{classed = _playerclass,
     name = "Wilfie",
@@ -2447,10 +2450,11 @@ Wylfie = _playerclass{classed = _playerclass,
 end
 end -- men
 
+
 --
 -- psy
 --
-if true then
+if false then
 if true then
 W1lfie = _playerclass{classed = _playerclass,
     name = "W1lfie",
@@ -2796,7 +2800,7 @@ local _timemin = Nums.MAXINTEGER
 local _timemax = Nums.MININTEGER
 function Tic:draw()
     local _timebeg = time()
-    if false then
+    if true then
     Tic.inputsDo()
 
     Tic:screenDraw()

@@ -1,5 +1,4 @@
 require("lib/tic/CElement")
-require("lib/tic/CEntityDrawable")
 require("lib/tic/CSprite")
 --
 -- IButton

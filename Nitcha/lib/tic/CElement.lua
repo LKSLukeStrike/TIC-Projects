@@ -53,20 +53,21 @@ function CElement:new(_argt)
     self.parent        = nil   -- parent element
     self.elements      = {}    -- sub elements if any
     self.activedcycler = CCyclerInt{maxindex =  10, mode = CCycler.MODEBLOCK} -- cycler to maintain the actived effect a little bit 
+    self.clickable     = false -- act as a button ?
     self.modifierkey   = nil   -- modifier key to switch functions
     self.clicklf       = nil   -- function to trigger on click lf
 	self.clickmd       = nil   -- function to trigger on click md
 	self.clickrg       = nil   -- function to trigger on click rg
 	self.wheelup       = nil   -- function to trigger on wheel up
 	self.wheeldw       = nil   -- function to trigger on wheel dw
-    self.hovertextlf   = CHoverTextLF{} -- FIXMEnadd more rotations ?
-    self.hovertextrg   = CHoverTextRG{}
-    self.hovertextup   = CHoverTextUP{}
-    self.hovertextdw   = CHoverTextDW{}
-    self.hovertextlfmk = CHoverTextLF{} -- when modifier key
-    self.hovertextrgmk = CHoverTextRG{}
-    self.hovertextupmk = CHoverTextUP{}
-    self.hovertextdwmk = CHoverTextDW{}
+    -- self.hovertextlf   = CHoverTextLF{} -- FIXMEnadd more rotations ?
+    -- self.hovertextrg   = CHoverTextRG{}
+    -- self.hovertextup   = CHoverTextUP{}
+    -- self.hovertextdw   = CHoverTextDW{}
+    -- self.hovertextlfmk = CHoverTextLF{} -- when modifier key
+    -- self.hovertextrgmk = CHoverTextRG{}
+    -- self.hovertextupmk = CHoverTextUP{}
+    -- self.hovertextdwmk = CHoverTextDW{}
     self.enabled       = true  -- can be clicked ?
     self.hovered       = false -- hovered by the mouse ?
     self.actived       = false -- function triggered ?
@@ -84,7 +85,6 @@ function CElement:new(_argt)
     self.colorframe1   = Tic.COLORWHITE
     self.colorframe2   = Tic.COLORGREYL
     self.keysfunctions = nil -- keys to functions mapping if any
-    self.clickable     = false -- act as a button ?
     --
     self:argt(_argt) -- override if any
 end
