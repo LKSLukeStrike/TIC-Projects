@@ -137,28 +137,40 @@ function CCyclerTable:argt(_argt) -- setup cycler
     return self.actvalue
 end
 
-function CCyclerTable:min() -- min cycler item
+function CCyclerTable:min() -- go at min cycler item
     self.actindex = self.minindex
     return self:argt()
 end
 
-function CCyclerTable:max() -- max cycler item
+function CCyclerTable:max() -- go at max cycler item
     self.actindex = self.maxindex
     return self:argt()
 end
 
-function CCyclerTable:btm() -- min cycler item value
-    return self.acttable[self.minindex]
-end
-
-function CCyclerTable:top() -- max cycler item value
-    return self.acttable[self.maxindex]
-end
-
-function CCyclerTable:at(_at) -- at cycler item
+function CCyclerTable:at(_at) -- go at _at cycler item
     if not Nums:isBW(_at, self.minindex, self.maxindex) then return end -- not in cycler
     self.actindex = _at
     return self:argt()
+end
+
+function CCyclerTable:getFirst() -- get first cycler item value
+    return self.acttable[self.minindex]
+end
+
+function CCyclerTable:getLast() -- get last cycler item value
+    return self.acttable[self.maxindex]
+end
+
+function CCyclerTable:getPrev() -- get prev cycler item value
+    local _result = self:prev()
+    self:next()
+    return _result
+end
+
+function CCyclerTable:getNext() -- get next cycler item value
+    local _result = self:next()
+    self:prev()
+    return _result
 end
 
 function CCyclerTable:find(_item)

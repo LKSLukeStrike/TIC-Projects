@@ -621,7 +621,7 @@ function CWindowWorld:drawPlayerActual()
                         if  not (_entity == _playeractual) -- hover with mouse if any
                         and _playeractual.spottingpick
                         and _entity:isHovered()
-                        and Tic:screenActual() == Tic:screenTop() then -- allows interactions only if top screen (no menus)
+                        and Tic:screenActual() == Tic:screenGetLast() then -- allows interactions only if top screen (no menus)
                             _playeractual:hoverEntity(_entity) -- give the entity a priority in spotting windows
                         end
 

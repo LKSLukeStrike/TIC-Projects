@@ -877,8 +877,8 @@ function Tic:screenActual() -- actual screen in the stack
     return Tic.SCREENS.actvalue
 end
 
-function Tic:screenTop() -- top screen in the stack
-    return Tic.SCREENS:top()
+function Tic:screenGetLast() -- top screen in the stack
+    return Tic.SCREENS:getLast()
 end
 
 function Tic:screenMin() -- first screen in the stack
@@ -957,6 +957,22 @@ end
 
 function Tic:playerMax() -- last player in the stack
     return Tic.PLAYERS:max()
+end
+
+function Tic:playerGetFirst() -- first player in the stack
+    return Tic.PLAYERS:getFirst()
+end
+
+function Tic:playerGetLast() -- last player in the stack
+    return Tic.PLAYERS:getLast()
+end
+
+function Tic:playerGetPrev() -- prev player in the stack
+    return Tic.PLAYERS:getPrev()
+end
+
+function Tic:playerGetNext() -- next player in the stack
+    return Tic.PLAYERS:getNext()
 end
 
 function Tic:playerFind(_player) -- find player in the stack -- return index or nil

@@ -786,14 +786,25 @@ end
 -- CButtonPlayerPrev
 --
 CButtonPlayerPrev = CButtonArrow270:extend() -- generic player prev button
+CButtonPlayerPrev.BEHAVIOUR = function(self)
+    IButtonPlayerChange.BEHAVIOUR(self)
+    if not self.display then return end
+    if self.enabled then
+        self.clicklf        = Tic.FUNCTIONPLAYERPREV
+        self.hovertextup    = CHoverTextUP{text = Tic.TEXTPREV}
+        self.clicklfmdk     = Tic.FUNCTIONPLAYERMIN
+        self.hovertextupmdk = CHoverTextDW{text = Tic.TEXTFIRST}
+    else
+        self.clicklf        = nil
+        self.hovertextup    = nil
+        self.clicklfmdk     = nil
+        self.hovertextupmdk = nil
+    end
+end
 function CButtonPlayerPrev:new(_argt)
     CButtonPlayerPrev.super.new(self, _argt)
     self.sprite.palette = IButton.PALETTEKEY
-	self.behaviour      = IButtonPlayerChange.BEHAVIOUR  -- function to trigger at first
-    self.clicklf        = Tic.FUNCTIONPLAYERPREV
-    self.hovertextup    = CHoverTextUP{text = Tic.TEXTPREV}
-    self.clickrg        = Tic.FUNCTIONPLAYERMIN
-    self.hovertextdw    = CHoverTextDW{text = Tic.TEXTFIRST}
+	self.behaviour      = CButtonPlayerPrev.BEHAVIOUR  -- function to trigger at first
     self:argt(_argt) -- override if any
 end
 
@@ -808,8 +819,8 @@ function CButtonPlayerNext:new(_argt)
 	self.behaviour      = IButtonPlayerChange.BEHAVIOUR  -- function to trigger at first
     self.clicklf        = Tic.FUNCTIONPLAYERNEXT
     self.hovertextup    = CHoverTextUP{text = Tic.TEXTNEXT}
-    self.clickrg        = Tic.FUNCTIONPLAYERMAX
-    self.hovertextdw    = CHoverTextDW{text = Tic.TEXTLAST}
+    self.clicklfmdk     = Tic.FUNCTIONPLAYERMAX
+    self.hovertextupmdk = CHoverTextDW{text = Tic.TEXTLAST}
     self:argt(_argt) -- override if any
 end
 
