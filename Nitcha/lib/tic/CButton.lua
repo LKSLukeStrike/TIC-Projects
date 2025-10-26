@@ -69,25 +69,31 @@ function CButton:drawBorder()
 end
 
 function CButton:drawHovertextUP()
-    self.hovertextup:adjustWH()
-    self.hovertextup.screenx = self.screenx - ((self.hovertextup.screenw - self.screenw) // 2) + 1
-    self.hovertextup.screeny = self.screeny - self.hovertextup.screenh
-    local _htmousesprite = (Tic.DRAWHOVERTEXTMOUSE)
-        and CSprite:spriteMouseClickLF()
+    local _hovertext      = (Tic:hovertextsIsMDKPressed() and self.hovertextupmdk)
+        and self.hovertextupmdk
+        or  self.hovertextup
+    local _htmousesprite  = CSprite:spriteMouseClickLF()
+    local _htmodkeysprite = (self.hovertextupmdk)
+        and CSprite:spriteModifierKey()
         or  nil
-    local _htmodkeysprite = CSprite:spriteModifierKey()
-    Tic:hovertextsAppend(self.hovertextup, _htmousesprite, _htmodkeysprite)
+    _hovertext:adjustWH()
+    _hovertext.screenx = self.screenx - ((_hovertext.screenw - self.screenw) // 2) + 1
+    _hovertext.screeny = self.screeny - _hovertext.screenh
+    Tic:hovertextsAppend(_hovertext, _htmousesprite, _htmodkeysprite)
 end
 
 function CButton:drawHovertextDW()
-    self.hovertextdw:adjustWH()
-    self.hovertextdw.screenx = self.screenx - ((self.hovertextdw.screenw - self.screenw) // 2) + 1
-    self.hovertextdw.screeny = self.screeny + self.screenh
-    local _htmousesprite = (Tic.DRAWHOVERTEXTMOUSE)
-        and CSprite:spriteMouseClickRG()
+    local _hovertext      = (Tic:hovertextsIsMDKPressed() and self.hovertextdwmdk)
+        and self.hovertextdwmdk
+        or  self.hovertextdw
+    local _htmousesprite  = CSprite:spriteMouseClickRG()
+    local _htmodkeysprite = (self.hovertextdwmdk)
+        and CSprite:spriteModifierKey()
         or  nil
-    local _htmodkeysprite = nil
-    Tic:hovertextsAppend(self.hovertextdw, _htmousesprite, _htmodkeysprite)
+    _hovertext:adjustWH()
+    _hovertext.screenx = self.screenx - ((_hovertext.screenw - self.screenw) // 2) + 1
+    _hovertext.screeny = self.screeny + self.screenh
+    Tic:hovertextsAppend(_hovertext, _htmousesprite, _htmodkeysprite)
 end
 
 function CButton:drawHovertextLF()
@@ -787,7 +793,7 @@ function CButtonPlayerPrev:new(_argt)
     self.clicklf        = Tic.FUNCTIONPLAYERPREV
     self.hovertextup    = CHoverTextUP{text = Tic.TEXTPREV}
     self.clickrg        = Tic.FUNCTIONPLAYERMIN
-    self.hovertextdw    = CHoverTextDW{text = Tic.TEXTFST}
+    self.hovertextdw    = CHoverTextDW{text = Tic.TEXTFIRST}
     self:argt(_argt) -- override if any
 end
 
@@ -803,7 +809,7 @@ function CButtonPlayerNext:new(_argt)
     self.clicklf        = Tic.FUNCTIONPLAYERNEXT
     self.hovertextup    = CHoverTextUP{text = Tic.TEXTNEXT}
     self.clickrg        = Tic.FUNCTIONPLAYERMAX
-    self.hovertextdw    = CHoverTextDW{text = Tic.TEXTLST}
+    self.hovertextdw    = CHoverTextDW{text = Tic.TEXTLAST}
     self:argt(_argt) -- override if any
 end
 
@@ -1516,7 +1522,7 @@ function CButtonMessagePrev:new(_argt)
     self.clicklf        = Tic.FUNCTIONMESSAGEPREV
     self.hovertextup    = CHoverTextUP{text = Tic.TEXTPREV}
     self.clickrg        = Tic.FUNCTIONMESSAGEMIN
-    self.hovertextdw    = CHoverTextDW{text = Tic.TEXTFST}
+    self.hovertextdw    = CHoverTextDW{text = Tic.TEXTFIRST}
     self:argt(_argt) -- override if any
 end
 
@@ -1536,7 +1542,7 @@ function CButtonMessageNext:new(_argt)
     self.clicklf        = Tic.FUNCTIONMESSAGENEXT
     self.hovertextup    = CHoverTextUP{text = Tic.TEXTNEXT}
     self.clickrg        = Tic.FUNCTIONMESSAGEMAX
-    self.hovertextdw    = CHoverTextDW{text = Tic.TEXTLST}
+    self.hovertextdw    = CHoverTextDW{text = Tic.TEXTLAST}
     self:argt(_argt) -- override if any
 end
 
