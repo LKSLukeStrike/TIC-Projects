@@ -15,62 +15,108 @@ end
 CElement = Classic:extend() -- generic screen element -- TODO build this class
 Classic.KINDELEMENT = "Element"
 Classic.NAMEELEMENT = "Element"
-CElement.CLICKLF = "clicklf" -- mouse function keys
-CElement.CLICKMD = "clickmd"
-CElement.CLICKRG = "clickrg"
-CElement.WHEELUP = "wheelup"
-CElement.WHEELDW = "wheeldw"
-CElement.WHEELLF = "wheellf"
-CElement.WHEELRG = "wheelrg"
-CElement.FUNCTIONS = { -- all of them
-    CElement.CLICKLF,
-    CElement.CLICKMD,
-    CElement.CLICKRG,
-    CElement.WHEELUP,
-    CElement.WHEELDW,
-    CElement.WHEELLF,
-    CElement.WHEELRG,
+CElement.KEYMDK        = "mdk" -- modifier key extension
+CElement.KEYCLICKLF    = "clicklf" -- mouse/elements functions keys
+CElement.KEYCLICKMD    = "clickmd"
+CElement.KEYCLICKRG    = "clickrg"
+CElement.KEYWHEELUP    = "wheelup"
+CElement.KEYWHEELDW    = "wheeldw"
+CElement.KEYWHEELLF    = "wheellf"
+CElement.KEYWHEELRG    = "wheelrg"
+CElement.KEYCLICKLFMDK = CElement.KEYCLICKLF..CElement.KEYMDK -- elements functions keys when modifier key
+CElement.KEYCLICKMDMDK = CElement.KEYCLICKMD..CElement.KEYMDK
+CElement.KEYCLICKRGMDK = CElement.KEYCLICKRG..CElement.KEYMDK
+CElement.KEYWHEELUPMDK = CElement.KEYCLICKLF..CElement.KEYMDK
+CElement.KEYWHEELDWMDK = CElement.KEYCLICKLF..CElement.KEYMDK
+CElement.KEYWHEELLFMDK = CElement.KEYCLICKLF..CElement.KEYMDK
+CElement.KEYWHEELRGMDK = CElement.KEYCLICKLF..CElement.KEYMDK
+CElement.MOUSEKEYS     = { -- all mouse keys
+    CElement.KEYCLICKLF,
+    CElement.KEYCLICKMD,
+    CElement.KEYCLICKRG,
+    CElement.KEYWHEELUP,
+    CElement.KEYWHEELDW,
+    CElement.KEYWHEELLF,
+    CElement.KEYWHEELRG,
+}
+CElement.FUNCTIONSKEYS = { -- all elements functions keys
+    CElement.KEYCLICKLF,
+    CElement.KEYCLICKMD,
+    CElement.KEYCLICKRG,
+    CElement.KEYWHEELUP,
+    CElement.KEYWHEELDW,
+    CElement.KEYWHEELLF,
+    CElement.KEYWHEELRG,
+    CElement.KEYCLICKLFMDK,
+    CElement.KEYCLICKMDMDK,
+    CElement.KEYCLICKRGMDK,
+    CElement.KEYWHEELUPMDK,
+    CElement.KEYWHEELDWMDK,
+    CElement.KEYWHEELLFMDK,
+    CElement.KEYWHEELRGMDK,
 }
 function CElement:new(_argt)
     CElement.super.new(self, _argt)
     self.kind = Classic.KINDELEMENT
     self.name = Classic.NAMEELEMENT
     --
-    self.screenx       = Tic.SCREENX -- positions
-    self.screeny       = Tic.SCREENY
-    self.screenw       = Tic.SCREENW -- sizes
-    self.screenh       = Tic.SCREENH
-    self.scale         = Tic.SCALE01
-    self.align         = Tic.DIRHIT -- sub elements alignment
-    self.marginlf      = 0
-    self.marginrg      = 0
-    self.marginup      = 0
-    self.margindw      = 0
-    self.separatorx    = 0     -- separator between elements in px if any
-    self.separatory    = 0     -- separator between elements in px if any
-    self.stretch       = false -- stretch elements ?
-	self.rounded       = false -- rounded border and frames ?
-    self.parent        = nil   -- parent element
-    self.elements      = {}    -- sub elements if any
-    self.activedcycler = CCyclerInt{maxindex =  10, mode = CCycler.MODEBLOCK} -- cycler to maintain the actived effect a little bit 
-    self.clickable     = false -- act as a button ?
-    self.enabled       = true  -- can be clicked ?
-    self.hovered       = false -- hovered by the mouse ?
-    self.actived       = false -- function triggered ?
-    self.behaviour     = IElement.BEHAVIOUR   -- behaviour function if any
-    self.display       = true  -- display or not ?
-    self.drawground    = true  -- draw beheviors
-    self.drawguides    = true
-    self.drawinside    = true
-    self.drawborder    = true
-    self.drawframes    = true
-    self.colorground   = Tic.COLORHUDSCREEN -- colors
-    self.colorguides   = Tic.COLORGREYM
-    self.colorinside   = Tic.COLORGREYM
-    self.colorborder   = Tic.COLORGREYM
-    self.colorframe1   = Tic.COLORWHITE
-    self.colorframe2   = Tic.COLORGREYL
-    self.keysfunctions = nil -- keys to functions mapping if any
+    self.screenx        = Tic.SCREENX -- positions
+    self.screeny        = Tic.SCREENY
+    self.screenw        = Tic.SCREENW -- sizes
+    self.screenh        = Tic.SCREENH
+    self.scale          = Tic.SCALE01
+    self.align          = Tic.DIRHIT -- sub elements alignment
+    self.marginlf       = 0
+    self.marginrg       = 0
+    self.marginup       = 0
+    self.margindw       = 0
+    self.separatorx     = 0     -- separator between elements in px if any
+    self.separatory     = 0     -- separator between elements in px if any
+    self.stretch        = false -- stretch elements ?
+	self.rounded        = false -- rounded border and frames ?
+    self.parent         = nil   -- parent element
+    self.elements       = {}    -- sub elements if any
+    self.activedcycler  = CCyclerInt{maxindex =  10, mode = CCycler.MODEBLOCK} -- cycler to maintain the actived effect a little bit 
+    self.enabled        = true  -- can be clicked ?
+    self.hovered        = false -- hovered by the mouse ?
+    self.actived        = false -- function triggered ?
+    self.behaviour      = IElement.BEHAVIOUR   -- behaviour function if any
+    self.display        = true  -- display or not ?
+    self.drawground     = true  -- draw beheviors
+    self.drawguides     = true
+    self.drawinside     = true
+    self.drawborder     = true
+    self.drawframes     = true
+    self.colorground    = Tic.COLORHUDSCREEN -- colors
+    self.colorguides    = Tic.COLORGREYM
+    self.colorinside    = Tic.COLORGREYM
+    self.colorborder    = Tic.COLORGREYM
+    self.colorframe1    = Tic.COLORWHITE
+    self.colorframe2    = Tic.COLORGREYL
+    self.keysfunctions  = nil   -- keys to functions mapping if any
+    self.clickable      = false -- act as a button ?
+    self.clicklf        = nil   -- function to trigger on click lf
+	self.clickmd        = nil   -- function to trigger on click md
+	self.clickrg        = nil   -- function to trigger on click rg
+	self.wheelup        = nil   -- function to trigger on wheel up
+	self.wheeldw        = nil   -- function to trigger on wheel dw
+	self.wheellf        = nil   -- function to trigger on wheel lf -- who use this ?
+	self.wheelrg        = nil   -- function to trigger on wheel rg
+    self.clicklfmdk     = nil   -- when modifier key
+	self.clickmdmdk     = nil
+	self.clickrgmdk     = nil
+	self.wheelupmdk     = nil
+	self.wheeldwmdk     = nil
+	self.wheellfmdk     = nil
+	self.wheelrgmdk     = nil
+    self.hovertextlf    = nil -- FIXMEnadd more rotations ?
+    self.hovertextrg    = nil
+    self.hovertextup    = nil
+    self.hovertextdw    = nil
+    self.hovertextlfmdk = nil -- when modifier key
+    self.hovertextrgmdk = nil
+    self.hovertextupmdk = nil
+    self.hovertextdwmdk = nil
     --
     self:argt(_argt) -- override if any
 end
@@ -310,40 +356,28 @@ end
 function CElement:functionsDefined() -- defined functions of a button
     local _result = {}
 
-    for _, _key in ipairs(CElement.FUNCTIONS) do
-        if type(self[_key]) == "function" then Tables:valInsert(_result, self[_key], true) end
+    for _, _key in ipairs(CElement.FUNCTIONSKEYS) do
+        if self:hasFunctionKey(_key) then Tables:valInsert(_result, self[_key], true) end
     end
 
+    return _result
+end
+
+function CElement:hasFunctionKey(_key)
+    local _result = type(self[_key]) == "function"
     return _result
 end
 
 function CElement:functionsActived() -- actived functions (in a key table) of a button
     local _result = {}
 
-    if Tic.MOUSE.clicklf
-        and type(self[CElement.CLICKLF]) == "function"
-    then
-        Tables:valInsert(_result, self[CElement.CLICKLF], true)
-    end
-    if Tic.MOUSE.clickmd
-        and type(self[CElement.CLICKMD]) == "function"
-    then
-        Tables:valInsert(_result, self[CElement.CLICKMD], true)
-    end
-    if Tic.MOUSE.clickrg
-        and type(self[CElement.CLICKRG]) == "function"
-    then
-        Tables:valInsert(_result, self[CElement.CLICKRG], true)
-    end
-    if Tic.MOUSE.scrolly > 0
-        and type(self[CElement.WHEELUP]) == "function"
-    then
-        Tables:valInsert(_result, self[CElement.WHEELUP], true)
-    end
-    if Tic.MOUSE.scrolly < 0
-        and type(self[CElement.WHEELDW]) == "function"
-    then
-        Tables:valInsert(_result, self[CElement.WHEELDW], true)
+    for _, _key in ipairs(CElement.MOUSEKEYS) do
+        if Tic.MOUSE[_key] and self:hasFunctionKey(_key) then
+            local _function = (Tic:hovertextsIsMDKPressed() and self:hasFunctionKey(_key..CElement.KEYMDK))
+                and self[_key..CElement.KEYMDK]
+                or  self[_key]
+            Tables:valInsert(_result, _function, true)
+        end
     end
 
     return _result
@@ -368,6 +402,10 @@ function CElement:deactivate() -- dehover the button and stop the activate effec
     if self.activedcycler:prev() == 0 then
         self.actived = false
     end
+end
+
+function CElement:isHovered() -- check if the mouse hovers the element
+    return self:region():hasInsidePoint(Tic:mousePointX(), Tic:mousePointY())
 end
 
 function CElement:hasParent(_parent) -- check if is part of parents line

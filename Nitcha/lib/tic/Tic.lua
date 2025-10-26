@@ -638,12 +638,17 @@ Tic.MOUSEDIRX      = Tic.DIRXLF
 Tic.MOUSECYCLER    = CCyclerInt{} -- delay cycler
 Tic.MOUSEDELAY     = 10 -- default delay ticks
 Tic.MOUSERESET     = {
+    -- screenx = 0, -- dont reset for mouse dirx
     screeny = 0,
     clicklf = false,
     clickmd = false,
     clickrg = false,
     scrollx = 0,
     scrolly = 0,
+    wheelup = false,
+    wheeldw = false,
+    wheellf = false,
+    wheelrg = false,
 }
 Tic.MOUSE          = {
     screenx = 0,
@@ -653,6 +658,10 @@ Tic.MOUSE          = {
     clickrg = false,
     scrollx = 0,
     scrolly = 0,
+    wheelup = false,
+    wheeldw = false,
+    wheellf = false,
+    wheelrg = false,
 }
 
 function Tic:mouseDelay(_delay) -- set a refresh mouse delay
@@ -674,6 +683,11 @@ function Tic:mouseInput() -- set the mouse inputs in a table
 
     _result.screenx, _result.screeny, _result.clicklf, _result.clickmd, _result.clickrg, _result.scrollx, _result.scrolly
         = mouse()
+    _result.wheelup = (_result.scrolly > 0)
+    _result.wheeldw = (_result.scrolly < 0)
+    _result.wheellf = (_result.scrollx < 0)
+    _result.wheelrg = (_result.scrollx > 0)
+    
     if _result.screenx < Tic.MOUSE.screenx then -- adjust mouse direction
         Tic.MOUSEOFFSETX = Tic.MOUSEOFFSETXLF
         Tic.MOUSEDIRX    = Tic.DIRXLF
@@ -713,7 +727,7 @@ function Tic:buttonsHandleInput()
         _button:deactivate()
 
         if _button:activable() then -- check if a button is active and hovered
-            if _button:region():hasInsidePoint(Tic:mousePointX(), Tic:mousePointY()) then
+            if _button:isHovered() then
                 if not _treatedbutton then
                     local _functionsactived = _button:functionsActived()
                     if Tables:size(_functionsactived) > 0 then -- activate
@@ -822,14 +836,14 @@ function Tic:hovertextsDrawAll() -- draw all hovertexts
         if Tic.DRAWHOVERTEXTMOUSE and _hovertext.htmousesprite then
             _hovertext.hovertext.screenx     = _hovertext.hovertext.screenx + 6
             _hovertext.htmousesprite.screenx = _hovertext.hovertext.screenx - Tic.SPRITESIZE
-            _hovertext.htmousesprite.screeny = _hovertext.hovertext.screeny - 2
+            _hovertext.htmousesprite.screeny = _hovertext.hovertext.screeny - 1
             _hovertext.htmousesprite:draw()
         end
         _hovertext.hovertext:draw()
         if Tic.DRAWHOVERTEXTMODIFIERKEY and _hovertext.htmodkeysprite then
-            _hovertext.htmodkeysprite.screenx = _hovertext.hovertext.screenx + _hovertext.hovertext.screenw
-            _hovertext.htmodkeysprite.screeny = _hovertext.hovertext.screeny - 2
-            _hovertext.htmodkeysprite.flip    = (Tic.MODIFIERKEYS[Tic.HOVERTEXTMODIFIERKEY])
+            _hovertext.htmodkeysprite.screenx = _hovertext.hovertext.screenx + _hovertext.hovertext.screenw - 1
+            _hovertext.htmodkeysprite.screeny = _hovertext.hovertext.screeny - 1
+            _hovertext.htmodkeysprite.flip    = (Tic:hovertextsIsMDKPressed())
                 and Tic.FLIPVERT
                 or  Tic.FLIPNONE
             _hovertext.htmodkeysprite:draw()
@@ -837,6 +851,9 @@ function Tic:hovertextsDrawAll() -- draw all hovertexts
     end
 end
 
+function Tic:hovertextsIsMDKPressed() -- is the modifier key pressed ?
+    return (Tic.MODIFIERKEYS[Tic.HOVERTEXTMODIFIERKEY])
+end
 
 -- Screens System -- handle screens stack
 Tic.SCREENS = CCyclerTable()

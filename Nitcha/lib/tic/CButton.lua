@@ -37,19 +37,6 @@ function CButton:new(_argt)
     self.colorgroundactived  = Tic.COLORHOVERTEXTUP
     self.colorhoverground    = Tic.COLORBIOMENIGHT
     self.clickable           = true -- act as a button
-    self.clicklf             = nil   -- function to trigger on click lf
-	self.clickmd             = nil   -- function to trigger on click md
-	self.clickrg             = nil   -- function to trigger on click rg
-	self.wheelup             = nil   -- function to trigger on wheel up
-	self.wheeldw             = nil   -- function to trigger on wheel dw
-    self.hovertextlf         = nil -- FIXMEnadd more rotations ?
-    self.hovertextrg         = nil
-    self.hovertextup         = nil
-    self.hovertextdw         = nil
-    self.hovertextlfmdk      = nil -- when modifier key
-    self.hovertextrgmdk      = nil
-    self.hovertextupmdk      = nil
-    self.hovertextdwmdk      = nil
     --
     self:argt(_argt) -- override if any
 end
@@ -88,7 +75,7 @@ function CButton:drawHovertextUP()
     local _htmousesprite = (Tic.DRAWHOVERTEXTMOUSE)
         and CSprite:spriteMouseClickLF()
         or  nil
-    local _htmodkeysprite = nil
+    local _htmodkeysprite = CSprite:spriteModifierKey()
     Tic:hovertextsAppend(self.hovertextup, _htmousesprite, _htmodkeysprite)
 end
 
