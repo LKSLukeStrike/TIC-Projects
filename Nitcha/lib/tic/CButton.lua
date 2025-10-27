@@ -216,7 +216,6 @@ function CButtonSprite:drawInside()
     _palette = (self.enabled)
         and _palette
         or  {[self.colorground] = self.colorgrounddisabled, [self.colorborder] = self.colorborderdisabled}
-    _palette = Tables:merge(self.sprite.palette, _palette)
 
     self.sprite:save()
     self.sprite.screenx = self.screenx
@@ -459,6 +458,7 @@ end
 
 function CButtonCheck:drawInside()
     local _palette = {[self.colorground] = self.colorground, [self.colorborder] = self.colorborder}
+
     _palette = (self.checked)
         and {[self.colorground] = self.colorground, [self.colorborder] = self.colorgroundactived}
         or  _palette
