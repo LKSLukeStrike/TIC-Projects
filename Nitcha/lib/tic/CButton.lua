@@ -793,12 +793,16 @@ CButtonPlayerPrev.BEHAVIOUR = function(self)
         self.clicklf        = Tic.FUNCTIONPLAYERPREV
         self.hovertextup    = CHoverTextUP{text = Tic.TEXTPREV}
         self.clicklfmdk     = Tic.FUNCTIONPLAYERMIN
-        self.hovertextupmdk = CHoverTextDW{text = Tic.TEXTFIRST}
+        self.hovertextupmdk = CHoverTextUP{text = Tic.TEXTFIRST}
+        self.hovertextrg    = (Tic:hovertextsIsMDKPressed())
+            and CHoverTextRG{text = Tic:playerGetFirst():stringNameKind()}
+            or  CHoverTextRG{text = Tic:playerGetPrev():stringNameKind()}
     else
         self.clicklf        = nil
         self.hovertextup    = nil
         self.clicklfmdk     = nil
         self.hovertextupmdk = nil
+        self.hovertextrg    = nil
     end
 end
 function CButtonPlayerPrev:new(_argt)
@@ -813,14 +817,29 @@ end
 -- CButtonPlayerNext
 --
 CButtonPlayerNext = CButtonArrow090:extend() -- generic player next button
+CButtonPlayerNext.BEHAVIOUR = function(self)
+    IButtonPlayerChange.BEHAVIOUR(self)
+    if not self.display then return end
+    if self.enabled then
+        self.clicklf        = Tic.FUNCTIONPLAYERNEXT
+        self.hovertextup    = CHoverTextUP{text = Tic.TEXTNEXT}
+        self.clicklfmdk     = Tic.FUNCTIONPLAYERMAX
+        self.hovertextupmdk = CHoverTextUP{text = Tic.TEXTLAST}
+        self.hovertextrg    = (Tic:hovertextsIsMDKPressed())
+            and CHoverTextRG{text = Tic:playerGetLast():stringNameKind()}
+            or  CHoverTextRG{text = Tic:playerGetNext():stringNameKind()}
+    else
+        self.clicklf        = nil
+        self.hovertextup    = nil
+        self.clicklfmdk     = nil
+        self.hovertextupmdk = nil
+        self.hovertextrg    = nil
+    end
+end
 function CButtonPlayerNext:new(_argt)
     CButtonPlayerNext.super.new(self, _argt)
     self.sprite.palette = IButton.PALETTEKEY
-	self.behaviour      = IButtonPlayerChange.BEHAVIOUR  -- function to trigger at first
-    self.clicklf        = Tic.FUNCTIONPLAYERNEXT
-    self.hovertextup    = CHoverTextUP{text = Tic.TEXTNEXT}
-    self.clicklfmdk     = Tic.FUNCTIONPLAYERMAX
-    self.hovertextupmdk = CHoverTextDW{text = Tic.TEXTLAST}
+	self.behaviour      = CButtonPlayerNext.BEHAVIOUR  -- function to trigger at first
     self:argt(_argt) -- override if any
 end
 
@@ -1522,6 +1541,21 @@ end
 -- CButtonMessagePrev
 --
 CButtonMessagePrev = CButtonArrow000:extend() -- generic message prev button
+CButtonMessagePrev.BEHAVIOUR = function(self)
+    IButtonMessageChange.BEHAVIOUR(self)
+    if not self.display then return end
+    if self.enabled then
+        self.clicklf        = Tic.FUNCTIONMESSAGEPREV
+        self.hovertextup    = CHoverTextUP{text = Tic.TEXTPREV}
+        self.clicklfmdk     = Tic.FUNCTIONMESSAGEMIN
+        self.hovertextupmdk = CHoverTextUP{text = Tic.TEXTFIRST}
+    else
+        self.clicklf        = nil
+        self.hovertextup    = nil
+        self.clicklfmdk     = nil
+        self.hovertextupmdk = nil
+    end
+end
 Classic.KINDBUTTONMESSAGEPREV = "ButtonMessagePrev"
 Classic.NAMEBUTTONMESSAGEPREV = "ButtonMessagePrev"
 function CButtonMessagePrev:new(_argt)
@@ -1529,11 +1563,7 @@ function CButtonMessagePrev:new(_argt)
     self.kind = Classic.KINDBUTTONMESSAGEPREV
     self.name = Classic.NAMEBUTTONMESSAGEPREV
     self.sprite.palette = IButton.PALETTEKEY
-	self.behaviour      = IButtonMessageChange.BEHAVIOUR  -- function to trigger at first
-    self.clicklf        = Tic.FUNCTIONMESSAGEPREV
-    self.hovertextup    = CHoverTextUP{text = Tic.TEXTPREV}
-    self.clickrg        = Tic.FUNCTIONMESSAGEMIN
-    self.hovertextdw    = CHoverTextDW{text = Tic.TEXTFIRST}
+	self.behaviour      = CButtonMessagePrev.BEHAVIOUR  -- function to trigger at first
     self:argt(_argt) -- override if any
 end
 
@@ -1542,6 +1572,21 @@ end
 -- CButtonMessageNext
 --
 CButtonMessageNext = CButtonArrow180:extend() -- generic message next button
+CButtonMessageNext.BEHAVIOUR = function(self)
+    IButtonMessageChange.BEHAVIOUR(self)
+    if not self.display then return end
+    if self.enabled then
+        self.clicklf        = Tic.FUNCTIONMESSAGENEXT
+        self.hovertextup    = CHoverTextUP{text = Tic.TEXTNEXT}
+        self.clicklfmdk     = Tic.FUNCTIONMESSAGEMAX
+        self.hovertextupmdk = CHoverTextUP{text = Tic.TEXTLAST}
+    else
+        self.clicklf        = nil
+        self.hovertextup    = nil
+        self.clicklfmdk     = nil
+        self.hovertextupmdk = nil
+    end
+end
 Classic.KINDBUTTONMESSAGENEXT = "ButtonMessageNext"
 Classic.NAMEBUTTONMESSAGENEXT = "ButtonMessageNext"
 function CButtonMessageNext:new(_argt)
@@ -1549,11 +1594,7 @@ function CButtonMessageNext:new(_argt)
     self.kind = Classic.KINDBUTTONMESSAGENEXT
     self.name = Classic.NAMEBUTTONMESSAGENEXT
     self.sprite.palette = IButton.PALETTEKEY
-	self.behaviour      = IButtonMessageChange.BEHAVIOUR  -- function to trigger at first
-    self.clicklf        = Tic.FUNCTIONMESSAGENEXT
-    self.hovertextup    = CHoverTextUP{text = Tic.TEXTNEXT}
-    self.clickrg        = Tic.FUNCTIONMESSAGEMAX
-    self.hovertextdw    = CHoverTextDW{text = Tic.TEXTLAST}
+	self.behaviour      = CButtonMessageNext.BEHAVIOUR  -- function to trigger at first
     self:argt(_argt) -- override if any
 end
 
@@ -1573,9 +1614,9 @@ function CButtonMessageTrash:new(_argt)
 	self.sprite.sprite  = CSpriteBG.SIGNDELETE
     self.sprite.palette = IButton.PALETTEKEY
 	self.behaviour      = IButtonMessage.BEHAVIOUR  -- function to trigger at first
-    self.clicklf        = function() Tic:messageDeleteOne() end
-    self.hovertextup    = CHoverTextUP{text = Tic.TEXTTRASH}
-    self.clickrg        = function() Tic:messageDeleteAll() end
-    self.hovertextdw    = CHoverTextDW{text = Tic.TEXTALL}
+    self.clicklf        = Tic.FUNCTIONMESSAGEDELONE
+    self.hovertextup    = CHoverTextUP{text = Tic.TEXTDELONE}
+    self.clicklfmdk     = Tic.FUNCTIONMESSAGEDELALL
+    self.hovertextupmdk = CHoverTextUP{text = Tic.TEXTDELALL}
     self:argt(_argt) -- override if any
 end

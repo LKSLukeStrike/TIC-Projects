@@ -49,6 +49,14 @@ function CEntity:string() -- entity as a string
     return self.worldx, self.worldy, self.kind, self.name
 end
 
+function CEntity:stringKindName() -- entity kind and name
+    return self:kindGet().." "..self:nameGet()
+end
+
+function CEntity:stringNameKind() -- entity name and kind
+    return self:nameGet().." "..self:kindGet()
+end
+
 function CEntity:focus() -- focus camera on itself
     if not self.camera then return end -- requires a camera
     self.camera:focusEntity(self)

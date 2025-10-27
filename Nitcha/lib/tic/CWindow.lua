@@ -717,7 +717,7 @@ function CWindowMessagesWorld:new(_argt)
                 drawground  = true,
                 colorground = self.colorground,
                 behaviour = function(self)
-                    self.text = Tic.MESSAGES.actindex
+                    self.text = Tic.MESSAGES.maxindex
                 end,
             }
     self.textrg      = CText{
@@ -734,10 +734,10 @@ function CWindowMessagesWorld:new(_argt)
                 drawground  = true,
                 colorground = self.colorground,
                 behaviour = function(self)
-                    self.text = Tic.MESSAGES.maxindex
+                    self.text = Tic.MESSAGES.actindex
                 end,
             }
-    self.elements    = {self.textline, self.textlf, self.textrg, self.buttonprev, self.buttontrash, self.buttonnext}
+    self.elements    = {self.textline, self.textlf, self.textrg, self.buttonnext, self.buttontrash, self.buttonprev}
     self.behaviour   = function(self)
         local function _showTextLFRG()
             Tables:eachDo({self.textlf, self.textrg}, function(_, _element) _element.display = true end)
