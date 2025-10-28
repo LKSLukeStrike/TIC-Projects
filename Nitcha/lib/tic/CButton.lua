@@ -480,8 +480,7 @@ CButtonPlayerPosture = CButtonCheck:extend() -- generic player posture button
 function CButtonPlayerPosture:new(_argt)
     CButtonPlayerPosture.super.new(self, _argt)
     self.drawborder     = false
-    self.colorground    = Tic.COLORGREYM
-    self.sprite.palette = {[Tic.COLORGREYL] = Tic.COLORRED}
+    self.colorground    = Tic.COLORBLUEM
     self:argt(_argt) -- override if any
 end
 
