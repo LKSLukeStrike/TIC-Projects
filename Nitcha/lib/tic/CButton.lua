@@ -31,11 +31,14 @@ function CButton:new(_argt)
     self.drawframes          = false
     self.colorground         = Tic.COLORWHITE -- colors
     self.colorborder         = Tic.COLORGREYM
-    self.colorhover          = Tic.COLORHUDSCREEN
+    self.colorgroundhovered  = Tic.COLORHUDSCREEN
+    self.colorborderhovered  = self.colorborder
+    self.colorgroundactived  = Tic.COLORHOVERTEXTUP
+    self.colorborderactived  = self.colorborder
+    self.colorgroundchecked  = Tic.COLORHOVERTEXTUP
+    self.colorborderchecked  = self.colorborder
     self.colorgrounddisabled = Tic.COLORGREYL
     self.colorborderdisabled = Tic.COLORGREYM
-    self.colorgroundactived  = Tic.COLORHOVERTEXTUP
-    self.colorhoverground    = Tic.COLORBIOMENIGHT
     self.clickable           = true -- act as a button
     --
     self:argt(_argt) -- override if any
@@ -53,10 +56,10 @@ end
 
 function CButton:drawGround()
     self:save()
-    self.colorground = (self.hovered) and self.colorhover          or self.colorground
-    self.colorground = (self.actived) and self.colorgroundactived  or self.colorground
-    self.colorground = (self.enabled) and self.colorground or self.colorgrounddisabled
-    self.colorborder = (self.enabled) and self.colorborder or self.colorborderdisabled
+    self.colorground = (self.hovered)     and self.colorgroundhovered  or self.colorground
+    self.colorground = (self.actived)     and self.colorgroundactived  or self.colorground
+    self.colorground = (not self.enabled) and self.colorgrounddisabled or self.colorground
+    self.colorborder = (not self.enabled) and self.colorborderdisabled or self.colorborder
     CButton.super.drawGround(self)
     self:load()
 end
@@ -202,27 +205,40 @@ function CButtonSprite:new(_argt)
 end
 
 function CButtonSprite:drawInside()
-    local _palette = self.sprite.palette
+    local _palette = {
+                        [self.colorground] = self.colorground,
+                        [self.colorborder] = self.colorborder,
+                    }
 
     _palette = (self.checked)
-        and {[self.colorground] = self.colorground, [self.colorborder] = self.colorgroundactived}
+        and {
+                [self.colorground] = self.colorgroundchecked,
+                [self.colorborder] = self.colorborderchecked,
+            }
         or  _palette
     _palette = (self.hovered)
-        and {[self.colorground] = self.colorhover, [self.colorborder] = self.colorborder}
+        and {
+                [self.colorground] = self.colorgroundhovered,
+                [self.colorborder] = self.colorborderhovered,
+            }
         or  _palette
     _palette = (self.actived)
-        and {[self.colorground] = self.colorgroundactived, [self.colorborder] = self.colorborder}
+        and {
+                [self.colorground] = self.colorgroundactived,
+                [self.colorborder] = self.colorborderactived,
+            }
         or  _palette
-    _palette = (self.enabled)
-        and _palette
-        or  {[self.colorground] = self.colorgrounddisabled, [self.colorborder] = self.colorborderdisabled}
+    _palette = (not self.enabled)
+        and {
+                [self.colorground] = self.colorgrounddisabled,
+                [self.colorborder] = self.colorborderdisabled,
+            }
+        or  _palette
 
-    self.sprite:save()
     self.sprite.screenx = self.screenx
     self.sprite.screeny = self.screeny
-    self.sprite.palette = _palette
+    self.sprite.palette = Tables:merge(self.sprite.palette, _palette)
     self.sprite:draw()
-    self.sprite:load()
 end
 
 
@@ -456,33 +472,24 @@ function CButtonCheck:new(_argt)
     self:argt(_argt) -- override if any
 end
 
-function CButtonCheck:drawInside()
-    local _palette = {[self.colorground] = self.colorground, [self.colorborder] = self.colorborder}
 
-    _palette = (self.checked)
-        and {[self.colorground] = self.colorground, [self.colorborder] = self.colorgroundactived}
-        or  _palette
-    _palette = (self.actived)
-        and {[self.colorground] = self.colorground, [self.colorborder] = self.colorgroundactived}
-        or  _palette
-    _palette = (self.hovered)
-        and {[self.colorground] = self.colorground, [self.colorborder] = self.colorhover}
-        or  _palette
-    _palette = (self.enabled)
-        and _palette
-        or  {[self.colorground] = self.colorgrounddisabled, [self.colorborder] = self.colorborderdisabled}
-
-    self.sprite.screenx = self.screenx
-    self.sprite.screeny = self.screeny
-    self.sprite.palette = Tables:merge(self.sprite.palette, _palette)
-    self.sprite:draw()
+--
+-- CButtonPlayerPosture
+--
+CButtonPlayerPosture = CButtonCheck:extend() -- generic player posture button
+function CButtonPlayerPosture:new(_argt)
+    CButtonPlayerPosture.super.new(self, _argt)
+    self.drawborder     = false
+    self.colorground    = Tic.COLORGREYM
+    self.sprite.palette = {[Tic.COLORGREYL] = Tic.COLORRED}
+    self:argt(_argt) -- override if any
 end
 
 
 --
 -- CButtonPlayerStand
 --
-CButtonPlayerStand = CButtonCheck:extend() -- generic player stand button
+CButtonPlayerStand = CButtonPlayerPosture:extend() -- generic player stand button
 CButtonPlayerStand.BEHAVIOUR = function(self)
     IButtonPlayer.BEHAVIOUR(self)
     if not self.display then return end -- no player
@@ -494,11 +501,10 @@ CButtonPlayerStand.BEHAVIOUR = function(self)
 end
 function CButtonPlayerStand:new(_argt)
     CButtonPlayerStand.super.new(self, _argt)
-    self.drawborder     = false
-	self.sprite.sprite  = CSpriteBG.SIGNSTAIDL
 	self.behaviour      = CButtonPlayerStand.BEHAVIOUR  -- function to trigger at first
-    self.clicklf        = function() Tic:toggleKneel() end
     self.hovertextup    = CHoverTextUP{text = Tic.TEXTSTAND}
+    self.clicklf        = function() Tic:toggleKneel() end
+    --
     self:argt(_argt) -- override if any
 end
 
@@ -506,7 +512,7 @@ end
 --
 -- CButtonPlayerKneel
 --
-CButtonPlayerKneel = CButtonCheck:extend() -- generic player kneel button
+CButtonPlayerKneel = CButtonPlayerPosture:extend() -- generic player kneel button
 CButtonPlayerKneel.BEHAVIOUR = function(self)
     IButtonPlayer.BEHAVIOUR(self)
     if not self.display then return end -- no player
@@ -518,11 +524,10 @@ CButtonPlayerKneel.BEHAVIOUR = function(self)
 end
 function CButtonPlayerKneel:new(_argt)
     CButtonPlayerKneel.super.new(self, _argt)
-    self.drawborder     = false
-	self.sprite.sprite  = CSpriteBG.SIGNKNEIDL
 	self.behaviour      = CButtonPlayerKneel.BEHAVIOUR  -- function to trigger at first
-    self.clicklf        = function() Tic:toggleKneel() end
     self.hovertextup    = CHoverTextUP{text = Tic.TEXTKNEEL}
+    self.clicklf        = function() Tic:toggleKneel() end
+    --
     self:argt(_argt) -- override if any
 end
 
@@ -530,7 +535,7 @@ end
 --
 -- CButtonPlayerWork
 --
-CButtonPlayerWork = CButtonCheck:extend() -- generic player work button
+CButtonPlayerWork = CButtonPlayerPosture:extend() -- generic player work button
 CButtonPlayerWork.BEHAVIOUR = function(self)
     IButtonPlayer.BEHAVIOUR(self)
     if not self.display then return end -- no player
@@ -539,11 +544,11 @@ CButtonPlayerWork.BEHAVIOUR = function(self)
 end
 function CButtonPlayerWork:new(_argt)
     CButtonPlayerWork.super.new(self, _argt)
-    self.drawborder     = false
-	self.sprite.sprite  = CSpriteBG.SIGNDOWORK
+    self.sprite.sprite  = CSpriteBG.SIGNDOWORK
 	self.behaviour      = CButtonPlayerWork.BEHAVIOUR  -- function to trigger at first
-    self.clicklf        = function() Tic:toggleWork() end
     self.hovertextup    = CHoverTextUP{text = Tic.TEXTWORK}
+    self.clicklf        = function() Tic:toggleWork() end
+    --
     self:argt(_argt) -- override if any
 end
 
@@ -551,7 +556,7 @@ end
 --
 -- CButtonPlayerSleep
 --
-CButtonPlayerSleep = CButtonCheck:extend() -- generic player sleep button
+CButtonPlayerSleep = CButtonPlayerPosture:extend() -- generic player sleep button
 CButtonPlayerSleep.BEHAVIOUR = function(self)
     IButtonPlayer.BEHAVIOUR(self)
     if not self.display then return end -- no player
@@ -560,11 +565,11 @@ CButtonPlayerSleep.BEHAVIOUR = function(self)
 end
 function CButtonPlayerSleep:new(_argt)
     CButtonPlayerSleep.super.new(self, _argt)
-    self.drawborder     = false
-	self.sprite.sprite  = CSpriteBG.SIGNDOSLEE
+    self.sprite.sprite  = CSpriteBG.SIGNDOSLEE
 	self.behaviour      = CButtonPlayerSleep.BEHAVIOUR  -- function to trigger at first
-    self.clicklf        = function() Tic:toggleSleep() end
     self.hovertextup    = CHoverTextUP{text = Tic.TEXTSLEEP}
+    self.clicklf        = function() Tic:toggleSleep() end
+    --
     self:argt(_argt) -- override if any
 end
 
@@ -702,8 +707,6 @@ function CButtonSlot:new(_argt)
     self.drawborder          = true
     self.drawground          = true
     self.colorground         = Tic.COLORBIOMENIGHT
-    -- self.colorhover          = Tic.COLORGREYL
-    -- self.colorgroundactived  = Tic.COLORGREYM
     self.colorborder         = self.colorframe1
     self.colorborderdisabled = self.colorframe2
     self.rounded             = true
@@ -996,7 +999,6 @@ function CButtonPlayerPickMenu:new(_argt)
                             Tic:screenRemove(self.screen)
                             Tic:mouseDelay()
                           end
-    -- self.hovertextrg    = CHoverTextRG{}
     self.clickrg        = nil
     self.hovertextdw    = nil
     self:argt(_argt) -- override if any
