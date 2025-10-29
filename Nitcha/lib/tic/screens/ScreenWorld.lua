@@ -23,10 +23,10 @@ ButtonPlayerMove180    = CButtonPlayerMove180{}
 ButtonPlayerMove225    = CButtonPlayerMove225{}
 ButtonPlayerMove270    = CButtonPlayerMove270{}
 ButtonPlayerMove315    = CButtonPlayerMove315{}
-ButtonSlotPlayerHead   = CButtonSlotPlayerHead{}
-ButtonSlotPlayerBack   = CButtonSlotPlayerBack{}
-ButtonSlotPlayerHandLF = CButtonSlotPlayerHandLF{}
-ButtonSlotPlayerHandRG = CButtonSlotPlayerHandRG{}
+ButtonPlayerSlotHead   = CButtonPlayerSlotHead{}
+ButtonPlayerSlotBack   = CButtonPlayerSlotBack{}
+ButtonPlayerSlotHandLF = CButtonPlayerSlotHandLF{}
+ButtonPlayerSlotHandRG = CButtonPlayerSlotHandRG{}
 ScreenWorldLF:elementsDistributeH( -- up h line
     {ButtonPlayerMove315, ButtonPlayerMove045},
     WindowPlayerPortrait.screenx - 6,
@@ -52,13 +52,13 @@ ScreenWorldLF:elementsDistributeV( -- md v line
     14
 )
 ScreenWorldLF:elementsDistributeH( -- head and back slots
-    {ButtonSlotPlayerHead, ButtonSlotPlayerBack},
+    {ButtonPlayerSlotHead, ButtonPlayerSlotBack},
     WindowPlayerPortrait.screenx - Tic.SPRITESIZE - 6,
     WindowPlayerPortrait.screeny - 2,
     28
 )
 ScreenWorldLF:elementsDistributeH( -- handrg and handlf slots
-    {ButtonSlotPlayerHandRG, ButtonSlotPlayerHandLF},
+    {ButtonPlayerSlotHandRG, ButtonPlayerSlotHandLF},
     WindowPlayerPortrait.screenx - Tic.SPRITESIZE - 6,
     WindowPlayerPortrait.screeny + Tic.SPRITESIZE + 2,
     28
@@ -104,10 +104,10 @@ ScreenWorldLF:appendElements{
     ButtonPlayerStatPhy,
     ButtonPlayerStatMen,
     ButtonPlayerStatPsy,
-    ButtonSlotPlayerHead,
-    ButtonSlotPlayerBack,
-    ButtonSlotPlayerHandLF,
-    ButtonSlotPlayerHandRG,
+    ButtonPlayerSlotHead,
+    ButtonPlayerSlotBack,
+    ButtonPlayerSlotHandLF,
+    ButtonPlayerSlotHandRG,
     ButtonPlayerMove000,
     ButtonPlayerMove045,
     ButtonPlayerMove090,
@@ -157,10 +157,10 @@ ButtonSpotting180        = CButtonSpotting180{}
 ButtonSpotting225        = CButtonSpotting225{}
 ButtonSpotting270        = CButtonSpotting270{}
 ButtonSpotting315        = CButtonSpotting315{}
-ButtonSlotSpottingHead   = CButtonSlotSpottingHead{}
-ButtonSlotSpottingBack   = CButtonSlotSpottingBack{}
-ButtonSlotSpottingHandLF = CButtonSlotSpottingHandLF{}
-ButtonSlotSpottingHandRG = CButtonSlotSpottingHandRG{}
+ButtonSpottingSlotHead   = CButtonSpottingSlotHead{}
+ButtonSpottingSlotBack   = CButtonSpottingSlotBack{}
+ButtonSpottingSlotHandLF = CButtonSpottingSlotHandLF{}
+ButtonSpottingSlotHandRG = CButtonSpottingSlotHandRG{}
 ScreenWorldRG:elementsDistributeH( -- up h line
     {ButtonSpotting135, ButtonSpotting225},
     WindowSpottingPortrait.screenx - 6,
@@ -186,13 +186,13 @@ ScreenWorldRG:elementsDistributeV( -- md v line
     14
 )
 ScreenWorldRG:elementsDistributeH( -- head and back slots
-    {ButtonSlotSpottingHead, ButtonSlotSpottingBack},
+    {ButtonSpottingSlotHead, ButtonSpottingSlotBack},
     WindowSpottingPortrait.screenx - Tic.SPRITESIZE - 6,
     WindowSpottingPortrait.screeny - 2,
     28
 )
 ScreenWorldRG:elementsDistributeH( -- handrg and handlf slots
-    {ButtonSlotSpottingHandRG, ButtonSlotSpottingHandLF},
+    {ButtonSpottingSlotHandRG, ButtonSpottingSlotHandLF},
     WindowSpottingPortrait.screenx - Tic.SPRITESIZE - 6,
     WindowSpottingPortrait.screeny + Tic.SPRITESIZE + 2,
     28
@@ -215,10 +215,10 @@ ScreenWorldRG:appendElements{
     ButtonSpottingPick,
     ButtonSpottingLock,
     ButtonSpottingSpot,
-    ButtonSlotSpottingHead,
-    ButtonSlotSpottingBack,
-    ButtonSlotSpottingHandLF,
-    ButtonSlotSpottingHandRG,
+    ButtonSpottingSlotHead,
+    ButtonSpottingSlotBack,
+    ButtonSpottingSlotHandLF,
+    ButtonSpottingSlotHandRG,
     ButtonSpotting000,
     ButtonSpotting045,
     ButtonSpotting090,

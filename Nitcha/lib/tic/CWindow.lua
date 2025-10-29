@@ -304,7 +304,6 @@ function CWindowPortraitDrawable:drawInside() -- window portrait content for -- 
     local _ticdrawhitbox     = Tic.DRAWHITBOX
     Tic.DRAWHITBOX           = false -- FIXME remove tic master at one point
 
-    clip(self.screenx, self.screeny, self.screenw, self.screenh)
     self.entity:drawPortrait({
             screenx    = self.screenx,
             screeny    = self.screeny,
@@ -312,7 +311,6 @@ function CWindowPortraitDrawable:drawInside() -- window portrait content for -- 
             idle       = self.idle,
         }
     )
-    clip()
 
     Tic.DRAWHITBOX = _ticdrawhitbox
 end

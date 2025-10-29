@@ -21,6 +21,8 @@ function CEntityDrawable:new(_argt)
     self.screeny        = 0
     self.offsetx        = 0
     self.offsety        = 0
+    self.screenw        = Tic.SPRITESIZE
+    self.screenh        = Tic.SPRITESIZE
     self.dirx           = Nums:random01() -- random flip lf/rg
     self.scale          = Tic.SCALE01
     self.rotate         = Tic.ROTATE000
@@ -263,7 +265,9 @@ function CEntityDrawable:drawPortrait(_argt) -- draw entity to board then back t
         self.frame      = CSprite.FRAME00
         self.animations = {}
     end
+    clip(self.screenx, self.screeny, self.screenw * self.scale, self.screenh * self.scale)
     self:draw()
+    clip()
     self:load()
 end
 
