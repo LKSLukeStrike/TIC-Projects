@@ -696,11 +696,11 @@ IButtonSlot.BEHAVIOUR = function(self) -- enable if has an object
 end
 
 --
--- CButtonSlot
+-- CButtonPortrait
 --
-CButtonSlot = CButtonSprite:extend() -- generic slot button
-function CButtonSlot:new(_argt)
-    CButtonSlot.super.new(self, _argt)
+CButtonPortrait = CButtonSprite:extend() -- generic portrait button
+function CButtonPortrait:new(_argt)
+    CButtonPortrait.super.new(self, _argt)
     self.behaviour           = IButtonSlot.BEHAVIOUR
     self.getslotobject       = nil -- getslotobject function if any
     self.drawborder          = true
@@ -715,13 +715,13 @@ function CButtonSlot:new(_argt)
     self:argt(_argt) -- override if any
 end
 
-function CButtonSlot:drawBorder()
+function CButtonPortrait:drawBorder()
     self:save()
     self.screenx = self.screenx - 1
     self.screeny = self.screeny - 1
     self.screenw = self.screenw + 2
     self.screenh = self.screenh + 2
-    CButtonSlot.super.drawBorder(self)
+    CButtonPortrait.super.drawBorder(self)
     self:load()
 
     local _object = nil
@@ -731,14 +731,14 @@ function CButtonSlot:drawBorder()
     end
 end
 
-function CButtonSlot:drawGround()
+function CButtonPortrait:drawGround()
     local _colorground = self.colorground -- FIXME use self colors
     _colorground = (self.hovered) and Tic.COLORGREYL or _colorground
     _colorground = (self.actived) and Tic.COLORGREYM or _colorground
     rect(self.screenx, self.screeny, self.screenw, self.screenh, _colorground)
 end
 
-function CButtonSlot:drawInside()
+function CButtonPortrait:drawInside()
     clip(self.screenx, self.screeny, self.screenw, self.screenh) -- just to be sure
     local _object = self:objectGet()
     local _groundsprite = self.groundsprite
@@ -747,7 +747,7 @@ function CButtonSlot:drawInside()
         _object.screenx = self.screenx
         _object.screeny = self.screeny
         _object.dirx    = _entitydirx
-        _object:draw()
+        _object:drawPortrait()
     elseif _groundsprite then -- empty slot with default ground sprite
         _groundsprite.screenx = self.screenx
         _groundsprite.screeny = self.screeny
@@ -760,7 +760,7 @@ function CButtonSlot:drawInside()
     clip()
 end
 
-function CButtonSlot:objectGet() -- object in slot if any
+function CButtonPortrait:objectGet() -- object in slot if any
     return (self.getslotobject and self:getslotobject())
 end
 
@@ -850,7 +850,7 @@ end
 --
 -- CButtonPlayerPick
 --
-CButtonPlayerPick = CButtonSlot:extend() -- generic player pick button
+CButtonPlayerPick = CButtonPortrait:extend() -- generic player pick button
 CButtonPlayerPick.BEHAVIOUR = function(self) -- need at least more than one player
     IButtonPlayerChange.BEHAVIOUR(self)
     if not self.display then return end -- no player
@@ -1041,7 +1041,7 @@ IButtonSlotPlayer.BEHAVIOUR = function(self) -- need at least one player with sl
     self.enabled = (self:canPick() or self:canDrop())
 end
 
-CButtonSlotPlayer = CButtonSlot:extend()
+CButtonSlotPlayer = CButtonPortrait:extend()
 function CButtonSlotPlayer:new(_argt)
     CButtonSlotPlayer.super.new(self, _argt)
     self.behaviour   = IButtonSlotPlayer.BEHAVIOUR
@@ -1220,7 +1220,7 @@ IButtonSlotSpotting.BEHAVIOUR = function(self) -- need at least one spotting wit
     self.display = (self.entity.slots)
 end
 
-CButtonSlotSpotting = CButtonSlot:extend()
+CButtonSlotSpotting = CButtonPortrait:extend()
 function CButtonSlotSpotting:new(_argt)
     CButtonSlotSpotting.super.new(self, _argt)
     self.behaviour = IButtonSlotSpotting.BEHAVIOUR
