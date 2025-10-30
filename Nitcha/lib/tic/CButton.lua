@@ -1028,8 +1028,28 @@ CButtonEntitySlot.BEHAVIOUR = function(self) -- need at least one player with sl
     self.display = (self.entity)
     if not self.display then return end -- no entity
     self.display = (self.entity.slots)
-    if not self.display then return end -- no slots
-    self.enabled = (self:canPick() or self:canDrop())
+end
+
+function CButtonEntitySlot:objectsinInventories(_inventories)
+    local _result = {}
+    for _, _inventory in pairs(_inventories or {}) do
+        if CInventory:isInventory(_inventory) then
+            local _objectsofslottype = _inventory:objectsofSlotType(self.slottype)
+            _result = Tables:imerge(_result, _objectsofslottype, true)
+        end
+    end
+    return _result
+end
+
+function CButtonEntitySlot:canPick()
+    if self:objectGet() then return true end -- has object in slot -- can be replaced by an empty one
+    local _objectsininventories = self:objectsinInventories(self.entity.inventories)
+    if Tables:size(_objectsininventories) > 0 then return true end --has other objects of same slottype
+    return false
+end
+
+function CButtonEntitySlot:canDrop()
+    return self:objectGet() -- has object in slot -- can drop it
 end
 
 
@@ -1040,15 +1060,33 @@ CButtonPlayerSlot = CButtonEntitySlot:extend()
 CButtonPlayerSlot.BEHAVIOUR = function(self) -- need at least one player with slots
     self.entity = Tic.playerActual()
     CButtonEntitySlot.BEHAVIOUR(self)
+    if not self.display then return end -- no slots
+    self.enabled = false
+    if self:canDrop() then
+        self.enabled = true
+        self.hovertextup = CHoverTextUP{text = Tic.TEXTDROP}
+        self.clicklf     = function() self.entity:dropObject(self:getslotobject()) end
+    else
+        self.hovertextup = nil
+        self.clicklf     = nil
+    end
+    if self:canPick() then
+        self.enabled = true
+        self.hovertextdw = CHoverTextDW{text = Tic.TEXTPICK}
+        self.clickrg     = function() Tic:logAppend("pick") end
+    else
+        self.hovertextdw = nil
+        self.clickrg     = nil
+    end
+    if self.enabled and self:getslotobject() then
+        self.hovertextrg = CHoverTextRG{text = self:getslotobject():stringNameKind()}
+    else
+        self.hovertextrg = nil
+    end
 end
 function CButtonPlayerSlot:new(_argt)
     CButtonPlayerSlot.super.new(self, _argt)
     self.behaviour   = CButtonPlayerSlot.BEHAVIOUR
-    self.hovertextup = CHoverTextUP{text = Tic.TEXTDROP}
-    self.clicklf     = nil -- override per slot
-    self.hovertextrg = CHoverTextRG{}
-    self.hovertextdw = CHoverTextDW{text = Tic.TEXTPICK}
-    self.clickrg     = function() self:menuPick() end
     self:argt(_argt) -- override if any
 end
 
@@ -1105,58 +1143,14 @@ function CButtonPlayerSlot:menuPick()
     Tic:screenAppend(_screen)
 end
 
-function CButtonPlayerSlot:objectsinInventories(_inventories)
-    local _result = {}
-    for _, _inventory in pairs(_inventories or {}) do
-        if CInventory:isInventory(_inventory) then
-            local _objectsofslottype = _inventory:objectsofSlotType(self.slottype)
-            _result = Tables:imerge(_result, _objectsofslottype, true)
-        end
-    end
-    return _result
-end
-
-function CButtonPlayerSlot:canPick()
-    if self:objectGet() then return true end -- has object in slot -- can be replaced by an empty one
-    local _inventories = self.entity.inventories
-    if not _inventories then return false end -- cannot pick in no inventories
-    local _objectsininventories = self:objectsinInventories(_inventories)
-    if Tables:size(_objectsininventories) > 0 then return true end --has other objects of same slottype
-    return false
-end
-
-function CButtonPlayerSlot:canDrop()
-    return self:objectGet() -- has object in slot -- can drop it
-end
-
--- function CButtonPlayerSlot:drawHovertextUP()
---     if not self:canPick() then return end
---     CButtonPlayerSlot.super.drawHovertextUP(self)
--- end
-
--- function CButtonPlayerSlot:drawHovertextDW()
---     if not self:objectGet() then return end
---     CButtonPlayerSlot.super.drawHovertextDW(self)
--- end
-
-function CButtonPlayerSlot:drawHovertextRG()
-    if not self:objectGet() then return end
-    local _slotobject = self:getslotobject()
-    self.hovertextrg.text = _slotobject:kindGet().." ".._slotobject:nameGet()
-    self:save()
-    self.colorgroundactived = Tic.COLORBLUEM
-    CButtonPlayerSlot.super.drawHovertextRG(self)
-    self:load()
-end
-
 CButtonPlayerSlotHead = CButtonPlayerSlot:extend()
 function CButtonPlayerSlotHead:new(_argt)
     CButtonPlayerSlotHead.super.new(self, _argt)
     self.classic       = CButtonPlayerSlotHead
-    self.clickrg       = Tic.FUNCTIONSLOTDROPHEAD
+    -- self.clickrg       = Tic.FUNCTIONSLOTDROPHEAD
     self.setslotobject = function(_object) return self.entity:slotSetHeadObject(_object) end
     self.getslotobject = function() return self.entity:slotGetHeadObject() end
-    self.sprite  = CButtonEntitySlot.SPRITEHEAD
+    self.sprite        = CButtonEntitySlot.SPRITEHEAD
     self.slottype      = CSlotHead
     self:argt(_argt) -- override if any
 end
@@ -1165,10 +1159,10 @@ CButtonPlayerSlotBack = CButtonPlayerSlot:extend()
 function CButtonPlayerSlotBack:new(_argt)
     CButtonPlayerSlotBack.super.new(self, _argt)
     self.classic       = CButtonPlayerSlotBack
-    self.clickrg       = Tic.FUNCTIONSLOTDROPBACK
+    -- self.clickrg       = Tic.FUNCTIONSLOTDROPBACK
     self.setslotobject = function(_object) return self.entity:slotSetBackObject(_object) end
     self.getslotobject = function() return self.entity:slotGetBackObject() end
-    self.sprite  = CButtonEntitySlot.SPRITEBACK
+    self.sprite        = CButtonEntitySlot.SPRITEBACK
     self.slottype      = CSlotBack
     self:argt(_argt) -- override if any
 end
@@ -1177,10 +1171,10 @@ CButtonPlayerSlotHandLF = CButtonPlayerSlot:extend()
 function CButtonPlayerSlotHandLF:new(_argt)
     CButtonPlayerSlotHandLF.super.new(self, _argt)
     self.classic       = CButtonPlayerSlotHandLF
-    self.clickrg       = Tic.FUNCTIONSLOTDROPHANDLF
+    -- self.clickrg       = Tic.FUNCTIONSLOTDROPHANDLF
     self.setslotobject = function(_object) return self.entity:slotSetHandLFObject(_object) end
     self.getslotobject = function() return self.entity:slotGetHandLFObject() end
-    self.sprite  = CButtonEntitySlot.SPRITEHAND
+    self.sprite        = CButtonEntitySlot.SPRITEHAND
     self.slottype      = CSlotHand
     self:argt(_argt) -- override if any
 end
@@ -1189,10 +1183,10 @@ CButtonPlayerSlotHandRG = CButtonPlayerSlot:extend()
 function CButtonPlayerSlotHandRG:new(_argt)
     CButtonPlayerSlotHandRG.super.new(self, _argt)
     self.classic       = CButtonPlayerSlotHandRG
-    self.clickrg       = Tic.FUNCTIONSLOTDROPHANDRG
+    -- self.clickrg       = Tic.FUNCTIONSLOTDROPHANDRG
     self.setslotobject = function(_object) return self.entity:slotSetHandRGObject(_object) end
     self.getslotobject = function() return self.entity:slotGetHandRGObject() end
-    self.sprite  = CButtonEntitySlot.SPRITEHAND
+    self.sprite        = CButtonEntitySlot.SPRITEHAND
     self.slottype      = CSlotHand
     self:argt(_argt) -- override if any
 end
