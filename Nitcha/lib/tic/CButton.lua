@@ -952,25 +952,13 @@ end
 
 
 --
--- IButtonPlayerMenu -- player pick/party button menus implementation
---
-IButtonPlayerMenu = Classic:extend() -- generic pick player button
-IButtonPlayerMenu.BEHAVIOUR = function(self) -- need at least more than one player
-    CButtonPortrait.BEHAVIOUR(self)
-    -- if not self.display then return end -- no player
-    -- local _slotobject = self:getslotobject()
-    -- self.hovertextrg.text = _slotobject:nameGet().." ".._slotobject:kindGet()
-end
-
-
---
 -- CButtonPlayerPickMenu
 --
 CButtonPlayerPickMenu = CButtonPlayerPick:extend() -- generic player pick button
 function CButtonPlayerPickMenu:new(_argt)
     CButtonPlayerPickMenu.super.new(self, _argt)
     self.classic        = CButtonPlayerPickMenu
-	self.behaviour      = IButtonPlayerMenu.BEHAVIOUR
+	self.behaviour      = CButtonPortrait.BEHAVIOUR
     self.screen         = nil -- parent menu screen
     self.hovertextup    = CHoverTextUP{text = Tic.TEXTPICK}
     self.clicklf        = function()
@@ -978,8 +966,9 @@ function CButtonPlayerPickMenu:new(_argt)
                             Tic:screenRemove(self.screen)
                             Tic:mouseDelay()
                           end
-    self.clickrg        = nil
+    self.hovertextrg    = CHoverTextRG{text = self:getslotobject():stringNameKind()}
     self.hovertextdw    = nil
+    self.clickrg        = nil
     self:argt(_argt) -- override if any
 end
 
@@ -991,7 +980,7 @@ CButtonPlayerPartyMenu = CButtonPlayerPick:extend() -- generic player pick butto
 function CButtonPlayerPartyMenu:new(_argt)
     CButtonPlayerPartyMenu.super.new(self, _argt)
     self.classic        = CButtonPlayerPartyMenu
-	self.behaviour      = IButtonPlayerMenu.BEHAVIOUR
+	self.behaviour      = CButtonPortrait.BEHAVIOUR
     self.screen         = nil -- parent menu screen
     self.hovertextup    = CHoverTextUP{text = Tic.TEXTLEAD}
     self.clicklf        = function()
@@ -999,7 +988,7 @@ function CButtonPlayerPartyMenu:new(_argt)
                             Tic:screenRemove(self.screen)
                             Tic:mouseDelay()
                           end
-    self.hovertextrg    = CHoverTextRG{}
+    self.hovertextrg    = CHoverTextRG{text = self:getslotobject():stringNameKind()}
     self.hovertextdw    = CHoverTextDW{text = Tic.TEXTQUIT}
     self.clickrg        = function()
                             self:getslotobject():quitParty(true)
@@ -1073,7 +1062,7 @@ CButtonPlayerSlot.BEHAVIOUR = function(self) -- need at least one player with sl
     if self:canPick() then
         self.enabled = true
         self.hovertextdw = CHoverTextDW{text = Tic.TEXTPICK}
-        self.clickrg     = function() Tic:logAppend("pick") end
+        self.clickrg     = function() self:menuPick() end
     else
         self.hovertextdw = nil
         self.clickrg     = nil
