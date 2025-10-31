@@ -693,9 +693,9 @@ function CButtonPortrait:new(_argt)
     self.colorborder         = self.colorframe1
     self.colorborderdisabled = self.colorframe2
     self.rounded             = true
-    self.hovertextup         = CHoverTextRG{}
-    self.hovertextrg         = CHoverTextRG{}
-    self.hovertextdw         = CHoverTextRG{}
+    -- self.hovertextup         = CHoverTextRG{}
+    -- self.hovertextrg         = CHoverTextRG{}
+    -- self.hovertextdw         = CHoverTextRG{}
     self:argt(_argt) -- override if any
 end
 
@@ -1098,8 +1098,10 @@ function CButtonPlayerSlot:menuPick()
     _screen:appendElements{_windowmenu}
 
     local _buttonslotempty = _classic{
+        behaviour     = Classic.NIL,
         getslotobject = function() return nil end, -- returns nil
-        clicklf = function()
+        hovertextdw   = CHoverTextDW{text = Tic.TEXTPICK},
+        clickrg = function()
             _setslotobject()
             Tic:screenRemove(_screen)
             Tic:mouseDelay()
@@ -1110,8 +1112,16 @@ function CButtonPlayerSlot:menuPick()
     for _, _object in ipairs(_entity:objectsofSlotType(_slottype)) do
         _windowmenu:appendElements{
             _classic{
+                behaviour = Classic.NIL,
                 getslotobject = function() return _object end, -- returns object
+                hovertextup = CHoverTextUP{text = Tic.TEXTDROP},
                 clicklf = function()
+                    _entity:dropObject(_object)
+                    Tic:screenRemove(_screen)
+                    Tic:mouseDelay()
+                end,
+                hovertextdw = CHoverTextDW{text = Tic.TEXTPICK},
+                clickrg = function()
                     local _whatslot = _object:findWhatSlot(_entity.slots) -- is object in a slot ?
                     if _whatslot then
                         _whatslot:appendObject(_getslotobject())
@@ -1120,11 +1130,9 @@ function CButtonPlayerSlot:menuPick()
                     Tic:screenRemove(_screen)
                     Tic:mouseDelay()
                 end,
-                clickrg = function()
-                    _entity:dropObject(_object)
-                    Tic:screenRemove(_screen)
-                    Tic:mouseDelay()
-                end
+                hovertextrg = (self:getslotobject())
+                    and CHoverTextRG{text = self:getslotobject():stringNameKind()}
+                    or  nil,
             }
         }
     end
