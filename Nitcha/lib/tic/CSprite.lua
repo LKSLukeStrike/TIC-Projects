@@ -490,6 +490,18 @@ function CSprite:spriteMouseClickRG()
     return _spritemouse
 end
 
+function CSprite:spriteMouseWheelUP()
+    local _spritemouse = CSprite:spriteMouse()
+    _spritemouse.palette[Tic.COLORPURPLE] = Tic.COLORBLUEL
+    return _spritemouse
+end
+
+function CSprite:spriteMouseWheelDW()
+    local _spritemouse = CSprite:spriteMouse()
+    _spritemouse.palette[Tic.COLORRED]    = Tic.COLORBLUEL
+    return _spritemouse
+end
+
 
 --
 -- Sprite Modifier Key
