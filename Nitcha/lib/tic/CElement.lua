@@ -109,14 +109,22 @@ function CElement:new(_argt)
 	self.wheeldwmdk     = nil
 	self.wheellfmdk     = nil
 	self.wheelrgmdk     = nil
-    self.hovertextlf    = nil -- FIXMEnadd more rotations ?
+    self.hovertextlf    = nil  -- hovertexts 8 directions
     self.hovertextrg    = nil
     self.hovertextup    = nil
     self.hovertextdw    = nil
-    self.hovertextlfmdk = nil -- when modifier key
+    self.hovertextul    = nil
+    self.hovertextur    = nil
+    self.hovertextdl    = nil
+    self.hovertextdr    = nil
+    self.hovertextlfmdk = nil  -- when modifier key
     self.hovertextrgmdk = nil
     self.hovertextupmdk = nil
     self.hovertextdwmdk = nil
+    self.hovertextulmdk = nil
+    self.hovertexturmdk = nil
+    self.hovertextdlmdk = nil
+    self.hovertextdrmdk = nil
     --
     self:argt(_argt) -- override if any
 end

@@ -44,6 +44,10 @@ function CButton:new(_argt)
     self:argt(_argt) -- override if any
 end
 
+function CButton:activable() -- is the button activable ?
+    return self.display and not self.actived
+end
+
 function CButton:draw() -- button drawing --TODO hover with wheel ?
     CButton.super.draw(self)
     if self.hovered then
@@ -51,6 +55,8 @@ function CButton:draw() -- button drawing --TODO hover with wheel ?
         if self.hovertextrg then self:drawHovertextRG() end
         if self.hovertextup then self:drawHovertextUP() end
         if self.hovertextdw then self:drawHovertextDW() end
+        if self.hovertextul then self:drawHovertextUL() end
+        if self.hovertextur then self:drawHovertextUR() end
     end
 end
 
@@ -75,11 +81,11 @@ function CButton:drawHovertextUP()
     local _hovertext      = (Tic:hovertextsIsMDKPressed() and self.hovertextupmdk)
         and self.hovertextupmdk
         or  self.hovertextup
+    _hovertext:adjustWH()
     local _htmousesprite  = CSprite:spriteMouseClickLF()
     local _htmodkeysprite = (self.hovertextupmdk)
         and CSprite:spriteModifierKey()
         or  nil
-    _hovertext:adjustWH()
     _hovertext.screenx = self.screenx - ((_hovertext.screenw - self.screenw) // 2) + 1
     _hovertext.screeny = self.screeny - _hovertext.screenh
     Tic:hovertextsAppend(_hovertext, _htmousesprite, _htmodkeysprite)
@@ -89,32 +95,46 @@ function CButton:drawHovertextDW()
     local _hovertext      = (Tic:hovertextsIsMDKPressed() and self.hovertextdwmdk)
         and self.hovertextdwmdk
         or  self.hovertextdw
+    _hovertext:adjustWH()
     local _htmousesprite  = CSprite:spriteMouseClickRG()
     local _htmodkeysprite = (self.hovertextdwmdk)
         and CSprite:spriteModifierKey()
         or  nil
-    _hovertext:adjustWH()
     _hovertext.screenx = self.screenx - ((_hovertext.screenw - self.screenw) // 2) + 1
     _hovertext.screeny = self.screeny + self.screenh
     Tic:hovertextsAppend(_hovertext, _htmousesprite, _htmodkeysprite)
 end
 
 function CButton:drawHovertextLF()
-    self.hovertextlf:adjustWH()
-    self.hovertextlf.screenx = self.screenx - self.hovertextlf.screenw
-    self.hovertextlf.screeny = self.screeny + ((self.screenh - self.hovertextlf.screenh) // 2)
-    Tic:hovertextsAppend(self.hovertextlf)
+    local _hovertext = self.hovertextlf
+    _hovertext:adjustWH()
+    _hovertext.screenx = self.screenx - _hovertext.screenw
+    _hovertext.screeny = self.screeny + ((self.screenh - _hovertext.screenh) // 2)
+    Tic:hovertextsAppend(_hovertext)
 end
 
 function CButton:drawHovertextRG()
-    self.hovertextrg:adjustWH()
-    self.hovertextrg.screenx = self.screenx + self.screenw
-    self.hovertextrg.screeny = self.screeny + ((self.screenh - self.hovertextrg.screenh) // 2)
-    Tic:hovertextsAppend(self.hovertextrg)
+    local _hovertext = self.hovertextrg
+    _hovertext:adjustWH()
+    _hovertext.screenx = self.screenx + self.screenw
+    _hovertext.screeny = self.screeny + ((self.screenh - _hovertext.screenh) // 2)
+    Tic:hovertextsAppend(_hovertext)
 end
 
-function CButton:activable() -- is the button activable ?
-    return self.display and not self.actived
+function CButton:drawHovertextUL()
+    local _hovertext      = (Tic:hovertextsIsMDKPressed() and self.hovertextulmdk)
+        and self.hovertextulmdk
+        or  self.hovertextul
+    _hovertext:adjustWH()
+    local _htmousesprite  = CSprite:spriteMouseWheelUP()
+    local _htmodkeysprite = (self.hovertextulmdk)
+        and CSprite:spriteModifierKey()
+        or  nil
+    _hovertext.screenx =  (self.hovertextulmdk)
+        and self.screenx - _hovertext.screenw - Tic.SPRITESIZE
+        or  self.screenx - _hovertext.screenw
+    _hovertext.screeny = self.screeny - _hovertext.screenh
+    Tic:hovertextsAppend(_hovertext, _htmousesprite, _htmodkeysprite)
 end
 
 
