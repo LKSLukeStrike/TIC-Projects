@@ -678,10 +678,7 @@ CButtonPortrait.PALETTEENABLED   = {}
 CButtonPortrait.PALETTEDISABLED  = {[Tic.COLORWHITE] = Tic.COLORGREYL, [Tic.COLORGREYL] = Tic.COLORGREYD}
 CButtonPortrait.BEHAVIOUR = function(self) -- enable if has an object
     IButton.BEHAVIOUR(self)
-    local _object = self:objectGet()
-    if self.enabled and self.getslotobject then
-       self.enabled = (self:getslotobject())
-    end
+    self.enabled = (self:objectGet())
 end
 function CButtonPortrait:new(_argt)
     CButtonPortrait.super.new(self, _argt)
@@ -693,9 +690,6 @@ function CButtonPortrait:new(_argt)
     self.colorborder         = self.colorframe1
     self.colorborderdisabled = self.colorframe2
     self.rounded             = true
-    -- self.hovertextup         = CHoverTextRG{}
-    -- self.hovertextrg         = CHoverTextRG{}
-    -- self.hovertextdw         = CHoverTextRG{}
     self:argt(_argt) -- override if any
 end
 
@@ -723,9 +717,10 @@ function CButtonPortrait:drawGround()
 end
 
 function CButtonPortrait:drawInside()
-    local _object = self:objectGet()
-    local _sprite = self.sprite
-    local _entitydirx = (self.entity and self.entity.dirx) and self.entity.dirx or Tic.DIRXLF
+    local _object     = self:objectGet()
+    local _sprite     = self.sprite
+    local _entitydirx = self.entity.dirx
+
     if _object then -- not empty slot
         _object.screenx = self.screenx
         _object.screeny = self.screeny
@@ -878,7 +873,6 @@ function CButtonPlayerPick:menuPick()
     local _screen        = CScreen{}
     local _screenx       = self.screenx - 9
     local _screeny       = self.screeny
-    local _classic       = CButtonPlayerPickMenu
     local _playeractual  = Tic:playerActual()
     local _players       = Tic:playerPlayers()
 
@@ -893,7 +887,7 @@ function CButtonPlayerPick:menuPick()
 
     local function _appendbutton(_slotobject)
         _windowmenu:appendElements{
-            _classic{
+            CButtonPlayerPickMenu{
                 screen = _screen,
                 getslotobject = function() return _slotobject end, -- returns slot object
             }
@@ -915,7 +909,6 @@ function CButtonPlayerPick:menuParty()
     local _screen        = CScreen{}
     local _screenx       = self.screenx + 9
     local _screeny       = self.screeny
-    local _classic       = CButtonPlayerPartyMenu
     local _playeractual  = Tic:playerActual()
     local _party         = _playeractual.party
     local _leader        = _party.leader
@@ -931,7 +924,7 @@ function CButtonPlayerPick:menuParty()
 
     local function _appendbutton(_slotobject)
         _windowmenu:appendElements{
-            _classic{
+            CButtonPlayerPartyMenu{
                 screen = _screen,
                 getslotobject = function() return _slotobject end, -- returns slot object
             }
@@ -1099,6 +1092,7 @@ function CButtonPlayerSlot:menuPick()
 
     local _buttonslotempty = _classic{
         behaviour     = Classic.NIL,
+        entity        = _entity,
         getslotobject = function() return nil end, -- returns nil
         hovertextdw   = CHoverTextDW{text = Tic.TEXTPICK},
         clickrg = function()
@@ -1113,6 +1107,7 @@ function CButtonPlayerSlot:menuPick()
         _windowmenu:appendElements{
             _classic{
                 behaviour = Classic.NIL,
+                entity    = _entity,
                 getslotobject = function() return _object end, -- returns object
                 hovertextup = CHoverTextUP{text = Tic.TEXTDROP},
                 clicklf = function()
@@ -1208,6 +1203,12 @@ CButtonSpottingSlot.BEHAVIOUR = function(self) -- need at least one spotting wit
     IButtonSpotting.BEHAVIOUR(self)
     if not self.display then return end -- no spotting
     self.display = (self.entity.slots)
+    if not self.display then return end -- no spotting
+    if self:getslotobject() then
+        self.hovertextlf = CHoverTextLF{text = self:getslotobject():stringKindName()}
+    else
+        self.hovertextlf = nil
+    end
 end
 function CButtonSpottingSlot:new(_argt)
     CButtonSpottingSlot.super.new(self, _argt)

@@ -2148,14 +2148,14 @@ W2lfie = _playerclass{classed = _playerclass,
     -- spottingspot = true,
     spottingpick = true,
     -- ["slots.handrg"] = CSlotHandRG{object = CWeaponWandMedium{}},
-    -- ["slots.handlf"] = CSlotHandLF{object = CWeaponRuneMedium{}},
+    ["slots.handlf"] = CSlotHandLF{object = CWeaponRuneMedium{}},
     -- ["slots.head"]   = CSlotHead{object = CClothesHelmetMedium{}},
     -- ["slots.head"]   = CSlotHead{object = CClothesHatMedium{}},
     ["slots.head"]   = CSlotHead{object = CClothesCapMedium{}},
     -- ["slots.back"]   = CSlotBack{object = CClothesScrollCaseMedium{}},
-    -- ["inventories.any"] = CInventoryAny{objects = {
-    --     CObjectSpellMedium{used = CObject.USEDHALF},
-    -- }},
+    ["inventories.any"] = CInventoryAny{objects = {
+        CObjectSpellMedium{used = CObject.USEDHALF},
+    }},
 }
 end
 if true then
@@ -2171,16 +2171,16 @@ W3lfie = _playerclass{classed = _playerclass,
     worldy = 20,
     -- spottingspot = true,
     spottingpick = true,
-    -- ["slots.handrg"] = CSlotHandRG{object = CWeaponWandLarge{}},
+    ["slots.handrg"] = CSlotHandRG{object = CWeaponWandLarge{}},
     -- ["slots.handlf"] = CSlotHandRG{object = CWeaponWandMedium{}},
     -- ["slots.handlf"] = CSlotHandLF{object = CWeaponRuneLarge{}},
     -- ["slots.head"]   = CSlotHead{object = CClothesHelmetLarge{}},
     -- ["slots.head"]   = CSlotHead{object = CClothesHatLarge{}},
     ["slots.head"]   = CSlotHead{object = CClothesCapLarge{}},
     -- ["slots.back"]   = CSlotBack{object = CClothesScrollCaseLarge{}},
-    -- ["inventories.any"] = CInventoryAny{objects = {
-    --     CObjectSpellLarge{used = CObject.USEDNONE},
-    -- }},
+    ["inventories.any"] = CInventoryAny{objects = {
+        CObjectSpellLarge{used = CObject.USEDNONE},
+    }},
 }
 end
 end -- psy
