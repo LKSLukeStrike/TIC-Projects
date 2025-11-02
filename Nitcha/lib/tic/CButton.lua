@@ -320,8 +320,8 @@ function CButtonEntityHoverLock:new(_argt)
                         _playeractual.spottinglock = false
                         Tic:mouseDelay()
                        end
-    self.clickrg     = self.lock
     self.hovertextdw = CHoverTextDW{text = Tic.TEXTLOCK}
+    self.clickrg     = self.lock
     self.hovertextrg = CHoverTextRG{}
     self.behaviour   = function(self)
                         local _playeractual = Tic:playerActual()
@@ -350,8 +350,8 @@ function CButtonEntityHoverLockPick:new(_argt)
                         Tic:playerActual().hovered = false
                         Tic:mouseDelay()
                        end
-    self.clicklf     = self.pick
     self.hovertextup = CHoverTextUP{text = Tic.TEXTPICK}
+    self.clicklf     = self.pick
     self:argt(_argt) -- override if any
 end
 
@@ -1617,9 +1617,9 @@ function CButtonMessageTrash:new(_argt)
     self.drawground     = false
 	self.sprite.sprite  = CSpriteBG.SIGNDELETE
 	self.behaviour      = IButtonMessage.BEHAVIOUR  -- function to trigger at first
-    self.clicklf        = Tic.FUNCTIONMESSAGEDELONE
     self.hovertextup    = CHoverTextUP{text = Tic.TEXTDELONE}
-    self.clicklfmdk     = Tic.FUNCTIONMESSAGEDELALL
+    self.clicklf        = Tic.FUNCTIONMESSAGEDELONE
     self.hovertextupmdk = CHoverTextUP{text = Tic.TEXTDELALL}
+    self.clicklfmdk     = Tic.FUNCTIONMESSAGEDELALL
     self:argt(_argt) -- override if any
 end
