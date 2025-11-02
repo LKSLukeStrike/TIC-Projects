@@ -824,30 +824,29 @@ function Tic:hovertextsClearHovertexts() -- clear the hovertexts table
     Tic.HOVERTEXTS = {}
 end
 
-function Tic:hovertextsAppend(_hovertext, _htmousesprite, _htmodkeysprite) -- append an hovertext for later drawing
+function Tic:hovertextsAppend(_hovertext, _mousesprite, _modkeysprite) -- append an hovertext for later drawing
     if not _hovertext then return end -- mandatory
     local _hovertextclone = CText{} -- make a clone of it --FIXME why ?
     _hovertextclone:implementall(_hovertext)
-    Tables:valInsert(Tic.HOVERTEXTS, {hovertext = _hovertextclone, htmousesprite = _htmousesprite, htmodkeysprite = _htmodkeysprite}, true)
+    Tables:valInsert(Tic.HOVERTEXTS, {hovertext = _hovertextclone, mousesprite = _mousesprite, modkeysprite = _modkeysprite}, true)
 end
 
 function Tic:hovertextsDrawAll() -- draw all hovertexts
     for _, _hovertext in ipairs(Tic.HOVERTEXTS) do
-        if Tic.DRAWHOVERTEXTMOUSE and _hovertext.htmousesprite then
-            _hovertext.hovertext.screenx     = _hovertext.hovertext.screenx + 6
-            _hovertext.htmousesprite.screenx = _hovertext.hovertext.screenx - Tic.SPRITESIZE
-            _hovertext.htmousesprite.screeny = _hovertext.hovertext.screeny - 1
-            _hovertext.htmousesprite:draw()
+        if Tic.DRAWHOVERTEXTMOUSE and _hovertext.mousesprite then
+            _hovertext.mousesprite.screenx = _hovertext.hovertext.screenx - _hovertext.mousesprite.screenw + 1
+            _hovertext.mousesprite.screeny = _hovertext.hovertext.screeny - 1
+            _hovertext.mousesprite:draw()
         end
-        _hovertext.hovertext:draw()
-        if Tic.DRAWHOVERTEXTMODIFIERKEY and _hovertext.htmodkeysprite then
-            _hovertext.htmodkeysprite.screenx = _hovertext.hovertext.screenx + _hovertext.hovertext.screenw - 1
-            _hovertext.htmodkeysprite.screeny = _hovertext.hovertext.screeny - 1
-            _hovertext.htmodkeysprite.flip    = (Tic:hovertextsIsMDKPressed())
+        if Tic.DRAWHOVERTEXTMODIFIERKEY and _hovertext.modkeysprite then
+            _hovertext.modkeysprite.screenx = _hovertext.hovertext.screenx + _hovertext.hovertext.screenw - 1
+            _hovertext.modkeysprite.screeny = _hovertext.hovertext.screeny - 1
+            _hovertext.modkeysprite.flip    = (Tic:hovertextsIsMDKPressed())
                 and Tic.FLIPVERT
                 or  Tic.FLIPNONE
-            _hovertext.htmodkeysprite:draw()
+            _hovertext.modkeysprite:draw()
         end 
+        _hovertext.hovertext:draw()
     end
 end
 

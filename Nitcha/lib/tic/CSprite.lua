@@ -36,6 +36,8 @@ function CSprite:init() -- init a sprite
     self.screeny     = 0
     self.offsetx     = 0 -- screen/board positions offsets
     self.offsety     = 0
+    self.screenw     = Tic.SPRITESIZE -- screen sizes
+    self.screenh     = Tic.SPRITESIZE
     self.frame       = CSprite.FRAME00
     self.frameoffset = CSprite.FRAMEOFFSET
     self.scale       = Tic.SCALE01 -- default scale
