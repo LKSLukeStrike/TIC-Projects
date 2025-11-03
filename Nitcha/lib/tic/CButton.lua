@@ -1551,15 +1551,15 @@ CButtonMessagePrev.BEHAVIOUR = function(self)
     IButtonMessageChange.BEHAVIOUR(self)
     if not self.display then return end
     if self.enabled then
-        self.clicklf        = Tic.FUNCTIONMESSAGEPREV
         self.hovertextup    = CHoverTextUP{text = Tic.TEXTPREV}
-        self.clicklfmdk     = Tic.FUNCTIONMESSAGEMIN
+        self.clicklf        = Tic.FUNCTIONMESSAGEPREV
         self.hovertextupmdk = CHoverTextUP{text = Tic.TEXTFIRST}
+        self.clicklfmdk     = Tic.FUNCTIONMESSAGEMIN
     else
-        self.clicklf        = nil
         self.hovertextup    = nil
-        self.clicklfmdk     = nil
+        self.clicklf        = nil
         self.hovertextupmdk = nil
+        self.clicklfmdk     = nil
     end
 end
 Classic.KINDBUTTONMESSAGEPREV = "ButtonMessagePrev"
@@ -1581,15 +1581,15 @@ CButtonMessageNext.BEHAVIOUR = function(self)
     IButtonMessageChange.BEHAVIOUR(self)
     if not self.display then return end
     if self.enabled then
-        self.clicklf        = Tic.FUNCTIONMESSAGENEXT
         self.hovertextup    = CHoverTextUP{text = Tic.TEXTNEXT}
-        self.clicklfmdk     = Tic.FUNCTIONMESSAGEMAX
+        self.clicklf        = Tic.FUNCTIONMESSAGENEXT
         self.hovertextupmdk = CHoverTextUP{text = Tic.TEXTLAST}
+        self.clicklfmdk     = Tic.FUNCTIONMESSAGEMAX
     else
-        self.clicklf        = nil
         self.hovertextup    = nil
-        self.clicklfmdk     = nil
+        self.clicklf        = nil
         self.hovertextupmdk = nil
+        self.clicklfmdk     = nil
     end
 end
 Classic.KINDBUTTONMESSAGENEXT = "ButtonMessageNext"
@@ -1613,6 +1613,28 @@ function CButtonMessageTrash:new(_argt)
     CButtonMessageTrash.super.new(self, _argt)
     self.kind = Classic.KINDBUTTONMESSAGETRASH
     self.name = Classic.NAMEBUTTONMESSAGETRASH
+    self.drawborder     = false
+    self.drawground     = false
+	self.sprite.sprite  = CSpriteBG.SIGNDELETE
+	self.behaviour      = IButtonMessage.BEHAVIOUR  -- function to trigger at first
+    self.hovertextup    = CHoverTextUP{text = Tic.TEXTDELONE}
+    self.clicklf        = Tic.FUNCTIONMESSAGEDELONE
+    self.hovertextupmdk = CHoverTextUP{text = Tic.TEXTDELALL}
+    self.clicklfmdk     = Tic.FUNCTIONMESSAGEDELALL
+    self:argt(_argt) -- override if any
+end
+
+
+--
+-- CButtonMessageHover
+--
+CButtonMessageHover = CButtonClick:extend() -- generic message hover button
+Classic.KINDBUTTONMESSAGEHOVER = "ButtonMessageHover"
+Classic.NAMEBUTTONMESSAGEHOVER = "ButtonMessageHover"
+function CButtonMessageTrash:new(_argt)
+    CButtonMessageHover.super.new(self, _argt)
+    self.kind = Classic.KINDBUTTONMESSAGEHOVER
+    self.name = Classic.NAMEBUTTONMESSAGEHOVER
     self.drawborder     = false
     self.drawground     = false
 	self.sprite.sprite  = CSpriteBG.SIGNDELETE

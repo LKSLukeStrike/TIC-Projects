@@ -700,9 +700,8 @@ function CWindowMessagesWorld:new(_argt)
                             end
                             self.wheelbutton = self.buttonnext
                         end
-    self.textline    = CTextLine{name = "WindowMessageWorldText", text = "", small = true, marginlf = 2}
+    self.textline    = CTextLine{text = "", small = true, marginlf = 2}
     self.textlf      = CText{
-                name = "WindowMessagesWorldTextLF",
                 text = "",
                 stretch = false,
                 align = Tic.DIR090,
@@ -719,7 +718,6 @@ function CWindowMessagesWorld:new(_argt)
                 end,
             }
     self.textrg      = CText{
-                name = "WindowMessagesWorldTextRG",
                 text = "",
                 stretch = false,
                 align = Tic.DIR090,
@@ -755,8 +753,8 @@ function CWindowMessagesWorld:new(_argt)
             return Tables:ifAny(_elements, function(_, _element) return _element.actived end)
         end
         local function _activedElements(_elements)
-            self.buttonprev.hovered = true
-            self.buttonnext.hovered = true
+            -- self.buttonprev.hovered = true
+            -- self.buttonnext.hovered = true
             Tables:eachDo(_elements, function(_, _element) _element.actived = true end)
             _showTextLFRG()
             self.colorborder = Tic.COLORHOVERTEXTUP
