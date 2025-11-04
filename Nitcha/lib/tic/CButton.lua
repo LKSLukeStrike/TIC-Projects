@@ -1631,6 +1631,9 @@ end
 CButtonMessageHover = CButtonSprite:extend() -- generic message hover button
 CButtonMessageHover.BEHAVIOUR = function(self)
     IButtonMessage.BEHAVIOUR(self)
+    if not self.display then return end
+    self.screenx = Tic.MOUSE.screenx
+    self.screeny = Tic.MOUSE.screeny
 end
 Classic.KINDBUTTONMESSAGEHOVER = "ButtonMessageHover"
 Classic.NAMEBUTTONMESSAGEHOVER = "ButtonMessageHover"
@@ -1642,9 +1645,13 @@ function CButtonMessageHover:new(_argt)
     self.drawground     = false
 	self.sprite.sprite  = CSpriteBG.SIGNBORDSQ
 	self.behaviour      = CButtonMessageHover.BEHAVIOUR  -- function to trigger at first
-    self.hovertextup    = CHoverTextUP{text = Tic.TEXTDELONE}
-    self.clicklf        = Tic.FUNCTIONMESSAGEDELONE
-    self.hovertextupmdk = CHoverTextUP{text = Tic.TEXTDELALL}
-    self.clicklfmdk     = Tic.FUNCTIONMESSAGEDELALL
+    self.hovertextul    = CHoverTextUP{text = Tic.TEXTPREV}
+    self.wheelup        = Tic.FUNCTIONMESSAGEPREV
+    self.hovertextulmdk = CHoverTextUP{text = Tic.TEXTFIRST}
+    self.wheelupmdk     = Tic.FUNCTIONMESSAGEMIN
+    self.hovertextur    = CHoverTextUP{text = Tic.TEXTNEXT}
+    self.wheeldw        = Tic.FUNCTIONMESSAGENEXT
+    self.hovertexturmdk = CHoverTextUP{text = Tic.TEXTLAST}
+    self.wheeldwmdk     = Tic.FUNCTIONMESSAGEMAX
     self:argt(_argt) -- override if any
 end

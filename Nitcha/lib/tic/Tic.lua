@@ -2536,6 +2536,7 @@ function Tic:drawLog()
     -- Tic:logWorld()
     -- Tic:logInventories()
     -- Tic:logScreens()
+    Tic:logButtons()
 end
 
 function Tic:logWorld()
@@ -2603,6 +2604,13 @@ function Tic:logScreens()
     Tic:logAppend("Screens", Tic.SCREENS.actindex, Tic.SCREENS.maxindex, Tic.INVENTORYSHOW)
     for _key, _screen in ipairs(Tic.SCREENS.acttable or {}) do
         Tic:logAppend(_key, _screen.kind, _screen.name)
+    end
+    Tic:logAppend()
+end
+
+function Tic:logButtons()
+    for _key, _button in ipairs(Tic.BUTTONS or {}) do
+        Tic:logAppend(_key, _button.kind, _button.name, _button.hovered)
     end
     Tic:logAppend()
 end

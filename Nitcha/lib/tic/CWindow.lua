@@ -679,28 +679,13 @@ function CWindowMessagesWorld:new(_argt)
 	self.screenh     = Tic.WORLDMESSAGESWH
     self.drawborder  = true
 	self.align       = Tic.DIR270
-    self.clickable   = true
+    -- self.clickable   = true
     self.buttonprev  = CButtonMessagePrev{}
     self.buttontrash = CButtonMessageTrash{}
     self.buttonnext  = CButtonMessageNext{}
-    self.buttonhover = CButtonMessageHover{} -- button related to the wheel move if any
-    -- self.wheelup     = function()
-    --                         if Tic.MODIFIERKEYS[self.modifierkey] then
-    --                             Tic.FUNCTIONMESSAGEMIN()
-    --                         else
-    --                             Tic.FUNCTIONMESSAGEPREV()
-    --                         end
-    --                         self.buttonhover = self.buttonprev
-    --                     end
-    -- self.wheeldw     = function()
-    --                         if Tic.MODIFIERKEYS[self.modifierkey] then
-    --                             Tic.FUNCTIONMESSAGEMAX()
-    --                         else
-    --                             Tic.FUNCTIONMESSAGENEXT()
-    --                         end
-    --                         self.buttonhover = self.buttonnext
-    --                     end
-    self.textline    = CTextLine{text = "", small = true, marginlf = 2}
+    -- self.textline    = CTextLine{text = "", small = true, marginlf = 2}
+    self.textline    = CButtonText{text = CText{text = "", small = true, marginlf = 2}}
+    -- self.buttonhover = CButtonMessageHover{} -- button related to the wheel move if any
     self.textlf      = CText{
                 text = "",
                 stretch = false,
@@ -775,17 +760,21 @@ function CWindowMessagesWorld:new(_argt)
         _hideTextLFRG()
         if Tic:messageCount() == 0 then return end
 
-        if     _anyHovered{self} and Tic:messageCount() == 1 then
+        -- if     _anyHovered{self} then
+            Tic:logAppend("hover", self.hovered, Tables:valFind(Tic.BUTTONS, self))
+        if  self.hovered then
+        -- if     _anyHovered(self.elements) then
             _showTextLFRG()
-        elseif _anyHovered{self} and Tic:messageCount() >= 2 then
-            _hoveredElements{self, self.buttonprev, self.buttonnext}
-        elseif _anyHovered{self, self.buttonprev} then
-            _hoveredElements{self, self.buttonprev}
-        elseif _anyHovered{self, self.buttontrash} then
-            _hoveredElements{self, self.buttontrash}
-        elseif _anyHovered{self, self.buttonnext} then
-            _hoveredElements{self, self.buttonnext}
         end
+        -- elseif _anyHovered{self} and Tic:messageCount() >= 2 then
+        --     _hoveredElements{self, self.buttonprev, self.buttonnext}
+        -- elseif _anyHovered{self, self.buttonprev} then
+        --     _hoveredElements{self, self.buttonprev}
+        -- elseif _anyHovered{self, self.buttontrash} then
+        --     _hoveredElements{self, self.buttontrash}
+        -- elseif _anyHovered{self, self.buttonnext} then
+        --     _hoveredElements{self, self.buttonnext}
+        -- end
 
         if     _anyActived{self} and Tic:messageCount() == 1 then
             _showTextLFRG()
