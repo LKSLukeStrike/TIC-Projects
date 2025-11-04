@@ -1628,17 +1628,20 @@ end
 --
 -- CButtonMessageHover
 --
-CButtonMessageHover = CButtonClick:extend() -- generic message hover button
+CButtonMessageHover = CButtonSprite:extend() -- generic message hover button
+CButtonMessageHover.BEHAVIOUR = function(self)
+    IButtonMessage.BEHAVIOUR(self)
+end
 Classic.KINDBUTTONMESSAGEHOVER = "ButtonMessageHover"
 Classic.NAMEBUTTONMESSAGEHOVER = "ButtonMessageHover"
-function CButtonMessageTrash:new(_argt)
+function CButtonMessageHover:new(_argt)
     CButtonMessageHover.super.new(self, _argt)
     self.kind = Classic.KINDBUTTONMESSAGEHOVER
     self.name = Classic.NAMEBUTTONMESSAGEHOVER
     self.drawborder     = false
     self.drawground     = false
-	self.sprite.sprite  = CSpriteBG.SIGNDELETE
-	self.behaviour      = IButtonMessage.BEHAVIOUR  -- function to trigger at first
+	self.sprite.sprite  = CSpriteBG.SIGNBORDSQ
+	self.behaviour      = CButtonMessageHover.BEHAVIOUR  -- function to trigger at first
     self.hovertextup    = CHoverTextUP{text = Tic.TEXTDELONE}
     self.clicklf        = Tic.FUNCTIONMESSAGEDELONE
     self.hovertextupmdk = CHoverTextUP{text = Tic.TEXTDELALL}

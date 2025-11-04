@@ -683,23 +683,23 @@ function CWindowMessagesWorld:new(_argt)
     self.buttonprev  = CButtonMessagePrev{}
     self.buttontrash = CButtonMessageTrash{}
     self.buttonnext  = CButtonMessageNext{}
-    self.wheelbutton = nil -- button related to the wheel move if any
-    self.wheelup     = function()
-                            if Tic.MODIFIERKEYS[self.modifierkey] then
-                                Tic.FUNCTIONMESSAGEMIN()
-                            else
-                                Tic.FUNCTIONMESSAGEPREV()
-                            end
-                            self.wheelbutton = self.buttonprev
-                        end
-    self.wheeldw     = function()
-                            if Tic.MODIFIERKEYS[self.modifierkey] then
-                                Tic.FUNCTIONMESSAGEMAX()
-                            else
-                                Tic.FUNCTIONMESSAGENEXT()
-                            end
-                            self.wheelbutton = self.buttonnext
-                        end
+    self.buttonhover = CButtonMessageHover{} -- button related to the wheel move if any
+    -- self.wheelup     = function()
+    --                         if Tic.MODIFIERKEYS[self.modifierkey] then
+    --                             Tic.FUNCTIONMESSAGEMIN()
+    --                         else
+    --                             Tic.FUNCTIONMESSAGEPREV()
+    --                         end
+    --                         self.buttonhover = self.buttonprev
+    --                     end
+    -- self.wheeldw     = function()
+    --                         if Tic.MODIFIERKEYS[self.modifierkey] then
+    --                             Tic.FUNCTIONMESSAGEMAX()
+    --                         else
+    --                             Tic.FUNCTIONMESSAGENEXT()
+    --                         end
+    --                         self.buttonhover = self.buttonnext
+    --                     end
     self.textline    = CTextLine{text = "", small = true, marginlf = 2}
     self.textlf      = CText{
                 text = "",
@@ -733,7 +733,15 @@ function CWindowMessagesWorld:new(_argt)
                     self.text = Tic.MESSAGES.actindex
                 end,
             }
-    self.elements    = {self.textline, self.textlf, self.textrg, self.buttonnext, self.buttontrash, self.buttonprev}
+    self.elements    = {
+                        self.textlf,
+                        self.buttonprev,
+                        self.buttontrash,
+                        self.buttonnext,
+                        self.textrg,
+                        self.textline,
+                        self.buttonhover,
+                       }
     self.behaviour   = function(self)
         local function _showTextLFRG()
             Tables:eachDo({self.textlf, self.textrg}, function(_, _element) _element.display = true end)
@@ -753,8 +761,8 @@ function CWindowMessagesWorld:new(_argt)
             return Tables:ifAny(_elements, function(_, _element) return _element.actived end)
         end
         local function _activedElements(_elements)
-            -- self.buttonprev.hovered = true
-            -- self.buttonnext.hovered = true
+            self.buttonprev.hovered = true
+            self.buttonnext.hovered = true
             Tables:eachDo(_elements, function(_, _element) _element.actived = true end)
             _showTextLFRG()
             self.colorborder = Tic.COLORHOVERTEXTUP
@@ -782,7 +790,7 @@ function CWindowMessagesWorld:new(_argt)
         if     _anyActived{self} and Tic:messageCount() == 1 then
             _showTextLFRG()
         elseif _anyActived{self} and Tic:messageCount() >= 2 then
-            _activedElements{self, self.wheelbutton}
+            _activedElements{self, self.buttonhover}
         elseif _anyActived{self, self.buttonprev} then
             _activedElements{self, self.buttonprev}
         elseif _anyActived{self, self.buttontrash} then
