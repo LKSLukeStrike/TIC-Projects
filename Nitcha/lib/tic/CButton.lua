@@ -1641,6 +1641,7 @@ function CButtonMessageHover:new(_argt)
     CButtonMessageHover.super.new(self, _argt)
     self.kind = Classic.KINDBUTTONMESSAGEHOVER
     self.name = Classic.NAMEBUTTONMESSAGEHOVER
+    --
     self.drawborder     = false
     self.drawground     = false
 	self.sprite.sprite  = CSpriteBG.SIGNBORDSQ
@@ -1653,5 +1654,39 @@ function CButtonMessageHover:new(_argt)
     self.wheeldw        = Tic.FUNCTIONMESSAGENEXT
     self.hovertexturmdk = CHoverTextUP{text = Tic.TEXTLAST}
     self.wheeldwmdk     = Tic.FUNCTIONMESSAGEMAX
+    --
     self:argt(_argt) -- override if any
+end
+
+
+--
+-- CButtonMessageText
+--
+CButtonMessageText = CButtonText:extend() -- generic message text button
+CButtonMessageText.BEHAVIOUR = function(self)
+    IButton.BEHAVIOUR(self)
+    if not self.display then return end
+    local _messageactual = Tic:messageActual()
+    local _text = (_messageactual) and _messageactual or ""
+    self.text:setText(_text)
+    self.colorborder = Tic.COLORENABLED
+    self.colorborder = (self.hovered) and Tic.COLORHOVERED or self.colorborder
+    self.colorborder = (self.actived) and Tic.COLORACTIVED or self.colorborder
+end
+Classic.KINDBUTTONMESSAGETEXT = "ButtonMessageText"
+Classic.NAMEBUTTONMESSAGETEXT = "ButtonMessageText"
+function CButtonMessageText:new(_argt)
+    CButtonMessageText.super.new(self, _argt)
+    self.kind = Classic.KINDBUTTONMESSAGETEXT
+    self.name = Classic.NAMEBUTTONMESSAGETEXT
+    --
+    self.behaviour   = CButtonMessageText.BEHAVIOUR
+	self.text        = CText{text = "", small = true, marginlf = 2}
+    self.align       = Tic.DIR270
+    self.rounded     = false
+    self.drawground  = false
+    self.colorinside = Tic.COLORGREYL
+    --
+    self:argt(_argt) -- override if any
+    self:adjustWH()
 end

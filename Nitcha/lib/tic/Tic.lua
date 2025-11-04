@@ -289,6 +289,11 @@ Tic.COLORHOVERTEXTDW = Tic.COLORBLUEL
 Tic.COLORHOVERTEXTLF = Tic.COLORBLUEM
 Tic.COLORHOVERTEXTRG = Tic.COLORBLUEM
 
+-- Palette colors for hovered/actived
+Tic.COLORENABLED     = Tic.COLORGREYM
+Tic.COLORHOVERED     = Tic.COLORGREYD
+Tic.COLORACTIVED     = Tic.COLORBLUEL
+
 -- Flips
 Tic.FLIPNONE = 0 -- none
 Tic.FLIPHORI = 1 -- horizontal
@@ -2536,7 +2541,7 @@ function Tic:drawLog()
     -- Tic:logWorld()
     -- Tic:logInventories()
     -- Tic:logScreens()
-    Tic:logButtons()
+    -- Tic:logButtons()
 end
 
 function Tic:logWorld()
