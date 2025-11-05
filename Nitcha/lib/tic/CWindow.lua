@@ -730,7 +730,7 @@ function CWindowMessagesWorld:new(_argt)
             Tables:eachDo({self.textlf, self.textrg}, function(_, _element) _element.display = true end)
         end
         local function _hideTextLFRG()
-            Tables:eachDo({self.textlf, self.textrg}, function(_, _element) _element.display = false end)
+            Tables:eachDo({self.textlf, self.textrg, self.buttonhover}, function(_, _element) _element.display = false end)
         end
         local function _anyHovered(_elements)
             return Tables:ifAny(_elements, function(_, _element) return _element.hovered end)
@@ -751,15 +751,13 @@ function CWindowMessagesWorld:new(_argt)
             self.colorborder = Tic.COLORHOVERTEXTUP
         end
 
+        _hideTextLFRG()
         if Tic:messageCount() == 0 then return end
+        if not _anyHovered(self.elements) then return end
 
-        self.buttonhover.display = false
-        if not _anyHovered(self.elements) then
-            _hideTextLFRG()
-            return
-        end
         _showTextLFRG()
-        self.buttontext.hovered = true
+        if self.buttontext.hovered then self.buttonhover.display = true end
+        -- self.buttontext.hovered = true
 
         if     _anyActived{self} and Tic:messageCount() == 1 then
             _showTextLFRG()

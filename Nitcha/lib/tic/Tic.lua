@@ -2541,7 +2541,7 @@ function Tic:drawLog()
     -- Tic:logWorld()
     -- Tic:logInventories()
     -- Tic:logScreens()
-    -- Tic:logButtons()
+    Tic:logButtons()
 end
 
 function Tic:logWorld()
