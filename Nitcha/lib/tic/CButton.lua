@@ -1646,16 +1646,12 @@ function CButtonMessageHover:new(_argt)
     --
     self.drawborder     = false
     self.drawground     = false
-	self.sprite.sprite  = CSpriteBG.SIGNBORDSQ
+	self.sprite.sprite  = CSpriteBG.SIGNWHEELY
 	self.behaviour      = CButtonMessageHover.BEHAVIOUR  -- function to trigger at first
     self.hovertextul    = CHoverTextUP{text = Tic.TEXTPREV}
-    self.wheelup        = Tic.FUNCTIONMESSAGEPREV
     self.hovertextulmdk = CHoverTextUP{text = Tic.TEXTFIRST}
-    self.wheelupmdk     = Tic.FUNCTIONMESSAGEMIN
     self.hovertextur    = CHoverTextUP{text = Tic.TEXTNEXT}
-    self.wheeldw        = Tic.FUNCTIONMESSAGENEXT
     self.hovertexturmdk = CHoverTextUP{text = Tic.TEXTLAST}
-    self.wheeldwmdk     = Tic.FUNCTIONMESSAGEMAX
     --
     self:argt(_argt) -- override if any
 end
@@ -1682,12 +1678,16 @@ function CButtonMessageText:new(_argt)
     self.kind = Classic.KINDBUTTONMESSAGETEXT
     self.name = Classic.NAMEBUTTONMESSAGETEXT
     --
-    self.behaviour   = CButtonMessageText.BEHAVIOUR
-	self.text        = CText{text = "", small = true, marginlf = 2}
-    self.align       = Tic.DIR270
-    self.rounded     = false
-    self.drawground  = false
-    self.colorinside = Tic.COLORGREYL
+    self.behaviour      = CButtonMessageText.BEHAVIOUR
+	self.text           = CText{text = "", small = true, marginlf = 2}
+    self.align          = Tic.DIR270
+    self.rounded        = false
+    self.drawground     = false
+    self.colorinside    = Tic.COLORGREYL
+    self.wheelup        = Tic.FUNCTIONMESSAGEPREV
+    self.wheelupmdk     = Tic.FUNCTIONMESSAGEMIN
+    self.wheeldw        = Tic.FUNCTIONMESSAGENEXT
+    self.wheeldwmdk     = Tic.FUNCTIONMESSAGEMAX
     --
     self:argt(_argt) -- override if any
     self:adjustWH()

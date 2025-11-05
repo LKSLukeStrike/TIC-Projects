@@ -738,18 +738,6 @@ function CWindowMessagesWorld:new(_argt)
         local function _anyActived(_elements)
             return Tables:ifAny(_elements, function(_, _element) return _element.actived end)
         end
-        local function _hoveredElements(_elements)
-            Tables:eachDo(_elements, function(_, _element) _element.hovered = true end)
-            _showTextLFRG()
-            self.colorborder = Tic.COLORGREYD
-        end
-        local function _activedElements(_elements)
-            self.buttonprev.hovered = true
-            self.buttonnext.hovered = true
-            Tables:eachDo(_elements, function(_, _element) _element.actived = true end)
-            _showTextLFRG()
-            self.colorborder = Tic.COLORHOVERTEXTUP
-        end
 
         _hideTextLFRG()
         if Tic:messageCount() == 0 then return end
@@ -760,14 +748,6 @@ function CWindowMessagesWorld:new(_argt)
 
         if _anyActived(self.elements) then
             self.buttontext.actived = true
-        -- elseif _anyActived{self} and Tic:messageCount() >= 2 then
-        --     _activedElements{self, self.buttonhover}
-        -- elseif _anyActived{self, self.buttonprev} then
-        --     _activedElements{self, self.buttonprev}
-        -- elseif _anyActived{self, self.buttontrash} then
-        --     _activedElements{self, self.buttontrash}
-        -- elseif _anyActived{self, self.buttonnext} then
-        --     _activedElements{self, self.buttonnext}
         end
     end
     self:argt(_argt) -- override if any
