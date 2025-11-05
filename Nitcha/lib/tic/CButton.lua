@@ -1631,9 +1631,11 @@ end
 CButtonMessageHover = CButtonSprite:extend() -- generic message hover button
 CButtonMessageHover.BEHAVIOUR = function(self)
     IButtonMessage.BEHAVIOUR(self)
+    self.hovered = false
     if not self.display then return end
     self.screenx = Tic.MOUSE.screenx
     self.screeny = Tic.MOUSE.screeny
+    self.hovered = true
 end
 Classic.KINDBUTTONMESSAGEHOVER = "ButtonMessageHover"
 Classic.NAMEBUTTONMESSAGEHOVER = "ButtonMessageHover"

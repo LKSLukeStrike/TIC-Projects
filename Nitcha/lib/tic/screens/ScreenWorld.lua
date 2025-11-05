@@ -233,6 +233,6 @@ ScreenWorldRG:appendElements{
 ScreenWorld:appendElements{
     CWindowScreen{name = "ScreenWorld"},
     ScreenWorldMD,
-    ScreenWorldLF,
+    -- ScreenWorldLF,
     ScreenWorldRG,
 }

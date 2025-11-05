@@ -697,7 +697,7 @@ function CWindowMessagesWorld:new(_argt)
                 drawground  = true,
                 colorground = self.colorground,
                 behaviour = function(self)
-                    self.text = Tic.MESSAGES.maxindex
+                    self.text = Tic.MESSAGES.actindex
                 end,
             }
     self.textrg      = CText{
@@ -713,7 +713,7 @@ function CWindowMessagesWorld:new(_argt)
                 drawground  = true,
                 colorground = self.colorground,
                 behaviour = function(self)
-                    self.text = Tic.MESSAGES.actindex
+                    self.text = Tic.MESSAGES.maxindex
                 end,
             }
     self.elements    = {
@@ -735,13 +735,13 @@ function CWindowMessagesWorld:new(_argt)
         local function _anyHovered(_elements)
             return Tables:ifAny(_elements, function(_, _element) return _element.hovered end)
         end
+        local function _anyActived(_elements)
+            return Tables:ifAny(_elements, function(_, _element) return _element.actived end)
+        end
         local function _hoveredElements(_elements)
             Tables:eachDo(_elements, function(_, _element) _element.hovered = true end)
             _showTextLFRG()
             self.colorborder = Tic.COLORGREYD
-        end
-        local function _anyActived(_elements)
-            return Tables:ifAny(_elements, function(_, _element) return _element.actived end)
         end
         local function _activedElements(_elements)
             self.buttonprev.hovered = true
@@ -753,22 +753,21 @@ function CWindowMessagesWorld:new(_argt)
 
         _hideTextLFRG()
         if Tic:messageCount() == 0 then return end
-        if not _anyHovered(self.elements) then return end
+        if not _anyHovered(self.elements) and not _anyActived(self.elements) then return end
 
         _showTextLFRG()
         if self.buttontext.hovered then self.buttonhover.display = true end
-        -- self.buttontext.hovered = true
 
-        if     _anyActived{self} and Tic:messageCount() == 1 then
-            _showTextLFRG()
-        elseif _anyActived{self} and Tic:messageCount() >= 2 then
-            _activedElements{self, self.buttonhover}
-        elseif _anyActived{self, self.buttonprev} then
-            _activedElements{self, self.buttonprev}
-        elseif _anyActived{self, self.buttontrash} then
-            _activedElements{self, self.buttontrash}
-        elseif _anyActived{self, self.buttonnext} then
-            _activedElements{self, self.buttonnext}
+        if _anyActived(self.elements) then
+            self.buttontext.actived = true
+        -- elseif _anyActived{self} and Tic:messageCount() >= 2 then
+        --     _activedElements{self, self.buttonhover}
+        -- elseif _anyActived{self, self.buttonprev} then
+        --     _activedElements{self, self.buttonprev}
+        -- elseif _anyActived{self, self.buttontrash} then
+        --     _activedElements{self, self.buttontrash}
+        -- elseif _anyActived{self, self.buttonnext} then
+        --     _activedElements{self, self.buttonnext}
         end
     end
     self:argt(_argt) -- override if any

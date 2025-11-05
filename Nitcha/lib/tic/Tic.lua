@@ -2541,7 +2541,7 @@ function Tic:drawLog()
     -- Tic:logWorld()
     -- Tic:logInventories()
     -- Tic:logScreens()
-    Tic:logButtons()
+    -- Tic:logButtons()
 end
 
 function Tic:logWorld()
@@ -2593,7 +2593,6 @@ function Tic:logInventory(_inventory, _indent)
     Tic:logAppend(_indent.._inventory.name, _inventory.kind, Tables:size(_inventory.objects).."/".._inventory.objectsmax)
     for _, _object in ipairs(_inventory.objects) do
         Tic:logAppend(_indent.." ", _object.kind, _object.name)
-        -- if _object.inventory then Tic:logInventory(_object.inventory, _indent.."  ") end
     end
 end
 
@@ -2615,7 +2614,7 @@ end
 
 function Tic:logButtons()
     for _key, _button in ipairs(Tic.BUTTONS or {}) do
-        Tic:logAppend(_key, _button.kind, _button.name, _button.hovered)
+        Tic:logAppend(_key, _button.kind, _button.name, _button.hovered, _button.actived)
     end
     Tic:logAppend()
 end
