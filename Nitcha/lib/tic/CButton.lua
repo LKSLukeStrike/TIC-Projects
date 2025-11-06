@@ -1522,28 +1522,17 @@ end
 
 
 --
--- IButtonMessage
---
-IButtonMessage = Classic:extend() -- messages buttons implementation
-IButtonMessage.BEHAVIOUR = function(self) -- need at least one message
-    IButton.BEHAVIOUR(self)
-    if not self.display then return end -- no message
-    self.enabled = (Tic:messageCount() > 0)
-end
-
-
---
 -- IButtonMessageChange
 --
 IButtonMessageChange1 = Classic:extend() -- message change buttons implementation
 IButtonMessageChange1.BEHAVIOUR = function(self) -- need at least more than one message
-    IButtonMessage.BEHAVIOUR(self)
+    IButton.BEHAVIOUR(self)
     if not self.display then return end -- no message
     self.enabled = (Tic:messageCount() > 0)
 end
 IButtonMessageChange2 = Classic:extend() -- message change buttons implementation
 IButtonMessageChange2.BEHAVIOUR = function(self) -- need at least more than one message
-    IButtonMessage.BEHAVIOUR(self)
+    IButton.BEHAVIOUR(self)
     if not self.display then return end -- no message
     self.enabled = (Tic:messageCount() > 1)
 end
@@ -1643,11 +1632,58 @@ end
 
 
 --
+-- CButtonMessageText
+--
+CButtonMessageText = CButtonText:extend() -- generic message text button
+CButtonMessageText.BEHAVIOUR = function(self)
+    IButtonMessageChange2.BEHAVIOUR(self)
+    if not self.display then return end
+    if self.enabled then
+        self.wheelup        = Tic.FUNCTIONMESSAGEPREV
+        self.wheelupmdk     = Tic.FUNCTIONMESSAGEMIN
+        self.wheeldw        = Tic.FUNCTIONMESSAGENEXT
+        self.wheeldwmdk     = Tic.FUNCTIONMESSAGEMAX
+    else
+        self.wheelup        = nil
+        self.wheelupmdk     = nil
+        self.wheeldw        = nil
+        self.wheeldwmdk     = nil
+    end
+    local _messageactual = (Tic:messageActual()) and Tic:messageActual() or ""
+    self.text:setText(_messageactual)
+    self.colorborder = Tic.COLORENABLED
+    self.colorborder = (self.hovered) and Tic.COLORHOVERED or self.colorborder
+    self.colorborder = (self.actived) and Tic.COLORACTIVED or self.colorborder
+end
+Classic.KINDBUTTONMESSAGETEXT = "ButtonMessageText"
+Classic.NAMEBUTTONMESSAGETEXT = "ButtonMessageText"
+function CButtonMessageText:new(_argt)
+    CButtonMessageText.super.new(self, _argt)
+    self.kind = Classic.KINDBUTTONMESSAGETEXT
+    self.name = Classic.NAMEBUTTONMESSAGETEXT
+    --
+    self.behaviour      = CButtonMessageText.BEHAVIOUR
+	self.text           = CText{text = "", small = true, marginlf = 2}
+    self.align          = Tic.DIR270
+    self.rounded        = false
+    self.drawground     = false
+    self.colorinside    = Tic.COLORGREYL
+    -- self.wheelup        = Tic.FUNCTIONMESSAGEPREV
+    -- self.wheelupmdk     = Tic.FUNCTIONMESSAGEMIN
+    -- self.wheeldw        = Tic.FUNCTIONMESSAGENEXT
+    -- self.wheeldwmdk     = Tic.FUNCTIONMESSAGEMAX
+    --
+    self:argt(_argt) -- override if any
+    self:adjustWH()
+end
+
+
+--
 -- CButtonMessageHover
 --
 CButtonMessageHover = CButtonSprite:extend() -- generic message hover button
 CButtonMessageHover.BEHAVIOUR = function(self)
-    IButtonMessage.BEHAVIOUR(self)
+    IButtonMessageChange1.BEHAVIOUR(self)
     self.hovered = false
     if not self.display then return end
     self.screenx = Tic.MOUSE.screenx
@@ -1671,41 +1707,4 @@ function CButtonMessageHover:new(_argt)
     self.hovertexturmdk = CHoverTextUP{text = Tic.TEXTLAST}
     --
     self:argt(_argt) -- override if any
-end
-
-
---
--- CButtonMessageText
---
-CButtonMessageText = CButtonText:extend() -- generic message text button
-CButtonMessageText.BEHAVIOUR = function(self)
-    IButtonMessageChange1.BEHAVIOUR(self)
-    if not self.display then return end
-    local _messageactual = Tic:messageActual()
-    local _text = (_messageactual) and _messageactual or ""
-    self.text:setText(_text)
-    self.colorborder = Tic.COLORENABLED
-    self.colorborder = (self.hovered) and Tic.COLORHOVERED or self.colorborder
-    self.colorborder = (self.actived) and Tic.COLORACTIVED or self.colorborder
-end
-Classic.KINDBUTTONMESSAGETEXT = "ButtonMessageText"
-Classic.NAMEBUTTONMESSAGETEXT = "ButtonMessageText"
-function CButtonMessageText:new(_argt)
-    CButtonMessageText.super.new(self, _argt)
-    self.kind = Classic.KINDBUTTONMESSAGETEXT
-    self.name = Classic.NAMEBUTTONMESSAGETEXT
-    --
-    self.behaviour      = CButtonMessageText.BEHAVIOUR
-	self.text           = CText{text = "", small = true, marginlf = 2}
-    self.align          = Tic.DIR270
-    self.rounded        = false
-    self.drawground     = false
-    self.colorinside    = Tic.COLORGREYL
-    self.wheelup        = Tic.FUNCTIONMESSAGEPREV
-    self.wheelupmdk     = Tic.FUNCTIONMESSAGEMIN
-    self.wheeldw        = Tic.FUNCTIONMESSAGENEXT
-    self.wheeldwmdk     = Tic.FUNCTIONMESSAGEMAX
-    --
-    self:argt(_argt) -- override if any
-    self:adjustWH()
 end

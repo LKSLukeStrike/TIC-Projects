@@ -744,7 +744,7 @@ function CWindowMessagesWorld:new(_argt)
         if not _anyHovered(self.elements) and not _anyActived(self.elements) then return end
 
         _showTextLFRG()
-        if self.buttontext.hovered then self.buttonhover.display = true end
+        if self.buttontext.hovered and Tic:messageCount() > 1 then self.buttonhover.display = true end
 
         if _anyActived(self.elements) then
             self.buttontext.actived = true
