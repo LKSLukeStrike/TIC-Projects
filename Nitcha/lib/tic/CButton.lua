@@ -1535,8 +1535,14 @@ end
 --
 -- IButtonMessageChange
 --
-IButtonMessageChange = Classic:extend() -- message change buttons implementation
-IButtonMessageChange.BEHAVIOUR = function(self) -- need at least more than one message
+IButtonMessageChange1 = Classic:extend() -- message change buttons implementation
+IButtonMessageChange1.BEHAVIOUR = function(self) -- need at least more than one message
+    IButtonMessage.BEHAVIOUR(self)
+    if not self.display then return end -- no message
+    self.enabled = (Tic:messageCount() > 0)
+end
+IButtonMessageChange2 = Classic:extend() -- message change buttons implementation
+IButtonMessageChange2.BEHAVIOUR = function(self) -- need at least more than one message
     IButtonMessage.BEHAVIOUR(self)
     if not self.display then return end -- no message
     self.enabled = (Tic:messageCount() > 1)
@@ -1548,7 +1554,7 @@ end
 --
 CButtonMessagePrev = CButtonArrow000:extend() -- generic message prev button
 CButtonMessagePrev.BEHAVIOUR = function(self)
-    IButtonMessageChange.BEHAVIOUR(self)
+    IButtonMessageChange2.BEHAVIOUR(self)
     if not self.display then return end
     if self.enabled then
         self.hovertextup    = CHoverTextUP{text = Tic.TEXTPREV}
@@ -1578,7 +1584,7 @@ end
 --
 CButtonMessageNext = CButtonArrow180:extend() -- generic message next button
 CButtonMessageNext.BEHAVIOUR = function(self)
-    IButtonMessageChange.BEHAVIOUR(self)
+    IButtonMessageChange2.BEHAVIOUR(self)
     if not self.display then return end
     if self.enabled then
         self.hovertextup    = CHoverTextUP{text = Tic.TEXTNEXT}
@@ -1607,6 +1613,21 @@ end
 -- CButtonMessageTrash
 --
 CButtonMessageTrash = CButtonClick:extend() -- generic message trash button
+CButtonMessageTrash.BEHAVIOUR = function(self)
+    IButtonMessageChange1.BEHAVIOUR(self)
+    if not self.display then return end
+    if self.enabled then
+        self.hovertextup    = CHoverTextUP{text = Tic.TEXTDELONE}
+        self.clicklf        = Tic.FUNCTIONMESSAGEDELONE
+        self.hovertextupmdk = CHoverTextUP{text = Tic.TEXTDELALL}
+        self.clicklfmdk     = Tic.FUNCTIONMESSAGEDELALL
+    else
+        self.hovertextup    = nil
+        self.clicklf        = nil
+        self.hovertextupmdk = nil
+        self.clicklfmdk     = nil
+    end
+end
 Classic.KINDBUTTONMESSAGETRASH = "ButtonMessageTrash"
 Classic.NAMEBUTTONMESSAGETRASH = "ButtonMessageTrash"
 function CButtonMessageTrash:new(_argt)
@@ -1616,11 +1637,7 @@ function CButtonMessageTrash:new(_argt)
     self.drawborder     = false
     self.drawground     = false
 	self.sprite.sprite  = CSpriteBG.SIGNDELETE
-	self.behaviour      = IButtonMessage.BEHAVIOUR  -- function to trigger at first
-    self.hovertextup    = CHoverTextUP{text = Tic.TEXTDELONE}
-    self.clicklf        = Tic.FUNCTIONMESSAGEDELONE
-    self.hovertextupmdk = CHoverTextUP{text = Tic.TEXTDELALL}
-    self.clicklfmdk     = Tic.FUNCTIONMESSAGEDELALL
+	self.behaviour      = CButtonMessageTrash.BEHAVIOUR  -- function to trigger at first
     self:argt(_argt) -- override if any
 end
 
@@ -1662,7 +1679,7 @@ end
 --
 CButtonMessageText = CButtonText:extend() -- generic message text button
 CButtonMessageText.BEHAVIOUR = function(self)
-    IButton.BEHAVIOUR(self)
+    IButtonMessageChange1.BEHAVIOUR(self)
     if not self.display then return end
     local _messageactual = Tic:messageActual()
     local _text = (_messageactual) and _messageactual or ""
