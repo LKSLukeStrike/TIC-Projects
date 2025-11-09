@@ -33,9 +33,9 @@ function CButton:new(_argt)
     self.colorborder         = Tic.COLORGREYM
     self.colorgroundhovered  = Tic.COLORHUDSCREEN
     self.colorborderhovered  = self.colorborder
-    self.colorgroundactived  = Tic.COLORHOVERTEXTUP
+    self.colorgroundactived  = Tic.COLORHOVERMOUSE
     self.colorborderactived  = self.colorborder
-    self.colorgroundchecked  = Tic.COLORHOVERTEXTUP
+    self.colorgroundchecked  = Tic.COLORHOVERMOUSE
     self.colorborderchecked  = self.colorborder
     self.colorgrounddisabled = Tic.COLORGREYL
     self.colorborderdisabled = Tic.COLORGREYM
@@ -57,6 +57,8 @@ function CButton:draw() -- button drawing --TODO hover with wheel ?
         if self.hovertextdw then self:drawHovertextDW() end
         if self.hovertextul then self:drawHovertextUL() end
         if self.hovertextur then self:drawHovertextUR() end
+        if self.hovertextdl then self:drawHovertextDL() end
+        if self.hovertextdr then self:drawHovertextDR() end
     end
 end
 
@@ -82,7 +84,7 @@ function CButton:drawHovertextUP()
         and self.hovertextupmdk
         or  self.hovertextup
     _hovertext:adjustWH()
-    local _mousesprite  = CSprite:spriteMouseClickLF()
+    local _mousesprite  = (self.hovertextupmdk and self.hovertextupmdk.mousesprite) or self.hovertextup.mousesprite
     local _modkeysprite = (self.hovertextupmdk)
         and CSprite:spriteModifierKey()
         or  nil
@@ -618,7 +620,7 @@ function CButtonPlayerStat:new(_argt)
     self.sprite.palette = {[Tic.COLORGREYM] = Tic.COLORWHITE, [Tic.COLORGREYD] = Tic.COLORKEY}
     self.behaviour      = IButtonPlayer.BEHAVIOUR
     self.getcolorstat   = nil -- getcolorstat function if any
-    self.clicklf        = function() end
+    self.hovertextlf    = CHoverTextLF{text = ""}
     self.hovertextrg    = CHoverTextRG{text = ""}
     self:argt(_argt) -- override if any
 end
@@ -642,7 +644,7 @@ function CButtonPlayerStatPhy:new(_argt)
                             IButtonPlayer.BEHAVIOUR(self)
                             if not self.display then return end
                             local _playeractual = Tic:playerActual()
-                            self.hovertextrg.text = Tic.TEXTPHY..":"
+                            self.hovertextlf.text = Tic.TEXTPHY..":"
                             .._playeractual:statphyactGet().."/".._playeractual:statphymaxGet()
                          end
     self:argt(_argt) -- override if any

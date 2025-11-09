@@ -114,58 +114,47 @@ function CHoverText:new(_argt)
     self.marginlf    = 1
     self.drawground  = true
     self.colorground = Tic.COLORHOVERGROUND
+    self.mousesprite = nil
     --
     self:argt(_argt) -- override if any
 end
 
-CHoverTextUP = CHoverText:extend() -- generic hovertextup
-Classic.KINDHOVERTEXTUP = "HoverTextUP"
-Classic.NAMEHOVERTEXTUP = "HoverTextUP"
+CHoverTextMouse = CHoverText:extend() -- generic hovertextmouse
+function CHoverTextMouse:new(_argt)
+    CHoverTextMouse.super.new(self, _argt)
+    --
+    self.colorinside = Tic.COLORHOVERMOUSE
+    --
+    self:argt(_argt) -- override if any
+end
+
+CHoverTextInfos = CHoverText:extend() -- generic hovertextinfos
+function CHoverTextInfos:new(_argt)
+    CHoverTextInfos.super.new(self, _argt)
+    --
+    self.colorinside = Tic.COLORHOVERINFOS
+    --
+    self:argt(_argt) -- override if any
+end
+
+CHoverTextUP = CHoverTextMouse:extend() -- generic hovertextup
 function CHoverTextUP:new(_argt)
     CHoverTextUP.super.new(self, _argt)
-    self.kind = Classic.KINDHOVERTEXTUP
-    self.name = Classic.NAMEHOVERTEXTUP
     --
-    self.colorinside = Tic.COLORHOVERTEXTUP
+    self.mousesprite = CSprite:spriteMouseClickLF()
     --
     self:argt(_argt) -- override if any
 end
 
-CHoverTextDW = CHoverText:extend() -- generic hovertextdw
-Classic.KINDHOVERTEXTDW = "HoverTextDW"
-Classic.NAMEHOVERTEXTDW = "HoverTextDW"
+CHoverTextDW = CHoverTextMouse:extend() -- generic hovertextdw
 function CHoverTextDW:new(_argt)
     CHoverTextDW.super.new(self, _argt)
-    self.kind = Classic.KINDHOVERTEXTDW
-    self.name = Classic.NAMEHOVERTEXTDW
     --
-    self.colorinside = Tic.COLORHOVERTEXTDW
+    self.mousesprite = CSprite:spriteMouseClickRG()
     --
     self:argt(_argt) -- override if any
 end
 
-CHoverTextLF = CHoverText:extend() -- generic hovertextlf
-Classic.KINDHOVERTEXTLF = "HoverTextLF"
-Classic.NAMEHOVERTEXTLF = "HoverTextLF"
-function CHoverTextLF:new(_argt)
-    CHoverTextLF.super.new(self, _argt)
-    self.kind = Classic.KINDHOVERTEXTLF
-    self.name = Classic.NAMEHOVERTEXTLF
-    --
-    self.colorinside = Tic.COLORHOVERTEXTLF
-    --
-    self:argt(_argt) -- override if any
-end
+CHoverTextLF = CHoverTextInfos:extend() -- generic hovertextlf
 
-CHoverTextRG = CHoverText:extend() -- generic hovertextrg
-Classic.KINDHOVERTEXTRG = "HoverTextRG"
-Classic.NAMEHOVERTEXTRG = "HoverTextRG"
-function CHoverTextRG:new(_argt)
-    CHoverTextRG.super.new(self, _argt)
-    self.kind = Classic.KINDHOVERTEXTRG
-    self.name = Classic.NAMEHOVERTEXTRG
-    --
-    self.colorinside = Tic.COLORHOVERTEXTRG
-    --
-    self:argt(_argt) -- override if any
-end
+CHoverTextRG = CHoverTextInfos:extend() -- generic hovertextrg
