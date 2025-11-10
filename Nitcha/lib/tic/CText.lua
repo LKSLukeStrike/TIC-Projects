@@ -137,24 +137,54 @@ function CHoverTextInfos:new(_argt)
     self:argt(_argt) -- override if any
 end
 
-CHoverTextUP = CHoverTextMouse:extend() -- generic hovertextup
-function CHoverTextUP:new(_argt)
-    CHoverTextUP.super.new(self, _argt)
+CHoverTextClickLF = CHoverTextMouse:extend() -- generic hovertextclicklf
+function CHoverTextClickLF:new(_argt)
+    CHoverTextClickLF.super.new(self, _argt)
     --
     self.mousesprite = CSprite:spriteMouseClickLF()
     --
     self:argt(_argt) -- override if any
 end
 
-CHoverTextDW = CHoverTextMouse:extend() -- generic hovertextdw
-function CHoverTextDW:new(_argt)
-    CHoverTextDW.super.new(self, _argt)
+CHoverTextClickRG = CHoverTextMouse:extend() -- generic hovertextclickrg
+function CHoverTextClickRG:new(_argt)
+    CHoverTextClickRG.super.new(self, _argt)
     --
     self.mousesprite = CSprite:spriteMouseClickRG()
     --
     self:argt(_argt) -- override if any
 end
 
-CHoverTextLF = CHoverTextInfos:extend() -- generic hovertextlf
+CHoverTextWheelUP = CHoverTextMouse:extend() -- generic hovertextclicklf
+function CHoverTextWheelUP:new(_argt)
+    CHoverTextWheelUP.super.new(self, _argt)
+    --
+    self.mousesprite = CSprite:spriteMouseWheelUP()
+    --
+    self:argt(_argt) -- override if any
+end
 
-CHoverTextRG = CHoverTextInfos:extend() -- generic hovertextrg
+CHoverTextWheelDW = CHoverTextMouse:extend() -- generic hovertextclickrg
+function CHoverTextWheelDW:new(_argt)
+    CHoverTextWheelDW.super.new(self, _argt)
+    --
+    self.mousesprite = CSprite:spriteMouseWheelDW()
+    --
+    self:argt(_argt) -- override if any
+end
+
+CHoverTextInfosUP = CHoverTextInfos:extend() -- generic hovertextup
+
+CHoverTextInfosDW = CHoverTextInfos:extend() -- generic hovertextdw
+
+CHoverTextInfosLF = CHoverTextInfos:extend() -- generic hovertextlf
+
+CHoverTextInfosRG = CHoverTextInfos:extend() -- generic hovertextrg
+
+CHoverTextInfosUL = CHoverTextInfos:extend() -- generic hovertextul
+
+CHoverTextInfosUR = CHoverTextInfos:extend() -- generic hovertextur
+
+CHoverTextInfosDL = CHoverTextInfos:extend() -- generic hovertextdl
+
+CHoverTextInfosDR = CHoverTextInfos:extend() -- generic hovertextdr

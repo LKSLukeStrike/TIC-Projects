@@ -51,13 +51,13 @@ end
 function CButton:draw() -- button drawing --TODO hover with wheel ?
     CButton.super.draw(self)
     if self.hovered then
+        if self.hovertextul then self:drawHovertextUL() end
+        if self.hovertextup then self:drawHovertextUP() end
+        if self.hovertextur then self:drawHovertextUR() end
         if self.hovertextlf then self:drawHovertextLF() end
         if self.hovertextrg then self:drawHovertextRG() end
-        if self.hovertextup then self:drawHovertextUP() end
-        if self.hovertextdw then self:drawHovertextDW() end
-        if self.hovertextul then self:drawHovertextUL() end
-        if self.hovertextur then self:drawHovertextUR() end
         if self.hovertextdl then self:drawHovertextDL() end
+        if self.hovertextdw then self:drawHovertextDW() end
         if self.hovertextdr then self:drawHovertextDR() end
     end
 end
@@ -77,6 +77,84 @@ function CButton:drawBorder()
     self.colorborder = (self.enabled) and self.colorborder or self.colorborderdisabled
     CButton.super.drawBorder(self)
     self:load()
+end
+
+function CButton:drawHovertextUL()
+    local _hovertext    = (self.hovertextulmdk and Tic:hovertextsIsMDKPressed())
+        and self.hovertextulmdk
+        or  self.hovertextul
+    _hovertext:adjustWH()
+
+    local _mousesprite  = (self.hovertextulmdk and self.hovertextulmdk.mousesprite) or self.hovertextul.mousesprite
+    local _modkeysprite = (self.hovertextulmdk)
+        and CSprite:spriteModifierKey()
+        or  nil
+
+    _hovertext.screenx  =  (self.hovertextulmdk and Tic.DRAWHOVERTEXTMODIFIERKEY)
+        and self.screenx - _hovertext.screenw - Tic.SPRITESIZE
+        or  self.screenx - _hovertext.screenw
+    _hovertext.screeny  = self.screeny - _hovertext.screenh
+    Tic:hovertextsAppend(_hovertext, _mousesprite, _modkeysprite)
+end
+
+function CButton:drawHovertextUP()
+    local _hovertext    = (self.hovertextupmdk and Tic:hovertextsIsMDKPressed())
+        and self.hovertextupmdk
+        or  self.hovertextup
+    _hovertext:adjustWH()
+
+    local _mousesprite  = (self.hovertextupmdk and self.hovertextupmdk.mousesprite) or self.hovertextup.mousesprite
+    local _modkeysprite = (self.hovertextupmdk)
+        and CSprite:spriteModifierKey()
+        or  nil
+
+    _hovertext.screenx  = self.screenx - ((_hovertext.screenw - self.screenw) // 2) + 1
+    _hovertext.screeny  = self.screeny - _hovertext.screenh
+    Tic:hovertextsAppend(_hovertext, _mousesprite, _modkeysprite)
+end
+
+function CButton:drawHovertextUR()
+    local _hovertext    = (self.hovertexturmdk and Tic:hovertextsIsMDKPressed())
+        and self.hovertexturmdk
+        or  self.hovertextur
+    _hovertext:adjustWH()
+
+    local _mousesprite  = (self.hovertexturmdk and self.hovertexturmdk.mousesprite) or self.hovertextur.mousesprite
+    local _modkeysprite = (self.hovertexturmdk)
+        and CSprite:spriteModifierKey()
+        or  nil
+
+    _hovertext.screenx  =  (Tic.DRAWHOVERTEXTMOUSE)
+        and self.screenx + self.screenw + Tic.SPRITESIZE
+        or  self.screenx + self.screenw
+    _hovertext.screeny  = self.screeny - _hovertext.screenh
+    Tic:hovertextsAppend(_hovertext, _mousesprite, _modkeysprite)
+end
+
+function CButton:drawHovertextLF()
+    local _hovertext    = (self.hovertextlfmdk and Tic:hovertextsIsMDKPressed())
+        and self.hovertextlfmdk
+        or  self.hovertextlf
+    _hovertext:adjustWH()
+
+    local _mousesprite  = (self.hovertextlfmdk and self.hovertextlfmdk.mousesprite) or self.hovertextlf.mousesprite
+    local _modkeysprite = (self.hovertextlfmdk)
+        and CSprite:spriteModifierKey()
+        or  nil
+
+    _hovertext.screenx  =  (self.hovertextlfmdk and Tic.DRAWHOVERTEXTMODIFIERKEY)
+        and self.screenx - _hovertext.screenw - Tic.SPRITESIZE
+        or  self.screenx - _hovertext.screenw
+    _hovertext.screeny  = self.screeny + ((self.screenh - _hovertext.screenh) // 2)
+    Tic:hovertextsAppend(_hovertext, _mousesprite, _modkeysprite)
+end
+
+function CButton:drawHovertextRG()
+    local _hovertext   = self.hovertextrg
+    _hovertext:adjustWH()
+    _hovertext.screenx = self.screenx + self.screenw
+    _hovertext.screeny = self.screeny + ((self.screenh - _hovertext.screenh) // 2)
+    Tic:hovertextsAppend(_hovertext)
 end
 
 function CButton:drawHovertextUP()
@@ -104,54 +182,6 @@ function CButton:drawHovertextDW()
         or  nil
     _hovertext.screenx  = self.screenx - ((_hovertext.screenw - self.screenw) // 2) + 1
     _hovertext.screeny  = self.screeny + self.screenh
-    Tic:hovertextsAppend(_hovertext, _mousesprite, _modkeysprite)
-end
-
-function CButton:drawHovertextLF()
-    local _hovertext   = self.hovertextlf
-    _hovertext:adjustWH()
-    _hovertext.screenx = self.screenx - _hovertext.screenw
-    _hovertext.screeny = self.screeny + ((self.screenh - _hovertext.screenh) // 2)
-    Tic:hovertextsAppend(_hovertext)
-end
-
-function CButton:drawHovertextRG()
-    local _hovertext   = self.hovertextrg
-    _hovertext:adjustWH()
-    _hovertext.screenx = self.screenx + self.screenw
-    _hovertext.screeny = self.screeny + ((self.screenh - _hovertext.screenh) // 2)
-    Tic:hovertextsAppend(_hovertext)
-end
-
-function CButton:drawHovertextUL()
-    local _hovertext    = (self.hovertextulmdk and Tic:hovertextsIsMDKPressed())
-        and self.hovertextulmdk
-        or  self.hovertextul
-    _hovertext:adjustWH()
-    local _mousesprite  = CSprite:spriteMouseWheelUP()
-    local _modkeysprite = (self.hovertextulmdk)
-        and CSprite:spriteModifierKey()
-        or  nil
-    _hovertext.screenx  =  (self.hovertextulmdk and Tic.DRAWHOVERTEXTMODIFIERKEY)
-        and self.screenx - _hovertext.screenw - Tic.SPRITESIZE
-        or  self.screenx - _hovertext.screenw
-    _hovertext.screeny = self.screeny - _hovertext.screenh
-    Tic:hovertextsAppend(_hovertext, _mousesprite, _modkeysprite)
-end
-
-function CButton:drawHovertextUR()
-    local _hovertext    = (self.hovertexturmdk and Tic:hovertextsIsMDKPressed())
-        and self.hovertexturmdk
-        or  self.hovertextur
-    _hovertext:adjustWH()
-    local _mousesprite  = CSprite:spriteMouseWheelDW()
-    local _modkeysprite = (self.hovertexturmdk)
-        and CSprite:spriteModifierKey()
-        or  nil
-    _hovertext.screenx  =  (Tic.DRAWHOVERTEXTMOUSE)
-        and self.screenx + self.screenw + Tic.SPRITESIZE
-        or  self.screenx + self.screenw
-    _hovertext.screeny = self.screeny - _hovertext.screenh
     Tic:hovertextsAppend(_hovertext, _mousesprite, _modkeysprite)
 end
 
@@ -322,9 +352,9 @@ function CButtonEntityHoverLock:new(_argt)
                         _playeractual.spottinglock = false
                         Tic:mouseDelay()
                        end
-    self.hovertextdw = CHoverTextDW{text = Tic.TEXTLOCK}
+    self.hovertextdw = CHoverTextClickRG{text = Tic.TEXTLOCK}
     self.clickrg     = self.lock
-    self.hovertextrg = CHoverTextRG{}
+    self.hovertextrg = CHoverTextInfosRG{}
     self.behaviour   = function(self)
                         local _playeractual = Tic:playerActual()
                         if _playeractual.spottinglock and _playeractual.spotting == self.entity then -- already locking ?
@@ -352,7 +382,7 @@ function CButtonEntityHoverLockPick:new(_argt)
                         Tic:playerActual().hovered = false
                         Tic:mouseDelay()
                        end
-    self.hovertextup = CHoverTextUP{text = Tic.TEXTPICK}
+    self.hovertextup = CHoverTextClickLF{text = Tic.TEXTPICK}
     self.clicklf     = self.pick
     self:argt(_argt) -- override if any
 end
@@ -539,7 +569,7 @@ end
 function CButtonPlayerStand:new(_argt)
     CButtonPlayerStand.super.new(self, _argt)
 	self.behaviour      = CButtonPlayerStand.BEHAVIOUR  -- function to trigger at first
-    self.hovertextup    = CHoverTextUP{text = Tic.TEXTSTAND}
+    self.hovertextup    = CHoverTextClickLF{text = Tic.TEXTSTAND}
     self.clicklf        = function() Tic:toggleKneel() end
     --
     self:argt(_argt) -- override if any
@@ -562,7 +592,7 @@ end
 function CButtonPlayerKneel:new(_argt)
     CButtonPlayerKneel.super.new(self, _argt)
 	self.behaviour      = CButtonPlayerKneel.BEHAVIOUR  -- function to trigger at first
-    self.hovertextup    = CHoverTextUP{text = Tic.TEXTKNEEL}
+    self.hovertextup    = CHoverTextClickLF{text = Tic.TEXTKNEEL}
     self.clicklf        = function() Tic:toggleKneel() end
     --
     self:argt(_argt) -- override if any
@@ -583,7 +613,7 @@ function CButtonPlayerWork:new(_argt)
     CButtonPlayerWork.super.new(self, _argt)
     self.sprite.sprite  = CSpriteBG.SIGNDOWORK
 	self.behaviour      = CButtonPlayerWork.BEHAVIOUR  -- function to trigger at first
-    self.hovertextup    = CHoverTextUP{text = Tic.TEXTWORK}
+    self.hovertextup    = CHoverTextClickLF{text = Tic.TEXTWORK}
     self.clicklf        = function() Tic:toggleWork() end
     --
     self:argt(_argt) -- override if any
@@ -604,7 +634,7 @@ function CButtonPlayerSleep:new(_argt)
     CButtonPlayerSleep.super.new(self, _argt)
     self.sprite.sprite  = CSpriteBG.SIGNDOSLEE
 	self.behaviour      = CButtonPlayerSleep.BEHAVIOUR  -- function to trigger at first
-    self.hovertextup    = CHoverTextUP{text = Tic.TEXTSLEEP}
+    self.hovertextup    = CHoverTextClickLF{text = Tic.TEXTSLEEP}
     self.clicklf        = function() Tic:toggleSleep() end
     --
     self:argt(_argt) -- override if any
@@ -620,8 +650,8 @@ function CButtonPlayerStat:new(_argt)
     self.sprite.palette = {[Tic.COLORGREYM] = Tic.COLORWHITE, [Tic.COLORGREYD] = Tic.COLORKEY}
     self.behaviour      = IButtonPlayer.BEHAVIOUR
     self.getcolorstat   = nil -- getcolorstat function if any
-    self.hovertextlf    = CHoverTextLF{text = ""}
-    self.hovertextrg    = CHoverTextRG{text = ""}
+    self.hovertextlf    = CHoverTextInfosLF{text = ""}
+    self.hovertextrg    = CHoverTextInfosRG{text = ""}
     self:argt(_argt) -- override if any
 end
 
@@ -811,12 +841,12 @@ CButtonPlayerPrev.BEHAVIOUR = function(self)
     if not self.display then return end
     if self.enabled then
         self.clicklf        = Tic.FUNCTIONPLAYERPREV
-        self.hovertextup    = CHoverTextUP{text = Tic.TEXTPREV}
+        self.hovertextup    = CHoverTextClickLF{text = Tic.TEXTPREV}
         self.clicklfmdk     = Tic.FUNCTIONPLAYERMIN
-        self.hovertextupmdk = CHoverTextUP{text = Tic.TEXTFIRST}
+        self.hovertextupmdk = CHoverTextClickLF{text = Tic.TEXTFIRST}
         self.hovertextrg    = (Tic:hovertextsIsMDKPressed())
-            and CHoverTextRG{text = Tic:playerGetFirst():stringNameKind()}
-            or  CHoverTextRG{text = Tic:playerGetPrev():stringNameKind()}
+            and CHoverTextInfosRG{text = Tic:playerGetFirst():stringNameKind()}
+            or  CHoverTextInfosRG{text = Tic:playerGetPrev():stringNameKind()}
     else
         self.clicklf        = nil
         self.hovertextup    = nil
@@ -841,12 +871,12 @@ CButtonPlayerNext.BEHAVIOUR = function(self)
     if not self.display then return end
     if self.enabled then
         self.clicklf        = Tic.FUNCTIONPLAYERNEXT
-        self.hovertextup    = CHoverTextUP{text = Tic.TEXTNEXT}
+        self.hovertextup    = CHoverTextClickLF{text = Tic.TEXTNEXT}
         self.clicklfmdk     = Tic.FUNCTIONPLAYERMAX
-        self.hovertextupmdk = CHoverTextUP{text = Tic.TEXTLAST}
+        self.hovertextupmdk = CHoverTextClickLF{text = Tic.TEXTLAST}
         self.hovertextrg    = (Tic:hovertextsIsMDKPressed())
-            and CHoverTextRG{text = Tic:playerGetLast():stringNameKind()}
-            or  CHoverTextRG{text = Tic:playerGetNext():stringNameKind()}
+            and CHoverTextInfosRG{text = Tic:playerGetLast():stringNameKind()}
+            or  CHoverTextInfosRG{text = Tic:playerGetNext():stringNameKind()}
     else
         self.clicklf        = nil
         self.hovertextup    = nil
@@ -870,7 +900,7 @@ CButtonPlayerPick.BEHAVIOUR = function(self) -- need at least more than one play
     IButtonPlayerChange.BEHAVIOUR(self)
     if not self.display then return end -- no player
     if self.enabled then -- more than one player
-        self.hovertextup = CHoverTextUP{text = Tic.TEXTPICK}
+        self.hovertextup = CHoverTextClickLF{text = Tic.TEXTPICK}
         self.clicklf     = function() self:menuPick() end
     else
         self.hovertextup = nil
@@ -878,14 +908,14 @@ CButtonPlayerPick.BEHAVIOUR = function(self) -- need at least more than one play
     end
     if self:getslotobject():isParty() then -- even if only one player but who is a party
         self.enabled     = true -- restore enabled in case of party
-        self.hovertextdw = CHoverTextDW{text = Tic.TEXTPARTY}
+        self.hovertextdw = CHoverTextClickRG{text = Tic.TEXTPARTY}
         self.clickrg     = function() self:menuParty() end
     else
         self.hovertextdw = nil
         self.clickrg     = nil
     end
     if self.enabled then
-        self.hovertextrg = CHoverTextRG{text = self:getslotobject():stringNameKind()}
+        self.hovertextrg = CHoverTextInfosRG{text = self:getslotobject():stringNameKind()}
     else
         self.hovertextrg = nil
     end
@@ -991,13 +1021,13 @@ function CButtonPlayerPickMenu:new(_argt)
     self.classic        = CButtonPlayerPickMenu
 	self.behaviour      = CButtonPortrait.BEHAVIOUR
     self.screen         = nil -- parent menu screen
-    self.hovertextup    = CHoverTextUP{text = Tic.TEXTPICK}
+    self.hovertextup    = CHoverTextClickLF{text = Tic.TEXTPICK}
     self.clicklf        = function()
                             Tic:playerPick(self:getslotobject())
                             Tic:screenRemove(self.screen)
                             Tic:mouseDelay()
                           end
-    self.hovertextrg    = CHoverTextRG{text = self:getslotobject():stringNameKind()}
+    self.hovertextrg    = CHoverTextInfosRG{text = self:getslotobject():stringNameKind()}
     self.hovertextdw    = nil
     self.clickrg        = nil
     self:argt(_argt) -- override if any
@@ -1013,14 +1043,14 @@ function CButtonPlayerPartyMenu:new(_argt)
     self.classic        = CButtonPlayerPartyMenu
 	self.behaviour      = CButtonPortrait.BEHAVIOUR
     self.screen         = nil -- parent menu screen
-    self.hovertextup    = CHoverTextUP{text = Tic.TEXTLEAD}
+    self.hovertextup    = CHoverTextClickLF{text = Tic.TEXTLEAD}
     self.clicklf        = function()
                             self:getslotobject():leadParty(nil, true)
                             Tic:screenRemove(self.screen)
                             Tic:mouseDelay()
                           end
-    self.hovertextrg    = CHoverTextRG{text = self:getslotobject():stringNameKind()}
-    self.hovertextdw    = CHoverTextDW{text = Tic.TEXTQUIT}
+    self.hovertextrg    = CHoverTextInfosRG{text = self:getslotobject():stringNameKind()}
+    self.hovertextdw    = CHoverTextClickRG{text = Tic.TEXTQUIT}
     self.clickrg        = function()
                             self:getslotobject():quitParty(true)
                             Tic:screenRemove(self.screen)
@@ -1084,7 +1114,7 @@ CButtonPlayerSlot.BEHAVIOUR = function(self) -- need at least one player with sl
     self.enabled = false
     if self:canDrop() then
         self.enabled = true
-        self.hovertextup = CHoverTextUP{text = Tic.TEXTDROP}
+        self.hovertextup = CHoverTextClickLF{text = Tic.TEXTDROP}
         self.clicklf     = function() self.entity:dropObject(self:getslotobject()) end
     else
         self.hovertextup = nil
@@ -1092,14 +1122,14 @@ CButtonPlayerSlot.BEHAVIOUR = function(self) -- need at least one player with sl
     end
     if self:canPick() then
         self.enabled = true
-        self.hovertextdw = CHoverTextDW{text = Tic.TEXTPICK}
+        self.hovertextdw = CHoverTextClickRG{text = Tic.TEXTPICK}
         self.clickrg     = function() self:menuPick() end
     else
         self.hovertextdw = nil
         self.clickrg     = nil
     end
     if self.enabled and self:getslotobject() then
-        self.hovertextrg = CHoverTextRG{text = self:getslotobject():stringNameKind()}
+        self.hovertextrg = CHoverTextInfosRG{text = self:getslotobject():stringNameKind()}
     else
         self.hovertextrg = nil
     end
@@ -1132,7 +1162,7 @@ function CButtonPlayerSlot:menuPick()
         behaviour     = Classic.NIL,
         entity        = _entity,
         getslotobject = function() return nil end, -- returns nil
-        hovertextdw   = CHoverTextDW{text = Tic.TEXTPICK},
+        hovertextdw   = CHoverTextClickRG{text = Tic.TEXTPICK},
         clickrg = function()
             _setslotobject()
             Tic:screenRemove(_screen)
@@ -1147,13 +1177,13 @@ function CButtonPlayerSlot:menuPick()
                 behaviour = Classic.NIL,
                 entity    = _entity,
                 getslotobject = function() return _object end, -- returns object
-                hovertextup = CHoverTextUP{text = Tic.TEXTDROP},
+                hovertextup = CHoverTextClickLF{text = Tic.TEXTDROP},
                 clicklf = function()
                     _entity:dropObject(_object)
                     Tic:screenRemove(_screen)
                     Tic:mouseDelay()
                 end,
-                hovertextdw = CHoverTextDW{text = Tic.TEXTPICK},
+                hovertextdw = CHoverTextClickRG{text = Tic.TEXTPICK},
                 clickrg = function()
                     local _whatslot = _object:findWhatSlot(_entity.slots) -- is object in a slot ?
                     if _whatslot then
@@ -1164,7 +1194,7 @@ function CButtonPlayerSlot:menuPick()
                     Tic:mouseDelay()
                 end,
                 hovertextrg = (self:getslotobject())
-                    and CHoverTextRG{text = self:getslotobject():stringNameKind()}
+                    and CHoverTextInfosRG{text = self:getslotobject():stringNameKind()}
                     or  nil,
             }
         }
@@ -1243,7 +1273,7 @@ CButtonSpottingSlot.BEHAVIOUR = function(self) -- need at least one spotting wit
     self.display = (self.entity.slots)
     if not self.display then return end -- no spotting
     if self:getslotobject() then
-        self.hovertextlf = CHoverTextLF{text = self:getslotobject():stringKindName()}
+        self.hovertextlf = CHoverTextInfosLF{text = self:getslotobject():stringKindName()}
     else
         self.hovertextlf = nil
     end
@@ -1307,7 +1337,7 @@ function CButtonSpottingSpot:new(_argt)
     self.sprite.palette = IButton.PALETTESPOTTINGMODE
 	self.behaviour      = CButtonSpottingSpot.BEHAVIOUR  -- function to trigger at first
     self.clicklf        = function() Tic:spottingToggleSpot() end
-    self.hovertextup    = CHoverTextUP{text = Tic.TEXTSPOT}
+    self.hovertextup    = CHoverTextClickLF{text = Tic.TEXTSPOT}
     self:argt(_argt) -- override if any
 end
 
@@ -1327,7 +1357,7 @@ function CButtonSpottingPick:new(_argt)
     self.sprite.palette = IButton.PALETTESPOTTINGMODE
 	self.behaviour      = CButtonSpottingPick.BEHAVIOUR  -- function to trigger at first
     self.clicklf        = function() Tic:spottingTogglePick() end
-    self.hovertextup    = CHoverTextUP{text = Tic.TEXTPICK}
+    self.hovertextup    = CHoverTextClickLF{text = Tic.TEXTPICK}
     self:argt(_argt) -- override if any
 end
 
@@ -1347,7 +1377,7 @@ function CButtonSpottingLock:new(_argt)
     self.sprite.palette = IButton.PALETTESPOTTINGMODE
 	self.behaviour      = CButtonSpottingLock.BEHAVIOUR  -- function to trigger at first
     self.clicklf        = function() Tic:spottingToggleLock() end
-    self.hovertextup    = CHoverTextUP{text = Tic.TEXTLOCK}
+    self.hovertextup    = CHoverTextClickLF{text = Tic.TEXTLOCK}
     self:argt(_argt) -- override if any
 end
 
@@ -1377,7 +1407,7 @@ function CButtonSpotting000:new(_argt)
     CButtonSpotting000.super.new(self, _argt)
     self.behaviour      = IButtonSpottingMove.BEHAVIOUR
     self.clicklf        = function() Tic:moveDirection000() end
-    self.hovertextup    = CHoverTextUP{text = Tic.TEXTMOVE}
+    self.hovertextup    = CHoverTextClickLF{text = Tic.TEXTMOVE}
     self:argt(_argt) -- override if any
 end
 
@@ -1386,7 +1416,7 @@ function CButtonSpotting045:new(_argt)
     CButtonSpotting045.super.new(self, _argt)
     self.behaviour      = IButtonSpottingMove.BEHAVIOUR
     self.clicklf        = function() Tic:moveDirection045() end
-    self.hovertextup    = CHoverTextUP{text = Tic.TEXTMOVE}
+    self.hovertextup    = CHoverTextClickLF{text = Tic.TEXTMOVE}
     self:argt(_argt) -- override if any
 end
 
@@ -1395,7 +1425,7 @@ function CButtonSpotting090:new(_argt)
     CButtonSpotting090.super.new(self, _argt)
     self.behaviour      = IButtonSpottingMove.BEHAVIOUR
     self.clicklf        = function() Tic:moveDirection090() end
-    self.hovertextup    = CHoverTextUP{text = Tic.TEXTMOVE}
+    self.hovertextup    = CHoverTextClickLF{text = Tic.TEXTMOVE}
     self:argt(_argt) -- override if any
 end
 
@@ -1404,7 +1434,7 @@ function CButtonSpotting135:new(_argt)
     CButtonSpotting135.super.new(self, _argt)
     self.behaviour      = IButtonSpottingMove.BEHAVIOUR
     self.clicklf        = function() Tic:moveDirection135() end
-    self.hovertextup    = CHoverTextUP{text = Tic.TEXTMOVE}
+    self.hovertextup    = CHoverTextClickLF{text = Tic.TEXTMOVE}
     self:argt(_argt) -- override if any
 end
 
@@ -1413,7 +1443,7 @@ function CButtonSpotting180:new(_argt)
     CButtonSpotting180.super.new(self, _argt)
     self.behaviour      = IButtonSpottingMove.BEHAVIOUR
     self.clicklf        = function() Tic:moveDirection180() end
-    self.hovertextup    = CHoverTextUP{text = Tic.TEXTMOVE}
+    self.hovertextup    = CHoverTextClickLF{text = Tic.TEXTMOVE}
     self:argt(_argt) -- override if any
 end
 
@@ -1422,7 +1452,7 @@ function CButtonSpotting225:new(_argt)
     CButtonSpotting225.super.new(self, _argt)
     self.behaviour      = IButtonSpottingMove.BEHAVIOUR
     self.clicklf        = function() Tic:moveDirection225() end
-    self.hovertextup    = CHoverTextUP{text = Tic.TEXTMOVE}
+    self.hovertextup    = CHoverTextClickLF{text = Tic.TEXTMOVE}
     self:argt(_argt) -- override if any
 end
 
@@ -1431,7 +1461,7 @@ function CButtonSpotting270:new(_argt)
     CButtonSpotting270.super.new(self, _argt)
     self.behaviour      = IButtonSpottingMove.BEHAVIOUR
     self.clicklf        = function() Tic:moveDirection270() end
-    self.hovertextup    = CHoverTextUP{text = Tic.TEXTMOVE}
+    self.hovertextup    = CHoverTextClickLF{text = Tic.TEXTMOVE}
     self:argt(_argt) -- override if any
 end
 
@@ -1440,7 +1470,7 @@ function CButtonSpotting315:new(_argt)
     CButtonSpotting315.super.new(self, _argt)
     self.behaviour      = IButtonSpottingMove.BEHAVIOUR
     self.clicklf        = function() Tic:moveDirection315() end
-    self.hovertextup    = CHoverTextUP{text = Tic.TEXTMOVE}
+    self.hovertextup    = CHoverTextClickLF{text = Tic.TEXTMOVE}
     self:argt(_argt) -- override if any
 end
 
@@ -1455,7 +1485,7 @@ IButtonPlayerMove.BEHAVIOUR = function(self)
     if not self.hovered then
         self.actived     = Tic:playerActual().direction == self.direction
     end
-    self.hovertextup = CHoverTextUP{text = Tic.TEXTMOVE}
+    self.hovertextup = CHoverTextClickLF{text = Tic.TEXTMOVE}
 end
 
 CButtonPlayerMove000 = CButtonArrow000:extend() -- generic player move 000 button
@@ -1548,9 +1578,9 @@ CButtonMessagePrev.BEHAVIOUR = function(self)
     IButtonMessageChange2.BEHAVIOUR(self)
     if not self.display then return end
     if self.enabled then
-        self.hovertextup    = CHoverTextUP{text = Tic.TEXTPREV}
+        self.hovertextup    = CHoverTextClickLF{text = Tic.TEXTPREV}
         self.clicklf        = Tic.FUNCTIONMESSAGEPREV
-        self.hovertextupmdk = CHoverTextUP{text = Tic.TEXTFIRST}
+        self.hovertextupmdk = CHoverTextClickLF{text = Tic.TEXTFIRST}
         self.clicklfmdk     = Tic.FUNCTIONMESSAGEMIN
     else
         self.hovertextup    = nil
@@ -1578,9 +1608,9 @@ CButtonMessageNext.BEHAVIOUR = function(self)
     IButtonMessageChange2.BEHAVIOUR(self)
     if not self.display then return end
     if self.enabled then
-        self.hovertextup    = CHoverTextUP{text = Tic.TEXTNEXT}
+        self.hovertextup    = CHoverTextClickLF{text = Tic.TEXTNEXT}
         self.clicklf        = Tic.FUNCTIONMESSAGENEXT
-        self.hovertextupmdk = CHoverTextUP{text = Tic.TEXTLAST}
+        self.hovertextupmdk = CHoverTextClickLF{text = Tic.TEXTLAST}
         self.clicklfmdk     = Tic.FUNCTIONMESSAGEMAX
     else
         self.hovertextup    = nil
@@ -1608,9 +1638,9 @@ CButtonMessageTrash.BEHAVIOUR = function(self)
     IButtonMessageChange1.BEHAVIOUR(self)
     if not self.display then return end
     if self.enabled then
-        self.hovertextup    = CHoverTextUP{text = Tic.TEXTDELONE}
+        self.hovertextup    = CHoverTextClickLF{text = Tic.TEXTDELONE}
         self.clicklf        = Tic.FUNCTIONMESSAGEDELONE
-        self.hovertextupmdk = CHoverTextUP{text = Tic.TEXTDELALL}
+        self.hovertextupmdk = CHoverTextClickLF{text = Tic.TEXTDELALL}
         self.clicklfmdk     = Tic.FUNCTIONMESSAGEDELALL
     else
         self.hovertextup    = nil
@@ -1703,10 +1733,10 @@ function CButtonMessageHover:new(_argt)
     self.drawground     = false
 	self.sprite.sprite  = CSpriteBG.SIGNWHEELY
 	self.behaviour      = CButtonMessageHover.BEHAVIOUR  -- function to trigger at first
-    self.hovertextul    = CHoverTextUP{text = Tic.TEXTPREV}
-    self.hovertextulmdk = CHoverTextUP{text = Tic.TEXTFIRST}
-    self.hovertextur    = CHoverTextUP{text = Tic.TEXTNEXT}
-    self.hovertexturmdk = CHoverTextUP{text = Tic.TEXTLAST}
+    self.hovertextul    = CHoverTextClickLF{text = Tic.TEXTPREV}
+    self.hovertextulmdk = CHoverTextClickLF{text = Tic.TEXTFIRST}
+    self.hovertextur    = CHoverTextClickLF{text = Tic.TEXTNEXT}
+    self.hovertexturmdk = CHoverTextClickLF{text = Tic.TEXTLAST}
     --
     self:argt(_argt) -- override if any
 end
