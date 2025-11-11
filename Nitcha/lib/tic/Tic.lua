@@ -827,11 +827,11 @@ function Tic:hovertextsClearHovertexts() -- clear the hovertexts table
     Tic.HOVERTEXTS = {}
 end
 
-function Tic:hovertextsAppend(_hovertext, _mousesprite, _modkeysprite) -- append an hovertext for later drawing
+function Tic:hovertextsAppend(_hovertext, _mousesprite, _mdksprite) -- append an hovertext for later drawing
     if not _hovertext then return end -- mandatory
     local _hovertextclone = CText{} -- make a clone of it --FIXME why ?
     _hovertextclone:implementall(_hovertext)
-    Tables:valInsert(Tic.HOVERTEXTS, {hovertext = _hovertextclone, mousesprite = _mousesprite, modkeysprite = _modkeysprite}, true)
+    Tables:valInsert(Tic.HOVERTEXTS, {hovertext = _hovertextclone, mousesprite = _mousesprite, mdksprite = _mdksprite}, true)
 end
 
 function Tic:hovertextsDrawAll() -- draw all hovertexts
@@ -841,13 +841,13 @@ function Tic:hovertextsDrawAll() -- draw all hovertexts
             _hovertext.mousesprite.screeny = _hovertext.hovertext.screeny - 1
             _hovertext.mousesprite:draw()
         end
-        if Tic.DRAWHOVERTEXTMODIFIERKEY and _hovertext.modkeysprite then
-            _hovertext.modkeysprite.screenx = _hovertext.hovertext.screenx + _hovertext.hovertext.screenw - 1
-            _hovertext.modkeysprite.screeny = _hovertext.hovertext.screeny - 1
-            _hovertext.modkeysprite.flip    = (Tic:hovertextsIsMDKPressed())
+        if Tic.DRAWHOVERTEXTMODIFIERKEY and _hovertext.mdksprite then
+            _hovertext.mdksprite.screenx = _hovertext.hovertext.screenx + _hovertext.hovertext.screenw - 1
+            _hovertext.mdksprite.screeny = _hovertext.hovertext.screeny - 1
+            _hovertext.mdksprite.flip    = (Tic:hovertextsIsMDKPressed())
                 and Tic.FLIPVERT
                 or  Tic.FLIPNONE
-            _hovertext.modkeysprite:draw()
+            _hovertext.mdksprite:draw()
         end 
         _hovertext.hovertext:draw()
     end
