@@ -85,122 +85,66 @@ function CButton:drawHovertext(_hovertext, _hovertextmdk, _direction)
         or  _hovertext
     _hovertext:adjustWH()
 
-    local _mousesprite  = (Tic:hovertextsIsMDKPressed() and _hovertextmdk and _hovertextmdk.mousesprite) or _hovertext.mousesprite
-    local _mdksprite    = (_hovertextmdk)
+    local _mousesprite  = (Tic.DRAWHOVERTEXTMOUSESPRITE)
+        and (Tic:hovertextsIsMDKPressed() and _hovertextmdk and _hovertextmdk.mousesprite) or _hovertext.mousesprite
+        or  nil
+    local _mdksprite    = (Tic.DRAWHOVERTEXTMDKSPRITE and _hovertextmdk)
         and CSprite:spriteModifierKey()
         or  nil
 
-    _hovertext.screenx  =  (self.hovertextulmdk and Tic.DRAWHOVERTEXTMODIFIERKEY)
-        and self.screenx - _hovertext.screenw - Tic.SPRITESIZE
-        or  self.screenx - _hovertext.screenw
-    _hovertext.screeny  = self.screeny - _hovertext.screenh
+    if     Tables:valFind({Tic.DIR315, Tic.DIR270, Tic.DIR225}, _direction) then -- LF
+        _hovertext.screenx  =  (_mdksprite)
+            and self.screenx - _hovertext.screenw - _mdksprite.screenw
+            or  self.screenx - _hovertext.screenw
+    elseif Tables:valFind({Tic.DIR045, Tic.DIR090, Tic.DIR135}, _direction) then -- RG
+        _hovertext.screenx  =  (_mousesprite)
+            and self.screenx + self.screenw + _mousesprite.screenw
+            or  self.screenx + self.screenw
+    else -- MD
+        _hovertext.screenx  = self.screenx - ((_hovertext.screenw - self.screenw) // 2)
+    end
+
+    if     Tables:valFind({Tic.DIR315, Tic.DIR000, Tic.DIR045}, _direction) then -- UP
+        _hovertext.screeny  = self.screeny - _hovertext.screenh
+    elseif Tables:valFind({Tic.DIR225, Tic.DIR180, Tic.DIR135}, _direction) then -- DW
+        _hovertext.screeny  = self.screeny + self.screenh
+    else -- MD
+        _hovertext.screeny  = self.screeny + ((self.screenh - _hovertext.screenh) // 2)
+    end
+
     Tic:hovertextsAppend(_hovertext, _mousesprite, _mdksprite)
 end
 
 function CButton:drawHovertextUL()
-    local _hovertext    = (self.hovertextulmdk and Tic:hovertextsIsMDKPressed())
-        and self.hovertextulmdk
-        or  self.hovertextul
-    _hovertext:adjustWH()
-
-    local _mousesprite  = (self.hovertextulmdk and self.hovertextulmdk.mousesprite) or self.hovertextul.mousesprite
-    local _mdksprite = (self.hovertextulmdk)
-        and CSprite:spriteModifierKey()
-        or  nil
-
-    _hovertext.screenx  =  (self.hovertextulmdk and Tic.DRAWHOVERTEXTMODIFIERKEY)
-        and self.screenx - _hovertext.screenw - Tic.SPRITESIZE
-        or  self.screenx - _hovertext.screenw
-    _hovertext.screeny  = self.screeny - _hovertext.screenh
-    Tic:hovertextsAppend(_hovertext, _mousesprite, _mdksprite)
+    self:drawHovertext(self.hovertextul, self.hovertextulmdk, Tic.DIR315)
 end
 
 function CButton:drawHovertextUP()
-    local _hovertext    = (self.hovertextupmdk and Tic:hovertextsIsMDKPressed())
-        and self.hovertextupmdk
-        or  self.hovertextup
-    _hovertext:adjustWH()
-
-    local _mousesprite  = (self.hovertextupmdk and self.hovertextupmdk.mousesprite) or self.hovertextup.mousesprite
-    local _mdksprite = (self.hovertextupmdk)
-        and CSprite:spriteModifierKey()
-        or  nil
-
-    _hovertext.screenx  = self.screenx - ((_hovertext.screenw - self.screenw) // 2) + 1
-    _hovertext.screeny  = self.screeny - _hovertext.screenh
-    Tic:hovertextsAppend(_hovertext, _mousesprite, _mdksprite)
+    self:drawHovertext(self.hovertextup, self.hovertextupmdk, Tic.DIR000)
 end
 
 function CButton:drawHovertextUR()
-    local _hovertext    = (self.hovertexturmdk and Tic:hovertextsIsMDKPressed())
-        and self.hovertexturmdk
-        or  self.hovertextur
-    _hovertext:adjustWH()
-
-    local _mousesprite  = (self.hovertexturmdk and self.hovertexturmdk.mousesprite) or self.hovertextur.mousesprite
-    local _mdksprite = (self.hovertexturmdk)
-        and CSprite:spriteModifierKey()
-        or  nil
-
-    _hovertext.screenx  =  (Tic.DRAWHOVERTEXTMOUSE)
-        and self.screenx + self.screenw + Tic.SPRITESIZE
-        or  self.screenx + self.screenw
-    _hovertext.screeny  = self.screeny - _hovertext.screenh
-    Tic:hovertextsAppend(_hovertext, _mousesprite, _mdksprite)
+    self:drawHovertext(self.hovertextur, self.hovertexturmdk, Tic.DIR045)
 end
 
 function CButton:drawHovertextLF()
-    local _hovertext    = (self.hovertextlfmdk and Tic:hovertextsIsMDKPressed())
-        and self.hovertextlfmdk
-        or  self.hovertextlf
-    _hovertext:adjustWH()
-
-    local _mousesprite  = (self.hovertextlfmdk and self.hovertextlfmdk.mousesprite) or self.hovertextlf.mousesprite
-    local _mdksprite = (self.hovertextlfmdk)
-        and CSprite:spriteModifierKey()
-        or  nil
-
-    _hovertext.screenx  =  (self.hovertextlfmdk and Tic.DRAWHOVERTEXTMODIFIERKEY)
-        and self.screenx - _hovertext.screenw - Tic.SPRITESIZE
-        or  self.screenx - _hovertext.screenw
-    _hovertext.screeny  = self.screeny + ((self.screenh - _hovertext.screenh) // 2)
-    Tic:hovertextsAppend(_hovertext, _mousesprite, _mdksprite)
+    self:drawHovertext(self.hovertextlf, self.hovertextlfmdk, Tic.DIR270)
 end
 
 function CButton:drawHovertextRG()
-    local _hovertext   = self.hovertextrg
-    _hovertext:adjustWH()
-    _hovertext.screenx = self.screenx + self.screenw
-    _hovertext.screeny = self.screeny + ((self.screenh - _hovertext.screenh) // 2)
-    Tic:hovertextsAppend(_hovertext)
+    self:drawHovertext(self.hovertextrg, self.hovertextrgmdk, Tic.DIR090)
 end
 
-function CButton:drawHovertextUP()
-    local _hovertext    = (self.hovertextupmdk and Tic:hovertextsIsMDKPressed())
-        and self.hovertextupmdk
-        or  self.hovertextup
-    _hovertext:adjustWH()
-    local _mousesprite  = (self.hovertextupmdk and self.hovertextupmdk.mousesprite) or self.hovertextup.mousesprite
-    local _mdksprite = (self.hovertextupmdk)
-        and CSprite:spriteModifierKey()
-        or  nil
-    _hovertext.screenx  = self.screenx - ((_hovertext.screenw - self.screenw) // 2) + 1
-    _hovertext.screeny  = self.screeny - _hovertext.screenh
-    Tic:hovertextsAppend(_hovertext, _mousesprite, _mdksprite)
+function CButton:drawHovertextDL()
+    self:drawHovertext(self.hovertextdl, self.hovertextdlmdk, Tic.DIR225)
 end
 
 function CButton:drawHovertextDW()
-    local _hovertext    = (self.hovertextdwmdk and Tic:hovertextsIsMDKPressed())
-        and self.hovertextdwmdk
-        or  self.hovertextdw
-    _hovertext:adjustWH()
-    local _mousesprite  = CSprite:spriteMouseClickRG()
-    local _mdksprite = (self.hovertextdwmdk)
-        and CSprite:spriteModifierKey()
-        or  nil
-    _hovertext.screenx  = self.screenx - ((_hovertext.screenw - self.screenw) // 2) + 1
-    _hovertext.screeny  = self.screeny + self.screenh
-    Tic:hovertextsAppend(_hovertext, _mousesprite, _mdksprite)
+    self:drawHovertext(self.hovertextdw, self.hovertextdwmdk, Tic.DIR180)
+end
+
+function CButton:drawHovertextDR()
+    self:drawHovertext(self.hovertextdr, self.hovertextdrmdk, Tic.DIR135)
 end
 
 

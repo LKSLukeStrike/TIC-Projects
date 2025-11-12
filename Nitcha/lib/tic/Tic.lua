@@ -820,8 +820,8 @@ end
 -- Hovertexts System -- handle hoveetexts stack
 Tic.HOVERTEXTS = {}
 Tic.HOVERTEXTMODIFIERKEY     = Tic.KEY_SHIFT
-Tic.DRAWHOVERTEXTMOUSE       = true
-Tic.DRAWHOVERTEXTMODIFIERKEY = true
+Tic.DRAWHOVERTEXTMOUSESPRITE = true
+Tic.DRAWHOVERTEXTMDKSPRITE   = true
 
 function Tic:hovertextsClearHovertexts() -- clear the hovertexts table
     Tic.HOVERTEXTS = {}
@@ -836,12 +836,12 @@ end
 
 function Tic:hovertextsDrawAll() -- draw all hovertexts
     for _, _hovertext in ipairs(Tic.HOVERTEXTS) do
-        if Tic.DRAWHOVERTEXTMOUSE and _hovertext.mousesprite then
+        if _hovertext.mousesprite then
             _hovertext.mousesprite.screenx = _hovertext.hovertext.screenx - _hovertext.mousesprite.screenw + 1
             _hovertext.mousesprite.screeny = _hovertext.hovertext.screeny - 1
             _hovertext.mousesprite:draw()
         end
-        if Tic.DRAWHOVERTEXTMODIFIERKEY and _hovertext.mdksprite then
+        if _hovertext.mdksprite then
             _hovertext.mdksprite.screenx = _hovertext.hovertext.screenx + _hovertext.hovertext.screenw - 1
             _hovertext.mdksprite.screeny = _hovertext.hovertext.screeny - 1
             _hovertext.mdksprite.flip    = (Tic:hovertextsIsMDKPressed())
