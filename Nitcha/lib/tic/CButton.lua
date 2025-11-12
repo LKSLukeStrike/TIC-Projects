@@ -612,8 +612,8 @@ function CButtonPlayerStat:new(_argt)
     self.sprite.palette = {[Tic.COLORGREYM] = Tic.COLORWHITE, [Tic.COLORGREYD] = Tic.COLORKEY}
     self.behaviour      = IButtonPlayer.BEHAVIOUR
     self.getcolorstat   = nil -- getcolorstat function if any
-    self.hovertextlf    = CHoverTextInfosLF{text = ""}
-    self.hovertextrg    = CHoverTextInfosRG{text = ""}
+    self.hovertextup    = CHoverTextInfosUP{text = ""}
+    self.hovertextdw    = CHoverTextInfosDW{text = ""}
     self:argt(_argt) -- override if any
 end
 
@@ -636,7 +636,7 @@ function CButtonPlayerStatPhy:new(_argt)
                             IButtonPlayer.BEHAVIOUR(self)
                             if not self.display then return end
                             local _playeractual = Tic:playerActual()
-                            self.hovertextlf.text = Tic.TEXTPHY..":"
+                            self.hovertextup.text = Tic.TEXTPHY..":"
                             .._playeractual:statphyactGet().."/".._playeractual:statphymaxGet()
                          end
     self:argt(_argt) -- override if any
@@ -651,7 +651,7 @@ function CButtonPlayerStatMen:new(_argt)
                             IButtonPlayer.BEHAVIOUR(self)
                             if not self.display then return end
                             local _playeractual = Tic:playerActual()
-                            self.hovertextrg.text = Tic.TEXTMEN..":"
+                            self.hovertextup.text = Tic.TEXTMEN..":"
                             .._playeractual:statmenactGet().."/".._playeractual:statmenmaxGet()
                          end
     self:argt(_argt) -- override if any
@@ -666,7 +666,7 @@ function CButtonPlayerStatPsy:new(_argt)
                             IButtonPlayer.BEHAVIOUR(self)
                             if not self.display then return end
                             local _playeractual = Tic:playerActual()
-                            self.hovertextrg.text = Tic.TEXTPSY..":"
+                            self.hovertextup.text = Tic.TEXTPSY..":"
                             .._playeractual:statpsyactGet().."/".._playeractual:statpsymaxGet()
                          end
     self:argt(_argt) -- override if any
@@ -1155,9 +1155,7 @@ function CButtonPlayerSlot:menuPick()
                     Tic:screenRemove(_screen)
                     Tic:mouseDelay()
                 end,
-                hovertextrg = (self:getslotobject())
-                    and CHoverTextInfosRG{text = self:getslotobject():stringNameKind()}
-                    or  nil,
+                hovertextrg = CHoverTextInfosRG{text = _object:stringNameKind()}
             }
         }
     end
