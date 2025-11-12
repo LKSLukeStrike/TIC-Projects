@@ -638,6 +638,8 @@ function CButtonPlayerStatPhy:new(_argt)
                             local _playeractual = Tic:playerActual()
                             self.hovertextup.text = Tic.TEXTPHY..":"
                             .._playeractual:statphyactGet().."/".._playeractual:statphymaxGet()
+                            self.hovertextdw.text = Tic.TEXTINV..":"
+                            ..Tables:size(_playeractual.inventories.phy.objects).."/".._playeractual:statphymaxGet()
                          end
     self:argt(_argt) -- override if any
 end
@@ -653,6 +655,8 @@ function CButtonPlayerStatMen:new(_argt)
                             local _playeractual = Tic:playerActual()
                             self.hovertextup.text = Tic.TEXTMEN..":"
                             .._playeractual:statmenactGet().."/".._playeractual:statmenmaxGet()
+                            self.hovertextdw.text = Tic.TEXTINV..":"
+                            ..Tables:size(_playeractual.inventories.men.objects).."/".._playeractual:statmenmaxGet()
                          end
     self:argt(_argt) -- override if any
 end
@@ -668,6 +672,8 @@ function CButtonPlayerStatPsy:new(_argt)
                             local _playeractual = Tic:playerActual()
                             self.hovertextup.text = Tic.TEXTPSY..":"
                             .._playeractual:statpsyactGet().."/".._playeractual:statpsymaxGet()
+                            self.hovertextdw.text = Tic.TEXTINV..":"
+                            ..Tables:size(_playeractual.inventories.psy.objects).."/".._playeractual:statpsymaxGet()
                          end
     self:argt(_argt) -- override if any
 end

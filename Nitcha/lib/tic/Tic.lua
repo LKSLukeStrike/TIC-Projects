@@ -80,6 +80,7 @@ Tic.TEXTMEN     = "Men"
 Tic.TEXTPSY     = "Psy"
 Tic.TEXTMAX     = "Max"
 Tic.TEXTACT     = "Act"
+Tic.TEXTINV     = "Inv"
 
 Tic.TEXTWELCOME = "Welcome ..."
 
