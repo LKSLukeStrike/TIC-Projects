@@ -17,10 +17,10 @@ function CHitbox:new(_argt)
     self.rg     = CHitbox.RG
     self.up     = CHitbox.UP
     self.dw     = CHitbox.DW
-    self.entity = nil -- parent entity -- override if any
+    self.entity = nil -- parent entity
     self.hitto  = {}  -- entities hitto -- table
     self.hitby  = {}  -- entities hitby -- table
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 function CHitbox:hittoAppend(_entity) -- append an entity hitto

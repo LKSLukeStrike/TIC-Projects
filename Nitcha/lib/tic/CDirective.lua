@@ -13,7 +13,7 @@ function CDirective:new(_argt)
     self.boardx = 0
     self.boardy = 0
     self.color  = 0
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 function CDirective:clone()

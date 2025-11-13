@@ -26,7 +26,7 @@ function CSprite:new(_argt)
     --
     self:init()
     --
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 function CSprite:init() -- init a sprite
@@ -328,7 +328,7 @@ function CSpriteBG:new(_argt) -- FIXME can be removed ?
     self.name = Classic.NAMESPRITEBG
     --
     --
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 
@@ -447,7 +447,7 @@ function CSpriteFG:new(_argt)
     self.spritebank = CSpriteFG.SPRITEBANK
     self.sprite     = self.spritebank
     --
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 
@@ -462,7 +462,7 @@ function CSpriteBoard:new(_argt)
     self.kind = Classic.KINDSPRITEBOARD
     self.name = Classic.NAMESPRITEBOARD
     self.sprite = nil
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 

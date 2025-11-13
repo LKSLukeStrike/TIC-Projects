@@ -14,7 +14,7 @@ function CWorld:new(_argt)
     self.region            = CRegion{} -- world boundaries
     self.entitieslocations = CEntitiesLocations{} -- record world entities and their locations
     --
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 function CWorld:appendEntity(_entity, _range, _trials) -- append an entity in the world

@@ -16,5 +16,5 @@ function CScreen:new(_argt)
     self.drawborder  = false
     self.drawframes  = false
     --
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end

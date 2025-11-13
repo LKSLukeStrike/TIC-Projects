@@ -15,7 +15,7 @@ function CCamera:new(_argt)
     self.world  = World
     self.rangex = CCamera.RANGEX
     self.rangey = CCamera.RANGEY
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 function CCamera:focusXY(_worldx, _worldy) -- focus camera on world positions -- default to center

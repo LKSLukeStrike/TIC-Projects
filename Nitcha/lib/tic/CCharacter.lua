@@ -259,7 +259,7 @@ function CCharacter:new(_argt)
                           }
     self.interactsprite = CSpriteFG.EFFECTCHIMK
     --
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
     self.camera       = CCamera{name = self:nameGet().." "..Classic.NAMECAMERA} -- one camera per character
     self:focus() -- focus its camera on itself
 end

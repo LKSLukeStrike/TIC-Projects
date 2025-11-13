@@ -2180,9 +2180,11 @@ W3lfie = _playerclass{classed = _playerclass,
     -- ["slots.head"]   = CSlotHead{object = CClothesHelmetLarge{}},
     -- ["slots.head"]   = CSlotHead{object = CClothesHatLarge{}},
     ["slots.head"]   = CSlotHead{object = CClothesCapLarge{}},
-    -- ["slots.back"]   = CSlotBack{object = CClothesScrollCaseLarge{}},
+    ["slots.back"]   = CSlotBack{object = CClothesScrollCaseLarge{}},
     ["inventories.any"] = CInventoryAny{objects = {
         CObjectSpellLarge{used = CObject.USEDNONE},
+        CClothesToolBoxLarge{},
+        CClothesBackPackLarge{},
     }},
 }
 end

@@ -29,7 +29,7 @@ function CEntity:new(_argt)
     self.camera = nil -- optional camera that follows the entity -- to override if any
     self.party        = nil -- behave to a party ?
     --
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 function CEntity:isParty()

@@ -13,7 +13,7 @@ function CRegion:new(_argt)
     self.rg = Nums.MAXINTEGER
     self.up = Nums.MININTEGER
     self.dw = Nums.MAXINTEGER
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 function CRegion:string() -- region as a string

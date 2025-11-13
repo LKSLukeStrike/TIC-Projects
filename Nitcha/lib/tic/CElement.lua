@@ -126,7 +126,7 @@ function CElement:new(_argt)
     self.hovertextdlmdk = nil
     self.hovertextdrmdk = nil
     --
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 function CElement:argt(_argt)

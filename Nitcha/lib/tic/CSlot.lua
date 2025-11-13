@@ -10,7 +10,7 @@ function CSlot:new(_argt)
     self.name = Classic.NAMESLOT
     self.slottype = nil -- allowed slot type -- nil = any
     self.object   = nil -- object contained in the slot
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 function CSlot:isSlot(_slot)
@@ -58,7 +58,7 @@ function CSlotHead:new(_argt)
     self.kind = Classic.KINDSLOTHEAD
     self.name = Classic.NAMESLOTHEAD
     self.slottype = CSlotHead
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 CSlotBack = CSlot:extend() -- generic back slot
@@ -69,7 +69,7 @@ function CSlotBack:new(_argt)
     self.kind = Classic.KINDSLOTBACK
     self.name = Classic.NAMESLOTBACK
     self.slottype = CSlotBack
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 CSlotHand = CSlot:extend() -- generic hand slot
@@ -80,7 +80,7 @@ function CSlotHand:new(_argt)
     self.kind = Classic.KINDSLOTHAND
     self.name = Classic.NAMESLOTHAND
     self.slottype = CSlotHand
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 CSlotHandLF = CSlotHand:extend() -- generic hand lf slot
@@ -90,7 +90,7 @@ function CSlotHandLF:new(_argt)
     CSlotHandLF.super.new(self, _argt)
     self.kind = Classic.KINDSLOTHANDLF
     self.name = Classic.NAMESLOTHANDLF
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 CSlotHandRG = CSlotHand:extend() -- generic hand rg slot
@@ -100,5 +100,5 @@ function CSlotHandRG:new(_argt)
     CSlotHandRG.super.new(self, _argt)
     self.kind = Classic.KINDSLOTHANDRG
     self.name = Classic.NAMESLOTHANDRG
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end

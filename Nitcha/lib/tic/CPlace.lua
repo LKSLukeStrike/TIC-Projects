@@ -56,5 +56,5 @@ function CPlace:new(_argt)
     self.classic = CPlace
     self.kind = Classic.KINDPLACE
     self.name = Classic.NAMEPLACE
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end

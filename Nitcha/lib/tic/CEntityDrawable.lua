@@ -28,7 +28,7 @@ function CEntityDrawable:new(_argt)
     self.rotate         = Tic.ROTATE000
     self.idle           = false -- dont move ?
     self.portraitmode   = false -- true to avoid to cycle in portraits etc
-    self.animations     = nil -- override if any
+    self.animations     = nil
     self.hovered        = false -- use hovered to draw a border
     self.spotted        = false -- use spotted to draw a border
     self.hitbox         = CHitbox{entity = self, lf = 0, rg = 7, up = 0, dw = 7}
@@ -40,7 +40,7 @@ function CEntityDrawable:new(_argt)
     self.musprite       = CSprite{} -- multi usage sprite
     self.interactsprite = CSpriteFG.EFFECTOBIMK
     --
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
     self:append()
 end
 
@@ -67,7 +67,7 @@ function CEntityDrawable:interactRemoveAll() -- remove all interactions
     self:interactbyRemoveAll()
 end
 
-function CEntityDrawable:draw() -- default draw for drawable entities -- override if any
+function CEntityDrawable:draw() -- default draw for drawable entities
     local _tick00      = Tic.TICK00.actvalue
 
     local _palette     = Tables:merge(self.palette, self.palettefg) -- apply diverse palettes if any

@@ -25,7 +25,7 @@ function CText:new(_argt)
     self.colorinside = Tic.COLORGREYL
     self.colorshadow = Tic.COLORGREYD
     --
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
     self:adjustWH()
 end
 
@@ -96,7 +96,7 @@ function CTextLine:new(_argt)
     self.name = Classic.NAMETEXTLINE
     --
     --
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 
@@ -116,7 +116,7 @@ function CHoverText:new(_argt)
     self.colorground = Tic.COLORHOVERGROUND
     self.mousesprite = nil
     --
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 CHoverTextMouse = CHoverText:extend() -- generic hovertextmouse
@@ -125,7 +125,7 @@ function CHoverTextMouse:new(_argt)
     --
     self.colorinside = Tic.COLORHOVERMOUSE
     --
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 CHoverTextInfos = CHoverText:extend() -- generic hovertextinfos
@@ -134,7 +134,7 @@ function CHoverTextInfos:new(_argt)
     --
     self.colorinside = Tic.COLORHOVERINFOS
     --
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 CHoverTextClickLF = CHoverTextMouse:extend() -- generic hovertextclicklf
@@ -143,7 +143,7 @@ function CHoverTextClickLF:new(_argt)
     --
     self.mousesprite = CSprite:spriteMouseClickLF()
     --
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 CHoverTextClickRG = CHoverTextMouse:extend() -- generic hovertextclickrg
@@ -152,7 +152,7 @@ function CHoverTextClickRG:new(_argt)
     --
     self.mousesprite = CSprite:spriteMouseClickRG()
     --
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 CHoverTextWheelUP = CHoverTextMouse:extend() -- generic hovertextclicklf
@@ -161,7 +161,7 @@ function CHoverTextWheelUP:new(_argt)
     --
     self.mousesprite = CSprite:spriteMouseWheelUP()
     --
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 CHoverTextWheelDW = CHoverTextMouse:extend() -- generic hovertextclickrg
@@ -170,7 +170,7 @@ function CHoverTextWheelDW:new(_argt)
     --
     self.mousesprite = CSprite:spriteMouseWheelDW()
     --
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 CHoverTextInfosUP = CHoverTextInfos:extend() -- generic hovertextup

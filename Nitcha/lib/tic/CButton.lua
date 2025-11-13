@@ -41,7 +41,7 @@ function CButton:new(_argt)
     self.colorborderdisabled = Tic.COLORGREYM
     self.clickable           = true -- act as a button
     --
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 function CButton:activable() -- is the button activable ?
@@ -159,7 +159,7 @@ function CButtonText:new(_argt)
 	self.text = CText{} -- override with CText if any
     self.rounded = true
     self.colorinside = self.colorborder
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
     self:adjustWH()
 end
 
@@ -188,7 +188,7 @@ Classic.NAMEBUTTONTEXTM2 = "ButtonTextM2"
 function CButtonTextM2:new(_argt)
     CButtonTextM2.super.new(self, _argt)
     self.name = Classic.NAMEBUTTONTEXTM2
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
     self.text.marginup = 2
     self.text.margindw = 2
     self.text.marginlf = 2
@@ -205,7 +205,7 @@ CButtonMenu = CButtonText:extend() -- generic menu button
 function CButtonMenu:new(_argt)
     CButtonMenu.super.new(self, _argt)
     self.align   = Tic.DIR270
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 
@@ -216,7 +216,7 @@ CButtonMenuM2 = CButtonTextM2:extend() -- generic menu button with margins 2
 function CButtonMenuM2:new(_argt)
     CButtonMenuM2.super.new(self, _argt)
     self.align   = Tic.DIR270
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 
@@ -231,7 +231,7 @@ function CButtonSprite:new(_argt)
     self.drawborder = false
     self.drawground = false
     --
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 function CButtonSprite:drawInside()
@@ -282,7 +282,7 @@ function CButtonEntityHover:new(_argt)
     self.entity        = nil
     self.colorborder   = Tic.COLORGREYM
     self.hovered = true
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 function CButtonEntityHover:drawInside()
@@ -328,7 +328,7 @@ function CButtonEntityHoverLock:new(_argt)
                         end
                         self.hovertextrg.text = self.entity:nameGet().." "..self.entity:kindGet()
                        end
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 
@@ -346,7 +346,7 @@ function CButtonEntityHoverLockPick:new(_argt)
                        end
     self.hovertextup = CHoverTextClickLF{text = Tic.TEXTPICK}
     self.clicklf     = self.pick
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 
@@ -369,7 +369,7 @@ CButtonArrowLine = CButtonArrow:extend() -- generic line arrow click button
 function CButtonArrowLine:new(_argt)
     CButtonArrowLine.super.new(self, _argt)
 	self.sprite.sprite = CSpriteBG.SIGNARROWL
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 
@@ -380,7 +380,7 @@ CButtonArrowDiag = CButtonArrow:extend() -- generic diag arrow click button
 function CButtonArrowDiag:new(_argt)
     CButtonArrowDiag.super.new(self, _argt)
 	self.sprite.sprite = CSpriteBG.SIGNARROWD
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 
@@ -392,7 +392,7 @@ function CButtonArrow000:new(_argt)
     CButtonArrow000.super.new(self, _argt)
     self.direction     = Tic.DIR000
 	self.sprite.rotate = Tic.ROTATE000
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 
@@ -404,7 +404,7 @@ function CButtonArrow045:new(_argt)
     CButtonArrow045.super.new(self, _argt)
     self.direction     = Tic.DIR045
 	self.sprite.rotate = Tic.ROTATE090
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 
@@ -416,7 +416,7 @@ function CButtonArrow090:new(_argt)
     CButtonArrow090.super.new(self, _argt)
     self.direction     = Tic.DIR090
 	self.sprite.rotate = Tic.ROTATE090
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 
@@ -428,7 +428,7 @@ function CButtonArrow135:new(_argt)
     CButtonArrow135.super.new(self, _argt)
     self.direction     = Tic.DIR135
 	self.sprite.rotate = Tic.ROTATE180
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 
@@ -440,7 +440,7 @@ function CButtonArrow180:new(_argt)
     CButtonArrow180.super.new(self, _argt)
     self.direction     = Tic.DIR180
 	self.sprite.rotate = Tic.ROTATE180
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 
@@ -452,7 +452,7 @@ function CButtonArrow225:new(_argt)
     CButtonArrow225.super.new(self, _argt)
     self.direction     = Tic.DIR225
 	self.sprite.rotate = Tic.ROTATE270
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 
@@ -464,7 +464,7 @@ function CButtonArrow270:new(_argt)
     CButtonArrow270.super.new(self, _argt)
     self.direction     = Tic.DIR270
 	self.sprite.rotate = Tic.ROTATE270
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 
@@ -476,7 +476,7 @@ function CButtonArrow315:new(_argt)
     CButtonArrow315.super.new(self, _argt)
     self.direction     = Tic.DIR315
 	self.sprite.rotate = Tic.ROTATE000
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 
@@ -488,7 +488,7 @@ function CButtonCenter:new(_argt)
     CButtonCenter.super.new(self, _argt)
     self.direction     = nil
 	self.sprite.sprite = CSpriteBG.SIGNCENTER
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 
@@ -499,7 +499,7 @@ CButtonCheck = CButtonSprite:extend() -- generic check button
 function CButtonCheck:new(_argt)
     CButtonCheck.super.new(self, _argt)
 	self.checked = false
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 
@@ -511,7 +511,7 @@ function CButtonPlayerPosture:new(_argt)
     CButtonPlayerPosture.super.new(self, _argt)
     self.drawborder     = false
     self.colorground    = Tic.COLORBLUEM
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 
@@ -534,7 +534,7 @@ function CButtonPlayerStand:new(_argt)
     self.hovertextup    = CHoverTextClickLF{text = Tic.TEXTSTAND}
     self.clicklf        = function() Tic:toggleKneel() end
     --
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 
@@ -557,7 +557,7 @@ function CButtonPlayerKneel:new(_argt)
     self.hovertextup    = CHoverTextClickLF{text = Tic.TEXTKNEEL}
     self.clicklf        = function() Tic:toggleKneel() end
     --
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 
@@ -578,7 +578,7 @@ function CButtonPlayerWork:new(_argt)
     self.hovertextup    = CHoverTextClickLF{text = Tic.TEXTWORK}
     self.clicklf        = function() Tic:toggleWork() end
     --
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 
@@ -599,7 +599,7 @@ function CButtonPlayerSleep:new(_argt)
     self.hovertextup    = CHoverTextClickLF{text = Tic.TEXTSLEEP}
     self.clicklf        = function() Tic:toggleSleep() end
     --
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 
@@ -614,7 +614,7 @@ function CButtonPlayerStat:new(_argt)
     self.getcolorstat   = nil -- getcolorstat function if any
     self.hovertextup    = CHoverTextInfosUP{text = ""}
     self.hovertextdw    = CHoverTextInfosDW{text = ""}
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 function CButtonPlayerStat:drawInside()
@@ -641,7 +641,7 @@ function CButtonPlayerStatPhy:new(_argt)
                             self.hovertextdw.text = Tic.TEXTINV..":"
                             ..Tables:size(_playeractual.inventories.phy.objects).."/".._playeractual:statphymaxGet()
                          end
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 CButtonPlayerStatMen = CButtonPlayerStat:extend()
@@ -658,7 +658,7 @@ function CButtonPlayerStatMen:new(_argt)
                             self.hovertextdw.text = Tic.TEXTINV..":"
                             ..Tables:size(_playeractual.inventories.men.objects).."/".._playeractual:statmenmaxGet()
                          end
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 CButtonPlayerStatPsy = CButtonPlayerStat:extend()
@@ -675,7 +675,7 @@ function CButtonPlayerStatPsy:new(_argt)
                             self.hovertextdw.text = Tic.TEXTINV..":"
                             ..Tables:size(_playeractual.inventories.psy.objects).."/".._playeractual:statpsymaxGet()
                          end
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 
@@ -702,7 +702,7 @@ function CButtonInteractions:new(_argt)
     self.sprite.palette = CEntityDrawable.PALETTEINTERACTBY
     self.behaviour      = IButtonInteractions.BEHAVIOUR
     self.drawground     = false
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 
@@ -726,7 +726,7 @@ function CButtonPortrait:new(_argt)
     self.colorborder         = self.colorframe1
     self.colorborderdisabled = self.colorframe2
     self.rounded             = true
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 function CButtonPortrait:drawBorder()
@@ -826,7 +826,7 @@ end
 function CButtonPlayerPrev:new(_argt)
     CButtonPlayerPrev.super.new(self, _argt)
 	self.behaviour      = CButtonPlayerPrev.BEHAVIOUR  -- function to trigger at first
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 
@@ -856,7 +856,7 @@ end
 function CButtonPlayerNext:new(_argt)
     CButtonPlayerNext.super.new(self, _argt)
 	self.behaviour      = CButtonPlayerNext.BEHAVIOUR  -- function to trigger at first
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 
@@ -893,7 +893,7 @@ function CButtonPlayerPick:new(_argt)
     self.classic        = CButtonPlayerPick
 	self.behaviour      = CButtonPlayerPick.BEHAVIOUR  -- function to trigger at first
     self.getslotobject  = function() return Tic:playerActual() end
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 function CButtonPlayerPick:drawInside()
@@ -998,7 +998,7 @@ function CButtonPlayerPickMenu:new(_argt)
     self.hovertextrg    = CHoverTextInfosRG{text = self:getslotobject():stringNameKind()}
     self.hovertextdw    = nil
     self.clickrg        = nil
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 
@@ -1024,7 +1024,7 @@ function CButtonPlayerPartyMenu:new(_argt)
                             Tic:screenRemove(self.screen)
                             Tic:mouseDelay()
                           end
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 
@@ -1105,7 +1105,7 @@ end
 function CButtonPlayerSlot:new(_argt)
     CButtonPlayerSlot.super.new(self, _argt)
     self.behaviour   = CButtonPlayerSlot.BEHAVIOUR
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 function CButtonPlayerSlot:menuPick()
@@ -1178,7 +1178,7 @@ function CButtonPlayerSlotHead:new(_argt)
     self.getslotobject = function() return self.entity:slotGetHeadObject() end
     self.sprite        = CButtonEntitySlot.SPRITEHEAD
     self.slottype      = CSlotHead
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 CButtonPlayerSlotBack = CButtonPlayerSlot:extend()
@@ -1190,7 +1190,7 @@ function CButtonPlayerSlotBack:new(_argt)
     self.getslotobject = function() return self.entity:slotGetBackObject() end
     self.sprite        = CButtonEntitySlot.SPRITEBACK
     self.slottype      = CSlotBack
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 CButtonPlayerSlotHandLF = CButtonPlayerSlot:extend()
@@ -1202,7 +1202,7 @@ function CButtonPlayerSlotHandLF:new(_argt)
     self.getslotobject = function() return self.entity:slotGetHandLFObject() end
     self.sprite        = CButtonEntitySlot.SPRITEHAND
     self.slottype      = CSlotHand
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 CButtonPlayerSlotHandRG = CButtonPlayerSlot:extend()
@@ -1214,7 +1214,7 @@ function CButtonPlayerSlotHandRG:new(_argt)
     self.getslotobject = function() return self.entity:slotGetHandRGObject() end
     self.sprite        = CButtonEntitySlot.SPRITEHAND
     self.slottype      = CSlotHand
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 
@@ -1248,7 +1248,7 @@ function CButtonSpottingSlot:new(_argt)
     CButtonSpottingSlot.super.new(self, _argt)
     self.behaviour = CButtonSpottingSlot.BEHAVIOUR
     self.enabled   = false
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 CButtonSpottingSlotHead = CButtonSpottingSlot:extend()
@@ -1257,7 +1257,7 @@ function CButtonSpottingSlotHead:new(_argt)
     self.getslotobject = function() return self.entity.slots.head.object end
     self.sprite  = CButtonEntitySlot.SPRITEHEAD
     self.slottype      = CSlotHead
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 CButtonSpottingSlotBack = CButtonSpottingSlot:extend()
@@ -1266,7 +1266,7 @@ function CButtonSpottingSlotBack:new(_argt)
     self.getslotobject = function() return self.entity.slots.back.object end
     self.sprite  = CButtonEntitySlot.SPRITEBACK
     self.slottype      = CSlotBack
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 CButtonSpottingSlotHandLF = CButtonSpottingSlot:extend()
@@ -1275,7 +1275,7 @@ function CButtonSpottingSlotHandLF:new(_argt)
     self.getslotobject = function() return self.entity.slots.handlf.object end
     self.sprite  = CButtonEntitySlot.SPRITEHAND
     self.slottype      = CSlotHand
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 CButtonSpottingSlotHandRG = CButtonSpottingSlot:extend()
@@ -1284,7 +1284,7 @@ function CButtonSpottingSlotHandRG:new(_argt)
     self.getslotobject = function() return self.entity.slots.handrg.object end
     self.sprite  = CButtonEntitySlot.SPRITEHAND
     self.slottype      = CSlotHand
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 
@@ -1304,7 +1304,7 @@ function CButtonSpottingSpot:new(_argt)
 	self.behaviour      = CButtonSpottingSpot.BEHAVIOUR  -- function to trigger at first
     self.clicklf        = function() Tic:spottingToggleSpot() end
     self.hovertextup    = CHoverTextClickLF{text = Tic.TEXTSPOT}
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 
@@ -1324,7 +1324,7 @@ function CButtonSpottingPick:new(_argt)
 	self.behaviour      = CButtonSpottingPick.BEHAVIOUR  -- function to trigger at first
     self.clicklf        = function() Tic:spottingTogglePick() end
     self.hovertextup    = CHoverTextClickLF{text = Tic.TEXTPICK}
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 
@@ -1344,7 +1344,7 @@ function CButtonSpottingLock:new(_argt)
 	self.behaviour      = CButtonSpottingLock.BEHAVIOUR  -- function to trigger at first
     self.clicklf        = function() Tic:spottingToggleLock() end
     self.hovertextup    = CHoverTextClickLF{text = Tic.TEXTLOCK}
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 
@@ -1374,7 +1374,7 @@ function CButtonSpotting000:new(_argt)
     self.behaviour      = IButtonSpottingMove.BEHAVIOUR
     self.clicklf        = function() Tic:moveDirection000() end
     self.hovertextup    = CHoverTextClickLF{text = Tic.TEXTMOVE}
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 CButtonSpotting045 = CButtonArrow045:extend() -- generic spotting 045 button
@@ -1383,7 +1383,7 @@ function CButtonSpotting045:new(_argt)
     self.behaviour      = IButtonSpottingMove.BEHAVIOUR
     self.clicklf        = function() Tic:moveDirection045() end
     self.hovertextup    = CHoverTextClickLF{text = Tic.TEXTMOVE}
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 CButtonSpotting090 = CButtonArrow090:extend() -- generic spotting 090 button
@@ -1392,7 +1392,7 @@ function CButtonSpotting090:new(_argt)
     self.behaviour      = IButtonSpottingMove.BEHAVIOUR
     self.clicklf        = function() Tic:moveDirection090() end
     self.hovertextup    = CHoverTextClickLF{text = Tic.TEXTMOVE}
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 CButtonSpotting135 = CButtonArrow135:extend() -- generic spotting 135 button
@@ -1401,7 +1401,7 @@ function CButtonSpotting135:new(_argt)
     self.behaviour      = IButtonSpottingMove.BEHAVIOUR
     self.clicklf        = function() Tic:moveDirection135() end
     self.hovertextup    = CHoverTextClickLF{text = Tic.TEXTMOVE}
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 CButtonSpotting180 = CButtonArrow180:extend() -- generic spotting 180 button
@@ -1410,7 +1410,7 @@ function CButtonSpotting180:new(_argt)
     self.behaviour      = IButtonSpottingMove.BEHAVIOUR
     self.clicklf        = function() Tic:moveDirection180() end
     self.hovertextup    = CHoverTextClickLF{text = Tic.TEXTMOVE}
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 CButtonSpotting225 = CButtonArrow225:extend() -- generic spotting 225 button
@@ -1419,7 +1419,7 @@ function CButtonSpotting225:new(_argt)
     self.behaviour      = IButtonSpottingMove.BEHAVIOUR
     self.clicklf        = function() Tic:moveDirection225() end
     self.hovertextup    = CHoverTextClickLF{text = Tic.TEXTMOVE}
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 CButtonSpotting270 = CButtonArrow270:extend() -- generic spotting 270 button
@@ -1428,7 +1428,7 @@ function CButtonSpotting270:new(_argt)
     self.behaviour      = IButtonSpottingMove.BEHAVIOUR
     self.clicklf        = function() Tic:moveDirection270() end
     self.hovertextup    = CHoverTextClickLF{text = Tic.TEXTMOVE}
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 CButtonSpotting315 = CButtonArrow315:extend() -- generic spotting 315 button
@@ -1437,7 +1437,7 @@ function CButtonSpotting315:new(_argt)
     self.behaviour      = IButtonSpottingMove.BEHAVIOUR
     self.clicklf        = function() Tic:moveDirection315() end
     self.hovertextup    = CHoverTextClickLF{text = Tic.TEXTMOVE}
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 
@@ -1459,7 +1459,7 @@ function CButtonPlayerMove000:new(_argt)
     CButtonPlayerMove000.super.new(self, _argt)
     self.behaviour      = IButtonPlayerMove.BEHAVIOUR
     self.clicklf        = function() Tic:moveDirection000() end
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 CButtonPlayerMove045 = CButtonArrow045:extend() -- generic player move 045 button
@@ -1467,7 +1467,7 @@ function CButtonPlayerMove045:new(_argt)
     CButtonPlayerMove045.super.new(self, _argt)
     self.behaviour      = IButtonPlayerMove.BEHAVIOUR
     self.clicklf        = function() Tic:moveDirection045() end
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 CButtonPlayerMove090 = CButtonArrow090:extend() -- generic player move 090 button
@@ -1475,7 +1475,7 @@ function CButtonPlayerMove090:new(_argt)
     CButtonPlayerMove090.super.new(self, _argt)
     self.behaviour      = IButtonPlayerMove.BEHAVIOUR
     self.clicklf        = function() Tic:moveDirection090() end
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 CButtonPlayerMove135 = CButtonArrow135:extend() -- generic player move 135 button
@@ -1483,7 +1483,7 @@ function CButtonPlayerMove135:new(_argt)
     CButtonPlayerMove135.super.new(self, _argt)
     self.behaviour      = IButtonPlayerMove.BEHAVIOUR
     self.clicklf        = function() Tic:moveDirection135() end
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 CButtonPlayerMove180 = CButtonArrow180:extend() -- generic player move 180 button
@@ -1491,7 +1491,7 @@ function CButtonPlayerMove180:new(_argt)
     CButtonPlayerMove180.super.new(self, _argt)
     self.behaviour      = IButtonPlayerMove.BEHAVIOUR
     self.clicklf        = function() Tic:moveDirection180() end
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 CButtonPlayerMove225 = CButtonArrow225:extend() -- generic player move 225 button
@@ -1499,7 +1499,7 @@ function CButtonPlayerMove225:new(_argt)
     CButtonPlayerMove225.super.new(self, _argt)
     self.behaviour      = IButtonPlayerMove.BEHAVIOUR
     self.clicklf        = function() Tic:moveDirection225() end
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 CButtonPlayerMove270 = CButtonArrow270:extend() -- generic player move 270 button
@@ -1507,7 +1507,7 @@ function CButtonPlayerMove270:new(_argt)
     CButtonPlayerMove270.super.new(self, _argt)
     self.behaviour      = IButtonPlayerMove.BEHAVIOUR
     self.clicklf        = function() Tic:moveDirection270() end
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 CButtonPlayerMove315 = CButtonArrow315:extend() -- generic player move 315 button
@@ -1515,7 +1515,7 @@ function CButtonPlayerMove315:new(_argt)
     CButtonPlayerMove315.super.new(self, _argt)
     self.behaviour      = IButtonPlayerMove.BEHAVIOUR
     self.clicklf        = function() Tic:moveDirection315() end
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 
@@ -1562,7 +1562,7 @@ function CButtonMessagePrev:new(_argt)
     self.kind = Classic.KINDBUTTONMESSAGEPREV
     self.name = Classic.NAMEBUTTONMESSAGEPREV
 	self.behaviour      = CButtonMessagePrev.BEHAVIOUR  -- function to trigger at first
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 
@@ -1592,7 +1592,7 @@ function CButtonMessageNext:new(_argt)
     self.kind = Classic.KINDBUTTONMESSAGENEXT
     self.name = Classic.NAMEBUTTONMESSAGENEXT
 	self.behaviour      = CButtonMessageNext.BEHAVIOUR  -- function to trigger at first
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 
@@ -1625,7 +1625,7 @@ function CButtonMessageTrash:new(_argt)
     self.drawground     = false
 	self.sprite.sprite  = CSpriteBG.SIGNDELETE
 	self.behaviour      = CButtonMessageTrash.BEHAVIOUR  -- function to trigger at first
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 
@@ -1671,7 +1671,7 @@ function CButtonMessageText:new(_argt)
     -- self.wheeldw        = Tic.FUNCTIONMESSAGENEXT
     -- self.wheeldwmdk     = Tic.FUNCTIONMESSAGEMAX
     --
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
     self:adjustWH()
 end
 
@@ -1704,5 +1704,5 @@ function CButtonMessageHover:new(_argt)
     self.hovertextur    = CHoverTextClickLF{text = Tic.TEXTNEXT}
     self.hovertexturmdk = CHoverTextClickLF{text = Tic.TEXTLAST}
     --
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end

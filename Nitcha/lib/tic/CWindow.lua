@@ -10,7 +10,7 @@ function CWindow:new(_argt)
     self.kind = Classic.KINDWINDOW
     self.name = Classic.NAMEWINDOW
     self.drawguides = false
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 
@@ -25,7 +25,7 @@ function CWindowScreen:new(_argt)
     self.kind = Classic.KINDWINDOWSCREEN
     self.name = Classic.NAMEWINDOWSCREEN
     self.drawframes = false
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 
@@ -39,7 +39,7 @@ function CWindowMenu:new(_argt)
     CWindowMenu.super.new(self, _argt)
     self.kind = Classic.KINDWINDOWMENU
     self.name = Classic.NAMEWINDOWMENU
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
     self:adjustWH()
 end
 
@@ -160,7 +160,7 @@ function CWindowMenuInteractions:new(_argt)
     self.drawborder = false
     self.behaviour = CWindowMenuInteractions.BEHAVIOUR
     self.interactto = nil -- current interactto if any
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
     self:adjustWH()
     self:adjustXY()
 end
@@ -188,7 +188,7 @@ function CWindowInfos:new(_argt)
     self.name = Classic.NAMEWINDOWINFOS
     self.drawborder  = false
     self.colorground = Tic.COLORBIOMENIGHT
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 function CWindowInfos:drawInside()
@@ -226,7 +226,7 @@ function CWindowInfosEntity:new(_argt)
     self.name = Classic.NAMEWINDOWINFOSENTITY
     self.align  = Tic.DIR000
 	self.entity = nil -- override
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 function CWindowInfosEntity:drawInside() -- window infos content for entities
@@ -264,7 +264,7 @@ function CWindowPlayerInfos:new(_argt)
     self.screenh   = Tic.PLAYERINFOSWH
 	self.entity    = Tic:playerActual()
 	self.behaviour = IWindowPlayer.BEHAVIOUR
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 
@@ -278,7 +278,7 @@ function CWindowPortrait:new(_argt)
     self.screenh     = Tic.PLAYERPORTRAITWH
     self.colorground = Tic.COLORBIOMENIGHT
     self.drawborder  = false
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 function CWindowPortrait:drawGround() -- window portrait ground
@@ -295,7 +295,7 @@ function CWindowPortraitDrawable:new(_argt)
     CWindowPortraitDrawable.super.new(self, _argt)
     self.idle   = false --false -- idle portait or not
 	self.entity = nil -- override
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 function CWindowPortraitDrawable:drawInside() -- window portrait content for -- [!] drawable entities
@@ -326,7 +326,7 @@ function CWindowPlayerPortrait:new(_argt)
     self.screeny   = Tic.PLAYERPORTRAITWY
 	self.entity    = Tic:playerActual()
 	self.behaviour = IWindowPlayer.BEHAVIOUR
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 function CWindowPlayerPortrait:drawInside()
@@ -346,7 +346,7 @@ function CWindowStats:new(_argt)
     self.colorground = Tic.COLORBIOMENIGHT
     self.colorborder = Tic.COLORWHITE
     self.drawborder  = false
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 
@@ -357,7 +357,7 @@ CWindowStatsCharacter = CWindowStats:extend() -- window stats for -- [!] charact
 function CWindowStatsCharacter:new(_argt)
     CWindowStatsCharacter.super.new(self, _argt)
 	self.entity = nil -- override
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 function CWindowStatsCharacter:drawInside() -- window stats content for -- [!] characters
@@ -439,7 +439,7 @@ function CWindowPlayerStats:new(_argt)
     self.screeny   = Tic.PLAYERSTATSWY
 	self.entity    = Tic:playerActual()
 	self.behaviour = IWindowPlayer.BEHAVIOUR
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 
@@ -460,7 +460,7 @@ function CWindowPlayerState:new(_argt)
     self.align     = Tic.DIR000
 	self.entity    = Tic:playerActual()
 	self.behaviour = IWindowPlayer.BEHAVIOUR
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 function CWindowPlayerState:drawInside() -- window state content for player
@@ -505,7 +505,7 @@ function CWindowSpottingInfos:new(_argt)
     self.screenw   = Tic.SPOTTINGINFOSWW
     self.screenh   = Tic.SPOTTINGINFOSWH
     self.behaviour = IWindowSpotting.BEHAVIOUR
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 
@@ -522,7 +522,7 @@ function CWindowSpottingPortrait:new(_argt)
     self.screenw   = Tic.SPOTTINGPORTRAITWW
     self.screenh   = Tic.SPOTTINGPORTRAITWH
     self.behaviour = IWindowSpotting.BEHAVIOUR
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 function CWindowSpottingPortrait:drawFrames()
@@ -547,7 +547,7 @@ function CWindowWorld:new(_argt)
     self.screenw         = Tic.WORLDWW -- sizes
     self.screenh         = Tic.WORLDWH
     self.colorground     = Tic.COLORBIOMENIGHT
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 function CWindowWorld:drawGround() -- window world ground
@@ -652,7 +652,7 @@ function CWindowInfosWorld:new(_argt)
 	self.align      = Tic.DIRHIT
     self.textline   = CTextLine{name = "WindowInfosWorldText", text = "", small = false}
     self.elements   = {self.textline}
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 function CWindowInfosWorld:drawInside() -- window infos content for world
@@ -750,7 +750,7 @@ function CWindowMessagesWorld:new(_argt)
             self.buttontext.actived = true
         end
     end
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
     self:elementsDistributeH(
         {self.buttonprev, self.buttontrash, self.buttonnext},
         self.screenx + (

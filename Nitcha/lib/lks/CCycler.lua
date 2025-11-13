@@ -35,7 +35,7 @@ function CCycler:new(_argt)
     self.stepnext = CCycler.STEPNEXT
     self.stepprev = CCycler.STEPPREV
     self.mode     = CCycler.MODECYCLE
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 function CCycler:print()
@@ -96,7 +96,7 @@ end
 CCyclerNum = CCycler:extend() -- numeric cyclers
 function CCyclerNum:new(_argt)
     CCyclerNum.super.new(self, _argt)
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
     return self.actvalue
 end
 
@@ -104,7 +104,7 @@ end
 CCyclerInt = CCyclerNum:extend() -- integer cyclers
 function CCyclerInt:new(_argt)
     CCyclerInt.super.new(self, _argt)
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
     return self.actvalue
 end
 
@@ -114,7 +114,7 @@ function CCyclerTable:new(_argt)
     self.acttable = {} -- internal table
     self.actvalue = nil
     CCyclerTable.super.new(self, _argt)
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
     return self.actvalue
 end
 

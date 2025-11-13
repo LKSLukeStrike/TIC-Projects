@@ -49,7 +49,7 @@ function CObject:new(_argt)
     self.name = Classic.NAMEOBJECT
     self.used         = CObject.USEDNONE -- used level if any
     self.inventories  = nil -- can have an inventories if any
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 
@@ -68,7 +68,7 @@ function CObjectInventory:new(_argt)
     self.interactions  = {
                          CInteractionPickObject{},
                         }
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 function CObjectInventory:handleOffsets(_state)
@@ -133,7 +133,7 @@ function CObjectPhy:new(_argt)
     self.name = Classic.NAMEOBJECTPHY
     self.inventorytype = CInventoryPhy
     self.colortype     = Tic.COLORPHYEQ
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 CObjectPhyHand = CObjectPhy:extend() -- generic phy hand objects
@@ -144,7 +144,7 @@ function CObjectPhyHand:new(_argt)
     self.kind = Classic.KINDOBJECPHYHAND
     self.name = Classic.NAMEOBJECPHYHAND
     self.slottype = CSlotHand
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 CObjectPhyHead = CObjectPhy:extend() -- generic phy head objects
@@ -155,7 +155,7 @@ function CObjectPhyHead:new(_argt)
     self.kind = Classic.KINDOBJECTPHYHEAD
     self.name = Classic.NAMEOBJECTPHYHEAD
     self.slottype = CSlotHead
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 CObjectPhyBack = CObjectPhy:extend() -- generic phy back objects
@@ -166,7 +166,7 @@ function CObjectPhyBack:new(_argt)
     self.kind = Classic.KINDOBJECTPHYBACK
     self.name = Classic.NAMEOBJECTPHYBACK
     self.slottype = CSlotBack
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 CObjectPhyNone = CObjectPhy:extend() -- generic phy none objects
@@ -177,7 +177,7 @@ function CObjectPhyNone:new(_argt)
     self.kind = Classic.KINDOBJECTPHYNONE
     self.name = Classic.NAMEOBJECTPHYNONE
     self.slottype = nil
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 
@@ -193,7 +193,7 @@ function CObjectMen:new(_argt)
     self.name = Classic.NAMEOBJECTMEN
     self.inventorytype = CInventoryMen
     self.colortype     = Tic.COLORMENEQ
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 CObjectMenHand = CObjectMen:extend() -- generic men hand objects
@@ -204,7 +204,7 @@ function CObjectMenHand:new(_argt)
     self.kind = Classic.KINDOBJECMENHAND
     self.name = Classic.NAMEOBJECMENHAND
     self.slottype = CSlotHand
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 CObjectMenHand = CObjectMen:extend() -- generic men hand objects
@@ -215,7 +215,7 @@ function CObjectMenHand:new(_argt)
     self.kind = Classic.KINDOBJECMENHAND
     self.name = Classic.NAMEOBJECMENHAND
     self.slottype = CSlotHand
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 CObjectMenHead = CObjectMen:extend() -- generic men head objects
@@ -226,7 +226,7 @@ function CObjectMenHead:new(_argt)
     self.kind = Classic.KINDOBJECTMENHEAD
     self.name = Classic.NAMEOBJECTMENHEAD
     self.slottype = CSlotHead
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 CObjectMenBack = CObjectMen:extend() -- generic men back objects
@@ -237,7 +237,7 @@ function CObjectMenBack:new(_argt)
     self.kind = Classic.KINDOBJECTMENBACK
     self.name = Classic.NAMEOBJECTMENBACK
     self.slottype = CSlotBack
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 CObjectMenNone = CObjectMen:extend() -- generic men none objects
@@ -248,7 +248,7 @@ function CObjectMenNone:new(_argt)
     self.kind = Classic.KINDOBJECTMENNONE
     self.name = Classic.NAMEOBJECTMENNONE
     self.slottype = nil
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 
@@ -264,7 +264,7 @@ function CObjectPsy:new(_argt)
     self.name = Classic.NAMEOBJECTPSY
     self.inventorytype = CInventoryPsy
     self.colortype     = Tic.COLORPSYEQ
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 CObjectPsyHand = CObjectPsy:extend() -- generic psy hand objects
@@ -275,7 +275,7 @@ function CObjectPsyHand:new(_argt)
     self.kind = Classic.KINDOBJECPSYHAND
     self.name = Classic.NAMEOBJECPSYHAND
     self.slottype = CSlotHand
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 CObjectPsyHand = CObjectPsy:extend() -- generic psy hand objects
@@ -286,7 +286,7 @@ function CObjectPsyHand:new(_argt)
     self.kind = Classic.KINDOBJECPSYHAND
     self.name = Classic.NAMEOBJECPSYHAND
     self.slottype = CSlotHand
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 CObjectPsyHead = CObjectPsy:extend() -- generic psy head objects
@@ -297,7 +297,7 @@ function CObjectPsyHead:new(_argt)
     self.kind = Classic.KINDOBJECTPSYHEAD
     self.name = Classic.NAMEOBJECTPSYHEAD
     self.slottype = CSlotHead
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 CObjectPsyBack = CObjectPsy:extend() -- generic psy back objects
@@ -308,7 +308,7 @@ function CObjectPsyBack:new(_argt)
     self.kind = Classic.KINDOBJECTPSYBACK
     self.name = Classic.NAMEOBJECTPSYBACK
     self.slottype = CSlotBack
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 CObjectPsyNone = CObjectPsy:extend() -- generic psy none objects
@@ -319,7 +319,7 @@ function CObjectPsyNone:new(_argt)
     self.kind = Classic.KINDOBJECTPSYNONE
     self.name = Classic.NAMEOBJECTPSYNONE
     self.slottype = nil
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 
@@ -334,7 +334,7 @@ function CObjectAny:new(_argt)
     self.kind = Classic.KINDOBJECTANY
     self.name = Classic.NAMEOBJECTANY
     self.inventorytype = CInventoryAny
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 CObjectAnyHand = CObjectAny:extend() -- generic any hand objects
@@ -345,7 +345,7 @@ function CObjectAnyHand:new(_argt)
     self.kind = Classic.KINDOBJECANYHAND
     self.name = Classic.NAMEOBJECANYHAND
     self.slottype = CSlotHand
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 CObjectAnyHand = CObjectAny:extend() -- generic any hand objects
@@ -356,7 +356,7 @@ function CObjectAnyHand:new(_argt)
     self.kind = Classic.KINDOBJECANYHAND
     self.name = Classic.NAMEOBJECANYHAND
     self.slottype = CSlotHand
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 CObjectAnyHead = CObjectAny:extend() -- generic any head objects
@@ -367,7 +367,7 @@ function CObjectAnyHead:new(_argt)
     self.kind = Classic.KINDOBJECTANYHEAD
     self.name = Classic.NAMEOBJECTANYHEAD
     self.slottype = CSlotHead
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 CObjectAnyBack = CObjectAny:extend() -- generic any back objects
@@ -378,7 +378,7 @@ function CObjectAnyBack:new(_argt)
     self.kind = Classic.KINDOBJECTANYBACK
     self.name = Classic.NAMEOBJECTANYBACK
     self.slottype = CSlotBack
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 CObjectAnyNone = CObjectAny:extend() -- generic any none objects
@@ -389,7 +389,7 @@ function CObjectAnyNone:new(_argt)
     self.kind = Classic.KINDOBJECTANYNONE
     self.name = Classic.NAMEOBJECTANYNONE
     self.slottype = nil
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 
@@ -566,7 +566,7 @@ function CWeaponMelee:new(_argt)
     self.kind = Classic.KINDDWEAPONMELEE
     self.name = Classic.NAMEDWEAPONMELEE
     self.sprite  = CSpriteFG.WEAPONMELEE
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
     self:implementnew(IObjectHandAttack)
 end
 
@@ -578,7 +578,7 @@ function CWeaponSword:new(_argt)
     self.kind = Classic.KINDDWEAPONSWORD
     self.name = Classic.NAMEDWEAPONSWORD
     self.sprite  = CSpriteFG.WEAPONMSWRD
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 CWeaponHammer = CWeaponMelee:extend() -- Hammer weapons
@@ -595,7 +595,7 @@ function CWeaponHammer:new(_argt)
         [Tic.ROTATE180] = {handlex = 3, handley = 2},
         [Tic.ROTATE270] = {handlex = 5, handley = 3},
     }
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 CWeaponLance = CWeaponMelee:extend() -- Lance weapons
@@ -618,7 +618,7 @@ function CWeaponLance:new(_argt)
         [CObject.INSIDE] = CObject.COLORONYXBG,
         [CObject.EFFECT] = CObject.COLORONYXFG,
     }
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 
@@ -633,7 +633,7 @@ function CWeaponShield:new(_argt)
     self.kind = Classic.KINDDWEAPONSHIELD
     self.name = Classic.NAMEDWEAPONSHIELD
     self.sprite  = CSpriteFG.WEAPONSHLDB
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
     self:implementnew(IObjectHandDefense)
 end
 
@@ -645,7 +645,7 @@ function CWeaponShieldSmall:new(_argt)
     self.kind = Classic.KINDWEAPONSHIELDSMALL
     self.name = Classic.KINDWEAPONSHIELDSMALL
     self.sprite = CSpriteFG.WEAPONSHLDS
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 CWeaponShieldMedium = CWeaponShield:extend() -- ShieldMedium weapons
@@ -656,7 +656,7 @@ function CWeaponShieldMedium:new(_argt)
     self.kind = Classic.KINDWEAPONSHIELDMEDIUM
     self.name = Classic.NAMEWEAPONSHIELDMEDIUM
     self.sprite = CSpriteFG.WEAPONSHLDM
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 CWeaponShieldLarge = CWeaponShield:extend() -- ShieldLarge weapons
@@ -667,7 +667,7 @@ function CWeaponShieldLarge:new(_argt)
     self.kind = Classic.KINDWEAPONSHIELDLARGE
     self.name = Classic.NAMEWEAPONSHIELDLARGE
     self.sprite = CSpriteFG.WEAPONSHLDL
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 
@@ -688,7 +688,7 @@ function CClothesHelmet:new(_argt)
         [CObject.INSIDE] = CObject.COLORLEATHERFG,
         [CObject.EFFECT] = CObject.COLORPHYM,
     }
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
     self:implementnew(IObjectHead)
 end
 
@@ -700,7 +700,7 @@ function CClothesHelmetSmall:new(_argt)
     self.kind = Classic.KINDCLOTHESHELMETSMALL
     self.name = Classic.NAMECLOTHESHELMETSMALL
     self.sprite = CSpriteFG.CLOTHESHLMS
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 CClothesHelmetMedium = CClothesHelmet:extend() -- HelmetMedium objects
@@ -711,7 +711,7 @@ function CClothesHelmetMedium:new(_argt)
     self.kind = Classic.KINDCLOTHESHELMETMEDIUM
     self.name = Classic.NAMECLOTHESHELMETMEDIUM
     self.sprite = CSpriteFG.CLOTHESHLMM
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 CClothesHelmetLarge = CClothesHelmet:extend() -- HelmetLarge objects
@@ -722,7 +722,7 @@ function CClothesHelmetLarge:new(_argt)
     self.kind = Classic.KINDCLOTHESHELMETLARGE
     self.name = Classic.NAMECLOTHESHELMETLARGE
     self.sprite = CSpriteFG.CLOTHESHLML
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 
@@ -737,8 +737,8 @@ function CClothesBackPack:new(_argt)
     self.kind = Classic.KINDCLOTHESBACKPACK
     self.name = Classic.NAMECLOTHESBACKPACK
     self.sprite    = CSpriteFG.CLOTHESBKPB
-    self.inventory = CInventoryAny2{}
-    self:argt(_argt) -- override if any
+    self.inventory = CInventoryPhy2{}
+    self:argt(_argt)
     self:implementnew(IObjectBack)
 end
 
@@ -750,8 +750,8 @@ function CClothesBackPackSmall:new(_argt)
     self.kind = Classic.KINDCLOTHESBACKPACKSMALL
     self.name = Classic.NAMECLOTHESBACKPACKSMALL
     self.sprite    = CSpriteFG.CLOTHESBKPS
-    self.inventory = CInventoryAny2{}
-    self:argt(_argt) -- override if any
+    self.inventory = CInventoryPhy2{}
+    self:argt(_argt)
 end
 
 CClothesBackPackMedium = CClothesBackPack:extend() -- BackPackMedium objects
@@ -762,8 +762,8 @@ function CClothesBackPackMedium:new(_argt)
     self.kind = Classic.KINDCLOTHESBACKPACKMEDIUM
     self.name = Classic.NAMECLOTHESBACKPACKMEDIUM
     self.sprite    = CSpriteFG.CLOTHESBKPM
-    self.inventory = CInventoryAny4{}
-    self:argt(_argt) -- override if any
+    self.inventory = CInventoryPhy4{}
+    self:argt(_argt)
 end
 
 CClothesBackPackLarge = CClothesBackPack:extend() -- BackPackLarge objects
@@ -774,8 +774,8 @@ function CClothesBackPackLarge:new(_argt)
     self.kind = Classic.KINDCLOTHESBACKPACKLARGE
     self.name = Classic.NAMECLOTHESBACKPACKLARGE
     self.sprite    = CSpriteFG.CLOTHESBKPL
-    self.inventory = CInventoryAny6{}
-    self:argt(_argt) -- override if any
+    self.inventory = CInventoryPhy6{}
+    self:argt(_argt)
 end
 
 
@@ -812,7 +812,7 @@ function CObjectBomb:new(_argt)
         [CObject.EXTRA1] = CObject.COLORFIREBG,
         [CObject.EXTRA2] = CObject.COLORIRONBG,
     }
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
     self:implementall(IObjectUsable)
 end
 
@@ -824,7 +824,7 @@ function CObjectBombSmall:new(_argt)
     self.kind = Classic.KINDOBJECTBOMBSMALL
     self.name = Classic.NAMEOBJECTBOMBSMALL
     self.sprite  = CSpriteFG.OBJECTBOMBS
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 CObjectBombMedium = CObjectBomb:extend() -- BombMedium objects
@@ -835,7 +835,7 @@ function CObjectBombMedium:new(_argt)
     self.kind = Classic.KINDOBJECTBOMBMEDIUM
     self.name = Classic.NAMEOBJECTBOMBMEDIUM
     self.sprite  = CSpriteFG.OBJECTBOMBM
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 CObjectBombLarge = CObjectBomb:extend() -- BombLarge objects
@@ -846,7 +846,7 @@ function CObjectBombLarge:new(_argt)
     self.kind = Classic.KINDOBJECTBOMBLARGE
     self.name = Classic.NAMEOBJECTBOMBLARGE
     self.sprite  = CSpriteFG.OBJECTBOMBL
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 
@@ -889,7 +889,7 @@ function CWeaponRange:new(_argt)
         [CObject.INSIDE] = CObject.COLORONYXBG,
         [CObject.EFFECT] = CObject.COLORONYXFG,
     }
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 CWeaponBowSmall = CWeaponRange:extend() -- BowSmall weapons
@@ -900,7 +900,7 @@ function CWeaponBowSmall:new(_argt)
     self.kind = Classic.KINDDWEAPONBOWSMALL
     self.name = Classic.NAMEDWEAPONBOWSMALL
     self.sprite  = CSpriteFG.WEAPONRBOWS
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 CWeaponBowMedium = CWeaponRange:extend() -- BowMedium weapons
@@ -911,7 +911,7 @@ function CWeaponBowMedium:new(_argt)
     self.kind = Classic.KINDDWEAPONBOWMEDIUM
     self.name = Classic.NAMEDWEAPONBOWMEDIUM
     self.sprite  = CSpriteFG.WEAPONRBOWM
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 CWeaponBowLarge = CWeaponRange:extend() -- BowLarge weapons
@@ -922,7 +922,7 @@ function CWeaponBowLarge:new(_argt)
     self.kind = Classic.KINDDWEAPONBOWLARGE
     self.name = Classic.NAMEDWEAPONBOWLARGE
     self.sprite  = CSpriteFG.WEAPONRBOWL
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 
@@ -967,7 +967,7 @@ function CWeaponBook:new(_argt)
         [CObject.EFFECT] = CObject.COLORLEATHERBG,
         [CObject.EXTRA1] = CObject.COLORONYXBG,
     }
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
     self:implementnew(IObjectHandDefense)
 end
 
@@ -979,7 +979,7 @@ function CWeaponBookSmall:new(_argt)
     self.kind = Classic.KINDWEAPONBOOKSMALL
     self.name = Classic.KINDWEAPONBOOKSMALL
     self.sprite = CSpriteFG.WEAPONBOOKS
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 CWeaponBookMedium = CWeaponBook:extend() -- BookMedium weapons
@@ -990,7 +990,7 @@ function CWeaponBookMedium:new(_argt)
     self.kind = Classic.KINDWEAPONBOOKMEDIUM
     self.name = Classic.NAMEWEAPONBOOKMEDIUM
     self.sprite = CSpriteFG.WEAPONBOOKM
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 CWeaponBookLarge = CWeaponBook:extend() -- BookLarge weapons
@@ -1001,7 +1001,7 @@ function CWeaponBookLarge:new(_argt)
     self.kind = Classic.KINDWEAPONBOOKLARGE
     self.name = Classic.NAMEWEAPONBOOKLARGE
     self.sprite = CSpriteFG.WEAPONBOOKL
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 
@@ -1022,7 +1022,7 @@ function CClothesHat:new(_argt)
         [CObject.INSIDE] = CObject.COLORLEATHERFG,
         [CObject.EFFECT] = CObject.COLORLEATHERFG,
     }
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
     self:implementnew(IObjectHead)
 end
 
@@ -1034,7 +1034,7 @@ function CClothesHatSmall:new(_argt)
     self.kind = Classic.KINDCLOTHESHATSMALL
     self.name = Classic.NAMECLOTHESHATSMALL
     self.sprite = CSpriteFG.CLOTHESHATS
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 CClothesHatMedium = CClothesHat:extend() -- HatMedium objects
@@ -1045,7 +1045,7 @@ function CClothesHatMedium:new(_argt)
     self.kind = Classic.KINDCLOTHESHATMEDIUM
     self.name = Classic.NAMECLOTHESHATMEDIUM
     self.sprite = CSpriteFG.CLOTHESHATM
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 CClothesHatLarge = CClothesHat:extend() -- HatLarge objects
@@ -1056,7 +1056,7 @@ function CClothesHatLarge:new(_argt)
     self.kind = Classic.KINDCLOTHESHATLARGE
     self.name = Classic.NAMECLOTHESHATLARGE
     self.sprite = CSpriteFG.CLOTHESHATL
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 
@@ -1071,7 +1071,7 @@ function CClothesToolBox:new(_argt)
     self.kind = Classic.KINDCLOTHESTOOLBOX
     self.name = Classic.NAMECLOTHESTOOLBOX
     self.sprite    = CSpriteFG.CLOTHESTBXB
-    self.inventory = CInventoryAny2{}
+    self.inventory = CInventoryMen2{}
     self.palettefg = {
         [CObject.HANDLE] = Tic.COLORKEY,
         [CObject.BORDER] = CObject.COLORONYXFG,
@@ -1079,7 +1079,7 @@ function CClothesToolBox:new(_argt)
         [CObject.EFFECT] = CObject.COLORWOODFG,
         [CObject.EXTRA1] = CObject.COLORONYXBG,
     }
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
     self:implementnew(IObjectBack)
 end
 
@@ -1091,8 +1091,8 @@ function CClothesToolBoxSmall:new(_argt)
     self.kind = Classic.KINDCLOTHESTOOLBOXSMALL
     self.name = Classic.NAMECLOTHESTOOLBOXSMALL
     self.sprite    = CSpriteFG.CLOTHESTBXS
-    self.inventory = CInventoryAny2{}
-    self:argt(_argt) -- override if any
+    self.inventory = CInventoryMen2{}
+    self:argt(_argt)
 end
 
 CClothesToolBoxMedium = CClothesToolBox:extend() -- ToolBoxMedium objects
@@ -1103,8 +1103,8 @@ function CClothesToolBoxMedium:new(_argt)
     self.kind = Classic.KINDCLOTHESTOOLBOXMEDIUM
     self.name = Classic.NAMECLOTHESTOOLBOXMEDIUM
     self.sprite    = CSpriteFG.CLOTHESTBXM
-    self.inventory = CInventoryAny4{}
-    self:argt(_argt) -- override if any
+    self.inventory = CInventoryMen4{}
+    self:argt(_argt)
 end
 
 CClothesToolBoxLarge = CClothesToolBox:extend() -- ToolBoxLarge objects
@@ -1115,8 +1115,8 @@ function CClothesToolBoxLarge:new(_argt)
     self.kind = Classic.KINDCLOTHESTOOLBOXLARGE
     self.name = Classic.NAMECLOTHESTOOLBOXLARGE
     self.sprite    = CSpriteFG.CLOTHESTBXL
-    self.inventory = CInventoryAny6{}
-    self:argt(_argt) -- override if any
+    self.inventory = CInventoryMen6{}
+    self:argt(_argt)
 end
 
 
@@ -1149,7 +1149,7 @@ function CObjectFlask:new(_argt)
         [CObject.INSIDE] = CObject.COLORWOODBG,
         [CObject.EFFECT] = CObject.COLORWOODBG,
     }
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
     self:implementall(IObjectUsable)
 end
 
@@ -1161,7 +1161,7 @@ function CObjectFlaskSmall:new(_argt)
     self.kind = Classic.KINDOBJECTFLASKSMALL
     self.name = Classic.NAMEOBJECTFLASKSMALL
     self.sprite  = CSpriteFG.OBJECTFLASS
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 CObjectFlaskMedium = CObjectFlask:extend() -- FlaskMedium objects
@@ -1172,7 +1172,7 @@ function CObjectFlaskMedium:new(_argt)
     self.kind = Classic.KINDOBJECTFLASKMEDIUM
     self.name = Classic.NAMEOBJECTFLASKMEDIUM
     self.sprite  = CSpriteFG.OBJECTFLASM
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 CObjectFlaskLarge = CObjectFlask:extend() -- FlaskLarge objects
@@ -1183,7 +1183,7 @@ function CObjectFlaskLarge:new(_argt)
     self.kind = Classic.KINDOBJECTFLASKLARGE
     self.name = Classic.NAMEOBJECTFLASKLARGE
     self.sprite  = CSpriteFG.OBJECTFLASL
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 
@@ -1210,7 +1210,7 @@ function CWeaponMagic:new(_argt)
         [CObject.INSIDE] = CObject.COLORMAGIC1BG,
         [CObject.EFFECT] = CObject.COLORMAGIC2BG,
     }
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
     self:implementnew(IObjectHandAttack)
 end
 
@@ -1222,7 +1222,7 @@ function CWeaponWandSmall:new(_argt)
     self.kind = Classic.KINDDWEAPONWANDSMALL
     self.name = Classic.NAMEDWEAPONWANDSMALL
     self.sprite  = CSpriteFG.WEAPONMWNDS
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 CWeaponWandMedium = CWeaponMagic:extend() -- WandMedium weapons
@@ -1233,7 +1233,7 @@ function CWeaponWandMedium:new(_argt)
     self.kind = Classic.KINDDWEAPONWANDMEDIUM
     self.name = Classic.NAMEDWEAPONWANDMEDIUM
     self.sprite  = CSpriteFG.WEAPONMWNDM
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 CWeaponWandLarge = CWeaponMagic:extend() -- WandLarge weapons
@@ -1244,7 +1244,7 @@ function CWeaponWandLarge:new(_argt)
     self.kind = Classic.KINDDWEAPONWANDLARGE
     self.name = Classic.NAMEDWEAPONWANDLARGE
     self.sprite  = CSpriteFG.WEAPONMWNDL
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 
@@ -1271,7 +1271,7 @@ function CWeaponRune:new(_argt)
         [CObject.INSIDE] = CObject.COLORMAGIC1BG,
         [CObject.EFFECT] = CObject.COLORMAGIC2BG,
     }
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
     self:implementnew(IObjectHandDefense)
 end
 
@@ -1283,7 +1283,7 @@ function CWeaponRuneSmall:new(_argt)
     self.kind = Classic.KINDWEAPONRUNESMALL
     self.name = Classic.KINDWEAPONRUNESMALL
     self.sprite = CSpriteFG.WEAPONRUNES
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 CWeaponRuneMedium = CWeaponRune:extend() -- RuneMedium weapons
@@ -1294,7 +1294,7 @@ function CWeaponRuneMedium:new(_argt)
     self.kind = Classic.KINDWEAPONRUNEMEDIUM
     self.name = Classic.NAMEWEAPONRUNEMEDIUM
     self.sprite = CSpriteFG.WEAPONRUNEM
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 CWeaponRuneLarge = CWeaponRune:extend() -- RuneLarge weapons
@@ -1305,7 +1305,7 @@ function CWeaponRuneLarge:new(_argt)
     self.kind = Classic.KINDWEAPONRUNELARGE
     self.name = Classic.NAMEWEAPONRUNELARGE
     self.sprite = CSpriteFG.WEAPONRUNEL
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 
@@ -1326,7 +1326,7 @@ function CClothesCap:new(_argt)
         [CObject.INSIDE] = CObject.COLORLEATHERFG,
         [CObject.EFFECT] = CObject.COLORLEATHERFG,
     }
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
     self:implementnew(IObjectHead)
 end
 
@@ -1338,7 +1338,7 @@ function CClothesCapSmall:new(_argt)
     self.kind = Classic.KINDCLOTHESCAPSMALL
     self.name = Classic.NAMECLOTHESCAPSMALL
     self.sprite = CSpriteFG.CLOTHESCAPS
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 CClothesCapMedium = CClothesCap:extend() -- CapMedium objects
@@ -1349,7 +1349,7 @@ function CClothesCapMedium:new(_argt)
     self.kind = Classic.KINDCLOTHESCAPMEDIUM
     self.name = Classic.NAMECLOTHESCAPMEDIUM
     self.sprite = CSpriteFG.CLOTHESCAPM
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 CClothesCapLarge = CClothesCap:extend() -- CapLarge objects
@@ -1360,7 +1360,7 @@ function CClothesCapLarge:new(_argt)
     self.kind = Classic.KINDCLOTHESCAPLARGE
     self.name = Classic.NAMECLOTHESCAPLARGE
     self.sprite = CSpriteFG.CLOTHESCAPL
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 
@@ -1375,7 +1375,7 @@ function CClothesScrollCase:new(_argt)
     self.kind = Classic.KINDCLOTHESSCROLLCASE
     self.name = Classic.NAMECLOTHESSCROLLCASE
     self.sprite    = CSpriteFG.CLOTHESCASB
-    self.inventory = CInventoryAny2{}
+    self.inventory = CInventoryPsy2{}
     self.palettefg = {
         [CObject.HANDLE] = Tic.COLORKEY,
         [CObject.BORDER] = CObject.COLORIRONBG,
@@ -1383,7 +1383,7 @@ function CClothesScrollCase:new(_argt)
         [CObject.EFFECT] = CObject.COLORWOODFG,
         [CObject.EXTRA1] = CObject.COLORWOODBG,
     }
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
     self:implementnew(IObjectBack)
 end
 
@@ -1395,8 +1395,8 @@ function CClothesScrollCaseSmall:new(_argt)
     self.kind = Classic.KINDCLOTHESSCROLLCASESMALL
     self.name = Classic.NAMECLOTHESSCROLLCASESMALL
     self.sprite    = CSpriteFG.CLOTHESCASS
-    self.inventory = CInventoryAny2{}
-    self:argt(_argt) -- override if any
+    self.inventory = CInventoryPsy2{}
+    self:argt(_argt)
 end
 
 CClothesScrollCaseMedium = CClothesScrollCase:extend() -- ScrollCaseMedium objects
@@ -1407,8 +1407,8 @@ function CClothesScrollCaseMedium:new(_argt)
     self.kind = Classic.KINDCLOTHESSCROLLCASEMEDIUM
     self.name = Classic.NAMECLOTHESSCROLLCASEMEDIUM
     self.sprite    = CSpriteFG.CLOTHESCASM
-    self.inventory = CInventoryAny4{}
-    self:argt(_argt) -- override if any
+    self.inventory = CInventoryPsy4{}
+    self:argt(_argt)
 end
 
 CClothesScrollCaseLarge = CClothesScrollCase:extend() -- ScrollCaseLarge objects
@@ -1419,8 +1419,8 @@ function CClothesScrollCaseLarge:new(_argt)
     self.kind = Classic.KINDCLOTHESSCROLLCASELARGE
     self.name = Classic.NAMECLOTHESSCROLLCASELARGE
     self.sprite    = CSpriteFG.CLOTHESCASL
-    self.inventory = CInventoryAny6{}
-    self:argt(_argt) -- override if any
+    self.inventory = CInventoryPsy6{}
+    self:argt(_argt)
 end
 
 
@@ -1457,7 +1457,7 @@ function CObjectSpell:new(_argt)
         [CObject.EXTRA1] = CObject.COLORLEATHERXG,
         [CObject.EXTRA2] = CObject.COLORIRONBG,
     }
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
     self:implementall(IObjectUsable)
 end
 
@@ -1469,7 +1469,7 @@ function CObjectSpellSmall:new(_argt)
     self.kind = Classic.KINDOBJECTSPELLSMALL
     self.name = Classic.NAMEOBJECTSPELLSMALL
     self.sprite  = CSpriteFG.OBJECTSPELS
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 CObjectSpellMedium = CObjectSpell:extend() -- SpellMedium objects
@@ -1480,7 +1480,7 @@ function CObjectSpellMedium:new(_argt)
     self.kind = Classic.KINDOBJECTSPELLMEDIUM
     self.name = Classic.NAMEOBJECTSPELLMEDIUM
     self.sprite  = CSpriteFG.OBJECTSPELM
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 CObjectSpellLarge = CObjectSpell:extend() -- SpellLarge objects
@@ -1491,5 +1491,5 @@ function CObjectSpellLarge:new(_argt)
     self.kind = Classic.KINDOBJECTSPELLLARGE
     self.name = Classic.NAMEOBJECTSPELLLARGE
     self.sprite  = CSpriteFG.OBJECTSPELL
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end

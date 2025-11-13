@@ -12,5 +12,5 @@ function CAnimation:new(_argt)
     self.percent0  = 0.5
     self.palette0  = {}
     self.palette1  = {}
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end

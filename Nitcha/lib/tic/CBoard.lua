@@ -16,7 +16,7 @@ function CBoard:new(_argt)
     self.board     = {}
     self.palette   = {} -- palette if any
     self.colorkeys = {} -- colorkeys if any
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 function CBoard:isEmpty(_boardx, _boardy) -- check if a point on board is empty

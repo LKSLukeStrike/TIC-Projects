@@ -10,7 +10,7 @@ function CPlayer:new(_argt)
     --
     self.hoverbutton  = CButtonEntityHoverLockPick{entity = self, colorborder = Tic.COLORGREEND} -- hover lock pick button
     --
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
     self:append()
 end
 
@@ -34,7 +34,7 @@ function CPlayerHumanoid:new(_argt)
     self.classic = CPlayerHumanoid
     --
     --
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
     self:implementall(ICharacterHumanoid)
 end
 
@@ -57,7 +57,7 @@ function CPlayerHuman:new(_argt)
     self.statpsymax   = 5
     self.statpsyact   = self.statpsymax
     --
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 
@@ -79,7 +79,7 @@ function CPlayerDwarf:new(_argt)
     self.statpsymax   = 2
     self.statpsyact   = self.statpsymax
     --
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 
@@ -102,7 +102,7 @@ function CPlayerGnome:new(_argt)
     self.statpsymax   = 6
     self.statpsyact   = self.statpsymax
     --
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 
@@ -126,7 +126,7 @@ function CPlayerElvwe:new(_argt)
     self.statpsymax   = 5
     self.statpsyact   = self.statpsymax
     --
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 
@@ -149,7 +149,7 @@ function CPlayerDrowe:new(_argt)
     self.statpsymax   = 4
     self.statpsyact   = self.statpsymax
     --
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 
@@ -172,7 +172,7 @@ function CPlayerAngel:new(_argt)
     self.statpsymax   = 6
     self.statpsyact   = self.statpsymax
     --
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 
@@ -197,7 +197,7 @@ function CPlayerGolth:new(_argt)
     self.statpsymax   = 1
     self.statpsyact   = self.statpsymax
     --
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 
@@ -220,7 +220,7 @@ function CPlayerHorne:new(_argt)
     self.statpsymax   = 7
     self.statpsyact   = self.statpsymax
     --
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 
@@ -238,7 +238,7 @@ function CPlayerDemon:new(_argt)
     self.statpsymax   = 7
     self.statpsyact   = self.statpsymax
     --
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 
@@ -257,7 +257,7 @@ function CPlayerTifel:new(_argt)
     self.statpsymax   = 5
     self.statpsyact   = self.statpsymax
     --
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 
@@ -279,7 +279,7 @@ function CPlayerMeduz:new(_argt)
     self.statpsymax   = 5
     self.statpsyact   = self.statpsymax
     --
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 
@@ -301,7 +301,7 @@ function CPlayerGnoll:new(_argt)
     self.statpsymax   = 2
     self.statpsyact   = self.statpsymax
     --
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 
@@ -313,7 +313,7 @@ function CPlayerWolfe:new(_argt)
     self.kind    = Classic.KINDWOLFE
     --
     --
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 
@@ -336,5 +336,5 @@ function CPlayerGhost:new(_argt)
     self.statpsymax   = 6
     self.statpsyact   = self.statpsymax
     --
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end

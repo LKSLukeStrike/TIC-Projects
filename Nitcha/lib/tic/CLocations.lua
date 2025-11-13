@@ -9,7 +9,7 @@ function CLocations:new(_argt)
     self.kind = Classic.KINDLOCATIONS
     self.name = Classic.NAMELOCATIONS
     self.locations = {}
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 function CLocations:entities(_locations) -- entities in locations

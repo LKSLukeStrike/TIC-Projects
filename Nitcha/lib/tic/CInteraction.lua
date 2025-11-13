@@ -13,7 +13,7 @@ function CInteraction:new(_argt)
     self.text = Tic.TEXTDEFAULT
     self.interactiflf = CInteraction.INTERACTIFDEFAULT
     self.interactdolf = CInteraction.INTERACTDODEFAULT
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 CInteractionSayMessage = CInteraction:extend() -- SayMessage interaction
@@ -22,7 +22,7 @@ function CInteractionSayMessage:new(_argt)
     CInteractionSayMessage.super.new(self, _argt)
     self.text = Tic.TEXTSAY
     self.interactdolf = CInteraction.INTERACTDOSAYMESSAGE
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 CInteractionPickObject = CInteraction:extend() -- PickObject interaction
@@ -33,7 +33,7 @@ function CInteractionPickObject:new(_argt)
     self.text = Tic.TEXTPICK
     self.interactiflf = CInteraction.INTERACTIFPICKOBJECT
     self.interactdolf = CInteraction.INTERACTDOPICKOBJECT
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 CInteractionJoinParty = CInteraction:extend() -- JoinParty interaction
@@ -44,5 +44,5 @@ function CInteractionJoinParty:new(_argt)
     self.text = Tic.TEXTJOIN
     -- self.interactiflf = CInteraction.INTERACTIFJOINPARTY
     self.interactdolf = CInteraction.INTERACTDOJOINPARTY
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end

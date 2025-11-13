@@ -10,7 +10,7 @@ function CEntitiesLocations:new(_argt)
     self.name = Classic.NAMEENTITIESLOCATIONS
     self.entities  = {} -- record each entity -- has to have worldx and worldy attributes
     self.locations = CLocations{} -- record each entity locations
-    self:argt(_argt) -- override if any
+    self:argt(_argt)
 end
 
 function CEntitiesLocations:existsEntity(_entity) -- if exists an entity
