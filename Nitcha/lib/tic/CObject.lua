@@ -48,10 +48,12 @@ function CObject:new(_argt)
     self.kind = Classic.KINDOBJECT
     self.name = Classic.NAMEOBJECT
     self.used         = CObject.USEDNONE -- used level if any
-    self.inventories  = nil -- can have an inventories if any
     self:argt(_argt)
 end
 
+function CObject:isBag() -- is a bag ?
+    return (self:is(CClothesBackPack) or self:is(CClothesToolBox) or self:is(CClothesScrollCase))
+end
 
 --
 -- CObjectInventory
@@ -730,8 +732,8 @@ end
 -- CClothesBackPack PHY BACK
 --
 CClothesBackPack = CObjectPhyBack:extend() -- BackPack objects
-Classic.KINDCLOTHESBACKPACK = "Bag"
-Classic.NAMECLOTHESBACKPACK = "Bag"
+Classic.KINDCLOTHESBACKPACK = "Pack"
+Classic.NAMECLOTHESBACKPACK = "Pack"
 function CClothesBackPack:new(_argt)
     CClothesBackPack.super.new(self, _argt)
     self.kind = Classic.KINDCLOTHESBACKPACK
@@ -743,8 +745,8 @@ function CClothesBackPack:new(_argt)
 end
 
 CClothesBackPackSmall = CClothesBackPack:extend() -- BackPackSmall objects
-Classic.KINDCLOTHESBACKPACKSMALL = "Bag.S"
-Classic.NAMECLOTHESBACKPACKSMALL = "Bag.S"
+Classic.KINDCLOTHESBACKPACKSMALL = "Pack.S"
+Classic.NAMECLOTHESBACKPACKSMALL = "Pack.S"
 function CClothesBackPackSmall:new(_argt)
     CClothesBackPackSmall.super.new(self, _argt)
     self.kind = Classic.KINDCLOTHESBACKPACKSMALL
@@ -755,8 +757,8 @@ function CClothesBackPackSmall:new(_argt)
 end
 
 CClothesBackPackMedium = CClothesBackPack:extend() -- BackPackMedium objects
-Classic.KINDCLOTHESBACKPACKMEDIUM = "Bag.M"
-Classic.NAMECLOTHESBACKPACKMEDIUM = "Bag.M"
+Classic.KINDCLOTHESBACKPACKMEDIUM = "Pack.M"
+Classic.NAMECLOTHESBACKPACKMEDIUM = "Pack.M"
 function CClothesBackPackMedium:new(_argt)
     CClothesBackPackMedium.super.new(self, _argt)
     self.kind = Classic.KINDCLOTHESBACKPACKMEDIUM
@@ -767,8 +769,8 @@ function CClothesBackPackMedium:new(_argt)
 end
 
 CClothesBackPackLarge = CClothesBackPack:extend() -- BackPackLarge objects
-Classic.KINDCLOTHESBACKPACKLARGE = "Bag.L"
-Classic.NAMECLOTHESBACKPACKLARGE = "Bag.L"
+Classic.KINDCLOTHESBACKPACKLARGE = "Pack.L"
+Classic.NAMECLOTHESBACKPACKLARGE = "Pack.L"
 function CClothesBackPackLarge:new(_argt)
     CClothesBackPackLarge.super.new(self, _argt)
     self.kind = Classic.KINDCLOTHESBACKPACKLARGE

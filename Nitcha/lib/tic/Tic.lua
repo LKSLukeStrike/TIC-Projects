@@ -81,6 +81,7 @@ Tic.TEXTPSY     = "Psy"
 Tic.TEXTMAX     = "Max"
 Tic.TEXTACT     = "Act"
 Tic.TEXTINV     = "Inv"
+Tic.TEXTBAG     = "Bag"
 
 Tic.TEXTWELCOME = "Welcome ..."
 
@@ -2184,6 +2185,7 @@ W3lfie = _playerclass{classed = _playerclass,
     ["inventories.any"] = CInventoryAny{objects = {
         CObjectSpellLarge{used = CObject.USEDNONE},
         CClothesToolBoxLarge{},
+        CClothesToolBoxLarge{inventory = CInventoryMen6{objects = {CWeaponBowSmall{}}}},
         CClothesBackPackLarge{},
     }},
 }

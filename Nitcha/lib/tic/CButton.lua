@@ -614,6 +614,9 @@ function CButtonPlayerStat:new(_argt)
     self.getcolorstat   = nil -- getcolorstat function if any
     self.hovertextup    = CHoverTextInfosUP{text = ""}
     self.hovertextdw    = CHoverTextInfosDW{text = ""}
+    self.hovertextur    = CHoverTextInfosUR{text = ""}
+    self.hovertextrg    = CHoverTextInfosRG{text = ""}
+    self.hovertextdr    = CHoverTextInfosDR{text = ""}
     self:argt(_argt)
 end
 
@@ -636,9 +639,23 @@ function CButtonPlayerStatPhy:new(_argt)
                             IButtonPlayer.BEHAVIOUR(self)
                             if not self.display then return end
                             local _playeractual = Tic:playerActual()
-                            self.hovertextup.text = Tic.TEXTPHY..":"
+                            self.hovertextur.text = Tic.TEXTPHY..":"
                             .._playeractual:statphyactGet().."/".._playeractual:statphymaxGet()
-                            self.hovertextdw.text = Tic.TEXTINV..":"
+                            local _bagscount = 0
+                            local _bagsused  = 0
+                            local _bagstotal = 0
+                            for _, _object in ipairs(_playeractual.inventories.phy.objects) do
+                                if _object:isBag() then
+                                    _bagscount = _bagscount + 1
+                                    _bagstotal = _bagstotal + _object.inventory.objectsmax
+                                    _bagsused  = _bagsused  + Tables:size(_object.inventory.objects)
+                                end
+                            end
+                            if _bagscount > 0 then
+                                self.hovertextrg.text = Tic.TEXTBAG..":"
+                                .._bagsused.."/".._bagstotal.." (".._bagscount..")"
+                            end
+                            self.hovertextdr.text = Tic.TEXTINV..":"
                             ..Tables:size(_playeractual.inventories.phy.objects).."/".._playeractual:statphymaxGet()
                          end
     self:argt(_argt)
@@ -653,9 +670,23 @@ function CButtonPlayerStatMen:new(_argt)
                             IButtonPlayer.BEHAVIOUR(self)
                             if not self.display then return end
                             local _playeractual = Tic:playerActual()
-                            self.hovertextup.text = Tic.TEXTMEN..":"
+                            self.hovertextur.text = Tic.TEXTMEN..":"
                             .._playeractual:statmenactGet().."/".._playeractual:statmenmaxGet()
-                            self.hovertextdw.text = Tic.TEXTINV..":"
+                            local _bagscount = 0
+                            local _bagsused  = 0
+                            local _bagstotal = 0
+                            for _, _object in ipairs(_playeractual.inventories.men.objects) do
+                                if _object:isBag() then
+                                    _bagscount = _bagscount + 1
+                                    _bagstotal = _bagstotal + _object.inventory.objectsmax
+                                    _bagsused  = _bagsused  + Tables:size(_object.inventory.objects)
+                                end
+                            end
+                            if _bagscount > 0 then
+                                self.hovertextrg.text = Tic.TEXTBAG..":"
+                                .._bagsused.."/".._bagstotal.." (".._bagscount..")"
+                            end
+                            self.hovertextdr.text = Tic.TEXTINV..":"
                             ..Tables:size(_playeractual.inventories.men.objects).."/".._playeractual:statmenmaxGet()
                          end
     self:argt(_argt)
@@ -670,9 +701,23 @@ function CButtonPlayerStatPsy:new(_argt)
                             IButtonPlayer.BEHAVIOUR(self)
                             if not self.display then return end
                             local _playeractual = Tic:playerActual()
-                            self.hovertextup.text = Tic.TEXTPSY..":"
+                            self.hovertextur.text = Tic.TEXTPSY..":"
                             .._playeractual:statpsyactGet().."/".._playeractual:statpsymaxGet()
-                            self.hovertextdw.text = Tic.TEXTINV..":"
+                            local _bagscount = 0
+                            local _bagsused  = 0
+                            local _bagstotal = 0
+                            for _, _object in ipairs(_playeractual.inventories.psy.objects) do
+                                if _object:isBag() then
+                                    _bagscount = _bagscount + 1
+                                    _bagstotal = _bagstotal + _object.inventory.objectsmax
+                                    _bagsused  = _bagsused  + Tables:size(_object.inventory.objects)
+                                end
+                            end
+                            if _bagscount > 0 then
+                                self.hovertextrg.text = Tic.TEXTBAG..":"
+                                .._bagsused.."/".._bagstotal.." (".._bagscount..")"
+                            end
+                            self.hovertextdr.text = Tic.TEXTINV..":"
                             ..Tables:size(_playeractual.inventories.psy.objects).."/".._playeractual:statpsymaxGet()
                          end
     self:argt(_argt)
