@@ -316,7 +316,7 @@ function CButtonEntityHoverLock:new(_argt)
                        end
     self.hovertextdw = CHoverTextClickRG{text = Tic.TEXTLOCK}
     self.clickrg     = self.lock
-    self.hovertextrg = CHoverTextInfosRG{}
+    self.hovertextrg = CHoverTextInfos{}
     self.behaviour   = function(self)
                         local _playeractual = Tic:playerActual()
                         if _playeractual.spottinglock and _playeractual.spotting == self.entity then -- already locking ?
@@ -612,11 +612,11 @@ function CButtonPlayerStat:new(_argt)
     self.sprite.palette = {[Tic.COLORGREYM] = Tic.COLORWHITE, [Tic.COLORGREYD] = Tic.COLORKEY}
     self.behaviour      = IButtonPlayer.BEHAVIOUR
     self.getcolorstat   = nil -- getcolorstat function if any
-    self.hovertextup    = CHoverTextInfosUP{text = ""}
-    self.hovertextdw    = CHoverTextInfosDW{text = ""}
-    self.hovertextur    = CHoverTextInfosUR{text = ""}
-    self.hovertextrg    = CHoverTextInfosRG{text = ""}
-    self.hovertextdr    = CHoverTextInfosDR{text = ""}
+    self.hovertextup    = CHoverTextInfos{text = ""}
+    self.hovertextdw    = CHoverTextInfos{text = ""}
+    self.hovertextur    = CHoverTextInfos{text = ""}
+    self.hovertextrg    = CHoverTextInfos{text = ""}
+    self.hovertextdr    = CHoverTextInfos{text = ""}
     self:argt(_argt)
 end
 
@@ -858,8 +858,8 @@ CButtonPlayerPrev.BEHAVIOUR = function(self)
         self.clicklfmdk     = Tic.FUNCTIONPLAYERMIN
         self.hovertextupmdk = CHoverTextClickLF{text = Tic.TEXTFIRST}
         self.hovertextrg    = (Tic:hovertextsIsMDKPressed())
-            and CHoverTextInfosRG{text = Tic:playerGetFirst():stringNameKind()}
-            or  CHoverTextInfosRG{text = Tic:playerGetPrev():stringNameKind()}
+            and CHoverTextInfos{text = Tic:playerGetFirst():stringNameKind()}
+            or  CHoverTextInfos{text = Tic:playerGetPrev():stringNameKind()}
     else
         self.clicklf        = nil
         self.hovertextup    = nil
@@ -888,8 +888,8 @@ CButtonPlayerNext.BEHAVIOUR = function(self)
         self.clicklfmdk     = Tic.FUNCTIONPLAYERMAX
         self.hovertextupmdk = CHoverTextClickLF{text = Tic.TEXTLAST}
         self.hovertextrg    = (Tic:hovertextsIsMDKPressed())
-            and CHoverTextInfosRG{text = Tic:playerGetLast():stringNameKind()}
-            or  CHoverTextInfosRG{text = Tic:playerGetNext():stringNameKind()}
+            and CHoverTextInfos{text = Tic:playerGetLast():stringNameKind()}
+            or  CHoverTextInfos{text = Tic:playerGetNext():stringNameKind()}
     else
         self.clicklf        = nil
         self.hovertextup    = nil
@@ -928,7 +928,7 @@ CButtonPlayerPick.BEHAVIOUR = function(self) -- need at least more than one play
         self.clickrg     = nil
     end
     if self.enabled then
-        self.hovertextrg = CHoverTextInfosRG{text = self:getslotobject():stringNameKind()}
+        self.hovertextrg = CHoverTextInfos{text = self:getslotobject():stringNameKind()}
     else
         self.hovertextrg = nil
     end
@@ -1040,7 +1040,7 @@ function CButtonPlayerPickMenu:new(_argt)
                             Tic:screenRemove(self.screen)
                             Tic:mouseDelay()
                           end
-    self.hovertextrg    = CHoverTextInfosRG{text = self:getslotobject():stringNameKind()}
+    self.hovertextrg    = CHoverTextInfos{text = self:getslotobject():stringNameKind()}
     self.hovertextdw    = nil
     self.clickrg        = nil
     self:argt(_argt)
@@ -1062,7 +1062,7 @@ function CButtonPlayerPartyMenu:new(_argt)
                             Tic:screenRemove(self.screen)
                             Tic:mouseDelay()
                           end
-    self.hovertextrg    = CHoverTextInfosRG{text = self:getslotobject():stringNameKind()}
+    self.hovertextrg    = CHoverTextInfos{text = self:getslotobject():stringNameKind()}
     self.hovertextdw    = CHoverTextClickRG{text = Tic.TEXTQUIT}
     self.clickrg        = function()
                             self:getslotobject():quitParty(true)
@@ -1142,7 +1142,7 @@ CButtonPlayerSlot.BEHAVIOUR = function(self) -- need at least one player with sl
         self.clickrg     = nil
     end
     if self.enabled and self:getslotobject() then
-        self.hovertextrg = CHoverTextInfosRG{text = self:getslotobject():stringNameKind()}
+        self.hovertextrg = CHoverTextInfos{text = self:getslotobject():stringNameKind()}
     else
         self.hovertextrg = nil
     end
@@ -1206,7 +1206,7 @@ function CButtonPlayerSlot:menuPick()
                     Tic:screenRemove(_screen)
                     Tic:mouseDelay()
                 end,
-                hovertextrg = CHoverTextInfosRG{text = _object:stringNameKind()}
+                hovertextrg = CHoverTextInfos{text = _object:stringNameKind()}
             }
         }
     end
@@ -1284,7 +1284,7 @@ CButtonSpottingSlot.BEHAVIOUR = function(self) -- need at least one spotting wit
     self.display = (self.entity.slots)
     if not self.display then return end -- no spotting
     if self:getslotobject() then
-        self.hovertextlf = CHoverTextInfosLF{text = self:getslotobject():stringKindName()}
+        self.hovertextlf = CHoverTextInfos{text = self:getslotobject():stringKindName()}
     else
         self.hovertextlf = nil
     end

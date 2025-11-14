@@ -128,15 +128,6 @@ function CHoverTextMouse:new(_argt)
     self:argt(_argt)
 end
 
-CHoverTextInfos = CHoverText:extend() -- generic hovertextinfos
-function CHoverTextInfos:new(_argt)
-    CHoverTextInfos.super.new(self, _argt)
-    --
-    self.colorinside = Tic.COLORHOVERINFOS
-    --
-    self:argt(_argt)
-end
-
 CHoverTextClickLF = CHoverTextMouse:extend() -- generic hovertextclicklf
 function CHoverTextClickLF:new(_argt)
     CHoverTextClickLF.super.new(self, _argt)
@@ -173,18 +164,11 @@ function CHoverTextWheelDW:new(_argt)
     self:argt(_argt)
 end
 
-CHoverTextInfosUP = CHoverTextInfos:extend() -- generic hovertextup
-
-CHoverTextInfosDW = CHoverTextInfos:extend() -- generic hovertextdw
-
-CHoverTextInfosLF = CHoverTextInfos:extend() -- generic hovertextlf
-
-CHoverTextInfosRG = CHoverTextInfos:extend() -- generic hovertextrg
-
-CHoverTextInfosUL = CHoverTextInfos:extend() -- generic hovertextul
-
-CHoverTextInfosUR = CHoverTextInfos:extend() -- generic hovertextur
-
-CHoverTextInfosDL = CHoverTextInfos:extend() -- generic hovertextdl
-
-CHoverTextInfosDR = CHoverTextInfos:extend() -- generic hovertextdr
+CHoverTextInfos = CHoverText:extend() -- generic hovertextinfos
+function CHoverTextInfos:new(_argt)
+    CHoverTextInfos.super.new(self, _argt)
+    --
+    self.colorinside = Tic.COLORHOVERINFOS
+    --
+    self:argt(_argt)
+end
