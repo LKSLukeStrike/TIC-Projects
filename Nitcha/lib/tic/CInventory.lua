@@ -142,6 +142,7 @@ function CInventoryAny10:new(_argt)
     self:argt(_argt)
 end
 
+
 CInventoryPhy = CInventory:extend() -- generic phy inventory
 Classic.KINDINVENTORYPHY = "InventoryPhy"
 Classic.NAMEINVENTORYPHY = "InventoryPhy"
@@ -208,6 +209,7 @@ function CInventoryPhy10:new(_argt)
     self:argt(_argt)
 end
 
+
 CInventoryMen = CInventory:extend() -- generic men inventory
 Classic.KINDINVENTORYMEN = "InventoryMen"
 Classic.NAMEINVENTORYMEN = "InventoryMen"
@@ -273,6 +275,7 @@ function CInventoryMen10:new(_argt)
 	self.objectsmax   = 10
     self:argt(_argt)
 end
+
 
 CInventoryPsy = CInventory:extend() -- generic psy inventory
 Classic.KINDINVENTORYPSY = "InventoryPsy"

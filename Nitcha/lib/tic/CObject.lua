@@ -739,7 +739,6 @@ function CClothesBackPack:new(_argt)
     self.kind = Classic.KINDCLOTHESBACKPACK
     self.name = Classic.NAMECLOTHESBACKPACK
     self.sprite    = CSpriteFG.CLOTHESBKPB
-    self.inventory = CInventoryPhy2{}
     self:argt(_argt)
     self:implementnew(IObjectBack)
 end
@@ -764,7 +763,7 @@ function CClothesBackPackMedium:new(_argt)
     self.kind = Classic.KINDCLOTHESBACKPACKMEDIUM
     self.name = Classic.NAMECLOTHESBACKPACKMEDIUM
     self.sprite    = CSpriteFG.CLOTHESBKPM
-    self.inventory = CInventoryPhy4{}
+    self.inventory = CInventoryPhy2{}
     self:argt(_argt)
 end
 
@@ -1073,7 +1072,6 @@ function CClothesToolBox:new(_argt)
     self.kind = Classic.KINDCLOTHESTOOLBOX
     self.name = Classic.NAMECLOTHESTOOLBOX
     self.sprite    = CSpriteFG.CLOTHESTBXB
-    self.inventory = CInventoryMen2{}
     self.palettefg = {
         [CObject.HANDLE] = Tic.COLORKEY,
         [CObject.BORDER] = CObject.COLORONYXFG,
@@ -1377,7 +1375,6 @@ function CClothesScrollCase:new(_argt)
     self.kind = Classic.KINDCLOTHESSCROLLCASE
     self.name = Classic.NAMECLOTHESSCROLLCASE
     self.sprite    = CSpriteFG.CLOTHESCASB
-    self.inventory = CInventoryPsy2{}
     self.palettefg = {
         [CObject.HANDLE] = Tic.COLORKEY,
         [CObject.BORDER] = CObject.COLORIRONBG,

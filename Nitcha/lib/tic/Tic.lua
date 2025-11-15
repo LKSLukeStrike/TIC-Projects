@@ -2158,7 +2158,9 @@ W2lfie = _playerclass{classed = _playerclass,
     ["slots.head"]   = CSlotHead{object = CClothesCapMedium{}},
     -- ["slots.back"]   = CSlotBack{object = CClothesScrollCaseMedium{}},
     ["inventories.any"] = CInventoryAny{objects = {
-        CObjectSpellMedium{used = CObject.USEDHALF},
+        CObjectSpellLarge{used = CObject.USEDHALF},
+        CObjectBombLarge{used = CObject.USEDHALF},
+        CObjectFlaskLarge{used = CObject.USEDHALF},
     }},
 }
 end
