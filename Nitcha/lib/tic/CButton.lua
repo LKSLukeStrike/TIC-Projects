@@ -612,11 +612,6 @@ function CButtonPlayerStat:new(_argt)
     self.sprite.palette = {[Tic.COLORGREYM] = Tic.COLORWHITE, [Tic.COLORGREYD] = Tic.COLORKEY}
     self.behaviour      = IButtonPlayer.BEHAVIOUR
     self.getcolorstat   = nil -- getcolorstat function if any
-    self.hovertextup    = CHoverTextInfos{text = ""}
-    self.hovertextdw    = CHoverTextInfos{text = ""}
-    self.hovertextur    = CHoverTextInfos{text = ""}
-    self.hovertextrg    = CHoverTextInfos{text = ""}
-    self.hovertextdr    = CHoverTextInfos{text = ""}
     self:argt(_argt)
 end
 
@@ -639,8 +634,10 @@ function CButtonPlayerStatPhy:new(_argt)
                             IButtonPlayer.BEHAVIOUR(self)
                             if not self.display then return end
                             local _playeractual = Tic:playerActual()
-                            self.hovertextur.text = Tic.TEXTPHY..":"
-                            .._playeractual:statphyactGet().."/".._playeractual:statphymaxGet()
+                            self.hovertextur = CHoverTextInfos{
+                                text = Tic.TEXTPHY..":"
+                                .._playeractual:statphyactGet().."/".._playeractual:statphymaxGet()
+                            }
                             local _bagscount = 0
                             local _bagsused  = 0
                             local _bagstotal = 0
@@ -652,11 +649,17 @@ function CButtonPlayerStatPhy:new(_argt)
                                 end
                             end
                             if _bagscount > 0 then
-                                self.hovertextrg.text = Tic.TEXTBAG..":"
-                                .._bagsused.."/".._bagstotal.." (".._bagscount..")"
+                                self.hovertextrg = CHoverTextInfos{
+                                    text = Tic.TEXTBAG..":"
+                                    .."(".._bagscount..") ".._bagsused.."/".._bagstotal
+                                }
+                            else
+                                self.hovertextrg = nil
                             end
-                            self.hovertextdr.text = Tic.TEXTINV..":"
-                            ..Tables:size(_playeractual.inventories.phy.objects).."/".._playeractual:statphymaxGet()
+                            self.hovertextdr = CHoverTextInfos{
+                                text = Tic.TEXTINV..":"
+                                ..Tables:size(_playeractual.inventories.phy.objects).."/".._playeractual:statphymaxGet()
+                            }
                          end
     self:argt(_argt)
 end
@@ -670,8 +673,10 @@ function CButtonPlayerStatMen:new(_argt)
                             IButtonPlayer.BEHAVIOUR(self)
                             if not self.display then return end
                             local _playeractual = Tic:playerActual()
-                            self.hovertextur.text = Tic.TEXTMEN..":"
-                            .._playeractual:statmenactGet().."/".._playeractual:statmenmaxGet()
+                            self.hovertextur = CHoverTextInfos{
+                                text = Tic.TEXTMEN..":"
+                                .._playeractual:statmenactGet().."/".._playeractual:statmenmaxGet()
+                            }
                             local _bagscount = 0
                             local _bagsused  = 0
                             local _bagstotal = 0
@@ -683,11 +688,17 @@ function CButtonPlayerStatMen:new(_argt)
                                 end
                             end
                             if _bagscount > 0 then
-                                self.hovertextrg.text = Tic.TEXTBAG..":"
-                                .._bagsused.."/".._bagstotal.." (".._bagscount..")"
+                                self.hovertextrg = CHoverTextInfos{
+                                    text = Tic.TEXTBAG..":"
+                                    .."(".._bagscount..") ".._bagsused.."/".._bagstotal
+                                }
+                            else
+                                self.hovertextrg = nil
                             end
-                            self.hovertextdr.text = Tic.TEXTINV..":"
-                            ..Tables:size(_playeractual.inventories.men.objects).."/".._playeractual:statmenmaxGet()
+                            self.hovertextdr = CHoverTextInfos{
+                                text = Tic.TEXTINV..":"
+                                ..Tables:size(_playeractual.inventories.men.objects).."/".._playeractual:statmenmaxGet()
+                            }
                          end
     self:argt(_argt)
 end
@@ -701,8 +712,10 @@ function CButtonPlayerStatPsy:new(_argt)
                             IButtonPlayer.BEHAVIOUR(self)
                             if not self.display then return end
                             local _playeractual = Tic:playerActual()
-                            self.hovertextur.text = Tic.TEXTPSY..":"
-                            .._playeractual:statpsyactGet().."/".._playeractual:statpsymaxGet()
+                            self.hovertextur = CHoverTextInfos{
+                                text = Tic.TEXTPSY..":"
+                                .._playeractual:statpsyactGet().."/".._playeractual:statpsymaxGet()
+                            }
                             local _bagscount = 0
                             local _bagsused  = 0
                             local _bagstotal = 0
@@ -714,11 +727,17 @@ function CButtonPlayerStatPsy:new(_argt)
                                 end
                             end
                             if _bagscount > 0 then
-                                self.hovertextrg.text = Tic.TEXTBAG..":"
-                                .._bagsused.."/".._bagstotal.." (".._bagscount..")"
+                                self.hovertextrg = CHoverTextInfos{
+                                    text = Tic.TEXTBAG..":"
+                                    .."(".._bagscount..") ".._bagsused.."/".._bagstotal
+                                }
+                            else
+                                self.hovertextrg = nil
                             end
-                            self.hovertextdr.text = Tic.TEXTINV..":"
-                            ..Tables:size(_playeractual.inventories.psy.objects).."/".._playeractual:statpsymaxGet()
+                            self.hovertextdr = CHoverTextInfos{
+                                text = Tic.TEXTINV..":"
+                                ..Tables:size(_playeractual.inventories.psy.objects).."/".._playeractual:statpsymaxGet()
+                            }
                          end
     self:argt(_argt)
 end
@@ -1142,7 +1161,11 @@ CButtonPlayerSlot.BEHAVIOUR = function(self) -- need at least one player with sl
         self.clickrg     = nil
     end
     if self.enabled and self:getslotobject() then
-        self.hovertextrg = CHoverTextInfos{text = self:getslotobject():stringNameKind()}
+        local _object = self:getslotobject()
+        local _hovertextrg = (_object:isBag())
+            and _object:stringNameKind().." "..Tables:size(_object.inventory.objects).."/".._object.inventory.objectsmax
+            or  _object:stringNameKind()
+        self.hovertextrg = CHoverTextInfos{text = _hovertextrg}
     else
         self.hovertextrg = nil
     end
@@ -1185,6 +1208,9 @@ function CButtonPlayerSlot:menuPick()
     _windowmenu:appendElements{_buttonslotempty}
 
     for _, _object in ipairs(_entity:objectsofSlotType(_slottype)) do
+        local _hovertextrg = (_object:isBag())
+            and _object:stringNameKind().." "..Tables:size(_object.inventory.objects).."/".._object.inventory.objectsmax
+            or  _object:stringNameKind()
         _windowmenu:appendElements{
             _classic{
                 behaviour = Classic.NIL,
@@ -1206,7 +1232,7 @@ function CButtonPlayerSlot:menuPick()
                     Tic:screenRemove(_screen)
                     Tic:mouseDelay()
                 end,
-                hovertextrg = CHoverTextInfos{text = _object:stringNameKind()}
+                hovertextrg = CHoverTextInfos{text = _hovertextrg}
             }
         }
     end

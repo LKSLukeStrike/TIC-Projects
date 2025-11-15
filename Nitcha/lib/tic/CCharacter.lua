@@ -330,6 +330,12 @@ function CCharacter:adjustInventoriesSlots()
     for _, _object in ipairs(_inventoryany.objects) do -- remove objects from the world
         _object.discovered = true -- the object is discovered
         _object:remove()
+        if _object:isBag() then
+            for _, _bagobject in ipairs(_object.inventory.objects) do -- remove bag objects from the world
+                _bagobject.discovered = true -- the object is discovered
+                _bagobject:remove()
+            end
+        end
     end
 
     _inventoryphy.objectsmax = self:statphymaxGet() -- adjust inventories limits

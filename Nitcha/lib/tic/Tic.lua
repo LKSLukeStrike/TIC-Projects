@@ -1467,11 +1467,6 @@ Tic.INVENTORYSCREEN = nil
 
 function Tic:inventoryToggleShow()
 	Tic.INVENTORYSHOW = Nums:toggleTF(Tic.INVENTORYSHOW)
-    -- if Tic.INVENTORYSHOW then
-    --     Tic:screenAppend(Tic.INVENTORYSCREEN)
-    -- else
-    --     Tic:screenRemove(Tic.INVENTORYSCREEN)
-    -- end
 end
 
 
@@ -2544,7 +2539,7 @@ end
 
 function Tic:drawLog()
     -- Tic:logWorld()
-    -- Tic:logInventories()
+    Tic:logInventories()
     -- Tic:logScreens()
     -- Tic:logButtons()
 end
@@ -2597,7 +2592,12 @@ function Tic:logInventory(_inventory, _indent)
 
     Tic:logAppend(_indent.._inventory.name, _inventory.kind, Tables:size(_inventory.objects).."/".._inventory.objectsmax)
     for _, _object in ipairs(_inventory.objects) do
-        Tic:logAppend(_indent.." ", _object.kind, _object.name)
+        local _objectisbag = _object:isBag()
+        local _textbag = (_objectisbag) and "(BAG)" or ""
+        Tic:logAppend(_indent.." ", _object.kind, _object.name, _textbag)
+        if _objectisbag then
+            Tic:logInventory(_object.inventory, "  ")
+        end
     end
 end
 
