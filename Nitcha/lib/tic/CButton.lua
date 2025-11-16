@@ -1225,6 +1225,7 @@ function CButtonPlayerSlot:menuPick()
                 hovertextdw = CHoverTextClickRG{text = Tic.TEXTPICK},
                 clickrg = function()
                     local _whatslot = _object:findWhatSlot(_entity.slots) -- is object in a slot ?
+                        Tic:logAppend("whatslot")
                     if _whatslot then
                         _whatslot:appendObject(_getslotobject())
                     end

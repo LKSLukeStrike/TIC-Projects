@@ -2134,7 +2134,7 @@ W1lfie = _playerclass{classed = _playerclass,
     -- }},
 }
 end
-if true then
+if false then
 W2lfie = _playerclass{classed = _playerclass,
     name = "W2lfie",
     size = Tic.SIZEM,
@@ -2159,7 +2159,7 @@ W2lfie = _playerclass{classed = _playerclass,
     }},
 }
 end
-if true then
+if false then
 W3lfie = _playerclass{classed = _playerclass,
     name = "W3lfie",
     size = Tic.SIZEL,

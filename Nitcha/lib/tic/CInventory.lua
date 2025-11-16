@@ -8,9 +8,9 @@ function CInventory:new(_argt)
     CInventory.super.new(self, _argt)
     self.kind = Classic.KINDINVENTORY
     self.name = Classic.NAMEINVENTORY
-    self.objectstypes = nil -- list of allowed inventory classes -- nil = any
-	self.objectsmax   = Nums.MAXINTEGER
-	self.objects      = {}
+    self.inventorytype = CInventoryAny -- allowed inventory type objects
+	self.objectsmax    = Nums.MAXINTEGER
+	self.objects       = {}
     self:argt(_argt)
 end
 
@@ -18,12 +18,18 @@ function CInventory:isInventory(_inventory)
     return Classic:thatis(_inventory, CInventory)
 end
 
+function CInventory:canAppend()
+    return (Tables:size(self.objects) < self.objectsmax) -- inventory not full
+end
+
 function CInventory:canAppendObject(_object)
     if not _object then return false end -- mandatory
-    if not _object.inventorytype then return false end -- mandatory -- only storable objects
-    if self.objectstypes and not Tables:valFind(self.objectstypes, _object.inventorytype) then return false end -- not allowed type if any
-    if not Tables:valFind(self.objects, _object) -- not in inventory
-    and Tables:size(self.objects) >= self.objectsmax then return false end -- and cannot append, inventory full
+    if not _object.inventorytype then return false end -- only storable objects
+    if not self:canAppend() then return false end -- inventory already full
+    if Tables:valFind(self.objects, _object) then return false end -- already in inventory
+    -- if self.inventorytype == CInventoryAny
+    -- or self.inventorytype == _object.inventorytype then return true end -- allowed type if any
+    -- return false
     return true
 end
 
@@ -73,6 +79,14 @@ function CInventory:objectsofSlotType(_slottype)
     local _result = {}
     for _, _object in ipairs(self.objects or {}) do
         if _object.slottype and _object.slottype == _slottype then Tables:valInsert(_result, _object, true) end
+    end
+    return _result
+end
+
+function CInventory:bags()
+    local _result = {}
+    for _, _object in ipairs(self.objects or {}) do
+        if _object:isBag() then Tables:valInsert(_result, _object, true) end
     end
     return _result
 end
@@ -150,7 +164,7 @@ function CInventoryPhy:new(_argt)
     CInventoryPhy.super.new(self, _argt)
     self.kind = Classic.KINDINVENTORYPHY
     self.name = Classic.NAMEINVENTORYPHY
-    self.objectstypes = {CInventoryPhy}
+    self.inventorytype = CInventoryPhy
     self:argt(_argt)
 end
 
@@ -217,7 +231,7 @@ function CInventoryMen:new(_argt)
     CInventoryMen.super.new(self, _argt)
     self.kind = Classic.KINDINVENTORYMEN
     self.name = Classic.NAMEINVENTORYMEN
-    self.objectstypes = {CInventoryMen}
+    self.inventorytype = CInventoryMen
     self:argt(_argt)
 end
 
@@ -284,7 +298,7 @@ function CInventoryPsy:new(_argt)
     CInventoryPsy.super.new(self, _argt)
     self.kind = Classic.KINDINVENTORYPSY
     self.name = Classic.NAMEINVENTORYPSY
-    self.objectstypes = {CInventoryPsy}
+    self.inventorytype = CInventoryPsy
     self:argt(_argt)
 end
 
