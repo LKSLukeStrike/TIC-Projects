@@ -932,19 +932,19 @@ CButtonPlayerPick.BEHAVIOUR = function(self) -- need at least more than one play
     IButtonPlayerChange.BEHAVIOUR(self)
     if not self.display then return end -- no player
     if self.enabled then -- more than one player
-        self.hovertextup = CHoverTextClickLF{text = Tic.TEXTPICK}
-        self.clicklf     = function() self:menuPick() end
-    else
-        self.hovertextup = nil
-        self.clicklf     = nil
-    end
-    if self:getslotobject():isParty() then -- even if only one player but who is a party
-        self.enabled     = true -- restore enabled in case of party
-        self.hovertextdw = CHoverTextClickRG{text = Tic.TEXTPARTY}
-        self.clickrg     = function() self:menuParty() end
+        self.hovertextdw = CHoverTextClickRG{text = Tic.TEXTPICK}
+        self.clickrg     = function() self:menuPick() end
     else
         self.hovertextdw = nil
         self.clickrg     = nil
+    end
+    if self:getslotobject():isParty() then -- even if only one player but who is a party
+        self.enabled     = true -- restore enabled in case of party
+        self.hovertextup = CHoverTextClickLF{text = Tic.TEXTPARTY}
+        self.clicklf     = function() self:menuParty() end
+    else
+        self.hovertextup = nil
+        self.clicklf     = nil
     end
     if self.enabled then
         self.hovertextrg = CHoverTextInfos{text = self:getslotobject():stringNameKind()}
@@ -971,7 +971,7 @@ end
 
 function CButtonPlayerPick:menuPick()
     local _screen        = CScreen{}
-    local _screenx       = self.screenx - 9
+    local _screenx       = self.screenx + 9
     local _screeny       = self.screeny
     local _playeractual  = Tic:playerActual()
     local _players       = Tic:playerPlayers()
@@ -1007,7 +1007,7 @@ end
 
 function CButtonPlayerPick:menuParty()
     local _screen        = CScreen{}
-    local _screenx       = self.screenx + 9
+    local _screenx       = self.screenx - 9
     local _screeny       = self.screeny
     local _playeractual  = Tic:playerActual()
     local _party         = _playeractual.party
@@ -1053,15 +1053,15 @@ function CButtonPlayerPickMenu:new(_argt)
     self.classic        = CButtonPlayerPickMenu
 	self.behaviour      = CButtonPortrait.BEHAVIOUR
     self.screen         = nil -- parent menu screen
-    self.hovertextup    = CHoverTextClickLF{text = Tic.TEXTPICK}
-    self.clicklf        = function()
+    self.hovertextdw    = CHoverTextClickRG{text = Tic.TEXTPICK}
+    self.clickrg        = function()
                             Tic:playerPick(self:getslotobject())
                             Tic:screenRemove(self.screen)
                             Tic:mouseDelay()
                           end
     self.hovertextrg    = CHoverTextInfos{text = self:getslotobject():stringNameKind()}
-    self.hovertextdw    = nil
-    self.clickrg        = nil
+    self.hovertextup    = nil
+    self.clicklf        = nil
     self:argt(_argt)
 end
 
