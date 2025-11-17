@@ -22,7 +22,7 @@ function CSlot:canAppendObject(_object, _emptyonly)
     if _emptyonly and self.object then return false end -- only if slot is empty
     if not _object then return true end -- allows nil object
     if not _object.slottype then return false end -- mandatory -- only slotable objects
-    if self.slottype and not (_object.slottype == self.slottype) then return false end -- not allowed type if any
+    if self.slottype and not (self.slottype == _object.slottype) then return false end -- not allowed type if any
     return true
 end
 

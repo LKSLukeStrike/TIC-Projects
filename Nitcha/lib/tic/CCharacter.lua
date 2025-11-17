@@ -262,13 +262,9 @@ function CCharacter:new(_argt)
     self:argt(_argt)
     self.camera       = CCamera{name = self:nameGet().." "..Classic.NAMECAMERA} -- one camera per character
     self:focus() -- focus its camera on itself
-end
-
-function CCharacter:argt(_argt)
-    CCharacter.super.argt(self, _argt)
-    if self.classic and self.classed and not (self.classic == self.classed) then return end -- limit to one classic if any
     self:adjustInventoriesSlots() -- adjust standard inventories sizes and contents + slots
 end
+
 
 --
 -- Get
@@ -311,7 +307,7 @@ function CCharacter:adjustInventoriesSlots()
     if not self.inventories.exists then return end -- ensure we already have inventories
 
     if not  self.inventories.any then self.inventories.any = CInventoryAny{} end
-    local _inventoryany = self.inventories.any -- grab all objects
+    local _inventoryany = self.inventories.any -- grab all objects into inventoryay
     local _inventoryphy = self.inventories.phy
     local _inventorymen = self.inventories.men
     local _inventorypsy = self.inventories.psy
@@ -398,7 +394,9 @@ function CCharacter:slotGetHandLFObject()
 end
 
 function CCharacter:slotSetHeadObject(_object)
+    Tic:logSlots(true)
     self:slotGetHead().object = _object
+    Tic:logSlots(true)
 	return _object
 end
 

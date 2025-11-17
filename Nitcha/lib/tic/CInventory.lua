@@ -27,10 +27,9 @@ function CInventory:canAppendObject(_object)
     if not _object.inventorytype then return false end -- only storable objects
     if not self:canAppend() then return false end -- inventory already full
     if Tables:valFind(self.objects, _object) then return false end -- already in inventory
-    -- if self.inventorytype == CInventoryAny
-    -- or self.inventorytype == _object.inventorytype then return true end -- allowed type if any
-    -- return false
-    return true
+    if self.inventorytype == CInventoryAny
+    or self.inventorytype == _object.inventorytype then return true end -- allowed type if any
+    return false
 end
 
 function CInventory:appendObject(_object)

@@ -1553,6 +1553,139 @@ function Tic:logRecordEntities(_entities, _clear) -- record entities
     end
 end
 
+function Tic:logWorld()
+    local _world = Tic:worldActual()
+    if not _world then return end
+
+    Tic:logAppend()
+    Tic:logAppend()
+    Tic:logAppend()
+    Tic:logAppend()
+    Tic:logAppend()
+    Tic:logAppend()
+    Tic:logAppend()
+    Tic:logAppend()
+    Tic:logAppend()
+    Tic:logAppend()
+
+    local _kindnames = {}
+    Tic:logAppend(_world.name, Tables:size(_world.entitieslocations.entities))
+    for _, _entity in pairs(_world.entitieslocations.entities) do
+        Tables:valInsert(_kindnames, _entity:kindGet().."\t".._entity:nameGet())
+    end
+    table.sort(_kindnames)
+    for _, _kindname in ipairs(_kindnames) do
+        Tic:logAppend(_kindname)
+    end
+    Tic:logAppend()
+end
+
+function Tic:logInventories(_indent, _trace, _force)
+    if not Tic.INVENTORYSHOW and not _force then return end
+    local _playeractual = Tic:playerActual()
+    if not _playeractual then return end
+    _indent = _indent or ""
+
+    if _trace then
+        Tic:trace(_playeractual.name, _playeractual.statphymax, _playeractual.statmenmax, _playeractual.statpsymax)
+    else
+        Tic:logAppend(_playeractual.name, _playeractual.statphymax, _playeractual.statmenmax, _playeractual.statpsymax)
+    end
+    for _, _inventory in pairs(_playeractual.inventories) do
+        Tic:logInventory(_inventory, _indent, _trace)
+    end
+    if _trace then
+        Tic:trace()
+    else
+        Tic:logAppend()
+    end
+end
+
+function Tic:logInventory(_inventory, _indent, _trace)
+    if not CInventory:isInventory(_inventory) then return end
+    _indent = _indent or ""
+
+    if _trace then
+        Tic:trace(_indent.._inventory.name, _inventory.kind, Tables:size(_inventory.objects).."/".._inventory.objectsmax)
+    else
+        Tic:logAppend(_indent.._inventory.name, _inventory.kind, Tables:size(_inventory.objects).."/".._inventory.objectsmax)
+    end
+    for _, _object in ipairs(_inventory.objects) do
+        local _objectisbag = _object:isBag()
+        local _textbag = (_objectisbag) and "(BAG)" or ""
+        if _trace then
+            Tic:trace(_indent.." ", _object.kind, _object.name, _textbag)
+        else
+            Tic:logAppend(_indent.." ", _object.kind, _object.name, _textbag)
+        end
+        if _objectisbag then
+            Tic:logInventory(_object.inventory, "  ", _trace)
+        end
+    end
+end
+
+function Tic:logSlots(_trace, _force)
+    if not Tic.INVENTORYSHOW and not _force then return end
+    local _playeractual = Tic:playerActual()
+    if not _playeractual then return end
+
+    for _, _slot in pairs(_playeractual.slots) do
+        Tic:logSlot(_slot, _trace)
+    end
+    if _trace then
+        Tic:trace()
+    else
+        Tic:logAppend()
+    end
+end
+
+function Tic:logSlot(_slot, _trace)
+    if not CSlot:isSlot(_slot) then return end
+    local _object = _slot.object
+    local _objectkind = (_object) and _object.kind or "--"
+    local _objectname = (_object) and _object.name or "--"
+    if _trace then
+        Tic:trace(_slot.name, _slot.kind.." :", _objectkind, _objectname)
+    else
+        Tic:logAppend(_slot.name, _slot.kind.." :", _objectkind, _objectname)
+    end
+end
+
+function Tic:logScreens()
+    Tic:logAppend("Screens", Tic.SCREENS.actindex, Tic.SCREENS.maxindex, Tic.INVENTORYSHOW)
+    for _key, _screen in ipairs(Tic.SCREENS.acttable or {}) do
+        Tic:logAppend(_key, _screen.kind, _screen.name)
+    end
+    Tic:logAppend()
+end
+
+function Tic:logButtons()
+    for _key, _button in ipairs(Tic.BUTTONS or {}) do
+        Tic:logAppend(_key, _button.kind, _button.name, _button.hovered, _button.actived)
+    end
+    Tic:logAppend()
+end
+
+function Tic:logRegion(_pfx, _region)
+    Tic:logAppend(_pfx, U.._region.up, D.._region.dw, L.._region.lf, R.._region.rg)
+end
+
+function Tic:logEntity(_pfx, _entity)
+    Tic:logAppend(_pfx, _entity.name, _entity.screenx, _entity.screeny)
+end
+
+function Tic:logDirective(_key, _directive, _colorkey)
+    if not _colorkey or not (_directive.color == _colorkey) then
+        Tic:logAppend(_key..")", Y.._directive.boardy, X.._directive.boardx, C..Tic.COLORNAMES[_directive.color])
+    end
+end
+
+function Tic:logDirectives(_directives, _colorkey)
+    for _key, _directive in ipair(_directives) do
+        Tic:logDirective(_key, _directive, _colorkey)
+    end
+end
+
 
 -- Time System -- extend functions based on time
 function Tic:time2seconds() -- time in seconds
@@ -2134,7 +2267,7 @@ W1lfie = _playerclass{classed = _playerclass,
     -- }},
 }
 end
-if false then
+if true then
 W2lfie = _playerclass{classed = _playerclass,
     name = "W2lfie",
     size = Tic.SIZEM,
@@ -2159,7 +2292,7 @@ W2lfie = _playerclass{classed = _playerclass,
     }},
 }
 end
-if false then
+if true then
 W3lfie = _playerclass{classed = _playerclass,
     name = "W3lfie",
     size = Tic.SIZEL,
@@ -2540,108 +2673,9 @@ end
 function Tic:drawLog()
     -- Tic:logWorld()
     Tic:logInventories()
+    Tic:logSlots()
     -- Tic:logScreens()
     -- Tic:logButtons()
-end
-
-function Tic:logWorld()
-    local _world = Tic:worldActual()
-    if not _world then return end
-
-    Tic:logAppend()
-    Tic:logAppend()
-    Tic:logAppend()
-    Tic:logAppend()
-    Tic:logAppend()
-    Tic:logAppend()
-    Tic:logAppend()
-    Tic:logAppend()
-    Tic:logAppend()
-    Tic:logAppend()
-
-    local _kindnames = {}
-    Tic:logAppend(_world.name, Tables:size(_world.entitieslocations.entities))
-    for _, _entity in pairs(_world.entitieslocations.entities) do
-        Tables:valInsert(_kindnames, _entity:kindGet().."\t".._entity:nameGet())
-    end
-    table.sort(_kindnames)
-    for _, _kindname in ipairs(_kindnames) do
-        Tic:logAppend(_kindname)
-    end
-    Tic:logAppend()
-end
-
-function Tic:logInventories() -- [-] remove
-    if not Tic.INVENTORYSHOW then return end
-    local _playeractual = Tic:playerActual()
-    if not _playeractual then return end
-
-    Tic:logAppend(_playeractual.name, _playeractual.statphymax, _playeractual.statmenmax, _playeractual.statpsymax)
-    for _, _inventory in pairs(_playeractual.inventories) do
-        Tic:logInventory(_inventory)
-    end
-    for _, _slot in pairs(_playeractual.slots) do
-        Tic:logSlot(_slot)
-    end
-    Tic:logAppend()
-end
-
-function Tic:logInventory(_inventory, _indent)
-    if not CInventory:isInventory(_inventory) then return end
-    _indent = _indent or ""
-
-    Tic:logAppend(_indent.._inventory.name, _inventory.kind, Tables:size(_inventory.objects).."/".._inventory.objectsmax)
-    for _, _object in ipairs(_inventory.objects) do
-        local _objectisbag = _object:isBag()
-        local _textbag = (_objectisbag) and "(BAG)" or ""
-        Tic:logAppend(_indent.." ", _object.kind, _object.name, _textbag)
-        if _objectisbag then
-            Tic:logInventory(_object.inventory, "  ")
-        end
-    end
-end
-
-function Tic:logSlot(_slot)
-    if not CSlot:isSlot(_slot) then return end
-    local _object = _slot.object
-    local _objectkind = (_object) and _object.kind or "--"
-    local _objectname = (_object) and _object.name or "--"
-    Tic:logAppend(_slot.name, _slot.kind.." :", _objectkind, _objectname)
-end
-
-function Tic:logScreens()
-    Tic:logAppend("Screens", Tic.SCREENS.actindex, Tic.SCREENS.maxindex, Tic.INVENTORYSHOW)
-    for _key, _screen in ipairs(Tic.SCREENS.acttable or {}) do
-        Tic:logAppend(_key, _screen.kind, _screen.name)
-    end
-    Tic:logAppend()
-end
-
-function Tic:logButtons()
-    for _key, _button in ipairs(Tic.BUTTONS or {}) do
-        Tic:logAppend(_key, _button.kind, _button.name, _button.hovered, _button.actived)
-    end
-    Tic:logAppend()
-end
-
-function Tic:logRegion(_pfx, _region)
-    Tic:logAppend(_pfx, U.._region.up, D.._region.dw, L.._region.lf, R.._region.rg)
-end
-
-function Tic:logEntity(_pfx, _entity)
-    Tic:logAppend(_pfx, _entity.name, _entity.screenx, _entity.screeny)
-end
-
-function Tic:logDirective(_key, _directive, _colorkey)
-    if not _colorkey or not (_directive.color == _colorkey) then
-        Tic:logAppend(_key..")", Y.._directive.boardy, X.._directive.boardx, C..Tic.COLORNAMES[_directive.color])
-    end
-end
-
-function Tic:logDirectives(_directives, _colorkey)
-    for _key, _directive in ipair(_directives) do
-        Tic:logDirective(_key, _directive, _colorkey)
-    end
 end
 
 function Tic:drawLine(_pointx0, _pointy0, _pointx1, _pointy1, _nobounds) -- TESTING

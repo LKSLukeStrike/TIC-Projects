@@ -1225,7 +1225,6 @@ function CButtonPlayerSlot:menuPick()
                 hovertextdw = CHoverTextClickRG{text = Tic.TEXTPICK},
                 clickrg = function()
                     local _whatslot = _object:findWhatSlot(_entity.slots) -- is object in a slot ?
-                        Tic:logAppend("whatslot")
                     if _whatslot then
                         _whatslot:appendObject(_getslotobject())
                     end
@@ -1245,9 +1244,8 @@ CButtonPlayerSlotHead = CButtonPlayerSlot:extend()
 function CButtonPlayerSlotHead:new(_argt)
     CButtonPlayerSlotHead.super.new(self, _argt)
     self.classic       = CButtonPlayerSlotHead
-    -- self.clickrg       = Tic.FUNCTIONSLOTDROPHEAD
-    self.setslotobject = function(_object) return self.entity:slotSetHeadObject(_object) end
     self.getslotobject = function() return self.entity:slotGetHeadObject() end
+    self.setslotobject = function(_object) return self.entity:slotSetHeadObject(_object) end
     self.sprite        = CButtonEntitySlot.SPRITEHEAD
     self.slottype      = CSlotHead
     self:argt(_argt)
@@ -1257,9 +1255,8 @@ CButtonPlayerSlotBack = CButtonPlayerSlot:extend()
 function CButtonPlayerSlotBack:new(_argt)
     CButtonPlayerSlotBack.super.new(self, _argt)
     self.classic       = CButtonPlayerSlotBack
-    -- self.clickrg       = Tic.FUNCTIONSLOTDROPBACK
-    self.setslotobject = function(_object) return self.entity:slotSetBackObject(_object) end
     self.getslotobject = function() return self.entity:slotGetBackObject() end
+    self.setslotobject = function(_object) return self.entity:slotSetBackObject(_object) end
     self.sprite        = CButtonEntitySlot.SPRITEBACK
     self.slottype      = CSlotBack
     self:argt(_argt)
@@ -1269,9 +1266,8 @@ CButtonPlayerSlotHandLF = CButtonPlayerSlot:extend()
 function CButtonPlayerSlotHandLF:new(_argt)
     CButtonPlayerSlotHandLF.super.new(self, _argt)
     self.classic       = CButtonPlayerSlotHandLF
-    -- self.clickrg       = Tic.FUNCTIONSLOTDROPHANDLF
-    self.setslotobject = function(_object) return self.entity:slotSetHandLFObject(_object) end
     self.getslotobject = function() return self.entity:slotGetHandLFObject() end
+    self.setslotobject = function(_object) return self.entity:slotSetHandLFObject(_object) end
     self.sprite        = CButtonEntitySlot.SPRITEHAND
     self.slottype      = CSlotHand
     self:argt(_argt)
@@ -1281,9 +1277,8 @@ CButtonPlayerSlotHandRG = CButtonPlayerSlot:extend()
 function CButtonPlayerSlotHandRG:new(_argt)
     CButtonPlayerSlotHandRG.super.new(self, _argt)
     self.classic       = CButtonPlayerSlotHandRG
-    -- self.clickrg       = Tic.FUNCTIONSLOTDROPHANDRG
-    self.setslotobject = function(_object) return self.entity:slotSetHandRGObject(_object) end
     self.getslotobject = function() return self.entity:slotGetHandRGObject() end
+    self.setslotobject = function(_object) return self.entity:slotSetHandRGObject(_object) end
     self.sprite        = CButtonEntitySlot.SPRITEHAND
     self.slottype      = CSlotHand
     self:argt(_argt)
