@@ -1237,6 +1237,17 @@ function CButtonPlayerSlot:menuPick()
         }
     end
 
+    local _bags = {}
+    for _, _object in ipairs(_entity:objectsofSlotType(CSlotBack)) do
+        if _object:isBag() then
+            local _bagobjects = _object.inventory:objectsofSlotType(_slottype)
+            if Tables:size(_bagobjects) > 0 then
+                Tables:keyAppend(_bags, _object, _bagobjects)
+            end
+        end
+    end
+    Tic:logTable(_bags)
+
     Tic:screenAppend(_screen)
 end
 

@@ -1681,8 +1681,14 @@ function Tic:logDirective(_key, _directive, _colorkey)
 end
 
 function Tic:logDirectives(_directives, _colorkey)
-    for _key, _directive in ipair(_directives) do
+    for _key, _directive in ipairs(_directives) do
         Tic:logDirective(_key, _directive, _colorkey)
+    end
+end
+
+function Tic:logTable(_table)
+    for _key, _val in ipairs(_table or {}) do
+        Tic:logAppend(_key, _val)
     end
 end
 
@@ -2316,7 +2322,7 @@ W3lfie = _playerclass{classed = _playerclass,
         CObjectSpellLarge{used = CObject.USEDNONE},
         CClothesToolBoxLarge{},
         CClothesToolBoxLarge{inventory = CInventoryMen6{objects = {CWeaponBowSmall{}}}},
-        CClothesBackPackLarge{},
+        CClothesBackPackLarge{inventory = CInventoryPhy6{objects = {CWeaponSword{}}}},
     }},
 }
 end
