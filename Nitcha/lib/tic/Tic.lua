@@ -54,6 +54,7 @@ Tic = {}
 -- Texts
 Tic.TEXTSPOT    = "Spot"
 Tic.TEXTPICK    = "Pick"
+Tic.TEXTDONE    = "Done"
 Tic.TEXTLOCK    = "Lock"
 Tic.TEXTUNLOCK  = "Unlock"
 Tic.TEXTMOVE    = "Move"

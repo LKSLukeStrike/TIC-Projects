@@ -1246,7 +1246,30 @@ function CButtonPlayerSlot:menuPick()
             end
         end
     end
-    Tic:logTable(_bags)
+
+    for _bag, _bagobjects in pairs(_bags) do
+        _screenx = _screenx + 9
+        local _windowmenu = CWindowMenu{
+            screenx = _screenx,
+            screeny = _screeny,
+            separatory = 1,
+            stretch = true,
+        }
+        _screen:appendElements{_windowmenu}
+
+        local _buttonslotempty = _classic{
+            behaviour     = Classic.NIL,
+            entity        = _entity,
+            getslotobject = function() return _bag end,
+            hovertextdw   = CHoverTextClickRG{text = Tic.TEXTDONE},
+            clickrg = function()
+                Tic:screenRemove(_screen)
+                Tic:mouseDelay()
+            end,
+            hovertextrg = CHoverTextInfos{text = _bag:stringNameKind().." "..Tables:size(_bag.inventory.objects).."/".._bag.inventory.objectsmax}
+        }
+        _windowmenu:appendElements{_buttonslotempty}
+    end
 
     Tic:screenAppend(_screen)
 end
