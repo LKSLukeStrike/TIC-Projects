@@ -1168,7 +1168,7 @@ function CCharacter:adjustInteract()
     local _entityspotting = self:entitySpotting()
     self:interacttoDelete()
     if  _entityspotting
-    -- and not (_entityspotting == Tic.playerActual())
+    -- and not (_entityspotting == Tic:playerActual())
     and _entityspotting:hasInteractions()
     and self:regionWorld():directionRegion(_entityspotting:regionWorld()) == Tic.DIRHIT
     then
