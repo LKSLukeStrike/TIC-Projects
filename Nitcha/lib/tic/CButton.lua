@@ -1186,7 +1186,7 @@ function CButtonPlayerSlot:menuPick()
     local _slottype      = self.slottype
     local _getslotobject = self.getslotobject
     local _setslotobject = self.setslotobject
-    Tic:logAppend(_setslotobject)
+    local _oldslotobject = _getslotobject()
 
     local _windowmenu = CWindowMenu{
         screenx = _screenx,
@@ -1196,66 +1196,25 @@ function CButtonPlayerSlot:menuPick()
     }
     _screen:appendElements{_windowmenu}
 
-    local function _appendbutton(_slotobject)
+    local function _appendbutton(_windowmenu, _slotobject, _header)
         _windowmenu:appendElements{
             CButtonPlayerSlotMenu{
-                screen = _screen,
-                entity = _entity,
-                sprite = _sprite,
+                screen        = _screen,
+                entity        = _entity,
+                sprite        = _sprite,
+                oldslotobject = _oldslotobject,
+                header        = _header,
                 getslotobject = function() return _slotobject end, -- returns slot object
                 setslotobject = _setslotobject,
             }
         }
     end
 
-    _appendbutton(nil)
+    _appendbutton(_windowmenu, nil)
 
     for _, _object in ipairs(_entity:objectsofSlotType(_slottype)) do
-        _appendbutton(_object)
+        _appendbutton(_windowmenu, _object)
     end
-
-    -- local _buttonslotempty = _classic{
-    --     behaviour     = Classic.NIL,
-    --     entity        = _entity,
-    --     getslotobject = function() return nil end, -- returns nil
-    --     hovertextdw   = CHoverTextClickRG{text = Tic.TEXTPICK},
-    --     clickrg = function()
-    --         _setslotobject()
-    --         Tic:screenRemove(_screen)
-    --         Tic:mouseDelay()
-    --     end,
-    -- }
-    -- _windowmenu:appendElements{_buttonslotempty}
-
-    -- for _, _object in ipairs(_entity:objectsofSlotType(_slottype)) do
-    --     local _hovertextrg = (_object:isBag())
-    --         and _object:stringNameKind().." "..Tables:size(_object.inventory.objects).."/".._object.inventory.objectsmax
-    --         or  _object:stringNameKind()
-    --     _windowmenu:appendElements{
-    --         _classic{
-    --             behaviour = Classic.NIL,
-    --             entity    = _entity,
-    --             getslotobject = function() return _object end, -- returns object
-    --             hovertextup = CHoverTextClickLF{text = Tic.TEXTDROP},
-    --             clicklf = function()
-    --                 _entity:dropObject(_object)
-    --                 Tic:screenRemove(_screen)
-    --                 Tic:mouseDelay()
-    --             end,
-    --             hovertextdw = CHoverTextClickRG{text = Tic.TEXTPICK},
-    --             clickrg = function()
-    --                 local _whatslot = _object:findWhatSlot(_entity.slots) -- is object already in a slot ?
-    --                 if _whatslot then
-    --                     _whatslot:appendObject(_getslotobject())
-    --                 end
-    --                 _setslotobject(_object)
-    --                 Tic:screenRemove(_screen)
-    --                 Tic:mouseDelay()
-    --             end,
-    --             hovertextrg = CHoverTextInfos{text = _hovertextrg}
-    --         }
-    --     }
-    -- end
 
     local _bags = {}
     for _, _object in ipairs(_entity:objectsofSlotType(CSlotBack)) do
@@ -1277,18 +1236,11 @@ function CButtonPlayerSlot:menuPick()
         }
         _screen:appendElements{_windowmenu}
 
-        local _buttonslotempty = _classic{
-            behaviour     = Classic.NIL,
-            entity        = _entity,
-            getslotobject = function() return _bag end,
-            hovertextdw   = CHoverTextClickRG{text = Tic.TEXTDONE},
-            clickrg = function()
-                Tic:screenRemove(_screen)
-                Tic:mouseDelay()
-            end,
-            hovertextrg = CHoverTextInfos{text = _bag:stringNameKind().." "..Tables:size(_bag.inventory.objects).."/".._bag.inventory.objectsmax}
-        }
-        _windowmenu:appendElements{_buttonslotempty}
+        _appendbutton(_windowmenu, _bag, true)
+
+        for _, _bagobject in ipairs(_bagobjects) do
+            _appendbutton(_windowmenu, _bagobject)
+        end
     end
 
     Tic:screenAppend(_screen)
@@ -1300,10 +1252,13 @@ end
 --
 CButtonPlayerSlotMenu = CButtonPlayerSlot:extend() -- generic player slot button
 CButtonPlayerSlotMenu.BEHAVIOUR = function(self)
-    local _slotobject  = self:getslotobject()
-    local _screen      = self.screen
-    local _entity      = self.entity
-    local _entityslots = self.entity.slots
+    local _slotobject    = self:getslotobject()
+    local _screen        = self.screen
+    local _entity        = self.entity
+    local _entityslots   = self.entity.slots
+    local _oldslotobject = self.oldslotobject
+    local _header        = self.header
+
     if _slotobject then
         local _isbag = _slotobject:isBag()
         self.hovertextrg = (_isbag)
@@ -1314,7 +1269,14 @@ CButtonPlayerSlotMenu.BEHAVIOUR = function(self)
             or  CHoverTextInfos{
                 text = _slotobject:stringNameKind()
             }
-        if _isbag then
+        if _header then
+            self.hovertextup    = nil
+            self.clicklf        = nil
+            self.hovertextdw    = CHoverTextClickRG{text = Tic.TEXTDONE}
+            self.clickrg        = function()
+                                    Tic:screenRemove(_screen)
+                                    Tic:mouseDelay()
+                                  end
         else
             self.hovertextup    = CHoverTextClickLF{text = Tic.TEXTDROP}
             self.clicklf        = function()
@@ -1326,7 +1288,7 @@ CButtonPlayerSlotMenu.BEHAVIOUR = function(self)
             self.clickrg        = function()
                                     local _whatslot = _slotobject:findWhatSlot(_entityslots) -- is object already in a slot ?
                                     if _whatslot then
-                                        _whatslot:appendObject()
+                                        _whatslot:appendObject(_oldslotobject)
                                     end
                                     self.setslotobject(_slotobject)
                                     Tic:screenRemove(_screen)
