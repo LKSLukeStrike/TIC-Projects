@@ -44,7 +44,7 @@ function CSlot:objectsinInventories(_inventories)
     local _result = {}
     for _, _inventory in pairs(_inventories or {}) do
         if CInventory:isInventory(_inventory) then
-            Tables:imerge(_result, _inventory:objectsofSlotType(self.slottype))
+            Tables:imerge(_result, _inventory:objectsOfSlotType(self.slottype))
         end
     end
     return _result

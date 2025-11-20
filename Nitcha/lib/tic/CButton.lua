@@ -300,34 +300,30 @@ end
 -- CButtonEntityHoverLock
 --
 CButtonEntityHoverLock = CButtonEntityHover:extend() -- generic entity hover lock button
+CButtonEntityHoverLock.BEHAVIOUR = function(self)
+    local _playeractual = Tic:playerActual()
+    if _playeractual.spottinglock and _playeractual.spotting == self.entity then -- already locking ?
+        self.hovertextup.text = Tic.TEXTUNLOCK
+        self.clicklf          = function()
+                                    _playeractual:spotEntity(nil)
+                                    _playeractual.spottinglock = false
+                                    Tic:mouseDelay()
+                                end
+    else
+        self.hovertextup.text = Tic.TEXTLOCK
+        self.clicklf          = function()
+                                    _playeractual:spotEntity(self.entity)
+                                    _playeractual.spottinglock = true
+                                    Tic:mouseDelay()
+                                end
+    end
+    self.hovertextrg.text = self.entity:stringNameKind()
+end
 function CButtonEntityHoverLock:new(_argt)
     CButtonEntityHoverLock.super.new(self, _argt)
-    self.lock        = function()
-                        local _playeractual = Tic:playerActual()
-                        _playeractual:spotEntity(self.entity)
-                        _playeractual.spottinglock = true
-                        Tic:mouseDelay()
-                       end
-    self.unlock      = function()
-                        local _playeractual = Tic:playerActual()
-                        _playeractual:spotEntity(nil)
-                        _playeractual.spottinglock = false
-                        Tic:mouseDelay()
-                       end
-    self.hovertextdw = CHoverTextClickRG{text = Tic.TEXTLOCK}
-    self.clickrg     = self.lock
+    self.behaviour   = CButtonEntityHoverLock.BEHAVIOUR
+    self.hovertextup = CHoverTextClickLF{}
     self.hovertextrg = CHoverTextInfos{}
-    self.behaviour   = function(self)
-                        local _playeractual = Tic:playerActual()
-                        if _playeractual.spottinglock and _playeractual.spotting == self.entity then -- already locking ?
-                            self.hovertextdw.text = Tic.TEXTUNLOCK
-                            self.clickrg = self.unlock
-                        else
-                            self.hovertextdw.text = Tic.TEXTLOCK
-                            self.clickrg = self.lock
-                        end
-                        self.hovertextrg.text = self.entity:nameGet().." "..self.entity:kindGet()
-                       end
     self:argt(_argt)
 end
 
@@ -338,14 +334,13 @@ end
 CButtonEntityHoverLockPick = CButtonEntityHoverLock:extend() -- generic entity hover lock pick button
 function CButtonEntityHoverLockPick:new(_argt)
     CButtonEntityHoverLockPick.super.new(self, _argt)
-    self.pick        = function()
+    self.hovertextdw = CHoverTextClickRG{text = Tic.TEXTPICK}
+    self.clickrg     = function()
                         Tic:playerActual().hovered = false
                         Tic:playerPick(self.entity)
                         Tic:playerActual().hovered = false
                         Tic:mouseDelay()
                        end
-    self.hovertextup = CHoverTextClickLF{text = Tic.TEXTPICK}
-    self.clicklf     = self.pick
     self:argt(_argt)
 end
 
@@ -1116,7 +1111,7 @@ function CButtonEntitySlot:objectsinInventories(_inventories)
     local _result = {}
     for _, _inventory in pairs(_inventories or {}) do
         if CInventory:isInventory(_inventory) then
-            local _objectsofslottype = _inventory:objectsofSlotType(self.slottype)
+            local _objectsofslottype = _inventory:objectsOfSlotType(self.slottype)
             _result = Tables:imerge(_result, _objectsofslottype, true)
         end
     end
@@ -1212,17 +1207,15 @@ function CButtonPlayerSlot:menuPick()
 
     _appendbutton(_windowmenu, nil)
 
-    for _, _object in ipairs(_entity:objectsofSlotType(_slottype)) do
+    for _, _object in ipairs(_entity:objectsOfSlotType(_slottype)) do
         _appendbutton(_windowmenu, _object)
     end
 
     local _bags = {}
-    for _, _object in ipairs(_entity:objectsofSlotType(CSlotBack)) do
-        if _object:isBag() then
-            local _bagobjects = _object.inventory:objectsofSlotType(_slottype)
-            if Tables:size(_bagobjects) > 0 then
-                Tables:keyAppend(_bags, _object, _bagobjects)
-            end
+    for _, _bag in ipairs(_entity:bags()) do
+        local _bagobjects = _bag.inventory:objectsOfSlotType(_slottype)
+        if Tables:size(_bagobjects) > 0 then
+            Tables:keyAppend(_bags, _bag, _bagobjects)
         end
     end
 

@@ -73,7 +73,7 @@ function CInventory:movetoInventory(_inventory)
     return _garbage
 end
 
-function CInventory:objectsofSlotType(_slottype)
+function CInventory:objectsOfSlotType(_slottype)
     if not CSlot:isSlot(_slottype) then return end -- mandatory
     local _result = {}
     for _, _object in ipairs(self.objects or {}) do

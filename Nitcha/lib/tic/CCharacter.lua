@@ -443,7 +443,11 @@ function CCharacter:dropObject(_object, _showmessage)
     if not _object then return end
     _showmessage = _showmessage or true
 
-    local _whatinventory = _object:findWhatInventory(self.inventories)
+    local _inventories = self.inventories
+    for _, _bag in ipairs(self:bags()) do
+        Tables:valInsert(_inventories, _bag.inventory, Tables.ONE)
+    end
+    local _whatinventory = _object:findWhatInventory(_inventories)
     if not _whatinventory then return end -- does not have the object
     _whatinventory:removeObject(_object)
 
@@ -481,12 +485,23 @@ function CCharacter:trialsDropping(_direction, _next)
     return _trials
 end
 
-function CCharacter:objectsofSlotType(_slottype)
+function CCharacter:objectsOfSlotType(_slottype)
     local _result = {}
     for _, _inventory in pairs(self.inventories or {}) do
         if CInventory:isInventory(_inventory) then
-            local _objectsofslottype = _inventory:objectsofSlotType(_slottype)
+            local _objectsofslottype = _inventory:objectsOfSlotType(_slottype)
             _result = Tables:imerge(_result, _objectsofslottype, true)
+        end
+    end
+    return _result
+end
+
+function CCharacter:bags()
+    local _result = {}
+    for _, _inventory in pairs(self.inventories or {}) do
+        if CInventory:isInventory(_inventory) then
+            local _bags = _inventory:bags()
+            _result = Tables:imerge(_result, _bags, true)
         end
     end
     return _result
