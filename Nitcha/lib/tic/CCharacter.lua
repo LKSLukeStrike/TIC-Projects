@@ -237,9 +237,6 @@ function CCharacter:new(_argt)
     self.statphymax     = 5 -- max stats -- 0-Tic.STATMAX
     self.statmenmax     = 5
     self.statpsymax     = 5
-    self.statphyact     = self.statphymax -- act stats -- 0-max
-    self.statmenact     = self.statmenmax
-    self.statpsyact     = self.statpsymax
     self.slots          = { -- character objects slots
                             head = CSlotHead{},
                             back = CSlotBack{},
@@ -257,6 +254,7 @@ function CCharacter:new(_argt)
                           }
     self.interactsprite = CSpriteFG.EFFECTCHIMK
     --
+    self:adjustStatsAct()
     self:argt(_argt)
     self.camera       = CCamera{name = self:nameGet().." "..Classic.NAMECAMERA} -- one camera per character
     self:focus() -- focus its camera on itself
@@ -264,8 +262,14 @@ end
 
 
 --
--- Inventories
+-- Adjust
 --
+function CCharacter:adjustStatsAct()
+    self.statphyact = self.statphymax -- act stats -- 0-max
+    self.statmenact = self.statmenmax
+    self.statpsyact = self.statpsymax
+end
+
 function CCharacter:adjustInventoriesSlots()
     if not self.inventories then return end -- mandatory (argt)
 

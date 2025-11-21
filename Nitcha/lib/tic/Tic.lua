@@ -2094,7 +2094,7 @@ end
 -- exit()
 
 
-local _playerclass = CPlayerDrowe --CPlayerMeduz --CPlayerGolth
+local _playerclass = CPlayerGhost
 if true then
 --
 -- phy
@@ -2242,7 +2242,7 @@ end -- men
 --
 if true then
 if true then
-W1lfie = CPlayerElvwe{
+W1lfie = _playerclass{
     name = "W1lfie",
     size = Tic.SIZES,
     statphyact = 10,
@@ -2281,7 +2281,7 @@ W2lfie = _playerclass{
     ["slots.handlf"] = CSlotHandLF{object = CWeaponRuneMedium{}},
     -- ["slots.head"]   = CSlotHead{object = CClothesHelmetMedium{}},
     -- ["slots.head"]   = CSlotHead{object = CClothesHatMedium{}},
-    ["slots.head"]   = CSlotHead{object = CClothesCapMedium{}},
+    -- ["slots.head"]   = CSlotHead{object = CClothesCapMedium{}},
     -- ["slots.back"]   = CSlotBack{object = CClothesScrollCaseMedium{}},
     ["inventories.any"] = CInventoryAny{objects = {
         CObjectSpellLarge{used = CObject.USEDHALF},
@@ -2295,7 +2295,7 @@ W2lfie = _playerclass{
     }},
 }
 end
-if false then
+if true then
 W3lfie = _playerclass{
     name = "W3lfie",
     size = Tic.SIZEL,
@@ -2313,7 +2313,7 @@ W3lfie = _playerclass{
     -- ["slots.handlf"] = CSlotHandLF{object = CWeaponRuneLarge{}},
     -- ["slots.head"]   = CSlotHead{object = CClothesHelmetLarge{}},
     -- ["slots.head"]   = CSlotHead{object = CClothesHatLarge{}},
-    ["slots.head"]   = CSlotHead{object = CClothesCapLarge{}},
+    -- ["slots.head"]   = CSlotHead{object = CClothesCapLarge{}},
     ["slots.back"]   = CSlotBack{object = CClothesScrollCaseLarge{}},
     ["inventories.any"] = CInventoryAny{objects = {
         CObjectSpellLarge{used = CObject.USEDNONE},

@@ -51,12 +51,10 @@ function CPlayerHuman:new(_argt)
     self.colorhairsbg = Tic.COLORRED
     self.headsprite   = CSpriteFG.HEADHUMAN -- head
     self.statphymax   = 5
-    self.statphyact   = self.statphymax
     self.statmenmax   = 5
-    self.statmenact   = self.statmenmax
     self.statpsymax   = 5
-    self.statpsyact   = self.statpsymax
     --
+    self:adjustStatsAct()
     self:argt(_argt)
     self:adjustInventoriesSlots() -- adjust standard inventories sizes and contents + slots
 end
@@ -74,12 +72,10 @@ function CPlayerDwarf:new(_argt)
     self.colorhairsbg = Tic.COLORORANGE
     self.headsprite   = CSpriteFG.HEADDWARF -- head
     self.statphymax   = 7
-    self.statphyact   = self.statphymax
     self.statmenmax   = 6
-    self.statmenact   = self.statmenmax
     self.statpsymax   = 2
-    self.statpsyact   = self.statpsymax
     --
+    self:adjustStatsAct()
     self:argt(_argt)
     self:adjustInventoriesSlots() -- adjust standard inventories sizes and contents + slots
 end
@@ -98,19 +94,17 @@ function CPlayerGnome:new(_argt)
     self.colorpants   = self.colorskin
     self.headsprite   = CSpriteFG.HEADGNOME -- head
     self.statphymax   = 3
-    self.statphyact   = self.statphymax
     self.statmenmax   = 6
-    self.statmenact   = self.statmenmax
     self.statpsymax   = 6
-    self.statpsyact   = self.statpsymax
     --
+    self:adjustStatsAct()
     self:argt(_argt)
     self:adjustInventoriesSlots() -- adjust standard inventories sizes and contents + slots
 end
 
 
 CPlayerElvwe = CPlayerHumanoid:extend{ -- Elvwe player characters
-    headsprite = CSpriteFG.HEADELVWE -- head
+    headsprite = CSpriteFG.HEADELVWE, -- head
 }
 Classic.KINDELVWE = "Elvwe"
 function CPlayerElvwe:new(_argt)
@@ -125,12 +119,10 @@ function CPlayerElvwe:new(_argt)
     self.colorhairsfg = Tic.COLORORANGE
     self.colorhairsbg = Tic.COLORYELLOW
     self.statphymax   = 4
-    self.statphyact   = self.statphymax
     self.statmenmax   = 6
-    self.statmenact   = self.statmenmax
     self.statpsymax   = 5
-    self.statpsyact   = self.statpsymax
     --
+    self:adjustStatsAct()
     self:argt(_argt)
     self:adjustInventoriesSlots() -- adjust standard inventories sizes and contents + slots
 end
@@ -149,14 +141,11 @@ function CPlayerDrowe:new(_argt)
     self.coloreyesbg  = Tic.COLORPURPLE
     self.colorhairsfg = Tic.COLORGREYD
     self.colorhairsbg = Tic.COLORGREYM
-    -- self.headsprite   = CSpriteFG.HEADELVWE -- head
     self.statphymax   = 5
-    self.statphyact   = self.statphymax
     self.statmenmax   = 6
-    self.statmenact   = self.statmenmax
     self.statpsymax   = 4
-    self.statpsyact   = self.statpsymax
     --
+    self:adjustStatsAct()
     self:argt(_argt)
     self:adjustInventoriesSlots() -- adjust standard inventories sizes and contents + slots
 end
@@ -175,12 +164,10 @@ function CPlayerAngel:new(_argt)
     self.colorextra   = Tic.COLORYELLOW
     self.headsprite   = CSpriteFG.HEADANGEL -- head
     self.statphymax   = 4
-    self.statphyact   = self.statphymax
     self.statmenmax   = 5
-    self.statmenact   = self.statmenmax
     self.statpsymax   = 6
-    self.statpsyact   = self.statpsymax
     --
+    self:adjustStatsAct()
     self:argt(_argt)
     self:adjustInventoriesSlots() -- adjust standard inventories sizes and contents + slots
 end
@@ -201,75 +188,74 @@ function CPlayerGolth:new(_argt)
     self.coloreyesbg  = Tic.COLORBLUEM
     self.headsprite   = CSpriteFG.HEADGOLTH -- head
     self.statphymax   = 8
-    self.statphyact   = self.statphymax
     self.statmenmax   = 6
-    self.statmenact   = self.statmenmax
     self.statpsymax   = 1
-    self.statpsyact   = self.statpsymax
     --
+    self:adjustStatsAct()
     self:argt(_argt)
     self:adjustInventoriesSlots() -- adjust standard inventories sizes and contents + slots
 end
 
 
-CPlayerHorne = CPlayerHumanoid:extend{} -- Horne player characters
+CPlayerHorne = CPlayerHumanoid:extend{ -- Horne player characters
+    size         = Tic.SIZEL, -- size
+    colorhairsfg = Tic.COLORPURPLE, -- colors
+    colorhairsbg = Tic.COLORRED,
+    colorextra   = Tic.COLORGREYD,
+    headsprite   = CSpriteFG.HEADHORNE, -- head
+}
 Classic.KINDHORNE = "Horne"
 function CPlayerHorne:new(_argt)
     CPlayerHorne.super.new(self, _argt)
+    self:implementall(CPlayerHorne)
     self.classic = CPlayerHorne
     self.kind    = Classic.KINDHORNE
     --
-    self.size         = Tic.SIZEL -- size
-    self.colorhairsfg = Tic.COLORPURPLE -- colors
-    self.colorhairsbg = Tic.COLORRED
-    self.colorextra   = Tic.COLORGREYD
-    self.headsprite   = CSpriteFG.HEADHORNE -- head
     self.statphymax   = 3
-    self.statphyact   = self.statphymax
     self.statmenmax   = 5
-    self.statmenact   = self.statmenmax
     self.statpsymax   = 7
-    self.statpsyact   = self.statpsymax
     --
+    self:adjustStatsAct()
     self:argt(_argt)
     self:adjustInventoriesSlots() -- adjust standard inventories sizes and contents + slots
 end
 
 
-CPlayerDemon = CPlayerHorne:extend{} -- Demon player characters
+CPlayerDemon = CPlayerHumanoid:extend{} -- Demon player characters
 Classic.KINDDEMON = "Demon"
 function CPlayerDemon:new(_argt)
     CPlayerDemon.super.new(self, _argt)
+    self:implementall(CPlayerHorne)
     self.classic = CPlayerDemon
     self.kind    = Classic.KINDDEMON
     --
+    self.size         = Tic.SIZEL -- size
     self.statphymax   = 3
-    self.statphyact   = self.statphymax
     self.statmenmax   = 5
-    self.statmenact   = self.statmenmax
     self.statpsymax   = 7
-    self.statpsyact   = self.statpsymax
     --
+    self:adjustStatsAct()
     self:argt(_argt)
+    self:adjustInventoriesSlots() -- adjust standard inventories sizes and contents + slots
 end
 
 
-CPlayerTifel = CPlayerHorne:extend{} -- Tifel player characters
+CPlayerTifel = CPlayerHumanoid:extend{} -- Tifel player characters
 Classic.KINDTIFEL = "Tifel"
 function CPlayerTifel:new(_argt)
     CPlayerTifel.super.new(self, _argt)
+    self:implementall(CPlayerHorne)
     self.classic = CPlayerTifel
     self.kind    = Classic.KINDTIFEL
     --
     self.size         = Tic.SIZEM -- size
     self.statphymax   = 4
-    self.statphyact   = self.statphymax
     self.statmenmax   = 6
-    self.statmenact   = self.statmenmax
     self.statpsymax   = 5
-    self.statpsyact   = self.statpsymax
     --
+    self:adjustStatsAct()
     self:argt(_argt)
+    self:adjustInventoriesSlots() -- adjust standard inventories sizes and contents + slots
 end
 
 
@@ -285,47 +271,53 @@ function CPlayerMeduz:new(_argt)
     self.colorhairsbg = Tic.COLORGREENM
     self.headsprite   = CSpriteFG.HEADMEDUZ -- head
     self.statphymax   = 4
-    self.statphyact   = self.statphymax
     self.statmenmax   = 6
-    self.statmenact   = self.statmenmax
     self.statpsymax   = 5
-    self.statpsyact   = self.statpsymax
     --
+    self:adjustStatsAct()
     self:argt(_argt)
+    self:adjustInventoriesSlots() -- adjust standard inventories sizes and contents + slots
 end
 
 
-CPlayerGnoll = CPlayerHumanoid:extend{} -- Gnoll player characters
+CPlayerGnoll = CPlayerHumanoid:extend{ -- Gnoll player characters
+    size         = Tic.SIZEL, -- size
+    coloreyesfg  = Tic.COLORRED, -- colors
+    coloreyesbg  = Tic.COLORPURPLE,
+    headsprite   = CSpriteFG.HEADGNOLL, -- head
+}
 Classic.KINDGNOLL = "Gnoll"
 function CPlayerGnoll:new(_argt)
     CPlayerGnoll.super.new(self, _argt)
+    self:implementall(CPlayerGnoll)
     self.classic = CPlayerGnoll
     self.kind    = Classic.KINDGNOLL
     --
-    self.size         = Tic.SIZEL -- size
-    self.coloreyesfg  = Tic.COLORRED -- colors
-    self.coloreyesbg  = Tic.COLORPURPLE
-    self.headsprite   = CSpriteFG.HEADGNOLL -- head
-    self.statphymax   = 7
-    self.statphyact   = self.statphymax
+    self.statphymax   = 8
     self.statmenmax   = 6
-    self.statmenact   = self.statmenmax
-    self.statpsymax   = 2
-    self.statpsyact   = self.statpsymax
+    self.statpsymax   = 1
     --
+    self:adjustStatsAct()
     self:argt(_argt)
+    self:adjustInventoriesSlots() -- adjust standard inventories sizes and contents + slots
 end
 
 
-CPlayerWolfe = CPlayerGnoll:extend{} -- Wolfe player characters
+CPlayerWolfe = CPlayerHumanoid:extend{} -- Wolfe player characters
 Classic.KINDWOLFE = "Wolfe"
 function CPlayerWolfe:new(_argt)
     CPlayerWolfe.super.new(self, _argt)
+    self:implementall(CPlayerGnoll)
     self.classic = CPlayerWolfe
     self.kind    = Classic.KINDWOLFE
     --
+    self.statphymax   = 7
+    self.statmenmax   = 5
+    self.statpsymax   = 3
     --
+    self:adjustStatsAct()
     self:argt(_argt)
+    self:adjustInventoriesSlots() -- adjust standard inventories sizes and contents + slots
 end
 
 
@@ -342,11 +334,10 @@ function CPlayerGhost:new(_argt)
     self.colorhands   = Tic.COLORPURPLE
     self.headsprite   = CSpriteFG.HEADGHOST -- head
     self.statphymax   = 3
-    self.statphyact   = self.statphymax
     self.statmenmax   = 6
-    self.statmenact   = self.statmenmax
     self.statpsymax   = 6
-    self.statpsyact   = self.statpsymax
     --
+    self:adjustStatsAct()
     self:argt(_argt)
+    self:adjustInventoriesSlots() -- adjust standard inventories sizes and contents + slots
 end
