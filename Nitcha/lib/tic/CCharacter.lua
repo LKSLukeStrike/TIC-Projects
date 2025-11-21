@@ -232,7 +232,7 @@ function CCharacter:new(_argt)
     self.colorpants     = Tic.COLORPANTS
     self.colorhands     = Tic.COLORHANDS
     self.bodysprite     = CSpriteFG.BODYHUMAN -- body
-    self.headsprite     = CSpriteFG.HEADELVWE -- head
+    self.headsprite     = CSpriteFG.HEADMEDUZ -- head
     self.eyessprite     = CSpriteFG.EYESHUMAN -- eyes
     self.statphymax     = 5 -- max stats -- 0-Tic.STATMAX
     self.statmenmax     = 5
@@ -241,14 +241,12 @@ function CCharacter:new(_argt)
     self.statmenact     = self.statmenmax
     self.statpsyact     = self.statpsymax
     self.slots          = { -- character objects slots
-                            exists = true, -- to check if already implemented
                             head = CSlotHead{},
                             back = CSlotBack{},
                             handlf = CSlotHandLF{},
                             handrg = CSlotHandRG{},
                           }
     self.inventories    = { -- character standard inventories
-                            exists = true, -- to check if already implemented
                             phy = CInventoryPhy{},
                             men = CInventoryMen{},
                             psy = CInventoryPsy{},
@@ -262,7 +260,59 @@ function CCharacter:new(_argt)
     self:argt(_argt)
     self.camera       = CCamera{name = self:nameGet().." "..Classic.NAMECAMERA} -- one camera per character
     self:focus() -- focus its camera on itself
-    self:adjustInventoriesSlots() -- adjust standard inventories sizes and contents + slots
+end
+
+
+--
+-- Inventories
+--
+function CCharacter:adjustInventoriesSlots()
+    if not self.inventories then return end -- mandatory (argt)
+
+    local _inventorytmp = CInventoryAny{} -- grab all objects into tmp inventory
+    for _, _slot in pairs(self.slots or {}) do
+        if CSlot:isSlot(_slot) then
+            _inventorytmp:appendObject(_slot.object)
+            if not _slot:canAppendObject(_slot.object) then -- keep only if allowed
+                _slot.object = nil
+            end
+        end
+    end
+    local _inventoryphy = self.inventories.phy or CInventoryPhy{}
+    local _inventorymen = self.inventories.men or CInventoryMen{}
+    local _inventorypsy = self.inventories.psy or CInventoryPsy{}
+    local _inventoryany = self.inventories.any or CInventoryAny{}
+    _inventoryphy:movetoInventory(_inventorytmp)
+    _inventorymen:movetoInventory(_inventorytmp)
+    _inventorypsy:movetoInventory(_inventorytmp)
+    _inventoryany:movetoInventory(_inventorytmp)
+
+    for _, _object in ipairs(_inventorytmp.objects) do -- remove objects from the world
+        _object.discovered = true -- the object is discovered
+        _object:remove()
+        if _object:isBag() then -- remove bag objects from the world
+            for _, _bagobject in ipairs(_object.inventory.objects) do
+                _bagobject.discovered = true -- the object is discovered
+                _bagobject:remove()
+            end
+        end
+    end
+
+    _inventoryphy.objectsmax = self:statphymaxGet() -- adjust inventories limits
+    _inventorymen.objectsmax = self:statmenmaxGet()
+    _inventorypsy.objectsmax = self:statpsymaxGet()
+
+    _inventorytmp:movetoInventory(_inventoryphy) -- redispatch objects if possible
+    _inventorytmp:movetoInventory(_inventorymen)
+    _inventorytmp:movetoInventory(_inventorypsy)
+
+    for _, _slot in pairs(self.slots or {}) do -- check if objects in slots are still available
+        if CSlot:isSlot(_slot) then
+            if Tables:valFind(_inventorytmp.objects, _slot.object) then _slot.object = nil end
+        end
+    end
+
+    self.inventories.any = nil -- get rid of extra objects
 end
 
 
@@ -297,58 +347,6 @@ end
 function CCharacter:statpsyactGet()
     if self:isParty() then return self.party.statpsyact end
     return self.statpsyact
-end
-
---
--- Inventories
---
-function CCharacter:adjustInventoriesSlots()
-    if not self.inventories then return end -- mandatory (argt)
-    if not self.inventories.exists then return end -- ensure we already have inventories
-
-    if not  self.inventories.any then self.inventories.any = CInventoryAny{} end
-    local _inventoryany = self.inventories.any -- grab all objects into inventoryay
-    local _inventoryphy = self.inventories.phy
-    local _inventorymen = self.inventories.men
-    local _inventorypsy = self.inventories.psy
-    for _, _slot in pairs(self.slots or {}) do
-        if CSlot:isSlot(_slot) then
-            _inventoryany:appendObject(_slot.object)
-            if not _slot:canAppendObject(_slot.object) then -- keep only if allowed
-                _slot.object = nil
-            end
-        end
-    end
-    _inventoryphy:movetoInventory(_inventoryany)
-    _inventorymen:movetoInventory(_inventoryany)
-    _inventorypsy:movetoInventory(_inventoryany)
-
-    for _, _object in ipairs(_inventoryany.objects) do -- remove objects from the world
-        _object.discovered = true -- the object is discovered
-        _object:remove()
-        if _object:isBag() then
-            for _, _bagobject in ipairs(_object.inventory.objects) do -- remove bag objects from the world
-                _bagobject.discovered = true -- the object is discovered
-                _bagobject:remove()
-            end
-        end
-    end
-
-    _inventoryphy.objectsmax = self:statphymaxGet() -- adjust inventories limits
-    _inventorymen.objectsmax = self:statmenmaxGet()
-    _inventorypsy.objectsmax = self:statpsymaxGet()
-
-    _inventoryany:movetoInventory(_inventoryphy) -- redispatch objects if possible
-    _inventoryany:movetoInventory(_inventorymen)
-    _inventoryany:movetoInventory(_inventorypsy)
-
-    for _, _slot in pairs(self.slots or {}) do -- check if objects in slots are still available
-        if CSlot:isSlot(_slot) then
-            if Tables:valFind(_inventoryany.objects, _slot.object) then _slot.object = nil end
-        end
-    end
-
-    self.inventories.any = nil -- get rid of extra objects
 end
 
 --

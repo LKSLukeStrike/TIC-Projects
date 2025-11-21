@@ -3,7 +3,7 @@ require("lib/tic/ICharacterHumanoid")
 --
 -- CPlayer
 --
-CPlayer = CCharacter:extend() -- player characters
+CPlayer = CCharacter:extend{} -- player characters
 function CPlayer:new(_argt)
     CPlayer.super.new(self, _argt)
     self.classic = CPlayer
@@ -28,7 +28,7 @@ end
 --
 -- CPlayerHumanoid
 --
-CPlayerHumanoid = CPlayer:extend() -- humanoid player characters
+CPlayerHumanoid = CPlayer:extend{} -- humanoid player characters
 function CPlayerHumanoid:new(_argt)
     CPlayerHumanoid.super.new(self, _argt)
     self.classic = CPlayerHumanoid
@@ -39,7 +39,7 @@ function CPlayerHumanoid:new(_argt)
 end
 
 
-CPlayerHuman = CPlayerHumanoid:extend() -- Human player characters
+CPlayerHuman = CPlayerHumanoid:extend{} -- Human player characters
 Classic.KINDHUMAN = "Human"
 function CPlayerHuman:new(_argt)
     CPlayerHuman.super.new(self, _argt)
@@ -58,10 +58,11 @@ function CPlayerHuman:new(_argt)
     self.statpsyact   = self.statpsymax
     --
     self:argt(_argt)
+    self:adjustInventoriesSlots() -- adjust standard inventories sizes and contents + slots
 end
 
 
-CPlayerDwarf = CPlayerHumanoid:extend() -- Dwarf player characters
+CPlayerDwarf = CPlayerHumanoid:extend{} -- Dwarf player characters
 Classic.KINDDWARF = "Dwarf"
 function CPlayerDwarf:new(_argt)
     CPlayerDwarf.super.new(self, _argt)
@@ -80,10 +81,11 @@ function CPlayerDwarf:new(_argt)
     self.statpsyact   = self.statpsymax
     --
     self:argt(_argt)
+    self:adjustInventoriesSlots() -- adjust standard inventories sizes and contents + slots
 end
 
 
-CPlayerGnome = CPlayerHumanoid:extend() -- Gnome player characters
+CPlayerGnome = CPlayerHumanoid:extend{} -- Gnome player characters
 Classic.KINDGNOME = "Gnome"
 function CPlayerGnome:new(_argt)
     CPlayerGnome.super.new(self, _argt)
@@ -103,13 +105,17 @@ function CPlayerGnome:new(_argt)
     self.statpsyact   = self.statpsymax
     --
     self:argt(_argt)
+    self:adjustInventoriesSlots() -- adjust standard inventories sizes and contents + slots
 end
 
 
-CPlayerElvwe = CPlayerHumanoid:extend() -- Elvwe player characters
+CPlayerElvwe = CPlayerHumanoid:extend{ -- Elvwe player characters
+    headsprite = CSpriteFG.HEADELVWE -- head
+}
 Classic.KINDELVWE = "Elvwe"
 function CPlayerElvwe:new(_argt)
     CPlayerElvwe.super.new(self, _argt)
+    self:implementall(CPlayerElvwe)
     self.classic = CPlayerElvwe
     self.kind    = Classic.KINDELVWE
     --
@@ -118,7 +124,6 @@ function CPlayerElvwe:new(_argt)
     self.coloreyesbg  = Tic.COLORGREEND
     self.colorhairsfg = Tic.COLORORANGE
     self.colorhairsbg = Tic.COLORYELLOW
-    self.headsprite   = CSpriteFG.HEADELVWE -- head
     self.statphymax   = 4
     self.statphyact   = self.statphymax
     self.statmenmax   = 6
@@ -127,13 +132,15 @@ function CPlayerElvwe:new(_argt)
     self.statpsyact   = self.statpsymax
     --
     self:argt(_argt)
+    self:adjustInventoriesSlots() -- adjust standard inventories sizes and contents + slots
 end
 
 
-CPlayerDrowe = CPlayerElvwe:extend() -- Drowe player characters
+CPlayerDrowe = CPlayerHumanoid:extend{} -- Drowe player characters
 Classic.KINDDROWE = "Drowe"
 function CPlayerDrowe:new(_argt)
     CPlayerDrowe.super.new(self, _argt)
+    self:implementall(CPlayerElvwe)
     self.classic = CPlayerDrowe
     self.kind    = Classic.KINDDROWE
     --
@@ -142,6 +149,7 @@ function CPlayerDrowe:new(_argt)
     self.coloreyesbg  = Tic.COLORPURPLE
     self.colorhairsfg = Tic.COLORGREYD
     self.colorhairsbg = Tic.COLORGREYM
+    -- self.headsprite   = CSpriteFG.HEADELVWE -- head
     self.statphymax   = 5
     self.statphyact   = self.statphymax
     self.statmenmax   = 6
@@ -150,10 +158,11 @@ function CPlayerDrowe:new(_argt)
     self.statpsyact   = self.statpsymax
     --
     self:argt(_argt)
+    self:adjustInventoriesSlots() -- adjust standard inventories sizes and contents + slots
 end
 
 
-CPlayerAngel = CPlayerHumanoid:extend() -- Angel player characters
+CPlayerAngel = CPlayerHumanoid:extend{} -- Angel player characters
 Classic.KINDANGEL = "Angel"
 function CPlayerAngel:new(_argt)
     CPlayerAngel.super.new(self, _argt)
@@ -173,10 +182,11 @@ function CPlayerAngel:new(_argt)
     self.statpsyact   = self.statpsymax
     --
     self:argt(_argt)
+    self:adjustInventoriesSlots() -- adjust standard inventories sizes and contents + slots
 end
 
 
-CPlayerGolth = CPlayerHumanoid:extend() -- Golth player characters
+CPlayerGolth = CPlayerHumanoid:extend{} -- Golth player characters
 Classic.KINDGOLTH = "Golth"
 function CPlayerGolth:new(_argt)
     CPlayerGolth.super.new(self, _argt)
@@ -198,10 +208,11 @@ function CPlayerGolth:new(_argt)
     self.statpsyact   = self.statpsymax
     --
     self:argt(_argt)
+    self:adjustInventoriesSlots() -- adjust standard inventories sizes and contents + slots
 end
 
 
-CPlayerHorne = CPlayerHumanoid:extend() -- Horne player characters
+CPlayerHorne = CPlayerHumanoid:extend{} -- Horne player characters
 Classic.KINDHORNE = "Horne"
 function CPlayerHorne:new(_argt)
     CPlayerHorne.super.new(self, _argt)
@@ -221,10 +232,11 @@ function CPlayerHorne:new(_argt)
     self.statpsyact   = self.statpsymax
     --
     self:argt(_argt)
+    self:adjustInventoriesSlots() -- adjust standard inventories sizes and contents + slots
 end
 
 
-CPlayerDemon = CPlayerHorne:extend() -- Demon player characters
+CPlayerDemon = CPlayerHorne:extend{} -- Demon player characters
 Classic.KINDDEMON = "Demon"
 function CPlayerDemon:new(_argt)
     CPlayerDemon.super.new(self, _argt)
@@ -242,7 +254,7 @@ function CPlayerDemon:new(_argt)
 end
 
 
-CPlayerTifel = CPlayerHorne:extend() -- Tifel player characters
+CPlayerTifel = CPlayerHorne:extend{} -- Tifel player characters
 Classic.KINDTIFEL = "Tifel"
 function CPlayerTifel:new(_argt)
     CPlayerTifel.super.new(self, _argt)
@@ -261,7 +273,7 @@ function CPlayerTifel:new(_argt)
 end
 
 
-CPlayerMeduz = CPlayerHumanoid:extend() -- Meduz player characters
+CPlayerMeduz = CPlayerHumanoid:extend{} -- Meduz player characters
 Classic.KINDMEDUZ = "Meduz"
 function CPlayerMeduz:new(_argt)
     CPlayerMeduz.super.new(self, _argt)
@@ -283,7 +295,7 @@ function CPlayerMeduz:new(_argt)
 end
 
 
-CPlayerGnoll = CPlayerHumanoid:extend() -- Gnoll player characters
+CPlayerGnoll = CPlayerHumanoid:extend{} -- Gnoll player characters
 Classic.KINDGNOLL = "Gnoll"
 function CPlayerGnoll:new(_argt)
     CPlayerGnoll.super.new(self, _argt)
@@ -305,7 +317,7 @@ function CPlayerGnoll:new(_argt)
 end
 
 
-CPlayerWolfe = CPlayerGnoll:extend() -- Wolfe player characters
+CPlayerWolfe = CPlayerGnoll:extend{} -- Wolfe player characters
 Classic.KINDWOLFE = "Wolfe"
 function CPlayerWolfe:new(_argt)
     CPlayerWolfe.super.new(self, _argt)
@@ -317,7 +329,7 @@ function CPlayerWolfe:new(_argt)
 end
 
 
-CPlayerGhost = CPlayerHumanoid:extend() -- Ghost player characters
+CPlayerGhost = CPlayerHumanoid:extend{} -- Ghost player characters
 Classic.KINDGHOST = "Ghost"
 function CPlayerGhost:new(_argt)
     CPlayerGhost.super.new(self, _argt)

@@ -15,7 +15,6 @@ CEntity.WORLDY = 0
 function CEntity:new(_argt)
     CEntity.super.new(self, _argt)
     self.classic = CEntity -- instance of
-    self.classed = nil -- override to limit argt
     self.kind    = Classic.KINDENTITY
     self.name    = Classic.NAMEENTITY
     --

@@ -1982,14 +1982,12 @@ end -- generate places
 if false then
 Truduk = CPlayerDwarf{
     name = "Truduk",
-    classed = CPlayerDwarf,
     worldx = 0,
     worldy = 0,
     ["slots.head"] = CSlotHead{object = CClothesHatSmall{}},
 }
 Prinnn = CPlayerGnome{
     name = "Prinnn",
-    classed = CPlayerGnome,
     worldx = 10,
     worldy = 0,
     coloreyesbg  = Tic.COLORRED,
@@ -1997,7 +1995,6 @@ Prinnn = CPlayerGnome{
 }
 Kaptan = CPlayerMeduz{
     name = "Kaptan",
-    classed = CPlayerMeduz,
     worldx = 20,
     worldy = 0,
     ["slots.head"] = CSlotHead{object = CClothesHatMedium{}},
@@ -2013,7 +2010,6 @@ Kaptan.slots.head.object.palettefg = {
 }
 Kaptin = CPlayerMeduz{
     name = "Kaptin",
-    classed = CPlayerMeduz,
     worldx = 30,
     worldy = 0,
     ["slots.head"] = CSlotHead{object = CClothesHatLarge{}},
@@ -2025,7 +2021,6 @@ Kaptin = CPlayerMeduz{
 }
 Aegeon = CPlayerElvwe{
     name = "Aegeon",
-    classed = CPlayerElvwe,
     worldx = 0,
     worldy = 20,
     colorshirt   = Tic.COLORGREENL,
@@ -2034,7 +2029,6 @@ Aegeon = CPlayerElvwe{
 }
 Nitcha = CPlayerDrowe{
     name = "Nitcha",
-    classed = CPlayerDrowe,
     worldx = 10,
     worldy = 20,
     ["slots.head"] = CSlotHead{object = CClothesHatMedium{}},
@@ -2043,13 +2037,11 @@ Nitcha = CPlayerDrowe{
 }
 Azarel = CPlayerAngel{
     name = "Azarel",
-    classed = CPlayerAngel,
     worldx = 20,
     worldy = 20,
 }
 Zikkow = CPlayerTifel{
     name = "Zikkow",
-    classed = CPlayerTifel,
     worldx = 30,
     worldy = 20,
     colorhairsbg = Tic.COLORGREENM,
@@ -2060,7 +2052,6 @@ Zikkow = CPlayerTifel{
 }
 Kaainn = CPlayerDemon{
     name = "Kaainn",
-    classed = CPlayerDemon,
     worldx = 0,
     worldy = 30,
     colorhairsbg = Tic.COLORGREYL,
@@ -2073,7 +2064,6 @@ Kaainn = CPlayerDemon{
 }
 Daemok = CPlayerDemon{
     name = "Daemok",
-    classed = CPlayerDemon,
     worldx = 10,
     worldy = 30,
 }
@@ -2111,7 +2101,7 @@ if true then
 --
 if false then
 if true then
-Walfie = _playerclass{classed = _playerclass,
+Walfie = _playerclass{
     name = "Walfie",
     size = Tic.SIZES,
     statphyact = 10,
@@ -2132,7 +2122,7 @@ Walfie = _playerclass{classed = _playerclass,
 }
 end
 if true then
-Welfie = _playerclass{classed = _playerclass,
+Welfie = _playerclass{
     name = "Welfie",
     size = Tic.SIZEM,
     statphyact = 10,
@@ -2153,7 +2143,7 @@ Welfie = _playerclass{classed = _playerclass,
 }
 end
 if true then
-Wilfie = _playerclass{classed = _playerclass,
+Wilfie = _playerclass{
     name = "Wilfie",
     size = Tic.SIZEL,
     statphyact = 10,
@@ -2182,7 +2172,7 @@ end -- phy
 --
 if false then
 if true then
-Wolfie = _playerclass{classed = _playerclass,
+Wolfie = _playerclass{
     name = "Wolfie",
     size = Tic.SIZES,
     statphyact = 10,
@@ -2203,7 +2193,7 @@ Wolfie = _playerclass{classed = _playerclass,
 }
 end
 if true then
-Wulfie = _playerclass{classed = _playerclass,
+Wulfie = _playerclass{
     name = "Wulfie",
     size = Tic.SIZEM,
     statphyact = 10,
@@ -2224,7 +2214,7 @@ Wulfie = _playerclass{classed = _playerclass,
 }
 end
 if true then
-Wylfie = _playerclass{classed = _playerclass,
+Wylfie = _playerclass{
     name = "Wylfie",
     size = Tic.SIZEL,
     statphyact = 10,
@@ -2252,7 +2242,7 @@ end -- men
 --
 if true then
 if true then
-W1lfie = _playerclass{classed = _playerclass,
+W1lfie = CPlayerElvwe{
     name = "W1lfie",
     size = Tic.SIZES,
     statphyact = 10,
@@ -2263,24 +2253,25 @@ W1lfie = _playerclass{classed = _playerclass,
     worldy = 20,
     -- spottingspot = true,
     spottingpick = true,
-    -- ["slots.handrg"] = CSlotHandRG{object = CWeaponWandSmall{}},
+    ["slots.handrg"] = CSlotHandRG{object = CWeaponWandSmall{}},
     -- ["slots.handlf"] = CSlotHandLF{object = CWeaponRuneSmall{}},
     -- ["slots.head"]   = CSlotHead{object = CClothesHelmetSmall{}},
     -- ["slots.head"]   = CSlotHead{object = CClothesHatSmall{}},
-    ["slots.head"]   = CSlotHead{object = CClothesCapSmall{}},
+    -- ["slots.head"]   = CSlotHead{object = CClothesCapSmall{}},
     -- ["slots.back"]   = CSlotBack{object = CClothesScrollCaseSmall{}},
     -- ["inventories.any"] = CInventoryAny{objects = {
     --     CObjectSpellSmall{used = CObject.USEDFULL},
     -- }},
+    ["inventories.any"] = CInventoryAny{}
 }
 end
 if true then
-W2lfie = _playerclass{classed = _playerclass,
+W2lfie = _playerclass{
     name = "W2lfie",
     size = Tic.SIZEM,
-    statphyact = 10,
-    statmenact = 10,
-    statpsyact = 10,
+    -- statphyact = 10,
+    -- statmenact = 10,
+    -- statpsyact = 10,
     -- colorextra = Tic.COLORGREENM,
     worldx = 20,
     worldy = 20,
@@ -2294,13 +2285,18 @@ W2lfie = _playerclass{classed = _playerclass,
     -- ["slots.back"]   = CSlotBack{object = CClothesScrollCaseMedium{}},
     ["inventories.any"] = CInventoryAny{objects = {
         CObjectSpellLarge{used = CObject.USEDHALF},
+        CObjectSpellLarge{used = CObject.USEDHALF},
+        CObjectSpellLarge{used = CObject.USEDHALF},
+        CObjectSpellLarge{used = CObject.USEDHALF},
+        CObjectSpellLarge{used = CObject.USEDHALF},
+        CObjectSpellLarge{used = CObject.USEDHALF},
         CObjectBombLarge{used = CObject.USEDHALF},
         CObjectFlaskLarge{used = CObject.USEDHALF},
     }},
 }
 end
-if true then
-W3lfie = _playerclass{classed = _playerclass,
+if false then
+W3lfie = _playerclass{
     name = "W3lfie",
     size = Tic.SIZEL,
     -- statphyact = 10,
@@ -2346,7 +2342,7 @@ end
 
 
 if false then
-Oxboow = CPlayerGhost{classed = CPlayerGhost,
+Oxboow = CPlayerGhost{
     name = "Oxboow",
     statphyact = 10,
     statmenact = 10,
