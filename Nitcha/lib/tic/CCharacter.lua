@@ -396,9 +396,7 @@ function CCharacter:slotGetHandLFObject()
 end
 
 function CCharacter:slotSetHeadObject(_object)
-    Tic:logSlots(true)
     self:slotGetHead().object = _object
-    Tic:logSlots(true)
 	return _object
 end
 

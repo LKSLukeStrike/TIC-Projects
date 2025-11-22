@@ -1581,75 +1581,58 @@ function Tic:logWorld()
     Tic:logAppend()
 end
 
-function Tic:logInventories(_indent, _trace, _force)
-    if not Tic.INVENTORYSHOW and not _force then return end
+function Tic:logInventories(_indent)
+    if not Tic.INVENTORYSHOW then return end
     local _playeractual = Tic:playerActual()
     if not _playeractual then return end
     _indent = _indent or ""
 
-    if _trace then
-        Tic:trace(_playeractual.name, _playeractual.statphymax, _playeractual.statmenmax, _playeractual.statpsymax)
-    else
-        Tic:logAppend(_playeractual.name, _playeractual.statphymax, _playeractual.statmenmax, _playeractual.statpsymax)
-    end
+    Tic:logAppend(_playeractual.name, _playeractual.statphymax, _playeractual.statmenmax, _playeractual.statpsymax)
     for _, _inventory in pairs(_playeractual.inventories) do
-        Tic:logInventory(_inventory, _indent, _trace)
+        Tic:logInventory(_inventory, _indent)
     end
-    if _trace then
-        Tic:trace()
-    else
-        Tic:logAppend()
-    end
+    Tic:logAppend()
 end
 
-function Tic:logInventory(_inventory, _indent, _trace)
+function Tic:logInventory(_inventory, _indent, _isbag)
     if not CInventory:isInventory(_inventory) then return end
     _indent = _indent or ""
 
-    if _trace then
-        Tic:trace(_indent.._inventory.name, _inventory.kind, Tables:size(_inventory.objects).."/".._inventory.objectsmax)
-    else
-        Tic:logAppend(_indent.._inventory.name, _inventory.kind, Tables:size(_inventory.objects).."/".._inventory.objectsmax)
+    if not _isbag then
+        Tic:logAppend(_indent.._inventory.name, _inventory.kind,
+            Tables:size(_inventory.objects).."/".._inventory.objectsmax
+        )
     end
     for _, _object in ipairs(_inventory.objects) do
-        local _objectisbag = _object:isBag()
-        local _textbag = (_objectisbag) and "(BAG)" or ""
-        if _trace then
-            Tic:trace(_indent.." ", _object.kind, _object.name, _textbag)
+        local _isbag = _object:isBag()
+        if _isbag then
+            Tic:logAppend(_indent.." ", _object.kind, _object.name,
+                Tables:size(_object.inventory.objects).."/".._object.inventory.objectsmax, "(BAG)"
+            )
+            Tic:logInventory(_object.inventory, "  ", _isbag)
         else
-            Tic:logAppend(_indent.." ", _object.kind, _object.name, _textbag)
-        end
-        if _objectisbag then
-            Tic:logInventory(_object.inventory, "  ", _trace)
+            Tic:logAppend(_indent.." ", _object.kind, _object.name)
         end
     end
 end
 
-function Tic:logSlots(_trace, _force)
-    if not Tic.INVENTORYSHOW and not _force then return end
+function Tic:logSlots()
+    if not Tic.INVENTORYSHOW then return end
     local _playeractual = Tic:playerActual()
     if not _playeractual then return end
 
     for _, _slot in pairs(_playeractual.slots) do
         Tic:logSlot(_slot, _trace)
     end
-    if _trace then
-        Tic:trace()
-    else
-        Tic:logAppend()
-    end
+    Tic:logAppend()
 end
 
-function Tic:logSlot(_slot, _trace)
+function Tic:logSlot(_slot)
     if not CSlot:isSlot(_slot) then return end
     local _object = _slot.object
     local _objectkind = (_object) and _object.kind or "--"
     local _objectname = (_object) and _object.name or "--"
-    if _trace then
-        Tic:trace(_slot.name, _slot.kind.." :", _objectkind, _objectname)
-    else
-        Tic:logAppend(_slot.name, _slot.kind.." :", _objectkind, _objectname)
-    end
+    Tic:logAppend(_slot.name, _slot.kind.." :", _objectkind, _objectname)
 end
 
 function Tic:logScreens()
@@ -1726,7 +1709,7 @@ function Tic:print(_screenx, _screeny, ...) -- print with multiple args
     _screenx = _screenx or 0
     _screeny = _screeny or 0
     local _line = Tic:args2line(...)
-    print( _line, _screenx, _screeny, Tic.COLORCYAN, true, 1, true)
+    print( _line, _screenx, _screeny, Tic.COLORYELLOW, true, 1, true)
 end
 
 
@@ -2094,7 +2077,7 @@ end
 -- exit()
 
 
-local _playerclass = CPlayerGhost
+local _playerclass = CPlayerHuman
 if true then
 --
 -- phy
