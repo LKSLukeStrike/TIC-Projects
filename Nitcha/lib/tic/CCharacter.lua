@@ -437,15 +437,15 @@ end
 
 function CCharacter:findWhatSlot(_object)
     if not _object then return end
-    for _, _slot in ipairs(self.slots) do
-        if _Slot.object == _object then return _slot end
+    for _, _slot in pairs(self.slots) do
+        if _slot.object == _object then return _slot end
     end
     return -- not found
 end
 
 function CCharacter:findWhatInventory(_object)
     if not _object then return end
-    for _, _inventory in ipairs(self.inventories) do
+    for _, _inventory in pairs(self.inventories) do
         if _inventory:findObject(_object) then return _inventory end
     end
     return -- not found
@@ -466,11 +466,11 @@ function CCharacter:dropObject(_object, _showmessage)
     local _whatslot      = self:findWhatSlot(_object)
     local _whatinventory = self:findWhatInventory(_object)
     local _whatbag       = self:findWhatBag(_object)
-    -- if not (_whatslot or _whatinventory or _whatbag) then return end -- does not own the object
+    if not (_whatslot or _whatinventory or _whatbag) then return end -- does not own the object
 
-    if _whatslot      then _whatslot:removeObject(_object, true) end -- free a slot if any
-    if _whatinventory then _whatinventory:removeObject(_object, true) end -- free an inventory if any
-    if _whatbag       then _whatbag.inventory:removeObject(_object, true) end -- free an bag inventory if any
+    if _whatslot      then _whatslot:removeObject(_object) end -- free a slot if any
+    if _whatinventory then _whatinventory:removeObject(_object) end -- free an inventory if any
+    if _whatbag       then _whatbag.inventory:removeObject(_object) end -- free an bag inventory if any
 
     local _trials = self:trialsDropping() -- prepare the trials for dropping
 
