@@ -1303,29 +1303,8 @@ end
 function CButtonPlayerSlotMenu:new(_argt)
     CButtonPlayerSlotMenu.super.new(self, _argt)
     self.classic        = CButtonPlayerSlotMenu
-    -- self.entity         = Tic:playerActual()
 	self.behaviour      = CButtonPlayerSlotMenu.BEHAVIOUR
     self.screen         = nil -- parent menu screen
-    -- self.hovertextup    = CHoverTextClickLF{text = Tic.TEXTDROP}
-    -- self.clicklf        = function()
-    --                         local _slotobject = self:getslotobject()
-    --                         _entity:dropObject(_slotobject)
-    --                         Tic:screenRemove(self.screen)
-    --                         Tic:mouseDelay()
-    --                       end
-    -- self.hovertextdw    = CHoverTextClickRG{text = Tic.TEXTPICK}
-    -- self.clickrg        = function()
-    --                         local _slotobject = self:getslotobject()
-    --                         local _whatslot = (_slotobject) -- is object already in a slot ?
-    --                             and _slotobject:findWhatSlot(_entity.slots)
-    --                             or  nil
-    --                         if _whatslot then
-    --                             _whatslot:appendObject(_slotobject)
-    --                         end
-    --                         self.setslotobject(_slotobject)
-    --                         Tic:screenRemove(self.screen)
-    --                         Tic:mouseDelay()
-    --                       end
     self:argt(_argt)
 end
 

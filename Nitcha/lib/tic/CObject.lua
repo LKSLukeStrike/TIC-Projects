@@ -106,18 +106,14 @@ end
 
 function CObjectInventory:findFreeSlot(_slots) -- can store object in a free slot ?
     for _, _slot in pairs(_slots or {}) do
-        if CSlot:isSlot(_slot) then
-            if _slot:canAppendObject(self, true) then return _slot end
-        end
+        if _slot:canAppendObject(self, true) then return _slot end
     end
     return -- not found
 end
 
 function CObjectInventory:findWhatSlot(_slots) -- in what slot is object stored ?
     for _, _slot in pairs(_slots or {}) do
-        if CSlot:isSlot(_slot) then
-            if _slot.object == self then return _slot end
-        end
+        if _slot.object == self then return _slot end
     end
     return -- not found
 end

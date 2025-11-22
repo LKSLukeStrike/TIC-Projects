@@ -76,10 +76,14 @@ end
 function CInventory:objectsOfSlotType(_slottype)
     if not CSlot:isSlot(_slottype) then return end -- mandatory
     local _result = {}
-    for _, _object in ipairs(self.objects or {}) do
+    for _, _object in ipairs(self.objects) do
         if _object.slottype and _object.slottype == _slottype then Tables:valInsert(_result, _object, true) end
     end
     return _result
+end
+
+function CInventory:findObject(_object)
+    return Tables:valFind(self.objects, _object)
 end
 
 function CInventory:bags()

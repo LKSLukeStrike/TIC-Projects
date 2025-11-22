@@ -33,8 +33,8 @@ function CSlot:appendObject(_object, _emptyonly)
 end
 
 function CSlot:removeObject(_object, _sameonly)
-    _sameonly = _sameonly or false
     if not _object then return end -- mandatory
+    _sameonly = _sameonly or false
     if _sameonly and not (self.object == _object) then return end -- only if object is already in slot
     self.object = nil
     return _object -- done

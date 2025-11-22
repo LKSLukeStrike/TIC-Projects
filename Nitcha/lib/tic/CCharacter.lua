@@ -274,12 +274,10 @@ function CCharacter:adjustInventoriesSlots()
     if not self.inventories then return end -- mandatory (argt)
 
     local _inventorytmp = CInventoryAny{} -- grab all objects into tmp inventory
-    for _, _slot in pairs(self.slots or {}) do
-        if CSlot:isSlot(_slot) then
-            _inventorytmp:appendObject(_slot.object)
-            if not _slot:canAppendObject(_slot.object) then -- keep only if allowed
-                _slot.object = nil
-            end
+    for _, _slot in pairs(self.slots) do
+        _inventorytmp:appendObject(_slot.object)
+        if not _slot:canAppendObject(_slot.object) then -- keep only in slot if allowed
+            _slot.object = nil
         end
     end
     local _inventoryphy = self.inventories.phy or CInventoryPhy{}
@@ -310,10 +308,8 @@ function CCharacter:adjustInventoriesSlots()
     _inventorytmp:movetoInventory(_inventorymen)
     _inventorytmp:movetoInventory(_inventorypsy)
 
-    for _, _slot in pairs(self.slots or {}) do -- check if objects in slots are still available
-        if CSlot:isSlot(_slot) then
-            if Tables:valFind(_inventorytmp.objects, _slot.object) then _slot.object = nil end
-        end
+    for _, _slot in pairs(self.slots) do -- check if objects in slots are still available
+        if Tables:valFind(_inventorytmp.objects, _slot.object) then _slot.object = nil end
     end
 
     self.inventories.any = nil -- get rid of extra objects
@@ -439,20 +435,42 @@ function CCharacter:slotDropHandLF()
 	return self:dropObject(_object)
 end
 
+function CCharacter:findWhatSlot(_object)
+    if not _object then return end
+    for _, _slot in ipairs(self.slots) do
+        if _Slot.object == _object then return _slot end
+    end
+    return -- not found
+end
+
+function CCharacter:findWhatInventory(_object)
+    if not _object then return end
+    for _, _inventory in ipairs(self.inventories) do
+        if _inventory:findObject(_object) then return _inventory end
+    end
+    return -- not found
+end
+
+function CCharacter:findWhatBag(_object)
+    if not _object then return end
+    for _, _bag in ipairs(self:bags()) do
+        if _bag.inventory:findObject(_object) then return _bag end
+    end
+    return -- not found
+end
+
 function CCharacter:dropObject(_object, _showmessage)
     if not _object then return end
     _showmessage = _showmessage or true
 
-    local _inventories = self.inventories
-    for _, _bag in ipairs(self:bags()) do
-        Tables:valInsert(_inventories, _bag.inventory, Tables.ONE)
-    end
-    local _whatinventory = _object:findWhatInventory(_inventories)
-    if not _whatinventory then return end -- does not have the object
-    _whatinventory:removeObject(_object)
+    local _whatslot      = self:findWhatSlot(_object)
+    local _whatinventory = self:findWhatInventory(_object)
+    local _whatbag       = self:findWhatBag(_object)
+    -- if not (_whatslot or _whatinventory or _whatbag) then return end -- does not own the object
 
-    local _whatslot = _object:findWhatSlot(self.slots)
-    if _whatslot then _whatslot:removeObject(_object, true) end -- free a slot if any
+    if _whatslot      then _whatslot:removeObject(_object, true) end -- free a slot if any
+    if _whatinventory then _whatinventory:removeObject(_object, true) end -- free an inventory if any
+    if _whatbag       then _whatbag.inventory:removeObject(_object, true) end -- free an bag inventory if any
 
     local _trials = self:trialsDropping() -- prepare the trials for dropping
 
