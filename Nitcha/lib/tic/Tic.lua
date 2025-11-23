@@ -2299,8 +2299,11 @@ W3lfie = _playerclass{
     -- ["slots.head"]   = CSlotHead{object = CClothesCapLarge{}},
     ["slots.back"]   = CSlotBack{object = CClothesScrollCaseLarge{}},
     ["inventories.any"] = CInventoryAny{objects = {
+        CObjectBombLarge{used = CObject.USEDHALF},
+        CObjectFlaskLarge{used = CObject.USEDHALF},
         CObjectSpellLarge{used = CObject.USEDNONE},
         CClothesToolBoxLarge{},
+        CClothesBackPackLarge{},
         CClothesToolBoxLarge{inventory = CInventoryMen6{objects = {CWeaponBowSmall{}}}},
         CClothesBackPackLarge{inventory = CInventoryPhy6{objects = {CWeaponSword{}}}},
     }},

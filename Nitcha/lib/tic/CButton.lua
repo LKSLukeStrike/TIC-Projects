@@ -1183,13 +1183,16 @@ function CButtonPlayerSlot:menuPick()
     local _setslotobject = self.setslotobject
     local _oldslotobject = _getslotobject()
 
-    local _windowmenu = CWindowMenu{
-        screenx = _screenx,
-        screeny = _screeny,
-        separatory = 1,
-        stretch = true,
-    }
-    _screen:appendElements{_windowmenu}
+    local function _appendwindowmenu(_screenx, _screeny)
+        local _windowmenu = CWindowMenu{
+            screenx = _screenx,
+            screeny = _screeny,
+            separatory = 1,
+            stretch = true,
+        }
+        _screen:appendElements{_windowmenu}
+        return _windowmenu
+    end
 
     local function _appendbutton(_windowmenu, _slotobject, _header)
         _windowmenu:appendElements{
@@ -1205,35 +1208,51 @@ function CButtonPlayerSlot:menuPick()
         }
     end
 
+    local _windowmenu = _appendwindowmenu(_screenx, _screeny)
     _appendbutton(_windowmenu, nil)
 
-    for _, _object in ipairs(_entity:objectsOfSlotType(_slottype)) do
-        _appendbutton(_windowmenu, _object)
+    local _objects = _entity:objectsPhyOfSlotType(_slottype)
+    if Tables:notempty(_objects) then
+        local _windowmenu = _appendwindowmenu(_screenx, _screeny + 9)
+        for _, _object in ipairs(_objects) do
+            _appendbutton(_windowmenu, _object)
+        end
+        _screenx = _screenx + 9
+    end
+
+    local _objects = _entity:objectsMenOfSlotType(_slottype)
+    if Tables:notempty(_objects) then
+        local _windowmenu = _appendwindowmenu(_screenx, _screeny + 9)
+        for _, _object in ipairs(_objects) do
+            _appendbutton(_windowmenu, _object)
+        end
+        _screenx = _screenx + 9
+    end
+
+    local _objects = _entity:objectsPsyOfSlotType(_slottype)
+    if Tables:notempty(_objects) then
+        local _windowmenu = _appendwindowmenu(_screenx, _screeny + 9)
+        for _, _object in ipairs(_objects) do
+            _appendbutton(_windowmenu, _object)
+        end
+        _screenx = _screenx + 9
     end
 
     local _bags = {}
     for _, _bag in ipairs(_entity:bags()) do
         local _bagobjects = _bag.inventory:objectsOfSlotType(_slottype)
-        if Tables:size(_bagobjects) > 0 then
+        if Tables:notempty(_bagobjects) then
             Tables:keyAppend(_bags, _bag, _bagobjects)
         end
     end
 
     for _bag, _bagobjects in pairs(_bags) do
-        _screenx = _screenx + 9
-        local _windowmenu = CWindowMenu{
-            screenx = _screenx,
-            screeny = _screeny,
-            separatory = 1,
-            stretch = true,
-        }
-        _screen:appendElements{_windowmenu}
-
-        _appendbutton(_windowmenu, _bag, true)
-
+        local _windowmenu = _appendwindowmenu(_screenx, _screeny)
+        _appendbutton(_windowmenu, _bag)
         for _, _bagobject in ipairs(_bagobjects) do
             _appendbutton(_windowmenu, _bagobject)
         end
+        _screenx = _screenx + 9
     end
 
     Tic:screenAppend(_screen)

@@ -25,6 +25,14 @@ function Tables:size(_table) -- size of a table
     return _result
 end
 
+function Tables:isempty(_table) -- is table empty ?
+    return (Tables:size(_table) == 0)
+end
+
+function Tables:notempty(_table) -- is table not empty ?
+    return (Tables:size(_table) > 0)
+end
+
 
 -- Keys and Vals
 function Tables:keys(_table) -- keys of a table -- SORTED

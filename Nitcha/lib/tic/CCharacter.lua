@@ -503,25 +503,43 @@ function CCharacter:trialsDropping(_direction, _next)
     return _trials
 end
 
+function CCharacter:objectsPhyOfSlotType(_slottype)
+    return self.inventories.phy:objectsOfSlotType(_slottype)
+end
+
+function CCharacter:objectsMenOfSlotType(_slottype)
+    return self.inventories.men:objectsOfSlotType(_slottype)
+end
+
+function CCharacter:objectsPsyOfSlotType(_slottype)
+    return self.inventories.psy:objectsOfSlotType(_slottype)
+end
+
 function CCharacter:objectsOfSlotType(_slottype)
     local _result = {}
-    for _, _inventory in pairs(self.inventories or {}) do
-        if CInventory:isInventory(_inventory) then
-            local _objectsofslottype = _inventory:objectsOfSlotType(_slottype)
-            _result = Tables:imerge(_result, _objectsofslottype, true)
-        end
-    end
+    _result = Tables:imerge(_result, self:objectsPhyOfSlotType(_slottype))
+    _result = Tables:imerge(_result, self:objectsMenOfSlotType(_slottype))
+    _result = Tables:imerge(_result, self:objectsPsyOfSlotType(_slottype))
     return _result
+end
+
+function CCharacter:bagsPhy()
+    return self.inventories.phy:bags()
+end
+
+function CCharacter:bagsMen()
+    return self.inventories.men:bags()
+end
+
+function CCharacter:bagsPsy()
+    return self.inventories.psy:bags()
 end
 
 function CCharacter:bags()
     local _result = {}
-    for _, _inventory in pairs(self.inventories or {}) do
-        if CInventory:isInventory(_inventory) then
-            local _bags = _inventory:bags()
-            _result = Tables:imerge(_result, _bags, true)
-        end
-    end
+    _result = Tables:imerge(_result, self:bagsPhy())
+    _result = Tables:imerge(_result, self:bagsMen())
+    _result = Tables:imerge(_result, self:bagsPsy())
     return _result
 end
 
