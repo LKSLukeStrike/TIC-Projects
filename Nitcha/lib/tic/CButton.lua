@@ -633,6 +633,10 @@ function CButtonPlayerStatPhy:new(_argt)
                                 text = Tic.TEXTPHY..":"
                                 .._playeractual:statphyactGet().."/".._playeractual:statphymaxGet()
                             }
+                            self.hovertextrg = CHoverTextInfos{
+                                text = Tic.TEXTINV..":"
+                                ..Tables:size(_playeractual.inventories.phy.objects).."/".._playeractual:statphymaxGet()
+                            }
                             local _bagscount = 0
                             local _bagsused  = 0
                             local _bagstotal = 0
@@ -644,17 +648,13 @@ function CButtonPlayerStatPhy:new(_argt)
                                 end
                             end
                             if _bagscount > 0 then
-                                self.hovertextrg = CHoverTextInfos{
+                                self.hovertextdr = CHoverTextInfos{
                                     text = Tic.TEXTBAG..":"
                                     .."(".._bagscount..") ".._bagsused.."/".._bagstotal
                                 }
                             else
-                                self.hovertextrg = nil
+                                self.hovertextdr = nil
                             end
-                            self.hovertextdr = CHoverTextInfos{
-                                text = Tic.TEXTINV..":"
-                                ..Tables:size(_playeractual.inventories.phy.objects).."/".._playeractual:statphymaxGet()
-                            }
                          end
     self:argt(_argt)
 end
@@ -672,6 +672,10 @@ function CButtonPlayerStatMen:new(_argt)
                                 text = Tic.TEXTMEN..":"
                                 .._playeractual:statmenactGet().."/".._playeractual:statmenmaxGet()
                             }
+                            self.hovertextrg = CHoverTextInfos{
+                                text = Tic.TEXTINV..":"
+                                ..Tables:size(_playeractual.inventories.men.objects).."/".._playeractual:statmenmaxGet()
+                            }
                             local _bagscount = 0
                             local _bagsused  = 0
                             local _bagstotal = 0
@@ -683,17 +687,13 @@ function CButtonPlayerStatMen:new(_argt)
                                 end
                             end
                             if _bagscount > 0 then
-                                self.hovertextrg = CHoverTextInfos{
+                                self.hovertextdr = CHoverTextInfos{
                                     text = Tic.TEXTBAG..":"
                                     .."(".._bagscount..") ".._bagsused.."/".._bagstotal
                                 }
                             else
-                                self.hovertextrg = nil
+                                self.hovertextdr = nil
                             end
-                            self.hovertextdr = CHoverTextInfos{
-                                text = Tic.TEXTINV..":"
-                                ..Tables:size(_playeractual.inventories.men.objects).."/".._playeractual:statmenmaxGet()
-                            }
                          end
     self:argt(_argt)
 end
@@ -711,6 +711,10 @@ function CButtonPlayerStatPsy:new(_argt)
                                 text = Tic.TEXTPSY..":"
                                 .._playeractual:statpsyactGet().."/".._playeractual:statpsymaxGet()
                             }
+                            self.hovertextrg = CHoverTextInfos{
+                                text = Tic.TEXTINV..":"
+                                ..Tables:size(_playeractual.inventories.psy.objects).."/".._playeractual:statpsymaxGet()
+                            }
                             local _bagscount = 0
                             local _bagsused  = 0
                             local _bagstotal = 0
@@ -722,17 +726,13 @@ function CButtonPlayerStatPsy:new(_argt)
                                 end
                             end
                             if _bagscount > 0 then
-                                self.hovertextrg = CHoverTextInfos{
+                                self.hovertextdr = CHoverTextInfos{
                                     text = Tic.TEXTBAG..":"
                                     .."(".._bagscount..") ".._bagsused.."/".._bagstotal
                                 }
                             else
-                                self.hovertextrg = nil
+                                self.hovertextdr = nil
                             end
-                            self.hovertextdr = CHoverTextInfos{
-                                text = Tic.TEXTINV..":"
-                                ..Tables:size(_playeractual.inventories.psy.objects).."/".._playeractual:statpsymaxGet()
-                            }
                          end
     self:argt(_argt)
 end
@@ -1101,6 +1101,15 @@ CButtonEntitySlot.SPRITEHAND = CSpriteBG{
     sprite  = CSpriteBG.SIGNSLHAND,
     rotate  = Tic.ROTATE270,
 }
+CButtonEntitySlot.SPRITEPHY = CSpriteBG{
+    sprite  = CSpriteBG.SIGNACTPHY,
+}
+CButtonEntitySlot.SPRITEMEN = CSpriteBG{
+    sprite  = CSpriteBG.SIGNACTMEN,
+}
+CButtonEntitySlot.SPRITEPSY = CSpriteBG{
+    sprite  = CSpriteBG.SIGNACTPSY,
+}
 CButtonEntitySlot.BEHAVIOUR = function(self) -- need at least one player with slots
     self.display = (self.entity)
     if not self.display then return end -- no entity
@@ -1194,7 +1203,7 @@ function CButtonPlayerSlot:menuPick()
         return _windowmenu
     end
 
-    local function _appendbutton(_windowmenu, _slotobject, _header)
+    local function _appendbutton(_windowmenu, _slotobject, _header, _stat)
         _windowmenu:appendElements{
             CButtonPlayerSlotMenu{
                 screen        = _screen,
@@ -1202,6 +1211,7 @@ function CButtonPlayerSlot:menuPick()
                 sprite        = _sprite,
                 oldslotobject = _oldslotobject,
                 header        = _header,
+                stat          = _stat,
                 getslotobject = function() return _slotobject end, -- returns slot object
                 setslotobject = _setslotobject,
             }
@@ -1213,29 +1223,32 @@ function CButtonPlayerSlot:menuPick()
 
     local _objects = _entity:objectsPhyOfSlotType(_slottype)
     if Tables:notempty(_objects) then
-        local _windowmenu = _appendwindowmenu(_screenx, _screeny + 9)
+        _screenx = _screenx + 9
+        local _windowmenu = _appendwindowmenu(_screenx, _screeny)
+        _appendbutton(_windowmenu, nil, true, Tic.TEXTPHY)
         for _, _object in ipairs(_objects) do
             _appendbutton(_windowmenu, _object)
         end
-        _screenx = _screenx + 9
     end
 
     local _objects = _entity:objectsMenOfSlotType(_slottype)
     if Tables:notempty(_objects) then
-        local _windowmenu = _appendwindowmenu(_screenx, _screeny + 9)
+        _screenx = _screenx + 9
+        local _windowmenu = _appendwindowmenu(_screenx, _screeny)
+        _appendbutton(_windowmenu, nil, true, Tic.TEXTMEN)
         for _, _object in ipairs(_objects) do
             _appendbutton(_windowmenu, _object)
         end
-        _screenx = _screenx + 9
     end
 
     local _objects = _entity:objectsPsyOfSlotType(_slottype)
     if Tables:notempty(_objects) then
-        local _windowmenu = _appendwindowmenu(_screenx, _screeny + 9)
+        _screenx = _screenx + 9
+        local _windowmenu = _appendwindowmenu(_screenx, _screeny)
+        _appendbutton(_windowmenu, nil, true, Tic.TEXTPSY)
         for _, _object in ipairs(_objects) do
             _appendbutton(_windowmenu, _object)
         end
-        _screenx = _screenx + 9
     end
 
     local _bags = {}
@@ -1247,12 +1260,12 @@ function CButtonPlayerSlot:menuPick()
     end
 
     for _bag, _bagobjects in pairs(_bags) do
+        _screenx = _screenx + 9
         local _windowmenu = _appendwindowmenu(_screenx, _screeny)
-        _appendbutton(_windowmenu, _bag)
+        _appendbutton(_windowmenu, _bag, true)
         for _, _bagobject in ipairs(_bagobjects) do
             _appendbutton(_windowmenu, _bagobject)
         end
-        _screenx = _screenx + 9
     end
 
     Tic:screenAppend(_screen)
@@ -1270,6 +1283,7 @@ CButtonPlayerSlotMenu.BEHAVIOUR = function(self)
     local _entityslots   = self.entity.slots
     local _oldslotobject = self.oldslotobject
     local _header        = self.header
+    local _stat          = self.stat
 
     if _slotobject then
         local _isbag = _slotobject:isBag()
@@ -1282,13 +1296,13 @@ CButtonPlayerSlotMenu.BEHAVIOUR = function(self)
                 text = _slotobject:stringNameKind()
             }
         if _header then
-            self.hovertextup    = nil
-            self.clicklf        = nil
-            self.hovertextdw    = CHoverTextClickRG{text = Tic.TEXTDONE}
-            self.clickrg        = function()
+            self.hovertextup    = CHoverTextClickLF{text = Tic.TEXTDONE}
+            self.clicklf        = function()
                                     Tic:screenRemove(_screen)
                                     Tic:mouseDelay()
                                   end
+            self.hovertextdw    = nil
+            self.clickrg        = nil
         else
             self.hovertextup    = CHoverTextClickLF{text = Tic.TEXTDROP}
             self.clicklf        = function()
@@ -1308,15 +1322,35 @@ CButtonPlayerSlotMenu.BEHAVIOUR = function(self)
                                   end
         end
     else
-        self.hovertextup    = nil
-        self.clicklf        = nil
-        self.hovertextrg    = nil
-        self.hovertextdw    = CHoverTextClickRG{text = Tic.TEXTPICK}
-        self.clickrg        = function()
-                                self.setslotobject()
-                                Tic:screenRemove(_screen)
-                                Tic:mouseDelay()
-                              end
+        if _stat then
+            self.hovertextup    = CHoverTextClickLF{text = Tic.TEXTDONE}
+            self.clicklf        = function()
+                                    Tic:screenRemove(_screen)
+                                    Tic:mouseDelay()
+                                  end
+            self.hovertextdw    = nil
+            self.clickrg        = nil
+            if     _stat == Tic.TEXTPHY then
+                self.sprite = CButtonEntitySlot.SPRITEPHY
+            elseif _stat == Tic.TEXTMEN then
+                self.sprite = CButtonEntitySlot.SPRITEMEN
+            elseif _stat == Tic.TEXTPSY then
+                self.sprite = CButtonEntitySlot.SPRITEPSY
+            end
+        else
+            self.hovertextup    = CHoverTextClickLF{text = Tic.TEXTDONE}
+            self.clicklf        = function()
+                                    Tic:screenRemove(_screen)
+                                    Tic:mouseDelay()
+                                  end
+            self.hovertextrg    = nil
+            self.hovertextdw    = CHoverTextClickRG{text = Tic.TEXTPICK}
+            self.clickrg        = function()
+                                    self.setslotobject()
+                                    Tic:screenRemove(_screen)
+                                    Tic:mouseDelay()
+                                  end
+        end
     end
 end
 function CButtonPlayerSlotMenu:new(_argt)
