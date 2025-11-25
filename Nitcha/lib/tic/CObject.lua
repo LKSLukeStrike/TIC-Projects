@@ -47,12 +47,19 @@ function CObject:new(_argt)
     CObject.super.new(self, _argt)
     self.kind = Classic.KINDOBJECT
     self.name = Classic.NAMEOBJECT
-    self.used         = CObject.USEDNONE -- used level if any
     self:argt(_argt)
 end
 
 function CObject:isBag() -- is a bag ?
     return (self:is(CClothesBackPack) or self:is(CClothesToolBox) or self:is(CClothesScrollCase))
+end
+
+function CObject:isUsable() -- is a usable object ?
+    return (self.used)
+end
+
+function CObject:canUse() -- can use this object ?
+    return (self:isUsable() and not (self.used == CObject.USEDFULL))
 end
 
 --
@@ -530,7 +537,9 @@ IObjectUsable = Classic:extend{ -- usable objects implementation
         [Tic.STATEFLOORLF] = {rotate = Tic.ROTATE000, flip = Tic.FLIPNONE},
         [Tic.STATEFLOORRG] = {rotate = Tic.ROTATE000, flip = Tic.FLIPHORI},
     },
+    used          = CObject.USEDNONE, -- used level if any
 }
+
 function IObjectUsable:draw()
     self:save()
     self.palettefg[CObject.USED1] = self.palettefg[CObject.INSIDE]
@@ -550,7 +559,11 @@ function IObjectUsable:draw()
     self:load()
 end
 
-
+function IObjectUsable:use()
+    self.used = (self.used == CObject.USEDNONE)
+        and CObject.USEDHALF
+        or  CObject.USEDFULL
+end
 
 
 --

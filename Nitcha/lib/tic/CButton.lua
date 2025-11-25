@@ -1119,7 +1119,7 @@ CButtonEntitySlot.BEHAVIOUR = function(self) -- need at least one player with sl
     self.display = (self.entity.slots)
 end
 
-function CButtonEntitySlot:objectsinInventories(_inventories)
+function CButtonEntitySlot:objectsInInventories(_inventories)
     local _result = {}
     for _, _inventory in pairs(_inventories or {}) do
         if CInventory:isInventory(_inventory) then
@@ -1131,14 +1131,18 @@ function CButtonEntitySlot:objectsinInventories(_inventories)
 end
 
 function CButtonEntitySlot:canPick()
-    if self:objectGet() then return true end -- has object in slot -- can be replaced by an empty one
-    local _objectsininventories = self:objectsinInventories(self.entity.inventories)
+    if self:objectGet() then return true end -- has an object in slot -- can be replaced by an empty one
+    local _objectsininventories = self:objectsInInventories(self.entity.inventories)
     if Tables:size(_objectsininventories) > 0 then return true end --has other objects of same slottype
     return false
 end
 
 function CButtonEntitySlot:canDrop()
-    return self:objectGet() -- has object in slot -- can drop it
+    return (self:objectGet()) -- has an object in slot -- can drop it
+end
+
+function CButtonEntitySlot:canUse()
+    return (self:objectGet() and self:objectGet():canUse()) -- has an object in slot that can be used
 end
 
 
@@ -1153,19 +1157,27 @@ CButtonPlayerSlot.BEHAVIOUR = function(self) -- need at least one player with sl
     self.enabled = false
     if self:canDrop() then
         self.enabled = true
-        self.hovertextup = CHoverTextClickLF{text = Tic.TEXTDROP}
-        self.clicklf     = function() self.entity:dropObject(self:getslotobject()) end
+        self.hovertextup    = CHoverTextClickLF{text = Tic.TEXTDROP}
+        self.clicklf        = function() self.entity:dropObject(self:getslotobject()) end
     else
-        self.hovertextup = nil
-        self.clicklf     = nil
+        self.hovertextup    = nil
+        self.clicklf        = nil
+    end
+    if self:canUse() then
+        self.enabled = true
+        self.hovertextupmdk = CHoverTextClickLF{text = Tic.TEXTUSE}
+        self.clicklfmdk     = function() self:getslotobject():use() end
+    else
+        self.hovertextupmdk = nil
+        self.clicklfmdk     = nil
     end
     if self:canPick() then
         self.enabled = true
-        self.hovertextdw = CHoverTextClickRG{text = Tic.TEXTPICK}
-        self.clickrg     = function() self:menuPick() end
+        self.hovertextdw    = CHoverTextClickRG{text = Tic.TEXTPICK}
+        self.clickrg        = function() self:menuPick() end
     else
-        self.hovertextdw = nil
-        self.clickrg     = nil
+        self.hovertextdw    = nil
+        self.clickrg        = nil
     end
     if self.enabled and self:getslotobject() then
         local _object = self:getslotobject()

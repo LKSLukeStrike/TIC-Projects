@@ -40,7 +40,7 @@ function CSlot:removeObject(_object, _sameonly)
     return _object -- done
 end
 
-function CSlot:objectsinInventories(_inventories)
+function CSlot:objectsInInventories(_inventories)
     local _result = {}
     for _, _inventory in pairs(_inventories or {}) do
         if CInventory:isInventory(_inventory) then
