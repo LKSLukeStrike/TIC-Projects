@@ -18,8 +18,20 @@ function CInventory:isInventory(_inventory)
     return Classic:thatis(_inventory, CInventory)
 end
 
+function CInventory:isFull()
+    return (Tables:size(self.objects) >= self.objectsmax)
+end
+
+function CInventory:notFull()
+    return (Tables:size(self.objects) < self.objectsmax)
+end
+
+function CInventory:isEmpty()
+    return (Tables:size(self.objects) == 0)
+end
+
 function CInventory:canAppend()
-    return (Tables:size(self.objects) < self.objectsmax) -- inventory not full
+    return self:notFull() -- inventory not full
 end
 
 function CInventory:canAppendObject(_object)
@@ -85,11 +97,19 @@ end
 function CInventory:findObject(_object)
     return Tables:valFind(self.objects, _object)
 end
-
+                                                                            
 function CInventory:bags()
     local _result = {}
     for _, _object in ipairs(self.objects or {}) do
         if _object:isBag() then Tables:valInsert(_result, _object, true) end
+    end
+    return _result
+end
+                                                                            
+function CInventory:bagsNotFull()
+    local _result = {}
+    for _, _object in ipairs(self.objects or {}) do
+        if _object:isBag() and _object.inventory:notFull() then Tables:valInsert(_result, _object, true) end
     end
     return _result
 end

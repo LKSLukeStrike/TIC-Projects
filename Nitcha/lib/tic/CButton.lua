@@ -1131,18 +1131,26 @@ function CButtonEntitySlot:objectsInInventories(_inventories)
 end
 
 function CButtonEntitySlot:canPick()
-    if self:objectGet() then return true end -- has an object in slot -- can be replaced by an empty one
+    local _slotobject = self:objectGet()
+    if _slotobject then return true end -- has an object in slot -- can be replaced by an empty one
     local _objectsininventories = self:objectsInInventories(self.entity.inventories)
     if Tables:size(_objectsininventories) > 0 then return true end --has other objects of same slottype
     return false
 end
 
 function CButtonEntitySlot:canDrop()
-    return (self:objectGet()) -- has an object in slot -- can drop it
+    local _slotobject = self:objectGet()
+    return (_slotobject) -- has an object in slot -- can drop it
 end
 
 function CButtonEntitySlot:canUse()
-    return (self:objectGet() and self:objectGet():canUse()) -- has an object in slot that can be used
+    local _slotobject = self:objectGet()
+    return (_slotobject and _slotobject:canUse()) -- has an object in slot that can be used
+end
+
+function CButtonEntitySlot:canPack()
+    local _slotobject = self:objectGet()
+    return (_slotobject) -- nothing to pack
 end
 
 
@@ -1178,6 +1186,14 @@ CButtonPlayerSlot.BEHAVIOUR = function(self) -- need at least one player with sl
     else
         self.hovertextdw    = nil
         self.clickrg        = nil
+    end
+    if self:canPack() then
+        self.enabled = true
+        self.hovertextdwmdk = CHoverTextClickRG{text = Tic.TEXTPACK}
+        self.clickrgmdk     = function() self:menuPack() end
+    else
+        self.hovertextdwmdk = nil
+        self.clicklfmdk     = nil
     end
     if self.enabled and self:getslotobject() then
         local _object = self:getslotobject()
