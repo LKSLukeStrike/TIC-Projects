@@ -1215,7 +1215,6 @@ function CButtonPlayerSlot:menuPick()
     local _screen        = CScreen{}
     local _screenx       = self.screenx + 9
     local _screeny       = self.screeny
-    local _classic       = self.classic
     local _entity        = self.entity
     local _sprite        = self.sprite
     local _slottype      = self.slottype
@@ -1236,7 +1235,7 @@ function CButtonPlayerSlot:menuPick()
 
     local function _appendbutton(_windowmenu, _slotobject, _header, _stat)
         _windowmenu:appendElements{
-            CButtonPlayerSlotMenu{
+            CButtonPlayerSlotMenuPick{
                 screen        = _screen,
                 entity        = _entity,
                 sprite        = _sprite,
@@ -1249,10 +1248,10 @@ function CButtonPlayerSlot:menuPick()
         }
     end
 
-    local _windowmenu = _appendwindowmenu(_screenx, _screeny)
+    local _windowmenu = _appendwindowmenu(_screenx, _screeny) -- empty object
     _appendbutton(_windowmenu, nil)
 
-    local _objects = _entity:objectsPhyOfSlotType(_slottype)
+    local _objects = _entity:objectsPhyOfSlotType(_slottype) -- phy objects
     if Tables:notempty(_objects) then
         _screenx = _screenx + 9
         local _windowmenu = _appendwindowmenu(_screenx, _screeny)
@@ -1262,7 +1261,7 @@ function CButtonPlayerSlot:menuPick()
         end
     end
 
-    local _objects = _entity:objectsMenOfSlotType(_slottype)
+    local _objects = _entity:objectsMenOfSlotType(_slottype) -- men objects
     if Tables:notempty(_objects) then
         _screenx = _screenx + 9
         local _windowmenu = _appendwindowmenu(_screenx, _screeny)
@@ -1272,7 +1271,7 @@ function CButtonPlayerSlot:menuPick()
         end
     end
 
-    local _objects = _entity:objectsPsyOfSlotType(_slottype)
+    local _objects = _entity:objectsPsyOfSlotType(_slottype) -- psy objects
     if Tables:notempty(_objects) then
         _screenx = _screenx + 9
         local _windowmenu = _appendwindowmenu(_screenx, _screeny)
@@ -1302,12 +1301,89 @@ function CButtonPlayerSlot:menuPick()
     Tic:screenAppend(_screen)
 end
 
+function CButtonPlayerSlot:menuPack()
+    local _screen        = CScreen{}
+    local _screenx       = self.screenx + 9
+    local _screeny       = self.screeny
+    local _entity        = self.entity
+    local _sprite        = self.sprite
+    local _slottype      = self.slottype
+    local _getslotobject = self.getslotobject
+    local _setslotobject = self.setslotobject
+    local _oldslotobject = _getslotobject()
+    local _inventorytype = _oldslotobject.inventorytype
+
+    local _entityinventory = nil
+    if     _inventorytype == CInventoryPhy then
+        _entityinventory = _entity.inventories.phy
+    elseif _inventorytype == CInventoryMen then
+        _entityinventory = _entity.inventories.men
+    elseif _inventorytype == CInventoryPsy then
+        _entityinventory = _entity.inventories.psy
+    else
+        return
+    end
+    Tic:logAppend("PACK")
+
+    local function _appendwindowmenu(_screenx, _screeny)
+        local _windowmenu = CWindowMenu{
+            screenx = _screenx,
+            screeny = _screeny,
+            separatory = 1,
+            stretch = true,
+        }
+        _screen:appendElements{_windowmenu}
+        return _windowmenu
+    end
+
+    local function _appendbutton(_windowmenu, _slotobject, _header, _stat)
+        _windowmenu:appendElements{
+            CButtonPlayerSlotMenuPick{
+                screen        = _screen,
+                entity        = _entity,
+                sprite        = _sprite,
+                oldslotobject = _oldslotobject,
+                header        = _header,
+                stat          = _stat,
+                getslotobject = function() return _slotobject end, -- returns slot object
+                setslotobject = _setslotobject,
+            }
+        }
+    end
+
+    local _objects = _entityinventory.objects -- stat objects
+    local _windowmenu = _appendwindowmenu(_screenx, _screeny)
+    _appendbutton(_windowmenu, nil, true, _entityinventory.stat)
+    for _, _object in ipairs(_objects) do
+        _appendbutton(_windowmenu, _object)
+    end
+
+    -- local _bags = {}
+    -- for _, _bag in ipairs(_entity:bags()) do
+    --     local _bagobjects = _bag.inventory:objectsOfSlotType(_slottype)
+    --     if Tables:notempty(_bagobjects) then
+    --         Tables:keyAppend(_bags, _bag, _bagobjects)
+    --     end
+    -- end
+
+    -- for _bag, _bagobjects in pairs(_bags) do
+    --     _screenx = _screenx + 9
+    --     local _windowmenu = _appendwindowmenu(_screenx, _screeny)
+    --     _appendbutton(_windowmenu, _bag, true)
+    --     for _, _bagobject in ipairs(_bagobjects) do
+    --         _appendbutton(_windowmenu, _bagobject)
+    --     end
+    -- end
+
+    Tic:screenAppend(_screen)
+end
+
 
 --
--- CButtonPlayerSlotMenu
+-- CButtonPlayerSlotMenuPick
 --
-CButtonPlayerSlotMenu = CButtonPlayerSlot:extend() -- generic player slot button
-CButtonPlayerSlotMenu.BEHAVIOUR = function(self)
+CButtonPlayerSlotMenuPick = CButtonPlayerSlot:extend() -- generic player slot button
+CButtonPlayerSlotMenuPick.BEHAVIOUR = function(self)
     local _slotobject    = self:getslotobject()
     local _screen        = self.screen
     local _entity        = self.entity
@@ -1399,10 +1475,10 @@ CButtonPlayerSlotMenu.BEHAVIOUR = function(self)
         end
     end
 end
-function CButtonPlayerSlotMenu:new(_argt)
-    CButtonPlayerSlotMenu.super.new(self, _argt)
-    self.classic        = CButtonPlayerSlotMenu
-	self.behaviour      = CButtonPlayerSlotMenu.BEHAVIOUR
+function CButtonPlayerSlotMenuPick:new(_argt)
+    CButtonPlayerSlotMenuPick.super.new(self, _argt)
+    self.classic        = CButtonPlayerSlotMenuPick
+	self.behaviour      = CButtonPlayerSlotMenuPick.BEHAVIOUR
     self.screen         = nil -- parent menu screen
     self:argt(_argt)
 end

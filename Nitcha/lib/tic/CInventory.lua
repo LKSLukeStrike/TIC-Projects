@@ -121,6 +121,7 @@ function CInventoryAny:new(_argt)
     CInventoryAny.super.new(self, _argt)
     self.kind = Classic.KINDINVENTORYANY
     self.name = Classic.NAMEINVENTORYANY
+    self.stat          = Tic.TEXTANY
     self:argt(_argt)
 end
 
@@ -188,6 +189,7 @@ function CInventoryPhy:new(_argt)
     self.kind = Classic.KINDINVENTORYPHY
     self.name = Classic.NAMEINVENTORYPHY
     self.inventorytype = CInventoryPhy
+    self.stat          = Tic.TEXTPHY
     self:argt(_argt)
 end
 
@@ -255,6 +257,7 @@ function CInventoryMen:new(_argt)
     self.kind = Classic.KINDINVENTORYMEN
     self.name = Classic.NAMEINVENTORYMEN
     self.inventorytype = CInventoryMen
+    self.stat          = Tic.TEXTMEN
     self:argt(_argt)
 end
 
@@ -322,6 +325,7 @@ function CInventoryPsy:new(_argt)
     self.kind = Classic.KINDINVENTORYPSY
     self.name = Classic.NAMEINVENTORYPSY
     self.inventorytype = CInventoryPsy
+    self.stat          = Tic.TEXTPSY
     self:argt(_argt)
 end
 
