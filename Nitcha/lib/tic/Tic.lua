@@ -2298,7 +2298,7 @@ W3lfie = _playerclass{
     -- ["slots.handlf"] = CSlotHandRG{object = CWeaponWandMedium{}},
     -- ["slots.handlf"] = CSlotHandLF{object = CWeaponRuneLarge{}},
     -- ["slots.head"]   = CSlotHead{object = CClothesHelmetLarge{}},
-    -- ["slots.head"]   = CSlotHead{object = CClothesHatLarge{}},
+    ["slots.head"]   = CSlotHead{object = CClothesHatLarge{}},
     -- ["slots.head"]   = CSlotHead{object = CClothesCapLarge{}},
     ["slots.back"]   = CSlotBack{object = CClothesScrollCaseLarge{}},
     ["inventories.any"] = CInventoryAny{objects = {
@@ -2308,7 +2308,7 @@ W3lfie = _playerclass{
         CClothesToolBoxLarge{},
         CClothesBackPackLarge{},
         CClothesToolBoxLarge{inventory = CInventoryMen6{objects = {CWeaponBowSmall{}}}},
-        CClothesBackPackLarge{inventory = CInventoryPhy6{objects = {CWeaponSword{}}}},
+        CClothesBackPackLarge{inventory = CInventoryPhy6{objects = {CWeaponSword{}, CClothesHelmetLarge{}}}},
     }},
 }
 end
