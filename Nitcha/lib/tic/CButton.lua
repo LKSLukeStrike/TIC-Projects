@@ -1213,7 +1213,7 @@ end
 
 function CButtonPlayerSlot:menuPick()
     local _screen        = CScreen{}
-    local _screenx       = self.screenx + 9
+    local _screenx       = self.screenx
     local _screeny       = self.screeny
     local _entity        = self.entity
     local _sprite        = self.sprite
@@ -1222,7 +1222,8 @@ function CButtonPlayerSlot:menuPick()
     local _setslotobject = self.setslotobject
     local _oldslotobject = _getslotobject()
 
-    local function _appendwindowmenu(_screenx, _screeny)
+    local function _appendwindowmenu()
+        _screenx = _screenx + 9
         local _windowmenu = CWindowMenu{
             screenx = _screenx,
             screeny = _screeny,
@@ -1233,51 +1234,48 @@ function CButtonPlayerSlot:menuPick()
         return _windowmenu
     end
 
-    local function _appendbutton(_windowmenu, _slotobject, _header, _stat)
-        _windowmenu:appendElements{
+    local function _appendbutton(_argt)
+        _argt.windowmenu:appendElements{
             CButtonPlayerSlotMenuPick{
                 screen        = _screen,
                 entity        = _entity,
                 sprite        = _sprite,
                 oldslotobject = _oldslotobject,
-                header        = _header,
-                stat          = _stat,
-                getslotobject = function() return _slotobject end, -- returns slot object
                 setslotobject = _setslotobject,
+                isheader      = _argt.isheader,
+                stat          = _argt.stat,
+                getslotobject = function() return _argt.slotobject end, -- returns slot object
             }
         }
     end
 
-    local _windowmenu = _appendwindowmenu(_screenx, _screeny) -- empty object
-    _appendbutton(_windowmenu, nil)
+    local _windowmenu = _appendwindowmenu() -- empty object
+    _appendbutton{windowmenu = _windowmenu, isheader = true, slotobject = nil}
 
     local _objects = _entity:objectsPhyOfSlotType(_slottype) -- phy objects
     if Tables:notempty(_objects) then
-        _screenx = _screenx + 9
-        local _windowmenu = _appendwindowmenu(_screenx, _screeny)
-        _appendbutton(_windowmenu, nil, true, Tic.TEXTPHY)
+        local _windowmenu = _appendwindowmenu()
+        _appendbutton{windowmenu = _windowmenu, isheader = true, slotobject = nil, stat = Tic.TEXTPHY}
         for _, _object in ipairs(_objects) do
-            _appendbutton(_windowmenu, _object)
+            _appendbutton{windowmenu = _windowmenu, isheader = false, slotobject = _object}
         end
     end
 
     local _objects = _entity:objectsMenOfSlotType(_slottype) -- men objects
     if Tables:notempty(_objects) then
-        _screenx = _screenx + 9
-        local _windowmenu = _appendwindowmenu(_screenx, _screeny)
-        _appendbutton(_windowmenu, nil, true, Tic.TEXTMEN)
+        local _windowmenu = _appendwindowmenu()
+        _appendbutton{windowmenu = _windowmenu, isheader = true, slotobject = nil, stat = Tic.TEXTMEN}
         for _, _object in ipairs(_objects) do
-            _appendbutton(_windowmenu, _object)
+            _appendbutton{windowmenu = _windowmenu, isheader = false, slotobject = _object}
         end
     end
 
     local _objects = _entity:objectsPsyOfSlotType(_slottype) -- psy objects
     if Tables:notempty(_objects) then
-        _screenx = _screenx + 9
-        local _windowmenu = _appendwindowmenu(_screenx, _screeny)
-        _appendbutton(_windowmenu, nil, true, Tic.TEXTPSY)
+        local _windowmenu = _appendwindowmenu()
+        _appendbutton{windowmenu = _windowmenu, isheader = true, slotobject = nil, stat = Tic.TEXTPSY}
         for _, _object in ipairs(_objects) do
-            _appendbutton(_windowmenu, _object)
+            _appendbutton{windowmenu = _windowmenu, isheader = false, slotobject = _object}
         end
     end
 
@@ -1290,11 +1288,10 @@ function CButtonPlayerSlot:menuPick()
     end
 
     for _bag, _bagobjects in pairs(_bags) do
-        _screenx = _screenx + 9
-        local _windowmenu = _appendwindowmenu(_screenx, _screeny)
-        _appendbutton(_windowmenu, _bag, true)
+        local _windowmenu = _appendwindowmenu()
+        _appendbutton{windowmenu = _windowmenu, isheader = true, slotobject = _bag}
         for _, _bagobject in ipairs(_bagobjects) do
-            _appendbutton(_windowmenu, _bagobject)
+            _appendbutton{windowmenu = _windowmenu, isheader = false, slotobject = _bagobject}
         end
     end
 
@@ -1303,7 +1300,7 @@ end
 
 function CButtonPlayerSlot:menuPack()
     local _screen        = CScreen{}
-    local _screenx       = self.screenx + 9
+    local _screenx       = self.screenx
     local _screeny       = self.screeny
     local _entity        = self.entity
     local _sprite        = self.sprite
@@ -1324,7 +1321,8 @@ function CButtonPlayerSlot:menuPack()
         return
     end
 
-    local function _appendwindowmenu(_screenx, _screeny)
+    local function _appendwindowmenu() --_screenx, _screeny
+        _screenx = _screenx + 9
         local _windowmenu = CWindowMenu{
             screenx = _screenx,
             screeny = _screeny,
@@ -1335,14 +1333,14 @@ function CButtonPlayerSlot:menuPack()
         return _windowmenu
     end
 
-    local function _appendbutton(_windowmenu, _slotobject, _header, _stat)
+    local function _appendbutton(_windowmenu, _slotobject, _isheader, _stat)
         _windowmenu:appendElements{
             CButtonPlayerSlotMenuPack{
                 screen        = _screen,
                 entity        = _entity,
                 sprite        = _sprite,
                 oldslotobject = _oldslotobject,
-                header        = _header,
+                isheader      = _isheader,
                 stat          = _stat,
                 getslotobject = function() return _slotobject end, -- returns slot object
                 setslotobject = _setslotobject,
@@ -1352,7 +1350,7 @@ function CButtonPlayerSlot:menuPack()
 
     local _bags = {}
     local _objects = _entityinventory.objects -- stat objects
-    local _windowmenu = _appendwindowmenu(_screenx, _screeny)
+    local _windowmenu = _appendwindowmenu()
     _appendbutton(_windowmenu, nil, true, _entityinventory.stat)
     for _, _object in ipairs(_objects) do
         _appendbutton(_windowmenu, _object)
@@ -1363,8 +1361,8 @@ function CButtonPlayerSlot:menuPack()
     end
 
     for _bag, _bagobjects in pairs(_bags) do
-        _screenx = _screenx + 9
-        local _windowmenu = _appendwindowmenu(_screenx, _screeny)
+        -- _screenx = _screenx + 9
+        local _windowmenu = _appendwindowmenu()
         _appendbutton(_windowmenu, _bag, true)
         for _, _bagobject in ipairs(_bagobjects) do
             _appendbutton(_windowmenu, _bagobject)
@@ -1385,7 +1383,7 @@ CButtonPlayerSlotMenuPick.BEHAVIOUR = function(self)
     local _entity        = self.entity
     local _entityslots   = self.entity.slots
     local _oldslotobject = self.oldslotobject
-    local _header        = self.header
+    local _isheader      = self.isheader
     local _stat          = self.stat
 
     if _slotobject then
@@ -1398,7 +1396,7 @@ CButtonPlayerSlotMenuPick.BEHAVIOUR = function(self)
             or  CHoverTextInfos{
                 text = _slotobject:stringNameKind()
             }
-        if _header then
+        if _isheader then
             self.hovertextup    = CHoverTextClickLF{text = Tic.TEXTDONE}
             self.clicklf        = function()
                                     Tic:screenRemove(_screen)
@@ -1490,7 +1488,7 @@ CButtonPlayerSlotMenuPack.BEHAVIOUR = function(self)
     local _entity        = self.entity
     local _entityslots   = self.entity.slots
     local _oldslotobject = self.oldslotobject
-    local _header        = self.header
+    local _isheader      = self.isheader
     local _stat          = self.stat
 
     if _slotobject then
@@ -1503,7 +1501,7 @@ CButtonPlayerSlotMenuPack.BEHAVIOUR = function(self)
             or  CHoverTextInfos{
                 text = _slotobject:stringNameKind()
             }
-        if _header then
+        if _isheader then
             self.hovertextup    = CHoverTextClickLF{text = Tic.TEXTDONE}
             self.clicklf        = function()
                                     Tic:screenRemove(_screen)
