@@ -1373,10 +1373,47 @@ function CButtonPlayerSlot:menuPack()
 end
 
 
+--FUNC
+function CButtonPlayerSlot:upDone()
+    self.hovertextup = CHoverTextClickLF{text = Tic.TEXTDONE}
+end
+
+function CButtonPlayerSlot:upDrop()
+    self.hovertextup = CHoverTextClickLF{text = Tic.TEXTDROP}
+    self.clicklf = function()
+        self.entity:dropObject(self:getslotobject())
+    end
+end
+
+-- MENU
+CButtonPlayerSlotMenu = CButtonPlayerSlot:extend() -- generic player slot button
+function CButtonPlayerSlotMenu:closeMenu()
+    _menudone = (_menudone == nil) and true or false
+    Tic:screenRemove(self.screen)
+    Tic:mouseDelay()
+end
+
+function CButtonPlayerSlotMenu:upDone()
+    CButtonPlayerSlotMenu.super.upDone(self)
+    self.clicklf = function()
+        self:closeMenu()
+    end
+end
+
+function CButtonPlayerSlotMenu:upDrop()
+    CButtonPlayerSlotMenu.super.upDrop(self)
+    local _clicklf = self.clicklf
+    self.clicklf = function()
+        _clicklf()
+        self:closeMenu()
+    end
+end
+
+
 --
 -- CButtonPlayerSlotMenuPick
 --
-CButtonPlayerSlotMenuPick = CButtonPlayerSlot:extend() -- generic player slot button
+CButtonPlayerSlotMenuPick = CButtonPlayerSlotMenu:extend() -- generic player slot button
 CButtonPlayerSlotMenuPick.BEHAVIOUR = function(self)
     local _slotobject    = self:getslotobject()
     local _screen        = self.screen
@@ -1397,20 +1434,15 @@ CButtonPlayerSlotMenuPick.BEHAVIOUR = function(self)
                 text = _slotobject:stringNameKind()
             }
         if _isheader then
-            self.hovertextup    = CHoverTextClickLF{text = Tic.TEXTDONE}
-            self.clicklf        = function()
-                                    Tic:screenRemove(_screen)
-                                    Tic:mouseDelay()
-                                  end
-            self.hovertextdw    = nil
-            self.clickrg        = nil
+            self:upDone()
         else
-            self.hovertextup    = CHoverTextClickLF{text = Tic.TEXTDROP}
-            self.clicklf        = function()
-                                    _entity:dropObject(_slotobject)
-                                    Tic:screenRemove(_screen)
-                                    Tic:mouseDelay()
-                                  end
+            self:upDrop()
+            -- self.hovertextup    = CHoverTextClickLF{text = Tic.TEXTDROP}
+            -- self.clicklf        = function()
+            --                         _entity:dropObject(_slotobject)
+            --                         Tic:screenRemove(_screen)
+            --                         Tic:mouseDelay()
+            --                       end
             self.hovertextdw    = CHoverTextClickRG{text = Tic.TEXTPICK}
             self.clickrg        = function()
                                     local _whatslot = _slotobject:findWhatSlot(_entityslots) -- is object already in a slot ?
@@ -1481,7 +1513,7 @@ end
 --
 -- CButtonPlayerSlotMenuPack
 --
-CButtonPlayerSlotMenuPack = CButtonPlayerSlot:extend() -- generic player slot button
+CButtonPlayerSlotMenuPack = CButtonPlayerSlotMenu:extend() -- generic player slot button
 CButtonPlayerSlotMenuPack.BEHAVIOUR = function(self)
     local _slotobject    = self:getslotobject()
     local _screen        = self.screen
