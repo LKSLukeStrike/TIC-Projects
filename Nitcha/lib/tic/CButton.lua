@@ -1163,14 +1163,7 @@ CButtonPlayerSlot.BEHAVIOUR = function(self) -- need at least one player with sl
     CButtonEntitySlot.BEHAVIOUR(self)
     if not self.display then return end -- no slots
     self.enabled = false
-    if self:canDrop() then
-        self.enabled = true
-        self.hovertextup    = CHoverTextClickLF{text = Tic.TEXTDROP}
-        self.clicklf        = function() self.entity:dropObject(self:getslotobject()) end
-    else
-        self.hovertextup    = nil
-        self.clicklf        = nil
-    end
+    if self:canDrop() then self:upDrop() else self:upNil() end
     if self:canUse() then
         self.enabled = true
         self.hovertextupmdk = CHoverTextClickLF{text = Tic.TEXTUSE}
@@ -1209,6 +1202,38 @@ function CButtonPlayerSlot:new(_argt)
     CButtonPlayerSlot.super.new(self, _argt)
     self.behaviour   = CButtonPlayerSlot.BEHAVIOUR
     self:argt(_argt)
+end
+
+--FUNC
+function CButtonPlayerSlot:upNil()
+    self.hovertextup    = nil
+    self.clicklf        = nil
+end
+
+function CButtonPlayerSlot:upmdkNil()
+    self.hovertextupmdk = nil
+    self.clicklfmdk     = nil
+end
+
+function CButtonPlayerSlot:dwNil()
+    self.hovertextdw    = nil
+    self.clicklf        = nil
+end
+
+function CButtonPlayerSlot:dwmdkNil()
+    self.hovertextdwmdk = nil
+    self.clicklfmdk     = nil
+end
+
+function CButtonPlayerSlot:upDone()
+    self.enabled        = true
+    self.hovertextup    = CHoverTextClickLF{text = Tic.TEXTDONE}
+end
+
+function CButtonPlayerSlot:upDrop()
+    self.enabled        = true
+    self.hovertextup    = CHoverTextClickLF{text = Tic.TEXTDROP}
+    self.clicklf        = function() self.entity:dropObject(self:getslotobject()) end
 end
 
 function CButtonPlayerSlot:menuPick()
@@ -1372,18 +1397,6 @@ function CButtonPlayerSlot:menuPack()
     Tic:screenAppend(_screen)
 end
 
-
---FUNC
-function CButtonPlayerSlot:upDone()
-    self.hovertextup = CHoverTextClickLF{text = Tic.TEXTDONE}
-end
-
-function CButtonPlayerSlot:upDrop()
-    self.hovertextup = CHoverTextClickLF{text = Tic.TEXTDROP}
-    self.clicklf = function()
-        self.entity:dropObject(self:getslotobject())
-    end
-end
 
 -- MENU
 CButtonPlayerSlotMenu = CButtonPlayerSlot:extend() -- generic player slot button
