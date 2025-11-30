@@ -1165,9 +1165,6 @@ CButtonPlayerSlot.BEHAVIOUR = function(self) -- need at least one player with sl
     self.enabled = false
     if self:canDrop() then self:upDrop() else self:upNil() end
     if self:canUse() then
-        self.enabled = true
-        self.hovertextupmdk = CHoverTextClickLF{text = Tic.TEXTUSE}
-        self.clicklfmdk     = function() self:getslotobject():use() end
     else
         self.hovertextupmdk = nil
         self.clicklfmdk     = nil
@@ -1225,6 +1222,10 @@ function CButtonPlayerSlot:dwmdkNil()
     self.clicklfmdk     = nil
 end
 
+function CButtonPlayerSlot:rgNil()
+    self.hovertextrg    = nil
+end
+
 function CButtonPlayerSlot:upDone()
     self.enabled        = true
     self.hovertextup    = CHoverTextClickLF{text = Tic.TEXTDONE}
@@ -1234,6 +1235,12 @@ function CButtonPlayerSlot:upDrop()
     self.enabled        = true
     self.hovertextup    = CHoverTextClickLF{text = Tic.TEXTDROP}
     self.clicklf        = function() self.entity:dropObject(self:getslotobject()) end
+end
+
+function CButtonPlayerSlot:upmdkUse()
+    self.enabled        = true
+    self.hovertextupmdk = CHoverTextClickLF{text = Tic.TEXTUSE}
+    self.clicklfmdk     = function() self:getslotobject():use() end
 end
 
 function CButtonPlayerSlot:menuPick()
