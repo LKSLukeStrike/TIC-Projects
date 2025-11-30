@@ -965,7 +965,7 @@ function CButtonPlayerPick:drawInside()
 end
 
 function CButtonPlayerPick:menuPick()
-    local _screen        = CScreen{}
+    local _menuscreen    = CScreen{}
     local _screenx       = self.screenx + 9
     local _screeny       = self.screeny
     local _playeractual  = Tic:playerActual()
@@ -978,12 +978,12 @@ function CButtonPlayerPick:menuPick()
         separatory = 1,
         stretch = true,
     }
-    _screen:appendElements{_windowmenu}
+    _menuscreen:appendElements{_windowmenu}
 
     local function _appendbutton(_slotobject)
         _windowmenu:appendElements{
             CButtonPlayerPickMenu{
-                screen = _screen,
+                screen = _menuscreen,
                 getslotobject = function() return _slotobject end, -- returns slot object
             }
         }
@@ -997,11 +997,11 @@ function CButtonPlayerPick:menuPick()
         end
     end
 
-    Tic:screenAppend(_screen)
+    Tic:screenAppend(_menuscreen)
 end
 
 function CButtonPlayerPick:menuParty()
-    local _screen        = CScreen{}
+    local _menuscreen    = CScreen{}
     local _screenx       = self.screenx - 9
     local _screeny       = self.screeny
     local _playeractual  = Tic:playerActual()
@@ -1015,12 +1015,12 @@ function CButtonPlayerPick:menuParty()
         separatory = 1,
         stretch = true,
     }
-    _screen:appendElements{_windowmenu}
+    _menuscreen:appendElements{_windowmenu}
 
     local function _appendbutton(_slotobject)
         _windowmenu:appendElements{
             CButtonPlayerPartyMenu{
-                screen = _screen,
+                screen = _menuscreen,
                 getslotobject = function() return _slotobject end, -- returns slot object
             }
         }
@@ -1035,7 +1035,7 @@ function CButtonPlayerPick:menuParty()
         end
     end
 
-    Tic:screenAppend(_screen)
+    Tic:screenAppend(_menuscreen)
 end
 
 
@@ -1047,13 +1047,13 @@ function CButtonPlayerPickMenu:new(_argt)
     CButtonPlayerPickMenu.super.new(self, _argt)
     self.classic        = CButtonPlayerPickMenu
 	self.behaviour      = CButtonPortrait.BEHAVIOUR
-    self.screen         = nil -- parent menu screen
+    self.menuscreen     = nil -- parent menu screen
     self.hovertextup    = nil
     self.clicklf        = nil
     self.hovertextdw    = CHoverTextClickRG{text = Tic.TEXTPICK}
     self.clickrg        = function()
                             Tic:playerPick(self:getslotobject())
-                            Tic:screenRemove(self.screen)
+                            Tic:screenRemove(self.menuscreen)
                             Tic:mouseDelay()
                           end
     self.hovertextrg    = CHoverTextInfos{text = self:getslotobject():stringNameKind()}
@@ -1069,18 +1069,18 @@ function CButtonPlayerPartyMenu:new(_argt)
     CButtonPlayerPartyMenu.super.new(self, _argt)
     self.classic        = CButtonPlayerPartyMenu
 	self.behaviour      = CButtonPortrait.BEHAVIOUR
-    self.screen         = nil -- parent menu screen
+    self.menuscreen     = nil -- parent menu screen
     self.hovertextup    = CHoverTextClickLF{text = Tic.TEXTLEAD}
     self.clicklf        = function()
                             self:getslotobject():leadParty(nil, true)
-                            Tic:screenRemove(self.screen)
+                            Tic:screenRemove(self.menuscreen)
                             Tic:mouseDelay()
                           end
     self.hovertextrg    = CHoverTextInfos{text = self:getslotobject():stringNameKind()}
     self.hovertextdw    = CHoverTextClickRG{text = Tic.TEXTQUIT}
     self.clickrg        = function()
                             self:getslotobject():quitParty(true)
-                            Tic:screenRemove(self.screen)
+                            Tic:screenRemove(self.menuscreen)
                             Tic:mouseDelay()
                           end
     self:argt(_argt)
@@ -1163,12 +1163,8 @@ CButtonPlayerSlot.BEHAVIOUR = function(self) -- need at least one player with sl
     CButtonEntitySlot.BEHAVIOUR(self)
     if not self.display then return end -- no slots
     self.enabled = false
-    if self:canDrop() then self:upDrop() else self:upNil() end
-    if self:canUse() then
-    else
-        self.hovertextupmdk = nil
-        self.clicklfmdk     = nil
-    end
+    self:upDrop()
+    self:upmdkUse()
     if self:canPick() then
         self.enabled = true
         self.hovertextdw    = CHoverTextClickRG{text = Tic.TEXTPICK}
@@ -1202,6 +1198,13 @@ function CButtonPlayerSlot:new(_argt)
 end
 
 --FUNC
+function CButtonPlayerSlot:closeMenu()
+    if self.menuscreen then
+        Tic:screenRemove(self.menuscreen)
+        Tic:mouseDelay()
+    end
+end
+
 function CButtonPlayerSlot:upNil()
     self.hovertextup    = nil
     self.clicklf        = nil
@@ -1232,19 +1235,30 @@ function CButtonPlayerSlot:upDone()
 end
 
 function CButtonPlayerSlot:upDrop()
-    self.enabled        = true
-    self.hovertextup    = CHoverTextClickLF{text = Tic.TEXTDROP}
-    self.clicklf        = function() self.entity:dropObject(self:getslotobject()) end
+    if self:canDrop() then
+        self.enabled        = true
+        self.hovertextup    = CHoverTextClickLF{text = Tic.TEXTDROP}
+        self.clicklf        = function()
+            self.entity:dropObject(self:getslotobject())
+            self:closeMenu()
+        end
+    else
+        self:upNil()
+    end
 end
 
 function CButtonPlayerSlot:upmdkUse()
-    self.enabled        = true
-    self.hovertextupmdk = CHoverTextClickLF{text = Tic.TEXTUSE}
-    self.clicklfmdk     = function() self:getslotobject():use() end
+    if self:canUse() then
+        self.enabled        = true
+        self.hovertextupmdk = CHoverTextClickLF{text = Tic.TEXTUSE}
+        self.clicklfmdk     = function() self:getslotobject():use() end
+    else
+        self:upmdkNil()
+    end
 end
 
 function CButtonPlayerSlot:menuPick()
-    local _screen        = CScreen{}
+    local _menuscreen    = CScreen{}
     local _screenx       = self.screenx
     local _screeny       = self.screeny
     local _entity        = self.entity
@@ -1262,14 +1276,14 @@ function CButtonPlayerSlot:menuPick()
             separatory = 1,
             stretch = true,
         }
-        _screen:appendElements{_windowmenu}
+        _menuscreen:appendElements{_windowmenu}
         return _windowmenu
     end
 
     local function _appendbutton(_argt)
         _argt.windowmenu:appendElements{
             CButtonPlayerSlotMenuPick{
-                screen        = _screen,
+                menuscreen    = _menuscreen,
                 entity        = _entity,
                 sprite        = _sprite,
                 oldslotobject = _oldslotobject,
@@ -1327,11 +1341,11 @@ function CButtonPlayerSlot:menuPick()
         end
     end
 
-    Tic:screenAppend(_screen)
+    Tic:screenAppend(_menuscreen)
 end
 
 function CButtonPlayerSlot:menuPack()
-    local _screen        = CScreen{}
+    local _menuscreen    = CScreen{}
     local _screenx       = self.screenx
     local _screeny       = self.screeny
     local _entity        = self.entity
@@ -1361,14 +1375,14 @@ function CButtonPlayerSlot:menuPack()
             separatory = 1,
             stretch = true,
         }
-        _screen:appendElements{_windowmenu}
+        _menuscreen:appendElements{_windowmenu}
         return _windowmenu
     end
 
     local function _appendbutton(_windowmenu, _slotobject, _isheader, _stat)
         _windowmenu:appendElements{
             CButtonPlayerSlotMenuPack{
-                screen        = _screen,
+                menuscreen    = _menuscreen,
                 entity        = _entity,
                 sprite        = _sprite,
                 oldslotobject = _oldslotobject,
@@ -1401,25 +1415,12 @@ function CButtonPlayerSlot:menuPack()
         end
     end
 
-    Tic:screenAppend(_screen)
+    Tic:screenAppend(_menuscreen)
 end
 
 
 -- MENU
 CButtonPlayerSlotMenu = CButtonPlayerSlot:extend() -- generic player slot button
-function CButtonPlayerSlotMenu:closeMenu()
-    _menudone = (_menudone == nil) and true or false
-    Tic:screenRemove(self.screen)
-    Tic:mouseDelay()
-end
-
-function CButtonPlayerSlotMenu:upDone()
-    CButtonPlayerSlotMenu.super.upDone(self)
-    self.clicklf = function()
-        self:closeMenu()
-    end
-end
-
 function CButtonPlayerSlotMenu:upDrop()
     CButtonPlayerSlotMenu.super.upDrop(self)
     local _clicklf = self.clicklf
@@ -1436,7 +1437,7 @@ end
 CButtonPlayerSlotMenuPick = CButtonPlayerSlotMenu:extend() -- generic player slot button
 CButtonPlayerSlotMenuPick.BEHAVIOUR = function(self)
     local _slotobject    = self:getslotobject()
-    local _screen        = self.screen
+    local _menuscreen    = self.menuscreen
     local _entity        = self.entity
     local _entityslots   = self.entity.slots
     local _oldslotobject = self.oldslotobject
@@ -1460,7 +1461,7 @@ CButtonPlayerSlotMenuPick.BEHAVIOUR = function(self)
             -- self.hovertextup    = CHoverTextClickLF{text = Tic.TEXTDROP}
             -- self.clicklf        = function()
             --                         _entity:dropObject(_slotobject)
-            --                         Tic:screenRemove(_screen)
+            --                         Tic:screenRemove(_menuscreen)
             --                         Tic:mouseDelay()
             --                       end
             self.hovertextdw    = CHoverTextClickRG{text = Tic.TEXTPICK}
@@ -1470,7 +1471,7 @@ CButtonPlayerSlotMenuPick.BEHAVIOUR = function(self)
                                         _whatslot:appendObject(_oldslotobject)
                                     end
                                     self.setslotobject(_slotobject)
-                                    Tic:screenRemove(_screen)
+                                    Tic:screenRemove(_menuscreen)
                                     Tic:mouseDelay()
                                   end
         end
@@ -1478,7 +1479,7 @@ CButtonPlayerSlotMenuPick.BEHAVIOUR = function(self)
         if _stat then
             self.hovertextup    = CHoverTextClickLF{text = Tic.TEXTDONE}
             self.clicklf        = function()
-                                    Tic:screenRemove(_screen)
+                                    Tic:screenRemove(_menuscreen)
                                     Tic:mouseDelay()
                                   end
             self.hovertextdw    = nil
@@ -1508,14 +1509,14 @@ CButtonPlayerSlotMenuPick.BEHAVIOUR = function(self)
         else
             self.hovertextup    = CHoverTextClickLF{text = Tic.TEXTDONE}
             self.clicklf        = function()
-                                    Tic:screenRemove(_screen)
+                                    Tic:screenRemove(_menuscreen)
                                     Tic:mouseDelay()
                                   end
             self.hovertextrg    = nil
             self.hovertextdw    = CHoverTextClickRG{text = Tic.TEXTPICK}
             self.clickrg        = function()
                                     self.setslotobject()
-                                    Tic:screenRemove(_screen)
+                                    Tic:screenRemove(_menuscreen)
                                     Tic:mouseDelay()
                                   end
         end
@@ -1525,7 +1526,7 @@ function CButtonPlayerSlotMenuPick:new(_argt)
     CButtonPlayerSlotMenuPick.super.new(self, _argt)
     self.classic        = CButtonPlayerSlotMenuPick
 	self.behaviour      = CButtonPlayerSlotMenuPick.BEHAVIOUR
-    self.screen         = nil -- parent menu screen
+    self.menuscreen     = nil -- parent menu screen
     self:argt(_argt)
 end
 
@@ -1536,7 +1537,7 @@ end
 CButtonPlayerSlotMenuPack = CButtonPlayerSlotMenu:extend() -- generic player slot button
 CButtonPlayerSlotMenuPack.BEHAVIOUR = function(self)
     local _slotobject    = self:getslotobject()
-    local _screen        = self.screen
+    local _menuscreen    = self.menuscreen
     local _entity        = self.entity
     local _entityslots   = self.entity.slots
     local _oldslotobject = self.oldslotobject
@@ -1556,7 +1557,7 @@ CButtonPlayerSlotMenuPack.BEHAVIOUR = function(self)
         if _isheader then
             self.hovertextup    = CHoverTextClickLF{text = Tic.TEXTDONE}
             self.clicklf        = function()
-                                    Tic:screenRemove(_screen)
+                                    Tic:screenRemove(_menuscreen)
                                     Tic:mouseDelay()
                                   end
             self.hovertextdw    = nil
@@ -1565,7 +1566,7 @@ CButtonPlayerSlotMenuPack.BEHAVIOUR = function(self)
             self.hovertextup    = CHoverTextClickLF{text = Tic.TEXTDROP}
             self.clicklf        = function()
                                     _entity:dropObject(_slotobject)
-                                    Tic:screenRemove(_screen)
+                                    Tic:screenRemove(_menuscreen)
                                     Tic:mouseDelay()
                                   end
             self.hovertextdw    = CHoverTextClickRG{text = Tic.TEXTPICK}
@@ -1575,7 +1576,7 @@ CButtonPlayerSlotMenuPack.BEHAVIOUR = function(self)
                                         _whatslot:appendObject(_oldslotobject)
                                     end
                                     self.setslotobject(_slotobject)
-                                    Tic:screenRemove(_screen)
+                                    Tic:screenRemove(_menuscreen)
                                     Tic:mouseDelay()
                                   end
         end
@@ -1583,7 +1584,7 @@ CButtonPlayerSlotMenuPack.BEHAVIOUR = function(self)
         if _stat then
             self.hovertextup    = CHoverTextClickLF{text = Tic.TEXTDONE}
             self.clicklf        = function()
-                                    Tic:screenRemove(_screen)
+                                    Tic:screenRemove(_menuscreen)
                                     Tic:mouseDelay()
                                   end
             self.hovertextdw    = nil
@@ -1613,14 +1614,14 @@ CButtonPlayerSlotMenuPack.BEHAVIOUR = function(self)
         else
             self.hovertextup    = CHoverTextClickLF{text = Tic.TEXTDONE}
             self.clicklf        = function()
-                                    Tic:screenRemove(_screen)
+                                    Tic:screenRemove(_menuscreen)
                                     Tic:mouseDelay()
                                   end
             self.hovertextrg    = nil
             self.hovertextdw    = CHoverTextClickRG{text = Tic.TEXTPICK}
             self.clickrg        = function()
                                     self.setslotobject()
-                                    Tic:screenRemove(_screen)
+                                    Tic:screenRemove(_menuscreen)
                                     Tic:mouseDelay()
                                   end
         end
@@ -1630,7 +1631,7 @@ function CButtonPlayerSlotMenuPack:new(_argt)
     CButtonPlayerSlotMenuPack.super.new(self, _argt)
     self.classic        = CButtonPlayerSlotMenuPack
 	self.behaviour      = CButtonPlayerSlotMenuPack.BEHAVIOUR
-    self.screen         = nil -- parent menu screen
+    self.menuscreen     = nil -- parent menu screen
     self:argt(_argt)
 end
 
