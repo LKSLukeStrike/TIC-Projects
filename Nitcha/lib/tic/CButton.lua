@@ -836,13 +836,6 @@ function CButtonPortrait:objectGet() -- object in slot if any
     return (self.getslotobject and self:getslotobject())
 end
 
-function CButtonPortrait:closeMenu()
-    if self.menuscreen then
-        Tic:screenRemove(self.menuscreen)
-        Tic:mouseDelay()
-    end
-end
-
 
 --
 -- IButtonPlayer
@@ -990,7 +983,7 @@ function CButtonPlayerPick:menuPick()
     local function _appendbutton(_slotobject)
         _windowmenu:appendElements{
             CButtonPlayerPickMenu{
-                menuscreen = _menuscreen,
+                screen = _menuscreen,
                 getslotobject = function() return _slotobject end, -- returns slot object
             }
         }
@@ -1027,7 +1020,7 @@ function CButtonPlayerPick:menuParty()
     local function _appendbutton(_slotobject)
         _windowmenu:appendElements{
             CButtonPlayerPartyMenu{
-                menuscreen = _menuscreen,
+                screen = _menuscreen,
                 getslotobject = function() return _slotobject end, -- returns slot object
             }
         }
@@ -1060,7 +1053,8 @@ function CButtonPlayerPickMenu:new(_argt)
     self.hovertextdw    = CHoverTextClickRG{text = Tic.TEXTPICK}
     self.clickrg        = function()
                             Tic:playerPick(self:getslotobject())
-                            self:closeMenu()
+                            Tic:screenRemove(self.menuscreen)
+                            Tic:mouseDelay()
                           end
     self.hovertextrg    = CHoverTextInfos{text = self:getslotobject():stringNameKind()}
     self:argt(_argt)
@@ -1079,13 +1073,15 @@ function CButtonPlayerPartyMenu:new(_argt)
     self.hovertextup    = CHoverTextClickLF{text = Tic.TEXTLEAD}
     self.clicklf        = function()
                             self:getslotobject():leadParty(nil, true)
-                            self:closeMenu()
+                            Tic:screenRemove(self.menuscreen)
+                            Tic:mouseDelay()
                           end
     self.hovertextrg    = CHoverTextInfos{text = self:getslotobject():stringNameKind()}
     self.hovertextdw    = CHoverTextClickRG{text = Tic.TEXTQUIT}
     self.clickrg        = function()
                             self:getslotobject():quitParty(true)
-                            self:closeMenu()
+                            Tic:screenRemove(self.menuscreen)
+                            Tic:mouseDelay()
                           end
     self:argt(_argt)
 end
@@ -1202,6 +1198,13 @@ function CButtonPlayerSlot:new(_argt)
 end
 
 --FUNC
+function CButtonPlayerSlot:closeMenu()
+    if self.menuscreen then
+        Tic:screenRemove(self.menuscreen)
+        Tic:mouseDelay()
+    end
+end
+
 function CButtonPlayerSlot:upNil()
     self.hovertextup    = nil
     self.clicklf        = nil
