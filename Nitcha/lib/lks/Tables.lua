@@ -94,14 +94,14 @@ end
  
 -- Find
 function Tables:keyFind(_table, _find) -- return the key of key _find else nil if not found
-    for _key, _ in pairs(_table or {}) do
+    for _key, _val in pairs(_table or {}) do
         if _key == _find then return _key end
     end
     return -- nil
 end
 
 function Tables:valFind(_table, _find) -- return the key of val _find else nil if not found
-    for _, _val in pairs(_table or {}) do
+    for _key, _val in pairs(_table or {}) do
         if _val == _find then return _key end
     end
     return -- nil
