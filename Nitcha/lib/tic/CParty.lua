@@ -4,7 +4,6 @@
 CParty = Classic:extend() -- generic party
 Classic.KINDPARTY = "Party"
 Classic.NAMEPARTY = "Party"
-CParty.STATS      = {statphymax, statmenmax, statpsymax, Tic.STATPHYACT, statmenact, statpsyact}
 function CParty:new(_argt)
     CParty.super.new(self, _argt)
     self.classic = CParty
@@ -28,6 +27,7 @@ function CParty:argt(_argt)
     if not self.leader then -- ensure a leader
         if self.members[1] then self.leader = self.members[1] else return end -- pick a leader in members or exit
     end
+
     Tables:valInsert(self.members, self.leader, Tables.ONE) -- ensure that leader is part of members
     for _, _member in ipairs(self.members) do -- set the members party
         _member.party = self
@@ -35,11 +35,21 @@ function CParty:argt(_argt)
             _member:remove()
         end
     end
+
     self:adjustStats()
 end
 
-function CParty:adjustStats() -- reset stats
-    if Tables:size(self.members) == 0 then return end -- no members
+function CParty:hasMembers()
+    return Tables:size(self.members) > 0
+end
+
+function CParty:hasMember(_member)
+    return Tables:valFind(self.members, _member)
+end
+
+function CParty:adjustStats() -- adjust stats to the members max
+    if not self:hasMembers() then return end -- no members
+
     for _, _stat in ipairs(Tic.STATS) do
         self[_stat] = 0
         for _, _member in ipairs(self.members) do
@@ -49,11 +59,13 @@ function CParty:adjustStats() -- reset stats
 end
 
 function CParty:leadMember(_member, _showmessage)
-    if (not _member) or (_member == self.leader) then return end
-    self:applyLeaderToMember(_member) -- useless ?
+    if (not _member) or (self.leader == _member) or (not self:hasMember(_member)) then return end
+
+    self:applyLeaderToMember(_member)
     self.leader:remove()
-    _member:append()
     self.leader = _member
+    self.leader:append()
+
     if _showmessage then
         Tic:messageAppend(_member:nameGet().." "..Tic.TEXTLEAD..": ".._member:nameGet().." ".._member:kindGet())
     end
@@ -61,12 +73,15 @@ function CParty:leadMember(_member, _showmessage)
 end
 
 function CParty:joinMember(_member, _showmessage)
-    if not _member then return end
-    if _member:isParty() then return self:joinParty(_member.party, _showmessage) end
-    Tables:valInsert(self.members, _member, Tables.ONE)
+    if not _member then return end -- mandatory
+
+    if _member:isParty() then return self:joinParty(_member.party, _showmessage) end -- join a party
+
+    Tables:valInsert(self.members, _member, Tables.ONE) -- join a member
     _member.party = self
     _member:remove()
     self:adjustStats()
+
     if _showmessage then
         Tic:messageAppend(_member:nameGet().." "..Tic.TEXTJOIN..": "..self.leader:nameGet().." "..self.leader:kindGet())
     end
@@ -74,9 +89,10 @@ function CParty:joinMember(_member, _showmessage)
 end
 
 function CParty:joinParty(_party, _showmessage)
-    if not _party then return end
+    if not _party then return end -- mandatory
+
     for _, _member in ipairs(_party.members) do
-        _member.party = nil
+        _member.party = nil -- requiered to avoid dead loop
         self:joinMember(_member, _showmessage)
     end
     _party = nil -- useless ?
@@ -85,6 +101,7 @@ end
 
 function CParty:applyLeaderToMember(_member)
     if not _member or not self.leader then return end -- mandatory
+
     _member.world     = self.leader.world
     _member.worldx    = self.leader.worldx
     _member.worldy    = self.leader.worldy
