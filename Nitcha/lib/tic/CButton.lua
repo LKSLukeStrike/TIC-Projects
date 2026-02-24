@@ -1232,6 +1232,7 @@ end
 function CButtonPlayerSlot:upDone()
     self.enabled        = true
     self.hovertextup    = CHoverTextClickLF{text = Tic.TEXTDONE}
+    -- self:closeMenu()
 end
 
 function CButtonPlayerSlot:upDrop()
@@ -1258,7 +1259,7 @@ function CButtonPlayerSlot:upmdkUse()
 end
 
 function CButtonPlayerSlot:menuPick()
-    local _menuscreen    = CScreen{}
+    local _menuscreen    = CScreen{} -- new menus screen
     local _screenx       = self.screenx
     local _screeny       = self.screeny
     local _entity        = self.entity
@@ -1268,7 +1269,7 @@ function CButtonPlayerSlot:menuPick()
     local _setslotobject = self.setslotobject
     local _oldslotobject = _getslotobject()
 
-    local function _appendwindowmenu()
+    local function _appendwindowmenu() -- append vertical menu to menus screen
         _screenx = _screenx + 9
         local _windowmenu = CWindowMenu{
             screenx = _screenx,
@@ -1280,7 +1281,7 @@ function CButtonPlayerSlot:menuPick()
         return _windowmenu
     end
 
-    local function _appendbutton(_argt)
+    local function _appendbutton(_argt) -- append button to vertical menu
         _argt.windowmenu:appendElements{
             CButtonPlayerSlotMenuPick{
                 menuscreen    = _menuscreen,
@@ -1289,21 +1290,21 @@ function CButtonPlayerSlot:menuPick()
                 oldslotobject = _oldslotobject,
                 setslotobject = _setslotobject,
                 isheader      = _argt.isheader,
-                stat          = _argt.stat,
                 getslotobject = function() return _argt.slotobject end, -- returns slot object
+                stat          = _argt.stat,
             }
         }
     end
 
     local _windowmenu = _appendwindowmenu() -- empty object
-    _appendbutton{windowmenu = _windowmenu, isheader = true, slotobject = nil}
+    _appendbutton{windowmenu = _windowmenu, isheader = true, slotobject = nil, stat = nil}
 
     local _objects = _entity:objectsPhyOfSlotType(_slottype) -- phy objects
     if Tables:notempty(_objects) then
         local _windowmenu = _appendwindowmenu()
         _appendbutton{windowmenu = _windowmenu, isheader = true, slotobject = nil, stat = Tic.TEXTPHY}
         for _, _object in ipairs(_objects) do
-            _appendbutton{windowmenu = _windowmenu, isheader = false, slotobject = _object}
+            _appendbutton{windowmenu = _windowmenu, isheader = false, slotobject = _object, stat = nil}
         end
     end
 
@@ -1312,7 +1313,7 @@ function CButtonPlayerSlot:menuPick()
         local _windowmenu = _appendwindowmenu()
         _appendbutton{windowmenu = _windowmenu, isheader = true, slotobject = nil, stat = Tic.TEXTMEN}
         for _, _object in ipairs(_objects) do
-            _appendbutton{windowmenu = _windowmenu, isheader = false, slotobject = _object}
+            _appendbutton{windowmenu = _windowmenu, isheader = false, slotobject = _object, stat = nil}
         end
     end
 
@@ -1321,11 +1322,11 @@ function CButtonPlayerSlot:menuPick()
         local _windowmenu = _appendwindowmenu()
         _appendbutton{windowmenu = _windowmenu, isheader = true, slotobject = nil, stat = Tic.TEXTPSY}
         for _, _object in ipairs(_objects) do
-            _appendbutton{windowmenu = _windowmenu, isheader = false, slotobject = _object}
+            _appendbutton{windowmenu = _windowmenu, isheader = false, slotobject = _object, stat = nil}
         end
     end
 
-    local _bags = {}
+    local _bags = {} -- bags and bags objects
     for _, _bag in ipairs(_entity:bags()) do
         local _bagobjects = _bag.inventory:objectsOfSlotType(_slottype)
         if Tables:notempty(_bagobjects) then
@@ -1335,9 +1336,9 @@ function CButtonPlayerSlot:menuPick()
 
     for _bag, _bagobjects in pairs(_bags) do
         local _windowmenu = _appendwindowmenu()
-        _appendbutton{windowmenu = _windowmenu, isheader = true, slotobject = _bag}
+        _appendbutton{windowmenu = _windowmenu, isheader = true, slotobject = _bag, stat = nil}
         for _, _bagobject in ipairs(_bagobjects) do
-            _appendbutton{windowmenu = _windowmenu, isheader = false, slotobject = _bagobject}
+            _appendbutton{windowmenu = _windowmenu, isheader = false, slotobject = _bagobject, stat = nil}
         end
     end
 
@@ -1458,12 +1459,6 @@ CButtonPlayerSlotMenuPick.BEHAVIOUR = function(self)
             self:upDone()
         else
             self:upDrop()
-            -- self.hovertextup    = CHoverTextClickLF{text = Tic.TEXTDROP}
-            -- self.clicklf        = function()
-            --                         _entity:dropObject(_slotobject)
-            --                         Tic:screenRemove(_menuscreen)
-            --                         Tic:mouseDelay()
-            --                       end
             self.hovertextdw    = CHoverTextClickRG{text = Tic.TEXTPICK}
             self.clickrg        = function()
                                     local _whatslot = _slotobject:findWhatSlot(_entityslots) -- is object already in a slot ?
