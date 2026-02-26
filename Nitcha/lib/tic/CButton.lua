@@ -1232,7 +1232,13 @@ end
 function CButtonPlayerSlot:upDone()
     self.enabled        = true
     self.hovertextup    = CHoverTextClickLF{text = Tic.TEXTDONE}
-    -- self:closeMenu()
+end
+
+function CButtonPlayerSlot:upDoneClose()
+    self:upDone()
+    self.clicklf        = function()
+        self:closeMenu()
+    end
 end
 
 function CButtonPlayerSlot:upDrop()
@@ -1435,8 +1441,8 @@ end
 --
 -- CButtonPlayerSlotMenuPick
 --
-CButtonPlayerSlotMenuPick = CButtonPlayerSlotMenu:extend() -- generic player slot button
-CButtonPlayerSlotMenuPick.BEHAVIOUR = function(self)
+CButtonPlayerSlotMenuPick = CButtonPlayerSlotMenu:extend() -- generic player slot menu pick button
+CButtonPlayerSlotMenuPick.BEHAVIOUR_X = function(self)
     local _slotobject    = self:getslotobject()
     local _menuscreen    = self.menuscreen
     local _entity        = self.entity
@@ -1515,6 +1521,45 @@ CButtonPlayerSlotMenuPick.BEHAVIOUR = function(self)
                                     Tic:mouseDelay()
                                   end
         end
+    end
+end
+CButtonPlayerSlotMenuPick.BEHAVIOUR = function(self)
+    local _slotobject    = self:getslotobject()
+    local _menuscreen    = self.menuscreen
+    local _entity        = self.entity
+    local _entityslots   = self.entity.slots
+    local _oldslotobject = self.oldslotobject
+    local _isheader      = self.isheader
+    local _stat          = self.stat
+
+    if _isheader then
+        self:upDoneClose()
+        if not _slotobject and not _stat then
+            -- pick
+            self.hovertextrg = CHoverTextInfos{text = "Blop"}
+        elseif _stat == Tic.TEXTPHY then
+            self.sprite = CButtonEntitySlot.SPRITEPHY
+            self.sprite.palette = Tables:merge(self.sprite.palette, {[Tic.COLORWHITE] = _entity:colorPhyAct()})
+            self.hovertextrg = CHoverTextInfos{
+                text = Tic.TEXTINV..":"
+                ..Tables:size(_entity.inventories.phy.objects).."/".._entity:statphymaxGet()
+            }
+        elseif _stat == Tic.TEXTMEN then
+            self.sprite = CButtonEntitySlot.SPRITEMEN
+            self.sprite.palette = Tables:merge(self.sprite.palette, {[Tic.COLORWHITE] = _entity:colorMenAct()})
+            self.hovertextrg = CHoverTextInfos{
+                text = Tic.TEXTINV..":"
+                ..Tables:size(_entity.inventories.men.objects).."/".._entity:statmenmaxGet()
+            }
+        elseif _stat == Tic.TEXTPSY then
+            self.sprite = CButtonEntitySlot.SPRITEPSY
+            self.sprite.palette = Tables:merge(self.sprite.palette, {[Tic.COLORWHITE] = _entity:colorPsyAct()})
+            self.hovertextrg = CHoverTextInfos{
+                text = Tic.TEXTINV..":"
+                ..Tables:size(_entity.inventories.psy.objects).."/".._entity:statpsymaxGet()
+            }
+        end
+    else
     end
 end
 function CButtonPlayerSlotMenuPick:new(_argt)
