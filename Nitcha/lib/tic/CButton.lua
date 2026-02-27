@@ -1268,6 +1268,33 @@ function CButtonPlayerSlot:dwPick()
     end
 end
 
+function CButtonPlayerSlot:htrgNone()
+    self.hovertextrg = CHoverTextInfos{
+        text = Tic.TEXTNONE
+    }
+end
+
+function CButtonPlayerSlot:htrgPhy()
+    self.hovertextrg = CHoverTextInfos{
+        text = Tic.TEXTINV..":"
+        ..Tables:size(self.entity.inventories.phy.objects).."/"..self.entity:statphymaxGet()
+    }
+end
+
+function CButtonPlayerSlot:htrgMen()
+    self.hovertextrg = CHoverTextInfos{
+        text = Tic.TEXTINV..":"
+        ..Tables:size(self.entity.inventories.men.objects).."/"..self.entity:statmenmaxGet()
+    }
+end
+
+function CButtonPlayerSlot:htrgPsy()
+    self.hovertextrg = CHoverTextInfos{
+        text = Tic.TEXTINV..":"
+        ..Tables:size(self.entity.inventories.psy.objects).."/"..self.entity:statpsymaxGet()
+    }
+end
+
 function CButtonPlayerSlot:menuPick()
     local _menuscreen    = CScreen{} -- new menus screen
     local _screenx       = self.screenx
@@ -1539,28 +1566,20 @@ CButtonPlayerSlotMenuPick.BEHAVIOUR = function(self)
     if _isheader then
         self:upDone()
         if not _slotobject and not _stat then
+            self:htrgNone()
             self:dwPick()
         elseif _stat == Tic.TEXTPHY then
             self.sprite = CButtonEntitySlot.SPRITEPHY
             self.sprite.palette = Tables:merge(self.sprite.palette, {[Tic.COLORWHITE] = _entity:colorPhyAct()})
-            self.hovertextrg = CHoverTextInfos{
-                text = Tic.TEXTINV..":"
-                ..Tables:size(_entity.inventories.phy.objects).."/".._entity:statphymaxGet()
-            }
+            self:htrgPhy()
         elseif _stat == Tic.TEXTMEN then
             self.sprite = CButtonEntitySlot.SPRITEMEN
             self.sprite.palette = Tables:merge(self.sprite.palette, {[Tic.COLORWHITE] = _entity:colorMenAct()})
-            self.hovertextrg = CHoverTextInfos{
-                text = Tic.TEXTINV..":"
-                ..Tables:size(_entity.inventories.men.objects).."/".._entity:statmenmaxGet()
-            }
+            self:htrgMen()
         elseif _stat == Tic.TEXTPSY then
             self.sprite = CButtonEntitySlot.SPRITEPSY
             self.sprite.palette = Tables:merge(self.sprite.palette, {[Tic.COLORWHITE] = _entity:colorPsyAct()})
-            self.hovertextrg = CHoverTextInfos{
-                text = Tic.TEXTINV..":"
-                ..Tables:size(_entity.inventories.psy.objects).."/".._entity:statpsymaxGet()
-            }
+            self:htrgPsy()
         end
     else
         self:upDrop()
