@@ -1230,12 +1230,7 @@ function CButtonPlayerSlot:rgNil()
 end
 
 function CButtonPlayerSlot:upDone()
-    self.enabled        = true
     self.hovertextup    = CHoverTextClickLF{text = Tic.TEXTDONE}
-end
-
-function CButtonPlayerSlot:upDoneClose()
-    self:upDone()
     self.clicklf        = function()
         self:closeMenu()
     end
@@ -1243,7 +1238,6 @@ end
 
 function CButtonPlayerSlot:upDrop()
     if self:canDrop() then
-        self.enabled        = true
         self.hovertextup    = CHoverTextClickLF{text = Tic.TEXTDROP}
         self.clicklf        = function()
             self.entity:dropObject(self:getslotobject())
@@ -1256,11 +1250,21 @@ end
 
 function CButtonPlayerSlot:upmdkUse()
     if self:canUse() then
-        self.enabled        = true
         self.hovertextupmdk = CHoverTextClickLF{text = Tic.TEXTUSE}
-        self.clicklfmdk     = function() self:getslotobject():use() end
+        self.clicklfmdk     = function()
+            self:getslotobject():use()
+            self:closeMenu()
+        end
     else
         self:upmdkNil()
+    end
+end
+
+function CButtonPlayerSlot:dwPick()
+    self.hovertextdw    = CHoverTextClickRG{text = Tic.TEXTPICK}
+    self.clickrg        = function()
+        self.setslotobject(self:getslotobject())
+        self:closeMenu()
     end
 end
 
@@ -1533,10 +1537,9 @@ CButtonPlayerSlotMenuPick.BEHAVIOUR = function(self)
     local _stat          = self.stat
 
     if _isheader then
-        self:upDoneClose()
+        self:upDone()
         if not _slotobject and not _stat then
-            -- pick
-            self.hovertextrg = CHoverTextInfos{text = "Blop"}
+            self:dwPick()
         elseif _stat == Tic.TEXTPHY then
             self.sprite = CButtonEntitySlot.SPRITEPHY
             self.sprite.palette = Tables:merge(self.sprite.palette, {[Tic.COLORWHITE] = _entity:colorPhyAct()})
@@ -1560,6 +1563,9 @@ CButtonPlayerSlotMenuPick.BEHAVIOUR = function(self)
             }
         end
     else
+        self:upDrop()
+        self:upmdkUse()
+        self:dwPick()
     end
 end
 function CButtonPlayerSlotMenuPick:new(_argt)
