@@ -617,6 +617,7 @@ function CButtonPlayerStat:drawInside()
 
     self.sprite.screenx = self.screenx
     self.sprite.screeny = self.screeny
+    self.sprite.flip    = self.entity.dirx
     self.sprite:draw()
 end
 
@@ -1263,6 +1264,12 @@ end
 function CButtonPlayerSlot:dwPick()
     self.hovertextdw    = CHoverTextClickRG{text = Tic.TEXTPICK}
     self.clickrg        = function()
+        if self:getslotobject() then
+            local _whatslot = self:getslotobject():findWhatSlot(self.entity.slots) -- is object already in a slot ?
+            if _whatslot then
+                _whatslot:appendObject(self.oldslotobject)
+            end
+        end
         self.setslotobject(self:getslotobject())
         self:closeMenu()
     end
@@ -1292,6 +1299,13 @@ function CButtonPlayerSlot:htrgPsy()
     self.hovertextrg = CHoverTextInfos{
         text = Tic.TEXTINV..":"
         ..Tables:size(self.entity.inventories.psy.objects).."/"..self.entity:statpsymaxGet()
+    }
+end
+
+function CButtonPlayerSlot:htrgBag()
+    self.hovertextrg = CHoverTextInfos{
+        text = self:getslotobject():stringNameKind().." "..Tables:size(self:getslotobject().inventory.objects).."/"
+        ..self:getslotobject().inventory.objectsmax
     }
 end
 
@@ -1580,6 +1594,8 @@ CButtonPlayerSlotMenuPick.BEHAVIOUR = function(self)
             self.sprite = CButtonEntitySlot.SPRITEPSY
             self.sprite.palette = Tables:merge(self.sprite.palette, {[Tic.COLORWHITE] = _entity:colorPsyAct()})
             self:htrgPsy()
+        else
+            self:htrgBag()
         end
     else
         self:upDrop()
