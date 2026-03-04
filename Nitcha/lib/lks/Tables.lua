@@ -108,7 +108,7 @@ function Tables:valFind(_table, _find) -- return the key of val _find else nil i
 end
 
 
--- Append, Delete, Insert, Remove
+-- Append, Delete, Insert, Remove, Concat
 function Tables:keyAppend(_table, _key, _val) -- append/replace a key val entry
     if not _table or not _key then return end -- mandatory
     _val = _val or true
@@ -154,6 +154,10 @@ function Tables:valRemove(_table, _val, _one) -- remove a val entry (ipaired tab
     end
 end
 
+function Tables:concat(_table1, _table2)
+    if not _table1 or not _table2 then return end -- mandatory
+    return {table.unpack(_table1), table.unpack(_table2)}
+end
 
 -- Do and DoIf
 function Tables:eachDo(_table, _do)

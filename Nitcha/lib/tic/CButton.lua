@@ -1309,6 +1309,20 @@ function CButtonPlayerSlot:htrgBag()
     }
 end
 
+function CButtonPlayerSlot:htrgObject()
+    self.hovertextrg = CHoverTextInfos{
+        text = self:getslotobject():stringNameKind()
+    }
+end
+
+function CButtonPlayerSlot:htrgBagOrObject()
+    if self:getslotobject():isBag() then
+        self:htrgBag()
+    else
+        self:htrgObject()
+    end
+end
+
 function CButtonPlayerSlot:menuPick()
     local _menuscreen    = CScreen{} -- new menus screen
     local _screenx       = self.screenx
@@ -1347,51 +1361,52 @@ function CButtonPlayerSlot:menuPick()
         }
     end
 
+    local function _appendstatobjects(_argt)
+        local _statobjects = _argt.statinventory:objectsOfSlotType(_slottype)
+        if Tables:notempty(_statobjects) then
+            local _windowmenu = _appendwindowmenu()
+            _appendbutton{windowmenu = _windowmenu, isheader = true, slotobject = nil, stat = _argt.stat}
+            for _, _statobject in ipairs(_statobjects) do
+                _appendbutton{windowmenu = _windowmenu, isheader = false, slotobject = _statobject, stat = nil}
+            end
+            _statobjects = _argt.statinventory:objectsNotOfSlotType(_slottype)
+            for _, _statobject in ipairs(_statobjects) do
+                _appendbutton{windowmenu = _windowmenu, isheader = true, slotobject = _statobject, stat = nil}
+            end
+        end
+    end
+
+    local function _appendbagsobjects(_bags)
+        for _, _bag in ipairs(_bags) do
+            local _bagobjects = _bag.inventory:objectsOfSlotType(_slottype)
+            if Tables:notempty(_bagobjects) then
+                local _windowmenu = _appendwindowmenu()
+                _appendbutton{windowmenu = _windowmenu, isheader = true, slotobject = _bag, stat = nil}
+                for _, _bagobject in ipairs(_bagobjects) do
+                    _appendbutton{windowmenu = _windowmenu, isheader = false, slotobject = _bagobject, stat = nil}
+                end
+                _bagobjects = _bag.inventory:objectsNotOfSlotType(_slottype)
+                for _, _bagobject in ipairs(_bagobjects) do
+                    _appendbutton{windowmenu = _windowmenu, isheader = true, slotobject = _bagobject, stat = nil}
+                end
+            end
+        end
+    end
+
     local _windowmenu = _appendwindowmenu() -- empty object
     _appendbutton{windowmenu = _windowmenu, isheader = true, slotobject = nil, stat = nil}
 
-    local _objects = _entity:objectsPhyOfSlotType(_slottype) -- phy objects
-    if Tables:notempty(_objects) then
-        local _windowmenu = _appendwindowmenu()
-        _appendbutton{windowmenu = _windowmenu, isheader = true, slotobject = nil, stat = Tic.TEXTPHY}
-        for _, _object in ipairs(_objects) do
-            _appendbutton{windowmenu = _windowmenu, isheader = false, slotobject = _object, stat = nil}
-        end
-    end
+    _appendstatobjects{stat = Tic.TEXTPHY, statinventory = _entity.inventories.phy} -- phy objects
 
-    local _objects = _entity:objectsMenOfSlotType(_slottype) -- men objects
-    if Tables:notempty(_objects) then
-        local _windowmenu = _appendwindowmenu()
-        _appendbutton{windowmenu = _windowmenu, isheader = true, slotobject = nil, stat = Tic.TEXTMEN}
-        for _, _object in ipairs(_objects) do
-            _appendbutton{windowmenu = _windowmenu, isheader = false, slotobject = _object, stat = nil}
-        end
-    end
+    _appendbagsobjects(_entity:bagsPhy())
 
-    local _objects = _entity:objectsPsyOfSlotType(_slottype) -- psy objects
-    if Tables:notempty(_objects) then
-        local _windowmenu = _appendwindowmenu()
-        _appendbutton{windowmenu = _windowmenu, isheader = true, slotobject = nil, stat = Tic.TEXTPSY}
-        for _, _object in ipairs(_objects) do
-            _appendbutton{windowmenu = _windowmenu, isheader = false, slotobject = _object, stat = nil}
-        end
-    end
+    _appendstatobjects{stat = Tic.TEXTMEN, statinventory = _entity.inventories.men} -- men objects
 
-    local _bags = {} -- bags and bags objects
-    for _, _bag in ipairs(_entity:bags()) do
-        local _bagobjects = _bag.inventory:objectsOfSlotType(_slottype)
-        if Tables:notempty(_bagobjects) then
-            Tables:keyAppend(_bags, _bag, _bagobjects)
-        end
-    end
+    _appendbagsobjects(_entity:bagsMen())
 
-    for _bag, _bagobjects in pairs(_bags) do
-        local _windowmenu = _appendwindowmenu()
-        _appendbutton{windowmenu = _windowmenu, isheader = true, slotobject = _bag, stat = nil}
-        for _, _bagobject in ipairs(_bagobjects) do
-            _appendbutton{windowmenu = _windowmenu, isheader = false, slotobject = _bagobject, stat = nil}
-        end
-    end
+    _appendstatobjects{stat = Tic.TEXTPSY, statinventory = _entity.inventories.psy} -- psy objects
+
+    _appendbagsobjects(_entity:bagsPsy())
 
     Tic:screenAppend(_menuscreen)
 end
@@ -1471,16 +1486,10 @@ function CButtonPlayerSlot:menuPack()
 end
 
 
--- MENU
-CButtonPlayerSlotMenu = CButtonPlayerSlot:extend() -- generic player slot button
-function CButtonPlayerSlotMenu:upDrop()
-    CButtonPlayerSlotMenu.super.upDrop(self)
-    local _clicklf = self.clicklf
-    self.clicklf = function()
-        _clicklf()
-        self:closeMenu()
-    end
-end
+--
+-- CButtonPlayerSlotMenu
+--
+CButtonPlayerSlotMenu = CButtonPlayerSlot:extend() -- generic player slot menu button
 
 
 --
@@ -1578,6 +1587,7 @@ CButtonPlayerSlotMenuPick.BEHAVIOUR = function(self)
     local _stat          = self.stat
 
     if _isheader then
+        self.colorborder = Tic.COLORGREYM
         self:upDone()
         if not _slotobject and not _stat then
             self:htrgNone()
@@ -1595,11 +1605,12 @@ CButtonPlayerSlotMenuPick.BEHAVIOUR = function(self)
             self.sprite.palette = Tables:merge(self.sprite.palette, {[Tic.COLORWHITE] = _entity:colorPsyAct()})
             self:htrgPsy()
         else
-            self:htrgBag()
+            self:htrgBagOrObject()
         end
     else
         self:upDrop()
         self:upmdkUse()
+        self:htrgBagOrObject()
         self:dwPick()
     end
 end
