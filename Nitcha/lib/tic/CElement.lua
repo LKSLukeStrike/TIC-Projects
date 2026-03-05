@@ -427,3 +427,11 @@ function CElement:hasParent(_parent) -- check if is part of parents line
 
     return false
 end
+
+function CElement:root() -- root parent of an element
+    local _result = self
+    while _result.parent do
+        _result = _result.parent
+    end
+    return _result
+end

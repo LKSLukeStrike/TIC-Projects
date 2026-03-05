@@ -886,7 +886,7 @@ function Tic:screenActual() -- actual screen in the stack
     return Tic.SCREENS.actvalue
 end
 
-function Tic:screenGetLast() -- top screen in the stack
+function Tic:screenLast() -- top screen in the stack
     return Tic.SCREENS:getLast()
 end
 

@@ -64,10 +64,9 @@ end
 
 function CButton:drawGround()
     self:save()
-    self.colorground = (self.hovered)     and self.colorgroundhovered  or self.colorground
-    self.colorground = (self.actived)     and self.colorgroundactived  or self.colorground
-    self.colorground = (not self.enabled) and self.colorgrounddisabled or self.colorground
-    self.colorborder = (not self.enabled) and self.colorborderdisabled or self.colorborder
+    self.colorground = (self.hovered) and self.colorgroundhovered  or self.colorground
+    self.colorground = (self.actived) and self.colorgroundactived  or self.colorground
+    self.colorground = (self.enabled) and self.colorground         or self.colorgrounddisabled
     CButton.super.drawGround(self)
     self:load()
 end
@@ -1164,6 +1163,7 @@ CButtonPlayerSlot.BEHAVIOUR = function(self) -- need at least one player with sl
     CButtonEntitySlot.BEHAVIOUR(self)
     if not self.display then return end -- no slots
     self.enabled = false
+    if not (Tic:screenActual() == Tic.screenLast()) then return end -- has a submenu openS
     self:upDrop()
     self:upmdkUse()
     if self:canPick() then
@@ -1587,7 +1587,7 @@ CButtonPlayerSlotMenuPick.BEHAVIOUR = function(self)
     local _stat          = self.stat
 
     if _isheader then
-        self.colorborder = Tic.COLORGREYM
+        self.colorborder = Tic.COLORGREYL
         self:upDone()
         if not _slotobject and not _stat then
             self:htrgNone()
@@ -1791,7 +1791,7 @@ CButtonSpottingSlot.BEHAVIOUR = function(self) -- need at least one spotting wit
     IButtonSpotting.BEHAVIOUR(self)
     if not self.display then return end -- no spotting
     self.display = (self.entity.slots)
-    if not self.display then return end -- no spotting
+    if not self.display then return end -- no slots
     if self:getslotobject() then
         self.hovertextlf = CHoverTextInfos{text = self:getslotobject():stringKindName()}
     else
