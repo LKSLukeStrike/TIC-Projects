@@ -926,6 +926,7 @@ CButtonPlayerPick = CButtonPortrait:extend() -- generic player pick button
 CButtonPlayerPick.BEHAVIOUR = function(self) -- need at least more than one player
     IButtonPlayerChange.BEHAVIOUR(self)
     if not self.display then return end -- no player
+    if not (Tic:screenActual() == Tic.screenLast()) then self.enabled = false end -- has a submenu open
     if self.enabled then -- more than one player
         self.hovertextdw = CHoverTextClickRG{text = Tic.TEXTPICK}
         self.clickrg     = function() self:menuPick() end
@@ -983,7 +984,7 @@ function CButtonPlayerPick:menuPick()
     local function _appendbutton(_slotobject)
         _windowmenu:appendElements{
             CButtonPlayerPickMenu{
-                screen = _menuscreen,
+                menuscreen = _menuscreen,
                 getslotobject = function() return _slotobject end, -- returns slot object
             }
         }
@@ -1020,7 +1021,7 @@ function CButtonPlayerPick:menuParty()
     local function _appendbutton(_slotobject)
         _windowmenu:appendElements{
             CButtonPlayerPartyMenu{
-                screen = _menuscreen,
+                menuscreen = _menuscreen,
                 getslotobject = function() return _slotobject end, -- returns slot object
             }
         }
@@ -1163,7 +1164,7 @@ CButtonPlayerSlot.BEHAVIOUR = function(self) -- need at least one player with sl
     CButtonEntitySlot.BEHAVIOUR(self)
     if not self.display then return end -- no slots
     self.enabled = false
-    if not (Tic:screenActual() == Tic.screenLast()) then return end -- has a submenu openS
+    if not (Tic:screenActual() == Tic.screenLast()) then return end -- has a submenu open
     self:upDrop()
     self:upmdkUse()
     if self:canPick() then
@@ -1183,11 +1184,7 @@ CButtonPlayerSlot.BEHAVIOUR = function(self) -- need at least one player with sl
         self.clicklfmdk     = nil
     end
     if self.enabled and self:getslotobject() then
-        local _object = self:getslotobject()
-        local _hovertextrg = (_object:isBag())
-            and _object:stringNameKind().." "..Tables:size(_object.inventory.objects).."/".._object.inventory.objectsmax
-            or  _object:stringNameKind()
-        self.hovertextrg = CHoverTextInfos{text = _hovertextrg}
+        self:htrgBagOrObject()
     else
         self.hovertextrg = nil
     end
@@ -1496,87 +1493,6 @@ CButtonPlayerSlotMenu = CButtonPlayerSlot:extend() -- generic player slot menu b
 -- CButtonPlayerSlotMenuPick
 --
 CButtonPlayerSlotMenuPick = CButtonPlayerSlotMenu:extend() -- generic player slot menu pick button
-CButtonPlayerSlotMenuPick.BEHAVIOUR_X = function(self)
-    local _slotobject    = self:getslotobject()
-    local _menuscreen    = self.menuscreen
-    local _entity        = self.entity
-    local _entityslots   = self.entity.slots
-    local _oldslotobject = self.oldslotobject
-    local _isheader      = self.isheader
-    local _stat          = self.stat
-
-    if _slotobject then
-        local _isbag = _slotobject:isBag()
-        self.hovertextrg = (_isbag)
-            and CHoverTextInfos{
-                text = _slotobject:stringNameKind().." "..Tables:size(_slotobject.inventory.objects).."/"
-                .._slotobject.inventory.objectsmax
-            }
-            or  CHoverTextInfos{
-                text = _slotobject:stringNameKind()
-            }
-        if _isheader then
-            self:upDone()
-        else
-            self:upDrop()
-            self.hovertextdw    = CHoverTextClickRG{text = Tic.TEXTPICK}
-            self.clickrg        = function()
-                                    local _whatslot = _slotobject:findWhatSlot(_entityslots) -- is object already in a slot ?
-                                    if _whatslot then
-                                        _whatslot:appendObject(_oldslotobject)
-                                    end
-                                    self.setslotobject(_slotobject)
-                                    Tic:screenRemove(_menuscreen)
-                                    Tic:mouseDelay()
-                                  end
-        end
-    else
-        if _stat then
-            self.hovertextup    = CHoverTextClickLF{text = Tic.TEXTDONE}
-            self.clicklf        = function()
-                                    Tic:screenRemove(_menuscreen)
-                                    Tic:mouseDelay()
-                                  end
-            self.hovertextdw    = nil
-            self.clickrg        = nil
-            if     _stat == Tic.TEXTPHY then
-                self.sprite = CButtonEntitySlot.SPRITEPHY
-                self.sprite.palette = Tables:merge(self.sprite.palette, {[Tic.COLORWHITE] = _entity:colorPhyAct()})
-                self.hovertextrg = CHoverTextInfos{
-                    text = Tic.TEXTINV..":"
-                    ..Tables:size(_entity.inventories.phy.objects).."/".._entity:statphymaxGet()
-                }
-            elseif _stat == Tic.TEXTMEN then
-                self.sprite = CButtonEntitySlot.SPRITEMEN
-                self.sprite.palette = Tables:merge(self.sprite.palette, {[Tic.COLORWHITE] = _entity:colorMenAct()})
-                self.hovertextrg = CHoverTextInfos{
-                    text = Tic.TEXTINV..":"
-                    ..Tables:size(_entity.inventories.men.objects).."/".._entity:statmenmaxGet()
-                }
-            elseif _stat == Tic.TEXTPSY then
-                self.sprite = CButtonEntitySlot.SPRITEPSY
-                self.sprite.palette = Tables:merge(self.sprite.palette, {[Tic.COLORWHITE] = _entity:colorPsyAct()})
-                self.hovertextrg = CHoverTextInfos{
-                    text = Tic.TEXTINV..":"
-                    ..Tables:size(_entity.inventories.psy.objects).."/".._entity:statpsymaxGet()
-                }
-            end
-        else
-            self.hovertextup    = CHoverTextClickLF{text = Tic.TEXTDONE}
-            self.clicklf        = function()
-                                    Tic:screenRemove(_menuscreen)
-                                    Tic:mouseDelay()
-                                  end
-            self.hovertextrg    = nil
-            self.hovertextdw    = CHoverTextClickRG{text = Tic.TEXTPICK}
-            self.clickrg        = function()
-                                    self.setslotobject()
-                                    Tic:screenRemove(_menuscreen)
-                                    Tic:mouseDelay()
-                                  end
-        end
-    end
-end
 CButtonPlayerSlotMenuPick.BEHAVIOUR = function(self)
     local _slotobject    = self:getslotobject()
     local _menuscreen    = self.menuscreen
@@ -1587,7 +1503,7 @@ CButtonPlayerSlotMenuPick.BEHAVIOUR = function(self)
     local _stat          = self.stat
 
     if _isheader then
-        self.colorborder = Tic.COLORGREYL
+        self.colorborder = self.colorborderdisabledS
         self:upDone()
         if not _slotobject and not _stat then
             self:htrgNone()
