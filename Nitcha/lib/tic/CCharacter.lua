@@ -1189,7 +1189,8 @@ function CCharacter:drawParty()
     self.musprite.flip    = self.dirx
     self.musprite.scale   = self.scale
     self.musprite.palette = {
-        -- [Tic.COLORGREYM]  = self.colorhairsbg,
+        [Tic.COLORGREYD]  = self.colorhairsbg,
+        [Tic.COLORGREYM]  = self.colorhairsfg,
         [Tic.COLORPURPLE] = _coloreyesbu,
         [Tic.COLORRED]    = _coloreyesbm,
         [Tic.COLORORANGE] = _coloreyesbd,

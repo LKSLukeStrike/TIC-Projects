@@ -2081,12 +2081,12 @@ end
 -- exit()
 
 
-local _playerclass = CPlayerHuman
+local _playerclass = CPlayerGolth
 if true then
 --
 -- phy
 --
-if false then
+if true then
 if true then
 Walfie = _playerclass{
     name = "Walfie",
@@ -2157,7 +2157,8 @@ end -- phy
 --
 -- men
 --
-if false then
+if true then
+local _playerclass = CPlayerDrowe
 if true then
 Wolfie = _playerclass{
     name = "Wolfie",
@@ -2228,6 +2229,7 @@ end -- men
 -- psy
 --
 if true then
+local _playerclass = CPlayerHuman
 if true then
 W1lfie = _playerclass{
     name = "W1lfie",
