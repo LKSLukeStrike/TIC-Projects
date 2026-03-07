@@ -2229,7 +2229,7 @@ end -- men
 -- psy
 --
 if true then
-local _playerclass = CPlayerHuman
+local _playerclass = CPlayerMeduz
 if true then
 W1lfie = _playerclass{
     name = "W1lfie",

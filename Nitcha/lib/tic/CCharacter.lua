@@ -1236,11 +1236,10 @@ function CCharacter:doSayMessage(_argt)
 end
 
 function CCharacter:doJoinParty(_argt)
-    local _object = self.interactto
-    if not _object then return end
-    _object:leadParty(nil, false)
-    self:joinParty(_object.party, true)
-    Tic:playerPick(_object)
+    local _character = self.interactto
+    if not _character then return end
+    self:joinCharacter(_character, true)
+    Tic:playerPick(_character)
 end
 
 function CCharacter:ifPickObject(_argt)
@@ -1521,10 +1520,16 @@ end
 
 --
 -- Party
--- 
+--
+function CCharacter:joinCharacter(_character, _showmessage)
+    if not _character then return end -- mandatory
+    _character:leadParty(nil, _showmessage)
+    self:joinParty(_character.party, _showmessage)
+end
+
 function CCharacter:leadParty(_party, _showmessage)
     _party = _party or self.party
-    if not _party then return CParty{leader = self} end -- create a party
+    if not _party then return CParty{leader = self} end -- create a party with itself as leader
     return _party:leadMember(self, _showmessage)
 end
 
@@ -1533,5 +1538,7 @@ function CCharacter:joinParty(_party, _showmessage)
     return _party:joinMember(self, _showmessage)
 end
 
-function CCharacter:quitParty()
+function CCharacter:quitParty(_showmessage)
+    if not self.party then return end -- not in a party
+    return self.party:quitMember(self, _showmessage)
 end

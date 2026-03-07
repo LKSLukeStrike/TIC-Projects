@@ -47,6 +47,10 @@ function CParty:hasMember(_member)
     return Tables:valFind(self.members, _member)
 end
 
+function CParty:isLeader(_member)
+    return self.leader == _member
+end
+
 function CParty:adjustStats() -- adjust stats to the members max
     if not self:hasMembers() then return end -- no members
 
@@ -59,7 +63,7 @@ function CParty:adjustStats() -- adjust stats to the members max
 end
 
 function CParty:leadMember(_member, _showmessage)
-    if (not _member) or (self.leader == _member) or (not self:hasMember(_member)) then return end
+    if (not _member) or (not self:hasMember(_member)) or (self:isLeader(_member)) then return end
 
     self:applyLeaderToMember(_member)
     self.leader:remove()
@@ -67,7 +71,7 @@ function CParty:leadMember(_member, _showmessage)
     self.leader:append()
 
     if _showmessage then
-        Tic:messageAppend(_member:nameGet().." "..Tic.TEXTLEAD..": ".._member:nameGet().." ".._member:kindGet())
+        Tic:messageAppend(_member:nameGet().." "..Tic.TEXTLEAD..": "..self.leader:stringNameKind())
     end
     return self
 end
@@ -83,7 +87,8 @@ function CParty:joinMember(_member, _showmessage)
     self:adjustStats()
 
     if _showmessage then
-        Tic:messageAppend(_member:nameGet().." "..Tic.TEXTJOIN..": "..self.leader:nameGet().." "..self.leader:kindGet())
+        -- Tic:messageAppend(_member:nameGet().." "..Tic.TEXTJOIN..": "..self.leader:nameGet().." "..self.leader:kindGet())
+        Tic:messageAppend(_member:nameGet().." "..Tic.TEXTJOIN..": "..self.leader:stringNameKind())
     end
     return self
 end
@@ -96,6 +101,20 @@ function CParty:joinParty(_party, _showmessage)
         self:joinMember(_member, _showmessage)
     end
     _party = nil -- useless ?
+    return self
+end
+
+function CParty:quitMember(_member, _showmessage)
+    if (not _member) or (not self:hasMember(_member)) then return end
+
+    -- self:applyLeaderToMember(_member)
+    -- self.leader:remove()
+    -- self.leader = _member
+    -- self.leader:append()
+
+    if _showmessage then
+        Tic:messageAppend(_member:nameGet().." "..Tic.TEXTQUIT..": "..self.leader:stringNameKind())
+    end
     return self
 end
 
