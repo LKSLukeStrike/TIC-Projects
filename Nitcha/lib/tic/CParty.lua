@@ -47,7 +47,7 @@ function CParty:hasMember(_member)
     return Tables:valFind(self.members, _member)
 end
 
-function CParty:isLeader(_member)
+function CParty:hasLeader(_member)
     return self.leader == _member
 end
 
@@ -63,7 +63,7 @@ function CParty:adjustStats() -- adjust stats to the members max
 end
 
 function CParty:leadMember(_member, _showmessage)
-    if (not _member) or (not self:hasMember(_member)) or (self:isLeader(_member)) then return end
+    if (not _member) or (not self:hasMember(_member)) or (self:hasLeader(_member)) then return end
 
     self:applyLeaderToMember(_member)
     self.leader:remove()
@@ -87,7 +87,6 @@ function CParty:joinMember(_member, _showmessage)
     self:adjustStats()
 
     if _showmessage then
-        -- Tic:messageAppend(_member:nameGet().." "..Tic.TEXTJOIN..": "..self.leader:nameGet().." "..self.leader:kindGet())
         Tic:messageAppend(_member:nameGet().." "..Tic.TEXTJOIN..": "..self.leader:stringNameKind())
     end
     return self
@@ -107,6 +106,9 @@ end
 function CParty:quitMember(_member, _showmessage)
     if (not _member) or (not self:hasMember(_member)) then return end
 
+    if self:hasLeader(_member) then -- pick up another leader
+        if not self:newLeader(_showmessage) then return end
+    end
     -- self:applyLeaderToMember(_member)
     -- self.leader:remove()
     -- self.leader = _member
@@ -116,6 +118,13 @@ function CParty:quitMember(_member, _showmessage)
         Tic:messageAppend(_member:nameGet().." "..Tic.TEXTQUIT..": "..self.leader:stringNameKind())
     end
     return self
+end
+
+function CParty:newLeader(_showmessage)
+    for _, _member in ipairs(self.members) do -- pick up another leader
+        if not self:hasLeader(_member) then return self:leadMember(_member, _showmessage) end
+    end
+    return -- nil
 end
 
 function CParty:applyLeaderToMember(_member)
