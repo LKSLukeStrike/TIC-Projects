@@ -43,6 +43,10 @@ function CParty:hasMembers()
     return Tables:size(self.members) > 0
 end
 
+function CParty:hasEnoughMembers()
+    return Tables:size(self.members) > 1
+end
+
 function CParty:hasMember(_member)
     return Tables:valFind(self.members, _member)
 end
@@ -109,13 +113,21 @@ function CParty:quitMember(_member, _showmessage)
     if self:hasLeader(_member) then -- pick up another leader
         if not self:newLeader(_showmessage) then return end
     end
-    -- self:applyLeaderToMember(_member)
-    -- self.leader:remove()
-    -- self.leader = _member
-    -- self.leader:append()
+
+    local _trials = self.leader:trialsDropping() -- prepare the trials for dropping
+    self.leader.world:appendEntity(_member, Tic.SPRITESIZE, _trials) -- drop the member aroundb the leader
+    _member:append()
+
+    Tables:valRemove(self.members, _member)
 
     if _showmessage then
         Tic:messageAppend(_member:nameGet().." "..Tic.TEXTQUIT..": "..self.leader:stringNameKind())
+    end
+
+    if self:hasEnoughMembers() then
+        self:adjustStats()
+    else
+        self.leader.party = nil -- not a party anymore
     end
     return self
 end
